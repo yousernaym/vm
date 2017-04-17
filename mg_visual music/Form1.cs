@@ -86,7 +86,10 @@ namespace Visual_Music
 			ResizeRedraw = true;
 
             songScrollBar.Dock = DockStyle.Bottom;
-            songScrollBar.Scroll += delegate { };
+            songScrollBar.Scroll += delegate {
+                songPanel.NormSongPos = (double)songScrollBar.Value / songScrollBar.Maximum;
+                songPanel.Invalidate();
+            };
             Controls.Add(songScrollBar);
             songScrollBar.BringToFront();
 
@@ -199,8 +202,11 @@ namespace Visual_Music
 			audioOffsetS.Value = (decimal)songPanel.AudioOffset;
 			maxPitchUd.Value = songPanel.Notes.MaxPitch;
 			minPitchUd.Value = songPanel.Notes.MinPitch;
-			
-		}
+
+            songScrollBar.Maximum = songPanel.SongLengthT;
+            songScrollBar.Value = songPanel.SongPosT;
+            upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
+        }
 
 		//void updateFormWithSongProps(string noteFilename = "")
 		//{
@@ -313,7 +319,9 @@ namespace Visual_Music
 		{
 			//songPanel.Invalidate();
 			songPanel.Qn_viewWidth = (float)((TbSlider)sender).Value;
-		}
+            songScrollBar.SmallChange = songPanel.ViewWidthT / 100;
+            songScrollBar.LargeChange = songPanel.ViewWidthT / 10;
+        }
 
 		private void audioOffsetS_ValueChanged(object sender, EventArgs e)
 		{
@@ -996,7 +1004,9 @@ namespace Visual_Music
 		private void invalidateSongPanel(object sender, EventArgs e)
 		{
 			songPanel.Invalidate();
+            songScrollBar.Value = songPanel.SongPosT;
 		}
+
 		void toggleIdleRendering(bool b)
 		{
 			if (b)

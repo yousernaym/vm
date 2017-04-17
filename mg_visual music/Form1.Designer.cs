@@ -322,7 +322,7 @@
             this.playbackToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(956, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(973, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -384,7 +384,7 @@
             this.trackPropsPanel.Controls.Add(this.trackList);
             this.trackPropsPanel.Controls.Add(this.leftTrackPropsPanel);
             this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.trackPropsPanel.Location = new System.Drawing.Point(561, 24);
+            this.trackPropsPanel.Location = new System.Drawing.Point(578, 24);
             this.trackPropsPanel.Name = "trackPropsPanel";
             this.trackPropsPanel.Size = new System.Drawing.Size(395, 10052);
             this.trackPropsPanel.TabIndex = 3;
@@ -1688,7 +1688,7 @@
             // textureBrowseBtn
             // 
             this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textureBrowseBtn.Location = new System.Drawing.Point(-1920, 10055);
+            this.textureBrowseBtn.Location = new System.Drawing.Point(-1937, 10055);
             this.textureBrowseBtn.Name = "textureBrowseBtn";
             this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
             this.textureBrowseBtn.TabIndex = 11;
@@ -1700,7 +1700,7 @@
             // texPathTb
             // 
             this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.texPathTb.Location = new System.Drawing.Point(-2032, 10056);
+            this.texPathTb.Location = new System.Drawing.Point(-2049, 10056);
             this.texPathTb.Name = "texPathTb";
             this.texPathTb.Size = new System.Drawing.Size(123, 20);
             this.texPathTb.TabIndex = 10;
@@ -1710,7 +1710,7 @@
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(-2035, 10040);
+            this.label4.Location = new System.Drawing.Point(-2052, 10040);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(43, 13);
             this.label4.TabIndex = 9;
@@ -1896,7 +1896,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.AutoScroll = true;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(973, 407);
+            this.ClientSize = new System.Drawing.Size(990, 407);
             this.Controls.Add(this.propsTogglePanel);
             this.Controls.Add(this.songPropsPanel);
             this.Controls.Add(this.resetDefaultBtn);

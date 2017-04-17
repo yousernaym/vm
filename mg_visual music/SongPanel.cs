@@ -157,8 +157,11 @@ namespace Visual_Music
 			get { return modInsTrack; }
 		}
 		Point videoSize = new Point(1920, 1080);
-		double normSongPos;
-		const float defaultQn_viewWidth = 16; //Number of quarter notes that fits on screen
+        public int SongLengthT { get { return notes != null ? notes.SongLengthInTicks : 0; } }
+        public int SongPosT { get { return (int)(normSongPos * SongLengthT); } }
+        double normSongPos;
+        public double NormSongPos { get => normSongPos; set => normSongPos = value; }
+        const float defaultQn_viewWidth = 16; //Number of quarter notes that fits on screen
 		float qn_viewWidth = defaultQn_viewWidth; 
 		public double AudioOffset { get; set; }
 		public float Qn_viewWidth
@@ -168,11 +171,14 @@ namespace Visual_Music
 			{
 				qn_viewWidth = value;
 				if (notes != null)
-					ticks_viewWidth = (int)(qn_viewWidth * notes.TimeDiv);
+					viewWidthT = (int)(qn_viewWidth * notes.TimeDiv);
 			}
 		}
-		int ticks_viewWidth; ////Number of ticks that fits on screen
-		
+    
+
+        int viewWidthT; ////Number of ticks that fits on screen
+        public int ViewWidthT { get => viewWidthT; }
+	
 		public SongPanel()
 		{
 		}
@@ -434,12 +440,12 @@ namespace Visual_Music
 		}
 		int screenPosToSongPos(float normScreenPos)
 		{
-			return (int)(normSongPos * notes.SongLengthInTicks + (double)normScreenPos * ticks_viewWidth * 0.5f);
+			return (int)(normSongPos * notes.SongLengthInTicks + (double)normScreenPos * viewWidthT * 0.5f);
 		}
 		Point getVisibleSongPortionT(double normPos)
 		{
 			int posT = (int)(normPos * notes.SongLengthInTicks);
-			return new Point(posT - ticks_viewWidth, posT + ticks_viewWidth);
+			return new Point(posT - viewWidthT, posT + viewWidthT);
 		}
 		int getPitch(float normPosY)
 		{
@@ -504,10 +510,10 @@ namespace Visual_Music
 			SongDrawProps songDrawProps = new SongDrawProps();
 			songDrawProps.yMargin = (int)(normPitchMargin * viewportSize.Y);
 			songDrawProps.noteHeight = (float)(viewportSize.Y - songDrawProps.yMargin * 2) / (notes.NumPitches);
-			songDrawProps.songPosT = (int)(normPos * notes.SongLengthInTicks);
+            songDrawProps.songPosT = SongPosT;
 			songDrawProps.songPosS = (float)getSongPosInSeconds();
 			songDrawProps.viewportSize = viewportSize;
-			songDrawProps.viewWidthT = ticks_viewWidth;
+			songDrawProps.viewWidthT = viewWidthT;
 			songDrawProps.song = notes;
 
 			for (int t=notes.Tracks.Count-1;t>=0;t--)
@@ -567,7 +573,7 @@ namespace Visual_Music
 
 				notes.createNoteBsp();
 				
-				ticks_viewWidth = (int)(Qn_viewWidth * notes.TimeDiv);
+				viewWidthT = (int)(Qn_viewWidth * notes.TimeDiv);
 				createTrackProps(notes.Tracks.Count, eraseCurrent);
 			}
 			catch (Exception e)
@@ -604,8 +610,8 @@ namespace Visual_Music
 			//    GdiPoint clientP = PointToClient(location);
 			//    int t = 0;
 			//    float noteHeight = ClientRectangle.Height / (notes.NumPitches + 1);
-			//    GdiPoint songP = new GdiPoint((int)(clientP.X * ticks_viewWidth / ClientRectangle.Width - ticks_viewWidth / 2 + normSongPos * notes.SongLengthInTicks), (int)((ClientRectangle.Height - (clientP.Y + noteHeight)) * (notes.NumPitches + 1) / ClientRectangle.Height));
-			//    //Point songP2 = new Point((int)((clientP.X - panel1.AutoScrollPosition.X) * notes.SongLengthInTicks / (panel1.AutoScrollMinSize.Width + panel1.ClientRectangle.Width) - ticks_viewWidth / 2), (int)((panel1.ClientRectangle.Height - (clientP.Y + noteHeight)) * (notes.NumPitches + 1) / panel1.ClientRectangle.Height));
+			//    GdiPoint songP = new GdiPoint((int)(clientP.X * viewWidthT / ClientRectangle.Width - viewWidthT / 2 + normSongPos * notes.SongLengthInTicks), (int)((ClientRectangle.Height - (clientP.Y + noteHeight)) * (notes.NumPitches + 1) / ClientRectangle.Height));
+			//    //Point songP2 = new Point((int)((clientP.X - panel1.AutoScrollPosition.X) * notes.SongLengthInTicks / (panel1.AutoScrollMinSize.Width + panel1.ClientRectangle.Width) - viewWidthT / 2), (int)((panel1.ClientRectangle.Height - (clientP.Y + noteHeight)) * (notes.NumPitches + 1) / panel1.ClientRectangle.Height));
 			//    if (songP.X < 0)
 			//        return;
 			//    int x = songP.X;

@@ -270,7 +270,7 @@ namespace Visual_Music
 				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
 				Vector2 noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch);
 
-				//noteDrawProps.nextNoteX = (int)(((float)(nextNote.start - songPos) / ticks_viewWidth + 0.5) * viewportSize.X);
+				//noteDrawProps.nextNoteX = (int)(((float)(nextNote.start - songPos) / viewWidthT + 0.5) * viewportSize.X);
 				//noteDrawProps.nextNoteY = viewportSize.Y - (nextNote.pitch - notes.MinPitch) * noteHeight - noteHeight / 2 - yMargin;
 
 				Color color;
