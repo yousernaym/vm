@@ -324,8 +324,8 @@ technique Simple
 	pass
 	{
 		CullMode = None;
-		VertexShader = compile vs_4_0 VS();
-		PixelShader  = compile ps_4_0 SimplePS();
+		VertexShader = compile vs_5_0 VS();
+		PixelShader  = compile ps_5_0 SimplePS();
 	}
 }
 
@@ -334,8 +334,8 @@ technique Lighting
 	pass
 	{
 		CullMode = None;
-		VertexShader = compile vs_4_0 VS();
-		PixelShader  = compile ps_4_0 LightingPS();
+		VertexShader = compile vs_5_0 VS();
+		PixelShader  = compile ps_5_0 LightingPS();
 	}
 }
 
@@ -344,14 +344,14 @@ technique Arrow
 	pass Area
 	{
 		CullMode = None;
-		VertexShader = compile vs_4_0 VS();
-		PixelShader  = compile ps_4_0 ArrowAreaPS();
+		VertexShader = compile vs_5_0 VS();
+		PixelShader  = compile ps_5_0 ArrowAreaPS();
 	}
 	/*pass Border
 	{
 		CullMode = None;
-		VertexShader = compile vs_4_0 VS();
-		PixelShader  = compile ps_4_0 ArrowBorderPS();
+		VertexShader = compile vs_5_0 VS();
+		PixelShader  = compile ps_5_0 ArrowBorderPS();
 	}*/
 }
 
@@ -360,7 +360,7 @@ technique Circle
 	pass
 	{
 		CullMode = None;
-		VertexShader = compile vs_4_0 VS();
-		PixelShader  = compile ps_4_0 CirclePS();
+		VertexShader = compile vs_5_0 VS();
+		PixelShader  = compile ps_5_0 CirclePS();
 	}
 }
