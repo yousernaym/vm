@@ -1,0 +1,4 @@
+﻿- Use shader for bar rendering and add rendering options for bar style.
+- Don't clamp brightness before modilating with texture.
+- Swap r and b channels in texture sample in shader when rendering video.
+- Bump mapping.
