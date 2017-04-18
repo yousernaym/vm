@@ -27,7 +27,11 @@ namespace Visual_Music
 		int MaxTrackTexPbWidth;
 		
 		EventHandler eh_invalidateSongPanel;
-		string vmSongFolder = "";
+		string VmSongFolder
+        { get => openProjDialog.InitialDirectory;
+          set { openProjDialog.InitialDirectory = saveProjDialog.InitialDirectory = value; }
+        }
+                 
 		string currentSongPath = "";
 		public ListView.ListViewItemCollection trackListItems
 		{
@@ -83,9 +87,9 @@ namespace Visual_Music
                     importModForm.AudioFolder = file.ReadLine();
                     saveVideoDlg.InitialDirectory = file.ReadLine();
 					openTextureDlg.InitialDirectory = file.ReadLine();
-					vmSongFolder = file.ReadLine();
-					openProjDialog.InitialDirectory = vmSongFolder;
-					saveProjDialog.InitialDirectory = vmSongFolder;
+					VmSongFolder = file.ReadLine();
+					openProjDialog.InitialDirectory = VmSongFolder;
+					saveProjDialog.InitialDirectory = VmSongFolder;
 				}
 			}
 			catch
@@ -313,9 +317,7 @@ namespace Visual_Music
             file.WriteLine(importModForm.AudioFolder);
             file.WriteLine(saveVideoDlg.InitialDirectory);
 			file.WriteLine(openTextureDlg.InitialDirectory);
-			openProjDialog.InitialDirectory = vmSongFolder;
-			saveProjDialog.InitialDirectory = vmSongFolder;
-			file.WriteLine(vmSongFolder);
+			file.WriteLine(VmSongFolder);
 			file.Close();
 		}
 
@@ -901,7 +903,7 @@ namespace Visual_Music
 		{
 			if (openProjDialog.ShowDialog() != DialogResult.OK)
 				return;
-			vmSongFolder = Path.GetDirectoryName(openProjDialog.FileName);
+			VmSongFolder = Path.GetDirectoryName(openProjDialog.FileName);
 			writeFolderNames();
 			openSongFile(openProjDialog.FileName);
 		}
@@ -979,7 +981,7 @@ namespace Visual_Music
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
 				return;
 			currentSongPath = saveProjDialog.FileName;
-			vmSongFolder = Path.GetDirectoryName(currentSongPath);
+			VmSongFolder = Path.GetDirectoryName(currentSongPath);
 			writeFolderNames();
 			saveSong();
 		}
