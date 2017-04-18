@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mg_visual music", "mg_visual music\mg_visual music.csproj", "{8D50C4D0-B932-47E1-88E2-971A33A1926A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE} = {EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}
+		{883D1FB6-BB56-4D7D-9AD3-785BB2076ED9} = {883D1FB6-BB56-4D7D-9AD3-785BB2076ED9}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "midilib", "..\MyLibs\midilib\midilib.csproj", "{F46482EC-DD3F-43B4-8D80-CB706A0B0EA4}"
 EndProject

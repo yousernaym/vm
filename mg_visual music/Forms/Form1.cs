@@ -33,16 +33,21 @@ namespace Visual_Music
 		{
 			get { return trackList.Items; }
 		}
-		Graphics trackListGfxObj;
+
+        bool AudioLoaded { get { return !isEmpty(importMidiForm.AudioFilePath) || !isEmpty(importModForm.AudioFilePath); } }
+
+        Graphics trackListGfxObj;
 		Pen trackListPen = new Pen(System.Drawing.Color.White);
 		bool updatingControls = false;
 
 		TrackProps selectedTrackProps;
 		const string trackPropsBtnText = "&Track Properties";
 		string foldersFileName = Program.Path+"\\folders";
-		SourceFileForm sourceFileForm;
+		//SourceFileForm sourceFileForm;
+        ImportMidiForm importMidiForm;
+        ImportModForm importModForm;
 
-		SongPanel songPanel = new SongPanel();
+        SongPanel songPanel = new SongPanel();
         ScrollBar songScrollBar = new HScrollBar();
         //Panel trackPropsPanel = new Panel();
         //public int SelectedTrack
@@ -62,18 +67,21 @@ namespace Visual_Music
 			ControlStyles.UserPaint |
 			ControlStyles.AllPaintingInWmPaint, true);
 
-			sourceFileForm = new SourceFileForm(this);
-			//trackPropsPanel =  new TrackPropsPanel(songPanel);
-			//showTrackPropsBtn.Text = "Show " + trackPropsBtnText;
-			
-			try
+			importMidiForm = new ImportMidiForm(this);
+            importModForm = new ImportModForm(this);
+            //trackPropsPanel =  new TrackPropsPanel(songPanel);
+            //showTrackPropsBtn.Text = "Show " + trackPropsBtnText;
+
+            try
 			{
 				//MessageBox.Show(foldersFileName);
 				using (StreamReader file = new StreamReader(foldersFileName))
 				{
-					sourceFileForm.NoteFolder = file.ReadLine();
-					sourceFileForm.AudioFolder = file.ReadLine();
-					saveVideoDlg.InitialDirectory = file.ReadLine();
+					importMidiForm.NoteFolder = file.ReadLine();
+                    importModForm.NoteFolder = file.ReadLine();
+                    importMidiForm.AudioFolder = file.ReadLine();
+                    importModForm.AudioFolder = file.ReadLine();
+                    saveVideoDlg.InitialDirectory = file.ReadLine();
 					openTextureDlg.InitialDirectory = file.ReadLine();
 					vmSongFolder = file.ReadLine();
 					openProjDialog.InitialDirectory = vmSongFolder;
@@ -115,17 +123,25 @@ namespace Visual_Music
 			//upDownVpWidth.Value = songPanel.Qn_viewWidth;
 
 			bool bSongFile = false;
-			bool bImportFiles = false;
-			string noteFile = null, audioFile = null;
+			bool bMidiFile = false;
+            bool bModFile = false;
+            bool bImportFiles = false;
+            //string noteFile = null;
+            string audioFile = null;
 			foreach (string arg in startupArgs)
 			{
 				string ext = Path.GetExtension(arg);
-				if (ext == ".mid" || ext == ".mod" || ext == ".xm" || ext == ".s3m" || ext == ".it" || ext == ".stm")
+				if (ext == ".mid")
 				{
-					noteFile = arg;
-					bImportFiles = true;
+					importMidiForm.NoteFilePath = arg;
+                    bMidiFile = bImportFiles = true;
 				}
-				else if (ext == ".wav" || ext == ".mp3")
+                else if (ext == ".mod" || ext == ".xm" || ext == ".s3m" || ext == ".it" || ext == ".stm")
+                {
+                    importModForm.NoteFilePath = arg;
+                    bModFile = bImportFiles = true;
+                }
+                else if (ext == ".wav" || ext == ".mp3")
 				{
 					audioFile = arg;
 					bImportFiles = true;
@@ -139,9 +155,17 @@ namespace Visual_Music
 			}
 			if (!bSongFile && bImportFiles)
 			{
-				sourceFileForm.NoteFilePath = noteFile;
-				sourceFileForm.AudioFilePath = audioFile;
-				newProjectToolStripMenuItem.PerformClick();
+                if (bModFile)
+                {
+                    importModForm.AudioFilePath = audioFile;
+                    importModuleToolStripMenuItem.PerformClick();
+                }
+                else
+                {
+                    importMidiForm.AudioFilePath = audioFile;
+                    importMidiToolStripMenuItem.PerformClick();
+                }
+                
 			}
 		}
 		void addInvalidateEH(Control.ControlCollection controls)
@@ -164,20 +188,18 @@ namespace Visual_Music
 			}
 		}
 
-		private void newProjectToolStripMenuItem_Click(object sender, EventArgs e)
+		private void importMidiSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (sourceFileForm.ShowDialog(this) == DialogResult.OK)
-			{
-				writeFolderNames();
-				songLoaded(sourceFileForm.NoteFilePath);
-				if (sourceFileForm.EraseCurrent)
-				{
-					currentSongPath = "";
-					updateFormTitle("");
-				}
-			}
+            if (importMidiForm.ShowDialog(this) == DialogResult.OK)
+                songPanel.IsMod = false;
 		}
-		void songLoaded(string path)
+        private void importModuleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (importModForm.ShowDialog(this) == DialogResult.OK)
+                songPanel.IsMod = true;
+        }
+                
+        void songLoaded(string path)
 		{
 			bool loaded = !isEmpty(path);
 			propsTogglePanel.Enabled = loaded;
@@ -189,8 +211,8 @@ namespace Visual_Music
 			saveSongToolStripMenuItem.Enabled = loaded;
 			saveSongAsToolStripMenuItem.Enabled = loaded;
 			exportVideoToolStripMenuItem.Enabled = loaded;
-			//startStopToolStripMenuItem.Enabled = !isEmpty(sourceFileForm.AudioFilePath);
-			playbackToolStripMenuItem.Enabled = !isEmpty(sourceFileForm.AudioFilePath);
+            //startStopToolStripMenuItem.Enabled = !isEmpty(sourceFileForm.AudioFilePath);
+            playbackToolStripMenuItem.Enabled = AudioLoaded;
 			
 			//if (loaded)
 			//{
@@ -225,7 +247,19 @@ namespace Visual_Music
 
 		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack)
 		{
-			return songPanel.importSong(notePath, audioPath, eraseCurrent, modInsTrack);
+            writeFolderNames();
+            if (songPanel.importSong(notePath, audioPath, eraseCurrent, modInsTrack))
+            {
+                songLoaded(notePath);
+                if (eraseCurrent)
+                {
+                    currentSongPath = "";
+                    updateFormTitle("");
+                }
+                return true;
+            }
+            else
+                return false;
 		}
 
 		private void panel1_MouseDown(object sender, MouseEventArgs e)
@@ -273,9 +307,11 @@ namespace Visual_Music
 		void writeFolderNames()
 		{
 			StreamWriter file = new StreamWriter(foldersFileName);
-			file.WriteLine(sourceFileForm.NoteFolder);
-			file.WriteLine(sourceFileForm.AudioFolder);
-			file.WriteLine(saveVideoDlg.InitialDirectory);
+			file.WriteLine(importMidiForm.NoteFolder);
+            file.WriteLine(importModForm.NoteFolder);
+            file.WriteLine(importMidiForm.AudioFolder);
+            file.WriteLine(importModForm.AudioFolder);
+            file.WriteLine(saveVideoDlg.InitialDirectory);
 			file.WriteLine(openTextureDlg.InitialDirectory);
 			openProjDialog.InitialDirectory = vmSongFolder;
 			saveProjDialog.InitialDirectory = vmSongFolder;
@@ -884,11 +920,19 @@ namespace Visual_Music
 					//songPanel.deserializeTrackProps(bf, stream);
 				}
 				initSongPanel(songPanel);
-                
-				sourceFileForm.NoteFilePath = songPanel.NoteFilePath;
-				sourceFileForm.AudioFilePath = songPanel.AudioFilePath;
-				sourceFileForm.ModInsTrack = songPanel.ModInsTrack;
-				currentSongPath = fileName;
+
+                if (songPanel.IsMod)
+                {
+                    importModForm.NoteFilePath = songPanel.NoteFilePath;
+                    importModForm.AudioFilePath = songPanel.AudioFilePath;
+                    importModForm.ModInsTrack = songPanel.ModInsTrack;
+                }
+                else
+                {
+                    importMidiForm.NoteFilePath = songPanel.NoteFilePath;
+                    importMidiForm.AudioFilePath = songPanel.AudioFilePath;
+                }
+                currentSongPath = fileName;
 				songLoaded(currentSongPath);
 				updateFormTitle(currentSongPath);
 			}
@@ -1402,7 +1446,8 @@ namespace Visual_Music
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).KeepAspect = ((CheckBox)sender).Checked;
 		}
-    }
+
+            }
     static class SongFormat
 	{
 		public const int WriteVersion = 1;

@@ -34,7 +34,8 @@
             this.saveVideoDlg = new System.Windows.Forms.SaveFileDialog();
             this.audioOffsetS = new System.Windows.Forms.NumericUpDown();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importMidiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importModuleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openSongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveSongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveSongAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -262,7 +263,8 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newProjectToolStripMenuItem,
+            this.importMidiToolStripMenuItem,
+            this.importModuleToolStripMenuItem,
             this.openSongToolStripMenuItem,
             this.saveSongToolStripMenuItem,
             this.saveSongAsToolStripMenuItem,
@@ -271,20 +273,29 @@
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
-            // newProjectToolStripMenuItem
+            // importMidiToolStripMenuItem
             // 
-            this.newProjectToolStripMenuItem.Name = "newProjectToolStripMenuItem";
-            this.newProjectToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.newProjectToolStripMenuItem.Text = "Import song files...";
-            this.newProjectToolStripMenuItem.Click += new System.EventHandler(this.newProjectToolStripMenuItem_Click);
+            this.importMidiToolStripMenuItem.Name = "importMidiToolStripMenuItem";
+            this.importMidiToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
+            this.importMidiToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.importMidiToolStripMenuItem.Text = "Import midi song...";
+            this.importMidiToolStripMenuItem.Click += new System.EventHandler(this.importMidiSongToolStripMenuItem_Click);
+            // 
+            // importModuleToolStripMenuItem
+            // 
+            this.importModuleToolStripMenuItem.Name = "importModuleToolStripMenuItem";
+            this.importModuleToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.M)));
+            this.importModuleToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.importModuleToolStripMenuItem.Text = "Import module...";
+            this.importModuleToolStripMenuItem.Click += new System.EventHandler(this.importModuleToolStripMenuItem_Click);
             // 
             // openSongToolStripMenuItem
             // 
             this.openSongToolStripMenuItem.Name = "openSongToolStripMenuItem";
             this.openSongToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openSongToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.openSongToolStripMenuItem.Text = "Open song...";
+            this.openSongToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.openSongToolStripMenuItem.Text = "Open project...";
             this.openSongToolStripMenuItem.Click += new System.EventHandler(this.openSongToolStripMenuItem_Click);
             // 
             // saveSongToolStripMenuItem
@@ -292,8 +303,8 @@
             this.saveSongToolStripMenuItem.Enabled = false;
             this.saveSongToolStripMenuItem.Name = "saveSongToolStripMenuItem";
             this.saveSongToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveSongToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.saveSongToolStripMenuItem.Text = "Save song";
+            this.saveSongToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.saveSongToolStripMenuItem.Text = "Save project";
             this.saveSongToolStripMenuItem.Click += new System.EventHandler(this.saveSongToolStripMenuItem_Click);
             // 
             // saveSongAsToolStripMenuItem
@@ -302,8 +313,8 @@
             this.saveSongAsToolStripMenuItem.Name = "saveSongAsToolStripMenuItem";
             this.saveSongAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-            this.saveSongAsToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.saveSongAsToolStripMenuItem.Text = "Save song as...";
+            this.saveSongAsToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.saveSongAsToolStripMenuItem.Text = "Save project as...";
             this.saveSongAsToolStripMenuItem.Click += new System.EventHandler(this.saveSongAsToolStripMenuItem_Click);
             // 
             // exportVideoToolStripMenuItem
@@ -311,7 +322,7 @@
             this.exportVideoToolStripMenuItem.Enabled = false;
             this.exportVideoToolStripMenuItem.Name = "exportVideoToolStripMenuItem";
             this.exportVideoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
-            this.exportVideoToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.exportVideoToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.exportVideoToolStripMenuItem.Text = "Export video...";
             this.exportVideoToolStripMenuItem.Click += new System.EventHandler(this.exportVideoToolStripMenuItem_Click);
             // 
@@ -322,7 +333,7 @@
             this.playbackToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(990, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1041, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -384,7 +395,7 @@
             this.trackPropsPanel.Controls.Add(this.trackList);
             this.trackPropsPanel.Controls.Add(this.leftTrackPropsPanel);
             this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.trackPropsPanel.Location = new System.Drawing.Point(595, 24);
+            this.trackPropsPanel.Location = new System.Drawing.Point(646, 24);
             this.trackPropsPanel.Name = "trackPropsPanel";
             this.trackPropsPanel.Size = new System.Drawing.Size(395, 10052);
             this.trackPropsPanel.TabIndex = 3;
@@ -1688,7 +1699,7 @@
             // textureBrowseBtn
             // 
             this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textureBrowseBtn.Location = new System.Drawing.Point(-1954, 10055);
+            this.textureBrowseBtn.Location = new System.Drawing.Point(-1971, 10055);
             this.textureBrowseBtn.Name = "textureBrowseBtn";
             this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
             this.textureBrowseBtn.TabIndex = 11;
@@ -1700,7 +1711,7 @@
             // texPathTb
             // 
             this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.texPathTb.Location = new System.Drawing.Point(-2066, 10056);
+            this.texPathTb.Location = new System.Drawing.Point(-2083, 10056);
             this.texPathTb.Name = "texPathTb";
             this.texPathTb.Size = new System.Drawing.Size(123, 20);
             this.texPathTb.TabIndex = 10;
@@ -1710,7 +1721,7 @@
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(-2069, 10040);
+            this.label4.Location = new System.Drawing.Point(-2086, 10040);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(43, 13);
             this.label4.TabIndex = 9;
@@ -1896,7 +1907,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.AutoScroll = true;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1007, 407);
+            this.ClientSize = new System.Drawing.Size(1058, 407);
             this.Controls.Add(this.propsTogglePanel);
             this.Controls.Add(this.songPropsPanel);
             this.Controls.Add(this.resetDefaultBtn);
@@ -1985,7 +1996,7 @@
 		private System.Windows.Forms.SaveFileDialog saveVideoDlg;
 		private System.Windows.Forms.NumericUpDown audioOffsetS;
 		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem newProjectToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem importMidiToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exportVideoToolStripMenuItem;
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.Label label7;
@@ -2127,6 +2138,7 @@
 		private System.Windows.Forms.NumericUpDown shapePowerUD;
 		private System.Windows.Forms.Label label38;
 		private System.Windows.Forms.CheckBox texKeepAspectCb;
-	}
+        private System.Windows.Forms.ToolStripMenuItem importModuleToolStripMenuItem;
+    }
 }
 

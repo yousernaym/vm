@@ -22,10 +22,7 @@ namespace Visual_Music
 			get { return audioFilePath.Text; }
 			set { audioFilePath.Text = value; }
 		}
-		public bool ModInsTrack
-		{
-			set { if (value) modInsTrackRbtn.Checked = true; else modChTrackRbtn.Checked = true; }
-		}
+		
 		Form1 parent;
 		public string NoteFolder
 		{
@@ -41,7 +38,11 @@ namespace Visual_Music
 		{
 			get { return eraseCurrent.Checked; }
 		}
-		public SourceFileForm(Form1 _parent)
+        public SourceFileForm()
+        {
+            InitializeComponent();
+        }
+        public SourceFileForm(Form1 _parent)
 		{
 			parent = _parent;
 			InitializeComponent();
@@ -81,24 +82,29 @@ namespace Visual_Music
 			//AudioFilePath = audioFilePath.Text;
 		}
 
-		private void Ok_Click(object sender, EventArgs e)
+		virtual protected void Ok_Click(object sender, EventArgs e)
 		{
-			if (string.IsNullOrEmpty(NoteFilePath))
-			{
-				MessageBox.Show("Song file path required.");
-				return;
-			}
-			if (!File.Exists(NoteFilePath))
-			{
-				MessageBox.Show("Song file note found.");
-				return;
-			}
-			if (parent.openSourceFiles(NoteFilePath, AudioFilePath, eraseCurrent.Checked, modInsTrackRbtn.Checked))
-			{
-				DialogResult = DialogResult.OK;
-				Hide();
-			}
+            importFiles(false);
 		}
+
+        protected void importFiles(bool modInsTrack)
+        {
+            if (string.IsNullOrEmpty(NoteFilePath))
+            {
+                MessageBox.Show("Song file path required.");
+                return;
+            }
+            if (!File.Exists(NoteFilePath))
+            {
+                MessageBox.Show("Song file note found.");
+                return;
+            }
+            if (parent.openSourceFiles(NoteFilePath, AudioFilePath, eraseCurrent.Checked, modInsTrack))
+            {
+                DialogResult = DialogResult.OK;
+                Hide();
+            }
+        }
 
 		private void SourceFileForm_VisibleChanged(object sender, EventArgs e)
 		{

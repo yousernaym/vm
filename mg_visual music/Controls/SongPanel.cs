@@ -78,84 +78,87 @@ namespace Visual_Music
 			return getPitchScreenPos(pitch);
 		}
 	}
-		
-	[Serializable()]
-	public class SongPanel : GraphicsDeviceControl, ISerializable
-    {
-		bool audioFromMod;
-		Texture2D regionSelectTexture;
-		float normPitchMargin = 1 / 50.0f;
-		bool bPlayback = false;
-		public bool IsPlaying
-		{
-			get { return bPlayback; }
-		}
-		bool bAudioFileLoaded = false;
-		bool bAudioPlayback = false;
-		TimeSpan oldTime = new TimeSpan(0);
-		TimeSpan pbStartSysTime = new TimeSpan(0);
-		double pbStartSongTimeS;
-		Stopwatch stopwatch = new Stopwatch();
-		public bool MbPressed { get; set; }
-		public bool RightMbPressed { get; set; }
-		bool scrollingSong = false;
-		double scrollCenter = 0;
-		bool selectingRegion = false;
-		bool mergeRegionSelection = false;
-		Rectangle selectedSongRegion;
-		Rectangle selectedScreenRegion;
-		public float NormMouseX { get; set; }
-		public float NormMouseY { get; set; }
-		ContentManager content;
-		SpriteBatch spriteBatch;
-		public SpriteBatch SpriteBatch
-		{
-			get { return spriteBatch; }
-			//set { spriteBatch = value; }
-		}
 
-		BlendState blendState;
-		public BlendState BlendState
-		{
-			get { return blendState; }
-//			set { blendState = value; }
-		}
-		internal TrackProps GlobalTrackProps
-		{
-			get { return trackProps[0]; }
-			set { trackProps[0] = value; }
-		}
-		List<TrackProps> trackProps;
-		internal List<TrackProps> TrackProps
-		{
-		  get { return trackProps; }
-		  set { trackProps = value; }
-		}
-		
-		RenderTarget2D videoFrame;
-		Midi.Song notes;
-		public Midi.Song Notes { get { return notes; } }
-		string noteFilePath="";
-		public string NoteFilePath
-		{
-			get { return noteFilePath; }
-			set { noteFilePath = value; }
-			//get { return ((Form1)Parent).sourceFileForm.NoteFilePath; }
-			//set { ((Form1)Parent).sourceFileForm.NoteFilePath = value; }
-		}
-		string audioFilePath = "";
-		public string AudioFilePath
-		{
-			get { return audioFilePath; }
-			set { audioFilePath = value; }
-			//get { return ((Form1)Parent).sourceFileForm.AudioFilePath; }
-			//set { ((Form1)Parent).sourceFileForm.AudioFilePath = value; }
-		}
-		bool modInsTrack;
-		public bool ModInsTrack
-		{
-			get { return modInsTrack; }
-		}
+    [Serializable()]
+    public class SongPanel : GraphicsDeviceControl, ISerializable
+    {
+        bool audioFromMod;
+        Texture2D regionSelectTexture;
+        float normPitchMargin = 1 / 50.0f;
+        bool bPlayback = false;
+        public bool IsPlaying
+        {
+            get { return bPlayback; }
+        }
+        bool bAudioFileLoaded = false;
+        bool bAudioPlayback = false;
+        TimeSpan oldTime = new TimeSpan(0);
+        TimeSpan pbStartSysTime = new TimeSpan(0);
+        double pbStartSongTimeS;
+        Stopwatch stopwatch = new Stopwatch();
+        public bool MbPressed { get; set; }
+        public bool RightMbPressed { get; set; }
+        bool scrollingSong = false;
+        double scrollCenter = 0;
+        bool selectingRegion = false;
+        bool mergeRegionSelection = false;
+        Rectangle selectedSongRegion;
+        Rectangle selectedScreenRegion;
+        public float NormMouseX { get; set; }
+        public float NormMouseY { get; set; }
+        ContentManager content;
+        SpriteBatch spriteBatch;
+        public SpriteBatch SpriteBatch
+        {
+            get { return spriteBatch; }
+            //set { spriteBatch = value; }
+        }
+
+        BlendState blendState;
+        public BlendState BlendState
+        {
+            get { return blendState; }
+            //			set { blendState = value; }
+        }
+        internal TrackProps GlobalTrackProps
+        {
+            get { return trackProps[0]; }
+            set { trackProps[0] = value; }
+        }
+        List<TrackProps> trackProps;
+        internal List<TrackProps> TrackProps
+        {
+            get { return trackProps; }
+            set { trackProps = value; }
+        }
+
+        RenderTarget2D videoFrame;
+        Midi.Song notes;
+        public Midi.Song Notes { get { return notes; } }
+        string noteFilePath = "";
+        public string NoteFilePath
+        {
+            get { return noteFilePath; }
+            set { noteFilePath = value; }
+            //get { return ((Form1)Parent).sourceFileForm.NoteFilePath; }
+            //set { ((Form1)Parent).sourceFileForm.NoteFilePath = value; }
+        }
+        string audioFilePath = "";
+        public string AudioFilePath
+        {
+            get { return audioFilePath; }
+            set { audioFilePath = value; }
+            //get { return ((Form1)Parent).sourceFileForm.AudioFilePath; }
+            //set { ((Form1)Parent).sourceFileForm.AudioFilePath = value; }
+        }
+        bool modInsTrack;
+        public bool ModInsTrack
+        {
+            get { return modInsTrack; }
+        }
+
+        bool isMod = false;
+        public bool IsMod { get => isMod; set => isMod = value; }
 		Point videoSize = new Point(1920, 1080);
         public int SongLengthT { get { return notes != null ? notes.SongLengthInTicks : 0; } }
         public int SongPosT { get { return (int)(normSongPos * SongLengthT); } }
