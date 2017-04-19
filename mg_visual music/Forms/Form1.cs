@@ -51,6 +51,7 @@ namespace Visual_Music
         ImportMidiForm importMidiForm;
         ImportModForm importModForm;
 
+        Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Default), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(NoteStyleProps_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum) };
         SongPanel songPanel = new SongPanel();
         ScrollBar songScrollBar = new HScrollBar();
         //Panel trackPropsPanel = new Panel();
@@ -233,22 +234,7 @@ namespace Visual_Music
             songScrollBar.Value = songPanel.SongPosT;
             upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
         }
-
-		//void updateFormWithSongProps(string noteFilename = "")
-		//{
-		//    Text = "Visual Music";
-		//    string songName = isEmpty(currentSongPath) ? noteFilename : currentSongPath;
-		//    if (!isEmpty(songName))
-		//    {
-		//        Text += " - " + songName;
-		//        createTrackList();
-		//        trackPropsBtn.Enabled = true;
-		//        updateTrackControls();
-		//    }
-		//    else
-		//        trackPropsBtn.Enabled = false;
-		//}
-
+        
 		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack)
 		{
             writeFolderNames();
@@ -911,17 +897,15 @@ namespace Visual_Music
 		{
 			try
 			{
-				BinaryFormatter bf = new BinaryFormatter();
-				using (FileStream stream = File.Open(fileName, FileMode.Open))
+				DataContractSerializer dcs = new DataContractSerializer(typeof(SongPanel), projectSerializationTypes);
+                using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
 					toggleIdleRendering(false);
 					Controls.Remove(songPanel);
 					songPanel.Dispose();
-					SongFormat.ReadVersion = (int)bf.Deserialize(stream);
-					songPanel = (SongPanel)bf.Deserialize(stream);
-					//songPanel.deserializeTrackProps(bf, stream);
-				}
-				initSongPanel(songPanel);
+                    songPanel = (SongPanel)dcs.ReadObject(stream);
+                }
+                initSongPanel(songPanel);
 
                 if (songPanel.IsMod)
                 {
@@ -962,13 +946,12 @@ namespace Visual_Music
 		{
 			try
 			{
-				BinaryFormatter bf = new BinaryFormatter();
-				using (FileStream stream = File.Open(currentSongPath, FileMode.Create))
+                DataContractSerializer dcs = new DataContractSerializer(typeof(SongPanel), projectSerializationTypes);
+
+                using (FileStream stream = File.Open(currentSongPath, FileMode.Create))
 				{
-					bf.Serialize(stream, SongFormat.WriteVersion);
-					bf.Serialize(stream, songPanel);
-					//songPanel.serializeTrackProps(bf, stream);
-				}
+                    dcs.WriteObject(stream, songPanel);
+                }
 				updateFormTitle(currentSongPath);
 			}
 			catch (Exception ex)
@@ -1448,11 +1431,5 @@ namespace Visual_Music
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).KeepAspect = ((CheckBox)sender).Checked;
 		}
-
-            }
-    static class SongFormat
-	{
-		public const int WriteVersion = 1;
-		public static int ReadVersion { get; set; }
-	}
+    }
 }

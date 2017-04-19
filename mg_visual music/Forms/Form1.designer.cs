@@ -1699,7 +1699,7 @@
             // textureBrowseBtn
             // 
             this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textureBrowseBtn.Location = new System.Drawing.Point(-1971, 10055);
+            this.textureBrowseBtn.Location = new System.Drawing.Point(-1988, 10055);
             this.textureBrowseBtn.Name = "textureBrowseBtn";
             this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
             this.textureBrowseBtn.TabIndex = 11;
@@ -1711,7 +1711,7 @@
             // texPathTb
             // 
             this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.texPathTb.Location = new System.Drawing.Point(-2083, 10056);
+            this.texPathTb.Location = new System.Drawing.Point(-2100, 10056);
             this.texPathTb.Name = "texPathTb";
             this.texPathTb.Size = new System.Drawing.Size(123, 20);
             this.texPathTb.TabIndex = 10;
@@ -1721,7 +1721,7 @@
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(-2086, 10040);
+            this.label4.Location = new System.Drawing.Point(-2103, 10040);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(43, 13);
             this.label4.TabIndex = 9;

@@ -41,7 +41,7 @@
             // 
             // openNoteFileDlg
             // 
-            this.openNoteFileDlg.Filter = "Midi files (*.mid) | *.mid | All files (*.*)| *.*";
+            this.openNoteFileDlg.Filter = "Midi files (*.mid)|*.mid|All files (*.*)|*.*";
             this.openNoteFileDlg.Title = "Open midi file";
             // 
             // ImportMidiForm

@@ -187,13 +187,11 @@ namespace Visual_Music
 		}
 		public SongPanel(SerializationInfo info, StreamingContext ctxt):base()
 		{
-			noteFilePath = (string)info.GetValue("noteFilePath", typeof(string));
+            SongFormat.readVersion = (int)info.GetValue("version", typeof(int));
+            noteFilePath = (string)info.GetValue("noteFilePath", typeof(string));
 			audioFilePath = (string)info.GetValue("audioFilePath", typeof(string));
 			modInsTrack = (bool)info.GetValue("modInsTrack", typeof(bool));
-			//audioFromMod = (bool)info.GetValue("audioFromMod", typeof(bool));
 			importSong(noteFilePath, audioFilePath, true, modInsTrack);
-			//openNoteFile(noteFilePath, true);
-			//openAudioFile(audioFilePath);
 			int trackPropsCountFromFile = (int)info.GetValue("trackPropsCount", typeof(int));
 			for (int i = 0; i < notes.Tracks.Count && i < trackPropsCountFromFile; i++)
 			{
@@ -211,11 +209,10 @@ namespace Visual_Music
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
-			info.AddValue("noteFilePath", noteFilePath);
-			//if (!audioFromMod)
+            info.AddValue("version", SongFormat.writeVersion);
+            info.AddValue("noteFilePath", noteFilePath);
 			info.AddValue("audioFilePath", audioFilePath);
 			info.AddValue("modInsTrack", modInsTrack);
-			//info.AddValue("audioFromMod", audioFromMod);
 			info.AddValue("trackPropsCount", trackProps.Count);
 			for (int i = 0; i < trackProps.Count; i++)
 				info.AddValue("trackProps"+i, trackProps[i]);
@@ -224,26 +221,7 @@ namespace Visual_Music
 			info.AddValue("maxPitch", Notes.MaxPitch);
 			info.AddValue("minPitch", Notes.MinPitch);
 		}
-		//public void deserializeTrackProps(BinaryFormatter bf, Stream stream)
-		//{
-		//    int trackPropsCountFromFile = (int)bf.Deserialize(stream);
-		//    int i;
-		//    createTrackProps(notes.Tracks.Count);
-		//    for (i = 0; i < notes.Tracks.Count && i < trackPropsCountFromFile; i++)
-		//    {
-		//        trackProps[i] = (TrackProps)bf.Deserialize(stream);
-		//    }
-		//    for (int j = i; j < trackPropsCountFromFile; j++)
-		//    {
-		//        TrackProps tp = (TrackProps)bf.Deserialize(stream);
-		//    }
-		//}
-		public void serializeTrackProps(BinaryFormatter bf, Stream stream)
-		{
-			bf.Serialize(stream, trackProps.Count);
-			for (int i = 0; i < trackProps.Count; i++)
-				bf.Serialize(stream, trackProps[i]);
-		}
+		
 		protected override void Initialize()
         {
 			stopwatch.Start();
@@ -922,5 +900,12 @@ namespace Visual_Music
         {
             Invalidate();
         }
-	}		
+	}
+
+    static class SongFormat
+    {
+        public const int writeVersion = 1;
+        public static int readVersion; 
+    }
 }
+

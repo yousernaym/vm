@@ -322,7 +322,7 @@
     <value>17, 17</value>
   </metadata>
   <data name="openNoteFileDlg.Filter" xml:space="preserve">
-    <value>Note files|*.mid;*.xm;*.mod;*.it;*.s3m|All files|*.*</value>
+    <value>Note files|*.mid;*.xm;*.mod;*.it;*.s3m;*.stm|All files|*.*</value>
   </data>
   <data name="openNoteFileDlg.Title" xml:space="preserve">
     <value>Open note file</value>
@@ -331,7 +331,7 @@
     <value>157, 17</value>
   </metadata>
   <data name="openAudioFileDlg.Filter" xml:space="preserve">
-    <value>Audio files|*.mp3;*.wma;*.wav|All files|*.*</value>
+    <value>Audio files (*.mp3; *.wma; *.wav)|*.mp3; *.wma; *.wav|All files|*.*</value>
   </data>
   <data name="openAudioFileDlg.Title" xml:space="preserve">
     <value>Open audio file</value>
