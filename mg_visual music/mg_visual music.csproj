@@ -123,6 +123,7 @@
     <Content Include="Content\Bar.fx" />
     <Content Include="Content\Line.fx" />
     <Content Include="Icon.ico" />
+    <Content Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />

@@ -20,8 +20,9 @@ namespace Visual_Music
 {
 	using GdiPoint = System.Drawing.Point;
 	using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
+    using WinKeys = System.Windows.Forms.Keys;
 
-	public class SongDrawProps
+    public class SongDrawProps
 	{
 		public int songPosT;
 		public float songPosS;
@@ -267,7 +268,6 @@ namespace Visual_Music
 			//NoteStyle.CircleFx = content.Load<Effect>("Circle");
 			NoteStyle.LineFx = content.Load<Effect>("Line");
 			NoteStyle.BarFx = content.Load<Effect>("Bar");
-
 		}
 		
 		protected override void Dispose(bool disposing)
@@ -346,23 +346,23 @@ namespace Visual_Music
 
 		void selectRegion()
 		{
-			if (!MbPressed)
-			{
-				selectingRegion = false;
-				mergeRegionSelection = false;
-				return;
-			}
-			KeyboardState kbState = Keyboard.GetState();
-			if (!selectingRegion)
-			{
-				selectingRegion = true;
-				if (kbState.IsKeyDown(XnaKeys.LeftControl) || kbState.IsKeyDown(XnaKeys.RightControl))
-					mergeRegionSelection = true;
-				selectedSongRegion.X = screenPosToSongPos(NormMouseX);
-				selectedSongRegion.Y = getPitch(NormMouseY);
-				selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width);
-				selectedScreenRegion.Y = (int)(NormMouseY * ClientRectangle.Height);
-			}
+			//if (!MbPressed)
+			//{
+			//	selectingRegion = false;
+			//	mergeRegionSelection = false;
+			//	return;
+			//}
+			//KeyboardState kbState = Keyboard.GetState();
+			//if (!selectingRegion)
+			//{
+			//	selectingRegion = true;
+   //             if (kbState.IsKeyDown(XnaKeys.LeftControl) || kbState.IsKeyDown(XnaKeys.RightControl))
+   //                 mergeRegionSelection = true;
+			//	selectedSongRegion.X = screenPosToSongPos(NormMouseX);
+			//	selectedSongRegion.Y = getPitch(NormMouseY);
+			//	selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width);
+			//	selectedScreenRegion.Y = (int)(NormMouseY * ClientRectangle.Height);
+			//}
 			if (selectingRegion)
 			{
 				int x = screenPosToSongPos(NormMouseX);
@@ -421,7 +421,7 @@ namespace Visual_Music
 		}
 		int screenPosToSongPos(float normScreenPos)
 		{
-			return (int)(normSongPos * notes.SongLengthInTicks + (double)normScreenPos * viewWidthT * 0.5f);
+            return (int)(normSongPos * notes.SongLengthInTicks + (double)normScreenPos * viewWidthT * 0.5f);
 		}
 		Point getVisibleSongPortionT(double normPos)
 		{
@@ -457,29 +457,29 @@ namespace Visual_Music
 		public void createTrackProps(int numTracks, bool eraseCurrent)
 		{
 			Visual_Music.TrackProps.NumTracks = numTracks;
-			int startTrack;
+			int startTrack; //At which index to start creating new (default) track props
 			if (eraseCurrent || trackProps == null)
 			{
 				startTrack = 0;
 				trackProps = new List<TrackProps>(numTracks);
 			}
 			else
-				startTrack = trackProps.Count;
+				startTrack = trackProps.Count; //Keep current props, but add new propsIf the new imported note file has more tracks than the current song, start assigning default track props at current song's track count and up.
 			
 			for (int i = 0; i < numTracks; i++)
 			{
-				if (i < startTrack) //!eraseCurrent, just update notes
+				if (i < startTrack) //Just update notes, not other (visual) props
 				{
 					trackProps[i].MidiTrack = notes.Tracks[trackProps[i].TrackNumber];
 					trackProps[i].createCurve();
 				}
-				else
+				else //New note file has more tracks than current song.Create new track props for the new tracks.
 				{
 					TrackProps props = new Visual_Music.TrackProps(i, numTracks, notes);
 					trackProps.Add(props);
 				}				
 			}
-			if (startTrack >= numTracks && numTracks > 0)
+			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra track props.
 				trackProps.RemoveRange(numTracks, startTrack - numTracks);
 		}
 		
@@ -900,7 +900,26 @@ namespace Visual_Music
         {
             Invalidate();
         }
-	}
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (e.Button != MouseButtons.Left || notes == null)
+                return;
+            selectingRegion = true;
+            if (ModifierKeys.HasFlag(WinKeys.Shift))
+                mergeRegionSelection = true;
+            selectedSongRegion.X = screenPosToSongPos(NormMouseX);
+            selectedSongRegion.Y = getPitch(NormMouseY);
+            selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width);
+            selectedScreenRegion.Y = (int)(NormMouseY * ClientRectangle.Height);
+        }
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            selectingRegion = false;
+            mergeRegionSelection = false;
+        }
+    }
 
     static class SongFormat
     {
