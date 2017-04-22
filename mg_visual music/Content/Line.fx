@@ -125,37 +125,13 @@ void SimplePS(out float4 color : COLOR0, in VSOutput IN)
 	//return;
 	float3 tPos; float distFromCenter; float distSign; float height; float normDistFromCenter;
 	initPixel(color, IN.normal, IN.normal2, tPos, distFromCenter, distSign, height, normDistFromCenter, IN.texCoords, IN.rawPos, IN.center, ShapePower, FadeoutFromCenter);
-
-	/*color = float4(Color.rgb,1);
-	IN.normal = normalize(IN.normal);
-	IN.normal2 = normalize(IN.normal2);
-	tPos = IN.rawPos - IN.center;
-	
-	//distFromCenter = dot(tPos, IN.normal);
-	distFromCenter = IN.normal.x * (-2000);// + IN.normal.y * tPos.y + IN.normal.z * tPos.z;
-	distSign = sign(distFromCenter);
-	distFromCenter = abs(distFromCenter);
-	
-	//float distFromCenter = length(tPos);
-	
-	if (FadeoutFromCenter == 0)
-	{
-		height = 1;
-		normDistFromCenter = 0;
-	}
-	else
-	{
-		normDistFromCenter = distFromCenter / FadeoutFromCenter;
-		height = saturate(1 - pow(abs(normDistFromCenter), ShapePower));  //Use abs to prevent compiler warning
-	}
-	normDistFromCenter = distFromCenter / FadeoutFromCenter;
-	height = saturate(1 - pow(abs(normDistFromCenter), ShapePower));  //Use abs to prevent compiler warning
-	*/
+		
 	color.rgb *= height;
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
 	color = blurEdges(color, distFromCenter);
 	//color.z = tPos.x;
 	//color = float4(IN.normal.x, IN.rawPos.x, 1, 1);
+	//color = float4(0, tPos.y*0.1, 0, 1);
 }
 
 void LightingPS(out float4 color : COLOR0, in VSOutput IN)
@@ -212,7 +188,7 @@ float3 ArrowEnd;
 float4 HlColor;
 float DistToCenter;
 
-void ArrowAreaPS(out float4 color : COLOR0, float3 normal : NORMAL0, float3 rawPos : POSITION2)
+void ArrowAreaPS(out float4 color : COLOR0, in VSOutput IN)
 {
 	//color = float4(1,1,1,1);
 	//return;
@@ -220,9 +196,9 @@ void ArrowAreaPS(out float4 color : COLOR0, float3 normal : NORMAL0, float3 rawP
 	//float distFromStart = dot(rawPos - ArrowStart, ArrowDir);
 	//clip(distFromStart / ArrowLength - ClipPercent);
 	//color = lerp(HlColor, Color, ClipPercent);
-	float distFromBottom = abs(dot(rawPos - ArrowStart, ArrowDir));
-	float distFromSide1 = abs(dot(rawPos - ArrowEnd, Side1Normal));
-	float distFromSide2 = abs(dot(rawPos - ArrowEnd, Side2Normal));
+	float distFromBottom = abs(dot(IN.rawPos - ArrowStart, ArrowDir));
+	float distFromSide1 = abs(dot(IN.rawPos - ArrowEnd, Side1Normal));
+	float distFromSide2 = abs(dot(IN.rawPos - ArrowEnd, Side2Normal));
 	float dist = min(distFromBottom, distFromSide1);
 	dist = min(dist, distFromSide2);
 	float normDistFromBorder = dist / DistToCenter;
@@ -249,6 +225,8 @@ void ArrowAreaPS(out float4 color : COLOR0, float3 normal : NORMAL0, float3 rawP
 	}
 	//
 	color.a = 0;
+	//color = float4(0, 0, 1, 1);
+	//color = float4(rawPos, 1);
 }
 
 //void ArrowBorderPS(out float4 color : COLOR0, float3 normal : NORMAL0, float3 arrowDir : NORMAL1, float3 arrowStart : POSITION1, float3 rawPos : POSITION2)
@@ -264,10 +242,11 @@ void ArrowAreaPS(out float4 color : COLOR0, float3 normal : NORMAL0, float3 rawP
 //	color = Color * lum;
 //}
 
-void CirclePS(out float4 color : COLOR0, float3 rawPos : POSITION2)
+//void CirclePS(out float4 color : COLOR0, float3 rawPos : POSITION2)
+void CirclePS(out float4 color : COLOR0, in VSOutput IN)
 {
 	float lum = 0;
-	float3 tPos = rawPos - WorldPos;
+	float3 tPos = IN.rawPos - WorldPos;
 	float distFromCenter = length(tPos);
 	float sgnDistFromEdge = distFromCenter - (HlSize - BlurredEdge);
 	float distFromEdge = abs(sgnDistFromEdge);
@@ -289,8 +268,10 @@ void CirclePS(out float4 color : COLOR0, float3 rawPos : POSITION2)
 		lum = 1 - saturate(sgnDistFromEdge / BlurredEdge);
 		color *= lum;
 	}
-
+	
 	color.a = 0;
+	//color.rgb *= saturate(pow(distFromCenter*0.0015, 30));
+	//color.rgb = rawPos;
 }
 
 float4 shadeHlObject(float sgnDistFromEdge, float distFromCenter)
