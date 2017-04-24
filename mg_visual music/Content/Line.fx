@@ -12,6 +12,7 @@ float2   ViewportSize;
 float2   TexSize;
 //float4x4 MatrixTransform : register(c2);
 texture Texture;
+
 sampler  TextureSampler = sampler_state
 {
 	texture = <Texture>;
@@ -88,21 +89,12 @@ struct VSOutput
 	float2 texCoords : TEXCOORD0;
 };
 
-// Vertex shader for rendering sprites on Windows.
 void VS(in VSInput IN, out VSOutput OUT)				
 {
-    //OUT.pos = float4(IN.pos.xyz, 1);
-	//OUT.pos.xy /= ViewportSize;
-	//OUT.pos.xy *= float2(2, -2);
-	//OUT.pos.xy -= float2(1, -1);
-	//return;
-	
 	OUT.normal = IN.normal;
 	OUT.normal2 = IN.normal2;
 	OUT.center = IN.center;
-	// Apply the matrix transform.
-    //position = mul(position, transpose(MatrixTransform));
-    
+	
 	OUT.pos = float4(IN.pos.xyz, 1);
 	OUT.rawPos = OUT.pos.xyz;
 	OUT.pos.xy -= 0.5;
@@ -114,6 +106,9 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.pos.xy /= ViewportSize;
 	OUT.pos.xy *= float2(2, -2);
 	OUT.pos.xy -= float2(1, -1);
+
+	// Apply the matrix transform.
+	//OUT.pos = mul(IN.pos.xyz, transpose(MatrixTransform));
 }
 
 

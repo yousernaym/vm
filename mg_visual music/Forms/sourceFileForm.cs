@@ -82,11 +82,6 @@ namespace Visual_Music
 			//AudioFilePath = audioFilePath.Text;
 		}
 
-		virtual protected void Ok_Click(object sender, EventArgs e)
-		{
-            importFiles(false);
-		}
-
         protected void importFiles(bool modInsTrack)
         {
             if (string.IsNullOrEmpty(NoteFilePath))

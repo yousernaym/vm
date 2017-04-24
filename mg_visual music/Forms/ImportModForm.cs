@@ -24,7 +24,7 @@ namespace Visual_Music
             set { if (value) modInsTrackBtn.Checked = true; else modChTrackBtn.Checked = true; }
         }
 
-        override protected void Ok_Click(object sender, EventArgs e)
+        private void Ok_Click(object sender, EventArgs e)
         {
             importFiles(ModInsTrack);
         }
