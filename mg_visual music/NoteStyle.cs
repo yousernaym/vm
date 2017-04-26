@@ -7,12 +7,14 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework.Content;
+using WinFormsGraphicsDevice;
 
 namespace Visual_Music
 {
-	enum NoteStyleEnum { Default, Bar, Line };
-	enum LineStyleEnum { Simple, Ribbon, Tube };
-	enum LineHlStyleEnum { Arrow, Circle };
+	public enum NoteStyleEnum { Default, Bar, Line };
+	public enum LineStyleEnum { Simple, Ribbon, Tube };
+	public enum LineHlStyleEnum { Arrow, Circle };
 
 	public struct TestVertex : IVertexType
 	{
@@ -54,201 +56,202 @@ namespace Visual_Music
 		//}
 	}
 
-	[Serializable()]
-	public abstract class NoteStyle : ISerializable
-	{
-		protected static TestVertex[] testVerts = new TestVertex[30];
-		protected static LineVertex[] lineVerts = new LineVertex[30000];
-		protected static LineVertex[] hLineVerts = new LineVertex[30000];
-		protected static short[] lineInds = new short[lineVerts.Length];
-		//protected static LineVertex[] arrowAreaVerts = new LineVertex[3];
-		//protected static LineVertex[] arrowBorderVerts = new LineVertex[3];
-		protected static LineVertex[] lineHlVerts = new LineVertex[4];
-		public class Textures
-		{
-			public Texture2D hilited;
-			public Texture2D normal;
-		}
-		protected static Textures[] textures = new Textures[Enum.GetValues(typeof(NoteStyleEnum)).GetLength(0)];
-		protected static Effect circleFx;
-		public static Effect CircleFx
-		{
-			get { return NoteStyle.circleFx; }
-			set { NoteStyle.circleFx = value; }
-		}
-		protected static Effect lineFx;
-		public static Effect LineFx
-		{
-			get { return NoteStyle.lineFx; }
-			set { NoteStyle.lineFx = value; }
-		}
-		protected static Effect barFx;
-		public static Effect BarFx
-		{
-			get { return NoteStyle.barFx; }
-			set { NoteStyle.barFx = value; }
-		}
-		protected int index;
-		public int Index
-		{
-			get { return index; }
-			set { index = value; }
-		}
-		public string Name
-		{
-			get { return Enum.GetNames(typeof(NoteStyleEnum))[index]; }
-		}
-		virtual public NoteStyle Value
-		{
-			get { return this; }
-		}
-		protected TrackProps trackProps = null;
-		public TrackProps TrackProps
-		{
-			get { return trackProps; }
-			set { trackProps = value; }
-		}
+    [Serializable()]
+    abstract public class NoteStyle : ISerializable
+    {
+        protected static TestVertex[] testVerts = new TestVertex[30];
+        protected static LineVertex[] lineVerts = new LineVertex[30000];
+        protected static LineVertex[] hLineVerts = new LineVertex[30000];
+        protected static short[] lineInds = new short[lineVerts.Length];
+        //protected static LineVertex[] arrowAreaVerts = new LineVertex[3];
+        //protected static LineVertex[] arrowBorderVerts = new LineVertex[3];
+        protected static LineVertex[] lineHlVerts = new LineVertex[4];
+        public class Textures
+        {
+            public Texture2D hilited;
+            public Texture2D normal;
+        }
+        protected static Textures[] defaultTextures = new Textures[Enum.GetValues(typeof(NoteStyleEnum)).GetLength(0)];
 
-		//virtual public int LineWidth
-		//{
-		//    set { }
-		//    get { return 0; }
-		//}
-		//public Texture2D Texture
-		//{
-		//    get { return textures[index]; }
-		//}
-		protected static SongPanel songPanel;
+        protected static Effect fx;
 
-		public NoteStyle()
-		{
-		}
-		public NoteStyle(TrackProps tprops)
-		{
-			trackProps = tprops;
-		}
-		public NoteStyle(SerializationInfo info, StreamingContext ctxt)
-		{
-			index = (int)info.GetValue("index", typeof(int));
-		}
+        protected NoteStyleEnum styleType;
+        //public int Index
+        //{
+        //    get { return index; }
+        //    set { index = value; }
+        //}
+        public string Name
+        {
+            get { return styleType.ToString(); }
+        }
+        virtual public NoteStyle Value
+        {
+            get { return this; }
+        }
+        protected TrackProps trackProps = null;
+        public TrackProps TrackProps
+        {
+            get { return trackProps; }
+            set { trackProps = value; }
+        }
 
-		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
-		{
-			info.AddValue("index", index);
-		}
-		public static void init(SongPanel _songPanel)
-		{
-			songPanel = _songPanel;
-			textures[(int)NoteStyleEnum.Bar] = new Textures();
-			textures[(int)NoteStyleEnum.Bar].normal = new Texture2D(songPanel.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-			textures[(int)NoteStyleEnum.Bar].normal.SetData(new[] { Color.White });
-			textures[(int)NoteStyleEnum.Bar].hilited = textures[(int)NoteStyleEnum.Bar].normal;
+        //virtual public int LineWidth
+        //{
+        //    set { }
+        //    get { return 0; }
+        //}
+        //public Texture2D Texture
+        //{
+        //    get { return textures[index]; }
+        //}
+        protected static SongPanel songPanel;
 
-			int radius = 20;
-			Color[] texData = new Color[radius * 2 * radius * 2];
-			float alphaMargin = 3;
-			for (int j = 0; j < radius * 2; j++)
-			{
-				for (int i = 0; i < radius * 2; i++)
-				{
-					int i2 = i - radius, j2 = j - radius;
-					Color c = Color.White;
-					float distFromCenter = (float)Math.Sqrt(i2 * i2 + j2 * j2);
+        public NoteStyle()
+        {
+        }
+        public NoteStyle(TrackProps tprops)
+        {
+            trackProps = tprops;
+        }
+        public NoteStyle(SerializationInfo info, StreamingContext ctxt)
+        {
+            //index = (int)info.GetValue("index", typeof(int));
+        }
 
-					if (distFromCenter >= (float)radius - alphaMargin)
-					{
-						float distFromOpaque = distFromCenter - (float)radius + alphaMargin;
-						float alpha = (alphaMargin - distFromOpaque) / alphaMargin;
-						if (alpha < 0)
-							alpha = 0;
-						c = Color.White * alpha;
-					}
-					//c = Color.White;
-					texData[i + j * radius * 2] = c;
-				}
-			}
-			textures[(int)NoteStyleEnum.Line] = new Textures();
-			//textures[(int)NoteStyleEnum.Line].hilited = new Texture2D(songPanel.GraphicsDevice, radius * 2, radius * 2, false, SurfaceFormat.Color);
-			//textures[(int)NoteStyleEnum.Line].hilited.SetData(texData);
-			textures[(int)NoteStyleEnum.Line].hilited = textures[(int)NoteStyleEnum.Bar].normal;
-			textures[(int)NoteStyleEnum.Line].normal = textures[(int)NoteStyleEnum.Bar].normal;
+        abstract public void GetObjectData(SerializationInfo info, StreamingContext ctxt);
+        //{
+        //info.AddValue("index", index);
+        //}
 
-			for (short i = 0; i < lineInds.Length; i++)
-				lineInds[i] = i;
-			//LineVertex.init(songPanel.GraphicsDevice, lineInds.Length);
-		}
-		protected void getMaterial(SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, int x1, int x2, out Color color, out Texture2D texture)
-		{
-			bool bHilited = false;
-			if (x1 < songDrawProps.viewportSize.X / 2 && x2 > songDrawProps.viewportSize.X / 2)
-				bHilited = true;
-			getMaterial(songDrawProps, trackProps, globalTrackProps, bHilited, out color, out texture);
-		}
-		protected void getMaterial(SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool bHilited, out Color color, out Texture2D texture)
-		{
-			color = trackProps.getColor(bHilited, globalTrackProps, true);
-			texture = trackProps.getTexture(bHilited, globalTrackProps);
-			if (texture == null)
-			{
-				if (bHilited)
-					texture = textures[index].hilited;
-				else
-					texture = textures[index].normal;
-			}
-		}
-		protected List<Midi.Note> getNotes(int leftMargin, Midi.Track track, SongDrawProps songDrawProps)
-		{   //Get currently visible notes in specified track
-			return track.getNotes(songDrawProps.songPosT - songDrawProps.viewWidthT / 2 - leftMargin, songDrawProps.songPosT + songDrawProps.viewWidthT / 2 /*+ margin*/);
-		}
-		public abstract void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps);
-		//public abstract void draw(NoteDrawProps drawProps, Color color, Texture2D texture, int pass);
-	}
+        public static void sInit(SongPanel _songPanel)
+        {
+            songPanel = _songPanel;
+            defaultTextures[(int)NoteStyleEnum.Bar] = new Textures();
+            defaultTextures[(int)NoteStyleEnum.Bar].normal = new Texture2D(songPanel.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            defaultTextures[(int)NoteStyleEnum.Bar].normal.SetData(new[] { Color.White });
+            defaultTextures[(int)NoteStyleEnum.Bar].hilited = defaultTextures[(int)NoteStyleEnum.Bar].normal;
 
-	[Serializable()]
-	class NoteStyle_Default : NoteStyle
-	{
-		//public override NoteStyle Value
-		//{
-		//    get { return null; }
-		//}
-		public NoteStyle_Default()
+            int radius = 20;
+            Color[] texData = new Color[radius * 2 * radius * 2];
+            float alphaMargin = 3;
+            for (int j = 0; j < radius * 2; j++)
+            {
+                for (int i = 0; i < radius * 2; i++)
+                {
+                    int i2 = i - radius, j2 = j - radius;
+                    Color c = Color.White;
+                    float distFromCenter = (float)Math.Sqrt(i2 * i2 + j2 * j2);
+
+                    if (distFromCenter >= (float)radius - alphaMargin)
+                    {
+                        float distFromOpaque = distFromCenter - (float)radius + alphaMargin;
+                        float alpha = (alphaMargin - distFromOpaque) / alphaMargin;
+                        if (alpha < 0)
+                            alpha = 0;
+                        c = Color.White * alpha;
+                    }
+                    //c = Color.White;
+                    texData[i + j * radius * 2] = c;
+                }
+            }
+            defaultTextures[(int)NoteStyleEnum.Line] = new Textures();
+            //textures[(int)NoteStyleEnum.Line].hilited = new Texture2D(songPanel.GraphicsDevice, radius * 2, radius * 2, false, SurfaceFormat.Color);
+            //textures[(int)NoteStyleEnum.Line].hilited.SetData(texData);
+            defaultTextures[(int)NoteStyleEnum.Line].hilited = defaultTextures[(int)NoteStyleEnum.Bar].normal;
+            defaultTextures[(int)NoteStyleEnum.Line].normal = defaultTextures[(int)NoteStyleEnum.Bar].normal;
+
+            for (short i = 0; i < lineInds.Length; i++)
+                lineInds[i] = i;
+            //LineVertex.init(songPanel.GraphicsDevice, lineInds.Length);
+
+            //NoteStyle.CircleFx = content.Load<Effect>("Circle");
+        }
+        abstract public void loadFx();
+        
+        protected void getMaterial(SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, int x1, int x2, out Color color, out Texture2D texture)
+        {
+            bool bHilited = false;
+            if (x1 < songDrawProps.viewportSize.X / 2 && x2 > songDrawProps.viewportSize.X / 2)
+                bHilited = true;
+            getMaterial(songDrawProps, trackProps, globalTrackProps, bHilited, out color, out texture);
+        }
+        protected void getMaterial(SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool bHilited, out Color color, out Texture2D texture)
+        {
+            color = trackProps.getColor(bHilited, globalTrackProps, true);
+            texture = trackProps.getTexture(bHilited, globalTrackProps);
+            if (texture == null)
+            {
+                if (bHilited)
+                    texture = defaultTextures[(int)styleType].hilited;
+                else
+                    texture = defaultTextures[(int)styleType].normal;
+            }
+        }
+        protected List<Midi.Note> getNotes(int leftMargin, Midi.Track track, SongDrawProps songDrawProps)
+        {   //Get currently visible notes in specified track
+            return track.getNotes(songDrawProps.songPosT - songDrawProps.viewWidthT / 2 - leftMargin, songDrawProps.songPosT + songDrawProps.viewWidthT / 2 /*+ margin*/);
+        }
+        virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
 		{
-			index = (int)NoteStyleEnum.Default;
-		}
-		public NoteStyle_Default(TrackProps tprops)
-			: base(tprops)
-		{
-			index = (int)NoteStyleEnum.Default;
-		}
-		public NoteStyle_Default(SerializationInfo info, StreamingContext ctxt)
-			: base(info, ctxt)
-		{
-		}
-		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
-		{
-			throw new NotImplementedException();
-		}
-		//public override void draw(NoteDrawProps drawProps, Color color, Texture2D texture, int pass)
-		//{
-		//throw new NotImplementedException();
-		//}
-	}
-	[Serializable()]
-	class NoteStyle_Bar : NoteStyle
+            fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
+        }
+        //abstract public void draw(NoteDrawProps drawProps, Color color, Texture2D texture, int pass);
+    }
+
+    //[Serializable()]
+    //class NoteStyle_Default : NoteStyle
+    //{
+    //	//public override NoteStyle Value
+    //	//{
+    //	//    get { return null; }
+    //	//}
+    //	public NoteStyle_Default()
+    //	{
+    //		index = (int)NoteStyleEnum.Default;
+    //	}
+    //	public NoteStyle_Default(TrackProps tprops)
+    //		: base(tprops)
+    //	{
+    //		index = (int)NoteStyleEnum.Default;
+    //	}
+    //	public NoteStyle_Default(SerializationInfo info, StreamingContext ctxt)
+    //		: base(info, ctxt)
+    //	{
+    //	}
+    //	public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
+    //	{
+    //		throw new NotImplementedException();
+    //	}
+    //	//public override void draw(NoteDrawProps drawProps, Color color, Texture2D texture, int pass)
+    //	//{
+    //	//throw new NotImplementedException();
+    //	//}
+    //}
+    [Serializable()]
+	public class NoteStyle_Bar : NoteStyle
 	{
 		public NoteStyle_Bar()
 		{
-			index = (int)NoteStyleEnum.Bar;
+			styleType = NoteStyleEnum.Bar;
 		}
 		public NoteStyle_Bar(TrackProps tprops)
 			: base(tprops)
 		{
-			index = (int)NoteStyleEnum.Bar;
+			styleType = NoteStyleEnum.Bar;
 		}
 		public NoteStyle_Bar(SerializationInfo info, StreamingContext ctxt)
 			: base(info, ctxt)
 		{
 		}
+        override public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+        {
+
+        }
+        override public void loadFx()
+        {
+            fx = songPanel.Content.Load<Effect>("Bar");
+        }
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
 		{
 			List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
@@ -355,119 +358,65 @@ namespace Visual_Music
 		//songPanel.SpriteBatch.Draw(texture, new Rectangle(drawProps.x1, drawProps.y - drawProps.noteHeight / 2, drawProps.x2 - drawProps.x1 + 1, drawProps.noteHeight), color);
 		//}
 	}
-
+    
 	[Serializable()]
-	class NoteStyleProps_Line : ISerializable
+	public class NoteStyle_Line : NoteStyle
 	{
-		public float qn_gapThreshold = 5;
-		public int lineWidth = 5;
-		public float fadeOut = 1;
-		public int blurredEdge = 2;
-		public float shapePower = 1;
-		public LineStyleEnum style = LineStyleEnum.Simple;
-		public LineHlStyleEnum hlStyle = LineHlStyleEnum.Arrow;
-		public int hlSize = 25;
-		public bool movingHl = false;
-		public bool shrinkingHl = false;
-		public bool hlBorder = false;
-		public NoteStyleProps_Line()
-		{
-		}
-		public NoteStyleProps_Line(SerializationInfo info, StreamingContext ctxt)
-		{
-			qn_gapThreshold = (float)info.GetValue("qn_gapThreshold", typeof(float));
-			lineWidth = (int)info.GetValue("lineWidth", typeof(int));
-			fadeOut = (float)info.GetValue("fadeOutFromCenter", typeof(float));
-			shapePower = (float)info.GetValue("shapePower", typeof(float));
-			blurredEdge = (int)info.GetValue("blurredEdge", typeof(int));
-			style = (LineStyleEnum)info.GetValue("style", typeof(LineStyleEnum));
-			hlStyle = (LineHlStyleEnum)info.GetValue("hlStyle", typeof(LineHlStyleEnum));
-			hlSize = (int)info.GetValue("hlSize", typeof(int));
-			movingHl = (bool)info.GetValue("movingHl", typeof(bool));
-			shrinkingHl = (bool)info.GetValue("shrinkingHl", typeof(bool));
-			hlBorder = (bool)info.GetValue("hlBorder", typeof(bool));
-		}
-		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
-		{
-			info.AddValue("qn_gapThreshold", qn_gapThreshold);
-			info.AddValue("lineWidth", lineWidth);
-			info.AddValue("fadeOutFromCenter", fadeOut);
-			info.AddValue("shapePower", shapePower);
-			info.AddValue("blurredEdge", blurredEdge);
-			info.AddValue("style", style);
-			info.AddValue("hlStyle", hlStyle);
-			info.AddValue("hlSize", hlSize);
-			info.AddValue("movingHl", movingHl);
-			info.AddValue("shrinkingHl", shrinkingHl);
-			info.AddValue("hlBorder", hlBorder);
-		}
-
-	}
-
-	[Serializable()]
-	class NoteStyle_Line : NoteStyle
-	{
-
-		float Qn_gapThreshold
-		{
-			get { return trackProps.LineStyleProps.qn_gapThreshold; }
-			//set { qn_gapThreshold = value; }
-		}
-		int LineWidth
-		{
-			get { return TrackProps.LineStyleProps.lineWidth; }
-		}
-
-		float Fadeout
-		{
-			get { return TrackProps.LineStyleProps.fadeOut; }
-		}
-		float ShapePower
-		{
-			get { return TrackProps.LineStyleProps.shapePower; }
-		}
-		int BlurredEdge
-		{
-			get { return TrackProps.LineStyleProps.blurredEdge; }
-		}
-		LineStyleEnum Style
-		{
-			get { return TrackProps.LineStyleProps.style; }
-		}
-		LineHlStyleEnum HlStyle
-		{
-			get { return TrackProps.LineStyleProps.hlStyle; }
-		}
-		int HlSize
-		{
-			get { return TrackProps.LineStyleProps.hlSize; }
-		}
-		bool MovingHl
-		{
-			get { return TrackProps.LineStyleProps.movingHl; }
-		}
-		bool ShrinkingHl
-		{
-			get { return TrackProps.LineStyleProps.shrinkingHl; }
-		}
-		bool HlBorder
-		{
-			get { return TrackProps.LineStyleProps.hlBorder; }
-		}
+        public float Qn_gapThreshold { get; set; } = 5;
+        public int LineWidth = 5;
+        public float FadeOut = 1;
+        public int BlurredEdge = 2;
+        public float ShapePower = 1;
+        public LineStyleEnum Style = LineStyleEnum.Simple;
+        public LineHlStyleEnum HlStyle = LineHlStyleEnum.Arrow;
+        public int HlSize = 25;
+        public bool MovingHl = false;
+        public bool ShrinkingHl = false;
+        public bool HlBorder = false;
+       
 		public NoteStyle_Line()
 		{
-			index = (int)NoteStyleEnum.Line;
+			styleType = NoteStyleEnum.Line;
 		}
 		public NoteStyle_Line(TrackProps tprops)
 			: base(tprops)
 		{
-			index = (int)NoteStyleEnum.Line;
+            styleType = NoteStyleEnum.Line;
 		}
 		public NoteStyle_Line(SerializationInfo info, StreamingContext ctxt)
 			: base(info, ctxt)
 		{
-		}
-		void drawTrackPass(int lineWidth, Vector4 colorMod, List<Midi.Note> noteList, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool bHilited, Effect effect, BlendState blendState)
+            Qn_gapThreshold = (float)info.GetValue("qn_gapThreshold", typeof(float));
+            LineWidth = (int)info.GetValue("lineWidth", typeof(int));
+            FadeOut = (float)info.GetValue("fadeOutFromCenter", typeof(float));
+            ShapePower = (float)info.GetValue("shapePower", typeof(float));
+            BlurredEdge = (int)info.GetValue("blurredEdge", typeof(int));
+            Style = (LineStyleEnum)info.GetValue("style", typeof(LineStyleEnum));
+            HlStyle = (LineHlStyleEnum)info.GetValue("hlStyle", typeof(LineHlStyleEnum));
+            HlSize = (int)info.GetValue("hlSize", typeof(int));
+            MovingHl = (bool)info.GetValue("movingHl", typeof(bool));
+            ShrinkingHl = (bool)info.GetValue("shrinkingHl", typeof(bool));
+            HlBorder = (bool)info.GetValue("hlBorder", typeof(bool));
+        }
+        override public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+        {
+            info.AddValue("qn_gapThreshold", Qn_gapThreshold);
+            info.AddValue("lineWidth", LineWidth);
+            info.AddValue("fadeOutFromCenter", FadeOut);
+            info.AddValue("shapePower", ShapePower);
+            info.AddValue("blurredEdge", BlurredEdge);
+            info.AddValue("style", Style);
+            info.AddValue("hlStyle", HlStyle);
+            info.AddValue("hlSize", HlSize);
+            info.AddValue("movingHl", MovingHl);
+            info.AddValue("shrinkingHl", ShrinkingHl);
+            info.AddValue("hlBorder", HlBorder);
+        }
+        override public void loadFx()
+        {
+            fx = songPanel.Content.Load<Effect>("Line");
+        }
+        void drawTrackPass(int lineWidth, Vector4 colorMod, List<Midi.Note> noteList, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool bHilited, Effect effect, BlendState blendState)
 		{
 			Color color;
 			Texture2D dummyTexture;
@@ -568,18 +517,18 @@ namespace Visual_Music
 						lineHlVerts[1].pos = arrowStart - arrowNormal * arrowWidth;
 						lineHlVerts[2].pos = arrowStart + arrowDir * arrowLength;
 						
-						lineFx.Parameters["ArrowDir"].SetValue(arrowDir);
+						fx.Parameters["ArrowDir"].SetValue(arrowDir);
 						//lineFx.Parameters["ArrowLength"].SetValue(nextNoteOffsetLength);
-						lineFx.Parameters["ArrowStart"].SetValue(arrowStart);
-						lineFx.Parameters["ArrowEnd"].SetValue(lineHlVerts[2].pos); //Is used to calc distance from the two "sides" of the triangle (not the bottom) since they share this point
+						fx.Parameters["ArrowStart"].SetValue(arrowStart);
+						fx.Parameters["ArrowEnd"].SetValue(lineHlVerts[2].pos); //Is used to calc distance from the two "sides" of the triangle (not the bottom) since they share this point
 						Vector3 side1Tangent = lineHlVerts[2].pos - lineHlVerts[0].pos;
 						Vector3 side1Normal = new Vector3(-side1Tangent.Y, side1Tangent.X, 0);
 						side1Normal.Normalize();
-						lineFx.Parameters["Side1Normal"].SetValue(side1Normal);
+						fx.Parameters["Side1Normal"].SetValue(side1Normal);
 						Vector3 side2Tangent = lineHlVerts[2].pos - lineHlVerts[1].pos;
 						Vector3 side2Normal = new Vector3(-side2Tangent.Y, side2Tangent.X, 0);
 						side2Normal.Normalize();
-						lineFx.Parameters["Side2Normal"].SetValue(side2Normal);
+						fx.Parameters["Side2Normal"].SetValue(side2Normal);
 					}
 					else if (HlStyle == LineHlStyleEnum.Circle && !MovingHl)
 					{
@@ -595,9 +544,9 @@ namespace Visual_Music
 							shrinkPercent = 1;
 					}
 
-					lineFx.Parameters["ClipPercent"].SetValue(shrinkPercent);
+					fx.Parameters["ClipPercent"].SetValue(shrinkPercent);
 					float innerHlSize = HlSize * 0.5f * (1 - shrinkPercent);
-					lineFx.Parameters["InnerHlSize"].SetValue(innerHlSize);
+					fx.Parameters["InnerHlSize"].SetValue(innerHlSize);
 				}
 				#endregion
 				//innerHlSize = HlSize / 40.0f;
@@ -762,7 +711,7 @@ namespace Visual_Music
 		}
 		void setHlCirclePos(Vector3 pos)
 		{
-			lineFx.Parameters["WorldPos"].SetValue(pos);
+			fx.Parameters["WorldPos"].SetValue(pos);
 			float halfHlSize = HlSize / 2.0f;
 			lineHlVerts[0].pos = new Vector3(-halfHlSize, -halfHlSize, 0) + pos;
 			lineHlVerts[1].pos = new Vector3(halfHlSize, - halfHlSize, 0) + pos;
@@ -847,7 +796,7 @@ namespace Visual_Music
 					for (float i = 0; i <= Math.Abs(nextY - y); i += 1)
 					{
 						//lineFx.Parameters["Center"].SetValue(new Vector2((float)x - 0.5f, y - 0.5f));
-						circleFx.Parameters["Center"].SetValue(new Vector2((float)x - 0.5f, y - 0.5f));
+						//circleFx.Parameters["Center"].SetValue(new Vector2((float)x - 0.5f, y - 0.5f));
 						try
 						{
 							songPanel.SpriteBatch.Begin(SpriteSortMode.Deferred, blendState, null, null, null, effect);
@@ -873,7 +822,8 @@ namespace Visual_Music
 
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
 		{
-			//testVerts[0].pos = new Vector4(1, 0, 0, 0);
+            base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps);
+            //testVerts[0].pos = new Vector4(1, 0, 0, 0);
 			//testVerts[1].pos = new Vector4(0, 2, 0, 0);
 			//testVerts[2].pos = new Vector4(0, 0, 3, 0);
 			//barFx.Techniques[0].Passes[0].Apply();
@@ -887,43 +837,43 @@ namespace Visual_Music
 				return;
 
 			//this.trackProps = trackProps;
-			lineFx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
+			
 			float fadeout = 0;
-			if (Fadeout > 0)
-				fadeout = LineWidth / (2.0f * Fadeout);
-			lineFx.Parameters["FadeoutFromCenter"].SetValue(fadeout);
-			lineFx.Parameters["ShapePower"].SetValue(ShapePower);
-			lineFx.Parameters["BlurredEdge"].SetValue((float)BlurredEdge);
-			lineFx.Parameters["Style"].SetValue((int)Style);
-			lineFx.Parameters["HlSize"].SetValue((float)HlSize / 2.0f);
+			if (FadeOut > 0)
+				fadeout = LineWidth / (2.0f * FadeOut);
+			fx.Parameters["FadeoutFromCenter"].SetValue(fadeout);
+			fx.Parameters["ShapePower"].SetValue(ShapePower);
+			fx.Parameters["BlurredEdge"].SetValue((float)BlurredEdge);
+            fx.Parameters["Style"].SetValue((int)Style);
+            fx.Parameters["HlSize"].SetValue((float)HlSize / 2.0f);
 			//lineFx.Parameters["TexAnchor"].SetValue(new int[]{(int)trackProps.TexUAnchor, (int)trackProps.TexVAnchor});
 			
-			//Light props
+			//Light props TODO: Move to drawTrack of base NoteStyle
 			TrackProps lightProps = trackProps.UseGlobalLight ? globalTrackProps : trackProps;
 			Vector3 normLightDir = lightProps.LightDir;
 			normLightDir.Normalize();
-			lineFx.Parameters["LightDir"].SetValue(normLightDir);
-			lineFx.Parameters["SpecAmount"].SetValue(lightProps.SpecAmount);
-			lineFx.Parameters["SpecPower"].SetValue(lightProps.SpecPower);
+            fx.Parameters["LightDir"].SetValue(normLightDir);
+            fx.Parameters["SpecAmount"].SetValue(lightProps.SpecAmount);
+            fx.Parameters["SpecPower"].SetValue(lightProps.SpecPower);
 			float angle = lightProps.SpecFov * (float)Math.PI / (360);
 			float camPosZ = (songDrawProps.viewportSize.X / 2) / (float)Math.Tan(angle);
 			Vector3 specCamPos = new Vector3(songDrawProps.viewportSize.X / 2, songDrawProps.viewportSize.Y / 2, camPosZ);
-			lineFx.Parameters["SpecCamPos"].SetValue(specCamPos);
+            fx.Parameters["SpecCamPos"].SetValue(specCamPos);
 
 			songPanel.GraphicsDevice.BlendState = songPanel.BlendState;
 			float radius = LineWidth / 2.0f;
-			//if (radius < 0.5f)
-				//radius = 0.5f;
-			lineFx.Parameters["Radius"].SetValue(radius);
+            //if (radius < 0.5f)
+            //radius = 0.5f;
+            fx.Parameters["Radius"].SetValue(radius);
 			Color color;
 			Texture2D texture;
 			getMaterial(songDrawProps, trackProps, globalTrackProps, false, out color, out texture);
-			lineFx.Parameters["Color"].SetValue(color.ToVector4());
-			
-			lineFx.Parameters["InnerHlSize"].SetValue(0.0f);
+            fx.Parameters["Color"].SetValue(color.ToVector4());
+
+            fx.Parameters["InnerHlSize"].SetValue(0.0f);
 			Vector2 texSize = new Vector2(texture.Width, texture.Height);
-			lineFx.Parameters["TexSize"].SetValue(texSize);
-			lineFx.Parameters["Texture"].SetValue(texture);
+            fx.Parameters["TexSize"].SetValue(texSize);
+            fx.Parameters["Texture"].SetValue(texture);
 			
 			TrackProps texTrackProps = trackProps.getTexture(false, null) != null ? trackProps : globalTrackProps;
 			songPanel.GraphicsDevice.SamplerStates[0] = texTrackProps.TexProps.SamplerState;
@@ -936,10 +886,10 @@ namespace Visual_Music
 			Color hlColor;
 			Texture2D hlTexture;
 			getMaterial(songDrawProps, trackProps, globalTrackProps, true, out hlColor, out hlTexture);
-			lineFx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
+            fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
 			if (drawHlNote)
 			{
-				lineFx.Parameters["Border"].SetValue(HlBorder);
+                fx.Parameters["Border"].SetValue(HlBorder);
 				if (HlStyle == LineHlStyleEnum.Arrow)
 				{
 					//Calc shortest dist to incenter from border, ie. the inscribed circle's radius
@@ -948,11 +898,11 @@ namespace Visual_Music
 					float c = (lineHlVerts[1].pos - lineHlVerts[2].pos).Length();
 					float k = (a + b + c) / 2.0f;
 					float icRadius = (float)Math.Sqrt(k * (k - a) * (k - b) * (k - c)) / k;
-					lineFx.Parameters["DistToCenter"].SetValue(icRadius);
+                    fx.Parameters["DistToCenter"].SetValue(icRadius);
 
 					songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
-					lineFx.CurrentTechnique = lineFx.Techniques["Arrow"];
-					lineFx.CurrentTechnique.Passes["Area"].Apply();
+                    fx.CurrentTechnique = fx.Techniques["Arrow"];
+                    fx.CurrentTechnique.Passes["Area"].Apply();
 					songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
 				}
 				else if (HlStyle == LineHlStyleEnum.Circle)
@@ -964,8 +914,8 @@ namespace Visual_Music
 						setHlCirclePos(circlePos);
 					}
 					songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
-					lineFx.CurrentTechnique = lineFx.Techniques["Circle"];
-					lineFx.CurrentTechnique.Passes[0].Apply();
+                    fx.CurrentTechnique = fx.Techniques["Circle"];
+                    fx.CurrentTechnique.Passes[0].Apply();
 					songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, lineHlVerts, 0, 2);
 				}
 			}
@@ -992,10 +942,10 @@ namespace Visual_Music
 				if (numVerts > 5 || numHLineVerts > 1)
 				{
 					if (Style == LineStyleEnum.Simple)
-						lineFx.CurrentTechnique = lineFx.Techniques["Simple"];
+                        fx.CurrentTechnique = fx.Techniques["Simple"];
 					else
-						lineFx.CurrentTechnique = lineFx.Techniques["Lighting"];
-					lineFx.CurrentTechnique.Passes[0].Apply();
+                        fx.CurrentTechnique = fx.Techniques["Lighting"];
+                    fx.CurrentTechnique.Passes[0].Apply();
 					if (numHLineVerts > 1)
 						songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
 					if (numVerts > 5)

@@ -51,7 +51,7 @@ namespace Visual_Music
         ImportMidiForm importMidiForm;
         ImportModForm importModForm;
 
-        Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Default), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(NoteStyleProps_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum) };
+        Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum)};
         SongPanel songPanel = new SongPanel();
         ScrollBar songScrollBar = new HScrollBar();
         //Panel trackPropsPanel = new Panel();
@@ -107,10 +107,14 @@ namespace Visual_Music
             songScrollBar.BringToFront();
 
             initSongPanel(songPanel);
-			styleList.Items.Add(new NoteStyle_Default(null));
-			styleList.Items.Add(new NoteStyle_Bar(null));
-			styleList.Items.Add(new NoteStyle_Line(null));
-			Array enumArray = Enum.GetValues(typeof(LineStyleEnum));
+            Array enumArray = Enum.GetValues(typeof(NoteStyleEnum));
+            foreach (NoteStyleEnum nse in enumArray)
+                styleList.Items.Add(nse.ToString());
+   //         styleList.Items.Add(new NoteStyle_Default(null));
+			//styleList.Items.Add(new NoteStyle_Bar(null));
+			//styleList.Items.Add(new NoteStyle_Line(null));
+
+            enumArray = Enum.GetValues(typeof(LineStyleEnum));
 			foreach (LineStyleEnum lse in enumArray)
 				lineStyleList.Items.Add(lse.ToString());
 			enumArray = Enum.GetValues(typeof(LineHlStyleEnum));
@@ -608,26 +612,33 @@ namespace Visual_Music
 					screenVAnchorRb.Checked = true;
 				texUScrollUD.Value = (decimal)texProps.UScroll;
 				texVScrollUD.Value = (decimal)texProps.VScroll;
-				//FixedTexXOriginCb.Checked = selectedTrackProps.FixedTexXOrigin;
-				//FixedTexYOriginCb.Checked = selectedTrackProps.FixedTexYOrigin;
-				//updateTexXYCb(FixedTexOriginCb, FixedTexXOriginCb, FixedTexYOriginCb);
-				
-				styleList.SelectedIndex = selectedTrackProps.NoteStyleIndex;
-				lineStyleList.SelectedIndex = (int)selectedTrackProps.LineStyleProps.style;
-				lineWidthUpDown.Value = selectedTrackProps.LineStyleProps.lineWidth;
-				qnGapFillUd.Value = (decimal)selectedTrackProps.LineStyleProps.qn_gapThreshold;
-				blurredEdgeUd.Value = (decimal)selectedTrackProps.LineStyleProps.blurredEdge;
-				
-				lineHlStyleList.SelectedIndex = (int)selectedTrackProps.LineStyleProps.hlStyle;
-				hlSizeUpDown.Value = selectedTrackProps.LineStyleProps.hlSize;
-				movingHlCb.Checked = selectedTrackProps.LineStyleProps.movingHl;
-				shrinkingHlCb.Checked = selectedTrackProps.LineStyleProps.shrinkingHl;
-				hlBorderCb.Checked = selectedTrackProps.LineStyleProps.hlBorder;
-				
-				fadeoutUd.Value = (decimal)(selectedTrackProps.LineStyleProps.fadeOut * 100);
-				shapePowerUD.Value = (decimal)selectedTrackProps.LineStyleProps.shapePower;
+                //FixedTexXOriginCb.Checked = selectedTrackProps.FixedTexXOrigin;
+                //FixedTexYOriginCb.Checked = selectedTrackProps.FixedTexYOrigin;
+                //updateTexXYCb(FixedTexOriginCb, FixedTexXOriginCb, FixedTexYOriginCb);
 
-				//Light
+                //Note style-----------------
+                styleList.SelectedIndex = (int)selectedTrackProps.NoteStyleType;
+
+                NoteStyle_Bar barStyle = selectedTrackProps.getBarNoteStyle();
+                //Update bar style controls here
+                
+                NoteStyle_Line lineStyle = selectedTrackProps.getLineNoteStyle();
+                lineStyleList.SelectedIndex = (int)lineStyle.Style;
+				lineWidthUpDown.Value = lineStyle.LineWidth;
+				qnGapFillUd.Value = (decimal)lineStyle.Qn_gapThreshold;
+				blurredEdgeUd.Value = (decimal)lineStyle.BlurredEdge;
+				
+				lineHlStyleList.SelectedIndex = (int)lineStyle.HlStyle;
+				hlSizeUpDown.Value = lineStyle.HlSize;
+				movingHlCb.Checked = lineStyle.MovingHl;
+				shrinkingHlCb.Checked = lineStyle.ShrinkingHl;
+				hlBorderCb.Checked = lineStyle.HlBorder;
+				
+				fadeoutUd.Value = (decimal)(lineStyle.FadeOut * 100);
+				shapePowerUD.Value = (decimal)lineStyle.ShapePower;
+                //-------------------------------
+				
+                //Light---------------------------
 				globalLightCb.Checked = selectedTrackProps.UseGlobalLight;
 				lightDirxTb.Text = selectedTrackProps.LightDir.X.ToString();
 				lightDiryTb.Text = selectedTrackProps.LightDir.Y.ToString();
@@ -635,6 +646,7 @@ namespace Visual_Music
 				specAmountUd.Value = (decimal)selectedTrackProps.SpecAmount;
 				specPowUd.Value = (decimal)selectedTrackProps.SpecPower;
 				specFovUd.Value = (decimal)selectedTrackProps.SpecFov;
+                //---------------------------------
 			}
 			updatingControls = false;
 		}
@@ -813,7 +825,7 @@ namespace Visual_Music
 
 		private void styleList_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (styleList.SelectedItem is NoteStyle_Line)
+			if (styleList.SelectedIndex == (int)NoteStyleEnum.Line)
 				lineStyleGroup.Visible = true;
 			else
 				lineStyleGroup.Visible = false;
@@ -822,8 +834,8 @@ namespace Visual_Music
 			songPanel.Invalidate();
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 			{
-				Type type = (styleList.SelectedItem).GetType();
-				songPanel.TrackProps[trackList.SelectedIndices[i]].NoteStyle = (NoteStyle)Activator.CreateInstance(type);
+                NoteStyleEnum type = (NoteStyleEnum)Enum.Parse(typeof(NoteStyleEnum), (string)styleList.SelectedItem);
+				songPanel.TrackProps[trackList.SelectedIndices[i]].NoteStyleType = type;
 				//if (type == typeof(NoteStyle_Default))
 					//songPanel.TrackProps[trackList.SelectedIndices[i]].NoteStyle = new NoteStyle_Default(null);
 			}
@@ -895,8 +907,8 @@ namespace Visual_Music
 		}
 		void openSongFile(string fileName)
 		{
-			try
-			{
+			//try
+			//{
 				DataContractSerializer dcs = new DataContractSerializer(typeof(SongPanel), projectSerializationTypes);
                 using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
@@ -904,6 +916,7 @@ namespace Visual_Music
 					Controls.Remove(songPanel);
 					songPanel.Dispose();
                     songPanel = (SongPanel)dcs.ReadObject(stream);
+                    songPanel.afterDeserialize();
                 }
                 initSongPanel(songPanel);
 
@@ -921,11 +934,11 @@ namespace Visual_Music
                 currentSongPath = fileName;
 				songLoaded(currentSongPath);
 				updateFormTitle(currentSongPath);
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message);
-			}
+			//}
+			//catch (Exception ex)
+			//{
+			//	MessageBox.Show(ex.Message);
+			//}
 		}
 		void updateFormTitle(string path)
 		{
@@ -992,7 +1005,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.lineWidth = (int)lineWidthUpDown.Value;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().LineWidth = (int)lineWidthUpDown.Value;
 		}
 
 		private void qnGapFillUd_ValueChanged(object sender, EventArgs e)
@@ -1000,14 +1013,14 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.qn_gapThreshold = (int)qnGapFillUd.Value;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().Qn_gapThreshold = (int)qnGapFillUd.Value;
 		}
 		private void fadeoutUd_ValueChanged(object sender, EventArgs e)
 		{
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.fadeOut = (float)((NumericUpDown)sender).Value / 100.0f;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().FadeOut = (float)((NumericUpDown)sender).Value / 100.0f;
 		}
 
 		private void lineStyleList_SelectedIndexChanged(object sender, EventArgs e)
@@ -1020,7 +1033,7 @@ namespace Visual_Music
 				return;
 			songPanel.Invalidate();
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.style = (LineStyleEnum)lineStyleList.SelectedIndex;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().Style = (LineStyleEnum)lineStyleList.SelectedIndex;
 		}
 
 		private void blurredEdgeUd_ValueChanged(object sender, EventArgs e)
@@ -1028,7 +1041,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.blurredEdge = (int)blurredEdgeUd.Value;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().BlurredEdge = (int)blurredEdgeUd.Value;
 		}
 		private void invalidateSongPanel(object sender, EventArgs e)
 		{
@@ -1190,7 +1203,7 @@ namespace Visual_Music
 				return;
 			songPanel.Invalidate();
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.hlStyle = (LineHlStyleEnum)lineHlStyleList.SelectedIndex;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().HlStyle = (LineHlStyleEnum)lineHlStyleList.SelectedIndex;
 		}
 
 		private void hlSizeUpDown_ValueChanged(object sender, EventArgs e)
@@ -1198,7 +1211,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.hlSize = (int)hlSizeUpDown.Value;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().HlSize = (int)hlSizeUpDown.Value;
 		}
 
 		private void movingHlCb_CheckedChanged(object sender, EventArgs e)
@@ -1206,7 +1219,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.movingHl = ((CheckBox)sender).Checked;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().MovingHl = ((CheckBox)sender).Checked;
 		}
 
 		private void shriunkingHlCb_CheckedChanged(object sender, EventArgs e)
@@ -1214,7 +1227,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.shrinkingHl = ((CheckBox)sender).Checked;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().ShrinkingHl = ((CheckBox)sender).Checked;
 		}
 
 		private void hlBorderCb_CheckedChanged(object sender, EventArgs e)
@@ -1222,7 +1235,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.hlBorder = ((CheckBox)sender).Checked;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().HlBorder = ((CheckBox)sender).Checked;
 		}
 
 		private void trackPropsCb_CheckedChanged(object sender, EventArgs e)
@@ -1421,7 +1434,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].LineStyleProps.shapePower = (float)((NumericUpDown)sender).Value;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().ShapePower = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void texKeepAspect_CheckedChanged(object sender, EventArgs e)

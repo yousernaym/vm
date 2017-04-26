@@ -24,7 +24,7 @@ namespace Visual_Music
 
     public class SongDrawProps
 	{
-		public int songPosT;
+        public int songPosT;
 		public float songPosS;
 		public float noteHeight;
 		public int yMargin;
@@ -83,6 +83,8 @@ namespace Visual_Music
     [Serializable()]
     public class SongPanel : GraphicsDeviceControl, ISerializable
     {
+        ContentManager content;
+        public ContentManager Content { get { return content; } }
         bool audioFromMod;
         Texture2D regionSelectTexture;
         float normPitchMargin = 1 / 50.0f;
@@ -107,7 +109,6 @@ namespace Visual_Music
         Rectangle selectedScreenRegion;
         public float NormMouseX { get; set; }
         public float NormMouseY { get; set; }
-        ContentManager content;
         SpriteBatch spriteBatch;
         public SpriteBatch SpriteBatch
         {
@@ -179,11 +180,10 @@ namespace Visual_Music
 			}
 		}
     
-
         int viewWidthT; ////Number of ticks that fits on screen
         public int ViewWidthT { get => viewWidthT; }
-	
-		public SongPanel()
+
+        public SongPanel()
 		{
 		}
 		public SongPanel(SerializationInfo info, StreamingContext ctxt):base()
@@ -225,7 +225,7 @@ namespace Visual_Music
 		
 		protected override void Initialize()
         {
-			stopwatch.Start();
+            stopwatch.Start();
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 			blendState = new BlendState();
 			videoFrame = new RenderTarget2D(GraphicsDevice, videoSize.X, videoSize.Y);
@@ -239,36 +239,21 @@ namespace Visual_Music
 			blendState.ColorWriteChannels = ColorWriteChannels.All;
 			blendState.AlphaBlendFunction = BlendFunction.Add;
 			blendState.ColorBlendFunction = BlendFunction.Add;
-			NoteStyle.init(this);
-			regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
+
+            content = new ContentManager(Services, "Content");
+            NoteStyle.sInit(this);
+
+            regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
 			regionSelectTexture.SetData(new[] { Color.White });
 
-			//Deserialization inits trackProps.texPath but not trackProps.texture because Texture2D is not serializable, and we can't load texture before the device is created
-			try
-			{
-				if (trackProps != null)
-				{
-					for (int i = 0; i < trackProps.Count; i++)
-					{
-						string path = trackProps[i].TexProps.Path;
-						if (!string.IsNullOrEmpty(path))
-							trackProps[i].TexProps.loadTexture(path, this);
-						path = trackProps[i].HmapProps.Path;
-						if (!string.IsNullOrEmpty(path))
-							trackProps[i].HmapProps.loadTexture(path, this);
-					}
-				}
+			if (trackProps != null)
+            {
+			    for (int i = 0; i < trackProps.Count; i++)
+                    trackProps[i].init(this);
 			}
-			catch (Exception)
-			{
-				MessageBox.Show("Failed to load texture");
-			}
-
-			content = new ContentManager(Services, "Content");
-			//NoteStyle.CircleFx = content.Load<Effect>("Circle");
-			NoteStyle.LineFx = content.Load<Effect>("Line");
-			NoteStyle.BarFx = content.Load<Effect>("Bar");
-		}
+			
+			
+        }
 		
 		protected override void Dispose(bool disposing)
         {
@@ -520,8 +505,8 @@ namespace Visual_Music
 		}
 		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _modInsTrack)
 		{
-			try
-			{
+			//try
+			//{
 				Invalidate();
 				stopPlayback();
 				noteFilePath = file;
@@ -556,12 +541,12 @@ namespace Visual_Music
 				
 				viewWidthT = (int)(Qn_viewWidth * notes.TimeDiv);
 				createTrackProps(notes.Tracks.Count, eraseCurrent);
-			}
-			catch (Exception e)
-			{
-				MessageBox.Show(Parent, e.Message, "Note file error");
-				return false;
-			}
+			//}
+			//catch (Exception e)
+			//{
+			//	MessageBox.Show(Parent, e.Message, "Note file error");
+			//	return false;
+			//}
 			return true;
 		}
 		public bool openAudioFile(string file)
@@ -918,6 +903,11 @@ namespace Visual_Music
             base.OnMouseUp(e);
             selectingRegion = false;
             mergeRegionSelection = false;
+        }
+
+        public void afterDeserialize()
+        {
+            
         }
     }
 

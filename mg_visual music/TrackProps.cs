@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Windows.Forms;
 
 
 namespace Visual_Music
@@ -185,7 +186,8 @@ namespace Visual_Music
 	[Serializable()]
 	public class TrackProps : ISerializable
 	{
-		TrackPropsTex texProps = new TrackPropsTex();
+        static TrackProps globalProps;
+        TrackPropsTex texProps = new TrackPropsTex();
 		public TrackPropsTex TexProps
 		{
 			get { return texProps; }
@@ -202,7 +204,6 @@ namespace Visual_Music
 			else
 				return hmapProps;
 		}
-		
 		
 		static bool bgr = false;
 		static public bool Bgr
@@ -234,33 +235,41 @@ namespace Visual_Music
 			get { return hue; }
 			set { hue = value; }
 		}
-		NoteStyle noteStyle;
-		internal NoteStyle NoteStyle
-		{
-			get { return noteStyle; }
-			set
-			{
-				noteStyle = value;
-				noteStyle.TrackProps = this;
-			}
-		}
-		NoteStyleProps_Line lineStyleProps = new NoteStyleProps_Line();
-		internal NoteStyleProps_Line LineStyleProps
-		{
-			get { return lineStyleProps; }
-			//set { lineStyleProps = value; }
-		}
-		public int NoteStyleIndex
-		{
-			get
-			{
-				if (noteStyle == null)
-					return (int)NoteStyleEnum.Default;
-				else
-					return noteStyle.Index;
-			}
-		}
-
+        public NoteStyleEnum NoteStyleType { get; set; }
+        NoteStyle[] noteStyles = new NoteStyle[Enum.GetNames(typeof(NoteStyleEnum)).Length];
+        
+        //NoteStyle_Bar barNoteStyle;
+        //NoteStyle_Line lineNoteStyle;
+        public NoteStyle SelectedNoteStyle
+        {
+            get
+            {
+                if (NoteStyleType == NoteStyleEnum.Default)
+                {
+                    if (trackNumber == 0)
+                        return getBarNoteStyle();
+                    else
+                        return globalProps.SelectedNoteStyle;
+                }
+                else
+                    return getNoteStyle(NoteStyleType);
+                //switch (NoteStyleEnum)
+                //{
+                //    case NoteStyleEnum.Bar:
+                //        return barNoteStyle;
+                //    case NoteStyleEnum.Line:
+                //        return lineNoteStyle;
+                //    case NoteStyleEnum.Default:
+                //        if (trackNumber == 0)
+                //            return barNoteStyle;
+                //        else
+                //            return globalProps.SelectedNoteStyle;
+                //}
+            }
+        }
+		
+        
+		
 		TrackProps2 normal;
 		internal TrackProps2 Normal
 		{
@@ -325,26 +334,37 @@ namespace Visual_Music
 
 		public TrackProps(int _trackNumber, int _numTracks, Midi.Song song)
 		{
-			midiTrack = song.Tracks[_trackNumber];
+            midiTrack = song.Tracks[_trackNumber];
 			trackNumber = _trackNumber;
-			numTracks = _numTracks;
+            numTracks = _numTracks;
 
 			createCurve();
 			resetProps();
-		}
+            if (trackNumber == 0)
+                globalProps = this;
+            loadtNoteStyleS();
+        }
 	
 		public TrackProps(SerializationInfo info, StreamingContext ctxt)
 		{
 			trackNumber = (int)info.GetValue("trackNumber", typeof(int));
-			transp = (float)info.GetValue("transp", typeof(float));
+            if (trackNumber == 0)
+                globalProps = this;
+            transp = (float)info.GetValue("transp", typeof(float));
 			hue = (float)info.GetValue("hue", typeof(float));
 			normal = (TrackProps2)info.GetValue("normal", typeof(TrackProps2));
 			hilited = (TrackProps2)info.GetValue("hilited", typeof(TrackProps2));
 			texProps = (TrackPropsTex)info.GetValue("texProps", typeof(TrackPropsTex));
 			hmapProps = (TrackPropsTex)info.GetValue("hmapProps", typeof(TrackPropsTex));
-			NoteStyle = (NoteStyle)info.GetValue("noteStyle", typeof(NoteStyle));
-			noteStyle.TrackProps = this;
-			lineStyleProps = (NoteStyleProps_Line)info.GetValue("lineStyleProps", typeof(NoteStyleProps_Line));
+			noteStyles = (NoteStyle[])info.GetValue("noteStyles", typeof(NoteStyle[]));
+            NoteStyleType = (NoteStyleEnum)info.GetValue("noteStyleType", typeof(NoteStyleEnum));
+
+            foreach (NoteStyle ns in noteStyles)
+            {
+                if (ns != null)
+                    ns.TrackProps = this;
+            }
+			//lineStyleProps = (NoteStyleProps_Line)info.GetValue("lineStyleProps", typeof(NoteStyleProps_Line));
 			//curve = (Curve)info.GetValue("curve", typeof(Curve));
 			lightDir = (Vector3)info.GetValue("lightDir", typeof(Vector3));
 			specAmount = (float)info.GetValue("specAmount", typeof(float));
@@ -362,8 +382,9 @@ namespace Visual_Music
 			info.AddValue("hilited", hilited);
 			info.AddValue("texProps", texProps);
 			info.AddValue("hmapProps", hmapProps);
-			info.AddValue("noteStyle", noteStyle);
-			info.AddValue("lineStyleProps", lineStyleProps);
+			info.AddValue("noteStyles", noteStyles);
+            info.AddValue("noteStyleType", NoteStyleType);
+            //info.AddValue("lineStyleProps", lineStyleProps);
 			//info.AddValue("curve", curve);
 			info.AddValue("lightDir", lightDir);
 			info.AddValue("specAmount", specAmount);
@@ -372,7 +393,37 @@ namespace Visual_Music
 			info.AddValue("useGlobalLight", useGlobalLight);
 
 		}
-		public TrackProps copyTo(TrackProps dest)
+
+        public void loadContent(SongPanel songPanel)
+        {
+            //Deserialization inits trackProps.texPath but not trackProps.texture because Texture2D is not serializable, and you can't load texture before the device is created
+            try
+            {
+                string path = TexProps.Path;
+                if (!string.IsNullOrEmpty(path))
+                    TexProps.loadTexture(path, songPanel);
+                path = HmapProps.Path;
+                if (!string.IsNullOrEmpty(path))
+                    HmapProps.loadTexture(path, songPanel);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Failed to load texture");
+            }
+            //Deserialization opens note file and creates track props before songPanel is initialized, so note style effects needs to be loaded here
+            loadNoteStyleFx();
+        }
+
+        void loadNoteStyleFx()
+        {
+            foreach (NoteStyle ns in noteStyles)
+            {
+                if (ns != null)
+                    ns.loadFx();
+            }
+        }
+
+        public TrackProps copyTo(TrackProps dest)
 		{
 			Midi.Track midiTrack = dest.midiTrack;
 			Curve curve = dest.curve;
@@ -449,15 +500,22 @@ namespace Visual_Music
 		
 		public void resetStyle()
 		{
-			if (trackNumber == 0)
+            int[] styleTypes = (int[])Enum.GetValues(typeof(NoteStyleEnum));
+            string[] styleNames = (string[])Enum.GetNames(typeof(NoteStyleEnum));
+            for (int i = 0; i < noteStyles.Length; i++)
+            {
+                if ((NoteStyleEnum)styleTypes[i] != NoteStyleEnum.Default)
+                    noteStyles[i] = (NoteStyle)Activator.CreateInstance(Type.GetType("Visual_Music.NoteStyle_"+styleNames[i]));
+            }
+            if (trackNumber == 0)
 			{
-				noteStyle = new NoteStyle_Bar(this);
-				UseGlobalLight = false;
+                NoteStyleType = NoteStyleEnum.Bar;
+			    UseGlobalLight = false;
 			}
 			else
 			{
-				noteStyle = new NoteStyle_Default(this);
-				UseGlobalLight = true;
+                NoteStyleType = NoteStyleEnum.Default;
+                UseGlobalLight = true;
 			}
 		}
 		public void resetLight()
@@ -485,36 +543,55 @@ namespace Visual_Music
 				bars.drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
 			}
 			else
-				getNoteStyle(globalTrackProps).drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
+				SelectedNoteStyle.drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
 		}
-		//public void drawNote(NoteDrawProps drawProps, TrackProps globalProps)
-		//{
-			//getNoteStyle(globalProps).draw(drawProps, getColor(drawProps.bHilited, globalProps, true), getTexture(drawProps.bHilited, globalProps));
-		//}
-		//public void calcColors(bool _bgr = false)
-		//{
-		//    bgr = _bgr;
-		//    normal.calcColor(hue, bgr);
-		//    hilited.calcColor(hue, bgr);
-		//}
-		//public void setNoteStyle(string styleString)
-		//{
-		//    if (styleString == NoteStyleEnum.Default.ToString())
-		//        noteStyle = null;
-		//    else if (styleString == NoteStyleEnum.Bar.ToString())
-		//        noteStyle = new NoteStyle_Bar();
-		//    else if (styleString == NoteStyleEnum.Line.ToString())
-		//        noteStyle = new NoteStyle_Line();
-		//}
+        //public void drawNote(NoteDrawProps drawProps, TrackProps globalProps)
+        //{
+        //getNoteStyle(globalProps).draw(drawProps, getColor(drawProps.bHilited, globalProps, true), getTexture(drawProps.bHilited, globalProps));
+        //}
+        //public void calcColors(bool _bgr = false)
+        //{
+        //    bgr = _bgr;
+        //    normal.calcColor(hue, bgr);
+        //    hilited.calcColor(hue, bgr);
+        //}
+        //public void setNoteStyle(string styleString)
+        //{
+        //    if (styleString == NoteStyleEnum.Default.ToString())
+        //        noteStyle = null;
+        //    else if (styleString == NoteStyleEnum.Bar.ToString())
+        //        noteStyle = new NoteStyle_Bar();
+        //    else if (styleString == NoteStyleEnum.Line.ToString())
+        //        noteStyle = new NoteStyle_Line();
+        //}
 
-		NoteStyle getNoteStyle(TrackProps globalProps)
-		{
-			NoteStyle ns = noteStyle is NoteStyle_Default ? globalProps.noteStyle : noteStyle;
-			if (ns is NoteStyle_Default) //if global has notestyle set to default
-				ns = new NoteStyle_Bar(this);
-			return ns;
-		}
-		public Texture2D getTexture(bool bhilited, TrackProps globalProps)
+        //void setNoteStyle(NoteStyleEnum style)
+        //{
+        //    noteStyleEnum = style;
+        //    if (style == NoteStyleEnum.Bar)
+        //        selectedNoteStyle = barNoteStyle;
+        //    else if (style == NoteStyleEnum.Line)
+        //        selectedNoteStyle = lineNoteStyle;
+        //}
+  //      NoteStyle getNoteStyle(TrackProps globalProps)
+		//{
+  //          NoteStyle globalStyle = globalProps.SelectedNoteStyle is NoteStyle_Default ? globalProps.getNoteStyle(NoteStyleEnum.Bar) : globalProps.SelectedNoteStyle;
+  //          NoteStyle ns = SelectedNoteStyle is NoteStyle_Default ?  globalStyle : SelectedNoteStyle;
+		//	return ns;
+		//}
+        public NoteStyle getNoteStyle(NoteStyleEnum styleType)
+        {
+            return noteStyles[(int)styleType];
+        }
+        public NoteStyle_Bar getBarNoteStyle()
+        {
+            return (NoteStyle_Bar)noteStyles[(int)NoteStyleEnum.Bar];
+        }
+        public NoteStyle_Line getLineNoteStyle()
+        {
+            return (NoteStyle_Line)noteStyles[(int)NoteStyleEnum.Line];
+        }
+        public Texture2D getTexture(bool bhilited, TrackProps globalProps)
 		{
 			Texture2D tex;
 			if (bhilited && hilited.Texture != null)

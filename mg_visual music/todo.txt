@@ -1,6 +1,7 @@
 ﻿- Use shader for bar rendering and add rendering options for bar style.
 - Don't clamp brightness before modulating with texture.
 - Bump mapping.
+- Refactor effects. TrackProps has LineStyleEnum to determine line style. NoteStyle_Bar/Line instances contains props and fx.
 
 Done:
 - Get MonoGame keys to work. (ctrl and shift when selecting notes in SongPanel)
