@@ -76,19 +76,7 @@ namespace Visual_Music
         protected static Effect fx;
 
         protected NoteStyleEnum styleType;
-        //public int Index
-        //{
-        //    get { return index; }
-        //    set { index = value; }
-        //}
-        public string Name
-        {
-            get { return styleType.ToString(); }
-        }
-        virtual public NoteStyle Value
-        {
-            get { return this; }
-        }
+        
         protected TrackProps trackProps = null;
         public TrackProps TrackProps
         {
@@ -96,15 +84,6 @@ namespace Visual_Music
             set { trackProps = value; }
         }
 
-        //virtual public int LineWidth
-        //{
-        //    set { }
-        //    get { return 0; }
-        //}
-        //public Texture2D Texture
-        //{
-        //    get { return textures[index]; }
-        //}
         protected static SongPanel songPanel;
 
         public NoteStyle()
@@ -116,13 +95,13 @@ namespace Visual_Music
         }
         public NoteStyle(SerializationInfo info, StreamingContext ctxt)
         {
-            //index = (int)info.GetValue("index", typeof(int));
+            styleType = (NoteStyleEnum)info.GetValue("styleType", typeof(NoteStyleEnum));
         }
 
-        abstract public void GetObjectData(SerializationInfo info, StreamingContext ctxt);
-        //{
-        //info.AddValue("index", index);
-        //}
+        virtual public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+        {
+            info.AddValue("styleType", styleType);
+        }
 
         public static void sInit(SongPanel _songPanel)
         {
@@ -196,38 +175,8 @@ namespace Visual_Music
 		{
             fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
         }
-        //abstract public void draw(NoteDrawProps drawProps, Color color, Texture2D texture, int pass);
     }
 
-    //[Serializable()]
-    //class NoteStyle_Default : NoteStyle
-    //{
-    //	//public override NoteStyle Value
-    //	//{
-    //	//    get { return null; }
-    //	//}
-    //	public NoteStyle_Default()
-    //	{
-    //		index = (int)NoteStyleEnum.Default;
-    //	}
-    //	public NoteStyle_Default(TrackProps tprops)
-    //		: base(tprops)
-    //	{
-    //		index = (int)NoteStyleEnum.Default;
-    //	}
-    //	public NoteStyle_Default(SerializationInfo info, StreamingContext ctxt)
-    //		: base(info, ctxt)
-    //	{
-    //	}
-    //	public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
-    //	{
-    //		throw new NotImplementedException();
-    //	}
-    //	//public override void draw(NoteDrawProps drawProps, Color color, Texture2D texture, int pass)
-    //	//{
-    //	//throw new NotImplementedException();
-    //	//}
-    //}
     [Serializable()]
 	public class NoteStyle_Bar : NoteStyle
 	{
@@ -246,7 +195,7 @@ namespace Visual_Music
 		}
         override public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
-
+            base.GetObjectData(info, ctxt);
         }
         override public void loadFx()
         {
@@ -400,6 +349,7 @@ namespace Visual_Music
         }
         override public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
+            base.GetObjectData(info, ctxt);
             info.AddValue("qn_gapThreshold", Qn_gapThreshold);
             info.AddValue("lineWidth", LineWidth);
             info.AddValue("fadeOutFromCenter", FadeOut);
@@ -815,10 +765,10 @@ namespace Visual_Music
 				completeNoteListIndex++;
 			}
 		}
-		static string GetName<T>(T item) where T : class
-		{
-			return typeof(T).GetProperties()[0].Name;
-		}
+		//static string GetName<T>(T item) where T : class
+		//{
+		//	return typeof(T).GetProperties()[0].Name;
+		//}
 
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
 		{

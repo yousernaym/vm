@@ -253,22 +253,8 @@ namespace Visual_Music
                 }
                 else
                     return getNoteStyle(NoteStyleType);
-                //switch (NoteStyleEnum)
-                //{
-                //    case NoteStyleEnum.Bar:
-                //        return barNoteStyle;
-                //    case NoteStyleEnum.Line:
-                //        return lineNoteStyle;
-                //    case NoteStyleEnum.Default:
-                //        if (trackNumber == 0)
-                //            return barNoteStyle;
-                //        else
-                //            return globalProps.SelectedNoteStyle;
-                //}
             }
         }
-		
-        
 		
 		TrackProps2 normal;
 		internal TrackProps2 Normal
@@ -342,7 +328,6 @@ namespace Visual_Music
 			resetProps();
             if (trackNumber == 0)
                 globalProps = this;
-            loadtNoteStyleS();
         }
 	
 		public TrackProps(SerializationInfo info, StreamingContext ctxt)
@@ -396,10 +381,10 @@ namespace Visual_Music
 
         public void loadContent(SongPanel songPanel)
         {
-            //Deserialization inits trackProps.texPath but not trackProps.texture because Texture2D is not serializable, and you can't load texture before the device is created
+            //Deserialization inits trackProps.texPath but not trackProps.texture because Texture2D is not serializable, and you can't load texture before the device is created.
+            string path = TexProps.Path;
             try
             {
-                string path = TexProps.Path;
                 if (!string.IsNullOrEmpty(path))
                     TexProps.loadTexture(path, songPanel);
                 path = HmapProps.Path;
@@ -408,13 +393,11 @@ namespace Visual_Music
             }
             catch (Exception)
             {
-                MessageBox.Show("Failed to load texture");
+                MessageBox.Show("Failed to load texture " + path);
             }
-            //Deserialization opens note file and creates track props before songPanel is initialized, so note style effects needs to be loaded here
-            loadNoteStyleFx();
         }
 
-        void loadNoteStyleFx()
+        public void loadNoteStyleFx()
         {
             foreach (NoteStyle ns in noteStyles)
             {
@@ -545,6 +528,7 @@ namespace Visual_Music
 			else
 				SelectedNoteStyle.drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
 		}
+
         //public void drawNote(NoteDrawProps drawProps, TrackProps globalProps)
         //{
         //getNoteStyle(globalProps).draw(drawProps, getColor(drawProps.bHilited, globalProps, true), getTexture(drawProps.bHilited, globalProps));
@@ -555,30 +539,7 @@ namespace Visual_Music
         //    normal.calcColor(hue, bgr);
         //    hilited.calcColor(hue, bgr);
         //}
-        //public void setNoteStyle(string styleString)
-        //{
-        //    if (styleString == NoteStyleEnum.Default.ToString())
-        //        noteStyle = null;
-        //    else if (styleString == NoteStyleEnum.Bar.ToString())
-        //        noteStyle = new NoteStyle_Bar();
-        //    else if (styleString == NoteStyleEnum.Line.ToString())
-        //        noteStyle = new NoteStyle_Line();
-        //}
-
-        //void setNoteStyle(NoteStyleEnum style)
-        //{
-        //    noteStyleEnum = style;
-        //    if (style == NoteStyleEnum.Bar)
-        //        selectedNoteStyle = barNoteStyle;
-        //    else if (style == NoteStyleEnum.Line)
-        //        selectedNoteStyle = lineNoteStyle;
-        //}
-  //      NoteStyle getNoteStyle(TrackProps globalProps)
-		//{
-  //          NoteStyle globalStyle = globalProps.SelectedNoteStyle is NoteStyle_Default ? globalProps.getNoteStyle(NoteStyleEnum.Bar) : globalProps.SelectedNoteStyle;
-  //          NoteStyle ns = SelectedNoteStyle is NoteStyle_Default ?  globalStyle : SelectedNoteStyle;
-		//	return ns;
-		//}
+      
         public NoteStyle getNoteStyle(NoteStyleEnum styleType)
         {
             return noteStyles[(int)styleType];

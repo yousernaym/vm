@@ -51,7 +51,7 @@ namespace Visual_Music
         ImportMidiForm importMidiForm;
         ImportModForm importModForm;
 
-        Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum)};
+        Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>)};
         SongPanel songPanel = new SongPanel();
         ScrollBar songScrollBar = new HScrollBar();
         //Panel trackPropsPanel = new Panel();
@@ -916,7 +916,6 @@ namespace Visual_Music
 					Controls.Remove(songPanel);
 					songPanel.Dispose();
                     songPanel = (SongPanel)dcs.ReadObject(stream);
-                    songPanel.afterDeserialize();
                 }
                 initSongPanel(songPanel);
 
@@ -1262,22 +1261,21 @@ namespace Visual_Music
 		{
 			if ((int)maxPitchUd.Value < songPanel.Notes.MinPitch)
 				maxPitchUd.Value = songPanel.Notes.MinPitch ;
-			songPanel.Notes.MaxPitch = (int)maxPitchUd.Value;
+			songPanel.MaxPitch = (int)maxPitchUd.Value;
 		}
 
 		private void minPitchUd_ValueChanged(object sender, EventArgs e)
 		{
 			if ((int)minPitchUd.Value > songPanel.Notes.MaxPitch)
 				minPitchUd.Value = songPanel.Notes.MaxPitch;
-			songPanel.Notes.MinPitch = (int)minPitchUd.Value;
+			songPanel.MinPitch = (int)minPitchUd.Value;
 		}
 
 		private void defaultPitchesBtn_Click(object sender, EventArgs e)
 		{
-			songPanel.Notes.MinPitch = -1000;
-			maxPitchUd.Value = (decimal)(songPanel.Notes.MaxPitch = songPanel.Notes.DefaultMaxPitch);
-			minPitchUd.Value = (decimal)(songPanel.Notes.MinPitch = songPanel.Notes.DefaultMinPitch);
-		}
+			maxPitchUd.Value = (decimal)(songPanel.MaxPitch = songPanel.Notes.MaxPitch);
+			minPitchUd.Value = (decimal)(songPanel.MinPitch = songPanel.Notes.MinPitch);
+        }
 
 		private void pointSmpCb_CheckedChanged(object sender, EventArgs e)
 		{

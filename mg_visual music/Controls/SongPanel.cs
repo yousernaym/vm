@@ -31,6 +31,7 @@ namespace Visual_Music
 		public Point viewportSize;
 		public int viewWidthT;
 		public Midi.Song song;
+        public int minPitch;
 
 		public Point getScreenPos(int timeT, int pitch)
 		{
@@ -55,10 +56,7 @@ namespace Visual_Music
 		}
 		public float getPitchScreenPos(float pitch)
 		{
-			//float pitch = normPitch * (song.DefaultMaxPitch - song.DefaultMinPitch);
-			//pitch += song.DefaultMinPitch;
-			//return (float)viewportSize.Y - (pitch - song.MinPitch) * (float)noteHeight - noteHeight / 2.0f - yMargin;
-			return (float)viewportSize.Y - (pitch - song.MinPitch) * (float)noteHeight - noteHeight / 2.0f - yMargin;
+			return (float)viewportSize.Y - (pitch - minPitch) * (float)noteHeight - noteHeight / 2.0f - yMargin;
 		}
 		public float getSongPosT(float screenX)
 		{ //Returns song pos in ticks
@@ -168,8 +166,8 @@ namespace Visual_Music
         public double NormSongPos { get => normSongPos; set => normSongPos = value; }
         const float defaultQn_viewWidth = 16; //Number of quarter notes that fits on screen
 		float qn_viewWidth = defaultQn_viewWidth; 
-		public double AudioOffset { get; set; }
-		public float Qn_viewWidth
+		
+        public float Qn_viewWidth
 		{
 			get {return qn_viewWidth;}
 			set
@@ -182,6 +180,10 @@ namespace Visual_Music
     
         int viewWidthT; ////Number of ticks that fits on screen
         public int ViewWidthT { get => viewWidthT; }
+        public double AudioOffset { get; set; }
+        public int MinPitch { get; set; } 
+        public int MaxPitch { get; set; }
+        int NumPitches { get { return MaxPitch - MinPitch + 1; } }
 
         public SongPanel()
 		{
@@ -192,21 +194,20 @@ namespace Visual_Music
             noteFilePath = (string)info.GetValue("noteFilePath", typeof(string));
 			audioFilePath = (string)info.GetValue("audioFilePath", typeof(string));
 			modInsTrack = (bool)info.GetValue("modInsTrack", typeof(bool));
-			importSong(noteFilePath, audioFilePath, true, modInsTrack);
-			int trackPropsCountFromFile = (int)info.GetValue("trackPropsCount", typeof(int));
-			for (int i = 0; i < notes.Tracks.Count && i < trackPropsCountFromFile; i++)
-			{
-				trackProps[i] = (TrackProps)info.GetValue("trackProps" + i, typeof(TrackProps));
-				trackProps[i].MidiTrack = notes.Tracks[trackProps[i].TrackNumber];
-				trackProps[i].createCurve();
-				//trackProps[i].NumTracks = trackPropsCountFromFile;
-			}
+			//int trackPropsCountFromFile = (int)info.GetValue("trackPropsCount", typeof(int));
+            trackProps = (List<TrackProps>)info.GetValue("trackProps", typeof(List<TrackProps>));
+   //         for (int i = 0; i < notes.Tracks.Count && i < trackPropsCountFromFile; i++)
+			//{
+				
+			//	trackProps[i].MidiTrack = notes.Tracks[trackProps[i].TrackNumber];
+			//	trackProps[i].createCurve();
+			//	//trackProps[i].NumTracks = trackPropsCountFromFile;
+			//}
 			
 			Qn_viewWidth = (float)info.GetValue("qn_viewWidth", typeof(float));
 			AudioOffset = (double)info.GetValue("audioOffset", typeof(double));
-			Notes.MaxPitch = (int)info.GetValue("maxPitch", typeof(int));
-			Notes.MinPitch = (int)info.GetValue("minPitch", typeof(int));
-			//default pitches are set in inportSong
+			MaxPitch = (int)info.GetValue("maxPitch", typeof(int));
+			MinPitch = (int)info.GetValue("minPitch", typeof(int));
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
@@ -214,13 +215,14 @@ namespace Visual_Music
             info.AddValue("noteFilePath", noteFilePath);
 			info.AddValue("audioFilePath", audioFilePath);
 			info.AddValue("modInsTrack", modInsTrack);
-			info.AddValue("trackPropsCount", trackProps.Count);
-			for (int i = 0; i < trackProps.Count; i++)
-				info.AddValue("trackProps"+i, trackProps[i]);
-			info.AddValue("qn_viewWidth", Qn_viewWidth);
+            //info.AddValue("trackPropsCount", trackProps.Count);
+            //for (int i = 0; i < trackProps.Count; i++)
+            //info.AddValue("trackProps"+i, trackProps[i]);
+            info.AddValue("trackProps", trackProps);
+            info.AddValue("qn_viewWidth", Qn_viewWidth);
 			info.AddValue("audioOffset", AudioOffset);
-			info.AddValue("maxPitch", Notes.MaxPitch);
-			info.AddValue("minPitch", Notes.MinPitch);
+			info.AddValue("maxPitch", MaxPitch);
+			info.AddValue("minPitch", MinPitch);
 		}
 		
 		protected override void Initialize()
@@ -246,10 +248,11 @@ namespace Visual_Music
             regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
 			regionSelectTexture.SetData(new[] { Color.White });
 
-			if (trackProps != null)
+            importSong(noteFilePath, audioFilePath, false, modInsTrack);
+            if (trackProps != null)
             {
 			    for (int i = 0; i < trackProps.Count; i++)
-                    trackProps[i].init(this);
+                    trackProps[i].loadContent(this);
 			}
 			
 			
@@ -331,23 +334,6 @@ namespace Visual_Music
 
 		void selectRegion()
 		{
-			//if (!MbPressed)
-			//{
-			//	selectingRegion = false;
-			//	mergeRegionSelection = false;
-			//	return;
-			//}
-			//KeyboardState kbState = Keyboard.GetState();
-			//if (!selectingRegion)
-			//{
-			//	selectingRegion = true;
-   //             if (kbState.IsKeyDown(XnaKeys.LeftControl) || kbState.IsKeyDown(XnaKeys.RightControl))
-   //                 mergeRegionSelection = true;
-			//	selectedSongRegion.X = screenPosToSongPos(NormMouseX);
-			//	selectedSongRegion.Y = getPitch(NormMouseY);
-			//	selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width);
-			//	selectedScreenRegion.Y = (int)(NormMouseY * ClientRectangle.Height);
-			//}
 			if (selectingRegion)
 			{
 				int x = screenPosToSongPos(NormMouseX);
@@ -419,7 +405,7 @@ namespace Visual_Music
 			int height = ClientRectangle.Height - (int)(normPitchMargin * 2 * ClientRectangle.Height);
 			float noteHeight = (float)height / notes.NumPitches;
 			int pos = (int)((normPosY - normPitchMargin) * ClientRectangle.Height + 1);
-			return notes.MinPitch + (int)(pos / noteHeight);
+			return MinPitch + (int)(pos / noteHeight);
 		}
 		void scrollSong(TimeSpan deltaTime)
 		{
@@ -428,8 +414,6 @@ namespace Visual_Music
 			{
 				if (!scrollingSong)
 				{
-					//scrollCenter = dNormMouseX;
-					//scrollCenter = 0;
 					scrollingSong = true;
 				}
 				dNormMouseX -= scrollCenter;
@@ -449,16 +433,16 @@ namespace Visual_Music
 				trackProps = new List<TrackProps>(numTracks);
 			}
 			else
-				startTrack = trackProps.Count; //Keep current props, but add new propsIf the new imported note file has more tracks than the current song, start assigning default track props at current song's track count and up.
+				startTrack = trackProps.Count; //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props at current song's track count and up.
 			
 			for (int i = 0; i < numTracks; i++)
 			{
-				if (i < startTrack) //Just update notes, not other (visual) props
+				if (i < startTrack) //Just update notes, not visual props.
 				{
 					trackProps[i].MidiTrack = notes.Tracks[trackProps[i].TrackNumber];
 					trackProps[i].createCurve();
 				}
-				else //New note file has more tracks than current song.Create new track props for the new tracks.
+				else //New note file has more tracks than current song. Create new track props for the new tracks.
 				{
 					TrackProps props = new Visual_Music.TrackProps(i, numTracks, notes);
 					trackProps.Add(props);
@@ -466,6 +450,10 @@ namespace Visual_Music
 			}
 			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra track props.
 				trackProps.RemoveRange(numTracks, startTrack - numTracks);
+            //Reload all notestyle fx files even if no new track props were created, since there is the possibility that songPanel was recreated with a new graphics device.
+            foreach (Visual_Music.TrackProps tp in trackProps)
+                tp.loadNoteStyleFx();
+
 		}
 		
 		public void drawSong(Point viewportSize, double normPos)
@@ -475,12 +463,13 @@ namespace Visual_Music
 
 			SongDrawProps songDrawProps = new SongDrawProps();
 			songDrawProps.yMargin = (int)(normPitchMargin * viewportSize.Y);
-			songDrawProps.noteHeight = (float)(viewportSize.Y - songDrawProps.yMargin * 2) / (notes.NumPitches);
+			songDrawProps.noteHeight = (float)(viewportSize.Y - songDrawProps.yMargin * 2) / (NumPitches);
             songDrawProps.songPosT = SongPosT;
 			songDrawProps.songPosS = (float)getSongPosInSeconds();
 			songDrawProps.viewportSize = viewportSize;
 			songDrawProps.viewWidthT = viewWidthT;
 			songDrawProps.song = notes;
+            songDrawProps.minPitch = MinPitch;
 
 			for (int t=notes.Tracks.Count-1;t>=0;t--)
 			{
@@ -519,8 +508,7 @@ namespace Visual_Music
 				}
 				else if (notes != null)
 				{
-					minPitch = notes.MinPitch;
-					maxPitch = notes.MaxPitch;
+					
 				}
 				if (string.IsNullOrEmpty(noteFilePath))
 				{
@@ -531,10 +519,10 @@ namespace Visual_Music
 				
 				notes = new Midi.Song();
 				notes.openFile(noteFilePath, ref audioFile, modInsTrack);
-				if (!eraseCurrent && maxPitch > 0)
+				if (eraseCurrent)
 				{
-					notes.MinPitch = minPitch;
-					notes.MaxPitch = maxPitch;
+                    minPitch = notes.MinPitch;
+                    maxPitch = notes.MaxPitch;
 				}
 
 				notes.createNoteBsp();
@@ -903,11 +891,6 @@ namespace Visual_Music
             base.OnMouseUp(e);
             selectingRegion = false;
             mergeRegionSelection = false;
-        }
-
-        public void afterDeserialize()
-        {
-            
         }
     }
 
