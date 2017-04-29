@@ -437,12 +437,13 @@ namespace Visual_Music
 			
 			for (int i = 0; i < numTracks; i++)
 			{
-				if (i < startTrack) //Just update notes, not visual props.
+				if (i < startTrack) //Just update notes, not visual props. Also reload note style effects in case a project file is being loaded, causing songPanel to be recreated with a new grapics device.
 				{
 					trackProps[i].MidiTrack = notes.Tracks[trackProps[i].TrackNumber];
 					trackProps[i].createCurve();
-				}
-				else //New note file has more tracks than current song. Create new track props for the new tracks.
+                    trackProps[i].loadNoteStyleFx();
+                }
+				else //New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
 				{
 					TrackProps props = new Visual_Music.TrackProps(i, numTracks, notes);
 					trackProps.Add(props);
@@ -451,8 +452,8 @@ namespace Visual_Music
 			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra track props.
 				trackProps.RemoveRange(numTracks, startTrack - numTracks);
             //Reload all notestyle fx files even if no new track props were created, since there is the possibility that songPanel was recreated with a new graphics device.
-            foreach (Visual_Music.TrackProps tp in trackProps)
-                tp.loadNoteStyleFx();
+            //foreach (Visual_Music.TrackProps tp in trackProps)
+               // tp.loadNoteStyleFx();
 
 		}
 		

@@ -490,7 +490,10 @@ namespace Visual_Music
             for (int i = 0; i < noteStyles.Length; i++)
             {
                 if ((NoteStyleEnum)styleTypes[i] != NoteStyleEnum.Default)
-                    noteStyles[i] = (NoteStyle)Activator.CreateInstance(Type.GetType("Visual_Music.NoteStyle_"+styleNames[i]));
+                {
+                    noteStyles[i] = (NoteStyle)Activator.CreateInstance(Type.GetType("Visual_Music.NoteStyle_" + styleNames[i]));
+                    noteStyles[i].loadFx();
+                }
             }
             if (trackNumber == 0)
 			{

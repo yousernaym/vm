@@ -158,7 +158,7 @@ namespace Visual_Music
         }
         protected List<Midi.Note> getNotes(int leftMargin, Midi.Track track, SongDrawProps songDrawProps)
         {   //Get currently visible notes in specified track
-            return track.getNotes(songDrawProps.songPosT - songDrawProps.viewWidthT / 2 - leftMargin, songDrawProps.songPosT + songDrawProps.viewWidthT / 2 /*+ margin*/);
+            return track.getNotes(songDrawProps.songPosT - songDrawProps.viewWidthT / 2 - leftMargin, songDrawProps.songPosT + songDrawProps.viewWidthT / 2 + leftMargin);
         }
         virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
 		{
