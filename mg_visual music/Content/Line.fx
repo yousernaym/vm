@@ -1,41 +1,37 @@
-//-----------------------------------------------------------------------------
-// SpriteBatch.fx
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
+// Input parameters
 
-float4 shadeHlObject(float sgnDistFromEdge, float distFromCenter);
-
-// Input parameters.
-float2   ViewportSize;
-float2   TexSize;
-//float4x4 MatrixTransform : register(c2);
+//Common parameters-----------
+float4x4 wvp;
+float2 ViewportSize;
+float2 TexSize;
 texture Texture;
 
 sampler  TextureSampler = sampler_state
 {
 	texture = <Texture>;
 };
-
-float Radius;
 float4 Color;
-float FadeoutFromCenter;
-float ShapePower;
 float BlurredEdge;
-int Style;
+float3 LightDir = normalize(float3(1, 1, 1));
 float AmbientLum = 0.25f;
-float3 LightDir = normalize(float3(1,1,1));
 float SpecAmount;
 float SpecPower;
 float SpecFov;
 float3 SpecCamPos;
+//------------------------------
+
+float Radius;
+float FadeoutFromCenter;
+float ShapePower;
+int Style;
 float3 WorldPos;
 float HlSize;
 float InnerHlSize;
 bool Border;
 
 //Helper functions------------------
+float4 shadeHlObject(float sgnDistFromEdge, float distFromCenter);
+
 void initPixel(inout float4 color, inout float3 normal, inout float3 normal2, inout float3 tPos, inout float distFromCenter, inout float distSign, inout float height, inout float normDistFromCenter, inout float2 texCoords, float3 rawPos, float3 center, float ShapePower, float fadeoutFromCenter)
 {
 	color = float4(Color.rgb,1);

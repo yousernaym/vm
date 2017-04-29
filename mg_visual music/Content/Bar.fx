@@ -1,44 +1,55 @@
-float4x4 World;
-float4x4 View;
-float4x4 Projection;
+// Input parameters
 
-// TODO: add effect parameters here.
+//Common parameters-----------
+float4x4 wvp;
+float2   ViewportSize;
+float2   TexSize;
+texture Texture;
 
-struct VertexShaderInput
+sampler  TextureSampler = sampler_state
 {
-    float4 Position : POSITION0;
+	texture = <Texture>;
+};
+float4 Color;
+float BlurredEdge;
+float3 LightDir = normalize(float3(1, 1, 1));
+float AmbientLum = 0.25f;
+float SpecAmount;
+float SpecPower;
+float SpecFov;
+float3 SpecCamPos;
+//------------------------------
 
-    // TODO: add input channels such as texture
-    // coordinates and vertex colors here.
+struct VSInput
+{
+    float4 pos : POSITION0;
+	float4 texCoords : TEXCOORD0;
 };
 
-struct VertexShaderOutput
+struct VSOutput
 {
-    float4 Position : POSITION0;
-
-    // TODO: add vertex shader outputs such as colors and texture
-    // coordinates here. These values will automatically be interpolated
-    // over the triangle, and provided as input to your pixel shader.
+    float4 pos : POSITION0;
+	float4 texCoords : TEXCOORD0;
 };
 
-VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
+VSOutput VS(VSInput input)
 {
-    VertexShaderOutput output;
+	VSOutput output;
+	output.pos = input.pos;
+	output.texCoords = input.texCoords;
+    //float4 worldPosition = mul(input.Position, World);
+    //float4 viewPosition = mul(worldPosition, View);
+    //output.Position = mul(viewPosition, Projection);
+	//output.pos = mul(input.pos, wvp);
 
-    float4 worldPosition = mul(input.Position, World);
-    float4 viewPosition = mul(worldPosition, View);
-    output.Position = mul(viewPosition, Projection);
-
-    // TODO: add your vertex shader code here.
-
-    return output;
+	return output;
 }
 
-float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
+float4 PS(VSOutput input) : COLOR0
 {
-    // TODO: add your pixel shader code here.
-
-    return float4(1, 0, 0, 1);
+	float4 color = Color;
+	color.rgb *= tex2D(TextureSampler, input.texCoords);
+    return color;
 }
 
 technique Technique1
@@ -47,7 +58,7 @@ technique Technique1
     {
         // TODO: set renderstates here.
 
-        VertexShader = compile vs_5_0 VertexShaderFunction();
-        PixelShader = compile ps_5_0 PixelShaderFunction();
+        //VertexShader = compile vs_5_0 VS();
+        PixelShader = compile ps_5_0 PS();
     }
 }

@@ -181,7 +181,7 @@ namespace Visual_Music
 				texture = null;
 			}
 		}
-	}
+    }
 
 	[Serializable()]
 	public class TrackProps : ISerializable
@@ -464,7 +464,8 @@ namespace Visual_Music
 
 		public void resetMaterial()
 		{
-			texProps.unloadTexture();
+            texProps.unloadTexture();
+            texProps = new TrackPropsTex();
 			if (trackNumber == 0)
 			{
 				transp = 1;
@@ -479,6 +480,7 @@ namespace Visual_Music
 				normal = new TrackProps2();
 				hilited = new TrackProps2(); ;
 			}
+            
 		}
 		
 		public void resetStyle()
@@ -521,12 +523,9 @@ namespace Visual_Music
 		public void drawTrack(SongDrawProps songDrawProps, TrackProps globalTrackProps, bool selectingRegion)
 		{
 			if (selectingRegion)
-			{
-				NoteStyle bars = new NoteStyle_Bar();
-				bars.drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
-			}
-			else
-				SelectedNoteStyle.drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
+			    getNoteStyle(NoteStyleEnum.Bar).drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
+            else
+			    SelectedNoteStyle.drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
 		}
 
         //public void drawNote(NoteDrawProps drawProps, TrackProps globalProps)

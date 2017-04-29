@@ -243,7 +243,7 @@ namespace Visual_Music
 			blendState.ColorBlendFunction = BlendFunction.Add;
 
             content = new ContentManager(Services, "Content");
-            NoteStyle.sInit(this);
+            NoteStyle.sInitAllStyles(this);
 
             regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
 			regionSelectTexture.SetData(new[] { Color.White });
