@@ -21,6 +21,7 @@ namespace Visual_Music
 	using GdiPoint = System.Drawing.Point;
 	using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
     using WinKeys = System.Windows.Forms.Keys;
+    public enum SourceSongType { Midi,Mod,Sid };
 
     public class SongDrawProps
 	{
@@ -157,8 +158,8 @@ namespace Visual_Music
             get { return modInsTrack; }
         }
 
-        bool isMod = false;
-        public bool IsMod { get => isMod; set => isMod = value; }
+        SourceSongType sourceSongType;
+        public SourceSongType SourceSongType { get => sourceSongType; set => sourceSongType = value; }
 		Point videoSize = new Point(1920, 1080);
         public int SongLengthT { get { return notes != null ? notes.SongLengthInTicks : 0; } }
         public int SongPosT { get { return (int)(normSongPos * SongLengthT); } }
@@ -194,36 +195,26 @@ namespace Visual_Music
             noteFilePath = (string)info.GetValue("noteFilePath", typeof(string));
 			audioFilePath = (string)info.GetValue("audioFilePath", typeof(string));
 			modInsTrack = (bool)info.GetValue("modInsTrack", typeof(bool));
-			//int trackPropsCountFromFile = (int)info.GetValue("trackPropsCount", typeof(int));
-            trackProps = (List<TrackProps>)info.GetValue("trackProps", typeof(List<TrackProps>));
-   //         for (int i = 0; i < notes.Tracks.Count && i < trackPropsCountFromFile; i++)
-			//{
-				
-			//	trackProps[i].MidiTrack = notes.Tracks[trackProps[i].TrackNumber];
-			//	trackProps[i].createCurve();
-			//	//trackProps[i].NumTracks = trackPropsCountFromFile;
-			//}
-			
-			Qn_viewWidth = (float)info.GetValue("qn_viewWidth", typeof(float));
+			trackProps = (List<TrackProps>)info.GetValue("trackProps", typeof(List<TrackProps>));
+   			Qn_viewWidth = (float)info.GetValue("qn_viewWidth", typeof(float));
 			AudioOffset = (double)info.GetValue("audioOffset", typeof(double));
 			MaxPitch = (int)info.GetValue("maxPitch", typeof(int));
 			MinPitch = (int)info.GetValue("minPitch", typeof(int));
-		}
+            sourceSongType = (SourceSongType)info.GetValue("sourceSongType", typeof(SourceSongType));
+        }
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
             info.AddValue("version", SongFormat.writeVersion);
             info.AddValue("noteFilePath", noteFilePath);
 			info.AddValue("audioFilePath", audioFilePath);
 			info.AddValue("modInsTrack", modInsTrack);
-            //info.AddValue("trackPropsCount", trackProps.Count);
-            //for (int i = 0; i < trackProps.Count; i++)
-            //info.AddValue("trackProps"+i, trackProps[i]);
             info.AddValue("trackProps", trackProps);
             info.AddValue("qn_viewWidth", Qn_viewWidth);
 			info.AddValue("audioOffset", AudioOffset);
 			info.AddValue("maxPitch", MaxPitch);
 			info.AddValue("minPitch", MinPitch);
-		}
+            info.AddValue("sourceSongType", sourceSongType);
+        }
 		
 		protected override void Initialize()
         {
@@ -248,7 +239,7 @@ namespace Visual_Music
             regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
 			regionSelectTexture.SetData(new[] { Color.White });
 
-            importSong(noteFilePath, audioFilePath, false, modInsTrack);
+            importSong(noteFilePath, audioFilePath, false, modInsTrack, SourceSongType == SourceSongType.Mod);
             if (trackProps != null)
             {
 			    for (int i = 0; i < trackProps.Count; i++)
@@ -477,15 +468,12 @@ namespace Visual_Music
 				trackProps[t].drawTrack(songDrawProps, GlobalTrackProps, selectingRegion);
 			}
 		}
-		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool modInsTrack)
+		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool modInsTrack, bool mixdown)
 		{
 			bool b = Media.closePlaybackSession();
-			bool noAudioFile = false;
-			if (string.IsNullOrEmpty(audioFile))
-				noAudioFile = true;
-			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, modInsTrack))
+			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, modInsTrack, mixdown))
 				return false;
-			if (!string.IsNullOrEmpty(audioFile) && noAudioFile)
+			if (mixdown)
 				audioFromMod = true;
 			else
 				audioFromMod = false;
@@ -493,7 +481,7 @@ namespace Visual_Music
 				return false;
 			return true;
 		}
-		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _modInsTrack)
+		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _modInsTrack, bool mixdown)
 		{
 			//try
 			//{
@@ -519,7 +507,7 @@ namespace Visual_Music
 				}
 				
 				notes = new Midi.Song();
-				notes.openFile(noteFilePath, ref audioFile, modInsTrack);
+				notes.openFile(noteFilePath, ref audioFile, modInsTrack, mixdown);
 				if (eraseCurrent)
 				{
                     minPitch = notes.MinPitch;

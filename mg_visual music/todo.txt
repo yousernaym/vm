@@ -3,6 +3,7 @@
 - Bump mapping.
 
 Done:
+- Mod effects: Pattern loop e6x, pos jump bxx, pattern break dxx, retrig rxy, sample offset 9xx
 - Refactor effects. TrackProps has LineStyleEnum to determine line style. NoteStyle_Bar/Line instances contains props and fx.
 - Get MonoGame keys to work. (ctrl and shift when selecting notes in SongPanel)
   Switched to winforms onmousedown/up instead.

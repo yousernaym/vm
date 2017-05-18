@@ -13,10 +13,17 @@ namespace Visual_Music
         public ImportModForm()
         {
             InitializeComponent();
+            customInit();
         }
         public ImportModForm(Form1 _parent) : base(_parent)
         {
             InitializeComponent();
+            customInit();
+        }
+        public void customInit()
+        {
+            string supportedFiles = "*.669; *.AMF; *.APUN; *.DSM; *.FAR; *.GDM; *.IT; *.IMF; *.MOD; *.MED; *.MTM; *.OKT; *.S3M; *.STM; *.STX; *.ULT; *.UNI; *.XM;";
+            openNoteFileDlg.Filter = "Module files (" + supportedFiles + ") | " + supportedFiles + " | All files(*.*) | *.*";
         }
         public bool ModInsTrack
         {
@@ -26,7 +33,7 @@ namespace Visual_Music
 
         private void Ok_Click(object sender, EventArgs e)
         {
-            importFiles(ModInsTrack);
+            importFiles(ModInsTrack, true);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Visual_Music
 				MessageBox.Show("Couldn't initialize Media Foundation.");
 				return;
 			}
-			if (!Midi.Song.initMikmod(Path+"\\mixdown.wav"))
+			if (!Midi.Song.initLib(Path+"\\mixdown.wav"))
 			{
 				MessageBox.Show("Couldn't initialize Mikmod.");
 				return;
@@ -32,7 +32,7 @@ namespace Visual_Music
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new Form1(args));
-			Midi.Song.exitMikmod();
+			Midi.Song.exitLib();
 			if (!Media.closeMF())
 				MessageBox.Show("Couldn't close Media Foundation.");
 		}

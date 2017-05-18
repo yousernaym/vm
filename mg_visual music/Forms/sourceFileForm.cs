@@ -82,7 +82,7 @@ namespace Visual_Music
 			//AudioFilePath = audioFilePath.Text;
 		}
 
-        protected void importFiles(bool modInsTrack)
+        protected void importFiles(bool modInsTrack, bool mixdown)
         {
             if (string.IsNullOrEmpty(NoteFilePath))
             {
@@ -94,7 +94,7 @@ namespace Visual_Music
                 MessageBox.Show("Song file note found.");
                 return;
             }
-            if (parent.openSourceFiles(NoteFilePath, AudioFilePath, eraseCurrent.Checked, modInsTrack))
+            if (parent.openSourceFiles(NoteFilePath, AudioFilePath, eraseCurrent.Checked, modInsTrack, mixdown))
             {
                 DialogResult = DialogResult.OK;
                 Hide();
@@ -112,5 +112,10 @@ namespace Visual_Music
 		{
 			Ok.Focus();
 		}
-	}
+
+        private void Ok_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
 }

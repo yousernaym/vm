@@ -8,17 +8,17 @@ using System.Windows.Forms;
 
 namespace Visual_Music
 {
-    public partial class ImportMidiForm : SourceFileForm
+    public partial class ImportSidForm : Visual_Music.SourceFileForm
     {
-        public ImportMidiForm()
+        public ImportSidForm()
         {
             InitializeComponent();
         }
-        public ImportMidiForm(Form1 _parent) : base(_parent)
+        public ImportSidForm(Form1 _parent) : base(_parent)
         {
             InitializeComponent();
         }
-
+        
         private void Ok_Click(object sender, EventArgs e)
         {
             importFiles(false, false);

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mg_visual music", "mg_visual music\mg_visual music.csproj", "{8D50C4D0-B932-47E1-88E2-971A33A1926A}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -13,9 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "midilib", "..\MyLibs\midili
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Media", "..\..\c++\MyLibs\Media\Media\Media.vcxproj", "{883D1FB6-BB56-4D7D-9AD3-785BB2076ED9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MikmodWrapper", "..\..\c++\MyLibs\MikmodWrapper\MikmodWrapper.vcxproj", "{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36B4ABDD-6238-44FB-8EF4-119823880343}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtractNotes", "..\..\c++\MyLibs\NoteExtractor\NoteExtractor.vcxproj", "{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -83,6 +83,7 @@
             resources.ApplyResources(this.Ok, "Ok");
             this.Ok.Name = "Ok";
             this.Ok.UseVisualStyleBackColor = true;
+            this.Ok.Click += new System.EventHandler(this.Ok_Click);
             // 
             // Cancel
             // 
