@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Visual_Music
 {
-    public partial class ImportSidForm : Visual_Music.SourceFileForm
+    public partial class ImportSidForm : ImportNotesWithAudioForm
     {
         public ImportSidForm()
         {
