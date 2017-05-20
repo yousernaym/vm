@@ -148,9 +148,6 @@
     <EmbeddedResource Include="Controls\ListViewNF.resx">
       <DependentUpon>ListViewNF.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ImportMidiForm.resx">
-      <DependentUpon>ImportMidiForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportModForm.resx">
       <DependentUpon>ImportModForm.cs</DependentUpon>
     </EmbeddedResource>

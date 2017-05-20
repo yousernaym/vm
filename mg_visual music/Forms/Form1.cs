@@ -126,8 +126,6 @@ namespace Visual_Music
 				lineHlStyleList.Items.Add(lse.ToString());
 
 			addInvalidateEH(this.Controls);
-            
-
 		}
 
 		private void Form1_Load(object sender, EventArgs e)

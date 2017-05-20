@@ -37,7 +37,7 @@
             // 
             // Ok
             // 
-            //this.Ok.Click += new System.EventHandler(this.Ok_Click);
+            this.Ok.Click += new System.EventHandler(this.Ok_Click);
             // 
             // openNoteFileDlg
             // 

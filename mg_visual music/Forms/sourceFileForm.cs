@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Visual_Music
 {
-	abstract public partial class SourceFileForm : Form
+	public partial class SourceFileForm : Form
 	{
 		public string NoteFilePath
 		{
@@ -82,18 +82,24 @@ namespace Visual_Music
 			//AudioFilePath = audioFilePath.Text;
 		}
 
-        protected void importFiles(bool modInsTrack, bool mixdown, string audioPath)
+		protected bool checkNoteFile()
+		{
+			if (string.IsNullOrEmpty(NoteFilePath))
+			{
+				MessageBox.Show("Note file path required.");
+				return false;
+			}
+			if (!File.Exists(NoteFilePath))
+			{
+				MessageBox.Show("Note file not found.");
+				return false;
+			}
+			return true;
+		}
+		protected void importFiles(bool modInsTrack, bool mixdown, string audioPath)
         {
-            if (string.IsNullOrEmpty(NoteFilePath))
-            {
-                MessageBox.Show("Note file path required.");
-                return;
-            }
-            if (!File.Exists(NoteFilePath))
-            {
-                MessageBox.Show("Note file not found.");
-                return;
-            }
+			if (!checkNoteFile())
+				return;
             if (parent.openSourceFiles(NoteFilePath, audioPath, eraseCurrent.Checked, modInsTrack, mixdown))
             {
                 DialogResult = DialogResult.OK;
