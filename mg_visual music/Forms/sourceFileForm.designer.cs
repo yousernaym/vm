@@ -35,11 +35,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.noteFilePath = new System.Windows.Forms.TextBox();
             this.audioFilePath = new System.Windows.Forms.TextBox();
-            this.Ok = new System.Windows.Forms.Button();
             this.Cancel = new System.Windows.Forms.Button();
             this.openNoteFileDlg = new System.Windows.Forms.OpenFileDialog();
             this.openAudioFileDlg = new System.Windows.Forms.OpenFileDialog();
             this.eraseCurrent = new System.Windows.Forms.CheckBox();
+            this.Ok = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // browseNoteBtn
@@ -78,13 +78,6 @@
             this.audioFilePath.Name = "audioFilePath";
             this.audioFilePath.TextChanged += new System.EventHandler(this.audioFilePath_TextChanged);
             // 
-            // Ok
-            // 
-            resources.ApplyResources(this.Ok, "Ok");
-            this.Ok.Name = "Ok";
-            this.Ok.UseVisualStyleBackColor = true;
-            this.Ok.Click += new System.EventHandler(this.Ok_Click);
-            // 
             // Cancel
             // 
             resources.ApplyResources(this.Cancel, "Cancel");
@@ -109,6 +102,12 @@
             this.eraseCurrent.CheckState = System.Windows.Forms.CheckState.Checked;
             this.eraseCurrent.Name = "eraseCurrent";
             this.eraseCurrent.UseVisualStyleBackColor = true;
+            // 
+            // Ok
+            // 
+            resources.ApplyResources(this.Ok, "Ok");
+            this.Ok.Name = "Ok";
+            this.Ok.UseVisualStyleBackColor = true;
             // 
             // SourceFileForm
             // 
@@ -138,15 +137,15 @@
 		#endregion
 
 		private System.Windows.Forms.Button browseNoteBtn;
-		private System.Windows.Forms.TextBox noteFilePath;
 		private System.Windows.Forms.OpenFileDialog openAudioFileDlg;
         protected System.Windows.Forms.Label label2;
-        protected System.Windows.Forms.Button Ok;
         protected System.Windows.Forms.Button Cancel;
         protected System.Windows.Forms.Label label1;
         protected System.Windows.Forms.CheckBox eraseCurrent;
         protected System.Windows.Forms.OpenFileDialog openNoteFileDlg;
         protected System.Windows.Forms.Button BrowseAudioBtn;
         protected System.Windows.Forms.TextBox audioFilePath;
+        protected System.Windows.Forms.TextBox noteFilePath;
+        protected System.Windows.Forms.Button Ok;
     }
 }

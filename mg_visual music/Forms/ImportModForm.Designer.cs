@@ -37,14 +37,9 @@
             this.label2.Size = new System.Drawing.Size(58, 13);
             this.label2.Text = "Module file";
             // 
-            // Ok
-            // 
-            this.Ok.Location = new System.Drawing.Point(227, 242);
-            this.Ok.Click += new System.EventHandler(this.Ok_Click);
-            // 
             // Cancel
             // 
-            this.Cancel.Location = new System.Drawing.Point(308, 242);
+            this.Cancel.Location = new System.Drawing.Point(308, 271);
             // 
             // label1
             // 
@@ -53,7 +48,7 @@
             // 
             // eraseCurrent
             // 
-            this.eraseCurrent.Location = new System.Drawing.Point(12, 193);
+            this.eraseCurrent.Location = new System.Drawing.Point(12, 222);
             // 
             // openNoteFileDlg
             // 
@@ -61,12 +56,17 @@
     "| All files (*.*)| *.*";
             this.openNoteFileDlg.Title = "Open module file";
             // 
+            // Ok
+            // 
+            this.Ok.Location = new System.Drawing.Point(227, 271);
+            this.Ok.Click += new System.EventHandler(this.Ok_Click);
+            // 
             // modChTrackBtn
             // 
             this.modChTrackBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.modChTrackBtn.AutoSize = true;
             this.modChTrackBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.modChTrackBtn.Location = new System.Drawing.Point(12, 248);
+            this.modChTrackBtn.Location = new System.Drawing.Point(12, 277);
             this.modChTrackBtn.Name = "modChTrackBtn";
             this.modChTrackBtn.Size = new System.Drawing.Size(168, 17);
             this.modChTrackBtn.TabIndex = 12;
@@ -80,7 +80,7 @@
             this.modInsTrackBtn.Checked = true;
             this.modInsTrackBtn.Cursor = System.Windows.Forms.Cursors.Default;
             this.modInsTrackBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.modInsTrackBtn.Location = new System.Drawing.Point(12, 225);
+            this.modInsTrackBtn.Location = new System.Drawing.Point(12, 254);
             this.modInsTrackBtn.Name = "modInsTrackBtn";
             this.modInsTrackBtn.Size = new System.Drawing.Size(178, 17);
             this.modInsTrackBtn.TabIndex = 11;
@@ -91,10 +91,11 @@
             // ImportModForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(400, 277);
+            this.ClientSize = new System.Drawing.Size(400, 306);
             this.Controls.Add(this.modInsTrackBtn);
             this.Controls.Add(this.modChTrackBtn);
             this.Name = "ImportModForm";
+            this.Controls.SetChildIndex(this.noteFilePath, 0);
             this.Controls.SetChildIndex(this.BrowseAudioBtn, 0);
             this.Controls.SetChildIndex(this.audioFilePath, 0);
             this.Controls.SetChildIndex(this.label1, 0);

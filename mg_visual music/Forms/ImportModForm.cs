@@ -33,7 +33,7 @@ namespace Visual_Music
 
         private void Ok_Click(object sender, EventArgs e)
         {
-            importFiles(ModInsTrack, true);
+            importFiles(ModInsTrack, true, true);
         }
     }
 }

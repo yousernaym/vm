@@ -10,14 +10,14 @@ using System.IO;
 
 namespace Visual_Music
 {
-	public partial class SourceFileForm : Form
+	abstract public partial class SourceFileForm : Form
 	{
 		public string NoteFilePath
 		{
 			get { return noteFilePath.Text; }
 			set { noteFilePath.Text = value; }
 		}
-		public string AudioFilePath
+        virtual public string AudioFilePath
 		{
 			get { return audioFilePath.Text; }
 			set { audioFilePath.Text = value; }
@@ -82,19 +82,19 @@ namespace Visual_Music
 			//AudioFilePath = audioFilePath.Text;
 		}
 
-        protected void importFiles(bool modInsTrack, bool mixdown)
+        protected void importFiles(bool modInsTrack, bool mixdown, string audioPath)
         {
             if (string.IsNullOrEmpty(NoteFilePath))
             {
-                MessageBox.Show("Song file path required.");
+                MessageBox.Show("Note file path required.");
                 return;
             }
             if (!File.Exists(NoteFilePath))
             {
-                MessageBox.Show("Song file note found.");
+                MessageBox.Show("Note file not found.");
                 return;
             }
-            if (parent.openSourceFiles(NoteFilePath, AudioFilePath, eraseCurrent.Checked, modInsTrack, mixdown))
+            if (parent.openSourceFiles(NoteFilePath, audioPath, eraseCurrent.Checked, modInsTrack, mixdown))
             {
                 DialogResult = DialogResult.OK;
                 Hide();
@@ -112,10 +112,5 @@ namespace Visual_Music
 		{
 			Ok.Focus();
 		}
-
-        private void Ok_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }
