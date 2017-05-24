@@ -84,7 +84,7 @@ namespace Visual_Music
     {
         ContentManager content;
         public ContentManager Content { get { return content; } }
-        bool audioFromMod;
+        bool internalMixdown;
         Texture2D regionSelectTexture;
         float normPitchMargin = 1 / 50.0f;
         bool bPlayback = false;
@@ -239,7 +239,7 @@ namespace Visual_Music
             regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
 			regionSelectTexture.SetData(new[] { Color.White });
 
-            importSong(noteFilePath, audioFilePath, false, modInsTrack, SourceSongType == SourceSongType.Mod);
+            importSong(noteFilePath, audioFilePath, false, modInsTrack, MixdownType.None);
             if (trackProps != null)
             {
 			    for (int i = 0; i < trackProps.Count; i++)
@@ -468,16 +468,12 @@ namespace Visual_Music
 				trackProps[t].drawTrack(songDrawProps, GlobalTrackProps, selectingRegion);
 			}
 		}
-		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool modInsTrack, bool mixdown)
+		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType)
 		{
 			bool b = Media.closePlaybackSession();
-			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, modInsTrack, mixdown))
+			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, modInsTrack, mixdownType == MixdownType.Internal))
 				return false;
-			if (mixdown)
-				audioFromMod = true;
-			else
-				audioFromMod = false;
-			if (!openAudioFile(audioFile))
+			if (!openAudioFile(audioFile, mixdownType))
 				return false;
 			return true;
 		}
@@ -533,12 +529,19 @@ namespace Visual_Music
 			}
 			return true;
 		}
-		public bool openAudioFile(string file)
+		public bool openAudioFile(string file, MixdownType mixdownType)
 		{
-			if (!audioFromMod)
-				audioFilePath = file;
+			internalMixdown = false;// mixdownType == MixdownType.Internal;
+			if (mixdownType == MixdownType.Tparty)
+			{
+				if (!ImportNotesWithAudioForm.runTpartyProcess())
+					return false ;
+				file = ImportNotesWithAudioForm.CmdLineOutputFile;
+			}
+			audioFilePath = file;
+
 			stopPlayback();
-			if (Form1.isEmpty(file))
+			if (string.IsNullOrWhiteSpace(file))
 			{
 				bAudioFileLoaded = false;
 				return true;
@@ -592,7 +595,7 @@ namespace Visual_Music
 				//videoFormat.audioSampleRate = 48000;
 				videoFormat.audioSampleRate = 44100;
 
-				if (!Media.beginVideoEnc(videoFilePath, audioFromMod ? Midi.Song.getModMixdownFilename() : audioFilePath, videoFormat, true))
+				if (!Media.beginVideoEnc(videoFilePath, internalMixdown ? Midi.Song.getModMixdownFilename() : audioFilePath, videoFormat, true))
 				{
 					lock (progressForm.cancelLock)
 						progressForm.Cancel = true;

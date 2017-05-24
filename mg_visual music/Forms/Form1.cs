@@ -229,10 +229,10 @@ namespace Visual_Music
             upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
         }
         
-		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, bool mixdown)
+		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType)
 		{
 			saveSettings();
-            if (songPanel.importSong(notePath, audioPath, eraseCurrent, modInsTrack, mixdown))
+            if (songPanel.importSong(notePath, audioPath, eraseCurrent, modInsTrack, mixdownType))
             {
                 songLoaded(notePath);
                 if (eraseCurrent)
