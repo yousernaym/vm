@@ -106,6 +106,7 @@
     <Compile Include="Controls\TbSlider.designer.cs">
       <DependentUpon>TbSlider.cs</DependentUpon>
     </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="TrackProps.cs" />
     <Compile Include="Xna forms\GraphicsDeviceControl.cs">
       <SubType>Component</SubType>

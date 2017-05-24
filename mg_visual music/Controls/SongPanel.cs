@@ -483,10 +483,13 @@ namespace Visual_Music
 		}
 		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _modInsTrack, bool mixdown)
 		{
-			//try
-			//{
+			
+			try
+			{
+				
 				Invalidate();
 				stopPlayback();
+				
 				noteFilePath = file;
 				modInsTrack = _modInsTrack;
 				int minPitch = 0, maxPitch = 0;
@@ -499,7 +502,7 @@ namespace Visual_Music
 				{
 					
 				}
-				if (string.IsNullOrEmpty(noteFilePath))
+				if (string.IsNullOrWhiteSpace(noteFilePath))
 				{
 					notes = null;
 					trackProps = null;
@@ -508,6 +511,7 @@ namespace Visual_Music
 				
 				notes = new Midi.Song();
 				notes.openFile(noteFilePath, ref audioFile, modInsTrack, mixdown);
+			
 				if (eraseCurrent)
 				{
                     minPitch = notes.MinPitch;
@@ -518,12 +522,15 @@ namespace Visual_Music
 				
 				viewWidthT = (int)(Qn_viewWidth * notes.TimeDiv);
 				createTrackProps(notes.Tracks.Count, eraseCurrent);
-			//}
-			//catch (Exception e)
-			//{
-			//	MessageBox.Show(Parent, e.Message, "Note file error");
-			//	return false;
-			//}
+			}
+			
+			catch (Exception)
+			{
+				notes = null;
+				//MessageBox.Show(Parent, e.Message, "Note file error");
+				MessageBox.Show(Parent, Path.GetFileName(NoteFilePath) + " couldn't be read", "File error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return false;
+			}
 			return true;
 		}
 		public bool openAudioFile(string file)

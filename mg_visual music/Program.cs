@@ -12,6 +12,7 @@ namespace Visual_Music
 		/// The main entry point for the application.
 		/// </summary>
 		static public string Path = System.IO.Path.GetDirectoryName(Application.ExecutablePath);
+		static public Form1 form1;
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
 		static void Main(string[] args)
@@ -31,7 +32,8 @@ namespace Visual_Music
 			}
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new Form1(args));
+			form1 = new Form1(args);
+			Application.Run(form1);
 			Midi.Song.exitLib();
 			if (!Media.closeMF())
 				MessageBox.Show("Couldn't close Media Foundation.");

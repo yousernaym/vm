@@ -84,7 +84,7 @@ namespace Visual_Music
 
 		protected bool checkNoteFile()
 		{
-			if (string.IsNullOrEmpty(NoteFilePath))
+			if (string.IsNullOrWhiteSpace(NoteFilePath))
 			{
 				MessageBox.Show("Note file path required.");
 				return false;

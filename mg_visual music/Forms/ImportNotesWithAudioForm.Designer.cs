@@ -49,7 +49,7 @@
 			// 
 			// Cancel
 			// 
-			this.Cancel.Location = new System.Drawing.Point(323, 257);
+			this.Cancel.Location = new System.Drawing.Point(328, 247);
 			// 
 			// label1
 			// 
@@ -58,21 +58,21 @@
 			// 
 			// eraseCurrent
 			// 
-			this.eraseCurrent.Location = new System.Drawing.Point(12, 260);
+			this.eraseCurrent.Location = new System.Drawing.Point(12, 253);
 			// 
 			// Ok
 			// 
-			this.Ok.Location = new System.Drawing.Point(242, 257);
+			this.Ok.Location = new System.Drawing.Point(247, 247);
 			// 
 			// existingAudioRbtn
 			// 
 			this.existingAudioRbtn.AutoSize = true;
 			this.existingAudioRbtn.Location = new System.Drawing.Point(3, 3);
 			this.existingAudioRbtn.Name = "existingAudioRbtn";
-			this.existingAudioRbtn.Size = new System.Drawing.Size(106, 17);
+			this.existingAudioRbtn.Size = new System.Drawing.Size(68, 17);
 			this.existingAudioRbtn.TabIndex = 9;
 			this.existingAudioRbtn.TabStop = true;
-			this.existingAudioRbtn.Text = "Existing audio file";
+			this.existingAudioRbtn.Text = "Audio file";
 			this.existingAudioRbtn.UseVisualStyleBackColor = true;
 			this.existingAudioRbtn.CheckedChanged += new System.EventHandler(this.existingAudioRbtn_CheckedChanged);
 			// 
@@ -205,7 +205,7 @@
 			// ImportNotesWithAudioForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(415, 292);
+			this.ClientSize = new System.Drawing.Size(415, 282);
 			this.Controls.Add(this.tPartyMixdownPnl);
 			this.Controls.Add(this.panel1);
 			this.Name = "ImportNotesWithAudioForm";
@@ -230,9 +230,7 @@
 
         #endregion
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.TextBox tpartyAppTb;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox tpartyAudioTb;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Panel tPartyMixdownPnl;
         private System.Windows.Forms.Button browseTpartyExeBtn;
@@ -240,9 +238,11 @@
         private System.Windows.Forms.OpenFileDialog openTpartyExeDlg;
         private System.Windows.Forms.OpenFileDialog openTpartyAudioDlg;
         private System.Windows.Forms.Button runTpartyBtn;
-        private System.Windows.Forms.TextBox tpartyArgsTb;
         private System.Windows.Forms.Label label5;
         protected System.Windows.Forms.RadioButton existingAudioRbtn;
         protected System.Windows.Forms.RadioButton thirdPartyMixdownRbtn;
-    }
+		public System.Windows.Forms.TextBox tpartyAppTb;
+		public System.Windows.Forms.TextBox tpartyAudioTb;
+		public System.Windows.Forms.TextBox tpartyArgsTb;
+	}
 }

@@ -5,12 +5,14 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Visual_Music
 {
     public partial class ImportModForm : ImportNotesWithAudioForm
     {
-        public ImportModForm()
+		static string[] XmPlayFormats = { "IT", "XM", "S3M", "MTM", "MOD", "UMX", "MO3" };
+		public ImportModForm()
         {
             InitializeComponent();
             customInit();
@@ -33,7 +35,16 @@ namespace Visual_Music
 
         private void Ok_Click(object sender, EventArgs e)
         {
-            importFiles(ModInsTrack, true, true);
+			bool xmPlayMixdownSupported = false;
+			string ext = Path.GetExtension(noteFilePath.Text);
+			if (ext.Length > 1)
+			{
+				ext = ext.Substring(1); //Remove '.'
+				foreach (string f in XmPlayFormats)
+					if (ext.ToLower() == f.ToLower())
+						xmPlayMixdownSupported = true;
+			}
+			importFiles(ModInsTrack, true, xmPlayMixdownSupported);
         }
     }
 }

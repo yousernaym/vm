@@ -28,29 +28,38 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.SuspendLayout();
-            // 
-            // label2
-            // 
-            this.label2.Size = new System.Drawing.Size(38, 13);
-            this.label2.Text = "Sid file";
-            // 
-            // Ok
-            // 
-            this.Ok.Click += new System.EventHandler(this.Ok_Click);
-            // 
-            // openNoteFileDlg
-            // 
-            this.openNoteFileDlg.Filter = "Sid files (*.sid; *.psid; *.dat; *.rsid; *.mus)|*.sid; *.psid; *.dat; *.rsid; *.m" +
+			this.SuspendLayout();
+			// 
+			// label2
+			// 
+			this.label2.Size = new System.Drawing.Size(38, 13);
+			this.label2.Text = "Sid file";
+			// 
+			// Cancel
+			// 
+			this.Cancel.Location = new System.Drawing.Point(324, 228);
+			// 
+			// eraseCurrent
+			// 
+			this.eraseCurrent.Location = new System.Drawing.Point(12, 234);
+			// 
+			// openNoteFileDlg
+			// 
+			this.openNoteFileDlg.Filter = "Sid files (*.sid; *.psid; *.dat; *.rsid; *.mus)|*.sid; *.psid; *.dat; *.rsid; *.m" +
     "us|All files|*.*";
-            // 
-            // ImportSidForm
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(400, 167);
-            this.Name = "ImportSidForm";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+			// 
+			// Ok
+			// 
+			this.Ok.Location = new System.Drawing.Point(243, 228);
+			this.Ok.Click += new System.EventHandler(this.Ok_Click);
+			// 
+			// ImportSidForm
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.ClientSize = new System.Drawing.Size(411, 263);
+			this.Name = "ImportSidForm";
+			this.ResumeLayout(false);
+			this.PerformLayout();
 
         }
 
