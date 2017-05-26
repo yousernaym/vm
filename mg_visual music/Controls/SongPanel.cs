@@ -84,8 +84,9 @@ namespace Visual_Music
     {
         ContentManager content;
         public ContentManager Content { get { return content; } }
-        bool internalMixdown;
-        Texture2D regionSelectTexture;
+		//bool internalMixdown;
+		MixdownType mixdownType;
+		Texture2D regionSelectTexture;
         float normPitchMargin = 1 / 50.0f;
         bool bPlayback = false;
         public bool IsPlaying
@@ -147,15 +148,15 @@ namespace Visual_Music
         string audioFilePath = "";
         public string AudioFilePath
         {
-            get { return audioFilePath; }
+            get { return mixdownType == MixdownType.None ? audioFilePath : ""; }
             set { audioFilePath = value; }
             //get { return ((Form1)Parent).sourceFileForm.AudioFilePath; }
             //set { ((Form1)Parent).sourceFileForm.AudioFilePath = value; }
         }
-        bool modInsTrack;
-        public bool ModInsTrack
+        bool insTrack;
+        public bool InsTrack
         {
-            get { return modInsTrack; }
+            get { return insTrack; }
         }
 
         SourceSongType sourceSongType;
@@ -193,28 +194,36 @@ namespace Visual_Music
 		{
             SongFormat.readVersion = (int)info.GetValue("version", typeof(int));
             noteFilePath = (string)info.GetValue("noteFilePath", typeof(string));
+			insTrack = (bool)info.GetValue("insTrack", typeof(bool));
+			mixdownType = (MixdownType)info.GetValue("mixdownType", typeof(MixdownType));
 			audioFilePath = (string)info.GetValue("audioFilePath", typeof(string));
-			modInsTrack = (bool)info.GetValue("modInsTrack", typeof(bool));
 			trackProps = (List<TrackProps>)info.GetValue("trackProps", typeof(List<TrackProps>));
    			Qn_viewWidth = (float)info.GetValue("qn_viewWidth", typeof(float));
 			AudioOffset = (double)info.GetValue("audioOffset", typeof(double));
 			MaxPitch = (int)info.GetValue("maxPitch", typeof(int));
 			MinPitch = (int)info.GetValue("minPitch", typeof(int));
             sourceSongType = (SourceSongType)info.GetValue("sourceSongType", typeof(SourceSongType));
-        }
+			ImportNotesWithAudioForm.TpartyApp = info.GetString("tpartyApp");
+			ImportNotesWithAudioForm.TpartyArgs = info.GetString("tpartyArgs");
+			ImportNotesWithAudioForm.TpartyOutputDir = info.GetString("tpartyOutputDir");
+		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
             info.AddValue("version", SongFormat.writeVersion);
             info.AddValue("noteFilePath", noteFilePath);
 			info.AddValue("audioFilePath", audioFilePath);
-			info.AddValue("modInsTrack", modInsTrack);
+			info.AddValue("insTrack", insTrack);
+			info.AddValue("mixdownType", mixdownType);
             info.AddValue("trackProps", trackProps);
             info.AddValue("qn_viewWidth", Qn_viewWidth);
 			info.AddValue("audioOffset", AudioOffset);
 			info.AddValue("maxPitch", MaxPitch);
 			info.AddValue("minPitch", MinPitch);
             info.AddValue("sourceSongType", sourceSongType);
-        }
+			info.AddValue("tpartyApp", ImportNotesWithAudioForm.TpartyApp);
+			info.AddValue("tpartyArgs", ImportNotesWithAudioForm.TpartyArgs);
+			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
+		}
 		
 		protected override void Initialize()
         {
@@ -239,15 +248,16 @@ namespace Visual_Music
             regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
 			regionSelectTexture.SetData(new[] { Color.White });
 
-            importSong(noteFilePath, audioFilePath, false, modInsTrack, MixdownType.None);
-            if (trackProps != null)
-            {
-			    for (int i = 0; i < trackProps.Count; i++)
-                    trackProps[i].loadContent(this);
+			if (!string.IsNullOrWhiteSpace(noteFilePath))
+			{
+				importSong(noteFilePath, audioFilePath, false, insTrack, mixdownType);
+				if (trackProps != null)
+				{
+					for (int i = 0; i < trackProps.Count; i++)
+						trackProps[i].loadContent(this);
+				}
 			}
-			
-			
-        }
+		}
 		
 		protected override void Dispose(bool disposing)
         {
@@ -468,47 +478,51 @@ namespace Visual_Music
 				trackProps[t].drawTrack(songDrawProps, GlobalTrackProps, selectingRegion);
 			}
 		}
-		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType)
+		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool _insTrack, MixdownType mixdownType)
 		{
-			bool b = Media.closePlaybackSession();
-			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, modInsTrack, mixdownType == MixdownType.Internal))
+			Media.closeAudioFile();
+			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, _insTrack, mixdownType == MixdownType.Internal))
 				return false;
 			if (!openAudioFile(audioFile, mixdownType))
 				return false;
 			return true;
 		}
-		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _modInsTrack, bool mixdown)
+		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _insTrack, bool mixdown)
 		{
-			
-			try
-			{
-				
 				Invalidate();
 				stopPlayback();
 				
 				noteFilePath = file;
-				modInsTrack = _modInsTrack;
+				insTrack = _insTrack;
 				int minPitch = 0, maxPitch = 0;
 				if (eraseCurrent)
 				{
 					Qn_viewWidth = defaultQn_viewWidth;
 					AudioOffset = 0;
 				}
-				else if (notes != null)
-				{
-					
-				}
-				if (string.IsNullOrWhiteSpace(noteFilePath))
-				{
-					notes = null;
-					trackProps = null;
-					return true;
-				}
-				
-				notes = new Midi.Song();
-				notes.openFile(noteFilePath, ref audioFile, modInsTrack, mixdown);
-			
-				if (eraseCurrent)
+
+			//if (string.IsNullOrWhiteSpace(noteFilePath))
+			//{
+			//	notes = null;
+			//	trackProps = null;
+			//	return true;
+			//}
+
+			Midi.Song newNotes = new Midi.Song();
+			try
+			{
+				newNotes.openFile(noteFilePath, ref audioFile, _insTrack, mixdown);
+			}
+			catch (Exception)
+			{
+				//notes = null;
+				//MessageBox.Show(Parent, e.Message, "Note file error");
+				MessageBox.Show(Parent, Path.GetFileName(NoteFilePath) + " couldn't be read", "File error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return false;
+			}
+
+			notes = newNotes;
+			if (eraseCurrent)
 				{
                     minPitch = notes.MinPitch;
                     maxPitch = notes.MaxPitch;
@@ -518,39 +532,33 @@ namespace Visual_Music
 				
 				viewWidthT = (int)(Qn_viewWidth * notes.TimeDiv);
 				createTrackProps(notes.Tracks.Count, eraseCurrent);
-			}
 			
-			catch (Exception)
-			{
-				notes = null;
-				//MessageBox.Show(Parent, e.Message, "Note file error");
-				MessageBox.Show(Parent, Path.GetFileName(NoteFilePath) + " couldn't be read", "File error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return false;
-			}
+			
+			
 			return true;
 		}
-		public bool openAudioFile(string file, MixdownType mixdownType)
+		public bool openAudioFile(string file, MixdownType _mixdownType)
 		{
-			internalMixdown = false;// mixdownType == MixdownType.Internal;
-			if (mixdownType == MixdownType.Tparty)
+			//internalMixdown = false;// mixdownType == MixdownType.Internal;
+			if (_mixdownType == MixdownType.Tparty)
 			{
-				if (!ImportNotesWithAudioForm.runTpartyProcess())
-					return false ;
-				file = ImportNotesWithAudioForm.CmdLineOutputFile;
+				file = ImportNotesWithAudioForm.runTpartyProcess();
+				if (string.IsNullOrWhiteSpace(file))
+					return false;
 			}
 			audioFilePath = file;
 
-			stopPlayback();
 			if (string.IsNullOrWhiteSpace(file))
 			{
 				bAudioFileLoaded = false;
 				return true;
 			}
-			if (!Media.openFileForPlayback(file))
+			if (!Media.openAudioFile(file))
 			{
 				MessageBox.Show(Parent, "Couldn't load audio file " + file, "Audio file error");
 				return false;
 			}
+			mixdownType = _mixdownType;
 			bAudioFileLoaded = true;
 			if (notes != null)
 				notes.SongLengthInTicks = (int)secondsToTicks(Media.getAudioLength());
@@ -595,7 +603,10 @@ namespace Visual_Music
 				//videoFormat.audioSampleRate = 48000;
 				videoFormat.audioSampleRate = 44100;
 
-				if (!Media.beginVideoEnc(videoFilePath, internalMixdown ? Midi.Song.getModMixdownFilename() : audioFilePath, videoFormat, true))
+				//ulong bla = 4;
+				//Media.writeFrame(5, new uint[] { 0, 4 }, 0, ref bla, AudioOffset, false);
+				//Media.endVideoEnc();
+				if (!Media.beginVideoEnc(videoFilePath, videoFormat, true))
 				{
 					lock (progressForm.cancelLock)
 						progressForm.Cancel = true;

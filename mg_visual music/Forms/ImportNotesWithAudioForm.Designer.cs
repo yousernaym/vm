@@ -38,7 +38,6 @@
 			this.tPartyMixdownPnl = new System.Windows.Forms.Panel();
 			this.tpartyArgsTb = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
-			this.runTpartyBtn = new System.Windows.Forms.Button();
 			this.browseTpartyOutputBtn = new System.Windows.Forms.Button();
 			this.browseTpartyExeBtn = new System.Windows.Forms.Button();
 			this.openTpartyExeDlg = new System.Windows.Forms.OpenFileDialog();
@@ -50,6 +49,7 @@
 			// Cancel
 			// 
 			this.Cancel.Location = new System.Drawing.Point(328, 247);
+			this.Cancel.TabIndex = 21;
 			// 
 			// label1
 			// 
@@ -59,10 +59,20 @@
 			// eraseCurrent
 			// 
 			this.eraseCurrent.Location = new System.Drawing.Point(12, 253);
+			this.eraseCurrent.TabIndex = 11;
+			// 
+			// BrowseAudioBtn
+			// 
+			this.BrowseAudioBtn.TabIndex = 4;
+			// 
+			// audioFilePath
+			// 
+			this.audioFilePath.TabIndex = 3;
 			// 
 			// Ok
 			// 
 			this.Ok.Location = new System.Drawing.Point(247, 247);
+			this.Ok.TabIndex = 20;
 			// 
 			// existingAudioRbtn
 			// 
@@ -70,7 +80,7 @@
 			this.existingAudioRbtn.Location = new System.Drawing.Point(3, 3);
 			this.existingAudioRbtn.Name = "existingAudioRbtn";
 			this.existingAudioRbtn.Size = new System.Drawing.Size(68, 17);
-			this.existingAudioRbtn.TabIndex = 9;
+			this.existingAudioRbtn.TabIndex = 2;
 			this.existingAudioRbtn.TabStop = true;
 			this.existingAudioRbtn.Text = "Audio file";
 			this.existingAudioRbtn.UseVisualStyleBackColor = true;
@@ -82,7 +92,7 @@
 			this.thirdPartyMixdownRbtn.Location = new System.Drawing.Point(3, 53);
 			this.thirdPartyMixdownRbtn.Name = "thirdPartyMixdownRbtn";
 			this.thirdPartyMixdownRbtn.Size = new System.Drawing.Size(119, 17);
-			this.thirdPartyMixdownRbtn.TabIndex = 10;
+			this.thirdPartyMixdownRbtn.TabIndex = 5;
 			this.thirdPartyMixdownRbtn.TabStop = true;
 			this.thirdPartyMixdownRbtn.Text = "Third-party mixdown";
 			this.thirdPartyMixdownRbtn.UseVisualStyleBackColor = true;
@@ -95,14 +105,14 @@
 			this.panel1.Location = new System.Drawing.Point(12, 53);
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(136, 69);
-			this.panel1.TabIndex = 11;
+			this.panel1.TabIndex = 2;
 			// 
 			// tpartyAppTb
 			// 
 			this.tpartyAppTb.Location = new System.Drawing.Point(76, 0);
 			this.tpartyAppTb.Name = "tpartyAppTb";
 			this.tpartyAppTb.Size = new System.Drawing.Size(258, 20);
-			this.tpartyAppTb.TabIndex = 12;
+			this.tpartyAppTb.TabIndex = 6;
 			// 
 			// label3
 			// 
@@ -118,7 +128,7 @@
 			this.tpartyAudioTb.Location = new System.Drawing.Point(76, 51);
 			this.tpartyAudioTb.Name = "tpartyAudioTb";
 			this.tpartyAudioTb.Size = new System.Drawing.Size(258, 20);
-			this.tpartyAudioTb.TabIndex = 14;
+			this.tpartyAudioTb.TabIndex = 9;
 			// 
 			// label4
 			// 
@@ -133,7 +143,6 @@
 			// 
 			this.tPartyMixdownPnl.Controls.Add(this.tpartyArgsTb);
 			this.tPartyMixdownPnl.Controls.Add(this.label5);
-			this.tPartyMixdownPnl.Controls.Add(this.runTpartyBtn);
 			this.tPartyMixdownPnl.Controls.Add(this.browseTpartyOutputBtn);
 			this.tPartyMixdownPnl.Controls.Add(this.browseTpartyExeBtn);
 			this.tPartyMixdownPnl.Controls.Add(this.tpartyAppTb);
@@ -143,14 +152,14 @@
 			this.tPartyMixdownPnl.Location = new System.Drawing.Point(15, 128);
 			this.tPartyMixdownPnl.Name = "tPartyMixdownPnl";
 			this.tPartyMixdownPnl.Size = new System.Drawing.Size(384, 83);
-			this.tPartyMixdownPnl.TabIndex = 16;
+			this.tPartyMixdownPnl.TabIndex = 6;
 			// 
 			// tpartyArgsTb
 			// 
 			this.tpartyArgsTb.Location = new System.Drawing.Point(76, 26);
 			this.tpartyArgsTb.Name = "tpartyArgsTb";
 			this.tpartyArgsTb.Size = new System.Drawing.Size(258, 20);
-			this.tpartyArgsTb.TabIndex = 19;
+			this.tpartyArgsTb.TabIndex = 8;
 			// 
 			// label5
 			// 
@@ -161,22 +170,12 @@
 			this.label5.TabIndex = 20;
 			this.label5.Text = "Arguments";
 			// 
-			// runTpartyBtn
-			// 
-			this.runTpartyBtn.Location = new System.Drawing.Point(340, 26);
-			this.runTpartyBtn.Name = "runTpartyBtn";
-			this.runTpartyBtn.Size = new System.Drawing.Size(39, 20);
-			this.runTpartyBtn.TabIndex = 18;
-			this.runTpartyBtn.Text = "Run";
-			this.runTpartyBtn.UseVisualStyleBackColor = true;
-			this.runTpartyBtn.Click += new System.EventHandler(this.runTpartyBtn_Click);
-			// 
 			// browseTpartyOutputBtn
 			// 
 			this.browseTpartyOutputBtn.Location = new System.Drawing.Point(340, 51);
 			this.browseTpartyOutputBtn.Name = "browseTpartyOutputBtn";
 			this.browseTpartyOutputBtn.Size = new System.Drawing.Size(28, 20);
-			this.browseTpartyOutputBtn.TabIndex = 17;
+			this.browseTpartyOutputBtn.TabIndex = 10;
 			this.browseTpartyOutputBtn.Text = "...";
 			this.browseTpartyOutputBtn.UseVisualStyleBackColor = true;
 			this.browseTpartyOutputBtn.Click += new System.EventHandler(this.browseTpartyOutputBtn_Click);
@@ -186,7 +185,7 @@
 			this.browseTpartyExeBtn.Location = new System.Drawing.Point(340, 0);
 			this.browseTpartyExeBtn.Name = "browseTpartyExeBtn";
 			this.browseTpartyExeBtn.Size = new System.Drawing.Size(28, 20);
-			this.browseTpartyExeBtn.TabIndex = 16;
+			this.browseTpartyExeBtn.TabIndex = 7;
 			this.browseTpartyExeBtn.Text = "...";
 			this.browseTpartyExeBtn.UseVisualStyleBackColor = true;
 			this.browseTpartyExeBtn.Click += new System.EventHandler(this.browseTpartyExeBtn_Click);
@@ -237,7 +236,6 @@
         private System.Windows.Forms.Button browseTpartyOutputBtn;
         private System.Windows.Forms.OpenFileDialog openTpartyExeDlg;
         private System.Windows.Forms.OpenFileDialog openTpartyAudioDlg;
-        private System.Windows.Forms.Button runTpartyBtn;
         private System.Windows.Forms.Label label5;
         protected System.Windows.Forms.RadioButton existingAudioRbtn;
         protected System.Windows.Forms.RadioButton thirdPartyMixdownRbtn;

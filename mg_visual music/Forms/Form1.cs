@@ -12,7 +12,7 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.IO.Compression;
 
 namespace Visual_Music
 {
@@ -52,10 +52,11 @@ namespace Visual_Music
         public ImportModForm importModForm;
         public ImportSidForm importSidForm;
 
-        Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType)};
+        Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType)};
         SongPanel songPanel = new SongPanel();
         ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
+
 		//Panel trackPropsPanel = new Panel();
 		//public int SelectedTrack
 		//{
@@ -65,7 +66,7 @@ namespace Visual_Music
 		{
 			InitializeComponent();
 
-            startupArgs = args;
+			startupArgs = args;
 			TrackTexPbHeight = trackTexPb.Height;
 			MaxTrackTexPbWidth = trackTexPb.Width;
 			eh_invalidateSongPanel = new EventHandler(invalidateSongPanel);
@@ -232,9 +233,10 @@ namespace Visual_Music
 		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType)
 		{
 			saveSettings();
-            if (songPanel.importSong(notePath, audioPath, eraseCurrent, modInsTrack, mixdownType))
+			
+			if (songPanel.importSong(notePath, audioPath, eraseCurrent, modInsTrack, mixdownType))
             {
-                songLoaded(notePath);
+				songLoaded(notePath);
                 if (eraseCurrent)
                 {
                     currentSongPath = "";
@@ -930,8 +932,7 @@ namespace Visual_Music
                     songPanel = (SongPanel)dcs.ReadObject(stream);
                 }
                 initSongPanel(songPanel);
-
-                if (songPanel.SourceSongType == SourceSongType.Midi)
+				if (songPanel.SourceSongType == SourceSongType.Midi)
                 {
                     importMidiForm.NoteFilePath = songPanel.NoteFilePath;
                     importMidiForm.AudioFilePath = songPanel.AudioFilePath;
@@ -940,7 +941,7 @@ namespace Visual_Music
                 {
                     importModForm.NoteFilePath = songPanel.NoteFilePath;
                     importModForm.AudioFilePath = songPanel.AudioFilePath;
-                    importModForm.ModInsTrack = songPanel.ModInsTrack;
+                    importModForm.ModInsTrack = songPanel.InsTrack;
                 }
                 else if (songPanel.SourceSongType == SourceSongType.Sid)
                 {
@@ -979,7 +980,8 @@ namespace Visual_Music
 
                 using (FileStream stream = File.Open(currentSongPath, FileMode.Create))
 				{
-                    dcs.WriteObject(stream, songPanel);
+
+					dcs.WriteObject(stream, songPanel);
                 }
 				updateFormTitle(currentSongPath);
 			}

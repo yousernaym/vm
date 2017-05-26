@@ -23,10 +23,12 @@ namespace Visual_Music
 		public static extern bool initMF();
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool closeMF();
-		
+
 		//Encoding
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool beginVideoEnc(string outPutFile, string audioFile, VideoFormat vidFmt, bool _bVideo);
+		public static extern bool bla();
+		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
+		public static extern bool beginVideoEnc(string outputFile, VideoFormat vidFmt, bool _bVideo);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool writeFrame(UInt32[] videoFrameBuffer, UInt64 rtStart, ref UInt64 rtDuration, double audioOffset, bool bFlush);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -34,11 +36,11 @@ namespace Visual_Music
 
 		//Playback
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool closePlaybackSession();
-		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool playbackIsRunning();
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool openFileForPlayback(string file);
+		public static extern bool openAudioFile(string file);
+		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
+		public static extern bool closeAudioFile();
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern double getPlaybackPos();
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]

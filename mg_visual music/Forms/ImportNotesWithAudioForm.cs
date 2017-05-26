@@ -18,11 +18,16 @@ namespace Visual_Music
 		static string XmPlayPath = Application.StartupPath + "\\plugins\\xmplay";
 		static string XmPlayOutputPath = XmPlayPath + "\\output";
 		static Process tpartyProcess;
-		FileSystemWatcher watcher = new FileSystemWatcher();
-        bool insTrack;
-        bool internalMixdownSupported;
-		static string cmdLineOutputFile;
-		public static string CmdLineOutputFile { get => cmdLineOutputFile; }
+		static FileSystemWatcher watcher;
+		static string tpartyApp;
+		static string tpartyArgs;
+		static string tpartyOutputDir;
+		static public string TpartyApp { get => tpartyApp; set => tpartyApp = value; }
+		static public string TpartyArgs { get => tpartyArgs; set => tpartyArgs = value; }
+		static public string TpartyOutputDir { get => tpartyOutputDir; set => tpartyOutputDir = value; }
+
+		static string tpartyOutputFile;
+		public static string TpartyOutputFile { get => tpartyOutputFile; }
 		public ImportNotesWithAudioForm()
         {
             InitializeComponent();
@@ -31,7 +36,14 @@ namespace Visual_Music
         { 
             InitializeComponent();
             existingAudioRbtn.Checked = true;
+
+			if (watcher != null)
+				watcher.Dispose();
+			watcher = new FileSystemWatcher();
 			watcher.Changed += new FileSystemEventHandler(OnChanged);
+			
+			watcher.NotifyFilter = NotifyFilters.LastWrite;
+			watcher.Filter = "*.wav";
 
 			string xmPlayIniPath = Application.StartupPath + "\\plugins\\xmplay\\xmplay.ini";
 			//FileStream xmPlayIni = File.Open(, FileMode.Open, FileAccess.Read);
@@ -82,12 +94,12 @@ namespace Visual_Music
                 tpartyAudioTb.Text = openTpartyAudioDlg.FileName;
         }
 
-        protected void importFiles(bool _insTrack, bool _internalMixdownSupported, bool xmPlayMixdownSupported)
+        protected void importFiles(bool insTrack, bool internalMixdownSupported, bool xmPlayMixdownSupported)
         {
 			if (!checkNoteFile())
 				return;
-			insTrack = _insTrack;
-            internalMixdownSupported = _internalMixdownSupported;
+			//insTrack = _insTrack;
+            //internalMixdownSupported = _internalMixdownSupported;
             if (existingAudioRbtn.Checked)
             {   //No user-specified command line
                 if (string.IsNullOrWhiteSpace(audioFilePath.Text))
@@ -95,13 +107,10 @@ namespace Visual_Music
                     if (xmPlayMixdownSupported)
                     {   //Mixdown with xmplay
 						//string folder = Application.StartupPath + "\\plugins\\xmplay";
-						if (createTpartyProcess(XmPlayPath + "\\xmplay.exe",
+						importUsingTpartyMixdown(insTrack, XmPlayPath + "\\xmplay.exe",
 								   "\"" + noteFilePath.Text + "\" -boost",
-								   XmPlayOutputPath))
-						{
-							//tpartyDoneEvent.WaitOne();
-							
-						}
+								   XmPlayOutputPath);
+						
                     }
                     else
                     {   //Mixdown internally if possible, otherwise there will be no audio
@@ -115,17 +124,16 @@ namespace Visual_Music
             }
             else 
             { //User-specified command line
-				if (createTpartyProcess(tpartyAppTb.Text,
+				importUsingTpartyMixdown(insTrack, tpartyAppTb.Text,
 					   tpartyArgsTb.Text.Replace("%notefilepath", "\"" + noteFilePath.Text + "\""),
-					   tpartyAudioTb.Text))
-				{
-					//base.importFiles(insTrack, false, tpartyAudioTb.Text.Replace("%notefilename", Path.GetFileName(noteFilePath.Text)));
-				}
+					   tpartyAudioTb.Text);
             }
         }
 
-		static public bool runTpartyProcess()
+		static public string runTpartyProcess()
 		{
+			if (!createTpartyProcess())
+				return null;
 			try
 			{
 				tpartyProcess.Start();
@@ -134,36 +142,45 @@ namespace Visual_Music
 			catch (Exception)
 			{
 				MessageBox.Show("Couldn't load application " + tpartyProcess.ProcessName);
-				return false;
+				return null;
 			}
-			return true;
+			finally
+			{
+				//tpartyProcess.Dispose();
+			}
+			return TpartyOutputFile;
 		}
-		private bool createTpartyProcess(string appPath, string arguments, string outputPath)
+		void importUsingTpartyMixdown(bool insTrack, string appPath, string arguments, string outputDir)
+		{
+			tpartyApp = appPath;
+			tpartyArgs = arguments;
+			tpartyOutputDir = outputDir;
+			base.importFiles(insTrack, MixdownType.Tparty, "");
+		}
+		static bool createTpartyProcess()
         {
-			try { watcher.Path = outputPath; }
+			try { watcher.Path = tpartyOutputDir; }
 			catch (System.ArgumentException e)
 			{
-				MessageBox.Show(Parent, e.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(e.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
 			}
 			
-			watcher.NotifyFilter = NotifyFilters.LastWrite;
-			watcher.Filter = "*.wav";
 			watcher.EnableRaisingEvents = true;
 
+			if (tpartyProcess != null)
+				tpartyProcess.Dispose();
 			tpartyProcess = new Process();
-            tpartyProcess.StartInfo.FileName = appPath;
-            tpartyProcess.StartInfo.Arguments = arguments;
-			
-			base.importFiles(insTrack, MixdownType.Tparty, "");
-			//tpartyProcess.WaitForExit();
+            tpartyProcess.StartInfo.FileName = tpartyApp;
+            tpartyProcess.StartInfo.Arguments = tpartyArgs;
 			return true;
 		}
        
-        private void OnChanged(object sender, FileSystemEventArgs e)
+        static private void OnChanged(object sender, FileSystemEventArgs e)
         {
-            watcher.EnableRaisingEvents = false;
-            var file = new FileInfo(e.FullPath);
+			//Console.WriteLine("OnChanged");
+			watcher.EnableRaisingEvents = false;
+			var file = new FileInfo(e.FullPath);
             FileStream stream = null;
             while (stream == null)
             {
@@ -171,14 +188,17 @@ namespace Visual_Music
                 {
                     stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
                 }
-                catch (IOException) { }
+                catch (IOException)
+				{
+					//Console.WriteLine("Filenotready");
+				}
                 finally
                 {
                     if (stream != null)
                         stream.Close();
                 }
             }
-			cmdLineOutputFile = e.FullPath;
+			tpartyOutputFile = e.FullPath;
 			//tpartyDoneEvent.Set();
 			//Process[] components = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tpartyProcess.StartInfo.FileName)));
 			//if (components.Length > 0)
@@ -186,17 +206,13 @@ namespace Visual_Music
 			if (!tpartyProcess.HasExited)
 			{
 				tpartyProcess.Kill();
-				tpartyProcess.Dispose();
 			}
-				//tpartyProcess.CloseMainWindow();
-
-				//}
-			}
+		}
 
 		private void runTpartyBtn_Click(object sender, EventArgs e)
 		{
-			if (!checkNoteFile())
-				return;
+			//if (!checkNoteFile())
+				//return;
 //			createTpartyProcess(tpartyAppTb.Text,
 	//				   tpartyArgsTb.Text.Replace("%notefilepath", "\"" + noteFilePath.Text + "\""));
 
