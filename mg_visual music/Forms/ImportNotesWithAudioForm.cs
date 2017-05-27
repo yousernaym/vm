@@ -15,8 +15,6 @@ namespace Visual_Music
 	public partial class ImportNotesWithAudioForm : SourceFileForm
     {
 		//AutoResetEvent tpartyDoneEvent = new AutoResetEvent(false);
-		static string XmPlayPath = Application.StartupPath + "\\plugins\\xmplay";
-		static string XmPlayOutputPath = XmPlayPath + "\\output";
 		static Process tpartyProcess;
 		static FileSystemWatcher watcher;
 		static string tpartyApp;
@@ -45,7 +43,7 @@ namespace Visual_Music
 			watcher.NotifyFilter = NotifyFilters.LastWrite;
 			watcher.Filter = "*.wav";
 
-			string xmPlayIniPath = Application.StartupPath + "\\plugins\\xmplay\\xmplay.ini";
+			string xmPlayIniPath = Program.XmPlayDir + "\\xmplay.ini";
 			//FileStream xmPlayIni = File.Open(, FileMode.Open, FileAccess.Read);
 			string[] iniLines = File.ReadAllLines(xmPlayIniPath);
 			string findKey = "WritePath";
@@ -56,11 +54,9 @@ namespace Visual_Music
 					continue;
 				string key = iniLines[i].Substring(0, equalSignIndex).Trim();
 				if (key == findKey)
-					iniLines[i] = findKey + "=" + XmPlayOutputPath + "\\";
+					iniLines[i] = findKey + "=" + Program.XmPlayOutputDir + "\\";
 			}
 			File.WriteAllLines(xmPlayIniPath, iniLines);
-
-
 		}
 
         override public string AudioFilePath
@@ -107,9 +103,9 @@ namespace Visual_Music
                     if (xmPlayMixdownSupported)
                     {   //Mixdown with xmplay
 						//string folder = Application.StartupPath + "\\plugins\\xmplay";
-						importUsingTpartyMixdown(insTrack, XmPlayPath + "\\xmplay.exe",
+						importUsingTpartyMixdown(insTrack, Program.XmPlayPath,
 								   "\"" + noteFilePath.Text + "\" -boost",
-								   XmPlayOutputPath);
+								   Program.XmPlayOutputDir);
 						
                     }
                     else

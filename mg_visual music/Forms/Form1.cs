@@ -27,9 +27,9 @@ namespace Visual_Music
 		int MaxTrackTexPbWidth;
 		
 		EventHandler eh_invalidateSongPanel;
-		string ProjectFolder
+		public string ProjectFolder
         { get => openProjDialog.InitialDirectory;
-          set { openProjDialog.InitialDirectory = saveProjDialog.InitialDirectory = value; }
+          set => openProjDialog.InitialDirectory = saveProjDialog.InitialDirectory = value; 
         }
                  
 		string currentSongPath = "";
@@ -38,7 +38,7 @@ namespace Visual_Music
 			get { return trackList.Items; }
 		}
 
-        bool AudioLoaded { get { return !isEmpty(importMidiForm.AudioFilePath) || !isEmpty(importModForm.AudioFilePath) || !isEmpty(importSidForm.AudioFilePath); } }
+        bool AudioLoaded { get { return Media.getAudioLength() > 0; } }// !isEmpty(importMidiForm.AudioFilePath) || !isEmpty(importModForm.AudioFilePath) || !isEmpty(importSidForm.AudioFilePath); } }
 
         Graphics trackListGfxObj;
 		Pen trackListPen = new Pen(System.Drawing.Color.White);
@@ -46,13 +46,15 @@ namespace Visual_Music
 
 		TrackProps selectedTrackProps;
 		const string trackPropsBtnText = "&Track Properties";
-		string foldersFileName = Program.Path+"\\folders";
+		string foldersFileName = Program.Dir+"\\folders";
 		//SourceFileForm sourceFileForm;
         public ImportMidiForm importMidiForm;
         public ImportModForm importModForm;
         public ImportSidForm importSidForm;
+		public TpartyIntegrationForm tpartyIntegrationForm;
 
-        Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType)};
+
+		Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType)};
         SongPanel songPanel = new SongPanel();
         ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
@@ -78,6 +80,7 @@ namespace Visual_Music
 			importMidiForm = new ImportMidiForm(this);
             importModForm = new ImportModForm(this);
             importSidForm = new ImportSidForm(this);
+			tpartyIntegrationForm = new TpartyIntegrationForm();
             //trackPropsPanel =  new TrackPropsPanel(songPanel);
             //showTrackPropsBtn.Text = "Show " + trackPropsBtnText;
 			            
@@ -941,7 +944,7 @@ namespace Visual_Music
                 {
                     importModForm.NoteFilePath = songPanel.NoteFilePath;
                     importModForm.AudioFilePath = songPanel.AudioFilePath;
-                    importModForm.ModInsTrack = songPanel.InsTrack;
+                    importModForm.InsTrack = songPanel.InsTrack;
                 }
                 else if (songPanel.SourceSongType == SourceSongType.Sid)
                 {
@@ -1468,83 +1471,14 @@ namespace Visual_Music
                 songPanel.SourceSongType = SourceSongType.Sid;
         }
 
-		//Settings-----------------------
-		[Serializable]
-		class Settings : ISerializable
+		private void tpartyToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			enum Keys { MidiNoteFolder, ModNoteFolder, SidNoteFolder, MidiAudioFolder, ModAudioFolder, SidAudioFolder, VideoFolder, TextureFolder, ProjectFolder, ModTpartyApp, ModTpartyArgs, ModTpartyOutput, SidTpartyApp, SidTpartyArgs, SidTpartyOutput }
-			public const string Filename = "settings";
-			public static Type[] Types = { typeof(string) };
-			string getKeyName(Keys key)
-			{
-				return Enum.GetName(typeof(Keys), key);
-			}
-			public Settings()
-			{
-			}
-			public Settings(SerializationInfo info, StreamingContext context)
-			{
-				Form1 form = Program.form1;
-				foreach (SerializationEntry entry in info)
-				{
-					if (entry.Name == getKeyName(Keys.MidiNoteFolder))
-						form.importMidiForm.NoteFolder = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.ModNoteFolder))
-						form.importModForm.NoteFolder = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.SidNoteFolder))
-						form.importSidForm.NoteFolder = (string)entry.Value;
-
-					else if (entry.Name == getKeyName(Keys.MidiAudioFolder))
-						form.importMidiForm.AudioFolder = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.ModAudioFolder))
-						form.importModForm.AudioFolder = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.SidAudioFolder))
-						form.importSidForm.AudioFolder = (string)entry.Value;
-
-					else if (entry.Name == getKeyName(Keys.VideoFolder))
-						form.saveVideoDlg.InitialDirectory = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.TextureFolder))
-						form.openTextureDlg.InitialDirectory = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.ProjectFolder))
-						form.ProjectFolder = (string)entry.Value;
-
-					else if (entry.Name == getKeyName(Keys.ModTpartyApp))
-						form.importModForm.tpartyAppTb.Text = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.ModTpartyArgs))
-						form.importModForm.tpartyArgsTb.Text = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.ModTpartyOutput))
-						form.importModForm.tpartyAudioTb.Text = (string)entry.Value;
-
-					else if (entry.Name == getKeyName(Keys.SidTpartyApp))
-						form.importSidForm.tpartyAppTb.Text = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.SidTpartyArgs))
-						form.importSidForm.tpartyArgsTb.Text = (string)entry.Value;
-					else if (entry.Name == getKeyName(Keys.SidTpartyOutput))
-						form.importSidForm.tpartyAudioTb.Text = (string)entry.Value;
-				}
-				
-			}
-			public void GetObjectData(SerializationInfo info, StreamingContext context)
-			{
-				Form1 form = Program.form1;
-				info.AddValue(getKeyName(Keys.MidiNoteFolder), form.importMidiForm.NoteFolder);
-				info.AddValue(getKeyName(Keys.ModNoteFolder), form.importModForm.NoteFolder);
-				info.AddValue(getKeyName(Keys.SidNoteFolder), form.importSidForm.NoteFolder);
-				info.AddValue(getKeyName(Keys.MidiAudioFolder), form.importMidiForm.AudioFolder);
-				info.AddValue(getKeyName(Keys.ModAudioFolder), form.importModForm.AudioFolder);
-				info.AddValue(getKeyName(Keys.SidAudioFolder), form.importSidForm.AudioFolder);
-
-				info.AddValue(getKeyName(Keys.VideoFolder), form.saveVideoDlg.InitialDirectory);
-				info.AddValue(getKeyName(Keys.TextureFolder), form.openTextureDlg.InitialDirectory);
-				info.AddValue(getKeyName(Keys.ProjectFolder), form.ProjectFolder);
-
-				info.AddValue(getKeyName(Keys.ModTpartyApp), form.importModForm.tpartyAppTb.Text);
-				info.AddValue(getKeyName(Keys.ModTpartyArgs), form.importModForm.tpartyArgsTb.Text);
-				info.AddValue(getKeyName(Keys.ModTpartyOutput), form.importModForm.tpartyAudioTb.Text);
-				info.AddValue(getKeyName(Keys.SidTpartyApp), form.importSidForm.tpartyAppTb.Text);
-				info.AddValue(getKeyName(Keys.SidTpartyArgs), form.importSidForm.tpartyArgsTb.Text);
-				info.AddValue(getKeyName(Keys.SidTpartyOutput), form.importSidForm.tpartyAudioTb.Text);
-			}
+			tpartyIntegrationForm.ShowDialog();
+			saveSettings();
+		}
+		public static void showErrorMsgBox(IWin32Window owner, string message, string caption = "" )
+		{
+			MessageBox.Show(owner, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 	}
 }

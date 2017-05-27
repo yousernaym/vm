@@ -2,6 +2,11 @@
 - Don't clamp brightness before modulating with texture.
 - Bump mapping.
 
+- abcde4.xm contains note's in channel 0
+- Parse songlengths.txt and point xmplay sid plugin to same.
+- Instruct user to browse for C64Music\DOCUMENTS folder
+
+
 Done:
 - Mod effects: Pattern loop e6x, pos jump bxx, pattern break dxx, retrig rxy, sample offset 9xx
 - Refactor effects. TrackProps has LineStyleEnum to determine line style. NoteStyle_Bar/Line instances contains props and fx.

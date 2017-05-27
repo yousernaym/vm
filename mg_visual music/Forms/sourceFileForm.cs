@@ -23,7 +23,7 @@ namespace Visual_Music
 			set { audioFilePath.Text = value; }
 		}
 		
-		Form1 parent;
+		protected Form1 parent;
 		public string NoteFolder
 		{
 			get { return openNoteFileDlg.InitialDirectory; }

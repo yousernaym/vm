@@ -32,6 +32,11 @@
 			this.modInsTrackBtn = new System.Windows.Forms.RadioButton();
 			this.SuspendLayout();
 			// 
+			// existingAudioRbtn
+			// 
+			this.existingAudioRbtn.Size = new System.Drawing.Size(215, 17);
+			this.existingAudioRbtn.Text = "Audio file (leave empty for module audio)";
+			// 
 			// label2
 			// 
 			this.label2.Size = new System.Drawing.Size(58, 13);
@@ -43,6 +48,7 @@
 			// 
 			// label1
 			// 
+			this.label1.Location = new System.Drawing.Point(292, 63);
 			this.label1.Size = new System.Drawing.Size(96, 13);
 			this.label1.Text = "Audio file (optional)";
 			// 
@@ -95,6 +101,7 @@
 			this.Controls.Add(this.modInsTrackBtn);
 			this.Controls.Add(this.modChTrackBtn);
 			this.Name = "ImportModForm";
+			this.Load += new System.EventHandler(this.ImportModForm_Load);
 			this.Controls.SetChildIndex(this.noteFilePath, 0);
 			this.Controls.SetChildIndex(this.BrowseAudioBtn, 0);
 			this.Controls.SetChildIndex(this.audioFilePath, 0);

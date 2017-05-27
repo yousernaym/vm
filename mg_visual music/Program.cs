@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.Security.Permissions;
+using System.IO;
 
 namespace Visual_Music
 {
@@ -11,7 +12,12 @@ namespace Visual_Music
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
-		static public string Path = System.IO.Path.GetDirectoryName(Application.ExecutablePath);
+		static public string Dir = Path.GetDirectoryName(Application.ExecutablePath);
+		static public string TpartyDir = Dir + @"\tparty";
+		public static string XmPlayDir = Program.TpartyDir + @"\xmplay";
+		public static string XmPlayPath = Program.XmPlayDir + @"\xmplay.exe";
+		public static string XmPlayOutputDir = XmPlayDir + @"\output";
+		public static string XmPlayFileName = Path.GetFileName(Program.XmPlayPath);
 		static public Form1 form1;
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
@@ -25,7 +31,7 @@ namespace Visual_Music
 				MessageBox.Show("Couldn't initialize Media Foundation.");
 				return;
 			}
-			if (!Midi.Song.initLib(Path+"\\mixdown.wav"))
+			if (!Midi.Song.initLib(Dir+"\\mixdown.wav"))
 			{
 				MessageBox.Show("Couldn't initialize Mikmod.");
 				return;

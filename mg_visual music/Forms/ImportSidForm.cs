@@ -21,7 +21,15 @@ namespace Visual_Music
         
         private void Ok_Click(object sender, EventArgs e)
         {
-            importFiles(false, false, true);
+            importFiles(false, false, parent.tpartyIntegrationForm.SidMixdown);
         }
-    }
+
+		private void ImportSidForm_Shown(object sender, EventArgs e)
+		{
+			if (!parent.tpartyIntegrationForm.SidMixdown)
+				existingAudioRbtn.Text = "Audio file";
+			else
+				existingAudioRbtn.Text = "Audio file (leave empty for SID file audio)";
+		}
+	}
 }

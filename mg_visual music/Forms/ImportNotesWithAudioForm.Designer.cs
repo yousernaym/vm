@@ -53,7 +53,7 @@
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(252, 53);
+			this.label1.Location = new System.Drawing.Point(333, 53);
 			this.label1.Visible = false;
 			// 
 			// eraseCurrent
@@ -104,7 +104,7 @@
 			this.panel1.Controls.Add(this.existingAudioRbtn);
 			this.panel1.Location = new System.Drawing.Point(12, 53);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(136, 69);
+			this.panel1.Size = new System.Drawing.Size(310, 69);
 			this.panel1.TabIndex = 2;
 			// 
 			// tpartyAppTb
