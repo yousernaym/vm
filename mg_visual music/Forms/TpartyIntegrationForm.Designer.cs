@@ -41,6 +41,7 @@
 			this.openXmPlayDialog = new System.Windows.Forms.OpenFileDialog();
 			this.hvscFolderBrowseDialog = new System.Windows.Forms.FolderBrowserDialog();
 			this.openXmPlaySidPluginDialog = new System.Windows.Forms.OpenFileDialog();
+			this.hvscDirTb = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// importXmPlayBtn
@@ -90,7 +91,7 @@
 			this.browseHvscBtn.Location = new System.Drawing.Point(12, 118);
 			this.browseHvscBtn.Name = "browseHvscBtn";
 			this.browseHvscBtn.Size = new System.Drawing.Size(164, 23);
-			this.browseHvscBtn.TabIndex = 9;
+			this.browseHvscBtn.TabIndex = 7;
 			this.browseHvscBtn.Text = "Browse for HVSC folder";
 			this.browseHvscBtn.UseVisualStyleBackColor = true;
 			this.browseHvscBtn.Click += new System.EventHandler(this.browseHvscBtn_Click);
@@ -101,7 +102,7 @@
 			this.hvscLink.Location = new System.Drawing.Point(182, 123);
 			this.hvscLink.Name = "hvscLink";
 			this.hvscLink.Size = new System.Drawing.Size(55, 13);
-			this.hvscLink.TabIndex = 7;
+			this.hvscLink.TabIndex = 8;
 			this.hvscLink.TabStop = true;
 			this.hvscLink.Text = "Download";
 			this.hvscLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.hvscLink_LinkClicked);
@@ -143,7 +144,7 @@
 			// 
 			this.songLengthCb.AutoSize = true;
 			this.songLengthCb.Enabled = false;
-			this.songLengthCb.Location = new System.Drawing.Point(12, 147);
+			this.songLengthCb.Location = new System.Drawing.Point(12, 173);
 			this.songLengthCb.Name = "songLengthCb";
 			this.songLengthCb.Size = new System.Drawing.Size(150, 17);
 			this.songLengthCb.TabIndex = 9;
@@ -153,23 +154,34 @@
 			// 
 			// openXmPlayDialog
 			// 
-			this.openXmPlayDialog.FileName = "openFileDialog1";
+			this.openXmPlayDialog.Filter = "XMPlay (XMPlay*.zip)|xmplay*.zip|Zip files (*.zip)|*.zip";
 			this.openXmPlayDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openXmPlayDialog_FileOk);
 			// 
 			// hvscFolderBrowseDialog
 			// 
+			this.hvscFolderBrowseDialog.Description = "Browse to C64Music\\DOCUMENTS";
 			this.hvscFolderBrowseDialog.ShowNewFolderButton = false;
 			// 
 			// openXmPlaySidPluginDialog
 			// 
-			this.openXmPlaySidPluginDialog.FileName = "openFileDialog1";
+			this.openXmPlaySidPluginDialog.Filter = "XMPlay SID plugin (xmp-sid.zip)|xmp-sid.zip|Zip files (*.zip)|*.zip";
 			this.openXmPlaySidPluginDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openXmPlaySidPluginDialog_FileOk);
+			// 
+			// hvscDirTb
+			// 
+			this.hvscDirTb.Location = new System.Drawing.Point(12, 147);
+			this.hvscDirTb.Name = "hvscDirTb";
+			this.hvscDirTb.ReadOnly = true;
+			this.hvscDirTb.Size = new System.Drawing.Size(234, 20);
+			this.hvscDirTb.TabIndex = 10;
+			this.hvscDirTb.TabStop = false;
 			// 
 			// TpartyIntegrationForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(258, 175);
+			this.ClientSize = new System.Drawing.Size(258, 202);
+			this.Controls.Add(this.hvscDirTb);
 			this.Controls.Add(this.songLengthCb);
 			this.Controls.Add(this.sidsCb);
 			this.Controls.Add(this.modulesCb);
@@ -205,5 +217,6 @@
 		public System.Windows.Forms.CheckBox sidsCb;
 		public System.Windows.Forms.CheckBox songLengthCb;
 		private System.Windows.Forms.OpenFileDialog openXmPlaySidPluginDialog;
+		private System.Windows.Forms.TextBox hvscDirTb;
 	}
 }

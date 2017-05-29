@@ -134,6 +134,7 @@ namespace Visual_Music
 			{
 				tpartyProcess.Start();
 				tpartyProcess.WaitForExit();
+				Program.form1.Activate();
 			}
 			catch (Exception)
 			{

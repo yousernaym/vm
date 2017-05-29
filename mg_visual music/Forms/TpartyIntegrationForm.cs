@@ -10,15 +10,16 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Visual_Music
 {
 	public partial class TpartyIntegrationForm : Form
 	{
-		//static string hvscDir = null;
+		CommonOpenFileDialog hvscDirDialog = new CommonOpenFileDialog();
 		const string SongLengthsFileName = "songlengths.txt";
 		string hvscDir;
-		public string HvscDir { get => hvscDir; set { hvscDir = value; songLengthCb.Enabled = HvscInstalled; } }
+		public string HvscDir { get => hvscDir; set { hvscDir = hvscDirDialog.InitialDirectory = hvscDirTb.Text = value; songLengthCb.Enabled = HvscInstalled; } }
 		string SongLengthsPath { get => HvscDir + "\\" + SongLengthsFileName; }
 		const string XmPlaySidPluginFileName = "xmp-sid.dll";
 		bool XmPlayInstalled { get => File.Exists(Program.XmPlayPath); }
@@ -27,10 +28,16 @@ namespace Visual_Music
 		public bool ModuleMixdown{ get => modulesCb.Checked && XmPlayInstalled; set => modulesCb.Checked = XmPlayInstalled ? value : false; }
 		public bool SidMixdown{ get => sidsCb.Checked && XmPlaySidPluginInstalled; set => sidsCb.Checked = XmPlaySidPluginInstalled ? value : false; }
 		public bool HvscSongLengths { get => songLengthCb.Checked && HvscInstalled  ; set => songLengthCb.Checked = HvscInstalled ? value : false; }
+		
+
 		public TpartyIntegrationForm()
 		{
 			InitializeComponent();
 			enableCheckboxes();
+			hvscDirDialog.IsFolderPicker = true;
+			hvscDirDialog.EnsurePathExists = true;
+			//hvscDirDialog.FileOk += new System.ComponentModel.CancelEventHandler(hvscDirDialog_FileOk);
+			hvscDirDialog.Title = "Select the C64Music\\DOCUMENTS folder";
 		}
 
 		private void xmPlayLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -84,11 +91,11 @@ namespace Visual_Music
 				Form1.showErrorMsgBox(this, ex.Message);
 				e.Cancel = true;
 			}
+			enableCheckboxes();
 		}
 		private void importXmPlayBtn_Click(object sender, EventArgs e)
 		{
 			openXmPlayDialog.ShowDialog();
-			//if (!Directory.Exists())
 			Directory.CreateDirectory(Program.XmPlayOutputDir);
 		}
 
@@ -109,26 +116,45 @@ namespace Visual_Music
 
 		private void browseHvscBtn_Click(object sender, EventArgs e)
 		{
-			if (hvscFolderBrowseDialog.ShowDialog() == DialogResult.OK)
+			if (hvscDirDialog.ShowDialog() == CommonFileDialogResult.Ok)
 			{
-				HvscDir = hvscFolderBrowseDialog.SelectedPath;
+				string oldDir = HvscDir;
+				HvscDir = hvscDirDialog.InitialDirectory = hvscDirDialog.FileName;
 				if (!HvscInstalled)
-					Form1.showErrorMsgBox(this, "HVSC not found in specified folder");
+				{
+					Form1.showErrorMsgBox(this, "songlengths.txt not found in specified folder.");
+					HvscDir = oldDir;
+					//e.Cancel = true;
+				}
+				enableCheckboxes();
 			}
-			enableCheckboxes();
+			Focus();
+			
 		}
 
 		private void openXmPlayDialog_FileOk(object sender, CancelEventArgs e)
 		{
 			importZip(openXmPlayDialog.FileName, Program.XmPlayFileName, Program.XmPlayDir, e);
-			enableCheckboxes();
 		}
 
 		private void openXmPlaySidPluginDialog_FileOk(object sender, CancelEventArgs e)
 		{
 			importZip(openXmPlaySidPluginDialog.FileName, XmPlaySidPluginFileName, Program.XmPlayDir, e);
+		}
+
+		private void hvscDirDialog_FileOk(object sender, CancelEventArgs e)
+		{
+			string oldDir = HvscDir;
+			HvscDir = hvscDirDialog.FileName;
+			if (!HvscInstalled)
+			{
+				Form1.showErrorMsgBox(this, "songlengths.txt not found in specified folder.");
+				HvscDir = oldDir;
+				e.Cancel = true;
+			}
 			enableCheckboxes();
 		}
+
 		void enableCheckboxes()
 		{
 			modulesCb.Enabled = XmPlayInstalled;
@@ -139,7 +165,6 @@ namespace Visual_Music
 		private void TpartyIntegrationForm_Load(object sender, EventArgs e)
 		{
 			enableCheckboxes();
-
 		}
 
 		private void modulesCb_EnabledChanged(object sender, EventArgs e)
