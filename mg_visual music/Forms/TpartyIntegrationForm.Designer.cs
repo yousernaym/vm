@@ -42,6 +42,7 @@
 			this.hvscFolderBrowseDialog = new System.Windows.Forms.FolderBrowserDialog();
 			this.openXmPlaySidPluginDialog = new System.Windows.Forms.OpenFileDialog();
 			this.hvscDirTb = new System.Windows.Forms.TextBox();
+			this.openHvscDialog = new System.Windows.Forms.OpenFileDialog();
 			this.SuspendLayout();
 			// 
 			// importXmPlayBtn
@@ -176,6 +177,12 @@
 			this.hvscDirTb.TabIndex = 10;
 			this.hvscDirTb.TabStop = false;
 			// 
+			// openHvscDialog
+			// 
+			this.openHvscDialog.CheckFileExists = false;
+			this.openHvscDialog.FileName = "Folder Selection";
+			this.openHvscDialog.ValidateNames = false;
+			// 
 			// TpartyIntegrationForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -218,5 +225,6 @@
 		public System.Windows.Forms.CheckBox songLengthCb;
 		private System.Windows.Forms.OpenFileDialog openXmPlaySidPluginDialog;
 		private System.Windows.Forms.TextBox hvscDirTb;
+		private System.Windows.Forms.OpenFileDialog openHvscDialog;
 	}
 }

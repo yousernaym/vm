@@ -37,7 +37,7 @@ namespace Visual_Music
 			hvscDirDialog.IsFolderPicker = true;
 			hvscDirDialog.EnsurePathExists = true;
 			//hvscDirDialog.FileOk += new System.ComponentModel.CancelEventHandler(hvscDirDialog_FileOk);
-			hvscDirDialog.Title = "Select the C64Music\\DOCUMENTS folder";
+			hvscDirDialog.Title = "Browae to <HVSC root>\\C64Music\\DOCUMENTS";
 		}
 
 		private void xmPlayLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -116,20 +116,28 @@ namespace Visual_Music
 
 		private void browseHvscBtn_Click(object sender, EventArgs e)
 		{
-			if (hvscDirDialog.ShowDialog() == CommonFileDialogResult.Ok)
+			bool close = false;
+			while (!close)
 			{
-				string oldDir = HvscDir;
-				HvscDir = hvscDirDialog.InitialDirectory = hvscDirDialog.FileName;
-				if (!HvscInstalled)
+				if (hvscDirDialog.ShowDialog() == CommonFileDialogResult.Ok)
 				{
-					Form1.showErrorMsgBox(this, "songlengths.txt not found in specified folder.");
-					HvscDir = oldDir;
-					//e.Cancel = true;
+					close = true;
+					string newDir = hvscDirDialog.InitialDirectory = hvscDirDialog.FileName;
+					if (!hvscInstalledAt(newDir))
+					{
+						Form1.showErrorMsgBox(this, SongLengthsFileName + " not found in specified folder.");
+						close = false;
+					}
+					else
+					{
+						HvscDir = newDir;
+					}
 				}
-				enableCheckboxes();
+				else
+					close = true;
 			}
+			enableCheckboxes();
 			Focus();
-			
 		}
 
 		private void openXmPlayDialog_FileOk(object sender, CancelEventArgs e)
@@ -170,24 +178,24 @@ namespace Visual_Music
 		private void modulesCb_EnabledChanged(object sender, EventArgs e)
 		{
 			CheckBox cb = (CheckBox)sender;
-			//if (!cb.Enabled)
-				cb.Checked = cb.Enabled;
+			cb.Checked = cb.Enabled;
 		}
 
 		private void sidsCb_EnabledChanged(object sender, EventArgs e)
 		{
 			CheckBox cb = (CheckBox)sender;
-			//if (!cb.Enabled)
-			//cb.Checked = false;
 			cb.Checked = cb.Enabled;
 		}
 
 		private void songLengthCb_EnabledChanged(object sender, EventArgs e)
 		{
 			CheckBox cb = (CheckBox)sender;
-			//if (!cb.Enabled)
-			//cb.Checked = false;
 			cb.Checked = cb.Enabled;
+		}
+
+		bool hvscInstalledAt(string dir)
+		{
+			return File.Exists(Path.Combine(dir,SongLengthsFileName));
 		}
 	}
 }
