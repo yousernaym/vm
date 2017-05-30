@@ -13,11 +13,6 @@ namespace Visual_Music
 		/// The main entry point for the application.
 		/// </summary>
 		static public string Dir = Path.GetDirectoryName(Application.ExecutablePath);
-		static public string TpartyDir = Dir + @"\tparty";
-		public static string XmPlayDir = Program.TpartyDir + @"\xmplay";
-		public static string XmPlayPath = Program.XmPlayDir + @"\xmplay.exe";
-		public static string XmPlayOutputDir = XmPlayDir + @"\output";
-		public static string XmPlayFileName = Path.GetFileName(Program.XmPlayPath);
 		static public Form1 form1;
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]

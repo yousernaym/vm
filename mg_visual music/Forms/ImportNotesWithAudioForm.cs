@@ -43,8 +43,7 @@ namespace Visual_Music
 			watcher.NotifyFilter = NotifyFilters.LastWrite;
 			watcher.Filter = "*.wav";
 
-			string xmPlayIniPath = Program.XmPlayDir + "\\xmplay.ini";
-			//FileStream xmPlayIni = File.Open(, FileMode.Open, FileAccess.Read);
+			string xmPlayIniPath = TpartyIntegrationForm.XmPlayDir + "\\xmplay.ini";
 			string[] iniLines = File.ReadAllLines(xmPlayIniPath);
 			string findKey = "WritePath";
 			for (int i=0;i<iniLines.Length;i++)
@@ -54,7 +53,7 @@ namespace Visual_Music
 					continue;
 				string key = iniLines[i].Substring(0, equalSignIndex).Trim();
 				if (key == findKey)
-					iniLines[i] = findKey + "=" + Program.XmPlayOutputDir + "\\";
+					iniLines[i] = findKey + "=" + TpartyIntegrationForm.XmPlayOutputDir + "\\";
 			}
 			File.WriteAllLines(xmPlayIniPath, iniLines);
 		}
@@ -103,9 +102,9 @@ namespace Visual_Music
                     if (xmPlayMixdownSupported)
                     {   //Mixdown with xmplay
 						//string folder = Application.StartupPath + "\\plugins\\xmplay";
-						importUsingTpartyMixdown(insTrack, Program.XmPlayPath,
+						importUsingTpartyMixdown(insTrack, TpartyIntegrationForm.XmPlayPath,
 								   "\"" + noteFilePath.Text + "\" -boost",
-								   Program.XmPlayOutputDir);
+								   TpartyIntegrationForm.XmPlayOutputDir);
 						
                     }
                     else
