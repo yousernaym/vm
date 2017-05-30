@@ -96,11 +96,11 @@ namespace Visual_Music
 			}
 			return true;
 		}
-		protected void importFiles(bool modInsTrack, MixdownType mixdownType, string audioPath)
+		protected void importFiles(bool modInsTrack, MixdownType mixdownType, string audioPath, double songLengthS)
         {
 			if (!checkNoteFile())
 				return;
-            if (parent.openSourceFiles(NoteFilePath, audioPath, eraseCurrent.Checked, modInsTrack, mixdownType))
+            if (parent.openSourceFiles(NoteFilePath, audioPath, eraseCurrent.Checked, modInsTrack, mixdownType, songLengthS))
             {
                 DialogResult = DialogResult.OK;
                 Hide();

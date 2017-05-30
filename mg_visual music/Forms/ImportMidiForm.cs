@@ -21,7 +21,7 @@ namespace Visual_Music
 
         private void Ok_Click(object sender, EventArgs e)
         {
-            importFiles(false, MixdownType.None, AudioFilePath);
+			importFiles(false, MixdownType.None, AudioFilePath, 0);
         }
     }
 }

@@ -44,7 +44,7 @@ namespace Visual_Music
 					if (ext.ToLower() == f.ToLower())
 						xmPlayMixdownSupported = true;
 			}
-			importFiles(InsTrack, true, xmPlayMixdownSupported && parent.tpartyIntegrationForm.ModuleMixdown);
+			importFiles(InsTrack, true, xmPlayMixdownSupported && parent.tpartyIntegrationForm.ModuleMixdown, 0);
         }
 
 		private void ImportModForm_Load(object sender, EventArgs e)

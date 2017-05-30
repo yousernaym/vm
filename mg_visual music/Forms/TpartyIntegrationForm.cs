@@ -28,7 +28,7 @@ namespace Visual_Music
 		CommonOpenFileDialog hvscDirDialog = new CommonOpenFileDialog();
 		string hvscDir;
 		public string HvscDir { get => hvscDir; set { hvscDir = hvscDirDialog.InitialDirectory = hvscDirTb.Text = value; songLengthCb.Enabled = HvscInstalled; } }
-		string SongLengthsPath { get => HvscDir + "\\" + SongLengthsFileName; }
+		public string SongLengthsPath { get => HvscDir + "\\" + SongLengthsFileName; }
 		bool XmPlayInstalled { get => File.Exists(XmPlayPath); }
 		bool XmPlaySidPluginInstalled { get => XmPlayInstalled && File.Exists(XmPlayDir + "\\" + XmPlaySidPluginFileName); }
 		bool HvscInstalled { get => File.Exists(SongLengthsPath); }

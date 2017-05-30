@@ -93,7 +93,6 @@ namespace Visual_Music
         {
             get { return bPlayback; }
         }
-        bool bAudioFileLoaded = false;
         bool bAudioPlayback = false;
         TimeSpan oldTime = new TimeSpan(0);
         TimeSpan pbStartSysTime = new TimeSpan(0);
@@ -250,7 +249,7 @@ namespace Visual_Music
 
 			if (!string.IsNullOrWhiteSpace(noteFilePath))
 			{
-				importSong(noteFilePath, audioFilePath, false, insTrack, mixdownType);
+				importSong(noteFilePath, audioFilePath, false, insTrack, mixdownType, 0);
 				if (trackProps != null)
 				{
 					for (int i = 0; i < trackProps.Count; i++)
@@ -478,28 +477,28 @@ namespace Visual_Music
 				trackProps[t].drawTrack(songDrawProps, GlobalTrackProps, selectingRegion);
 			}
 		}
-		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool _insTrack, MixdownType mixdownType)
+		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool _insTrack, MixdownType mixdownType, double songLengthS)
 		{
 			Media.closeAudioFile();
-			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, _insTrack, mixdownType == MixdownType.Internal))
+			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, _insTrack, mixdownType == MixdownType.Internal, songLengthS))
 				return false;
 			if (!openAudioFile(audioFile, mixdownType))
 				return false;
 			return true;
 		}
-		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _insTrack, bool mixdown)
+		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _insTrack, bool mixdown, double songLengthS)
 		{
-				Invalidate();
-				stopPlayback();
+			Invalidate();
+			stopPlayback();
 				
-				noteFilePath = file;
-				insTrack = _insTrack;
-				int minPitch = 0, maxPitch = 0;
-				if (eraseCurrent)
-				{
-					Qn_viewWidth = defaultQn_viewWidth;
-					AudioOffset = 0;
-				}
+			noteFilePath = file;
+			insTrack = _insTrack;
+			int minPitch = 0, maxPitch = 0;
+			if (eraseCurrent)
+			{
+				Qn_viewWidth = defaultQn_viewWidth;
+				AudioOffset = 0;
+			}
 
 			//if (string.IsNullOrWhiteSpace(noteFilePath))
 			//{
@@ -511,7 +510,7 @@ namespace Visual_Music
 			Midi.Song newNotes = new Midi.Song();
 			try
 			{
-				newNotes.openFile(noteFilePath, ref audioFile, _insTrack, mixdown);
+				newNotes.openFile(noteFilePath, ref audioFile, _insTrack, mixdown, songLengthS);
 			}
 			catch (Exception)
 			{
