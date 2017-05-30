@@ -1480,5 +1480,9 @@ namespace Visual_Music
 		{
 			MessageBox.Show(owner, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
+		public static void showWarningMsgBox(IWin32Window owner, string message, string caption = "")
+		{
+			MessageBox.Show(owner, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+		}
 	}
 }

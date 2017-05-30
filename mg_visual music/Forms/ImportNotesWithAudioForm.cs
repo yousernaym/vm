@@ -42,20 +42,6 @@ namespace Visual_Music
 			
 			watcher.NotifyFilter = NotifyFilters.LastWrite;
 			watcher.Filter = "*.wav";
-
-			string xmPlayIniPath = TpartyIntegrationForm.XmPlayDir + "\\xmplay.ini";
-			string[] iniLines = File.ReadAllLines(xmPlayIniPath);
-			string findKey = "WritePath";
-			for (int i=0;i<iniLines.Length;i++)
-			{
-				int equalSignIndex = iniLines[i].IndexOf('=');
-				if (equalSignIndex < 0)
-					continue;
-				string key = iniLines[i].Substring(0, equalSignIndex).Trim();
-				if (key == findKey)
-					iniLines[i] = findKey + "=" + TpartyIntegrationForm.XmPlayOutputDir + "\\";
-			}
-			File.WriteAllLines(xmPlayIniPath, iniLines);
 		}
 
         override public string AudioFilePath
@@ -131,9 +117,13 @@ namespace Visual_Music
 				return null;
 			try
 			{
+				tpartyOutputFile = null;
 				tpartyProcess.Start();
 				tpartyProcess.WaitForExit();
+				watcher.EnableRaisingEvents = false;
 				Program.form1.Activate();
+				if (tpartyOutputFile == null)
+					Form1.showWarningMsgBox(null, "Couldn't find audio mixdown at " + tpartyOutputDir);
 			}
 			catch (Exception)
 			{
@@ -193,6 +183,8 @@ namespace Visual_Music
                     if (stream != null)
                         stream.Close();
                 }
+				if (tpartyProcess.HasExited)
+					return;
             }
 			tpartyOutputFile = e.FullPath;
 			//tpartyDoneEvent.Set();

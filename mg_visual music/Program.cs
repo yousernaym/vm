@@ -46,7 +46,5 @@ namespace Visual_Music
 			//Console.WriteLine("MyHandler caught : " + e.Message);
 			//Console.WriteLine("Runtime terminating: {0}", args.IsTerminating);
 		}
-	
-
 	}
 }

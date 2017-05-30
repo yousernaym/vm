@@ -543,14 +543,11 @@ namespace Visual_Music
 			if (_mixdownType == MixdownType.Tparty)
 			{
 				file = ImportNotesWithAudioForm.runTpartyProcess();
-				if (string.IsNullOrWhiteSpace(file))
-					return false;
 			}
 			audioFilePath = file;
 
 			if (string.IsNullOrWhiteSpace(file))
 			{
-				bAudioFileLoaded = false;
 				return true;
 			}
 			if (!Media.openAudioFile(file))
@@ -559,7 +556,6 @@ namespace Visual_Music
 				return false;
 			}
 			mixdownType = _mixdownType;
-			bAudioFileLoaded = true;
 			if (notes != null)
 				notes.SongLengthInTicks = (int)secondsToTicks(Media.getAudioLength());
 			return true;
@@ -758,7 +754,7 @@ namespace Visual_Music
 		}
 		public void togglePlayback()
 		{
-			if (!bAudioFileLoaded)
+			if (Media.getAudioLength() == 0)
 				return;
 			bPlayback = !bPlayback;
 			bAudioPlayback = !bAudioPlayback;

@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Text.RegularExpressions;
 
 namespace Visual_Music
 {
@@ -101,13 +102,18 @@ namespace Visual_Music
 		}
 		private void importXmPlayBtn_Click(object sender, EventArgs e)
 		{
-			openXmPlayDialog.ShowDialog();
-			Directory.CreateDirectory(XmPlayOutputDir);
+			if (openXmPlayDialog.ShowDialog() == DialogResult.OK)
+			{
+				setXmPlayIniValue("", "WritePath", XmPlayOutputDir+"\\");
+				trySetHvscPathInXmPlay();
+				Directory.CreateDirectory(XmPlayOutputDir);
+			}
 		}
 
 		private void importSidBtn_Click(object sender, EventArgs e)
 		{
 			openXmPlaySidPluginDialog.ShowDialog();
+			trySetHvscPathInXmPlay();
 		}
 
 		protected override bool ProcessDialogKey(Keys keyData)
@@ -137,6 +143,7 @@ namespace Visual_Music
 					else
 					{
 						HvscDir = newDir;
+						trySetHvscPathInXmPlay();
 					}
 				}
 				else
@@ -204,9 +211,50 @@ namespace Visual_Music
 			return File.Exists(Path.Combine(dir,SongLengthsFileName));
 		}
 		
-		void setHvscPathInXmPlaySidPlugin()
+		void trySetHvscPathInXmPlay()
 		{
+			if (XmPlayInstalled && XmPlaySidPluginInstalled)
+				setXmPlayIniValue("SID_.*", "documents", HvscDir);
+		}
 
+		static void setXmPlayIniValue(string section, string key, string value)
+		{
+			if (string.IsNullOrEmpty(section))
+				section = "XMPlay";
+			string file = XmPlayDir + "\\xmplay.ini";
+			string[] iniLines = File.ReadAllLines(file);
+			int sectionStart = -1;
+			for (int i = 0; i < iniLines.Length; i++)
+			{
+				string pattern = "\\[" + section + "\\]";
+				Regex regex = new Regex(pattern);
+				if (Regex.IsMatch(iniLines[i], pattern))
+				{
+					Match m = regex.Match(iniLines[i]);
+					bool b = m.Success;
+					sectionStart = i;
+					break;
+				}
+			}
+			if (sectionStart < 0)
+				throw new Exception("Couldn't find section " + section + " in " + file);
+			bool keyFound = false;
+			for (int i = sectionStart; i < iniLines.Length; i++)
+			{
+				int equalSignIndex = iniLines[i].IndexOf('=');
+				if (equalSignIndex < 0)
+					continue;
+				string lineKey = iniLines[i].Substring(0, equalSignIndex).Trim();
+				if (lineKey == key)
+				{
+					iniLines[i] = key + "=" + value;
+					keyFound = true;
+					break;
+				}
+			}
+			if (!keyFound)
+				throw new Exception("Couldn't find key " + key + " in " + file);
+			File.WriteAllLines(file, iniLines);
 		}
 	}
 }
