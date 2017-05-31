@@ -45,6 +45,8 @@ namespace Visual_Music
 			hvscDirDialog.EnsurePathExists = true;
 			//hvscDirDialog.FileOk += new System.ComponentModel.CancelEventHandler(hvscDirDialog_FileOk);
 			hvscDirDialog.Title = "Browae to <HVSC root>\\C64Music\\DOCUMENTS";
+
+			trySetXmPlayIni_outputPath();
 		}
 
 		private void xmPlayLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -104,16 +106,16 @@ namespace Visual_Music
 		{
 			if (openXmPlayDialog.ShowDialog() == DialogResult.OK)
 			{
-				setXmPlayIniValue("", "WritePath", XmPlayOutputDir+"\\");
-				trySetHvscPathInXmPlay();
+				trySetXmPlayIni_outputPath();
+				trySetXmPlayIni_hvscPath();
 				Directory.CreateDirectory(XmPlayOutputDir);
 			}
 		}
-
+		
 		private void importSidBtn_Click(object sender, EventArgs e)
 		{
 			openXmPlaySidPluginDialog.ShowDialog();
-			trySetHvscPathInXmPlay();
+			trySetXmPlayIni_hvscPath();
 		}
 
 		protected override bool ProcessDialogKey(Keys keyData)
@@ -143,7 +145,7 @@ namespace Visual_Music
 					else
 					{
 						HvscDir = newDir;
-						trySetHvscPathInXmPlay();
+						trySetXmPlayIni_hvscPath();
 					}
 				}
 				else
@@ -211,12 +213,16 @@ namespace Visual_Music
 			return File.Exists(Path.Combine(dir,SongLengthsFileName));
 		}
 		
-		void trySetHvscPathInXmPlay()
+		void trySetXmPlayIni_hvscPath()
 		{
 			if (XmPlayInstalled && XmPlaySidPluginInstalled)
 				setXmPlayIniValue("SID_.*", "documents", HvscDir);
 		}
-
+		void trySetXmPlayIni_outputPath()
+		{
+			if (XmPlayInstalled)
+				setXmPlayIniValue("", "WritePath", XmPlayOutputDir + "\\");
+		}
 		static void setXmPlayIniValue(string section, string key, string value)
 		{
 			if (string.IsNullOrEmpty(section))

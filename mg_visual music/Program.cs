@@ -38,6 +38,8 @@ namespace Visual_Music
 			Midi.Song.exitLib();
 			if (!Media.closeMF())
 				MessageBox.Show("Couldn't close Media Foundation.");
+			DirectoryInfo dirInfo = new DirectoryInfo(TpartyIntegrationForm.XmPlayDir);
+			dirInfo.clean();
 		}
 		static void exceptionHandler(object sender, UnhandledExceptionEventArgs args)
 		{
@@ -45,6 +47,11 @@ namespace Visual_Music
 			MessageBox.Show(e.Message);
 			//Console.WriteLine("MyHandler caught : " + e.Message);
 			//Console.WriteLine("Runtime terminating: {0}", args.IsTerminating);
+		}
+		public static void clean(this System.IO.DirectoryInfo directory)
+		{
+			foreach (System.IO.FileInfo file in directory.GetFiles()) file.Delete();
+			foreach (System.IO.DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
 		}
 	}
 }
