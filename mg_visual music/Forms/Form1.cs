@@ -32,7 +32,7 @@ namespace Visual_Music
           set => openProjDialog.InitialDirectory = saveProjDialog.InitialDirectory = value; 
         }
                  
-		string currentSongPath = "";
+		string currentProjPath = "";
 		public ListView.ListViewItemCollection trackListItems
 		{
 			get { return trackList.Items; }
@@ -242,7 +242,7 @@ namespace Visual_Music
 				songLoaded(notePath);
                 if (eraseCurrent)
                 {
-                    currentSongPath = "";
+                    currentProjPath = "";
                     updateFormTitle("");
                 }
                 return true;
@@ -951,9 +951,9 @@ namespace Visual_Music
                     importSidForm.NoteFilePath = songPanel.NoteFilePath;
                     importSidForm.AudioFilePath = songPanel.AudioFilePath;
                 }
-                currentSongPath = fileName;
-				songLoaded(currentSongPath);
-				updateFormTitle(currentSongPath);
+                currentProjPath = fileName;
+				songLoaded(currentProjPath);
+				updateFormTitle(currentProjPath);
 			//}
 			//catch (Exception ex)
 			//{
@@ -968,7 +968,7 @@ namespace Visual_Music
 		}
 		private void saveSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (isEmpty(currentSongPath))
+			if (isEmpty(currentProjPath))
 			{
 				saveSongAs();
 				return;
@@ -981,12 +981,12 @@ namespace Visual_Music
 			{
                 DataContractSerializer dcs = new DataContractSerializer(typeof(SongPanel), projectSerializationTypes);
 
-                using (FileStream stream = File.Open(currentSongPath, FileMode.Create))
+                using (FileStream stream = File.Open(currentProjPath, FileMode.Create))
 				{
 
 					dcs.WriteObject(stream, songPanel);
                 }
-				updateFormTitle(currentSongPath);
+				updateFormTitle(currentProjPath);
 			}
 			catch (Exception ex)
 			{
@@ -995,10 +995,11 @@ namespace Visual_Music
 		}
 		void saveSongAs()
 		{
+
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
 				return;
-			currentSongPath = saveProjDialog.FileName;
-			ProjectFolder = Path.GetDirectoryName(currentSongPath);
+			currentProjPath = saveProjDialog.FileName;
+			ProjectFolder = Path.GetDirectoryName(currentProjPath);
 			writeFolderNames();
 			saveSong();
 		}
