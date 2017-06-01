@@ -53,17 +53,11 @@ namespace Visual_Music
         public ImportSidForm importSidForm;
 		public TpartyIntegrationForm tpartyIntegrationForm;
 
-
 		Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType)};
         SongPanel songPanel = new SongPanel();
         ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
-
-		//Panel trackPropsPanel = new Panel();
-		//public int SelectedTrack
-		//{
-		//get { return (int)upDownVpWidth.Value; }
-		//}
+				
 		public Form1(string[] args)
 		{
 			InitializeComponent();
@@ -935,22 +929,8 @@ namespace Visual_Music
                     songPanel = (SongPanel)dcs.ReadObject(stream);
                 }
                 initSongPanel(songPanel);
-				if (songPanel.SourceSongType == SourceSongType.Midi)
-                {
-                    importMidiForm.NoteFilePath = songPanel.NoteFilePath;
-                    importMidiForm.AudioFilePath = songPanel.AudioFilePath;
-                }
-                else if (songPanel.SourceSongType == SourceSongType.Mod)
-                {
-                    importModForm.NoteFilePath = songPanel.NoteFilePath;
-                    importModForm.AudioFilePath = songPanel.AudioFilePath;
-                    importModForm.InsTrack = songPanel.InsTrack;
-                }
-                else if (songPanel.SourceSongType == SourceSongType.Sid)
-                {
-                    importSidForm.NoteFilePath = songPanel.NoteFilePath;
-                    importSidForm.AudioFilePath = songPanel.AudioFilePath;
-                }
+				updateImportForm();
+				
                 currentProjPath = fileName;
 				songLoaded(currentProjPath);
 				updateFormTitle(currentProjPath);
@@ -959,6 +939,26 @@ namespace Visual_Music
 			//{
 			//	MessageBox.Show(ex.Message);
 			//}
+		}
+		
+		void updateImportForm()
+		{
+			if (songPanel.SourceSongType == SourceSongType.Midi)
+            {
+                importMidiForm.NoteFilePath = songPanel.NoteFilePath;
+                importMidiForm.AudioFilePath = songPanel.AudioFilePath;
+            }
+            else if (songPanel.SourceSongType == SourceSongType.Mod)
+            {
+                importModForm.NoteFilePath = songPanel.NoteFilePath;
+                importModForm.AudioFilePath = songPanel.AudioFilePath;
+                importModForm.InsTrack = songPanel.InsTrack;
+            }
+            else if (songPanel.SourceSongType == SourceSongType.Sid)
+            {
+                importSidForm.NoteFilePath = songPanel.NoteFilePath;
+                importSidForm.AudioFilePath = songPanel.AudioFilePath;
+            }
 		}
 		void updateFormTitle(string path)
 		{
@@ -995,9 +995,17 @@ namespace Visual_Music
 		}
 		void saveSongAs()
 		{
-
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
 				return;
+			saveMixdownDialog.FileName = Path.GetFileName(saveProjDialog.FileName);
+			if (songPanel.MixdownType != MixdownType.None && saveMixdownDialog.ShowDialog() == DialogResult.OK)
+			{
+				File.Copy(Media.getAudioFilePath(), saveMixdownDialog.FileName, true);
+				songPanel.MixdownType = MixdownType.None;
+				songPanel.AudioFilePath = saveMixdownDialog.FileName;
+				updateImportForm(); //To update audio file path
+			}
+
 			currentProjPath = saveProjDialog.FileName;
 			ProjectFolder = Path.GetDirectoryName(currentProjPath);
 			writeFolderNames();

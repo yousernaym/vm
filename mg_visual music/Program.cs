@@ -38,7 +38,7 @@ namespace Visual_Music
 			Midi.Song.exitLib();
 			if (!Media.closeMF())
 				MessageBox.Show("Couldn't close Media Foundation.");
-			DirectoryInfo dirInfo = new DirectoryInfo(TpartyIntegrationForm.XmPlayDir);
+			DirectoryInfo dirInfo = new DirectoryInfo(TpartyIntegrationForm.XmPlayOutputDir);
 			dirInfo.clean();
 		}
 		static void exceptionHandler(object sender, UnhandledExceptionEventArgs args)

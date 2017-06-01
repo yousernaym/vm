@@ -79,13 +79,14 @@ namespace Visual_Music
 		}
 	}
 
-    [Serializable()]
-    public class SongPanel : GraphicsDeviceControl, ISerializable
-    {
-        ContentManager content;
-        public ContentManager Content { get { return content; } }
+	[Serializable()]
+	public class SongPanel : GraphicsDeviceControl, ISerializable
+	{
+		ContentManager content;
+		public ContentManager Content { get { return content; } }
 		//bool internalMixdown;
 		MixdownType mixdownType;
+		public MixdownType MixdownType { get => mixdownType; set => mixdownType = value; } 
 		Texture2D regionSelectTexture;
         float normPitchMargin = 1 / 50.0f;
         bool bPlayback = false;

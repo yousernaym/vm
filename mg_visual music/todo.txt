@@ -1,11 +1,13 @@
-﻿- Use shader for bar rendering and add rendering options for bar style.
+﻿(- Parse songlengths.txt) Not really needed if a very long songlength is specified for note creation and XmPlay is pointed to songlengths.txt. The notes will be cut off when audio ends.
+- Use shader for bar rendering and add rendering options for bar style.
 - Don't clamp brightness before modulating with texture.
 - Bump mapping.
+- Specify mixdown name to libmikmod so that different projects can be open at the same time (in multiple instances of Visual Music) with their respective mixdown files.
 
-- Parse songlengths.txt and point xmplay sid plugin to same.
-- Instruct user to browse for C64Music\DOCUMENTS folder
 
 Done:
+- Point xmplay sid plugin to songlengths.txt.
+- Instruct user to browse for C64Music\DOCUMENTS folder
 - abcde4.xm contains note's in channel 0 (29/05 -17)
 - Mod effects: Pattern loop e6x, pos jump bxx, pattern break dxx, retrig rxy, sample offset 9xx
 - Refactor effects. TrackProps has LineStyleEnum to determine line style. NoteStyle_Bar/Line instances contains props and fx.

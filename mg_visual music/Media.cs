@@ -18,15 +18,21 @@ namespace Visual_Music
 
 	static class Media
 	{
-		//Global stuff
+		//General stuff
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool initMF();
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool closeMF();
+		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
+		public static extern bool openAudioFile(string file);
+		[DllImport("media.dll", EntryPoint = "getAudioFilePath", CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr getAudioFilePath_intptr();
+		public static string getAudioFilePath()
+		{
+			return Marshal.PtrToStringAnsi(getAudioFilePath_intptr());
+		}
 
 		//Encoding
-		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool bla();
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool beginVideoEnc(string outputFile, VideoFormat vidFmt, bool _bVideo);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -37,8 +43,6 @@ namespace Visual_Music
 		//Playback
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool playbackIsRunning();
-		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool openAudioFile(string file);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool closeAudioFile();
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
