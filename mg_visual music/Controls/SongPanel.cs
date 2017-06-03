@@ -517,7 +517,7 @@ namespace Visual_Music
 			{
 				//notes = null;
 				//MessageBox.Show(Parent, e.Message, "Note file error");
-				MessageBox.Show(Parent, "Couldn't load note file" + Path.GetFileName(NoteFilePath), "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(Parent, "Couldn't load note file " + Path.GetFileName(NoteFilePath), "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
 			}
 
