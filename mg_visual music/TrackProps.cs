@@ -417,12 +417,12 @@ namespace Visual_Music
 		}
 		TrackProps clone()
 		{
-			BinaryFormatter bf = new BinaryFormatter();
+			DataContractSerializer dcs = new DataContractSerializer(typeof(TrackProps), Form1.projectSerializationTypes);
 			MemoryStream stream = new MemoryStream();
-			bf.Serialize(stream, this);
+			dcs.WriteObject(stream, this);
 			stream.Flush();
 			stream.Position = 0;
-			TrackProps dest = (TrackProps)bf.Deserialize(stream);
+			TrackProps dest = (TrackProps)dcs.ReadObject(stream);
 			dest.MidiTrack = midiTrack;
 			//dest.NumTracks = numTracks;
 			return dest;
