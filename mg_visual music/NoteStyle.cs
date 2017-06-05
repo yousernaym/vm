@@ -214,7 +214,7 @@ namespace Visual_Music
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				Midi.Note note = noteList[n], nextNote;
-				if (note.start > songDrawProps.song.SongLengthInTicks) //only if audio ends before the notes end
+				if (note.start > songDrawProps.song.SongLengthT) //only if audio ends before the notes end
 					continue;
 
 				if (n < noteList.Count - 1)
@@ -405,7 +405,7 @@ namespace Visual_Music
 			{
 				#region Get (current) note and nextNote from noteList
 				Midi.Note note = noteList[n], nextNote;
-				if (note.start > songDrawProps.song.SongLengthInTicks) //only  if audio ends before the notes end
+				if (note.start > songDrawProps.song.SongLengthT) //only  if audio ends before the notes end
 					continue;
 
 				if (n < noteList.Count - 1)
@@ -427,7 +427,7 @@ namespace Visual_Music
 				//nextNoteStart.X = (int)nextNoteStart.X; nextNoteStart.Y = (int)nextNoteStart.Y;
 
 				bool endOfSegment = false;
-				if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * songDrawProps.song.TimeDiv || note == nextNote)
+				if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * songDrawProps.song.TicksPerBeat || note == nextNote)
 				{
 					if (nextNoteStart.X != noteStart.X)
 						nextNoteStart.Y = (int)MathHelper.Lerp(noteStart.Y, nextNoteStart.Y, (float)(noteEnd - noteStart.X) / (nextNoteStart.X - noteStart.X));
@@ -697,7 +697,7 @@ namespace Visual_Music
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				Midi.Note note = noteList[n], nextNote;
-				if (note.start > songDrawProps.song.SongLengthInTicks) //only  if audio ends before the notes end
+				if (note.start > songDrawProps.song.SongLengthT) //only  if audio ends before the notes end
 					continue;
 
 				if (n < noteList.Count - 1)
@@ -711,7 +711,7 @@ namespace Visual_Music
 				int noteEnd = songDrawProps.getScreenPos(note.stop, note.pitch).X;
 				Point nextNoteStart = songDrawProps.getScreenPos(nextNote.start, nextNote.pitch);
 
-				if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * songDrawProps.song.TimeDiv || note == nextNote)
+				if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * songDrawProps.song.TicksPerBeat || note == nextNote)
 				{
 					nextNoteStart.X = noteEnd;
 					nextNoteStart.Y = noteStart.Y;
@@ -800,7 +800,7 @@ namespace Visual_Music
 			//lineFx.CurrentTechnique.Passes["Area"].Apply();
 			//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineVerts, 0, 1);
 			//return;
-			List<Midi.Note> noteList = getNotes((int)(Qn_gapThreshold * songDrawProps.song.TimeDiv), midiTrack, songDrawProps);
+			List<Midi.Note> noteList = getNotes((int)(Qn_gapThreshold * songDrawProps.song.TicksPerBeat), midiTrack, songDrawProps);
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			if (noteList.Count == 0)
 				return;

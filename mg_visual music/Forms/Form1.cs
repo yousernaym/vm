@@ -217,7 +217,7 @@ namespace Visual_Music
 			updateTrackControls();
 			//}
 
-			upDownVpWidth.Value = songPanel.Qn_viewWidth;
+			upDownVpWidth.Value = songPanel.ViewWidthQn;
 			audioOffsetS.Value = (decimal)songPanel.AudioOffset;
 			maxPitchUd.Value = songPanel.Notes.MaxPitch;
 			minPitchUd.Value = songPanel.Notes.MinPitch;
@@ -357,7 +357,7 @@ namespace Visual_Music
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
 		{
 			//songPanel.Invalidate();
-			songPanel.Qn_viewWidth = (float)((TbSlider)sender).Value;
+			songPanel.ViewWidthQn = (float)((TbSlider)sender).Value;
             songScrollBar.SmallChange = songPanel.ViewWidthT / 100;
             songScrollBar.LargeChange = songPanel.ViewWidthT / 10;
         }

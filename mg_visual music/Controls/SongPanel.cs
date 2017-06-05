@@ -69,7 +69,7 @@ namespace Visual_Music
 		}
 		public float getSongLengthP()
 		{
-			return (float)(song.SongLengthInTicks * viewportSize.X) / viewWidthT;
+			return (float)(song.SongLengthT * viewportSize.X) / viewWidthT;
 		}
 		
 		public float getCurveScreenY(float x, Curve curve)
@@ -162,21 +162,22 @@ namespace Visual_Music
         SourceSongType sourceSongType;
         public SourceSongType SourceSongType { get => sourceSongType; set => sourceSongType = value; }
 		Point videoSize = new Point(1920, 1080);
-        public int SongLengthT { get { return notes != null ? notes.SongLengthInTicks : 0; } }
-        public int SongPosT { get { return (int)(normSongPos * SongLengthT); } }
-        double normSongPos;
+		double desiredSongLengthS = 0; //Desired song length in seconds when importing note file. 0 = not specified. Currently not used.
+		public int SongLengthT { get { return notes != null ? notes.SongLengthT : 0; } } //Song length in ticks
+        public int SongPosT { get { return (int)(normSongPos * SongLengthT); } } //Current song position at center of screen
+        double normSongPos; //Song position normalized to [0,1]
         public double NormSongPos { get => normSongPos; set => normSongPos = value; }
-        const float defaultQn_viewWidth = 16; //Number of quarter notes that fits on screen
-		float qn_viewWidth = defaultQn_viewWidth; 
+        const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen
+		float viewWidthQn = DefaultViewWidthQn; 
 		
-        public float Qn_viewWidth
+        public float ViewWidthQn
 		{
-			get {return qn_viewWidth;}
+			get {return viewWidthQn;}
 			set
 			{
-				qn_viewWidth = value;
+				viewWidthQn = value;
 				if (notes != null)
-					viewWidthT = (int)(qn_viewWidth * notes.TimeDiv);
+					viewWidthT = (int)(viewWidthQn * notes.TicksPerBeat);
 			}
 		}
     
@@ -198,7 +199,7 @@ namespace Visual_Music
 			mixdownType = (MixdownType)info.GetValue("mixdownType", typeof(MixdownType));
 			audioFilePath = (string)info.GetValue("audioFilePath", typeof(string));
 			trackProps = (List<TrackProps>)info.GetValue("trackProps", typeof(List<TrackProps>));
-   			Qn_viewWidth = (float)info.GetValue("qn_viewWidth", typeof(float));
+   			ViewWidthQn = (float)info.GetValue("qn_viewWidth", typeof(float));
 			AudioOffset = (double)info.GetValue("audioOffset", typeof(double));
 			MaxPitch = (int)info.GetValue("maxPitch", typeof(int));
 			MinPitch = (int)info.GetValue("minPitch", typeof(int));
@@ -206,6 +207,7 @@ namespace Visual_Music
 			ImportNotesWithAudioForm.TpartyApp = info.GetString("tpartyApp");
 			ImportNotesWithAudioForm.TpartyArgs = info.GetString("tpartyArgs");
 			ImportNotesWithAudioForm.TpartyOutputDir = info.GetString("tpartyOutputDir");
+			desiredSongLengthS = info.GetDouble("desiredSongLengthS");
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
@@ -215,7 +217,7 @@ namespace Visual_Music
 			info.AddValue("insTrack", insTrack);
 			info.AddValue("mixdownType", mixdownType);
             info.AddValue("trackProps", trackProps);
-            info.AddValue("qn_viewWidth", Qn_viewWidth);
+            info.AddValue("qn_viewWidth", ViewWidthQn);
 			info.AddValue("audioOffset", AudioOffset);
 			info.AddValue("maxPitch", MaxPitch);
 			info.AddValue("minPitch", MinPitch);
@@ -223,6 +225,7 @@ namespace Visual_Music
 			info.AddValue("tpartyApp", ImportNotesWithAudioForm.TpartyApp);
 			info.AddValue("tpartyArgs", ImportNotesWithAudioForm.TpartyArgs);
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
+			info.AddValue("desiredSongLengthS", desiredSongLengthS);
 		}
 		
 		protected override void Initialize()
@@ -250,7 +253,7 @@ namespace Visual_Music
 
 			if (!string.IsNullOrWhiteSpace(noteFilePath))
 			{
-				importSong(noteFilePath, audioFilePath, false, insTrack, mixdownType, 0);
+				importSong(noteFilePath, audioFilePath, false, insTrack, mixdownType, desiredSongLengthS);
 				if (trackProps != null)
 				{
 					for (int i = 0; i < trackProps.Count; i++)
@@ -393,11 +396,11 @@ namespace Visual_Music
 		}
 		int screenPosToSongPos(float normScreenPos)
 		{
-            return (int)(normSongPos * notes.SongLengthInTicks + (double)normScreenPos * viewWidthT * 0.5f);
+            return (int)(normSongPos * notes.SongLengthT + (double)normScreenPos * viewWidthT * 0.5f);
 		}
 		Point getVisibleSongPortionT(double normPos)
 		{
-			int posT = (int)(normPos * notes.SongLengthInTicks);
+			int posT = (int)(normPos * notes.SongLengthT);
 			return new Point(posT - viewWidthT, posT + viewWidthT);
 		}
 		int getPitch(float normPosY)
@@ -480,6 +483,7 @@ namespace Visual_Music
 		}
 		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool _insTrack, MixdownType mixdownType, double songLengthS)
 		{
+			desiredSongLengthS = songLengthS;
 			Media.closeAudioFile();
 			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, _insTrack, mixdownType == MixdownType.Internal, songLengthS))
 				return false;
@@ -497,7 +501,7 @@ namespace Visual_Music
 			int minPitch = 0, maxPitch = 0;
 			if (eraseCurrent)
 			{
-				Qn_viewWidth = defaultQn_viewWidth;
+				ViewWidthQn = DefaultViewWidthQn;
 				AudioOffset = 0;
 			}
 
@@ -530,7 +534,7 @@ namespace Visual_Music
 
 				notes.createNoteBsp();
 				
-				viewWidthT = (int)(Qn_viewWidth * notes.TimeDiv);
+				viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
 				createTrackProps(notes.Tracks.Count, eraseCurrent);
 			
 			
@@ -557,7 +561,7 @@ namespace Visual_Music
 			}
 			mixdownType = _mixdownType;
 			if (notes != null)
-				notes.SongLengthInTicks = (int)secondsToTicks(Media.getAudioLength());
+				notes.SongLengthT = (int)secondsToTicks(Media.getAudioLength());
 			return true;
 		}
 		public void showNoteInfo(GdiPoint location)
@@ -624,7 +628,7 @@ namespace Visual_Music
 					double normSongPosBackup = normSongPos;
 					setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS);
 
-					while ((int)songPosInTicks < notes.SongLengthInTicks && !progressForm.Cancel)
+					while ((int)songPosInTicks < notes.SongLengthT && !progressForm.Cancel)
 					{
 						BeginDraw();
 						//lock (progressForm)
@@ -634,7 +638,7 @@ namespace Visual_Music
 						GraphicsDevice.Clear(Color.Transparent);
 
 						//spriteBatch.Begin(SpriteSortMode.Deferred, blendState);
-						drawSong(videoSize, (float)songPosInTicks / notes.SongLengthInTicks);
+						drawSong(videoSize, (float)songPosInTicks / notes.SongLengthT);
 						//spriteBatch.End();
 
 						GraphicsDevice.SetRenderTarget(null);
@@ -700,17 +704,17 @@ namespace Visual_Music
 					else
 						bLastTempoEvent = true;
 					
-					double nextTempoTimeS = ((double)notes.TempoEvents[nextTempoEvent].Time - currentTimeT) / (notes.TimeDiv * currentBps) + (double)currentTimeS;
+					double nextTempoTimeS = ((double)notes.TempoEvents[nextTempoEvent].Time - currentTimeT) / (notes.TicksPerBeat * currentBps) + (double)currentTimeS;
 					nextTimeStepS = nextTempoTimeS;
 					if (nextTimeStepS > newTimeS || nextTimeStepS < currentTimeS || nextTimeStepS == currentTimeS && bLastTempoEvent)
 						nextTimeStepS = newTimeS; //always causes loop to exit
 					else
 						currentTempoEvent = nextTempoEvent;
 				}			
-				currentTimeT += (nextTimeStepS - currentTimeS) * currentBps * notes.TimeDiv;
+				currentTimeT += (nextTimeStepS - currentTimeS) * currentBps * notes.TicksPerBeat;
 				currentTimeS = nextTimeStepS;
 			}
-			normSongPos = currentTimeT / (double)notes.SongLengthInTicks;
+			normSongPos = currentTimeT / (double)notes.SongLengthT;
 		}
 
 		double getSongPosInSeconds()
@@ -721,7 +725,7 @@ namespace Visual_Music
 		{
 			if (notes == null)
 				return 0;
-			int songPosT = (int)(_normSongPos * notes.SongLengthInTicks);
+			int songPosT = (int)(_normSongPos * notes.SongLengthT);
 			int nextTempoEvent = 0;
 			int currentTempoEvent = 0;
 			bool bLastTempoEvent = false;
@@ -747,7 +751,7 @@ namespace Visual_Music
 					else
 						currentTempoEvent = nextTempoEvent;
 				}
-				currentTimeS += (nextTimeStepT - currentTimeT) / (notes.TimeDiv * currentBps);
+				currentTimeS += (nextTimeStepT - currentTimeT) / (notes.TicksPerBeat * currentBps);
 				currentTimeT = nextTimeStepT;
 			}
 			return currentTimeS;

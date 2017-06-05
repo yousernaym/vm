@@ -25,7 +25,7 @@ namespace Visual_Music
         {
 			if (!checkNoteFile())
 				return;
-			double songLengthS = 500; //song length in seconds
+			double songLengthS = 0; //song length in seconds. //0 = NoteExtractor default
 			//if (parent.tpartyIntegrationForm.HvscSongLengths)
 				//songLengthS = getSongLength();
 			importFiles(false, false, parent.tpartyIntegrationForm.SidMixdown, songLengthS);
