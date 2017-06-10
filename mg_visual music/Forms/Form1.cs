@@ -302,26 +302,12 @@ namespace Visual_Music
 			if (saveVideoDlg.ShowDialog(this) != DialogResult.OK)
 				return;
 			saveVideoDlg.InitialDirectory = Path.GetDirectoryName(saveVideoDlg.FileName);
-			saveSettings();//writeFolderNames();
+			saveSettings();
 			
 			RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName);
 			renderProgressForm.ShowDialog(this);
 		}
-		void writeFolderNames()
-		{
-			StreamWriter file = new StreamWriter(foldersFileName);
-			file.WriteLine(importMidiForm.NoteFolder);
-            file.WriteLine(importModForm.NoteFolder);
-            file.WriteLine(importSidForm.NoteFolder);
-            file.WriteLine(importMidiForm.AudioFolder);
-            file.WriteLine(importModForm.AudioFolder);
-            file.WriteLine(importSidForm.AudioFolder);
-            file.WriteLine(saveVideoDlg.InitialDirectory);
-			file.WriteLine(openTextureDlg.InitialDirectory);
-			file.WriteLine(ProjectFolder);
-			file.Close();
-		}
-
+		
 		private void panel1_KeyDown(object sender, KeyEventArgs e)
 		{
 
@@ -858,7 +844,7 @@ namespace Visual_Music
 			{
 				openTextureDlg.InitialDirectory = Path.GetDirectoryName(openTextureDlg.FileName);
 				texPathTb.Text = openTextureDlg.FileName;
-				writeFolderNames();
+				saveSettings();
 			}
 		}
 
@@ -871,8 +857,8 @@ namespace Visual_Music
 					return;
 				
 				openTextureDlg.InitialDirectory = Path.GetDirectoryName(openTextureDlg.FileName);
-				writeFolderNames();
-				
+				saveSettings();
+								
 				for (i = 0; i < trackList.SelectedIndices.Count; i++)
 				{
 					//Texture2d.FromStream fails if file is loaded outside of for loop
@@ -913,7 +899,7 @@ namespace Visual_Music
 			if (openProjDialog.ShowDialog() != DialogResult.OK)
 				return;
 			ProjectFolder = Path.GetDirectoryName(openProjDialog.FileName);
-			writeFolderNames();
+			saveSettings();
 			openSongFile(openProjDialog.FileName);
 		}
 		void openSongFile(string fileName)
@@ -1008,7 +994,7 @@ namespace Visual_Music
 
 			currentProjPath = saveProjDialog.FileName;
 			ProjectFolder = Path.GetDirectoryName(currentProjPath);
-			writeFolderNames();
+			saveSettings();
 			saveSong();
 		}
 

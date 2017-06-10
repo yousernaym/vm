@@ -29,6 +29,30 @@ namespace Visual_Music
 			pos = _pos;
 		}
 	}
+
+	public struct BarMeshVertex
+	{
+		public Vector2 pos;
+		public BarMeshVertex(float x, float y)
+		{
+			pos = new Vector2();
+			pos.X = x;
+			pos.Y = y;
+		}
+	}
+
+	public struct BarInstanceVertex
+	{
+		public Vector4 destRect;
+		public Vector4 srcRect;
+		public Color color;
+		public BarInstanceVertex(Vector4 _destRect, Vector4 _srcRect, Color _color)
+		{
+			destRect = _destRect;
+			srcRect = _srcRect;
+			color = _color;
+		}
+	}
 	public struct LineVertex : IVertexType
 	{
 		public Vector3 pos;
@@ -59,7 +83,8 @@ namespace Visual_Music
     [Serializable()]
     abstract public class NoteStyle : ISerializable
     {
-        public class Textures
+		protected const int NumDynamicVerts = 30000;
+		public class Textures
         {
             public Texture2D hilited;
             public Texture2D normal;
@@ -98,11 +123,11 @@ namespace Visual_Music
 
         public static void sInitAllStyles(SongPanel _songPanel)
         {
-            NoteStyle_Bar.sInit();
+			songPanel = _songPanel;
+			NoteStyle_Bar.sInit();
             NoteStyle_Line.sInit();
-            songPanel = _songPanel;
-            defaultTextures[(int)NoteStyleEnum.Bar] = new Textures();
-            defaultTextures[(int)NoteStyleEnum.Bar].normal = new Texture2D(songPanel.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+			defaultTextures[(int)NoteStyleEnum.Bar] = new Textures();
+			defaultTextures[(int)NoteStyleEnum.Bar].normal = new Texture2D(songPanel.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             defaultTextures[(int)NoteStyleEnum.Bar].normal.SetData(new[] { Color.White });
             defaultTextures[(int)NoteStyleEnum.Bar].hilited = defaultTextures[(int)NoteStyleEnum.Bar].normal;
 
@@ -182,6 +207,14 @@ namespace Visual_Music
     [Serializable()]
 	public class NoteStyle_Bar : NoteStyle
 	{
+		static VertexBuffer meshVb;
+		static DynamicVertexBuffer instanceVb;
+		static VertexDeclaration meshVertDecl;
+		static VertexDeclaration instanceVertDecl;
+		static BarInstanceVertex[] instanceVerts = new BarInstanceVertex[NumDynamicVerts];
+		static IndexBuffer indexBuf;
+		static VertexBufferBinding[] vbBindings = new VertexBufferBinding[2];
+
 		public NoteStyle_Bar()
 		{
 			styleType = NoteStyleEnum.Bar;
@@ -210,7 +243,8 @@ namespace Visual_Music
 			if (noteList.Count == 0)
 				return;
 			TrackProps texTrackProps = trackProps.getTexture(false, null) != null ? trackProps : globalTrackProps;
-			songPanel.SpriteBatch.Begin(SpriteSortMode.Deferred, songPanel.BlendState, texTrackProps.TexProps.SamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+			
+			//songPanel.SpriteBatch.Begin(SpriteSortMode.Deferred, songPanel.BlendState, texTrackProps.TexProps.SamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				Midi.Note note = noteList[n], nextNote;
@@ -231,7 +265,9 @@ namespace Visual_Music
 				Color color;
 				Texture2D texture;
 				getMaterial(songDrawProps, trackProps, globalTrackProps, (int)noteStart.X, (int)noteEnd.X, out color, out texture);
-                fx.Parameters["Color"].SetValue(color.ToVector4());
+				//fx.Parameters["Color"].SetValue(color.ToVector4());
+				instanceVerts[n].color = color;
+				fx.Parameters["Texture"].SetValue(texture);
 				Rectangle destRect = new Rectangle((int)noteStart.X, (int)(noteStart.Y - songDrawProps.noteHeight / 2), (int)(noteEnd.X - noteStart.X + 1), (int)(songDrawProps.noteHeight - 1));
 				Rectangle srcRect = destRect;
 
@@ -258,13 +294,21 @@ namespace Visual_Music
 					srcRect.X -= (int)(texScroll.X * texture.Width);
 					srcRect.Y -= (int)(texScroll.Y * texture.Height);
 				}
-                songPanel.SpriteBatch.Draw(texture, destRect, srcRect,color);
-                //fx.CurrentTechnique = fx.Techniques["Technique1"];
-                //fx.CurrentTechnique.Passes["Pass1"].Apply();
-                //songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, verts, 0, 1);
-
-            }
-            songPanel.SpriteBatch.End();
+				instanceVerts[n].destRect = new Vector4(destRect.X, destRect.Y, destRect.Right, destRect.Bottom);
+				instanceVerts[n].srcRect = new Vector4(srcRect.X, srcRect.Y, srcRect.Right, srcRect.Bottom);
+				instanceVerts[n].srcRect.X /= texture.Width;
+				instanceVerts[n].srcRect.Z /= texture.Width;
+				instanceVerts[n].srcRect.Y /= texture.Height;
+				instanceVerts[n].srcRect.W /= texture.Height;
+				//songPanel.SpriteBatch.Draw(texture, destRect, srcRect,color);
+			}
+			//songPanel.SpriteBatch.End();
+			instanceVb.SetData(instanceVerts, 0, noteList.Count, SetDataOptions.Discard);
+			songPanel.GraphicsDevice.SetVertexBuffers(vbBindings);
+			songPanel.GraphicsDevice.Indices = indexBuf;
+			fx.CurrentTechnique = fx.Techniques["Technique1"];
+			fx.CurrentTechnique.Passes["Pass1"].Apply();
+			songPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, noteList.Count);
 		}
 		void setSrcRect(out int pos, out int size, int texSize, int vpSize, int notePos, int noteSize, bool tile, TexAnchorEnum anchor, SongDrawProps songDrawProps)
 		{
@@ -310,8 +354,28 @@ namespace Visual_Music
 
         public static void sInit()
         {
-            
-        }
+			//Mesh vb
+			meshVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0));
+			meshVb = new VertexBuffer(songPanel.GraphicsDevice, meshVertDecl, 4, BufferUsage.WriteOnly);
+			//Instance vb
+			instanceVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.Position, 1), new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 0), new VertexElement(32, VertexElementFormat.Color, VertexElementUsage.Color, 0));
+			instanceVb = new DynamicVertexBuffer(songPanel.GraphicsDevice, instanceVertDecl, NumDynamicVerts, BufferUsage.WriteOnly);
+			BarMeshVertex[] meshVerts = 
+			{
+				new BarMeshVertex(0,0),
+				new BarMeshVertex(1,0),
+				new BarMeshVertex(0,1),
+				new BarMeshVertex(1,1)
+			};
+			meshVb.SetData(meshVerts);
+			//Index buffer
+			indexBuf = new IndexBuffer(songPanel.GraphicsDevice, typeof(short), 4, BufferUsage.WriteOnly);
+			short[] indices = { 0, 1, 2, 3 };
+			indexBuf.SetData(indices);
+			//Bindings
+			vbBindings[0] = new VertexBufferBinding(meshVb);
+			vbBindings[1] = new VertexBufferBinding(instanceVb, 0, 1);
+		}
         //public override void draw(NoteDrawProps drawProps, Color color, Texture2D texture, int pass)
         //{
         //if (texture == null)
@@ -323,10 +387,10 @@ namespace Visual_Music
 	[Serializable()]
 	public class NoteStyle_Line : NoteStyle
 	{
-        protected static TestVertex[] testVerts = new TestVertex[30];
-        protected static LineVertex[] lineVerts = new LineVertex[30000];
-        protected static LineVertex[] hLineVerts = new LineVertex[30000];
-        protected static short[] lineInds = new short[lineVerts.Length];
+        static TestVertex[] testVerts = new TestVertex[30];
+        static LineVertex[] lineVerts = new LineVertex[NumDynamicVerts];
+        static LineVertex[] hLineVerts = new LineVertex[NumDynamicVerts];
+        static short[] lineInds = new short[lineVerts.Length];
         //protected static LineVertex[] arrowAreaVerts = new LineVertex[3];
         //protected static LineVertex[] arrowBorderVerts = new LineVertex[3];
         protected static LineVertex[] lineHlVerts = new LineVertex[4];

@@ -22,34 +22,43 @@ float3 SpecCamPos;
 
 struct VSInput
 {
-    float4 pos : POSITION0;
+    float2 pos : POSITION0;
+	float4 rect : POSITION1;
 	float4 texCoords : TEXCOORD0;
+	float4 color : COLOR0;
 };
 
 struct VSOutput
 {
     float4 pos : POSITION0;
-	float4 texCoords : TEXCOORD0;
+	float2 texCoords : TEXCOORD0;
+	float4 color : COLOR0;
 };
 
-VSOutput VS(VSInput input)
+VSOutput VS(VSInput IN)
 {
-	VSOutput output;
-	output.pos = input.pos;
-	output.texCoords = input.texCoords;
+	VSOutput OUT;
+	OUT.pos = float4(IN.rect.xy + IN.pos * (IN.rect.zw - IN.rect.xy), 0, 1);
+	// Viewport adjustment.
+	OUT.pos.xy /= ViewportSize;
+	OUT.pos.xy *= float2(2, -2);
+	OUT.pos.xy -= float2(1, -1);
+	OUT.texCoords = IN.texCoords.xy + IN.pos * (IN.texCoords.zw - IN.texCoords.xy);
+	OUT.color = IN.color;
     //float4 worldPosition = mul(input.Position, World);
     //float4 viewPosition = mul(worldPosition, View);
     //output.Position = mul(viewPosition, Projection);
 	//output.pos = mul(input.pos, wvp);
 
-	return output;
+	return OUT;
 }
 
-float4 PS(VSOutput input) : COLOR0
+float4 PS(VSOutput IN) : COLOR0
 {
-	float4 color = Color;
-	color.rgb *= tex2D(TextureSampler, input.texCoords);
+	float4 color = IN.color;
+	color.rgb *= tex2D(TextureSampler, IN.texCoords);
     return color;
+	//return float4(1, 1, 1, 1);
 }
 
 technique Technique1
@@ -58,7 +67,7 @@ technique Technique1
     {
         // TODO: set renderstates here.
 
-        //VertexShader = compile vs_5_0 VS();
+        VertexShader = compile vs_5_0 VS();
         PixelShader = compile ps_5_0 PS();
     }
 }

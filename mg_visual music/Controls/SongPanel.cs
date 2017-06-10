@@ -338,6 +338,8 @@ namespace Visual_Music
 
 		void selectRegion()
 		{
+			if (((Form1)Parent).trackListItems.Count == 0)
+				return;
 			if (selectingRegion)
 			{
 				int x = screenPosToSongPos(NormMouseX);
@@ -527,18 +529,16 @@ namespace Visual_Music
 
 			notes = newNotes;
 			if (eraseCurrent)
-				{
-                    minPitch = notes.MinPitch;
-                    maxPitch = notes.MaxPitch;
-				}
+			{
+				minPitch = notes.MinPitch;
+				maxPitch = notes.MaxPitch;
+			}
 
-				notes.createNoteBsp();
+			notes.createNoteBsp();
 				
-				viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
-				createTrackProps(notes.Tracks.Count, eraseCurrent);
-			
-			
-			
+			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
+			createTrackProps(notes.Tracks.Count, eraseCurrent);
+		
 			return true;
 		}
 		public bool openAudioFile(string file, MixdownType _mixdownType)
