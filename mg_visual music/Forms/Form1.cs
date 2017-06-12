@@ -55,12 +55,14 @@ namespace Visual_Music
 
 		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType)};
         SongPanel songPanel = new SongPanel();
-        ScrollBar songScrollBar = new HScrollBar();
+		ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
 				
 		public Form1(string[] args)
 		{
 			InitializeComponent();
+
+			Application.Idle += delegate { songPanel.update(); };
 
 			startupArgs = args;
 			TrackTexPbHeight = trackTexPb.Height;
@@ -83,7 +85,6 @@ namespace Visual_Music
             songScrollBar.Dock = DockStyle.Bottom;
             songScrollBar.Scroll += delegate {
                 songPanel.NormSongPos = (double)songScrollBar.Value / songScrollBar.Maximum;
-                songPanel.Invalidate();
             };
             Controls.Add(songScrollBar);
             songScrollBar.BringToFront();
@@ -265,28 +266,7 @@ namespace Visual_Music
 				}
 			}			
 		}
-		private void panel1_MouseDown(object sender, MouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Left)
-				songPanel.MbPressed = true;
-			if (e.Button == MouseButtons.Right)
-				songPanel.RightMbPressed = true;
-			toggleIdleRendering(true);
-
-		}
-		private void panel1_MouseUp(object sender, MouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Left)
-			{
-				songPanel.MbPressed = false;
-			}
-			if (e.Button == MouseButtons.Right)
-			{
-				//songPanel.showNoteInfo(e.Location);
-				songPanel.RightMbPressed = false;
-			}
-			toggleIdleRendering(false);
-		}
+		
 		private void panel1_MouseMove(object sender, MouseEventArgs e)
 		{
 			//GdiPoint clientP = songPanel.PointToClient(e.Location);
@@ -315,6 +295,8 @@ namespace Visual_Music
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (ModifierKeys != 0)
+				return;
 			if (e.KeyCode == Keys.Space)
 			{
 				startStopToolStripMenuItem_Click(null, null);
@@ -325,19 +307,8 @@ namespace Visual_Music
 				resetPositionToolStripMenuItem_Click(null, null);
 				e.SuppressKeyPress = true;
 			}
-			if (e.Control)
-			{
-				if (e.KeyCode == Keys.D)
-				{
-					//trackList.Select();
-					//songPanel.resetTrackProps(trackList.SelectedIndices);
-				}
-				if (e.KeyCode == Keys.A)
-				{
-					
-					//trackList.Select();
-				}
-			}
+			if (e.KeyCode == Keys.Z)
+				songPanel.ForceSimpleDrawMode = !songPanel.ForceSimpleDrawMode;
 		}
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
@@ -909,7 +880,6 @@ namespace Visual_Music
 				DataContractSerializer dcs = new DataContractSerializer(typeof(SongPanel), projectSerializationTypes);
                 using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
-					toggleIdleRendering(false);
 					Controls.Remove(songPanel);
 					songPanel.Dispose();
                     songPanel = (SongPanel)dcs.ReadObject(stream);
@@ -1010,10 +980,13 @@ namespace Visual_Music
 			songPanel.Visible = true;
 			Controls.Add(songPanel);
 			songPanel.BringToFront();
-			songPanel.MouseUp += new MouseEventHandler(panel1_MouseUp);
-			songPanel.MouseDown += new MouseEventHandler(panel1_MouseDown);
 			songPanel.MouseMove += new MouseEventHandler(panel1_MouseMove);
 			songPanel.KeyDown += new KeyEventHandler(panel1_KeyDown);
+			songPanel.OnSongPosChanged = delegate ()
+			{
+				if (songPanel.SongPosT <= songScrollBar.Maximum && songPanel.SongPosT >= songScrollBar.Minimum)
+					songScrollBar.Value = songPanel.SongPosT;
+			};
 		}
 
 		private void lineWidthUpDown_ValueChanged(object sender, EventArgs e)
@@ -1062,22 +1035,7 @@ namespace Visual_Music
 		private void invalidateSongPanel(object sender, EventArgs e)
 		{
 			songPanel.Invalidate();
-            songScrollBar.Value = songPanel.SongPosT;
-		}
-
-		void toggleIdleRendering(bool b)
-		{
-			if (b)
-			{
-				Application.Idle -= eh_invalidateSongPanel;
-				songPanel.updateTimeStamp();
-				Application.Idle += eh_invalidateSongPanel;
-			}
-			else
-			{
-				songPanel.Invalidate();
-				Application.Idle -= eh_invalidateSongPanel;
-			}
+            //songScrollBar.Value = songPanel.SongPosT;
 		}
 
 		private void trackPropsPanel_Paint(object sender, PaintEventArgs e)
@@ -1170,13 +1128,11 @@ namespace Visual_Music
 		private void startStopToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			songPanel.togglePlayback();
-			toggleIdleRendering(songPanel.IsPlaying);
 		}
 
 		private void resetPositionToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			songPanel.stopPlayback();
-			songPanel.Invalidate();
 		}
 
 		private void button1_Click(object sender, EventArgs e)

@@ -424,7 +424,7 @@ namespace Visual_Music
 			stream.Position = 0;
 			TrackProps dest = (TrackProps)dcs.ReadObject(stream);
 			dest.MidiTrack = midiTrack;
-			//dest.NumTracks = numTracks;
+			dest.loadNoteStyleFx();
 			return dest;
 		}
 		public void createCurve(/*Midi.Song song*/)

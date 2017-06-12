@@ -84,7 +84,8 @@ namespace Visual_Music
 	{
 		ContentManager content;
 		public ContentManager Content { get { return content; } }
-		//bool internalMixdown;
+		bool forceSimpleDrawMode = false;
+		public bool ForceSimpleDrawMode { get =>forceSimpleDrawMode; set { forceSimpleDrawMode = value; Invalidate(); } }
 		MixdownType mixdownType;
 		public MixdownType MixdownType { get => mixdownType; set => mixdownType = value; } 
 		Texture2D regionSelectTexture;
@@ -99,13 +100,15 @@ namespace Visual_Music
         TimeSpan pbStartSysTime = new TimeSpan(0);
         double pbStartSongTimeS;
         Stopwatch stopwatch = new Stopwatch();
-        public bool MbPressed { get; set; }
-        public bool RightMbPressed { get; set; }
-        bool scrollingSong = false;
-        double scrollCenter = 0;
+		TimeSpan deltaTime;
+		long renderInterval = 1; //Stopwatch.Frequency / 400;
+		bool leftMbPressed = false;
+		//public bool RightMbPressed { get; set; }
+		double scrollCenter = 0;
         bool selectingRegion = false;
-        bool mergeRegionSelection = false;
-        Rectangle selectedSongRegion;
+		bool mergeRegionSelection = false;
+		bool mousePosScrollSong = false;
+		Rectangle selectedSongRegion;
         Rectangle selectedScreenRegion;
         public float NormMouseX { get; set; }
         public float NormMouseY { get; set; }
@@ -120,7 +123,7 @@ namespace Visual_Music
         public BlendState BlendState
         {
             get { return blendState; }
-            //			set { blendState = value; }
+            //set { blendState = value; }
         }
         internal TrackProps GlobalTrackProps
         {
@@ -166,8 +169,24 @@ namespace Visual_Music
 		public int SongLengthT { get { return notes != null ? notes.SongLengthT : 0; } } //Song length in ticks
         public int SongPosT { get { return (int)(normSongPos * SongLengthT); } } //Current song position at center of screen
         double normSongPos; //Song position normalized to [0,1]
-        public double NormSongPos { get => normSongPos; set => normSongPos = value; }
-        const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen
+        public double NormSongPos
+		{
+			get => normSongPos;
+			set
+			{
+				double oldPos = normSongPos;
+				normSongPos = value;
+				if (oldPos != value)
+				{ 
+					Invalidate();
+					if (OnSongPosChanged != null)
+						OnSongPosChanged();
+				}
+			}
+		}
+		public delegate void Delegate_songPosChanged();
+		public Delegate_songPosChanged OnSongPosChanged { get; set; }
+		const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen
 		float viewWidthQn = DefaultViewWidthQn; 
 		
         public float ViewWidthQn
@@ -181,14 +200,15 @@ namespace Visual_Music
 			}
 		}
     
-        int viewWidthT; ////Number of ticks that fits on screen
-        public int ViewWidthT { get => viewWidthT; }
+		int viewWidthT; ////Number of ticks that fits on screen
+		public int ViewWidthT { get => viewWidthT; }
         public double AudioOffset { get; set; }
         public int MinPitch { get; set; } 
         public int MaxPitch { get; set; }
         int NumPitches { get { return MaxPitch - MinPitch + 1; } }
+		static bool bInited = false;
 
-        public SongPanel()
+		public SongPanel()
 		{
 		}
 		public SongPanel(SerializationInfo info, StreamingContext ctxt):base()
@@ -230,7 +250,7 @@ namespace Visual_Music
 		
 		protected override void Initialize()
         {
-            stopwatch.Start();
+			stopwatch.Start();
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 			blendState = new BlendState();
 			videoFrame = new RenderTarget2D(GraphicsDevice, videoSize.X, videoSize.Y);
@@ -261,7 +281,55 @@ namespace Visual_Music
 				}
 			}
 		}
-		
+		public void update()
+		{
+			if (notes == null)
+				return;
+			TimeSpan newTime = stopwatch.Elapsed;
+			deltaTime = newTime - oldTime;
+			if (deltaTime.Ticks < renderInterval)
+				return;
+
+			oldTime = newTime;
+			selectRegion();
+
+			#region Scroll song depending on user input or playback position.
+			if (bPlayback)
+			{
+				double timeS;
+				if (!bAudioPlayback)
+				{
+					timeS = (stopwatch.Elapsed - pbStartSysTime).TotalMilliseconds / 1000.0 + pbStartSongTimeS;
+					if (timeS > AudioOffset)
+					{
+						bAudioPlayback = true;
+						Media.startPlaybackAtTime(0);
+					}
+				}
+				else
+				{
+					if (!Media.playbackIsRunning())
+					{
+						bPlayback = bAudioPlayback = false;
+						timeS = getSongPosInSeconds();
+					}
+					else
+						timeS = Media.getPlaybackPos() + AudioOffset;
+				}
+				setSongPosInSeconds(timeS);
+				if (normSongPos > 1)
+					togglePlayback();
+			}
+			else
+				scrollSong(deltaTime);
+
+			if (normSongPos < 0)
+				normSongPos = 0;
+			if (normSongPos > 1)
+				normSongPos = 1;
+			#endregion
+		}
+
 		protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -271,77 +339,28 @@ namespace Visual_Music
         }
 		protected override void Draw()
         {
-			
-			//try
-			//{
-				GraphicsDevice.Clear(Color.Transparent);
-				if (notes == null)
-                    return;
-
-				//newKbState = Keyboard.GetState();
-				//if (newKbState.IsKeyDown(XnaKeys.Space) && oldKbState.IsKeyUp(XnaKeys.Space))
-				//togglePlayback();
-				selectRegion();
-
-				TimeSpan newTime = stopwatch.Elapsed;
-				TimeSpan deltaTime = newTime - oldTime;
-				oldTime = newTime;
-
-				#region Scroll song depending on user input or playback position.
-				if (bPlayback)
-				{
-					Invalidate();
-					double timeS;
-					if (!bAudioPlayback)
-					{
-						timeS = (stopwatch.Elapsed - pbStartSysTime).TotalMilliseconds / 1000.0 + pbStartSongTimeS;
-						if (timeS > AudioOffset)
-						{
-							bAudioPlayback = true;
-							Media.startPlaybackAtTime(0);
-						}
-					}
-					else
-					{
-						if (!Media.playbackIsRunning())
-						{
-							bPlayback = bAudioPlayback = false;
-							timeS = getSongPosInSeconds();
-						}
-						else
-							timeS = Media.getPlaybackPos() + AudioOffset;
-					}
-					setSongPosInSeconds(timeS);
-					//double songPosInTicks = 0;
-					//songPosInTicks = secondsToTicks(timeS);
-					//normSongPos = songPosInTicks / (double)notes.SongLengthInTicks;
-					if (normSongPos > 1)
-						togglePlayback();
-				}
-				else
-					scrollSong(deltaTime);
-
-				if (normSongPos < 0)
-					normSongPos = 0;
-				if (normSongPos > 1)
-					normSongPos = 1;
-				#endregion
-				//spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-				drawSong(new Point(ClientRectangle.Size.Width, ClientRectangle.Size.Height), normSongPos);
-			//}
-			//catch (Exception e)
-			//{
-			//	MessageBox.Show(e.Message);
-			//	throw e;
-			//}
+			GraphicsDevice.Clear(Color.Transparent);
+			if (selectingRegion)
+			{
+				spriteBatch.Begin();
+				Rectangle normRect = normalizeRect(selectedScreenRegion);
+				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
+				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
+				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
+				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
+				spriteBatch.End();
+			}
+			drawSong(new Point(ClientRectangle.Size.Width, ClientRectangle.Size.Height), normSongPos);
 		}
 
 		void selectRegion()
 		{
 			if (((Form1)Parent).trackListItems.Count == 0)
 				return;
-			if (selectingRegion)
+			if (leftMbPressed)
 			{
+				Invalidate();
+				selectingRegion = true;
 				int x = screenPosToSongPos(NormMouseX);
 				selectedSongRegion.Width = x - selectedSongRegion.X;
 				int y = getPitch(NormMouseY);
@@ -351,15 +370,7 @@ namespace Visual_Music
 				selectedScreenRegion.Width = mousePos.X - selectedScreenRegion.X;
 				selectedScreenRegion.Height = mousePos.Y - selectedScreenRegion.Y;
 
-				spriteBatch.Begin();
-				Rectangle normRect = normalizeRect(selectedScreenRegion);
-				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
-				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
-				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
-				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
-				spriteBatch.End();
-
-				normRect = normalizeRect(selectedSongRegion);
+				Rectangle normRect = normalizeRect(selectedSongRegion);
 				int selectedCount = 0;
 				for (int i = 1; i < notes.Tracks.Count; i++)
 				{
@@ -377,6 +388,11 @@ namespace Visual_Music
 					((Form1)Parent).trackListItems[0].Selected = true;
 				else if (selectedCount > 0)
 					((Form1)Parent).trackListItems[0].Selected = false;
+			}
+			else if (selectingRegion)
+			{
+				selectingRegion = false;
+				Invalidate();
 			}
 		}
 		Rectangle normalizeRect(Rectangle _rect)
@@ -415,18 +431,11 @@ namespace Visual_Music
 		}
 		void scrollSong(TimeSpan deltaTime)
 		{
-			double dNormMouseX = (double)NormMouseX;
-			if (RightMbPressed == true && !selectingRegion)
+			if (mousePosScrollSong && !selectingRegion)
 			{
-				if (!scrollingSong)
-				{
-					scrollingSong = true;
-				}
-				dNormMouseX -= scrollCenter;
-				normSongPos += (float)(Math.Pow(dNormMouseX, 2) * Math.Sign(dNormMouseX) * deltaTime.Ticks / 20000000.0);
+				double dNormMouseX = (double)NormMouseX - scrollCenter;
+				NormSongPos += (float)(Math.Pow(dNormMouseX, 2) * Math.Sign(dNormMouseX) * deltaTime.Ticks / 20000000.0);
 			}
-			else
-				scrollingSong = false;
 		}
 
 		public void createTrackProps(int numTracks, bool eraseCurrent)
@@ -480,7 +489,7 @@ namespace Visual_Music
 
 			for (int t=notes.Tracks.Count-1;t>=0;t--)
 			{
-				trackProps[t].drawTrack(songDrawProps, GlobalTrackProps, selectingRegion);
+				trackProps[t].drawTrack(songDrawProps, GlobalTrackProps, selectingRegion || ForceSimpleDrawMode);
 			}
 		}
 		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool _insTrack, MixdownType mixdownType, double songLengthS)
@@ -676,7 +685,8 @@ namespace Visual_Music
 			double currentTimeS = 0;
 			double normSongPosTemp = normSongPos;
 			setSongPosInSeconds(ref currentTempoEvent, ref currentTimeT, ref currentTimeS, seconds);
-			normSongPos = normSongPosTemp;
+			//Todo: create function that returns these values without modifying Mormsongpos
+			NormSongPos = normSongPosTemp;
 			return currentTimeT;
 		}
 
@@ -714,7 +724,7 @@ namespace Visual_Music
 				currentTimeT += (nextTimeStepS - currentTimeS) * currentBps * notes.TicksPerBeat;
 				currentTimeS = nextTimeStepS;
 			}
-			normSongPos = currentTimeT / (double)notes.SongLengthT;
+			NormSongPos = currentTimeT / (double)notes.SongLengthT;
 		}
 
 		double getSongPosInSeconds()
@@ -794,7 +804,7 @@ namespace Visual_Music
 			bAudioPlayback = false;
 			if (!Media.stopPlayback())
 				MessageBox.Show("An error occured while stopping playback.");
-			normSongPos = 0;
+			NormSongPos = 0;
 		}
 		public static Color HSLA2RGBA(double h, double s, double l, float a, bool bgr)
 		{
@@ -883,25 +893,39 @@ namespace Visual_Music
         {
             Invalidate();
         }
-        protected override void OnMouseDown(MouseEventArgs e)
+
+		protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            if (e.Button != MouseButtons.Left || notes == null)
+            if (notes == null)
                 return;
-            selectingRegion = true;
-            if (ModifierKeys.HasFlag(WinKeys.Shift))
-                mergeRegionSelection = true;
-            selectedSongRegion.X = screenPosToSongPos(NormMouseX);
-            selectedSongRegion.Y = getPitch(NormMouseY);
-            selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width);
-            selectedScreenRegion.Y = (int)(NormMouseY * ClientRectangle.Height);
-        }
+			if (e.Button == MouseButtons.Left)
+			{
+				leftMbPressed = true;
+				if (ModifierKeys.HasFlag(WinKeys.Shift))
+					mergeRegionSelection = true;
+				selectedSongRegion.X = screenPosToSongPos(NormMouseX);
+				selectedSongRegion.Y = getPitch(NormMouseY);
+				selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width);
+				selectedScreenRegion.Y = (int)(NormMouseY * ClientRectangle.Height);
+			}
+			if (e.Button == MouseButtons.Right)
+			{
+				mousePosScrollSong = true;
+			}
+
+		}
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            selectingRegion = false;
-            mergeRegionSelection = false;
-        }
+			if (e.Button == MouseButtons.Left)
+			{
+				leftMbPressed = false;
+				mergeRegionSelection = false;
+			}
+			if (e.Button == MouseButtons.Right)
+				mousePosScrollSong = false;
+		}
     }
 
     static class SongFormat
