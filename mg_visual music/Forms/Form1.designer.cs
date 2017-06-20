@@ -169,6 +169,8 @@
 			this.openTextureDlg = new System.Windows.Forms.OpenFileDialog();
 			this.trackPropsCb = new System.Windows.Forms.CheckBox();
 			this.songPropsPanel = new System.Windows.Forms.Panel();
+			this.resetCamBtn = new System.Windows.Forms.Button();
+			this.dim3Cb = new System.Windows.Forms.CheckBox();
 			this.defaultPitchesBtn = new System.Windows.Forms.Button();
 			this.minPitchUd = new System.Windows.Forms.NumericUpDown();
 			this.maxPitchUd = new System.Windows.Forms.NumericUpDown();
@@ -355,7 +357,7 @@
             this.playbackToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1160, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1194, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -417,7 +419,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.leftTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(765, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(799, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 10052);
 			this.trackPropsPanel.TabIndex = 3;
@@ -1721,7 +1723,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-2362, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-2413, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1733,7 +1735,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-2474, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-2525, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1743,7 +1745,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-2477, 10040);
+			this.label4.Location = new System.Drawing.Point(-2528, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1792,6 +1794,8 @@
 			// 
 			// songPropsPanel
 			// 
+			this.songPropsPanel.Controls.Add(this.resetCamBtn);
+			this.songPropsPanel.Controls.Add(this.dim3Cb);
 			this.songPropsPanel.Controls.Add(this.defaultPitchesBtn);
 			this.songPropsPanel.Controls.Add(this.minPitchUd);
 			this.songPropsPanel.Controls.Add(this.maxPitchUd);
@@ -1808,6 +1812,27 @@
 			this.songPropsPanel.Size = new System.Drawing.Size(209, 10052);
 			this.songPropsPanel.TabIndex = 17;
 			this.songPropsPanel.Visible = false;
+			// 
+			// resetCamBtn
+			// 
+			this.resetCamBtn.Location = new System.Drawing.Point(13, 235);
+			this.resetCamBtn.Name = "resetCamBtn";
+			this.resetCamBtn.Size = new System.Drawing.Size(85, 23);
+			this.resetCamBtn.TabIndex = 20;
+			this.resetCamBtn.Text = "Reset camera";
+			this.resetCamBtn.UseVisualStyleBackColor = true;
+			this.resetCamBtn.Click += new System.EventHandler(this.resetCamBtn_Click);
+			// 
+			// dim3Cb
+			// 
+			this.dim3Cb.AutoSize = true;
+			this.dim3Cb.Location = new System.Drawing.Point(12, 211);
+			this.dim3Cb.Name = "dim3Cb";
+			this.dim3Cb.Size = new System.Drawing.Size(40, 17);
+			this.dim3Cb.TabIndex = 19;
+			this.dim3Cb.Text = "3D";
+			this.dim3Cb.UseVisualStyleBackColor = true;
+			this.dim3Cb.CheckedChanged += new System.EventHandler(this.dim3Cb_CheckedChanged);
 			// 
 			// defaultPitchesBtn
 			// 
@@ -1901,7 +1926,7 @@
 			this.songPropsCb.Name = "songPropsCb";
 			this.songPropsCb.Size = new System.Drawing.Size(91, 23);
 			this.songPropsCb.TabIndex = 18;
-			this.songPropsCb.Text = "&Song properties";
+			this.songPropsCb.Text = "Song &properties";
 			this.songPropsCb.UseVisualStyleBackColor = true;
 			this.songPropsCb.CheckedChanged += new System.EventHandler(this.songPropsCb_CheckedChanged);
 			// 
@@ -1933,7 +1958,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1177, 407);
+			this.ClientSize = new System.Drawing.Size(1211, 407);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);
 			this.Controls.Add(this.resetDefaultBtn);
@@ -1950,6 +1975,7 @@
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+			this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).EndInit();
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
@@ -2168,6 +2194,8 @@
 		public System.Windows.Forms.SaveFileDialog saveVideoDlg;
 		public System.Windows.Forms.OpenFileDialog openTextureDlg;
 		private System.Windows.Forms.SaveFileDialog saveMixdownDialog;
+		private System.Windows.Forms.CheckBox dim3Cb;
+		private System.Windows.Forms.Button resetCamBtn;
 	}
 }
 

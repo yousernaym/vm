@@ -61,5 +61,9 @@ namespace Visual_Music
 			foreach (FileInfo file in directory.GetFiles()) file.Delete();
 			foreach (DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
 		}
+		static public float getSecondsF(this TimeSpan ts)
+		{
+			return (float)((double)ts.Ticks / (double)Stopwatch.Frequency);
+		}
 	}
 }

@@ -1,24 +1,6 @@
+#include "notestyle.fx"
+
 // Input parameters
-
-//Common parameters-----------
-float4x4 wvp;
-float2 ViewportSize;
-float2 TexSize;
-texture Texture;
-
-sampler  TextureSampler = sampler_state
-{
-	texture = <Texture>;
-};
-float4 Color;
-float BlurredEdge;
-float3 LightDir = normalize(float3(1, 1, 1));
-float AmbientLum = 0.25f;
-float SpecAmount;
-float SpecPower;
-float SpecFov;
-float3 SpecCamPos;
-//------------------------------
 
 float Radius;
 float FadeoutFromCenter;
@@ -91,17 +73,19 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.normal2 = IN.normal2;
 	OUT.center = IN.center;
 	
-	OUT.pos = float4(IN.pos.xyz, 1);
-	OUT.rawPos = OUT.pos.xyz;
-	OUT.pos.xy -= 0.5;
+	OUT.rawPos = IN.pos.xyz;
+	//OUT.pos.xy -= 0.5;
 	// Compute the texture coordinate.
 	//OUT.texCoords = OUT.rawPos.xy / TexSize;
 	OUT.texCoords = IN.texCoords;
 
+	OUT.pos = float4(IN.pos.xyz, 1);
+	OUT.pos.z = -2.412;
+	OUT.pos = mul(OUT.pos, WvpMat);
 	// Viewport adjustment.
-	OUT.pos.xy /= ViewportSize;
-	OUT.pos.xy *= float2(2, -2);
-	OUT.pos.xy -= float2(1, -1);
+	//OUT.pos.xy /= ViewportSize;
+	//OUT.pos.xy *= float2(2, -2);
+	//OUT.pos.xy -= float2(1, -1);
 
 	// Apply the matrix transform.
 	//OUT.pos = mul(IN.pos.xyz, transpose(MatrixTransform));

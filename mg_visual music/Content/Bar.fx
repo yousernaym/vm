@@ -1,24 +1,5 @@
+#include "notestyle.fx"
 // Input parameters
-
-//Common parameters-----------
-float4x4 wvp;
-float2   ViewportSize;
-float2   TexSize;
-texture Texture;
-
-sampler  TextureSampler = sampler_state
-{
-	texture = <Texture>;
-};
-float4 Color;
-float BlurredEdge;
-float3 LightDir = normalize(float3(1, 1, 1));
-float AmbientLum = 0.25f;
-float SpecAmount;
-float SpecPower;
-float SpecFov;
-float3 SpecCamPos;
-//------------------------------
 
 struct VSInput
 {
@@ -38,17 +19,20 @@ struct VSOutput
 VSOutput VS(VSInput IN)
 {
 	VSOutput OUT;
-	OUT.pos = float4(IN.rect.xy + IN.pos * (IN.rect.zw - IN.rect.xy), 0, 1);
+	OUT.pos = float4(IN.rect.xy + IN.pos * (IN.rect.zw - IN.rect.xy), -2.412, 1);
 	// Viewport adjustment.
-	OUT.pos.xy /= ViewportSize;
-	OUT.pos.xy *= float2(2, -2);
-	OUT.pos.xy -= float2(1, -1);
+	//OUT.pos.xy /= ViewportSize.xy;
+	//OUT.pos.xy *= float2(2, -2);
+	//OUT.pos.xy -= float2(1, -1);
+	OUT.pos = mul(OUT.pos, WvpMat);
+	//OUT.pos.z = 0;
+	//OUT.pos.w = 1;
 	OUT.texCoords = IN.texCoords.xy + IN.pos * (IN.texCoords.zw - IN.texCoords.xy);
 	OUT.color = IN.color;
     //float4 worldPosition = mul(input.Position, World);
     //float4 viewPosition = mul(worldPosition, View);
     //output.Position = mul(viewPosition, Projection);
-	//output.pos = mul(input.pos, wvp);
+	//output.pos = mul(input.pos, WvpMat);
 
 	return OUT;
 }

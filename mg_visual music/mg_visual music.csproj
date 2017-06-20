@@ -85,6 +85,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Camera.cs" />
     <Compile Include="Forms\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -195,6 +196,7 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
     <None Include="app.config" />
     <None Include="app.manifest" />
+    <Content Include="Content\NoteStyle.fx" />
     <None Include="packages.config" />
     <None Include="tparty\xmplay\xmplay.ini" />
   </ItemGroup>

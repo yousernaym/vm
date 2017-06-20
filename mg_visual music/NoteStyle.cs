@@ -165,7 +165,7 @@ namespace Visual_Music
         protected void getMaterial(SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, int x1, int x2, out Color color, out Texture2D texture)
         {
             bool bHilited = false;
-            if (x1 < songDrawProps.viewportSize.X / 2 && x2 > songDrawProps.viewportSize.X / 2)
+            if (x1 < 0 && x2 > 0)
                 bHilited = true;
             getMaterial(songDrawProps, trackProps, globalTrackProps, bHilited, out color, out texture);
         }
@@ -187,10 +187,13 @@ namespace Visual_Music
         }
         virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
 		{
-            fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
-
-            //Light props
-            TrackProps lightProps = trackProps.UseGlobalLight ? globalTrackProps : trackProps;
+			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
+			//songPanel.GraphicsDevice.pre
+			//songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+			fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
+			fx.Parameters["WvpMat"].SetValue(Camera.VpMat);
+			//Light props
+			TrackProps lightProps = trackProps.UseGlobalLight ? globalTrackProps : trackProps;
             Vector3 normLightDir = lightProps.LightDir;
             normLightDir.Normalize();
             fx.Parameters["LightDir"].SetValue(normLightDir);
@@ -239,7 +242,8 @@ namespace Visual_Music
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
 		{
             base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps);
-            List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
+			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
+			List<Midi.Note> noteList = midiTrack.Notes;
 			if (noteList.Count == 0)
 				return;
 			TrackProps texTrackProps = trackProps.getTexture(false, null) != null ? trackProps : globalTrackProps;
@@ -501,7 +505,7 @@ namespace Visual_Music
 
 				#region Fill vertBuf with highlight vertices
 				//Fill verrtbuf with highlight vertices
-				int vpCenterX = songDrawProps.viewportSize.X/2;
+				int vpCenterX = 0; // songDrawProps.viewportSize.X/2;
 				if (noteStart.X < vpCenterX && noteEnd > vpCenterX)
 				{
 					Vector3 noteStartVec = new Vector3(noteStart.X, noteStart.Y, 0);
@@ -528,7 +532,7 @@ namespace Visual_Music
 						}
 						else
 						{
-							float x1 = songDrawProps.viewportSize.X / 2.0f;
+							float x1 = 0;// songDrawProps.viewportSize.X / 2.0f;
 							float normPitch = trackProps.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x1));
 							float y1 = songDrawProps.getPitchScreenPos(normPitch);
 							float x2 = x1 + 1;
@@ -586,7 +590,7 @@ namespace Visual_Music
 				
 				float startDraw = noteStart.X;
 				float endDraw = nextNoteStart.X;
-				if (endDraw < 0 || startDraw > songDrawProps.viewportSize.X)
+				if (endDraw < -songDrawProps.viewportSize.X / 2 || startDraw > songDrawProps.viewportSize.X / 2)
 				{
 					completeNoteListIndex++;
 					continue;
@@ -856,7 +860,7 @@ namespace Visual_Music
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
 		{
             base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps);
-            //testVerts[0].pos = new Vector4(1, 0, 0, 0);
+			//testVerts[0].pos = new Vector4(1, 0, 0, 0);
 			//testVerts[1].pos = new Vector4(0, 2, 0, 0);
 			//testVerts[2].pos = new Vector4(0, 0, 3, 0);
 			//barFx.Techniques[0].Passes[0].Apply();
@@ -864,7 +868,8 @@ namespace Visual_Music
 			//lineFx.CurrentTechnique.Passes["Area"].Apply();
 			//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineVerts, 0, 1);
 			//return;
-			List<Midi.Note> noteList = getNotes((int)(Qn_gapThreshold * songDrawProps.song.TicksPerBeat), midiTrack, songDrawProps);
+			//List<Midi.Note> noteList = getNotes((int)(Qn_gapThreshold * songDrawProps.song.TicksPerBeat), midiTrack, songDrawProps);
+			List<Midi.Note> noteList = midiTrack.Notes;
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			if (noteList.Count == 0)
 				return;
@@ -931,7 +936,7 @@ namespace Visual_Music
 				{
 					if (MovingHl)
 					{
-						float x = songDrawProps.viewportSize.X / 2.0f;
+						float x = 0;// songDrawProps.viewportSize.X / 2.0f;
 						Vector3 circlePos = new Vector3(x, songDrawProps.getCurveScreenY(x, trackProps.Curve), 0);
 						setHlCirclePos(circlePos);
 					}
@@ -968,8 +973,8 @@ namespace Visual_Music
 					else
                         fx.CurrentTechnique = fx.Techniques["Lighting"];
                     fx.CurrentTechnique.Passes[0].Apply();
-					if (numHLineVerts > 1)
-						songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
+					//if (numHLineVerts > 1)
+						//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
 					if (numVerts > 5)
 					    songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
 				}

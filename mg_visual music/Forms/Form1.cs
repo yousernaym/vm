@@ -295,6 +295,14 @@ namespace Visual_Music
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
 		{
+			Camera.control(e.KeyCode, true);
+			if (e.Control)
+			{
+				if (e.KeyCode == Keys.D2)
+					dim3Cb.Checked = false;
+				if (e.KeyCode == Keys.D3)
+					dim3Cb.Checked = true;
+			}
 			if (ModifierKeys != 0)
 				return;
 			if (e.KeyCode == Keys.Space)
@@ -309,6 +317,11 @@ namespace Visual_Music
 			}
 			if (e.KeyCode == Keys.Z)
 				songPanel.ForceSimpleDrawMode = !songPanel.ForceSimpleDrawMode;
+		}
+
+		private void Form1_KeyUp(object sender, KeyEventArgs e)
+		{
+			Camera.control(e.KeyCode, false);
 		}
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
@@ -1434,6 +1447,16 @@ namespace Visual_Music
 		public static void showWarningMsgBox(IWin32Window owner, string message, string caption = "")
 		{
 			MessageBox.Show(owner, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+		}
+
+		private void dim3Cb_CheckedChanged(object sender, EventArgs e)
+		{
+			Camera.ProjType = dim3Cb.Checked ? ProjType.Perspective : ProjType.Ortho;
+		}
+
+		private void resetCamBtn_Click(object sender, EventArgs e)
+		{
+			Camera.reset();
 		}
 	}
 }

@@ -49,7 +49,7 @@ namespace Visual_Music
 		}
 		public float getTimeTPosF(int timeT)
 		{
-			return (float)((double)(timeT - songPosT) / viewWidthT + 0.5) * viewportSize.X;
+			return (float)((double)(timeT - songPosT) / viewWidthT + 0.5) * viewportSize.X - viewportSize.X / 2.0f;
 		}
 		public int getPitchScreenPos(int pitch)
 		{
@@ -57,11 +57,11 @@ namespace Visual_Music
 		}
 		public float getPitchScreenPos(float pitch)
 		{
-			return (float)viewportSize.Y - (pitch - minPitch) * (float)noteHeight - noteHeight / 2.0f - yMargin;
+			return (float)viewportSize.Y - (pitch - minPitch) * (float)noteHeight - noteHeight / 2.0f - yMargin - viewportSize.Y / 2.0f;
 		}
 		public float getSongPosT(float screenX)
 		{ //Returns song pos in ticks
-			return (((float)screenX / (float)viewportSize.X - 0.5f) * (float)viewWidthT + (float)songPosT);
+			return (float)screenX / (float)viewportSize.X * (float)viewWidthT + (float)songPosT; //Far right -> screenX = viewPortSize/2
 		}
 		public float getSongPosP(float screenX)
 		{ //Returns song pos in pixels
@@ -100,8 +100,9 @@ namespace Visual_Music
         TimeSpan pbStartSysTime = new TimeSpan(0);
         double pbStartSongTimeS;
         Stopwatch stopwatch = new Stopwatch();
-		TimeSpan deltaTime;
-		long renderInterval = 1; //Stopwatch.Frequency / 400;
+		//TimeSpan deltaTime;
+		double deltaTimeS;
+		double renderInterval = 0.000000001;
 		bool leftMbPressed = false;
 		//public bool RightMbPressed { get; set; }
 		double scrollCenter = 0;
@@ -206,10 +207,11 @@ namespace Visual_Music
         public int MinPitch { get; set; } 
         public int MaxPitch { get; set; }
         int NumPitches { get { return MaxPitch - MinPitch + 1; } }
-		static bool bInited = false;
-
+		
 		public SongPanel()
 		{
+			Camera.ProjType = ProjType.Ortho;
+			Camera.reset();
 		}
 		public SongPanel(SerializationInfo info, StreamingContext ctxt):base()
 		{
@@ -247,7 +249,7 @@ namespace Visual_Music
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
 			info.AddValue("desiredSongLengthS", desiredSongLengthS);
 		}
-		
+
 		protected override void Initialize()
         {
 			stopwatch.Start();
@@ -280,16 +282,19 @@ namespace Visual_Music
 						trackProps[i].loadContent(this);
 				}
 			}
+			Camera.SongPanel = this;
 		}
+
 		public void update()
 		{
 			if (notes == null)
 				return;
 			TimeSpan newTime = stopwatch.Elapsed;
-			deltaTime = newTime - oldTime;
-			if (deltaTime.Ticks < renderInterval)
-				return;
+			deltaTimeS = (newTime - oldTime).getSecondsF();
+			//if (deltaTimeS < renderInterval)
+				//return;
 
+			Camera.update((float)deltaTimeS);
 			oldTime = newTime;
 			selectRegion();
 
@@ -321,7 +326,7 @@ namespace Visual_Music
 					togglePlayback();
 			}
 			else
-				scrollSong(deltaTime);
+				scrollSong();
 
 			if (normSongPos < 0)
 				normSongPos = 0;
@@ -429,12 +434,12 @@ namespace Visual_Music
 			int pos = (int)((normPosY - normPitchMargin) * ClientRectangle.Height + 1);
 			return MinPitch + (int)(pos / noteHeight);
 		}
-		void scrollSong(TimeSpan deltaTime)
+		void scrollSong()
 		{
 			if (mousePosScrollSong && !selectingRegion)
 			{
 				double dNormMouseX = (double)NormMouseX - scrollCenter;
-				NormSongPos += (float)(Math.Pow(dNormMouseX, 2) * Math.Sign(dNormMouseX) * deltaTime.Ticks / 20000000.0);
+				NormSongPos += (float)(Math.Pow(dNormMouseX, 2) * Math.Sign(dNormMouseX) * deltaTimeS * 0.13f);
 			}
 		}
 
@@ -686,7 +691,7 @@ namespace Visual_Music
 			double normSongPosTemp = normSongPos;
 			setSongPosInSeconds(ref currentTempoEvent, ref currentTimeT, ref currentTimeS, seconds);
 			//Todo: create function that returns these values without modifying Mormsongpos
-			NormSongPos = normSongPosTemp;
+			normSongPos = normSongPosTemp;
 			return currentTimeT;
 		}
 
@@ -724,7 +729,7 @@ namespace Visual_Music
 				currentTimeT += (nextTimeStepS - currentTimeS) * currentBps * notes.TicksPerBeat;
 				currentTimeS = nextTimeStepS;
 			}
-			NormSongPos = currentTimeT / (double)notes.SongLengthT;
+			normSongPos = currentTimeT / (double)notes.SongLengthT;
 		}
 
 		double getSongPosInSeconds()
