@@ -8,35 +8,28 @@ using System.Windows.Forms;
 
 namespace Visual_Music
 {
-	public enum ProjType { Ortho, Perspective };
 	static class Camera
 	{
+		public static float Fov { get; set; } = (float)Math.PI / 4.0f;
 		static Vector3 pos = new Vector3();
-		static public Vector3 Pos { get => pos; set { pos = value; if (SongPanel != null) SongPanel.Invalidate(); } }
+		public static Vector3 Pos { get => pos; set { pos = value; if (SongPanel != null) SongPanel.Invalidate(); } }
 		static Vector3 angles = new Vector3();
-		static public Vector3 Angles { get => angles; set { angles = value; if (SongPanel != null) SongPanel.Invalidate(); } }
+		public static Vector3 Angles { get => angles; set { angles = value; if (SongPanel != null) SongPanel.Invalidate(); } }
 		static Vector3 moveVel = new Vector3();
 		static Vector3 rotVel = new Vector3();
 		const float rotSpeed = 0.2f;
 		const float moveSpeed = 0.5f;
 
 		static Matrix RotMat { get { return Matrix.CreateRotationY(angles.Y); } }
-		static public Matrix ViewMat
+		public static Matrix ViewMat
 		{
 			get
 			{
-				if (ProjType == ProjType.Ortho)
-					return Matrix.Identity;
-				else
-				{
-					Matrix transMat = Matrix.CreateTranslation(pos);
-					return Matrix.Invert(RotMat * transMat);
-					//return Matrix.CreateLookAt(pos, RotMat.Forward, RotMat.Up);
-				}
+				Matrix transMat = Matrix.CreateTranslation(pos);
+				return Matrix.Invert(RotMat * transMat);
 			}
 		}
-		static public Vector2 ViewPortSize { get => new Vector2((float)SongPanel.ClientRectangle.Width, (float)SongPanel.ClientRectangle.Height); }
-		static public ProjType ProjType { get; set; } = ProjType.Ortho;
+		public static Vector2 ViewPortSize { get => new Vector2((float)SongPanel.ClientRectangle.Width, (float)SongPanel.ClientRectangle.Height); }
 		static Matrix ViewPortMat
 		{
 			get
@@ -45,37 +38,27 @@ namespace Visual_Music
 											0, -2 / ViewPortSize.Y, 0, 0,
 											0, 0, 1, 0,
 											0, 0, 0, 1);
-				
-				
 			}
 		}
-		static public Matrix ProjMat
+		public static Matrix ProjMat
 		{
 			get
 			{
-				if (ProjType == ProjType.Ortho)
-				{
-					Matrix mat = Matrix.Identity;
-					mat.M33 = 0;
-					return mat;
-				}
-				else //if (ProjType == ProjType.Perspective)
-					return Matrix.CreatePerspectiveFieldOfView((float)Math.PI / 4.0f, 1/*ViewPortSize.X / ViewPortSize.Y*/, 0.001f, 100000);
+				return Matrix.CreatePerspectiveFieldOfView(Fov, 1/*ViewPortSize.X / ViewPortSize.Y*/, 0.001f, 100000);
 			}
 		}
 
-		static public Matrix VpMat
+		public static Matrix VpMat
 		{
 			get
 			{
 				return ViewPortMat * ViewMat * ProjMat;
 			}
 		}
-		static public SongPanel SongPanel { get; set; }
+		public static SongPanel SongPanel { get; set; }
 
-		static public void update(float deltaTime)
+		public  static void update(float deltaTime)
 		{
-			//Pos += moveVel * Math.Abs(Vector3.Dot(RotMat.Forward, Vector3.Forward)) * deltaTime;
 			pos += Vector3.Transform(moveVel, RotMat) * deltaTime;
 			Vector3 oldAngles = Angles;
 			Angles += rotVel * deltaTime;
@@ -86,7 +69,7 @@ namespace Visual_Music
 				angles.Y += Pi2;
 		}
 
-		static public void control(Keys key, bool isKeyDown)
+		public static void control(Keys key, bool isKeyDown)
 		{
 			float startOrStop = isKeyDown ? 1 : 0;
 
@@ -103,10 +86,11 @@ namespace Visual_Music
 			if (key == Keys.D)
 				moveVel = -Vector3.Left * moveSpeed * startOrStop;
 		}
-		static public void reset()
+		public static void reset()
 		{
 			Pos = new Vector3(0, 0, 0);
 			Angles = new Vector3(0, 0, 0);
+			Fov = (float)Math.PI / 4.0f;
 		}
 	}
 }

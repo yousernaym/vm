@@ -188,8 +188,7 @@ namespace Visual_Music
         virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
 		{
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
-			//songPanel.GraphicsDevice.pre
-			//songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
 			fx.Parameters["WvpMat"].SetValue(Camera.VpMat);
 			//Light props

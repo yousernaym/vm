@@ -210,7 +210,6 @@ namespace Visual_Music
 		
 		public SongPanel()
 		{
-			Camera.ProjType = ProjType.Ortho;
 			Camera.reset();
 		}
 		public SongPanel(SerializationInfo info, StreamingContext ctxt):base()
