@@ -5,23 +5,25 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using System.Windows.Forms;
+using System.Runtime.Serialization;
 
 namespace Visual_Music
 {
-	static class Camera
+	[Serializable]
+	public class Camera : ISerializable
 	{
-		public static float Fov { get; set; } = (float)Math.PI / 4.0f;
-		static Vector3 pos = new Vector3();
-		public static Vector3 Pos { get => pos; set { pos = value; if (SongPanel != null) SongPanel.Invalidate(); } }
-		static Vector3 angles = new Vector3();
-		public static Vector3 Angles { get => angles; set { angles = value; if (SongPanel != null) SongPanel.Invalidate(); } }
-		static Vector3 moveVel = new Vector3();
-		static Vector3 rotVel = new Vector3();
+		public float Fov { get; set; } = (float)Math.PI / 4.0f;
+		Vector3 pos = new Vector3();
+		public Vector3 Pos { get => pos; set { pos = value; if (SongPanel != null) SongPanel.Invalidate(); } }
+		Vector3 angles = new Vector3();
+		public Vector3 Angles { get => angles; set { angles = value; if (SongPanel != null) SongPanel.Invalidate(); } }
+		Vector3 moveVel = new Vector3();
+		Vector3 rotVel = new Vector3();
 		const float rotSpeed = 0.2f;
 		const float moveSpeed = 0.5f;
 
-		static Matrix RotMat { get { return Matrix.CreateRotationY(angles.Y); } }
-		public static Matrix ViewMat
+		Matrix RotMat { get { return Matrix.CreateRotationY(angles.Y); } }
+		public Matrix ViewMat
 		{
 			get
 			{
@@ -29,8 +31,8 @@ namespace Visual_Music
 				return Matrix.Invert(RotMat * transMat);
 			}
 		}
-		public static Vector2 ViewPortSize { get => new Vector2((float)SongPanel.ClientRectangle.Width, (float)SongPanel.ClientRectangle.Height); }
-		static Matrix ViewPortMat
+		public Vector2 ViewPortSize { get => new Vector2((float)SongPanel.ClientRectangle.Width, (float)SongPanel.ClientRectangle.Height); }
+		Matrix ViewPortMat
 		{
 			get
 			{
@@ -40,7 +42,7 @@ namespace Visual_Music
 											0, 0, 0, 1);
 			}
 		}
-		public static Matrix ProjMat
+		public Matrix ProjMat
 		{
 			get
 			{
@@ -48,16 +50,42 @@ namespace Visual_Music
 			}
 		}
 
-		public static Matrix VpMat
+		public Matrix VpMat
 		{
 			get
 			{
 				return ViewPortMat * ViewMat * ProjMat;
 			}
 		}
-		public static SongPanel SongPanel { get; set; }
+		public SongPanel SongPanel { get; set; }
 
-		public  static void update(float deltaTime)
+
+		//Methods/////////////////////////////////
+		public Camera(SongPanel spanel = null)
+		{
+			SongPanel = spanel;
+		}
+
+		public Camera(SerializationInfo info, StreamingContext ctxt)
+		{
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "fov")
+					Fov = (float)entry.Value;
+				else if (entry.Name == "pos")
+					pos = (Vector3)entry.Value;
+				else if (entry.Name == "angles")
+					angles = (Vector3)entry.Value;
+			}
+		}
+		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+		{
+			info.AddValue("fov", Fov);
+			info.AddValue("pos", pos);
+			info.AddValue("angles", angles);
+		}
+
+		public void update(float deltaTime)
 		{
 			pos += Vector3.Transform(moveVel, RotMat) * deltaTime;
 			Vector3 oldAngles = Angles;
@@ -69,7 +97,7 @@ namespace Visual_Music
 				angles.Y += Pi2;
 		}
 
-		public static void control(Keys key, bool isKeyDown)
+		public void control(Keys key, bool isKeyDown)
 		{
 			float startOrStop = isKeyDown ? 1 : 0;
 
@@ -86,7 +114,7 @@ namespace Visual_Music
 			if (key == Keys.D)
 				moveVel = -Vector3.Left * moveSpeed * startOrStop;
 		}
-		public static void reset()
+		public void reset()
 		{
 			Pos = new Vector3(0, 0, 0);
 			Angles = new Vector3(0, 0, 0);

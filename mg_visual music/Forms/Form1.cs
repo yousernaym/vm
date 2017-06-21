@@ -53,7 +53,7 @@ namespace Visual_Music
         public ImportSidForm importSidForm;
 		public TpartyIntegrationForm tpartyIntegrationForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType)};
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera)};
         SongPanel songPanel = new SongPanel();
 		ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
@@ -295,11 +295,13 @@ namespace Visual_Music
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
 		{
-			Camera.control(e.KeyCode, true);
+			songPanel.Camera.control(e.KeyCode, true);
 			if (e.Control)
 			{
 				if (e.KeyCode == Keys.R)
-					Camera.reset();
+				{
+					songPanel.Camera = new Camera(songPanel);
+				}
 			}
 			if (ModifierKeys != 0)
 				return;
@@ -319,7 +321,7 @@ namespace Visual_Music
 
 		private void Form1_KeyUp(object sender, KeyEventArgs e)
 		{
-			Camera.control(e.KeyCode, false);
+			songPanel.Camera.control(e.KeyCode, false);
 		}
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
@@ -1449,7 +1451,7 @@ namespace Visual_Music
 
 		private void resetCamBtn_Click(object sender, EventArgs e)
 		{
-			Camera.reset();
+			songPanel.Camera = new Camera(songPanel);
 		}
 	}
 }

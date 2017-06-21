@@ -185,12 +185,15 @@ namespace Visual_Music
         {   //Get currently visible notes in specified track
             return track.getNotes(songDrawProps.songPosT - songDrawProps.viewWidthT / 2 - leftMargin, songDrawProps.songPosT + songDrawProps.viewWidthT / 2 + leftMargin);
         }
-        virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
+        virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion)
 		{
+			Camera cam = selectingRegion ? songPanel.DefaultCamera : songPanel.Camera;
+			
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
-			fx.Parameters["WvpMat"].SetValue(Camera.VpMat);
+			fx.Parameters["WvpMat"].SetValue(cam.VpMat);
+			
 			//Light props
 			TrackProps lightProps = trackProps.UseGlobalLight ? globalTrackProps : trackProps;
             Vector3 normLightDir = lightProps.LightDir;
@@ -238,9 +241,9 @@ namespace Visual_Music
         {
             fx = songPanel.Content.Load<Effect>("Bar");
         }
-		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
+		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion)
 		{
-            base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps);
+            base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion);
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			List<Midi.Note> noteList = midiTrack.Notes;
 			if (noteList.Count == 0)
@@ -856,9 +859,9 @@ namespace Visual_Music
 		//	return typeof(T).GetProperties()[0].Name;
 		//}
 
-		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
+		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion)
 		{
-            base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps);
+            base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion);
 			//testVerts[0].pos = new Vector4(1, 0, 0, 0);
 			//testVerts[1].pos = new Vector4(0, 2, 0, 0);
 			//testVerts[2].pos = new Vector4(0, 0, 3, 0);

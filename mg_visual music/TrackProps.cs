@@ -526,9 +526,9 @@ namespace Visual_Music
 		public void drawTrack(SongDrawProps songDrawProps, TrackProps globalTrackProps, bool selectingRegion)
 		{
 			if (selectingRegion)
-			    getNoteStyle(NoteStyleEnum.Bar).drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
+			    getNoteStyle(NoteStyleEnum.Bar).drawTrack(midiTrack, songDrawProps, this, globalTrackProps, selectingRegion);
             else
-			    SelectedNoteStyle.drawTrack(midiTrack, songDrawProps, this, globalTrackProps);
+			    SelectedNoteStyle.drawTrack(midiTrack, songDrawProps, this, globalTrackProps, selectingRegion);
 		}
 
         //public void drawNote(NoteDrawProps drawProps, TrackProps globalProps)

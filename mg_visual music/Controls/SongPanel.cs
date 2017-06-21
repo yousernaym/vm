@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 
 #endregion
 
@@ -82,10 +81,19 @@ namespace Visual_Music
 	[Serializable()]
 	public class SongPanel : GraphicsDeviceControl, ISerializable
 	{
+		public Camera Camera { get; set; } = new Camera();
+		public Camera DefaultCamera { get; } = new Camera();
+		public Camera cameraSave;
 		ContentManager content;
 		public ContentManager Content { get { return content; } }
 		bool forceSimpleDrawMode = false;
-		public bool ForceSimpleDrawMode { get =>forceSimpleDrawMode; set { forceSimpleDrawMode = value; Invalidate(); } }
+		public bool ForceSimpleDrawMode { get =>forceSimpleDrawMode;
+			set
+			{
+				forceSimpleDrawMode = value;
+				Invalidate();
+			}
+		}
 		MixdownType mixdownType;
 		public MixdownType MixdownType { get => mixdownType; set => mixdownType = value; } 
 		Texture2D regionSelectTexture;
@@ -102,7 +110,7 @@ namespace Visual_Music
         Stopwatch stopwatch = new Stopwatch();
 		//TimeSpan deltaTime;
 		double deltaTimeS;
-		double renderInterval = 0.000000001;
+		double renderInterval = 0.0001;
 		bool leftMbPressed = false;
 		//public bool RightMbPressed { get; set; }
 		double scrollCenter = 0;
@@ -210,7 +218,6 @@ namespace Visual_Music
 		
 		public SongPanel()
 		{
-			Camera.reset();
 		}
 		public SongPanel(SerializationInfo info, StreamingContext ctxt):base()
 		{
@@ -229,6 +236,7 @@ namespace Visual_Music
 			ImportNotesWithAudioForm.TpartyArgs = info.GetString("tpartyArgs");
 			ImportNotesWithAudioForm.TpartyOutputDir = info.GetString("tpartyOutputDir");
 			desiredSongLengthS = info.GetDouble("desiredSongLengthS");
+			Camera = (Camera)info.GetValue("camera", typeof(Camera));
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
@@ -247,6 +255,7 @@ namespace Visual_Music
 			info.AddValue("tpartyArgs", ImportNotesWithAudioForm.TpartyArgs);
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
 			info.AddValue("desiredSongLengthS", desiredSongLengthS);
+			info.AddValue("camera", Camera);
 		}
 
 		protected override void Initialize()
@@ -282,6 +291,7 @@ namespace Visual_Music
 				}
 			}
 			Camera.SongPanel = this;
+			DefaultCamera.SongPanel = this;
 		}
 
 		public void update()
