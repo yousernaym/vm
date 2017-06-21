@@ -14,9 +14,30 @@ namespace Visual_Music
 	{
 		public float Fov { get; set; } = (float)Math.PI / 4.0f;
 		Vector3 pos = new Vector3();
-		public Vector3 Pos { get => pos; set { pos = value; if (SongPanel != null) SongPanel.Invalidate(); } }
+		public Vector3 Pos { get => pos;
+			set
+			{
+				if (!pos.Equals(value))
+				{
+					SongPanel.Invalidate();
+					pos = value;
+				}
+			}
+		}
+				
 		Vector3 angles = new Vector3();
-		public Vector3 Angles { get => angles; set { angles = value; if (SongPanel != null) SongPanel.Invalidate(); } }
+		public Vector3 Angles { get => angles;
+			set
+			{
+				if (!angles.Equals(value))
+				{
+					SongPanel.Invalidate();
+					angles = value;
+				}
+			}
+		}
+		
+				
 		Vector3 moveVel = new Vector3();
 		Vector3 rotVel = new Vector3();
 		const float rotSpeed = 0.2f;
@@ -87,7 +108,7 @@ namespace Visual_Music
 
 		public void update(float deltaTime)
 		{
-			pos += Vector3.Transform(moveVel, RotMat) * deltaTime;
+			Pos += Vector3.Transform(moveVel, RotMat) * deltaTime;
 			Vector3 oldAngles = Angles;
 			Angles += rotVel * deltaTime;
 			float Pi2 = (float)Math.PI * 2;

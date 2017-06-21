@@ -594,8 +594,8 @@ namespace Visual_Music
 				float endDraw = nextNoteStart.X;
 				if (endDraw < -songDrawProps.viewportSize.X / 2 || startDraw > songDrawProps.viewportSize.X / 2)
 				{
-					completeNoteListIndex++;
-					continue;
+					//completeNoteListIndex++;
+					//continue;
 				}
 				//Draw between note start and next note start
 				//startDraw = 960;
