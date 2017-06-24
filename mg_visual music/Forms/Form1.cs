@@ -1164,6 +1164,7 @@ namespace Visual_Music
 		}
 		private void endToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			songPanel.stopPlayback();
 			songScrollBar.Value = songScrollBar.Maximum;
 		}
 

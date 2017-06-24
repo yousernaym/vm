@@ -329,7 +329,7 @@ namespace Visual_Music
 					else
 						timeS = Media.getPlaybackPos() + AudioOffset;
 				}
-				setSongPosInSeconds(timeS);
+				setSongPosInSeconds(timeS, true);
 				if (normSongPos > 1)
 					togglePlayback();
 			}
@@ -648,7 +648,7 @@ namespace Visual_Music
 					const double startSongPosS = 0;
 					double songPosInTicks = 0;
 					double normSongPosBackup = normSongPos;
-					setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS);
+					setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
 
 					while ((int)songPosInTicks < notes.SongLengthT && !progressForm.Cancel)
 					{
@@ -680,7 +680,7 @@ namespace Visual_Music
 						}
 						frameStart += frameDuration;
 
-						setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0f / videoFormat.fps);
+						setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0f / videoFormat.fps, false);
 						frames++;
 						//EndDraw();
 					}
@@ -697,20 +697,20 @@ namespace Visual_Music
 			double currentTimeT = 0;
 			double currentTimeS = 0;
 			double normSongPosTemp = normSongPos;
-			setSongPosInSeconds(ref currentTempoEvent, ref currentTimeT, ref currentTimeS, seconds);
+			setSongPosInSeconds(ref currentTempoEvent, ref currentTimeT, ref currentTimeS, seconds, false);
 			//Todo: create function that returns these values without modifying Mormsongpos
 			normSongPos = normSongPosTemp;
 			return currentTimeT;
 		}
 
-		void setSongPosInSeconds(double newTimeS)
+		void setSongPosInSeconds(double newTimeS, bool updateScreen)
 		{
 			int currentTempoEvent = 0;
 			double currentTimeT = 0;
 			double currentTimeS = 0;
-			setSongPosInSeconds(ref currentTempoEvent, ref currentTimeT, ref currentTimeS, newTimeS);
+			setSongPosInSeconds(ref currentTempoEvent, ref currentTimeT, ref currentTimeS, newTimeS, updateScreen);
 		}
-		void setSongPosInSeconds(ref int currentTempoEvent, ref double currentTimeT, ref double currentTimeS, double newTimeS)
+		void setSongPosInSeconds(ref int currentTempoEvent, ref double currentTimeT, ref double currentTimeS, double newTimeS, bool updateScreen)
 		{
 			int nextTempoEvent = currentTempoEvent; 
 			bool bLastTempoEvent = false;
@@ -737,7 +737,11 @@ namespace Visual_Music
 				currentTimeT += (nextTimeStepS - currentTimeS) * currentBps * notes.TicksPerBeat;
 				currentTimeS = nextTimeStepS;
 			}
-			normSongPos = currentTimeT / (double)notes.SongLengthT;
+			double newSongPos = currentTimeT / (double)notes.SongLengthT;
+			if (updateScreen)
+				NormSongPos = newSongPos;
+			else
+				normSongPos = newSongPos;
 		}
 
 		double getSongPosInSeconds()
