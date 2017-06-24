@@ -83,7 +83,6 @@ namespace Visual_Music
 	{
 		public Camera Camera { get; set; } = new Camera();
 		public Camera DefaultCamera { get; } = new Camera();
-		public Camera cameraSave;
 		ContentManager content;
 		public ContentManager Content { get { return content; } }
 		bool forceSimpleDrawMode = false;

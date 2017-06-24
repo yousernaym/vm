@@ -45,7 +45,8 @@
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.playbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.startStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.resetPlaybackPositionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.beginningToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.endToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
@@ -356,7 +357,7 @@
             this.playbackToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1211, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1262, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -364,7 +365,8 @@
 			// 
 			this.playbackToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.startStopToolStripMenuItem,
-            this.resetPlaybackPositionToolStripMenuItem});
+            this.beginningToolStripMenuItem,
+            this.endToolStripMenuItem});
 			this.playbackToolStripMenuItem.Enabled = false;
 			this.playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
 			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
@@ -374,17 +376,25 @@
 			// 
 			this.startStopToolStripMenuItem.Name = "startStopToolStripMenuItem";
 			this.startStopToolStripMenuItem.ShowShortcutKeys = false;
-			this.startStopToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-			this.startStopToolStripMenuItem.Text = "Start/Stop          Space";
+			this.startStopToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+			this.startStopToolStripMenuItem.Text = "Start/Stop      Space";
 			this.startStopToolStripMenuItem.Click += new System.EventHandler(this.startStopToolStripMenuItem_Click);
 			// 
-			// resetPlaybackPositionToolStripMenuItem
+			// beginningToolStripMenuItem
 			// 
-			this.resetPlaybackPositionToolStripMenuItem.Name = "resetPlaybackPositionToolStripMenuItem";
-			this.resetPlaybackPositionToolStripMenuItem.ShowShortcutKeys = false;
-			this.resetPlaybackPositionToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-			this.resetPlaybackPositionToolStripMenuItem.Text = "Reset position           R";
-			this.resetPlaybackPositionToolStripMenuItem.Click += new System.EventHandler(this.resetPositionToolStripMenuItem_Click);
+			this.beginningToolStripMenuItem.Name = "beginningToolStripMenuItem";
+			this.beginningToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+			this.beginningToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+			this.beginningToolStripMenuItem.Text = "Beginning";
+			this.beginningToolStripMenuItem.Click += new System.EventHandler(this.beginningToolStripMenuItem_Click);
+			// 
+			// endToolStripMenuItem
+			// 
+			this.endToolStripMenuItem.Name = "endToolStripMenuItem";
+			this.endToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End)));
+			this.endToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+			this.endToolStripMenuItem.Text = "End";
+			this.endToolStripMenuItem.Click += new System.EventHandler(this.endToolStripMenuItem_Click);
 			// 
 			// label7
 			// 
@@ -418,7 +428,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.leftTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(816, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(867, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 10052);
 			this.trackPropsPanel.TabIndex = 3;
@@ -1722,7 +1732,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-2430, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-2447, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1734,7 +1744,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-2542, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-2559, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1744,7 +1754,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-2545, 10040);
+			this.label4.Location = new System.Drawing.Point(-2562, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1945,7 +1955,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1228, 407);
+			this.ClientSize = new System.Drawing.Size(1279, 407);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);
 			this.Controls.Add(this.resetDefaultBtn);
@@ -2125,7 +2135,7 @@
 		private System.Windows.Forms.ToolStripMenuItem defaultPropertiesToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem playbackToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem startStopToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem resetPlaybackPositionToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem beginningToolStripMenuItem;
 		private System.Windows.Forms.Button defaultStyleBtn;
 		private System.Windows.Forms.Button defaultLightBtn;
 		private TbSlider upDownVpWidth;
@@ -2182,6 +2192,7 @@
 		public System.Windows.Forms.OpenFileDialog openTextureDlg;
 		private System.Windows.Forms.SaveFileDialog saveMixdownDialog;
 		private System.Windows.Forms.Button resetCamBtn;
+		private System.Windows.Forms.ToolStripMenuItem endToolStripMenuItem;
 	}
 }
 

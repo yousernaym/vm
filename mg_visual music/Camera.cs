@@ -37,9 +37,9 @@ namespace Visual_Music
 			}
 		}
 		
-				
 		Vector3 moveVel = new Vector3();
 		Vector3 rotVel = new Vector3();
+		
 		const float rotSpeed = 0.2f;
 		const float moveSpeed = 0.5f;
 
@@ -79,12 +79,14 @@ namespace Visual_Music
 			}
 		}
 		public SongPanel SongPanel { get; set; }
-
+		
 
 		//Methods/////////////////////////////////
 		public Camera(SongPanel spanel = null)
 		{
 			SongPanel = spanel;
+			if (SongPanel != null)
+				SongPanel.Invalidate();
 		}
 
 		public Camera(SerializationInfo info, StreamingContext ctxt)
@@ -118,28 +120,61 @@ namespace Visual_Music
 				angles.Y += Pi2;
 		}
 
-		public void control(Keys key, bool isKeyDown)
+		public bool control(Keys key, bool isKeyDown)
 		{
 			float startOrStop = isKeyDown ? 1 : 0;
-
+			bool keyMatch = false;
 			if (key == Keys.Q)
+			{
 				rotVel.Y = rotSpeed * startOrStop;
+				keyMatch = true;
+			}
 			if (key == Keys.E)
+			{
 				rotVel.Y = -rotSpeed * startOrStop;
+				keyMatch = true;
+			}
 			if (key == Keys.W)
+			{
 				moveVel = Vector3.Forward * moveSpeed * startOrStop;
+				keyMatch = true;
+			}
 			if (key == Keys.S)
+			{
 				moveVel = -Vector3.Forward * moveSpeed * startOrStop;
+				keyMatch = true;
+			}
 			if (key == Keys.A)
+			{
 				moveVel = Vector3.Left * moveSpeed * startOrStop;
+				keyMatch = true;
+			}
 			if (key == Keys.D)
+			{
 				moveVel = -Vector3.Left * moveSpeed * startOrStop;
+				keyMatch = true;
+			}
+			if (key == Keys.R)
+			{
+				moveVel = Vector3.Up * moveSpeed * startOrStop;
+				keyMatch = true;
+			}
+			if (key == Keys.F)
+			{
+				moveVel = -Vector3.Up * moveSpeed * startOrStop;
+				keyMatch = true;
+			}
+			return keyMatch;
 		}
-		public void reset()
-		{
-			Pos = new Vector3(0, 0, 0);
-			Angles = new Vector3(0, 0, 0);
-			Fov = (float)Math.PI / 4.0f;
-		}
+		//public void reset()
+		//{
+		//	Pos = new Vector3(0, 0, 0);
+		//	Angles = new Vector3(0, 0, 0);
+		//	Fov = (float)Math.PI / 4.0f;
+		//}
+		//public bool intersectsFrustum(BoundingSphere sphere)
+		//{
+		//	return new BoundingFrustum(VpMat).Intersects(sphere);
+		//}
 	}
 }

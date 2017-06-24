@@ -9,6 +9,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Content;
 using WinFormsGraphicsDevice;
+using System.Diagnostics;
 
 namespace Visual_Music
 {
@@ -83,6 +84,9 @@ namespace Visual_Music
     [Serializable()]
     abstract public class NoteStyle : ISerializable
     {
+		public static bool bCull = true;
+		public static bool bSkipClose = false;
+		public static bool bSkipPoints = true;
 		protected const int NumDynamicVerts = 30000;
 		public class Textures
         {
@@ -467,31 +471,65 @@ namespace Visual_Music
 		}
 		void drawTrackLine(out int vertIndex, out bool drawHlNote, int lineWidth, List<Midi.Note> noteList, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps texTrackProps, Vector2 texSize)
 		{
+			int skippedNotes = 0;
+			int culledNotes = 0;
+			int skippedPoints = 0;
+			int totalVerts = 0;
+
 			vertIndex = 3;
 			int hLineVertIndex = 0;
 			drawHlNote = false;
 			int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
 			for (int n = 0; n < noteList.Count; n++)
 			{
-				#region Get (current) note and nextNote from noteList
+				//Get current note
 				Midi.Note note = noteList[n], nextNote;
 				if (note.start > songDrawProps.song.SongLengthT) //only  if audio ends before the notes end
 					continue;
-
-				if (n < noteList.Count - 1)
-					nextNote = noteList[n + 1];
-				else if (completeNoteListIndex < midiTrack.Notes.Count - 1)
-					nextNote = midiTrack.Notes[completeNoteListIndex + 1];
-				else
-					nextNote = note;
-				#endregion
-				#region Calc note viewport coords (noteStart, noteEnd(x-coord only) and nextNoteStart)
 				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
 				float noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch).X;
-				Vector2 nextNoteStart = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
-				if (noteEnd > nextNoteStart.X && completeNoteListIndex < midiTrack.Notes.Count - 1)
-					noteEnd = nextNoteStart.X;
-				#endregion
+				float z = -2.41f;
+				Vector4 noteStartProj = Vector4.Transform(new Vector4(noteStart.X, noteStart.Y, z, 1), songPanel.Camera.VpMat);
+				Vector3 noteStartScreen = new Vector3(noteStartProj.X, noteStartProj.Y, noteStartProj.Z) / noteStartProj.W;
+				//---------------------------------
+
+				Vector2 nextNoteStart;
+				float screenDist;
+				Vector3 nextNoteStartScreen;
+				do
+				{
+					if (n < noteList.Count - 1)
+						nextNote = noteList[n + 1];
+					else if (completeNoteListIndex < midiTrack.Notes.Count - 1)
+						nextNote = midiTrack.Notes[completeNoteListIndex + 1];
+					else
+						nextNote = note;
+	
+					nextNoteStart = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
+					if (noteEnd > nextNoteStart.X && completeNoteListIndex < midiTrack.Notes.Count - 1)
+						noteEnd = nextNoteStart.X;
+
+					//If notes are too close after transformation, skip to next note
+					Vector4 nextNoteStartProj = Vector4.Transform(new Vector4(nextNoteStart.X, nextNoteStart.Y, z, 1), songPanel.Camera.VpMat);
+					nextNoteStartScreen = new Vector3(nextNoteStartProj.X, nextNoteStartProj.Y, nextNoteStartProj.Z) / nextNoteStartProj.W;
+					screenDist = (noteStartScreen - nextNoteStartScreen).LengthSquared();
+					n++;
+					completeNoteListIndex++;
+					skippedNotes++;
+				} while (screenDist < 2.0f / Math.Max(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y) && note != nextNote && bSkipClose);
+				n--;
+				completeNoteListIndex--;
+				skippedNotes--;
+				//float bboxSize = Math.Max(nextNoteStartScreen.X - noteStartScreen.X, Math.Abs(nextNoteStartScreen.Y - noteStartScreen.Y);
+				//float cullBorder = 1 + bboxSize;
+				BoundingBox bbox = BoundingBox.CreateFromPoints(new Vector3[] { noteStartScreen, nextNoteStartScreen });
+				Vector3 clipMargin = new Vector3(0.1f, 0.1f, 0.1f);
+				if (!bbox.Intersects(new BoundingBox(new Vector3(-1, -1, 0) - clipMargin, new Vector3(1, 1, 1) + clipMargin)) && bCull)
+				{
+					completeNoteListIndex++;
+					culledNotes++;
+					continue;
+				}
 
 				//noteStart.X = (int)noteStart.X; noteStart.Y = (int)noteStart.Y;
 				//nextNoteStart.X = (int)nextNoteStart.X; nextNoteStart.Y = (int)nextNoteStart.Y;
@@ -592,6 +630,7 @@ namespace Visual_Music
 				
 				float startDraw = noteStart.X;
 				float endDraw = nextNoteStart.X;
+				float startEndXDist = Math.Abs(noteStartScreen.X - nextNoteStartScreen.X) * songDrawProps.viewportSize.X / 2.0f;
 				if (endDraw < -songDrawProps.viewportSize.X / 2 || startDraw > songDrawProps.viewportSize.X / 2)
 				{
 					//completeNoteListIndex++;
@@ -600,7 +639,12 @@ namespace Visual_Music
 				//Draw between note start and next note start
 				//startDraw = 960;
 				//endDraw = 1000;
-				for (float x = startDraw; x < endDraw; x++)
+								
+				float step = ((endDraw - startDraw) / startEndXDist);
+				if (step < 1 || !bSkipPoints)
+					step = 1;
+				
+				for (float x = startDraw; x < endDraw; x += step)
 				{
 					//Vector2 scale = new Vector2(lineWidth / texture.Width, (float)curLineWidth / texture.Height);
 					Vector3[] points = new Vector3[3];
@@ -645,8 +689,7 @@ namespace Visual_Music
 					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
 					if (texTrackProps.TexProps.Texture != null)
 						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, lineVerts[vertIndex].center, texTrackProps.TexProps, texSize, x - startDraw, (float)(x - startDraw) / (float)(nextNoteStart.X - noteStart.X), songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex+1].pos);
-
-										
+													
 					if (Style == LineStyleEnum.Ribbon)
 					{
 						do
@@ -661,16 +704,24 @@ namespace Visual_Music
 					}
 
 					vertIndex += 2;
-					
-					if (x > songDrawProps.viewportSize.X)
-						break;
+					totalVerts += 2;
+
+					//if (x > songDrawProps.viewportSize.X)
+					//break;
+					skippedPoints--;					
 				}
-				if (endOfSegment)
+				skippedPoints += (int)(endDraw - startDraw + 1);
+				if (endOfSegment || vertIndex > NumDynamicVerts - 1000)
 					drawLineSegment(ref vertIndex, ref hLineVertIndex);
+				
 				completeNoteListIndex++;
 				//break;
 			}
 			drawLineSegment(ref vertIndex, ref hLineVertIndex);
+			Debug.WriteLine("Skipped notes: " + skippedNotes);
+			Debug.WriteLine("Culled notes: " + culledNotes);
+			Debug.WriteLine("Skipped points: " + skippedPoints);
+			Debug.WriteLine("Vertices: " + totalVerts); 
 		}
 		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, Vector3 lineCenter, TrackPropsTex texProps, Vector2 texSize, float stepFromNoteStart, float normStepFromNoteStart, SongDrawProps songDrawProps, float lineWidth, Vector3 pos1, Vector3 pos2)
 		{

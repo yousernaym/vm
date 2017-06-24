@@ -61,7 +61,7 @@ namespace Visual_Music
 		public Form1(string[] args)
 		{
 			InitializeComponent();
-
+			this.beginningToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Home)));
 			Application.Idle += delegate { songPanel.update(); };
 
 			startupArgs = args;
@@ -83,7 +83,7 @@ namespace Visual_Music
 			ResizeRedraw = true;
 
             songScrollBar.Dock = DockStyle.Bottom;
-            songScrollBar.Scroll += delegate {
+            songScrollBar.ValueChanged += delegate {
                 songPanel.NormSongPos = (double)songScrollBar.Value / songScrollBar.Maximum;
             };
             Controls.Add(songScrollBar);
@@ -295,26 +295,41 @@ namespace Visual_Music
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
 		{
-			songPanel.Camera.control(e.KeyCode, true);
-			if (e.Control)
+			if (ModifierKeys == Keys.Control)
 			{
 				if (e.KeyCode == Keys.R)
 				{
 					songPanel.Camera = new Camera(songPanel);
 				}
 			}
+			
+			if (e.KeyCode == Keys.D1)
+			{
+				NoteStyle.bSkipClose = e.Control ? true : false;
+				songPanel.Invalidate();
+			}
+			if (e.KeyCode == Keys.D2)
+			{
+				NoteStyle.bCull = e.Control ? true : false;
+				songPanel.Invalidate();
+			}
+			if (e.KeyCode == Keys.D3)
+			{
+				NoteStyle.bSkipPoints = e.Control ? true : false;
+				songPanel.Invalidate();
+			}
+
 			if (ModifierKeys != 0)
 				return;
+
+			if (songPanel.Camera.control(e.KeyCode, true))
+				e.SuppressKeyPress = true;
 			if (e.KeyCode == Keys.Space)
 			{
 				startStopToolStripMenuItem_Click(null, null);
 				e.SuppressKeyPress = true;
 			}
-			if (e.KeyCode == Keys.R)
-			{
-				resetPositionToolStripMenuItem_Click(null, null);
-				e.SuppressKeyPress = true;
-			}
+			
 			if (e.KeyCode == Keys.Z)
 				songPanel.ForceSimpleDrawMode = !songPanel.ForceSimpleDrawMode;
 		}
@@ -1143,9 +1158,13 @@ namespace Visual_Music
 			songPanel.togglePlayback();
 		}
 
-		private void resetPositionToolStripMenuItem_Click(object sender, EventArgs e)
+		private void beginningToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			songPanel.stopPlayback();
+		}
+		private void endToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			songScrollBar.Value = songScrollBar.Maximum;
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -1453,5 +1472,7 @@ namespace Visual_Music
 		{
 			songPanel.Camera = new Camera(songPanel);
 		}
+
+		
 	}
 }
