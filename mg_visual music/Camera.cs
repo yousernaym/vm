@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Windows.Forms;
 using System.Runtime.Serialization;
 
@@ -12,6 +13,7 @@ namespace Visual_Music
 	[Serializable]
 	public class Camera : ISerializable
 	{
+		int CubeMapFace { get; set; } = -1; //-1 = normal rendering
 		public float Fov { get; set; } = (float)Math.PI / 4.0f;
 		Vector3 pos = new Vector3();
 		public Vector3 Pos { get => pos;
@@ -43,7 +45,37 @@ namespace Visual_Music
 		const float rotSpeed = 0.2f;
 		const float moveSpeed = 0.5f;
 
-		Matrix RotMat { get { return Matrix.CreateRotationY(angles.Y); } }
+		Matrix RotMat
+		{
+			get
+			{
+				Vector3 angleOffsets = new Vector3();
+				float rot90 = (float)Math.PI / 2.0f;
+				switch (CubeMapFace)
+				{
+					case 1:
+						angleOffsets.X = -rot90;
+						break;
+					case 2:
+						angleOffsets.X = rot90;
+						break;
+					case 3:
+						angleOffsets.Y = rot90 * 2;
+						break;
+					case 4:
+						angleOffsets.Z = -rot90;
+						break;
+					case 5:
+						angleOffsets.Z = rot90;
+						break;
+				}
+				Matrix rot = Matrix.CreateRotationY(angles.Y);
+				if (CubeMapFace <= 0)
+					return rot;
+				else
+					return rot * Matrix.CreateFromYawPitchRoll(angleOffsets.Y, angleOffsets.X, angleOffsets.Z);
+			}
+		}
 		public Matrix ViewMat
 		{
 			get
@@ -52,7 +84,13 @@ namespace Visual_Music
 				return Matrix.Invert(RotMat * transMat);
 			}
 		}
-		public Vector2 ViewPortSize { get => new Vector2((float)SongPanel.ClientRectangle.Width, (float)SongPanel.ClientRectangle.Height); }
+		public Vector2 ViewPortSize
+		{
+			get
+			{
+				return new Vector2((float)SongPanel.GraphicsDevice.Viewport.Width, (float)SongPanel.GraphicsDevice.Viewport.Height);
+			}
+		}
 		Matrix ViewPortMat
 		{
 			get
@@ -67,7 +105,8 @@ namespace Visual_Music
 		{
 			get
 			{
-				return Matrix.CreatePerspectiveFieldOfView(Fov, 1/*ViewPortSize.X / ViewPortSize.Y*/, 0.001f, 100000);
+				float fov = CubeMapFace >= 0 ? (float)Math.PI / 2.0f : Fov;
+				return Matrix.CreatePerspectiveFieldOfView(fov, 1/*ViewPortSize.X / ViewPortSize.Y*/, 0.001f, 100000);
 			}
 		}
 
@@ -166,6 +205,8 @@ namespace Visual_Music
 			}
 			return keyMatch;
 		}
+		
+		
 		//public void reset()
 		//{
 		//	Pos = new Vector3(0, 0, 0);

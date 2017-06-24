@@ -13,7 +13,7 @@ namespace Visual_Music
 {
 	public partial class RenderProgressForm : Form
 	{
-		delegate void Delegate_renderVideo(string file, RenderProgressForm progressForm);
+		delegate void Delegate_renderVideo(string file, RenderProgressForm progressForm, VideoExportForm options);
 		delegate void Delegate_updateProgress(int progress);
 		delegate void Delegate_void_noparams();
 		delegate void Delegate_void_string(string str);
@@ -73,7 +73,7 @@ namespace Visual_Music
 			Invoke(new Delegate_updateProgress(_updateProgress), progress);
 		}
 				
-		public RenderProgressForm(SongPanel _songPanel, string file)
+		public RenderProgressForm(SongPanel _songPanel, string file, VideoExportForm options)
 		{
 			InitializeComponent();
 
@@ -85,7 +85,7 @@ namespace Visual_Music
 			
 			//Delegate_updateProgress delestimatedTimeestimatedTimeegate_updateProgress = new Delegate_updateProgress(updateProgress);
 			Delegate_renderVideo delegate_renderVideo = new Delegate_renderVideo(songPanel.renderVideo);
-			IAsyncResult result = delegate_renderVideo.BeginInvoke(file, this, renderingFinished, delegate_renderVideo);
+			IAsyncResult result = delegate_renderVideo.BeginInvoke(file, this, options, renderingFinished, delegate_renderVideo);
 			
 			stopWatch.Start();
 			//startTime = stopWatch.Elapsed;

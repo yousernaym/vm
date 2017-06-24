@@ -281,10 +281,13 @@ namespace Visual_Music
 				return;
 			saveVideoDlg.InitialDirectory = Path.GetDirectoryName(saveVideoDlg.FileName);
 			saveSettings();
-			
-			RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName);
-			renderProgressForm.ShowDialog(this);
-		}
+
+			VideoExportForm vidExpForm = new VideoExportForm();
+			if (vidExpForm.ShowDialog() != DialogResult.OK)
+				return;
+			RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, vidExpForm);
+			renderProgressForm.ShowDialog();
+	}
 		
 		private void panel1_KeyDown(object sender, KeyEventArgs e)
 		{

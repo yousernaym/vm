@@ -611,7 +611,7 @@ namespace Visual_Music
 			//    MessageBox.Show("Start: " + noteStart + "    End: " + x + "\nPitch: "+songP.Y);
 			//}
 		}
-		public void renderVideo(string videoFilePath, RenderProgressForm progressForm)
+		public void renderVideo(string videoFilePath, RenderProgressForm progressForm, VideoExportForm options)
 		{
 			lock (renderLock)
 			{
@@ -622,8 +622,8 @@ namespace Visual_Music
 				videoFormat.fps = 30;
 				videoFormat.height = (uint)videoSize.Y;
 				videoFormat.width = (uint)videoSize.X;
-				//videoFormat.audioSampleRate = 48000;
-				videoFormat.audioSampleRate = 44100;
+				videoFormat.audioSampleRate = 48000;
+				//videoFormat.audioSampleRate = 44100;
 
 				//ulong bla = 4;
 				//Media.writeFrame(5, new uint[] { 0, 4 }, 0, ref bla, AudioOffset, false);
@@ -658,17 +658,22 @@ namespace Visual_Music
 						progressForm.updateProgress((int)(frameStart / 10000000));
 						GraphicsDevice.SetRenderTarget(videoFrame);
 						GraphicsDevice.Clear(Color.Transparent);
-
-						//spriteBatch.Begin(SpriteSortMode.Deferred, blendState);
+						
 						drawSong(videoSize, (float)songPosInTicks / notes.SongLengthT);
-						//spriteBatch.End();
 
 						GraphicsDevice.SetRenderTarget(null);
 						videoFrame.GetData<uint>(frameData);
 						for (uint i = 0; i < frameData.Length; i++)
 						{
+							//Swap r and b channels
 							uint c = frameData[i];
 							frameData[i] = ((c & 0xff) << 16) | (c & 0xff00) | ((c & 0xff0000) >> 16);
+
+							//Convert to spherical coordinates
+							if (options.Sphere)
+							{
+
+							}
 						}
 
 						if (!Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset, false))
