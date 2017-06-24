@@ -61,7 +61,6 @@ namespace Visual_Music
 		public Form1(string[] args)
 		{
 			InitializeComponent();
-			this.beginningToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Home)));
 			Application.Idle += delegate { songPanel.update(); };
 
 			startupArgs = args;
@@ -83,10 +82,9 @@ namespace Visual_Music
 			ResizeRedraw = true;
 
             songScrollBar.Dock = DockStyle.Bottom;
-            songScrollBar.ValueChanged += delegate {
-                songPanel.NormSongPos = (double)songScrollBar.Value / songScrollBar.Maximum;
-            };
-            Controls.Add(songScrollBar);
+			songScrollBar.ValueChanged += songScrollBar_ValueChanged;
+			songScrollBar.Scroll += delegate { updatePlaybackPosWhilePlaying(); };
+			Controls.Add(songScrollBar);
             songScrollBar.BringToFront();
 
             initSongPanel(songPanel);
@@ -297,39 +295,46 @@ namespace Visual_Music
 		{
 			if (ModifierKeys == Keys.Control)
 			{
+				//Reset camera
 				if (e.KeyCode == Keys.R)
-				{
 					songPanel.Camera = new Camera(songPanel);
-				}
 			}
-			
+
+			//Debug rendering options---------------------
+			//Skip notes that lies very close in screen space
 			if (e.KeyCode == Keys.D1)
 			{
 				NoteStyle.bSkipClose = e.Control ? true : false;
 				songPanel.Invalidate();
 			}
+			//Cull notes outside of view
 			if (e.KeyCode == Keys.D2)
 			{
 				NoteStyle.bCull = e.Control ? true : false;
 				songPanel.Invalidate();
 			}
+			//Skip line points that lie very close in screen space
 			if (e.KeyCode == Keys.D3)
 			{
 				NoteStyle.bSkipPoints = e.Control ? true : false;
 				songPanel.Invalidate();
 			}
+			//-----------------------------------
 
 			if (ModifierKeys != 0)
 				return;
 
+			//Control camera
 			if (songPanel.Camera.control(e.KeyCode, true))
 				e.SuppressKeyPress = true;
+
+			//Start/stop playback
 			if (e.KeyCode == Keys.Space)
 			{
 				startStopToolStripMenuItem_Click(null, null);
 				e.SuppressKeyPress = true;
 			}
-			
+			//Toggle simple rendering mode (default camera and bar bar style)
 			if (e.KeyCode == Keys.Z)
 				songPanel.ForceSimpleDrawMode = !songPanel.ForceSimpleDrawMode;
 		}
@@ -343,8 +348,8 @@ namespace Visual_Music
 		{
 			//songPanel.Invalidate();
 			songPanel.ViewWidthQn = (float)((TbSlider)sender).Value;
-            songScrollBar.SmallChange = songPanel.ViewWidthT / 100;
-            songScrollBar.LargeChange = songPanel.ViewWidthT / 10;
+            songScrollBar.SmallChange = songPanel.ViewWidthT / 16;
+            songScrollBar.LargeChange = songPanel.ViewWidthT / 1;
         }
 
 		private void audioOffsetS_ValueChanged(object sender, EventArgs e)
@@ -1474,6 +1479,40 @@ namespace Visual_Music
 			songPanel.Camera = new Camera(songPanel);
 		}
 
-		
+		private void nudgeBackwardsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			songScrollBar.Value = Math.Max(songScrollBar.Minimum, songScrollBar.Value - songScrollBar.SmallChange);
+			updatePlaybackPosWhilePlaying();
+		}
+
+		private void nudgeForwardToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			songScrollBar.Value = Math.Min(songScrollBar.Maximum, songScrollBar.Value + songScrollBar.SmallChange);
+			updatePlaybackPosWhilePlaying();
+		}
+
+		private void jumpBackwardsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			songScrollBar.Value = Math.Max(songScrollBar.Minimum, songScrollBar.Value - songScrollBar.LargeChange);
+			updatePlaybackPosWhilePlaying();
+		}
+
+		private void jumpForwardToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			songScrollBar.Value = Math.Min(songScrollBar.Maximum, songScrollBar.Value + songScrollBar.LargeChange);
+			updatePlaybackPosWhilePlaying();
+		}
+		void updatePlaybackPosWhilePlaying()
+		{
+			if (songPanel.IsPlaying)
+			{
+				songPanel.togglePlayback();
+				songPanel.togglePlayback();
+			}
+		}
+		private void songScrollBar_ValueChanged(object sender, EventArgs e)
+		{
+			songPanel.NormSongPos = (double)songScrollBar.Value / songScrollBar.Maximum;
+		}
 	}
 }
