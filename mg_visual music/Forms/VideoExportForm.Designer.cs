@@ -55,7 +55,6 @@
 			this.fullHdRb.Name = "fullHdRb";
 			this.fullHdRb.Size = new System.Drawing.Size(84, 17);
 			this.fullHdRb.TabIndex = 20;
-			this.fullHdRb.TabStop = true;
 			this.fullHdRb.Text = "1920 x 1080";
 			this.fullHdRb.UseVisualStyleBackColor = true;
 			this.fullHdRb.CheckedChanged += new System.EventHandler(this.fullHdRb_CheckedChanged);
@@ -78,7 +77,6 @@
 			this.fourkRb.Name = "fourkRb";
 			this.fourkRb.Size = new System.Drawing.Size(78, 17);
 			this.fourkRb.TabIndex = 10;
-			this.fourkRb.TabStop = true;
 			this.fourkRb.Text = "3840x2160";
 			this.fourkRb.UseVisualStyleBackColor = true;
 			this.fourkRb.CheckedChanged += new System.EventHandler(this.fourkRb_CheckedChanged);
@@ -113,6 +111,8 @@
 			this.Controls.Add(this.StereoscopicCb);
 			this.Controls.Add(this.sphereCb);
 			this.Name = "VideoExportForm";
+			this.Controls.SetChildIndex(this.okBtn, 0);
+			this.Controls.SetChildIndex(this.cancelBtn, 0);
 			this.Controls.SetChildIndex(this.sphereCb, 0);
 			this.Controls.SetChildIndex(this.StereoscopicCb, 0);
 			this.Controls.SetChildIndex(this.youtubeCb, 0);

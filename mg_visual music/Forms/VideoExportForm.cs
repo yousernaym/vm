@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
+//using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework;
 
 namespace Visual_Music
 {
@@ -13,9 +14,11 @@ namespace Visual_Music
 		Point resolution;
 		public Point Resolution { get => resolution; }
 		public bool Sphere { get => sphereCb.Checked; }
+		public bool Stereo { get => StereoscopicCb.Checked; }
 		public VideoExportForm()
 		{
 			InitializeComponent();
+			fourkRb.Checked = true;
 		}
 
 		private void sphereCb_CheckedChanged(object sender, EventArgs e)

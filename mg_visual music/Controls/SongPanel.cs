@@ -81,6 +81,8 @@ namespace Visual_Music
 	[Serializable()]
 	public class SongPanel : GraphicsDeviceControl, ISerializable
 	{
+		bool isRenderingVideo = false;
+		public const int CmFaceSize = 1080;
 		public Camera Camera { get; set; } = new Camera();
 		public Camera DefaultCamera { get; } = new Camera();
 		ContentManager content;
@@ -145,7 +147,6 @@ namespace Visual_Music
             set { trackProps = value; }
         }
 
-        RenderTarget2D videoFrame;
         Midi.Song notes;
         public Midi.Song Notes { get { return notes; } }
         string noteFilePath = "";
@@ -262,8 +263,7 @@ namespace Visual_Music
 			stopwatch.Start();
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 			blendState = new BlendState();
-			videoFrame = new RenderTarget2D(GraphicsDevice, videoSize.X, videoSize.Y);
-
+			
 			blendState.AlphaDestinationBlend = Blend.DestinationAlpha;
 			//blendState.AlphaDestinationBlend = Blend.One;
 			blendState.AlphaSourceBlend = Blend.InverseDestinationAlpha;
@@ -295,7 +295,7 @@ namespace Visual_Music
 
 		public void update()
 		{
-			if (notes == null)
+			if (notes == null || isRenderingVideo)
 				return;
 			TimeSpan newTime = stopwatch.Elapsed;
 			deltaTimeS = (newTime - oldTime).getSecondsF();
@@ -611,23 +611,27 @@ namespace Visual_Music
 			//    MessageBox.Show("Start: " + noteStart + "    End: " + x + "\nPitch: "+songP.Y);
 			//}
 		}
+		public void toggleIdleUpdate()
+		{
+
+		}
 		public void renderVideo(string videoFilePath, RenderProgressForm progressForm, VideoExportForm options)
 		{
+
 			lock (renderLock)
 			{
-				//Visual_Music.TrackProps.Bgr = true;
+				isRenderingVideo = true;
+				Camera.InvertY = true;
 
 				VideoFormat videoFormat = new VideoFormat();
 				videoFormat.bitRate = 24000000;
 				videoFormat.fps = 30;
-				videoFormat.height = (uint)videoSize.Y;
-				videoFormat.width = (uint)videoSize.X;
+				Point videoFrameSize = options.Sphere ? new Point(256, 256 / (options.Stereo ? 1 : 2)) : options.Resolution;
+				videoFormat.height = (uint)videoFrameSize.Y;
+				videoFormat.width = (uint)videoFrameSize.X;
 				videoFormat.audioSampleRate = 48000;
 				//videoFormat.audioSampleRate = 44100;
 
-				//ulong bla = 4;
-				//Media.writeFrame(5, new uint[] { 0, 4 }, 0, ref bla, AudioOffset, false);
-				//Media.endVideoEnc();
 				if (!Media.beginVideoEnc(videoFilePath, videoFormat, true))
 				{
 					lock (progressForm.cancelLock)
@@ -636,10 +640,13 @@ namespace Visual_Music
 				}
 				else
 				{
-					//GraphicsDevice.SetRenderTarget(videoFrame);
+					RenderTarget2D renderTarget2d = new RenderTarget2D(GraphicsDevice, options.Resolution.X, options.Resolution.Y, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 8, RenderTargetUsage.PreserveContents);
+					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSize, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					uint[] frameData = new uint[videoFrameSize.X * videoFrameSize.Y];
+					uint[][] cubeMapData = new uint[6][];
+					for (int i = 0; i < 6; i++)
+						cubeMapData[i] = new uint[CmFaceSize * CmFaceSize];
 
-					//int frames = 1000;
-					uint[] frameData = new uint[videoSize.X * videoSize.Y]; //video size = rendertarget size
 					UInt64 frameDuration = 0;
 					UInt64 frameStart = 0;
 					int currentTempoEvent = 0;
@@ -648,34 +655,60 @@ namespace Visual_Music
 					const double startSongPosS = 0;
 					double songPosInTicks = 0;
 					double normSongPosBackup = normSongPos;
+
 					setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
 
 					while ((int)songPosInTicks < notes.SongLengthT && !progressForm.Cancel)
 					{
 						BeginDraw();
-						//lock (progressForm)
-						//progressForm.Progress = (double);
 						progressForm.updateProgress((int)(frameStart / 10000000));
-						GraphicsDevice.SetRenderTarget(videoFrame);
-						GraphicsDevice.Clear(Color.Transparent);
-						
-						drawSong(videoSize, (float)songPosInTicks / notes.SongLengthT);
-
-						GraphicsDevice.SetRenderTarget(null);
-						videoFrame.GetData<uint>(frameData);
-						for (uint i = 0; i < frameData.Length; i++)
+						if (options.Sphere)
 						{
-							//Swap r and b channels
-							uint c = frameData[i];
-							frameData[i] = ((c & 0xff) << 16) | (c & 0xff00) | ((c & 0xff0000) >> 16);
-
-							//Convert to spherical coordinates
-							if (options.Sphere)
+							for (int i = 0; i < 6; i++)
 							{
-
+								//if (i != 1)
+									//continue;
+								GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
+								Camera.CubeMapFace = i;
+								//GraphicsDevice.Clear(Color.Transparent);
+								GraphicsDevice.Clear(new Color((uint)i*10000));
+								drawSong(new Point(CmFaceSize, CmFaceSize), (float)songPosInTicks / notes.SongLengthT);
 							}
 						}
+						else
+						{
+							GraphicsDevice.SetRenderTarget(renderTarget2d);
+							GraphicsDevice.Clear(Color.Transparent);
+							drawSong(options.Resolution, (float)songPosInTicks / notes.SongLengthT);
+						}
 
+						GraphicsDevice.SetRenderTarget(null);
+						if (options.Sphere)
+						{
+							//Get data from all cubemap faces
+							for (int i = 0; i < 6; i++)
+							{
+								renderTargetCube.GetData<uint>((CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i), cubeMapData[i]);
+								//for (int j = 0; j < cubeMapData[i].Length; j++)
+									//cubeMapData[i][j] = (uint)(i * 16000000);
+							}
+							for (int y = 0; y < videoFrameSize.Y; y++)
+							{
+								for (int x = 0; x < videoFrameSize.X; x++)
+								{
+									float normX = 2.0f * x / videoFrameSize.X - 1.0f;
+									float normY = 2.0f * y / videoFrameSize.Y - 1.0f;
+									float theta = -normX * (float)Math.PI;
+									float phi = normY * (float)Math.PI / 2.0f;
+									//float phi = (float)Math.Asin(y);
+									Vector3 cmCoords = new Vector3((float)Math.Cos(phi) * (float)Math.Cos(theta), (float)Math.Sin(phi), (float)Math.Cos(phi) * (float)Math.Sin(theta));
+									frameData[y * videoFrameSize.X + x] = sampleCubeMap(cmCoords, cubeMapData, CmFaceSize);
+								}
+							}
+						}
+						else
+							renderTarget2d.GetData<uint>(frameData);
+						
 						if (!Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset, false))
 						{
 							lock (progressForm.cancelLock)
@@ -693,9 +726,92 @@ namespace Visual_Music
 				}
 				GraphicsDevice.SetRenderTarget(null);
 				Media.endVideoEnc();
-				Visual_Music.TrackProps.Bgr = false;
+				Camera.CubeMapFace = -1;
+				Camera.InvertY = false;
+				isRenderingVideo = false;
 			}
 		}
+
+		uint sampleCubeMap(Vector3 coords, uint[][] cmFaces, int faceSize)
+		{
+			int face;
+			float absX = Math.Abs(coords.X);
+			float absY = Math.Abs(coords.Y);
+			float absZ = Math.Abs(coords.Z);
+
+			bool isXPositive = coords.X > 0;
+			bool isYPositive = coords.Y > 0;
+			bool isZPositive = coords.Z > 0;
+
+			float maxAxis, uc, vc;
+			
+			// POSITIVE X
+			if (isXPositive && absX >= absY && absX >= absZ)
+			{
+				// u (0 to 1) goes from +z to -z
+				// v (0 to 1) goes from -y to +y
+				maxAxis = absX;
+				uc = -coords.Z;
+				vc = coords.Y;
+				face = 0;
+			}
+			// NEGATIVE X
+			else if (!isXPositive && absX >= absY && absX >= absZ)
+			{
+				// u (0 to 1) goes from -z to +z
+				// v (0 to 1) goes from -y to +y
+				maxAxis = absX;
+				uc = coords.Z;
+				vc = coords.Y;
+				face = 1;
+			}
+			// POSITIVE Y
+			else if (isYPositive && absY >= absX && absY >= absZ)
+			{
+				// u (0 to 1) goes from -x to +x
+				// v (0 to 1) goes from +z to -z
+				maxAxis = absY;
+				uc = coords.X;
+				vc = -coords.Z;
+				face = 2;
+			}
+			// NEGATIVE Y
+			else if (!isYPositive && absY >= absX && absY >= absZ)
+			{
+				// u (0 to 1) goes from -x to +x
+				// v (0 to 1) goes from -z to +z
+				maxAxis = absY;
+				uc = coords.X;
+				vc = coords.Z;
+				face = 3;
+			}
+			// POSITIVE Z
+			else if (isZPositive && absZ >= absX && absZ >= absY)
+			{
+				// u (0 to 1) goes from -x to +x
+				// v (0 to 1) goes from -y to +y
+				maxAxis = absZ;
+				uc = coords.X;
+				vc = coords.Y;
+				face = 4;
+			}
+			// NEGATIVE Z
+			else //if (!isZPositive && absZ >= absX && absZ >= absY)
+			{
+				// u (0 to 1) goes from +x to -x
+				// v (0 to 1) goes from -y to +y
+				maxAxis = absZ;
+				uc = -coords.X;
+				vc = coords.Y;
+				face = 5;
+			}
+
+			// Convert range from -1 to 1 to 0 to cubemap size
+			int u = (int)(0.5f * (uc / maxAxis + 1.0f) * (faceSize-1) );
+			int v = (int)(0.5f * (vc / maxAxis + 1.0f) * (faceSize-1) );
+			return cmFaces[face][v * faceSize + u];
+		}
+
 		double secondsToTicks(double seconds)
 		{
 			int currentTempoEvent = 0;
