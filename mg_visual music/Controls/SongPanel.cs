@@ -82,7 +82,6 @@ namespace Visual_Music
 	public class SongPanel : GraphicsDeviceControl, ISerializable
 	{
 		bool isRenderingVideo = false;
-		public const int CmFaceSize = 1080;
 		public Camera Camera { get; set; } = new Camera();
 		public Camera DefaultCamera { get; } = new Camera();
 		ContentManager content;
@@ -626,7 +625,7 @@ namespace Visual_Music
 				VideoFormat videoFormat = new VideoFormat();
 				videoFormat.bitRate = 24000000;
 				videoFormat.fps = 30;
-				Point videoFrameSize = options.Sphere ? new Point(256, 256 / (options.Stereo ? 1 : 2)) : options.Resolution;
+				Point videoFrameSize = options.Sphere ? new Point(2048, 2048 / (options.Stereo ? 1 : 2)) : options.Resolution;
 				videoFormat.height = (uint)videoFrameSize.Y;
 				videoFormat.width = (uint)videoFrameSize.X;
 				videoFormat.audioSampleRate = 48000;
@@ -641,11 +640,12 @@ namespace Visual_Music
 				else
 				{
 					RenderTarget2D renderTarget2d = new RenderTarget2D(GraphicsDevice, options.Resolution.X, options.Resolution.Y, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 8, RenderTargetUsage.PreserveContents);
-					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSize, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					const int CmFaceSide = 1080;
+					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 					uint[] frameData = new uint[videoFrameSize.X * videoFrameSize.Y];
 					uint[][] cubeMapData = new uint[6][];
 					for (int i = 0; i < 6; i++)
-						cubeMapData[i] = new uint[CmFaceSize * CmFaceSize];
+						cubeMapData[i] = new uint[CmFaceSide * CmFaceSide];
 
 					UInt64 frameDuration = 0;
 					UInt64 frameStart = 0;
@@ -672,7 +672,7 @@ namespace Visual_Music
 								Camera.CubeMapFace = i;
 								//GraphicsDevice.Clear(Color.Transparent);
 								GraphicsDevice.Clear(new Color((uint)i*10000));
-								drawSong(new Point(CmFaceSize, CmFaceSize), (float)songPosInTicks / notes.SongLengthT);
+								drawSong(new Point(CmFaceSide, CmFaceSide), (float)songPosInTicks / notes.SongLengthT);
 							}
 						}
 						else
@@ -683,33 +683,21 @@ namespace Visual_Music
 						}
 
 						GraphicsDevice.SetRenderTarget(null);
+							
+						bool b;
 						if (options.Sphere)
 						{
 							//Get data from all cubemap faces
 							for (int i = 0; i < 6; i++)
-							{
 								renderTargetCube.GetData<uint>((CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i), cubeMapData[i]);
-								//for (int j = 0; j < cubeMapData[i].Length; j++)
-									//cubeMapData[i][j] = (uint)(i * 16000000);
-							}
-							for (int y = 0; y < videoFrameSize.Y; y++)
-							{
-								for (int x = 0; x < videoFrameSize.X; x++)
-								{
-									float normX = 2.0f * x / videoFrameSize.X - 1.0f;
-									float normY = 2.0f * y / videoFrameSize.Y - 1.0f;
-									float theta = -normX * (float)Math.PI;
-									float phi = normY * (float)Math.PI / 2.0f;
-									//float phi = (float)Math.Asin(y);
-									Vector3 cmCoords = new Vector3((float)Math.Cos(phi) * (float)Math.Cos(theta), (float)Math.Sin(phi), (float)Math.Cos(phi) * (float)Math.Sin(theta));
-									frameData[y * videoFrameSize.X + x] = sampleCubeMap(cmCoords, cubeMapData, CmFaceSize);
-								}
-							}
+							b = Media.writeFrameCube(frameData, frameStart, ref frameDuration, AudioOffset, false, cubeMapData[0], cubeMapData[1], cubeMapData[2], cubeMapData[3], cubeMapData[4], cubeMapData[5], CmFaceSide, videoFrameSize.X, videoFrameSize.Y);
 						}
 						else
+						{
 							renderTarget2d.GetData<uint>(frameData);
-						
-						if (!Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset, false))
+							b = Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset, false);
+						}
+						if (!b)
 						{
 							lock (progressForm.cancelLock)
 								progressForm.Cancel = true;
@@ -732,7 +720,7 @@ namespace Visual_Music
 			}
 		}
 
-		uint sampleCubeMap(Vector3 coords, uint[][] cmFaces, int faceSize)
+		uint sampleCubeMap(Vector3 coords, uint[][] cmFaces, int faceSide)
 		{
 			int face;
 			float absX = Math.Abs(coords.X);
@@ -807,9 +795,9 @@ namespace Visual_Music
 			}
 
 			// Convert range from -1 to 1 to 0 to cubemap size
-			int u = (int)(0.5f * (uc / maxAxis + 1.0f) * (faceSize-1) );
-			int v = (int)(0.5f * (vc / maxAxis + 1.0f) * (faceSize-1) );
-			return cmFaces[face][v * faceSize + u];
+			int u = (int)(0.5f * (uc / maxAxis + 1.0f) * (faceSide-1) );
+			int v = (int)(0.5f * (vc / maxAxis + 1.0f) * (faceSide-1) );
+			return cmFaces[face][v * faceSide + u];
 		}
 
 		double secondsToTicks(double seconds)

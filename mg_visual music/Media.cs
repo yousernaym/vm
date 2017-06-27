@@ -36,6 +36,8 @@ namespace Visual_Music
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool beginVideoEnc(string outputFile, VideoFormat vidFmt, bool _bVideo);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
+		public static extern bool writeFrameCube(UInt32[] videoFrameBuffer, UInt64 rtStart, ref UInt64 rtDuration, double audioOffset, bool bFlush, UInt32[] cmFace0, UInt32[] cmFace1, UInt32[] cmFace2, UInt32[] cmFace3, UInt32[] cmFace4, UInt32[] cmFace5, int cmFaceSide, int videFrameX, int videoFrameY);
+		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool writeFrame(UInt32[] videoFrameBuffer, UInt64 rtStart, ref UInt64 rtDuration, double audioOffset, bool bFlush);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern void endVideoEnc();
