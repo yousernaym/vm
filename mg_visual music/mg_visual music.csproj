@@ -164,6 +164,7 @@
     <Compile Include="Controls\TbSlider.designer.cs">
       <DependentUpon>TbSlider.cs</DependentUpon>
     </Compile>
+    <Compile Include="Quad.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TrackProps.cs" />
     <Compile Include="Forms\BaseDialog.cs">
@@ -200,6 +201,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Bar.fx" />
+    <Content Include="Content\CubeToPlane.fx" />
     <Content Include="Content\Line.fx" />
     <Content Include="Icon.ico" />
     <Content Include="todo.txt" />

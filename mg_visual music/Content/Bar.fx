@@ -1,5 +1,4 @@
 #include "notestyle.fx"
-// Input parameters
 
 struct VSInput
 {

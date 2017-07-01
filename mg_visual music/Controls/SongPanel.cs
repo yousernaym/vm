@@ -19,19 +19,19 @@ namespace Visual_Music
 {
 	using GdiPoint = System.Drawing.Point;
 	using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
-    using WinKeys = System.Windows.Forms.Keys;
-    public enum SourceSongType { Midi,Mod,Sid };
+	using WinKeys = System.Windows.Forms.Keys;
+	public enum SourceSongType { Midi, Mod, Sid };
 
-    public class SongDrawProps
+	public class SongDrawProps
 	{
-        public int songPosT;
+		public int songPosT;
 		public float songPosS;
 		public float noteHeight;
 		public int yMargin;
 		public Point viewportSize;
 		public int viewWidthT;
 		public Midi.Song song;
-        public int minPitch;
+		public int minPitch;
 
 		public Point getScreenPos(int timeT, int pitch)
 		{
@@ -70,7 +70,7 @@ namespace Visual_Music
 		{
 			return (float)(song.SongLengthT * viewportSize.X) / viewWidthT;
 		}
-		
+
 		public float getCurveScreenY(float x, Curve curve)
 		{
 			float pitch = curve.Evaluate((float)getSongPosT(x));
@@ -81,13 +81,16 @@ namespace Visual_Music
 	[Serializable()]
 	public class SongPanel : GraphicsDeviceControl, ISerializable
 	{
+		Quad quad;
 		bool isRenderingVideo = false;
 		public Camera Camera { get; set; } = new Camera();
 		public Camera DefaultCamera { get; } = new Camera();
 		ContentManager content;
 		public ContentManager Content { get { return content; } }
 		bool forceSimpleDrawMode = false;
-		public bool ForceSimpleDrawMode { get =>forceSimpleDrawMode;
+		public bool ForceSimpleDrawMode
+		{
+			get => forceSimpleDrawMode;
 			set
 			{
 				forceSimpleDrawMode = value;
@@ -95,89 +98,89 @@ namespace Visual_Music
 			}
 		}
 		MixdownType mixdownType;
-		public MixdownType MixdownType { get => mixdownType; set => mixdownType = value; } 
+		public MixdownType MixdownType { get => mixdownType; set => mixdownType = value; }
 		Texture2D regionSelectTexture;
-        float normPitchMargin = 1 / 50.0f;
-        bool bPlayback = false;
-        public bool IsPlaying
-        {
-            get { return bPlayback; }
-        }
-        bool bAudioPlayback = false;
-        TimeSpan oldTime = new TimeSpan(0);
-        TimeSpan pbStartSysTime = new TimeSpan(0);
-        double pbStartSongTimeS;
-        Stopwatch stopwatch = new Stopwatch();
+		float normPitchMargin = 1 / 50.0f;
+		bool bPlayback = false;
+		public bool IsPlaying
+		{
+			get { return bPlayback; }
+		}
+		bool bAudioPlayback = false;
+		TimeSpan oldTime = new TimeSpan(0);
+		TimeSpan pbStartSysTime = new TimeSpan(0);
+		double pbStartSongTimeS;
+		Stopwatch stopwatch = new Stopwatch();
 		//TimeSpan deltaTime;
 		double deltaTimeS;
 		double renderInterval = 0.0001;
 		bool leftMbPressed = false;
 		//public bool RightMbPressed { get; set; }
 		double scrollCenter = 0;
-        bool selectingRegion = false;
+		bool selectingRegion = false;
 		bool mergeRegionSelection = false;
 		bool mousePosScrollSong = false;
 		Rectangle selectedSongRegion;
-        Rectangle selectedScreenRegion;
-        public float NormMouseX { get; set; }
-        public float NormMouseY { get; set; }
-        SpriteBatch spriteBatch;
-        public SpriteBatch SpriteBatch
-        {
-            get { return spriteBatch; }
-            //set { spriteBatch = value; }
-        }
+		Rectangle selectedScreenRegion;
+		public float NormMouseX { get; set; }
+		public float NormMouseY { get; set; }
+		SpriteBatch spriteBatch;
+		public SpriteBatch SpriteBatch
+		{
+			get { return spriteBatch; }
+			//set { spriteBatch = value; }
+		}
 
-        BlendState blendState;
-        public BlendState BlendState
-        {
-            get { return blendState; }
-            //set { blendState = value; }
-        }
-        internal TrackProps GlobalTrackProps
-        {
-            get { return trackProps[0]; }
-            set { trackProps[0] = value; }
-        }
-        List<TrackProps> trackProps;
-        internal List<TrackProps> TrackProps
-        {
-            get { return trackProps; }
-            set { trackProps = value; }
-        }
+		BlendState blendState;
+		public BlendState BlendState
+		{
+			get { return blendState; }
+			//set { blendState = value; }
+		}
+		internal TrackProps GlobalTrackProps
+		{
+			get { return trackProps[0]; }
+			set { trackProps[0] = value; }
+		}
+		List<TrackProps> trackProps;
+		internal List<TrackProps> TrackProps
+		{
+			get { return trackProps; }
+			set { trackProps = value; }
+		}
 
-        Midi.Song notes;
-        public Midi.Song Notes { get { return notes; } }
-        string noteFilePath = "";
-        public string NoteFilePath
-        {
-            get { return noteFilePath; }
-            set { noteFilePath = value; }
-            //get { return ((Form1)Parent).sourceFileForm.NoteFilePath; }
-            //set { ((Form1)Parent).sourceFileForm.NoteFilePath = value; }
-        }
-        string audioFilePath = "";
-        public string AudioFilePath
-        {
-            get { return mixdownType == MixdownType.None ? audioFilePath : ""; }
-            set { audioFilePath = value; }
-            //get { return ((Form1)Parent).sourceFileForm.AudioFilePath; }
-            //set { ((Form1)Parent).sourceFileForm.AudioFilePath = value; }
-        }
-        bool insTrack;
-        public bool InsTrack
-        {
-            get { return insTrack; }
-        }
+		Midi.Song notes;
+		public Midi.Song Notes { get { return notes; } }
+		string noteFilePath = "";
+		public string NoteFilePath
+		{
+			get { return noteFilePath; }
+			set { noteFilePath = value; }
+			//get { return ((Form1)Parent).sourceFileForm.NoteFilePath; }
+			//set { ((Form1)Parent).sourceFileForm.NoteFilePath = value; }
+		}
+		string audioFilePath = "";
+		public string AudioFilePath
+		{
+			get { return mixdownType == MixdownType.None ? audioFilePath : ""; }
+			set { audioFilePath = value; }
+			//get { return ((Form1)Parent).sourceFileForm.AudioFilePath; }
+			//set { ((Form1)Parent).sourceFileForm.AudioFilePath = value; }
+		}
+		bool insTrack;
+		public bool InsTrack
+		{
+			get { return insTrack; }
+		}
 
-        SourceSongType sourceSongType;
-        public SourceSongType SourceSongType { get => sourceSongType; set => sourceSongType = value; }
+		SourceSongType sourceSongType;
+		public SourceSongType SourceSongType { get => sourceSongType; set => sourceSongType = value; }
 		Point videoSize = new Point(1920, 1080);
 		double desiredSongLengthS = 0; //Desired song length in seconds when importing note file. 0 = not specified. Currently not used.
 		public int SongLengthT { get { return notes != null ? notes.SongLengthT : 0; } } //Song length in ticks
-        public int SongPosT { get { return (int)(normSongPos * SongLengthT); } } //Current song position at center of screen
-        double normSongPos; //Song position normalized to [0,1]
-        public double NormSongPos
+		public int SongPosT { get { return (int)(normSongPos * SongLengthT); } } //Current song position at center of screen
+		double normSongPos; //Song position normalized to [0,1]
+		public double NormSongPos
 		{
 			get => normSongPos;
 			set
@@ -185,7 +188,7 @@ namespace Visual_Music
 				double oldPos = normSongPos;
 				normSongPos = value;
 				if (oldPos != value)
-				{ 
+				{
 					Invalidate();
 					if (OnSongPosChanged != null)
 						OnSongPosChanged();
@@ -195,11 +198,11 @@ namespace Visual_Music
 		public delegate void Delegate_songPosChanged();
 		public Delegate_songPosChanged OnSongPosChanged { get; set; }
 		const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen
-		float viewWidthQn = DefaultViewWidthQn; 
-		
-        public float ViewWidthQn
+		float viewWidthQn = DefaultViewWidthQn;
+
+		public float ViewWidthQn
 		{
-			get {return viewWidthQn;}
+			get { return viewWidthQn; }
 			set
 			{
 				viewWidthQn = value;
@@ -207,30 +210,30 @@ namespace Visual_Music
 					viewWidthT = (int)(viewWidthQn * notes.TicksPerBeat);
 			}
 		}
-    
+
 		int viewWidthT; ////Number of ticks that fits on screen
 		public int ViewWidthT { get => viewWidthT; }
-        public double AudioOffset { get; set; }
-        public int MinPitch { get; set; } 
-        public int MaxPitch { get; set; }
-        int NumPitches { get { return MaxPitch - MinPitch + 1; } }
-		
+		public double AudioOffset { get; set; }
+		public int MinPitch { get; set; }
+		public int MaxPitch { get; set; }
+		int NumPitches { get { return MaxPitch - MinPitch + 1; } }
+
 		public SongPanel()
 		{
 		}
-		public SongPanel(SerializationInfo info, StreamingContext ctxt):base()
+		public SongPanel(SerializationInfo info, StreamingContext ctxt) : base()
 		{
-            SongFormat.readVersion = (int)info.GetValue("version", typeof(int));
-            noteFilePath = (string)info.GetValue("noteFilePath", typeof(string));
+			SongFormat.readVersion = (int)info.GetValue("version", typeof(int));
+			noteFilePath = (string)info.GetValue("noteFilePath", typeof(string));
 			insTrack = (bool)info.GetValue("insTrack", typeof(bool));
 			mixdownType = (MixdownType)info.GetValue("mixdownType", typeof(MixdownType));
 			audioFilePath = (string)info.GetValue("audioFilePath", typeof(string));
 			trackProps = (List<TrackProps>)info.GetValue("trackProps", typeof(List<TrackProps>));
-   			ViewWidthQn = (float)info.GetValue("qn_viewWidth", typeof(float));
+			ViewWidthQn = (float)info.GetValue("qn_viewWidth", typeof(float));
 			AudioOffset = (double)info.GetValue("audioOffset", typeof(double));
 			MaxPitch = (int)info.GetValue("maxPitch", typeof(int));
 			MinPitch = (int)info.GetValue("minPitch", typeof(int));
-            sourceSongType = (SourceSongType)info.GetValue("sourceSongType", typeof(SourceSongType));
+			sourceSongType = (SourceSongType)info.GetValue("sourceSongType", typeof(SourceSongType));
 			ImportNotesWithAudioForm.TpartyApp = info.GetString("tpartyApp");
 			ImportNotesWithAudioForm.TpartyArgs = info.GetString("tpartyArgs");
 			ImportNotesWithAudioForm.TpartyOutputDir = info.GetString("tpartyOutputDir");
@@ -239,17 +242,17 @@ namespace Visual_Music
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
-            info.AddValue("version", SongFormat.writeVersion);
-            info.AddValue("noteFilePath", noteFilePath);
+			info.AddValue("version", SongFormat.writeVersion);
+			info.AddValue("noteFilePath", noteFilePath);
 			info.AddValue("audioFilePath", audioFilePath);
 			info.AddValue("insTrack", insTrack);
 			info.AddValue("mixdownType", mixdownType);
-            info.AddValue("trackProps", trackProps);
-            info.AddValue("qn_viewWidth", ViewWidthQn);
+			info.AddValue("trackProps", trackProps);
+			info.AddValue("qn_viewWidth", ViewWidthQn);
 			info.AddValue("audioOffset", AudioOffset);
 			info.AddValue("maxPitch", MaxPitch);
 			info.AddValue("minPitch", MinPitch);
-            info.AddValue("sourceSongType", sourceSongType);
+			info.AddValue("sourceSongType", sourceSongType);
 			info.AddValue("tpartyApp", ImportNotesWithAudioForm.TpartyApp);
 			info.AddValue("tpartyArgs", ImportNotesWithAudioForm.TpartyArgs);
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
@@ -258,11 +261,11 @@ namespace Visual_Music
 		}
 
 		protected override void Initialize()
-        {
+		{
 			stopwatch.Start();
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 			blendState = new BlendState();
-			
+
 			blendState.AlphaDestinationBlend = Blend.DestinationAlpha;
 			//blendState.AlphaDestinationBlend = Blend.One;
 			blendState.AlphaSourceBlend = Blend.InverseDestinationAlpha;
@@ -273,10 +276,10 @@ namespace Visual_Music
 			blendState.AlphaBlendFunction = BlendFunction.Add;
 			blendState.ColorBlendFunction = BlendFunction.Add;
 
-            content = new ContentManager(Services, "Content");
-            NoteStyle.sInitAllStyles(this);
+			content = new ContentManager(Services, "Content");
+			NoteStyle.sInitAllStyles(this);
 
-            regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
+			regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
 			regionSelectTexture.SetData(new[] { Color.White });
 
 			if (!string.IsNullOrWhiteSpace(noteFilePath))
@@ -290,6 +293,7 @@ namespace Visual_Music
 			}
 			Camera.SongPanel = this;
 			DefaultCamera.SongPanel = this;
+			quad = new Quad(this);
 		}
 
 		public void update()
@@ -299,7 +303,7 @@ namespace Visual_Music
 			TimeSpan newTime = stopwatch.Elapsed;
 			deltaTimeS = (newTime - oldTime).getSecondsF();
 			//if (deltaTimeS < renderInterval)
-				//return;
+			//return;
 
 			Camera.update((float)deltaTimeS);
 			oldTime = newTime;
@@ -343,14 +347,14 @@ namespace Visual_Music
 		}
 
 		protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-            }
-            base.Dispose(disposing);
-        }
+		{
+			if (disposing)
+			{
+			}
+			base.Dispose(disposing);
+		}
 		protected override void Draw()
-        {
+		{
 			GraphicsDevice.Clear(Color.Transparent);
 			if (selectingRegion)
 			{
@@ -426,7 +430,7 @@ namespace Visual_Music
 		}
 		int screenPosToSongPos(float normScreenPos)
 		{
-            return (int)(normSongPos * notes.SongLengthT + (double)normScreenPos * viewWidthT * 0.5f);
+			return (int)(normSongPos * notes.SongLengthT + (double)normScreenPos * viewWidthT * 0.5f);
 		}
 		Point getVisibleSongPortionT(double normPos)
 		{
@@ -461,29 +465,29 @@ namespace Visual_Music
 			}
 			else
 				startTrack = trackProps.Count; //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props at current song's track count and up.
-			
+
 			for (int i = 0; i < numTracks; i++)
 			{
 				if (i < startTrack) //Just update notes, not visual props. Also reload note style effects in case a project file is being loaded, causing songPanel to be recreated with a new grapics device.
 				{
 					trackProps[i].MidiTrack = notes.Tracks[trackProps[i].TrackNumber];
 					trackProps[i].createCurve();
-                    trackProps[i].loadNoteStyleFx();
-                }
+					trackProps[i].loadNoteStyleFx();
+				}
 				else //New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
 				{
 					TrackProps props = new Visual_Music.TrackProps(i, numTracks, notes);
 					trackProps.Add(props);
-				}				
+				}
 			}
 			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra track props.
 				trackProps.RemoveRange(numTracks, startTrack - numTracks);
-            //Reload all notestyle fx files even if no new track props were created, since there is the possibility that songPanel was recreated with a new graphics device.
-            //foreach (Visual_Music.TrackProps tp in trackProps)
-               // tp.loadNoteStyleFx();
+			//Reload all notestyle fx files even if no new track props were created, since there is the possibility that songPanel was recreated with a new graphics device.
+			//foreach (Visual_Music.TrackProps tp in trackProps)
+			// tp.loadNoteStyleFx();
 
 		}
-		
+
 		public void drawSong(Point viewportSize, double normPos)
 		{
 			if (notes == null)
@@ -492,14 +496,14 @@ namespace Visual_Music
 			SongDrawProps songDrawProps = new SongDrawProps();
 			songDrawProps.yMargin = (int)(normPitchMargin * viewportSize.Y);
 			songDrawProps.noteHeight = (float)(viewportSize.Y - songDrawProps.yMargin * 2) / (NumPitches);
-            songDrawProps.songPosT = SongPosT;
+			songDrawProps.songPosT = SongPosT;
 			songDrawProps.songPosS = (float)getSongPosInSeconds();
 			songDrawProps.viewportSize = viewportSize;
 			songDrawProps.viewWidthT = viewWidthT;
 			songDrawProps.song = notes;
-            songDrawProps.minPitch = MinPitch;
+			songDrawProps.minPitch = MinPitch;
 
-			for (int t=notes.Tracks.Count-1;t>=0;t--)
+			for (int t = notes.Tracks.Count - 1; t >= 0; t--)
 			{
 				trackProps[t].drawTrack(songDrawProps, GlobalTrackProps, selectingRegion || ForceSimpleDrawMode);
 			}
@@ -518,7 +522,7 @@ namespace Visual_Music
 		{
 			Invalidate();
 			stopPlayback();
-				
+
 			noteFilePath = file;
 			insTrack = _insTrack;
 			int minPitch = 0, maxPitch = 0;
@@ -556,10 +560,10 @@ namespace Visual_Music
 			}
 
 			notes.createNoteBsp();
-				
+
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
 			createTrackProps(notes.Tracks.Count, eraseCurrent);
-		
+
 			return true;
 		}
 		public bool openAudioFile(string file, MixdownType _mixdownType)
@@ -625,7 +629,7 @@ namespace Visual_Music
 				VideoFormat videoFormat = new VideoFormat();
 				videoFormat.bitRate = 24000000;
 				videoFormat.fps = 30;
-				Point videoFrameSize = options.Sphere ? new Point(2048, 2048 / (options.Stereo ? 1 : 2)) : options.Resolution;
+				Point videoFrameSize = options.Sphere ? new Point(256, 256/ (options.Stereo ? 1 : 2)) : options.Resolution;
 				videoFormat.height = (uint)videoFrameSize.Y;
 				videoFormat.width = (uint)videoFrameSize.X;
 				videoFormat.audioSampleRate = 48000;
@@ -639,13 +643,17 @@ namespace Visual_Music
 				}
 				else
 				{
-					RenderTarget2D renderTarget2d = new RenderTarget2D(GraphicsDevice, options.Resolution.X, options.Resolution.Y, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 8, RenderTargetUsage.PreserveContents);
+					RenderTarget2D renderTarget2d = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 8, RenderTargetUsage.PreserveContents);
 					const int CmFaceSide = 1080;
 					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 					uint[] frameData = new uint[videoFrameSize.X * videoFrameSize.Y];
 					uint[][] cubeMapData = new uint[6][];
 					for (int i = 0; i < 6; i++)
 						cubeMapData[i] = new uint[CmFaceSide * CmFaceSide];
+
+					Effect cubeToPlaneFx = Content.Load<Effect>("CubeToPlane");
+					cubeToPlaneFx.Parameters["CubeMap"].SetValue(renderTargetCube);
+					cubeToPlaneFx.Parameters["Viewport"].SetValue(new Vector2(videoFrameSize.X, videoFrameSize.Y));
 
 					UInt64 frameDuration = 0;
 					UInt64 frameStart = 0;
@@ -667,11 +675,11 @@ namespace Visual_Music
 							for (int i = 0; i < 6; i++)
 							{
 								//if (i != 1)
-									//continue;
+								//continue;
 								GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
 								Camera.CubeMapFace = i;
-								//GraphicsDevice.Clear(Color.Transparent);
-								GraphicsDevice.Clear(new Color((uint)i*10000));
+								GraphicsDevice.Clear(Color.Transparent);
+								//GraphicsDevice.Clear(new Color((uint)i * 10000));
 								drawSong(new Point(CmFaceSide, CmFaceSide), (float)songPosInTicks / notes.SongLengthT);
 							}
 						}
@@ -683,20 +691,22 @@ namespace Visual_Music
 						}
 
 						GraphicsDevice.SetRenderTarget(null);
-							
+
 						bool b;
 						if (options.Sphere)
 						{
+							GraphicsDevice.SetRenderTarget(renderTarget2d);
+							cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();
+							quad.draw();
+							
 							//Get data from all cubemap faces
-							for (int i = 0; i < 6; i++)
-								renderTargetCube.GetData<uint>((CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i), cubeMapData[i]);
-							b = Media.writeFrameCube(frameData, frameStart, ref frameDuration, AudioOffset, false, cubeMapData[0], cubeMapData[1], cubeMapData[2], cubeMapData[3], cubeMapData[4], cubeMapData[5], CmFaceSide, videoFrameSize.X, videoFrameSize.Y);
+							//for (int i = 0; i < 6; i++)
+							//renderTargetCube.GetData<uint>((CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i), cubeMapData[i]);
+							//b = Media.writeFrameCube(frameData, frameStart, ref frameDuration, AudioOffset, false, cubeMapData[0], cubeMapData[1], cubeMapData[2], cubeMapData[3], cubeMapData[4], cubeMapData[5], CmFaceSide, videoFrameSize.X, videoFrameSize.Y);
 						}
-						else
-						{
-							renderTarget2d.GetData<uint>(frameData);
-							b = Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset, false);
-						}
+
+						renderTarget2d.GetData<uint>(frameData);
+						b = Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset, false);
 						if (!b)
 						{
 							lock (progressForm.cancelLock)
@@ -711,6 +721,7 @@ namespace Visual_Music
 						//EndDraw();
 					}
 					normSongPos = normSongPosBackup;
+					cubeToPlaneFx.Dispose();
 				}
 				GraphicsDevice.SetRenderTarget(null);
 				Media.endVideoEnc();
@@ -732,7 +743,7 @@ namespace Visual_Music
 			bool isZPositive = coords.Z > 0;
 
 			float maxAxis, uc, vc;
-			
+
 			// POSITIVE X
 			if (isXPositive && absX >= absY && absX >= absZ)
 			{
@@ -795,8 +806,8 @@ namespace Visual_Music
 			}
 
 			// Convert range from -1 to 1 to 0 to cubemap size
-			int u = (int)(0.5f * (uc / maxAxis + 1.0f) * (faceSide-1) );
-			int v = (int)(0.5f * (vc / maxAxis + 1.0f) * (faceSide-1) );
+			int u = (int)(0.5f * (uc / maxAxis + 1.0f) * (faceSide - 1));
+			int v = (int)(0.5f * (vc / maxAxis + 1.0f) * (faceSide - 1));
 			return cmFaces[face][v * faceSide + u];
 		}
 
@@ -821,7 +832,7 @@ namespace Visual_Music
 		}
 		void setSongPosInSeconds(ref int currentTempoEvent, ref double currentTimeT, ref double currentTimeS, double newTimeS, bool updateScreen)
 		{
-			int nextTempoEvent = currentTempoEvent; 
+			int nextTempoEvent = currentTempoEvent;
 			bool bLastTempoEvent = false;
 			while ((float)currentTimeS < (float)newTimeS)
 			{
@@ -835,14 +846,14 @@ namespace Visual_Music
 						nextTempoEvent++;
 					else
 						bLastTempoEvent = true;
-					
+
 					double nextTempoTimeS = ((double)notes.TempoEvents[nextTempoEvent].Time - currentTimeT) / (notes.TicksPerBeat * currentBps) + (double)currentTimeS;
 					nextTimeStepS = nextTempoTimeS;
 					if (nextTimeStepS > newTimeS || nextTimeStepS < currentTimeS || nextTimeStepS == currentTimeS && bLastTempoEvent)
 						nextTimeStepS = newTimeS; //always causes loop to exit
 					else
 						currentTempoEvent = nextTempoEvent;
-				}			
+				}
 				currentTimeT += (nextTimeStepS - currentTimeS) * currentBps * notes.TicksPerBeat;
 				currentTimeS = nextTimeStepS;
 			}
@@ -994,7 +1005,7 @@ namespace Visual_Music
 			else
 				rgb = new Color((float)r, (float)g, (float)b, (float)1);
 			//rgb *= a;
-			rgb.A = (byte)(a*255);
+			rgb.A = (byte)(a * 255);
 
 			return rgb;
 		}
@@ -1005,7 +1016,7 @@ namespace Visual_Music
 		//    props.color = trackProps[track].getColor(hilited, GlobalTrackProps, true);
 		//    return props;
 		//}
-		
+
 		public void updateTimeStamp()
 		{
 			oldTime = stopwatch.Elapsed;
@@ -1015,16 +1026,16 @@ namespace Visual_Music
 			foreach (int index in indices)
 				trackProps[index].resetProps();
 		}
-        protected override void OnResize(EventArgs e)
-        {
-            Invalidate();
-        }
+		protected override void OnResize(EventArgs e)
+		{
+			Invalidate();
+		}
 
 		protected override void OnMouseDown(MouseEventArgs e)
-        {
-            base.OnMouseDown(e);
-            if (notes == null)
-                return;
+		{
+			base.OnMouseDown(e);
+			if (notes == null)
+				return;
 			if (e.Button == MouseButtons.Left)
 			{
 				leftMbPressed = true;
@@ -1041,9 +1052,9 @@ namespace Visual_Music
 			}
 
 		}
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
+		protected override void OnMouseUp(MouseEventArgs e)
+		{
+			base.OnMouseUp(e);
 			if (e.Button == MouseButtons.Left)
 			{
 				leftMbPressed = false;
@@ -1052,12 +1063,12 @@ namespace Visual_Music
 			if (e.Button == MouseButtons.Right)
 				mousePosScrollSong = false;
 		}
-    }
+	}
 
-    static class SongFormat
-    {
-        public const int writeVersion = 1;
-        public static int readVersion; 
-    }
+	static class SongFormat
+	{
+		public const int writeVersion = 1;
+		public static int readVersion;
+	}
 }
 
