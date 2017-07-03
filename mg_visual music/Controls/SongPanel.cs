@@ -626,13 +626,14 @@ namespace Visual_Music
 				isRenderingVideo = true;
 				Camera.InvertY = true;
 
-				VideoFormat videoFormat = new VideoFormat();
-				videoFormat.bitRate = 24000000;
+				Point videoFrameSize = options.Sphere ? new Point(2048, 2048 / (options.Stereo ? 1 : 2)) : options.Resolution;
+				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
+				//videoFormat.bitRate = 160000000;
 				videoFormat.fps = 30;
-				Point videoFrameSize = options.Sphere ? new Point(256, 256/ (options.Stereo ? 1 : 2)) : options.Resolution;
-				videoFormat.height = (uint)videoFrameSize.Y;
-				videoFormat.width = (uint)videoFrameSize.X;
-				videoFormat.audioSampleRate = 48000;
+				//videoFormat.height = (uint)videoFrameSize.Y;
+				//videoFormat.width = (uint)videoFrameSize.X;
+				videoFormat.aspectNumerator = 1;
+				//videoFormat.audioSampleRate = 48000;
 				//videoFormat.audioSampleRate = 44100;
 
 				if (!Media.beginVideoEnc(videoFilePath, videoFormat, true))
@@ -668,18 +669,15 @@ namespace Visual_Music
 
 					while ((int)songPosInTicks < notes.SongLengthT && !progressForm.Cancel)
 					{
-						BeginDraw();
+						//BeginDraw();
 						progressForm.updateProgress((int)(frameStart / 10000000));
 						if (options.Sphere)
 						{
 							for (int i = 0; i < 6; i++)
 							{
-								//if (i != 1)
-								//continue;
 								GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
 								Camera.CubeMapFace = i;
 								GraphicsDevice.Clear(Color.Transparent);
-								//GraphicsDevice.Clear(new Color((uint)i * 10000));
 								drawSong(new Point(CmFaceSide, CmFaceSide), (float)songPosInTicks / notes.SongLengthT);
 							}
 						}
@@ -706,7 +704,7 @@ namespace Visual_Music
 						}
 
 						renderTarget2d.GetData<uint>(frameData);
-						b = Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset, false);
+						b = Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset);
 						if (!b)
 						{
 							lock (progressForm.cancelLock)
@@ -721,7 +719,6 @@ namespace Visual_Music
 						//EndDraw();
 					}
 					normSongPos = normSongPosBackup;
-					cubeToPlaneFx.Dispose();
 				}
 				GraphicsDevice.SetRenderTarget(null);
 				Media.endVideoEnc();

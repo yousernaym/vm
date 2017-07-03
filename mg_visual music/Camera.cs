@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 
 namespace Visual_Music
 {
-	using XnaCubeMapFace = Microsoft.Xna.Framework.Graphics.CubeMapFace;
+	//using XnaCubeMapFace = Microsoft.Xna.Framework.Graphics.CubeMapFace;
 	[Serializable]
 	public class Camera : ISerializable
 	{
@@ -46,18 +46,23 @@ namespace Visual_Music
 		const float rotSpeed = 0.2f;
 		const float moveSpeed = 0.5f;
 
+		Matrix NonCubeRotMat
+		{
+			get
+			{
+				return Matrix.CreateRotationY(angles.Y);
+			}
+		}
 		Matrix RotMat
 		{
 			get
 			{
-				Matrix rot = Matrix.CreateRotationY(angles.Y);
+				Matrix rot = NonCubeRotMat;
 				if (CubeMapFace < 0)
 					return rot;
 
 				Vector3 angleOffsets = new Vector3();
 				float rot90 = (float)Math.PI / 2.0f;
-				XnaCubeMapFace face = (XnaCubeMapFace)Enum.ToObject(typeof(XnaCubeMapFace), CubeMapFace);
-								
 				switch (CubeMapFace)
 				{
 					case 0:
@@ -86,7 +91,11 @@ namespace Visual_Music
 		{
 			get
 			{
-				Matrix transMat = Matrix.CreateTranslation(pos);
+				Vector3 posOffset = new Vector3();
+				//if (CubeMapFace >= 0)
+					//posOffset = 2 * Vector3.Forward;
+				Vector3 newPos = pos + Vector3.Transform(posOffset, NonCubeRotMat);
+				Matrix transMat = Matrix.CreateTranslation(newPos);
 				return Matrix.Invert(RotMat * transMat);
 			}
 		}
@@ -214,7 +223,6 @@ namespace Visual_Music
 			}
 			return keyMatch;
 		}
-		
 		
 		//public void reset()
 		//{

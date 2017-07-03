@@ -43,14 +43,14 @@ float4 getColor(float2 planeCoords)
 float4 PS(VSOutput IN) : COLOR0
 {
 	float4 cmSample = float4(0,0,0,0);
-	float2 sampleIffsetStep = 0.5 / Viewport;
+	float2 sampleOffsetStep = 0.5f / Viewport;
 	cmSample = getColor(IN.planeCoords);
 	for (int j = 0; j < 2; j++)
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			float2 currentOffset = -sampleIffsetStep + sampleIffsetStep * 2 * float2(i, j);
-			cmSample += getColor(IN.planeCoords);
+			float2 currentOffset = -sampleOffsetStep + sampleOffsetStep * 2 * float2(i, j);
+			cmSample += getColor(IN.planeCoords + currentOffset);
 		}
 	}	
 	return cmSample / 5;

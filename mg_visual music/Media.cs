@@ -14,6 +14,19 @@ namespace Visual_Music
 		public UInt32 fps;
 		public UInt32 bitRate;
 		public UInt32 audioSampleRate;
+		public UInt32 aspectNumerator;
+		public UInt32 aspectDenominator;
+		public VideoFormat(UInt32 _width, UInt32 _height, UInt32 _fps = 30u, UInt32 _bitRate = 150000000u, UInt32 _audioSampleRate = 48000u, UInt32 _aspectNumerator = 1u, UInt32 _aspectDenominator = 1u)
+		{
+			width = _width;
+			height = _height;
+			fps = _fps;
+			bitRate = _bitRate;
+			audioSampleRate = _audioSampleRate;
+			aspectNumerator = _aspectNumerator;
+			aspectDenominator = _aspectDenominator;
+		}
+
 	};
 
 	static class Media
@@ -36,9 +49,9 @@ namespace Visual_Music
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool beginVideoEnc(string outputFile, VideoFormat vidFmt, bool _bVideo);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool writeFrameCube(UInt32[] videoFrameBuffer, UInt64 rtStart, ref UInt64 rtDuration, double audioOffset, bool bFlush, UInt32[] cmFace0, UInt32[] cmFace1, UInt32[] cmFace2, UInt32[] cmFace3, UInt32[] cmFace4, UInt32[] cmFace5, int cmFaceSide, int videFrameX, int videoFrameY);
+		public static extern bool writeFrameCube(UInt32[] videoFrameBuffer, UInt64 rtStart, ref UInt64 rtDuration, double audioOffset, UInt32[] cmFace0, UInt32[] cmFace1, UInt32[] cmFace2, UInt32[] cmFace3, UInt32[] cmFace4, UInt32[] cmFace5, int cmFaceSide, int videFrameX, int videoFrameY);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool writeFrame(UInt32[] videoFrameBuffer, UInt64 rtStart, ref UInt64 rtDuration, double audioOffset, bool bFlush);
+		public static extern bool writeFrame(UInt32[] videoFrameBuffer, UInt64 rtStart, ref UInt64 rtDuration, double audioOffset);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern void endVideoEnc();
 
