@@ -626,10 +626,10 @@ namespace Visual_Music
 				isRenderingVideo = true;
 				Camera.InvertY = true;
 
-				Point videoFrameSize = options.Sphere ? new Point(2048, 2048 / (options.Stereo ? 1 : 2)) : options.Resolution;
+				Point videoFrameSize = options.Sphere ? new Point(4096, 4096 / (options.Stereo ? 1 : 2)) : options.Resolution;
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
 				//videoFormat.bitRate = 160000000;
-				videoFormat.fps = 30;
+				videoFormat.fps = 60;
 				//videoFormat.height = (uint)videoFrameSize.Y;
 				//videoFormat.width = (uint)videoFrameSize.X;
 				videoFormat.aspectNumerator = 1;
@@ -670,7 +670,6 @@ namespace Visual_Music
 					while ((int)songPosInTicks < notes.SongLengthT && !progressForm.Cancel)
 					{
 						//BeginDraw();
-						progressForm.updateProgress((int)(frameStart / 10000000));
 						if (options.Sphere)
 						{
 							for (int i = 0; i < 6; i++)
@@ -713,8 +712,8 @@ namespace Visual_Music
 							break;
 						}
 						frameStart += frameDuration;
-
 						setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0f / videoFormat.fps, false);
+						progressForm.updateProgress(normSongPos);
 						frames++;
 						//EndDraw();
 					}

@@ -14,7 +14,7 @@ namespace Visual_Music
 	public partial class RenderProgressForm : Form
 	{
 		delegate void Delegate_renderVideo(string file, RenderProgressForm progressForm, VideoExportForm options);
-		delegate void Delegate_updateProgress(int progress);
+		delegate void Delegate_updateProgress(double progress);
 		delegate void Delegate_void_noparams();
 		delegate void Delegate_void_string(string str);
 
@@ -27,48 +27,50 @@ namespace Visual_Music
 		//TimeSpan startTime;
 		Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager taskBarProgress = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
 		StopRenderingMb cancelMb = new StopRenderingMb();
-		static int timeBufIndex = 0;
-		static float[] timeBuf = new float[100];
+		static int progressBufIndex0 = 1;
+		static int progressBufIndex1 = 0;
+		static ProgressAtTime[] progressBuf = new ProgressAtTime[100];
 		static bool timeBufFull = false;
 		static int frame = 0;
 		static float totalTime = 0;
-
-		void _updateProgress(int progress)
-		{
-			if (frame % 40 == 0 || !timeBufFull)
-			{
-				progressBar1.Value = progress;
-				float normProgress = (float)progress / (float)progressBar1.Maximum;
-				Text = "Render progress: " + ((int)(100.0f * normProgress)).ToString() + "%";
 				
-				if (normProgress > 0)
-					timeBuf[timeBufIndex++] = (float)stopWatch.Elapsed.TotalSeconds / normProgress;
-				if (timeBufIndex >= timeBuf.Length)
-				{
-					timeBufFull = true;
-					timeBufIndex = 0;
-				}
-				foreach (float t in timeBuf)
-					totalTime += t;
-				totalTime /= timeBuf.Length;
-				//Task bar
-				taskBarProgress.SetProgressValue(progress, progressBar1.Maximum);
-			}
-			TimeSpan estimatedTime;
-			if (totalTime > 0)
+		void _updateProgress(double progress)
+		{
+			if (frame % 1 == 0)
 			{
-				float seconds = totalTime - (float)stopWatch.Elapsed.TotalSeconds;
-				if (seconds < 0)
-					seconds = 0;
-				estimatedTime = TimeSpan.FromSeconds(seconds);
+				progress = Math.Min(1, progress);
+				progress = Math.Max(0, progress);
+				int value = (int)(progress * songPanel.SongLengthT);
+				progressBar1.Value = value;
+				int percent = (int)(100.0 * progress + 0.5);
+				if (percent > 100)
+					percent = 100;
+				Text = "Render progress: " + percent.ToString() + "%";
+
+				ProgressAtTime pat = new ProgressAtTime();
+				pat.time = stopWatch.Elapsed.TotalSeconds;
+				pat.progress = progress;
+				progressBuf[progressBufIndex1] = pat;
+				
+				//Task bar
+				taskBarProgress.SetProgressValue(progressBar1.Value, progressBar1.Maximum);
+
+				double deltaTime = progressBuf[progressBufIndex1].time - progressBuf[progressBufIndex0].time;
+				double deltaProgress = progressBuf[progressBufIndex1].progress - progressBuf[progressBufIndex0].progress;
+				double progressLeft = 1.0 - progressBuf[progressBufIndex1].progress;
+				TimeSpan timeLeft = TimeSpan.FromSeconds(deltaTime * progressLeft / deltaProgress);
+
+				estimatedTimeLabel.Text = string.Format("Estimated time remaining: {0:d2}:{1:d2}:{2:d2}", new object[] { timeLeft.Hours, timeLeft.Minutes, timeLeft.Seconds });
+				elapsedTimeLabel.Text = string.Format("Elapsed time: {0:d2}:{1:d2}:{2:d2}", new object[] { stopWatch.Elapsed.Hours, stopWatch.Elapsed.Minutes, stopWatch.Elapsed.Seconds });
+
+				if (++progressBufIndex0 >= progressBuf.Length)
+					progressBufIndex0 = 0;
+				if (++progressBufIndex1 >= progressBuf.Length)
+					progressBufIndex1 = 0;
 			}
-			else
-				estimatedTime = new TimeSpan(0);
-			estimatedTimeLabel.Text = string.Format("Estimated time remaining: {0:d2}:{1:d2}:{2:d2}", new object[] { estimatedTime.Hours, estimatedTime.Minutes, estimatedTime.Seconds });
-			elapsedTimeLabel.Text = string.Format("Elapsed time: {0:d2}:{1:d2}:{2:d2}", new object[] { stopWatch.Elapsed.Hours, stopWatch.Elapsed.Minutes, stopWatch.Elapsed.Seconds });
 			frame++;
 		}
-		public void updateProgress(int progress)
+		public void updateProgress(double progress)
 		{
 			Invoke(new Delegate_updateProgress(_updateProgress), progress);
 		}
@@ -80,7 +82,7 @@ namespace Visual_Music
 			songPanel = _songPanel;
 			//Application.Idle -= delegate { songPanel.Invalidate(); };
 			Cancel = false;
-			progressBar1.Maximum = (int)songPanel.getSongPosInSeconds(1);
+			progressBar1.Maximum = songPanel.SongLengthT;// getSongPosInSeconds(1);
 			taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.Normal);
 			
 			//Delegate_updateProgress delestimatedTimeestimatedTimeegate_updateProgress = new Delegate_updateProgress(updateProgress);
@@ -151,5 +153,10 @@ namespace Visual_Music
 		{
 		}
 		
+	}
+	struct ProgressAtTime
+	{
+		public double time;
+		public double progress;
 	}
 }
