@@ -33,7 +33,7 @@
 			this.resolutionGroup = new System.Windows.Forms.GroupBox();
 			this.fourkRb = new System.Windows.Forms.RadioButton();
 			this.StereoscopicCb = new System.Windows.Forms.CheckBox();
-			this.youtubeCb = new System.Windows.Forms.CheckBox();
+			this.vrMetadataCb = new System.Windows.Forms.CheckBox();
 			this.resolutionGroup.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -91,23 +91,25 @@
 			this.StereoscopicCb.Text = "Stereoscopic";
 			this.StereoscopicCb.UseVisualStyleBackColor = true;
 			// 
-			// youtubeCb
+			// vrMetadataCb
 			// 
-			this.youtubeCb.AutoSize = true;
-			this.youtubeCb.Enabled = false;
-			this.youtubeCb.Location = new System.Drawing.Point(103, 12);
-			this.youtubeCb.Name = "youtubeCb";
-			this.youtubeCb.Size = new System.Drawing.Size(113, 17);
-			this.youtubeCb.TabIndex = 20;
-			this.youtubeCb.Text = "Youtube metadata";
-			this.youtubeCb.UseVisualStyleBackColor = true;
+			this.vrMetadataCb.AutoSize = true;
+			this.vrMetadataCb.Checked = true;
+			this.vrMetadataCb.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.vrMetadataCb.Enabled = false;
+			this.vrMetadataCb.Location = new System.Drawing.Point(103, 12);
+			this.vrMetadataCb.Name = "vrMetadataCb";
+			this.vrMetadataCb.Size = new System.Drawing.Size(99, 17);
+			this.vrMetadataCb.TabIndex = 20;
+			this.vrMetadataCb.Text = "Inject metadata";
+			this.vrMetadataCb.UseVisualStyleBackColor = true;
 			// 
 			// VideoExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.ClientSize = new System.Drawing.Size(284, 261);
 			this.Controls.Add(this.resolutionGroup);
-			this.Controls.Add(this.youtubeCb);
+			this.Controls.Add(this.vrMetadataCb);
 			this.Controls.Add(this.StereoscopicCb);
 			this.Controls.Add(this.sphereCb);
 			this.Name = "VideoExportForm";
@@ -115,7 +117,7 @@
 			this.Controls.SetChildIndex(this.cancelBtn, 0);
 			this.Controls.SetChildIndex(this.sphereCb, 0);
 			this.Controls.SetChildIndex(this.StereoscopicCb, 0);
-			this.Controls.SetChildIndex(this.youtubeCb, 0);
+			this.Controls.SetChildIndex(this.vrMetadataCb, 0);
 			this.Controls.SetChildIndex(this.resolutionGroup, 0);
 			this.resolutionGroup.ResumeLayout(false);
 			this.resolutionGroup.PerformLayout();
@@ -129,7 +131,7 @@
 		private System.Windows.Forms.GroupBox resolutionGroup;
 		public System.Windows.Forms.CheckBox StereoscopicCb;
 		private System.Windows.Forms.CheckBox sphereCb;
-		public System.Windows.Forms.CheckBox youtubeCb;
+		public System.Windows.Forms.CheckBox vrMetadataCb;
 		private System.Windows.Forms.RadioButton fourkRb;
 	}
 }

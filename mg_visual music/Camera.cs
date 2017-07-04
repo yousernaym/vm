@@ -99,16 +99,7 @@ namespace Visual_Music
 				return Matrix.Invert(RotMat * transMat);
 			}
 		}
-		public Vector2 ViewPortSize
-		{
-			get
-			{
-				//if (CubeMapFace < 0)
-					return new Vector2((float)SongPanel.GraphicsDevice.Viewport.Width, (float)SongPanel.GraphicsDevice.Viewport.Height);
-				//else
-					//return new Vector2((float)SongPanel.GraphicsDevice.Viewport.Width, (float)SongPanel.GraphicsDevice.Viewport.Height);
-			}
-		}
+		public Vector2 ViewPortSize => new Vector2(SongPanel.GraphicsDevice.Viewport.Width, SongPanel.GraphicsDevice.Viewport.Height);
 		Matrix ViewPortMat
 		{
 			get

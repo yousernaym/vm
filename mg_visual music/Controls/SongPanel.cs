@@ -626,7 +626,8 @@ namespace Visual_Music
 				isRenderingVideo = true;
 				Camera.InvertY = true;
 
-				Point videoFrameSize = options.Sphere ? new Point(4096, 4096 / (options.Stereo ? 1 : 2)) : options.Resolution;
+				int vrWidth = 1024;
+				Point videoFrameSize = options.Sphere ? new Point(vrWidth, vrWidth / (options.Stereo ? 1 : 2)) : options.Resolution;
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
 				//videoFormat.bitRate = 160000000;
 				videoFormat.fps = 60;
@@ -719,12 +720,28 @@ namespace Visual_Music
 					}
 					normSongPos = normSongPosBackup;
 				}
-				GraphicsDevice.SetRenderTarget(null);
-				Media.endVideoEnc();
-				Camera.CubeMapFace = -1;
-				Camera.InvertY = false;
-				isRenderingVideo = false;
+				endVideoRender();
+				if (options.VrMetadata && File.Exists(videoFilePath))
+				{
+					Process injector = new Process();
+					injector.StartInfo.FileName = "Metadata Injector\\__main__.exe";
+					injector.StartInfo.Arguments = " -i " + "\"" + videoFilePath + "\" \"" + videoFilePath + "_\"";
+					injector.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+					injector.Start();
+					injector.WaitForExit();
+					File.Delete(videoFilePath);
+					File.Move(videoFilePath + "_", videoFilePath);
+				}
 			}
+		}
+
+		void endVideoRender()
+		{
+			GraphicsDevice.SetRenderTarget(null);
+			Media.endVideoEnc();
+			Camera.CubeMapFace = -1;
+			Camera.InvertY = false;
+			isRenderingVideo = false;
 		}
 
 		uint sampleCubeMap(Vector3 coords, uint[][] cmFaces, int faceSide)

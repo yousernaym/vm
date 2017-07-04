@@ -30,10 +30,8 @@ namespace Visual_Music
 		static int progressBufIndex0 = 1;
 		static int progressBufIndex1 = 0;
 		static ProgressAtTime[] progressBuf = new ProgressAtTime[100];
-		static bool timeBufFull = false;
 		static int frame = 0;
-		static float totalTime = 0;
-				
+						
 		void _updateProgress(double progress)
 		{
 			if (frame % 1 == 0)
