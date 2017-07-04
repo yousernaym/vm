@@ -620,12 +620,8 @@ namespace Visual_Music
 		}
 		public void renderVideo(string videoFilePath, RenderProgressForm progressForm, VideoExportForm options)
 		{
-
 			lock (renderLock)
 			{
-				isRenderingVideo = true;
-				Camera.InvertY = true;
-
 				int vrWidth = 1024;
 				Point videoFrameSize = options.Sphere ? new Point(vrWidth, vrWidth / (options.Stereo ? 1 : 2)) : options.Resolution;
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
@@ -665,6 +661,19 @@ namespace Visual_Music
 					const double startSongPosS = 0;
 					double songPosInTicks = 0;
 					double normSongPosBackup = normSongPos;
+					Camera.InvertY = true;
+					
+					float viewWidthQnBackup = ViewWidthQn;
+					int maxPitchBackup = MaxPitch;
+					int minPitchBackup = MinPitch;
+					if (options.Sphere)
+					{
+						ViewWidthQn /= 2.4f;
+						int pitchChange = (int)((MaxPitch - MinPitch) / 4.6f);
+						MaxPitch -= pitchChange;
+						MinPitch += pitchChange;
+					}
+					isRenderingVideo = true;
 
 					setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
 
@@ -719,18 +728,22 @@ namespace Visual_Music
 						//EndDraw();
 					}
 					normSongPos = normSongPosBackup;
-				}
-				endVideoRender();
-				if (options.VrMetadata && File.Exists(videoFilePath))
-				{
-					Process injector = new Process();
-					injector.StartInfo.FileName = "Metadata Injector\\__main__.exe";
-					injector.StartInfo.Arguments = " -i " + "\"" + videoFilePath + "\" \"" + videoFilePath + "_\"";
-					injector.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-					injector.Start();
-					injector.WaitForExit();
-					File.Delete(videoFilePath);
-					File.Move(videoFilePath + "_", videoFilePath);
+					ViewWidthQn = viewWidthQnBackup;
+					MaxPitch = maxPitchBackup;
+					MinPitch = minPitchBackup;
+					endVideoRender();
+					if (options.VrMetadata)
+					{
+						Process injector = new Process();
+						injector.StartInfo.FileName = "Metadata Injector\\__main__.exe";
+						string stereo = options.Stereo ? "--stereo top-bottom" : "";
+						injector.StartInfo.Arguments = " -i " + stereo + " \"" + videoFilePath + "\" \"" + videoFilePath + "_\"";
+						injector.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+						injector.Start();
+						injector.WaitForExit();
+						File.Delete(videoFilePath);
+						File.Move(videoFilePath + "_", videoFilePath);
+					}
 				}
 			}
 		}

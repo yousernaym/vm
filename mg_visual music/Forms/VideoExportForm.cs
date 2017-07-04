@@ -15,7 +15,7 @@ namespace Visual_Music
 		public Point Resolution { get => resolution; }
 		public bool Sphere { get => sphereCb.Checked; }
 		public bool Stereo { get => StereoscopicCb.Checked; }
-		public bool VrMetadata { get => vrMetadataCb.Checked && vrMetadataCb.Enabled; }
+		public bool VrMetadata { get => vrMetadataCb.Checked; }
 		public VideoExportForm()
 		{
 			InitializeComponent();
@@ -24,7 +24,7 @@ namespace Visual_Music
 
 		private void sphereCb_CheckedChanged(object sender, EventArgs e)
 		{
-			vrMetadataCb.Enabled = sphereCb.Checked;
+			vrMetadataCb.Enabled = vrMetadataCb.Checked = sphereCb.Checked;
 		}
 
 		private void fourkRb_CheckedChanged(object sender, EventArgs e)
