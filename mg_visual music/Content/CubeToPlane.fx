@@ -1,11 +1,32 @@
-﻿const float PI = 3.1415926535f;
+﻿/*float3x3 SampleWeights = { 0.5 , 0.75, 0.5 ,
+						   0.75, 1   , 0.75,
+						   0.5 , 0.75, 0.5 };*/
+float3x3 SampleWeights = { 0.75, 0.5, 0.75,
+						   0.5 ,  1, 0.5 ,
+						   0.75, 0.5, 0.75 };
+float PI = 3.1415926535f;
 float2 Viewport;
+float FrameSamples = 1;
+bool IsFirstFrame;
 
 // Input parameters
 texture CubeMap;
 samplerCUBE  CubeMapSampler = sampler_state
 {
+	/*MinFilter = ANISOTROPIC;
+	MagFilter = ANISOTROPIC;
+	MipFilter = ANISOTROPIC;*/
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = LINEAR;
+	//MaxAnisotropy = 8;
 	texture = <CubeMap>;
+};
+
+texture PrevFrame;
+sampler2D PrevFrameSampler = sampler_state
+{
+	texture = <PrevFrame>;
 };
 
 struct VSInput
@@ -44,16 +65,19 @@ float4 PS(VSOutput IN) : COLOR0
 {
 	float4 cmSample = float4(0,0,0,0);
 	float2 sampleOffsetStep = 0.5f / Viewport;
-	cmSample = getColor(IN.planeCoords);
-	for (int j = 0; j < 2; j++)
+	//return cmSample = getColor(IN.planeCoords);
+	for (int j = -1; j <= 1; j++)
 	{
-		for (int i = 0; i < 2; i++)
+		for (int i = -1; i <= 1; i++)
 		{
-			float2 currentOffset = -sampleOffsetStep + sampleOffsetStep * 2 * float2(i, j);
-			cmSample += getColor(IN.planeCoords + currentOffset);
+			float2 currentOffset = sampleOffsetStep * float2(i, j);
+			cmSample += getColor(IN.planeCoords + currentOffset) * SampleWeights[i+1][j+1];
 		}
 	}	
-	return cmSample / 5;
+	cmSample /= 6 * FrameSamples;
+	if (!IsFirstFrame)
+		cmSample += tex2D(PrevFrameSampler, IN.planeCoords * float2(0.5f, -0.5f) + 0.5f);
+	return cmSample;
 }
 
 

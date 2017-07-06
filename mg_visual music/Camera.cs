@@ -85,16 +85,21 @@ namespace Visual_Music
 						break;
 				}
 				return rot * Matrix.CreateFromYawPitchRoll(angleOffsets.Y, angleOffsets.X, angleOffsets.Z);
+				
 			}
 		}
 		public Matrix ViewMat
 		{
 			get
 			{
-				Vector3 posOffset = new Vector3();
+				//Vector3 posOffset = new Vector3();
 				//if (CubeMapFace >= 0)
-					//posOffset = 2 * Vector3.Forward;
-				Vector3 newPos = pos + Vector3.Transform(posOffset, NonCubeRotMat);
+				//posOffset = 2 * Vector3.Forward;
+				//Vector3 newPos = pos + Vector3.Transform(posOffset, NonCubeRotMat);
+
+				//Vector3 rotCenter = pos - NonCubeRotMat.Forward * 1;
+				//Vector3 newPos = Vector3.Transform(pos - rotCenter, RotMat) + rotCenter;
+				Vector3 newPos = pos;
 				Matrix transMat = Matrix.CreateTranslation(newPos);
 				return Matrix.Invert(RotMat * transMat);
 			}

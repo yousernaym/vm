@@ -81,6 +81,7 @@ namespace Visual_Music
 	[Serializable()]
 	public class SongPanel : GraphicsDeviceControl, ISerializable
 	{
+		const int CmFaceSide = 4096;
 		Quad quad;
 		bool isRenderingVideo = false;
 		public Camera Camera { get; set; } = new Camera();
@@ -622,7 +623,7 @@ namespace Visual_Music
 		{
 			lock (renderLock)
 			{
-				int vrWidth = 1024;
+				int vrWidth = 4096;
 				Point videoFrameSize = options.Sphere ? new Point(vrWidth, vrWidth / (options.Stereo ? 1 : 2)) : options.Resolution;
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
 				//videoFormat.bitRate = 160000000;
@@ -641,13 +642,14 @@ namespace Visual_Music
 				}
 				else
 				{
-					RenderTarget2D renderTarget2d = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 8, RenderTargetUsage.PreserveContents);
-					const int CmFaceSide = 1080;
-					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					RenderTarget2D[] renderTarget2d = { new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents), new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents) };
+					RenderTarget2D renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgr32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+
 					uint[] frameData = new uint[videoFrameSize.X * videoFrameSize.Y];
-					uint[][] cubeMapData = new uint[6][];
-					for (int i = 0; i < 6; i++)
-						cubeMapData[i] = new uint[CmFaceSide * CmFaceSide];
+					//uint[][] cubeMapData = new uint[6][];
+					//for (int i = 0; i < 6; i++)
+						//cubeMapData[i] = new uint[CmFaceSide * CmFaceSide];
 
 					Effect cubeToPlaneFx = Content.Load<Effect>("CubeToPlane");
 					cubeToPlaneFx.Parameters["CubeMap"].SetValue(renderTargetCube);
@@ -668,52 +670,39 @@ namespace Visual_Music
 					int minPitchBackup = MinPitch;
 					if (options.Sphere)
 					{
-						ViewWidthQn /= 2.4f;
-						int pitchChange = (int)((MaxPitch - MinPitch) / 4.6f);
+						ViewWidthQn /= 3;
+						int pitchChange = (int)((MaxPitch - MinPitch) / 5.0f);
 						MaxPitch -= pitchChange;
-						MinPitch += pitchChange;
+						MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
 					}
+					const int frameSamples = 2;
+					cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
 					isRenderingVideo = true;
 
 					setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
 
 					while ((int)songPosInTicks < notes.SongLengthT && !progressForm.Cancel)
 					{
-						//BeginDraw();
-						if (options.Sphere)
+						RenderTarget2D rt = null;
+						for (int i = 0; i < frameSamples; i++)
 						{
-							for (int i = 0; i < 6; i++)
-							{
-								GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
-								Camera.CubeMapFace = i;
-								GraphicsDevice.Clear(Color.Transparent);
-								drawSong(new Point(CmFaceSide, CmFaceSide), (float)songPosInTicks / notes.SongLengthT);
-							}
-						}
-						else
-						{
-							GraphicsDevice.SetRenderTarget(renderTarget2d);
-							GraphicsDevice.Clear(Color.Transparent);
-							drawSong(options.Resolution, (float)songPosInTicks / notes.SongLengthT);
+							rt = renderTarget2d[i % 2];
+							RenderTarget2D tex = null;
+							if (i > 0)
+								tex = renderTarget2d[(i+1) % 2]; //Only blend with output of previous pass if not first pass
+							if (i == frameSamples - 1)
+								rt = renderTarget2d8bit; //Last pass should draw to normal rendertarget iwth 8 bits per channel
+							drawVideoFrame(options, renderTargetCube, rt, tex, songPosInTicks, cubeToPlaneFx);
+							setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0 / frameSamples / videoFormat.fps, false);
 						}
 
 						GraphicsDevice.SetRenderTarget(null);
-
-						bool b;
-						if (options.Sphere)
-						{
-							GraphicsDevice.SetRenderTarget(renderTarget2d);
-							cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();
-							quad.draw();
-							
-							//Get data from all cubemap faces
-							//for (int i = 0; i < 6; i++)
-							//renderTargetCube.GetData<uint>((CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i), cubeMapData[i]);
-							//b = Media.writeFrameCube(frameData, frameStart, ref frameDuration, AudioOffset, false, cubeMapData[0], cubeMapData[1], cubeMapData[2], cubeMapData[3], cubeMapData[4], cubeMapData[5], CmFaceSide, videoFrameSize.X, videoFrameSize.Y);
-						}
-
-						renderTarget2d.GetData<uint>(frameData);
-						b = Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset);
+						rt.GetData<uint>(frameData);
+						//uint[] uFrameData = new uint[videoFrameSize.X * videoFrameSize.Y];
+						//for (int i = 0; i < uFrameData.Length; i++)
+						//	uFrameData[i] = ((uint)(frameData[i].X * 255) << 16) | ((uint)(frameData[i].Y * 255) << 8) | (uint)(frameData[i].Z * 255);
+						
+						bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, AudioOffset);
 						if (!b)
 						{
 							lock (progressForm.cancelLock)
@@ -722,7 +711,7 @@ namespace Visual_Music
 							break;
 						}
 						frameStart += frameDuration;
-						setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0f / videoFormat.fps, false);
+						//setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0 / frameSamples / videoFormat.fps, false);
 						progressForm.updateProgress(normSongPos);
 						frames++;
 						//EndDraw();
@@ -745,6 +734,40 @@ namespace Visual_Music
 						File.Move(videoFilePath + "_", videoFilePath);
 					}
 				}
+			}
+		}
+
+		void drawVideoFrame(VideoExportForm options, RenderTargetCube renderTargetCube, RenderTarget2D renderTarget2d, Texture2D prevFrame, double songPosInTicks, Effect cubeToPlaneFx)
+		{
+			if (options.Sphere)
+			{
+				for (int i = 0; i < 6; i++)
+				{
+					GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
+					Camera.CubeMapFace = i;
+					GraphicsDevice.Clear(Color.Transparent);
+					drawSong(new Point(CmFaceSide, CmFaceSide), (float)songPosInTicks / notes.SongLengthT);
+				}
+			}
+			else
+			{
+				GraphicsDevice.SetRenderTarget(renderTarget2d);
+				GraphicsDevice.Clear(Color.Transparent);
+				drawSong(options.Resolution, (float)songPosInTicks / notes.SongLengthT);
+			}
+
+			if (options.Sphere)
+			{
+				GraphicsDevice.SetRenderTarget(renderTarget2d);
+				cubeToPlaneFx.Parameters["PrevFrame"].SetValue(prevFrame);
+				cubeToPlaneFx.Parameters["IsFirstFrame"].SetValue(prevFrame == null);
+				cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();
+				quad.draw();
+
+				//Get data from all cubemap faces
+				//for (int i = 0; i < 6; i++)
+				//renderTargetCube.GetData<uint>((CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i), cubeMapData[i]);
+				//b = Media.writeFrameCube(frameData, frameStart, ref frameDuration, AudioOffset, false, cubeMapData[0], cubeMapData[1], cubeMapData[2], cubeMapData[3], cubeMapData[4], cubeMapData[5], CmFaceSide, videoFrameSize.X, videoFrameSize.Y);
 			}
 		}
 

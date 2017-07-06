@@ -711,7 +711,7 @@ namespace Visual_Music
 					skippedPoints--;					
 				}
 				skippedPoints += (int)(endDraw - startDraw + 1);
-				if (endOfSegment || vertIndex > NumDynamicVerts - 1000)
+				if (endOfSegment || vertIndex > NumDynamicVerts - 10000)
 					drawLineSegment(ref vertIndex, ref hLineVertIndex);
 				
 				completeNoteListIndex++;
