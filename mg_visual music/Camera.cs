@@ -52,16 +52,13 @@ namespace Visual_Music
 			get
 			{
 				Matrix rot = NonCubeRotMat;
-				if (CubeMapFace < 0)
+				if (CubeMapFace <= 0)
 					return rot;
 
 				Vector3 angleOffsets = new Vector3();
 				float rot90 = (float)Math.PI / 2.0f;
 				switch (CubeMapFace)
 				{
-					case 0:
-						angleOffsets.Y = 0;
-						break;
 					case 1:
 						angleOffsets.Y = 2 * rot90;
 						break;
@@ -120,13 +117,8 @@ namespace Visual_Music
 			}
 		}
 
-		public Matrix VpMat
-		{
-			get
-			{
-				return ViewPortMat * ViewMat * ProjMat;
-			}
-		}
+		public Matrix VpMat => ViewPortMat * ViewMat * ProjMat;
+		
 		public SongPanel SongPanel { get; set; }
 		
 
