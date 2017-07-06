@@ -46,13 +46,7 @@ namespace Visual_Music
 		const float rotSpeed = 0.2f;
 		const float moveSpeed = 0.5f;
 
-		Matrix NonCubeRotMat
-		{
-			get
-			{
-				return Matrix.CreateRotationY(angles.Y);
-			}
-		}
+		Matrix NonCubeRotMat => Matrix.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
 		Matrix RotMat
 		{
 			get
@@ -73,9 +67,11 @@ namespace Visual_Music
 						break;
 					case 2:
 						angleOffsets.X = rot90;
+						angleOffsets.Z = -rot90;
 						break;
 					case 3:
 						angleOffsets.X = -rot90;
+						angleOffsets.Z = rot90;
 						break;
 					case 4:
 						angleOffsets.Y = rot90;
@@ -84,7 +80,7 @@ namespace Visual_Music
 						angleOffsets.Y = -rot90;
 						break;
 				}
-				return rot * Matrix.CreateFromYawPitchRoll(angleOffsets.Y, angleOffsets.X, angleOffsets.Z);
+				return Matrix.CreateFromYawPitchRoll(angleOffsets.Y, angleOffsets.X, angleOffsets.Z) * rot;
 				
 			}
 		}
@@ -110,7 +106,7 @@ namespace Visual_Music
 			get
 			{
 				return new Matrix(2 / ViewPortSize.X, 0, 0, 0,
-											0, -2 / ViewPortSize.Y * (InvertY ? -1 : 1), 0, 0,
+											0, -2 / ViewPortSize.Y, 0, 0,
 											0, 0, 1, 0,
 											0, 0, 0, 1);
 			}
@@ -215,6 +211,17 @@ namespace Visual_Music
 			if (key == Keys.F)
 			{
 				moveVel = -Vector3.Up * moveSpeed * startOrStop;
+				keyMatch = true;
+			}
+
+			if (key == Keys.X)
+			{
+				rotVel.Z = rotSpeed * startOrStop;
+				keyMatch = true;
+			}
+			if (key == Keys.C)
+			{
+				rotVel.Z = -rotSpeed * startOrStop;
 				keyMatch = true;
 			}
 			return keyMatch;

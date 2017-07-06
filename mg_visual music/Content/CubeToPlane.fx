@@ -43,7 +43,7 @@ struct VSOutput
 VSOutput VS(VSInput IN)
 {
 	VSOutput OUT;
-	OUT.pos = float4(IN.pos, 0, 1);
+	OUT.pos = float4(IN.pos*float2(1,-1), 0, 1); //Flip y-coord when writing mp4 videos
 	OUT.planeCoords = IN.pos;
 	return OUT;
 }
@@ -76,7 +76,7 @@ float4 PS(VSOutput IN) : COLOR0
 	}	
 	cmSample /= 6 * FrameSamples;
 	if (!IsFirstFrame)
-		cmSample += tex2D(PrevFrameSampler, IN.planeCoords * float2(0.5f, -0.5f) + 0.5f);
+		cmSample += tex2D(PrevFrameSampler, IN.planeCoords * float2(0.5f, 0.5f) + 0.5f);
 	return cmSample;
 }
 

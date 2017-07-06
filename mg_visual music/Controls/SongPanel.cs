@@ -302,7 +302,8 @@ namespace Visual_Music
 			if (notes == null || isRenderingVideo)
 				return;
 			TimeSpan newTime = stopwatch.Elapsed;
-			deltaTimeS = (newTime - oldTime).getSecondsF();
+			//Debug.WriteLine(deltaTimeS);
+			deltaTimeS = (newTime - oldTime).TotalSeconds;
 			//if (deltaTimeS < renderInterval)
 			//return;
 
@@ -623,11 +624,11 @@ namespace Visual_Music
 		{
 			lock (renderLock)
 			{
-				int vrWidth = 4096;
+				int vrWidth = 1024;
 				Point videoFrameSize = options.Sphere ? new Point(vrWidth, vrWidth / (options.Stereo ? 1 : 2)) : options.Resolution;
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
 				//videoFormat.bitRate = 160000000;
-				videoFormat.fps = 60;
+				videoFormat.fps = 30;
 				//videoFormat.height = (uint)videoFrameSize.Y;
 				//videoFormat.width = (uint)videoFrameSize.X;
 				videoFormat.aspectNumerator = 1;
@@ -663,8 +664,7 @@ namespace Visual_Music
 					const double startSongPosS = 0;
 					double songPosInTicks = 0;
 					double normSongPosBackup = normSongPos;
-					Camera.InvertY = true;
-					
+										
 					float viewWidthQnBackup = ViewWidthQn;
 					int maxPitchBackup = MaxPitch;
 					int minPitchBackup = MinPitch;
@@ -746,6 +746,7 @@ namespace Visual_Music
 					GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
 					Camera.CubeMapFace = i;
 					GraphicsDevice.Clear(Color.Transparent);
+					GraphicsDevice.Clear(new Color((uint)i*40));
 					drawSong(new Point(CmFaceSide, CmFaceSide), (float)songPosInTicks / notes.SongLengthT);
 				}
 			}
@@ -776,7 +777,6 @@ namespace Visual_Music
 			GraphicsDevice.SetRenderTarget(null);
 			Media.endVideoEnc();
 			Camera.CubeMapFace = -1;
-			Camera.InvertY = false;
 			isRenderingVideo = false;
 		}
 
