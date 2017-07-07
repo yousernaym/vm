@@ -670,7 +670,7 @@ namespace Visual_Music
 					{
 						ViewWidthQn /= 3;
 						int pitchChange = (int)((MaxPitch - MinPitch) / 5.0f);
-						MaxPitch -= pitchChange;
+						MaxPitch -= (int)(pitchChange / 1.3f);
 						MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
 					}
 					const int frameSamples = 2;

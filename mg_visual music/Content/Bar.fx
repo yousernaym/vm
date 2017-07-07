@@ -18,7 +18,7 @@ struct VSOutput
 VSOutput VS(VSInput IN)
 {
 	VSOutput OUT;
-	OUT.pos = float4(IN.rect.xy + IN.pos * (IN.rect.zw - IN.rect.xy), -2.412, 1);
+	OUT.pos = float4(IN.rect.xy + IN.pos * (IN.rect.zw - IN.rect.xy), -2.412 * ViewportSize.y , 1);
 	// Viewport adjustment.
 	//OUT.pos.xy /= ViewportSize.xy;
 	//OUT.pos.xy *= float2(2, -2);

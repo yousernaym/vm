@@ -43,7 +43,7 @@ namespace Visual_Music
 		Vector3 moveVel = new Vector3();
 		Vector3 rotVel = new Vector3();
 		
-		const float rotSpeed = 0.2f;
+		const float rotSpeed = 0.5f;
 		const float moveSpeed = 0.5f;
 
 		Matrix NonCubeRotMat => Matrix.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
@@ -102,8 +102,8 @@ namespace Visual_Music
 		{
 			get
 			{
-				return new Matrix(2 / ViewPortSize.X, 0, 0, 0,
-											0, -2 / ViewPortSize.Y, 0, 0,
+				return new Matrix(2 , 0, 0, 0,
+											0, -2 , 0, 0,
 											0, 0, 1, 0,
 											0, 0, 0, 1);
 			}
@@ -113,7 +113,7 @@ namespace Visual_Music
 			get
 			{
 				float fov = CubeMapFace >= 0 ? (float)Math.PI / 2.0f : Fov;
-				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, 1/*ViewPortSize.X / ViewPortSize.Y*/, 0.001f, 100000);
+				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, ViewPortSize.X / ViewPortSize.Y, 0.001f, 100000);
 				if (InvertY)
 					mat.M22 *= -1;
 				return mat;
