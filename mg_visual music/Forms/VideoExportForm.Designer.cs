@@ -94,8 +94,6 @@
 			// vrMetadataCb
 			// 
 			this.vrMetadataCb.AutoSize = true;
-			this.vrMetadataCb.Checked = true;
-			this.vrMetadataCb.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.vrMetadataCb.Enabled = false;
 			this.vrMetadataCb.Location = new System.Drawing.Point(103, 12);
 			this.vrMetadataCb.Name = "vrMetadataCb";

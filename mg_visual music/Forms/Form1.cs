@@ -52,6 +52,7 @@ namespace Visual_Music
         public ImportModForm importModForm;
         public ImportSidForm importSidForm;
 		public TpartyIntegrationForm tpartyIntegrationForm;
+		VideoExportForm vidExpForm;
 
 		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera)};
         SongPanel songPanel = new SongPanel();
@@ -76,9 +77,10 @@ namespace Visual_Music
             importModForm = new ImportModForm(this);
             importSidForm = new ImportSidForm(this);
 			tpartyIntegrationForm = new TpartyIntegrationForm();
-            //trackPropsPanel =  new TrackPropsPanel(songPanel);
-            //showTrackPropsBtn.Text = "Show " + trackPropsBtnText;
-			            
+			vidExpForm = new VideoExportForm();
+			//trackPropsPanel =  new TrackPropsPanel(songPanel);
+			//showTrackPropsBtn.Text = "Show " + trackPropsBtnText;
+
 			ResizeRedraw = true;
 
             songScrollBar.Dock = DockStyle.Bottom;
@@ -282,7 +284,6 @@ namespace Visual_Music
 			saveVideoDlg.InitialDirectory = Path.GetDirectoryName(saveVideoDlg.FileName);
 			saveSettings();
 
-			VideoExportForm vidExpForm = new VideoExportForm();
 			if (vidExpForm.ShowDialog() != DialogResult.OK)
 				return;
 			RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, vidExpForm);
@@ -911,8 +912,8 @@ namespace Visual_Music
 		}
 		void openSongFile(string fileName)
 		{
-			//try
-			//{
+			try
+			{
 				DataContractSerializer dcs = new DataContractSerializer(typeof(SongPanel), projectSerializationTypes);
                 using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
@@ -926,12 +927,12 @@ namespace Visual_Music
                 currentProjPath = fileName;
 				songLoaded(currentProjPath);
 				updateFormTitle(currentProjPath);
-			//}
-			//catch (Exception ex)
-			//{
-			//	MessageBox.Show(ex.Message);
-			//}
-		}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+}
 		
 		void updateImportForm()
 		{

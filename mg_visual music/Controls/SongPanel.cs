@@ -373,7 +373,7 @@ namespace Visual_Music
 
 		void selectRegion()
 		{
-			if (((Form1)Parent).trackListItems.Count == 0)
+			if (Parent == null || ((Form1)Parent).trackListItems.Count == 0)
 				return;
 			if (leftMbPressed)
 			{
@@ -629,10 +629,8 @@ namespace Visual_Music
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
 				//videoFormat.bitRate = 160000000;
 				videoFormat.fps = 30;
-				//videoFormat.height = (uint)videoFrameSize.Y;
-				//videoFormat.width = (uint)videoFrameSize.X;
 				videoFormat.aspectNumerator = 1;
-				//videoFormat.audioSampleRate = 48000;
+				videoFormat.audioSampleRate = 48000;
 				//videoFormat.audioSampleRate = 44100;
 
 				if (!Media.beginVideoEnc(videoFilePath, videoFormat, true))
@@ -677,6 +675,7 @@ namespace Visual_Music
 					}
 					const int frameSamples = 2;
 					cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
+					Camera.InvertY = !options.Sphere;
 					isRenderingVideo = true;
 
 					setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
@@ -777,6 +776,7 @@ namespace Visual_Music
 			GraphicsDevice.SetRenderTarget(null);
 			Media.endVideoEnc();
 			Camera.CubeMapFace = -1;
+			Camera.InvertY = false;
 			isRenderingVideo = false;
 		}
 

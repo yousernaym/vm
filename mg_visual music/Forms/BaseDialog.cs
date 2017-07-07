@@ -20,7 +20,7 @@ namespace Visual_Music
 		private void okBtn_Click(object sender, EventArgs e)
 		{
 			DialogResult = DialogResult.OK;
-			Close();
+			Hide();
 		}
 
 		private void BaseDialog_Load(object sender, EventArgs e)
