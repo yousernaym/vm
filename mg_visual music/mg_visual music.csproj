@@ -164,7 +164,7 @@
     <Compile Include="Controls\TbSlider.designer.cs">
       <DependentUpon>TbSlider.cs</DependentUpon>
     </Compile>
-    <Compile Include="Quad.cs" />
+    <Compile Include="ScreenQuad.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TrackProps.cs" />
     <Compile Include="Forms\BaseDialog.cs">

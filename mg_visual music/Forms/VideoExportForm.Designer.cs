@@ -37,6 +37,14 @@
 			this.resolutionGroup.SuspendLayout();
 			this.SuspendLayout();
 			// 
+			// okBtn
+			// 
+			this.okBtn.TabIndex = 50;
+			// 
+			// cancelBtn
+			// 
+			this.cancelBtn.TabIndex = 60;
+			// 
 			// sphereCb
 			// 
 			this.sphereCb.AutoSize = true;
