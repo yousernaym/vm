@@ -5,7 +5,8 @@ float3x3 SampleWeights = { 0.75, 0.5, 0.75,
 						   0.5 ,  1, 0.5 ,
 						   0.75, 0.5, 0.75 };
 float PI = 3.1415926535f;
-float2 Viewport;
+float2 ViewportSize;
+float2 PrevFrameScaleOffset;
 float FrameSamples = 1;
 bool IsFirstFrame;
 
@@ -64,7 +65,7 @@ float4 getColor(float2 planeCoords)
 float4 PS(VSOutput IN) : COLOR0
 {
 	float4 cmSample = float4(0,0,0,0);
-	float2 sampleOffsetStep = 0.5f / Viewport;
+	float2 sampleOffsetStep = 0.5f / ViewportSize;
 	//return cmSample = getColor(IN.planeCoords);
 	for (int j = -1; j <= 1; j++)
 	{
@@ -76,7 +77,7 @@ float4 PS(VSOutput IN) : COLOR0
 	}	
 	cmSample /= 6 * FrameSamples;
 	if (!IsFirstFrame)
-		cmSample += tex2D(PrevFrameSampler, IN.planeCoords * float2(0.5f, 0.5f) + 0.5f);
+		cmSample += tex2D(PrevFrameSampler, IN.planeCoords * float2(0.5f, 0.5f * PrevFrameScaleOffset.x) + float2(0.5f, 0.5 + PrevFrameScaleOffset.y));
 	return cmSample;
 }
 

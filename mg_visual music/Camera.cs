@@ -14,7 +14,7 @@ namespace Visual_Music
 	public class Camera : ISerializable
 	{
 		public int Eye { get; set; } = 0;   //Stereoscopic rendering: -1 = left, 0 = center(monoscopic), 1 = right
-		public float EyeSeparation { get; set; } = 0.5f;   //1 = 100% of viewport width
+		public float EyeOffset { get; set; } = 0.25f;   //1 = 100% of viewport width
 		public bool InvertY { get; set; } = false;
 		public int CubeMapFace { get; set; } = -1; //-1 = normal rendering
 		public float Fov { get; set; } = (float)Math.PI / 4.0f;
@@ -87,17 +87,10 @@ namespace Visual_Music
 		{
 			get
 			{
-				//Vector3 posOffset = new Vector3();
-				//if (CubeMapFace >= 0)
-				//posOffset = 2 * Vector3.Forward;
-				//Vector3 newPos = pos + Vector3.Transform(posOffset, NonCubeRotMat);
-
 				//Vector3 rotCenter = pos - NonCubeRotMat.Forward * 1;
 				//Vector3 newPos = Vector3.Transform(pos - rotCenter, RotMat) + rotCenter;
 				Vector3 newPos = pos;
-				//Matrix rotMat = NonCubeRotMat;
-				//Matrix rotMat = RotMat;
-				Vector3 LeftOffset = NonCubeRotMat.Left * EyeSeparation * ViewPortSize.X;
+				Vector3 LeftOffset = NonCubeRotMat.Left * EyeOffset * ViewPortSize.X;
 				if (Eye == -1)
 					newPos += LeftOffset;
 				else if (Eye == 1)

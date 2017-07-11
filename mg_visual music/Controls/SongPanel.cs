@@ -653,8 +653,7 @@ namespace Visual_Music
 
 					Effect cubeToPlaneFx = Content.Load<Effect>("CubeToPlane");
 					cubeToPlaneFx.Parameters["CubeMap"].SetValue(renderTargetCube);
-					cubeToPlaneFx.Parameters["Viewport"].SetValue(new Vector2(videoFrameSize.X, videoFrameSize.Y));
-
+					
 					UInt64 frameDuration = 0;
 					UInt64 frameStart = 0;
 					int currentTempoEvent = 0;
@@ -674,17 +673,10 @@ namespace Visual_Music
 						MaxPitch -= (int)(pitchChange / 1.3f);
 						MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
 					}
-					const int frameSamples = 1;
+					const int frameSamples = 2;
 					cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
 					Camera.InvertY = !options.Sphere;
-					if (options.Stereo)
-					{
-						//if (options.Sphere)
-						//	quad.Size = new Vector2(1, 0.5f);
-						//else
-						//	quad.Size = new Vector2(0.5f, 1);
-					}
-
+					
 					setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
 					
 					while ((int)songPosInTicks < notes.SongLengthT && !progressForm.Cancel)
@@ -704,7 +696,6 @@ namespace Visual_Music
 						setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0 / videoFormat.fps, false);
 						progressForm.updateProgress(normSongPos);
 						frames++;
-						//EndDraw();
 					}
 					normSongPos = normSongPosBackup;
 					ViewWidthQn = viewWidthQnBackup;
@@ -756,7 +747,7 @@ namespace Visual_Music
 			{
 				if (options.Stereo)
 				{
-					drawSphere(renderTargetCube, renderTarget2d, prevFrame, songPosInTicks, cubeToPlaneFx, - 1);
+					drawSphere(renderTargetCube, renderTarget2d, prevFrame, songPosInTicks, cubeToPlaneFx, -1);
 					drawSphere(renderTargetCube, renderTarget2d, prevFrame, songPosInTicks, cubeToPlaneFx, 1);
 				}
 				else
@@ -797,13 +788,34 @@ namespace Visual_Music
 			Camera.Eye = 0;
 			cubeToPlaneFx.Parameters["PrevFrame"].SetValue(prevFrame);
 			cubeToPlaneFx.Parameters["IsFirstFrame"].SetValue(prevFrame == null);
-			cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();
 			GraphicsDevice.SetRenderTarget(renderTarget2d);
 			Viewport viewport = GraphicsDevice.Viewport;
-			if (eye == 1)
-				GraphicsDevice.Viewport = new Viewport(0, 0, viewport.Width, viewport.Height / 2);
+
+			Vector4 vpBounds;
+			Vector2 prevFrameSO;
+			if (eye == 0)
+			{
+				vpBounds = new Vector4(0, 0, viewport.Width, viewport.Height);
+				prevFrameSO = new Vector2(1, 0);
+			}
+			else if (eye == 1)
+			{
+				vpBounds = new Vector4(0, 0, viewport.Width, viewport.Height / 2);
+				prevFrameSO = new Vector2(0.5f, -0.25f);
+			}
 			else if (eye == -1)
-				GraphicsDevice.Viewport = new Viewport(0, viewport.Height / 2, viewport.Width, viewport.Height / 2);
+			{
+				vpBounds = new Vector4(0, viewport.Height / 2, viewport.Width, viewport.Height / 2);
+				prevFrameSO = new Vector2(0.5f, 0.25f);
+			}
+			else
+				throw new Exception("Undefined eye index");
+			
+			cubeToPlaneFx.Parameters["ViewportSize"].SetValue(new Vector2(vpBounds.Z, vpBounds.W));
+			cubeToPlaneFx.Parameters["PrevFrameScaleOffset"].SetValue(prevFrameSO);
+			GraphicsDevice.Viewport = new Viewport((int)vpBounds.X, (int)vpBounds.Y, (int)vpBounds.Z, (int)vpBounds.W);
+			
+			cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();
 			quad.draw();
 		}
 
