@@ -367,6 +367,7 @@ namespace Visual_Music
 			specPower = (float)info.GetValue("specPower", typeof(float));
 			specFov = (float)info.GetValue("specFov", typeof(float));
 			useGlobalLight = (bool)info.GetValue("useGlobalLight", typeof(bool));
+			posOffset = (Vector3)info.GetValue("posOffset", typeof(Vector3));
 		}
 		
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -387,7 +388,7 @@ namespace Visual_Music
 			info.AddValue("specPower", specPower);
 			info.AddValue("specFov", specAmount);
 			info.AddValue("useGlobalLight", useGlobalLight);
-
+			info.AddValue("posOffset", posOffset);
 		}
 
         public void loadContent(SongPanel songPanel)
