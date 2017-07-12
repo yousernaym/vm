@@ -343,31 +343,45 @@ namespace Visual_Music
 	
 		public TrackProps(SerializationInfo info, StreamingContext ctxt)
 		{
-			trackNumber = (int)info.GetValue("trackNumber", typeof(int));
-            if (trackNumber == 0)
-                globalProps = this;
-            transp = (float)info.GetValue("transp", typeof(float));
-			hue = (float)info.GetValue("hue", typeof(float));
-			normal = (Material)info.GetValue("normal", typeof(Material));
-			hilited = (Material)info.GetValue("hilited", typeof(Material));
-			texProps = (TrackPropsTex)info.GetValue("texProps", typeof(TrackPropsTex));
-			hmapProps = (TrackPropsTex)info.GetValue("hmapProps", typeof(TrackPropsTex));
-			noteStyles = (NoteStyle[])info.GetValue("noteStyles", typeof(NoteStyle[]));
-            NoteStyleType = (NoteStyleEnum)info.GetValue("noteStyleType", typeof(NoteStyleEnum));
-
-            foreach (NoteStyle ns in noteStyles)
-            {
-                if (ns != null)
-                    ns.TrackProps = this;
-            }
-			//lineStyleProps = (NoteStyleProps_Line)info.GetValue("lineStyleProps", typeof(NoteStyleProps_Line));
-			//curve = (Curve)info.GetValue("curve", typeof(Curve));
-			lightDir = (Vector3)info.GetValue("lightDir", typeof(Vector3));
-			specAmount = (float)info.GetValue("specAmount", typeof(float));
-			specPower = (float)info.GetValue("specPower", typeof(float));
-			specFov = (float)info.GetValue("specFov", typeof(float));
-			useGlobalLight = (bool)info.GetValue("useGlobalLight", typeof(bool));
-			posOffset = (Vector3)info.GetValue("posOffset", typeof(Vector3));
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "trackNumber")
+					trackNumber = (int)entry.Value;
+				if (entry.Name == "transp")
+					transp = (float)entry.Value;
+				if (entry.Name == "hue")
+					hue = (float)entry.Value;
+				if (entry.Name == "normal")
+					normal = (Material)entry.Value;
+				if (entry.Name == "hilited")
+					hilited = (Material)entry.Value;
+				if (entry.Name == "texProps")
+					texProps = (TrackPropsTex)entry.Value;
+				if(entry.Name == "hmapProps")
+					hmapProps = (TrackPropsTex)entry.Value;
+				if (entry.Name == "noteStyles")
+					noteStyles = (NoteStyle[])entry.Value;
+				if (entry.Name == "noteStyleType")
+					NoteStyleType = (NoteStyleEnum)entry.Value;
+				if (entry.Name == "lightDir")
+					lightDir = (Vector3)entry.Value;
+				if (entry.Name == "specAmount")
+					specAmount = (float)entry.Value;
+				if (entry.Name == "specPower")
+					specPower = (float)entry.Value;
+				//specFov = (float)info.GetValue("specFov", typeof(float));
+				if (entry.Name == "useGlobalLight")
+					useGlobalLight = (bool)entry.Value;
+				if (entry.Name == "posOffset")
+					posOffset = (Vector3)entry.Value;
+			}
+			if (trackNumber == 0)
+				globalProps = this;
+			foreach (NoteStyle ns in noteStyles)
+			{
+				if (ns != null)
+					ns.TrackProps = this;
+			}
 		}
 		
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
