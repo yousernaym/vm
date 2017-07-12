@@ -186,8 +186,25 @@ namespace Visual_Music
 	[Serializable()]
 	public class TrackProps : ISerializable
 	{
-        static TrackProps globalProps;
-        TrackPropsTex texProps = new TrackPropsTex();
+		static TrackProps globalProps;
+		public Vector3 posOffset;
+		public Vector3 PosOffset { get => posOffset; set => posOffset = value; }
+		public float XOffset
+		{
+			get => posOffset.X;
+			set => posOffset.X = value;
+		}
+		public float YOffset
+		{
+			get => posOffset.Y;
+			set => posOffset.Y = value;
+		}
+		public float ZOffset
+		{
+			get => posOffset.Z;
+			set => posOffset.Z = value;
+		}
+		TrackPropsTex texProps = new TrackPropsTex();
 		public TrackPropsTex TexProps
 		{
 			get { return texProps; }
@@ -205,12 +222,6 @@ namespace Visual_Music
 				return hmapProps;
 		}
 		
-		static bool bgr = false;
-		static public bool Bgr
-		{
-			get { return bgr; }
-			set { bgr = value; }
-		}
 		int trackNumber;
 		public int TrackNumber
 		{
@@ -256,14 +267,14 @@ namespace Visual_Music
             }
         }
 		
-		TrackProps2 normal;
-		internal TrackProps2 Normal
+		Material normal;
+		internal Material Normal
 		{
 			get { return normal; }
 			set { normal = value; }
 		}
-		TrackProps2 hilited;
-		internal TrackProps2 Hilited
+		Material hilited;
+		internal Material Hilited
 		{
 			get { return hilited; }
 			set { hilited = value; }
@@ -337,8 +348,8 @@ namespace Visual_Music
                 globalProps = this;
             transp = (float)info.GetValue("transp", typeof(float));
 			hue = (float)info.GetValue("hue", typeof(float));
-			normal = (TrackProps2)info.GetValue("normal", typeof(TrackProps2));
-			hilited = (TrackProps2)info.GetValue("hilited", typeof(TrackProps2));
+			normal = (Material)info.GetValue("normal", typeof(Material));
+			hilited = (Material)info.GetValue("hilited", typeof(Material));
 			texProps = (TrackPropsTex)info.GetValue("texProps", typeof(TrackPropsTex));
 			hmapProps = (TrackPropsTex)info.GetValue("hmapProps", typeof(TrackPropsTex));
 			noteStyles = (NoteStyle[])info.GetValue("noteStyles", typeof(NoteStyle[]));
@@ -462,6 +473,30 @@ namespace Visual_Music
 			}
 		}
 
+		public void resetStyle()
+		{
+			int[] styleTypes = (int[])Enum.GetValues(typeof(NoteStyleEnum));
+			string[] styleNames = (string[])Enum.GetNames(typeof(NoteStyleEnum));
+			for (int i = 0; i < noteStyles.Length; i++)
+			{
+				if ((NoteStyleEnum)styleTypes[i] != NoteStyleEnum.Default)
+				{
+					noteStyles[i] = (NoteStyle)Activator.CreateInstance(Type.GetType("Visual_Music.NoteStyle_" + styleNames[i]));
+					noteStyles[i].loadFx();
+				}
+			}
+			if (trackNumber == 0)
+			{
+				NoteStyleType = NoteStyleEnum.Bar;
+				UseGlobalLight = false;
+			}
+			else
+			{
+				NoteStyleType = NoteStyleEnum.Default;
+				UseGlobalLight = true;
+			}
+		}
+
 		public void resetMaterial()
 		{
             texProps.unloadTexture();
@@ -470,42 +505,19 @@ namespace Visual_Music
 			{
 				transp = 1;
 				hue = 0.1f;
-				normal = new TrackProps2(1, 0.27f);
-				hilited = new TrackProps2(0.8f, 0.75f);
+				normal = new Material(1, 0.27f);
+				hilited = new Material(0.8f, 0.75f);
 			}
 			else
 			{
 				transp = 0.5f;
 				hue = (float)(trackNumber - 1) / (numTracks - 1);
-				normal = new TrackProps2();
-				hilited = new TrackProps2(); ;
+				normal = new Material();
+				hilited = new Material(); ;
 			}
             
 		}
-		
-		public void resetStyle()
-		{
-            int[] styleTypes = (int[])Enum.GetValues(typeof(NoteStyleEnum));
-            string[] styleNames = (string[])Enum.GetNames(typeof(NoteStyleEnum));
-            for (int i = 0; i < noteStyles.Length; i++)
-            {
-                if ((NoteStyleEnum)styleTypes[i] != NoteStyleEnum.Default)
-                {
-                    noteStyles[i] = (NoteStyle)Activator.CreateInstance(Type.GetType("Visual_Music.NoteStyle_" + styleNames[i]));
-                    noteStyles[i].loadFx();
-                }
-            }
-            if (trackNumber == 0)
-			{
-                NoteStyleType = NoteStyleEnum.Bar;
-			    UseGlobalLight = false;
-			}
-			else
-			{
-                NoteStyleType = NoteStyleEnum.Default;
-                UseGlobalLight = true;
-			}
-		}
+				
 		public void resetLight()
 		{
 			if (trackNumber == 0)
@@ -517,11 +529,18 @@ namespace Visual_Music
 			specPower = 50;
 			specFov = 90;
 		}
+
+		public void resetSpatial()
+		{
+			PosOffset = new Vector3();
+		}
+
 		public void resetProps()
 		{
 			resetMaterial();
 			resetStyle();
 			resetLight();
+			resetSpatial();
 		}
 		public void drawTrack(SongDrawProps songDrawProps, TrackProps globalTrackProps, bool selectingRegion)
 		{
@@ -582,8 +601,8 @@ namespace Visual_Music
 		public Color getColor(bool bhilited, TrackProps globalProps, bool alpha)
 		{
 			double h, s, l;
-			TrackProps2 tp2;
-			TrackProps2 globalTp2;
+			Material tp2;
+			Material globalTp2;
 			if (bhilited)
 			{
 				tp2 = hilited;
@@ -603,7 +622,7 @@ namespace Visual_Music
 			    s = 1;
 			if (l > 1)
 			    l = 1;
-			Color c = SongPanel.HSLA2RGBA(h, s, l, alpha ? transp * globalProps.transp : 1, bgr);
+			Color c = SongPanel.HSLA2RGBA(h, s, l, alpha ? transp * globalProps.transp : 1);
 			
 			//c *= (transp * globalProps.transp * 255);
 			return c;
@@ -611,7 +630,7 @@ namespace Visual_Music
 	}
 
 	[Serializable()]
-	class TrackProps2 : ISerializable
+	class Material : ISerializable
 	{
 		//TrackProps parent;
 		float sat = 1;
@@ -641,19 +660,19 @@ namespace Visual_Music
 		{
 			get { return System.Drawing.Color.FromArgb(color.R, color.G, color.B); }
 		}
-		public TrackProps2()
+		public Material()
 		{
 			sat = 1;
 			lum = 1;
 			texture = null;
 		}
-		public TrackProps2(float _sat, float _lum, Texture2D tex = null)
+		public Material(float _sat, float _lum, Texture2D tex = null)
 		{
 			sat = _sat;
 			lum = _lum;
 			texture = tex;
 		}
-		public TrackProps2(SerializationInfo info, StreamingContext ctxt)
+		public Material(SerializationInfo info, StreamingContext ctxt)
 		{
 			sat = (float)info.GetValue("sat", typeof(float));
 			lum = (float)info.GetValue("lum", typeof(float));
@@ -666,10 +685,6 @@ namespace Visual_Music
 			info.AddValue("lum", lum);
 			info.AddValue("texture", texture);
 		}
-		//public void calcColor(float hue, bool bgr)
-		//{
-		//    color = SongPanel.HSLA2RGBA(hue, sat, lum, 1, bgr);
-		//}
 	}
 	
 }

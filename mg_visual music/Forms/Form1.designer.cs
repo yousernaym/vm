@@ -166,6 +166,15 @@
 			this.label25 = new System.Windows.Forms.Label();
 			this.lightDirxTb = new System.Windows.Forms.TextBox();
 			this.globalLightCb = new System.Windows.Forms.CheckBox();
+			this.tabPage4 = new System.Windows.Forms.TabPage();
+			this.defaultSpatialBtn = new System.Windows.Forms.Button();
+			this.label41 = new System.Windows.Forms.Label();
+			this.label40 = new System.Windows.Forms.Label();
+			this.label39 = new System.Windows.Forms.Label();
+			this.label20 = new System.Windows.Forms.Label();
+			this.zoffsetUd = new System.Windows.Forms.NumericUpDown();
+			this.yoffsetUd = new System.Windows.Forms.NumericUpDown();
+			this.xoffsetUd = new System.Windows.Forms.NumericUpDown();
 			this.textureBrowseBtn = new System.Windows.Forms.Button();
 			this.texPathTb = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -223,6 +232,10 @@
 			((System.ComponentModel.ISupportInitialize)(this.specFovUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).BeginInit();
+			this.tabPage4.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).BeginInit();
 			this.songPropsPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).BeginInit();
@@ -563,6 +576,7 @@
 			this.leftTrackPropsPanel.Controls.Add(this.tabPage3);
 			this.leftTrackPropsPanel.Controls.Add(this.tabPage1);
 			this.leftTrackPropsPanel.Controls.Add(this.tabPage2);
+			this.leftTrackPropsPanel.Controls.Add(this.tabPage4);
 			this.leftTrackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
 			this.leftTrackPropsPanel.Location = new System.Drawing.Point(187, 0);
 			this.leftTrackPropsPanel.Name = "leftTrackPropsPanel";
@@ -1769,10 +1783,128 @@
 			this.globalLightCb.UseVisualStyleBackColor = true;
 			this.globalLightCb.CheckedChanged += new System.EventHandler(this.globalLightCb_CheckedChanged);
 			// 
+			// tabPage4
+			// 
+			this.tabPage4.Controls.Add(this.defaultSpatialBtn);
+			this.tabPage4.Controls.Add(this.label41);
+			this.tabPage4.Controls.Add(this.label40);
+			this.tabPage4.Controls.Add(this.label39);
+			this.tabPage4.Controls.Add(this.label20);
+			this.tabPage4.Controls.Add(this.zoffsetUd);
+			this.tabPage4.Controls.Add(this.yoffsetUd);
+			this.tabPage4.Controls.Add(this.xoffsetUd);
+			this.tabPage4.Location = new System.Drawing.Point(4, 22);
+			this.tabPage4.Name = "tabPage4";
+			this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage4.Size = new System.Drawing.Size(200, 10026);
+			this.tabPage4.TabIndex = 3;
+			this.tabPage4.Text = "Spatial";
+			this.tabPage4.UseVisualStyleBackColor = true;
+			// 
+			// defaultSpatialBtn
+			// 
+			this.defaultSpatialBtn.Location = new System.Drawing.Point(7, 6);
+			this.defaultSpatialBtn.Name = "defaultSpatialBtn";
+			this.defaultSpatialBtn.Size = new System.Drawing.Size(179, 23);
+			this.defaultSpatialBtn.TabIndex = 2;
+			this.defaultSpatialBtn.Text = "Default Spatial";
+			this.defaultSpatialBtn.UseVisualStyleBackColor = true;
+			this.defaultSpatialBtn.Click += new System.EventHandler(this.defaultSpatialBtn_Click);
+			// 
+			// label41
+			// 
+			this.label41.AutoSize = true;
+			this.label41.Location = new System.Drawing.Point(156, 80);
+			this.label41.Name = "label41";
+			this.label41.Size = new System.Drawing.Size(14, 13);
+			this.label41.TabIndex = 1;
+			this.label41.Text = "Z";
+			// 
+			// label40
+			// 
+			this.label40.AutoSize = true;
+			this.label40.Location = new System.Drawing.Point(92, 80);
+			this.label40.Name = "label40";
+			this.label40.Size = new System.Drawing.Size(14, 13);
+			this.label40.TabIndex = 1;
+			this.label40.Text = "Y";
+			// 
+			// label39
+			// 
+			this.label39.AutoSize = true;
+			this.label39.Location = new System.Drawing.Point(24, 80);
+			this.label39.Name = "label39";
+			this.label39.Size = new System.Drawing.Size(14, 13);
+			this.label39.TabIndex = 1;
+			this.label39.Text = "X";
+			// 
+			// label20
+			// 
+			this.label20.AutoSize = true;
+			this.label20.Location = new System.Drawing.Point(6, 41);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(73, 13);
+			this.label20.TabIndex = 1;
+			this.label20.Text = "Position offset";
+			// 
+			// zoffsetUd
+			// 
+			this.zoffsetUd.Location = new System.Drawing.Point(140, 57);
+			this.zoffsetUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.zoffsetUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.zoffsetUd.Name = "zoffsetUd";
+			this.zoffsetUd.Size = new System.Drawing.Size(54, 20);
+			this.zoffsetUd.TabIndex = 0;
+			this.zoffsetUd.ValueChanged += new System.EventHandler(this.zoffsetUd_ValueChanged);
+			// 
+			// yoffsetUd
+			// 
+			this.yoffsetUd.Location = new System.Drawing.Point(71, 57);
+			this.yoffsetUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.yoffsetUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.yoffsetUd.Name = "yoffsetUd";
+			this.yoffsetUd.Size = new System.Drawing.Size(63, 20);
+			this.yoffsetUd.TabIndex = 0;
+			this.yoffsetUd.ValueChanged += new System.EventHandler(this.yoffsetUd_ValueChanged);
+			// 
+			// xoffsetUd
+			// 
+			this.xoffsetUd.Location = new System.Drawing.Point(6, 57);
+			this.xoffsetUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.xoffsetUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.xoffsetUd.Name = "xoffsetUd";
+			this.xoffsetUd.Size = new System.Drawing.Size(59, 20);
+			this.xoffsetUd.TabIndex = 0;
+			this.xoffsetUd.ValueChanged += new System.EventHandler(this.xoffsetUd_ValueChanged);
+			// 
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-2532, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-2600, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1784,7 +1916,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-2644, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-2712, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1794,7 +1926,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-2647, 10040);
+			this.label4.Location = new System.Drawing.Point(-2715, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2065,6 +2197,11 @@
 			((System.ComponentModel.ISupportInitialize)(this.specFovUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).EndInit();
+			this.tabPage4.ResumeLayout(false);
+			this.tabPage4.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).EndInit();
 			this.songPropsPanel.ResumeLayout(false);
 			this.songPropsPanel.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).EndInit();
@@ -2237,6 +2374,15 @@
 		private System.Windows.Forms.ToolStripMenuItem nudgeForwardToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem jumpBackwardsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem jumpForwardToolStripMenuItem;
+		private System.Windows.Forms.TabPage tabPage4;
+		private System.Windows.Forms.Button defaultSpatialBtn;
+		private System.Windows.Forms.Label label20;
+		private System.Windows.Forms.NumericUpDown xoffsetUd;
+		private System.Windows.Forms.Label label41;
+		private System.Windows.Forms.Label label40;
+		private System.Windows.Forms.Label label39;
+		private System.Windows.Forms.NumericUpDown zoffsetUd;
+		private System.Windows.Forms.NumericUpDown yoffsetUd;
 	}
 }
 

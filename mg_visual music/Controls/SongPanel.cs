@@ -114,7 +114,7 @@ namespace Visual_Music
 		Stopwatch stopwatch = new Stopwatch();
 		//TimeSpan deltaTime;
 		double deltaTimeS;
-		double renderInterval = 0.0001;
+		//double renderInterval = 0.0001;
 		bool leftMbPressed = false;
 		//public bool RightMbPressed { get; set; }
 		double scrollCenter = 0;
@@ -1043,7 +1043,7 @@ namespace Visual_Music
 				MessageBox.Show("An error occured while stopping playback.");
 			NormSongPos = 0;
 		}
-		public static Color HSLA2RGBA(double h, double s, double l, float a, bool bgr)
+		public static Color HSLA2RGBA(double h, double s, double l, float a, bool bgr = false)
 		{
 			double v;
 			double r, g, b;

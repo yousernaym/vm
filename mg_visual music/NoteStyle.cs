@@ -197,7 +197,9 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
 			fx.Parameters["WvpMat"].SetValue(cam.VpMat);
-			
+			Matrix projMat = cam.ProjMat;
+			fx.Parameters["ProjScale"].SetValue(new Vector2(projMat.M11, projMat.M22));
+
 			//Light props
 			TrackProps lightProps = trackProps.UseGlobalLight ? globalTrackProps : trackProps;
             Vector3 normLightDir = lightProps.LightDir;
@@ -205,11 +207,15 @@ namespace Visual_Music
             fx.Parameters["LightDir"].SetValue(normLightDir);
             fx.Parameters["SpecAmount"].SetValue(lightProps.SpecAmount);
             fx.Parameters["SpecPower"].SetValue(lightProps.SpecPower);
-            float angle = lightProps.SpecFov * (float)Math.PI / (360);
-            float camPosZ = (songDrawProps.viewportSize.X / 2) / (float)Math.Tan(angle);
-            Vector3 specCamPos = new Vector3(songDrawProps.viewportSize.X / 2, songDrawProps.viewportSize.Y / 2, camPosZ);
-            fx.Parameters["SpecCamPos"].SetValue(specCamPos);
+            //float angle = lightProps.SpecFov * (float)Math.PI / (360);
+            //float camPosZ = (songDrawProps.viewportSize.X / 2) / (float)Math.Tan(angle);
+            //Vector3 specCamPos = new Vector3(songDrawProps.viewportSize.X / 2, songDrawProps.viewportSize.Y / 2, camPosZ);
+            fx.Parameters["SpecCamPos"].SetValue(songPanel.Camera.Pos);
 
+			//Spatial props
+			Vector3 posOffset = globalTrackProps.PosOffset + trackProps.PosOffset;
+			posOffset *= 0.01f * songDrawProps.viewportSize.X;
+			fx.Parameters["PosOffset"].SetValue(posOffset);
         }
     }
 

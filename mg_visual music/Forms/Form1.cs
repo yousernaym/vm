@@ -54,7 +54,7 @@ namespace Visual_Music
 		public TpartyIntegrationForm tpartyIntegrationForm;
 		VideoExportForm vidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(TrackProps2), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera)};
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(Material), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera)};
         SongPanel songPanel = new SongPanel();
 		ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
@@ -651,7 +651,12 @@ namespace Visual_Music
 				specAmountUd.Value = (decimal)selectedTrackProps.SpecAmount;
 				specPowUd.Value = (decimal)selectedTrackProps.SpecPower;
 				specFovUd.Value = (decimal)selectedTrackProps.SpecFov;
-                //---------------------------------
+				//---------------------------------
+
+				//Spatial---------------------------------
+				xoffsetUd.Value = (decimal)selectedTrackProps.XOffset;
+				yoffsetUd.Value = (decimal)selectedTrackProps.YOffset;
+				zoffsetUd.Value = (decimal)selectedTrackProps.ZOffset;                  //---------------------------------------------
 			}
 			updatingControls = false;
 		}
@@ -1211,6 +1216,13 @@ namespace Visual_Music
 			updateTrackControls();
 		}
 
+		private void defaultSpatialBtn_Click(object sender, EventArgs e)
+		{
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				songPanel.TrackProps[trackList.SelectedIndices[i]].resetSpatial();
+			updateTrackControls();
+		}
+
 		private void lineHlStyleList_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (updatingControls)
@@ -1517,6 +1529,30 @@ namespace Visual_Music
 		private void songScrollBar_ValueChanged(object sender, EventArgs e)
 		{
 			songPanel.NormSongPos = (double)songScrollBar.Value / songScrollBar.Maximum;
+		}
+
+		private void xoffsetUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				songPanel.TrackProps[trackList.SelectedIndices[i]].XOffset = (float)xoffsetUd.Value;
+		}
+
+		private void yoffsetUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				songPanel.TrackProps[trackList.SelectedIndices[i]].YOffset = (float)yoffsetUd.Value;
+		}
+
+		private void zoffsetUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				songPanel.TrackProps[trackList.SelectedIndices[i]].ZOffset = (float)zoffsetUd.Value;
 		}
 	}
 }

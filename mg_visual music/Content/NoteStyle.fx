@@ -2,6 +2,7 @@
 float2 ViewportSize;
 float2 TexSize;
 texture Texture;
+float2 ProjScale;
 
 sampler  TextureSampler = sampler_state
 {
@@ -15,3 +16,4 @@ float SpecAmount;
 float SpecPower;
 float SpecFov;
 float3 SpecCamPos;
+float3 PosOffset;

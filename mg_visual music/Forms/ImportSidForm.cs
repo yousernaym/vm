@@ -41,42 +41,42 @@ namespace Visual_Music
 		double getSongLength()
 		{
 			return 300;
-			using (var stream = File.OpenRead(noteFilePath.Text))
-			{
-				using (var md5 = MD5.Create())
-				{
-					//TODO: Create accurate sid hash
-					byte[] bytes = md5.ComputeHash(stream);
-					string hash1 = "";
-					foreach (byte b in bytes)
-					{
-						hash1 += b.ToString("X2");
-					}
-					hash1 = hash1.ToLower();
-					using (StreamReader reader = new StreamReader(parent.tpartyIntegrationForm.SongLengthsPath))
-					{
-						while (!reader.EndOfStream)
-						{
-							string line = reader.ReadLine().Trim();
-							if (!string.IsNullOrEmpty(line) && line[0] != ';')
-							{
-								int equalSignIndex = line.IndexOf('=');
-								if (equalSignIndex > 0)
-								{
-									string hash2 = line.Substring(0, equalSignIndex).ToLower();
-									if (hash1 == hash2)
-									{
-										//read song time
-										MessageBox.Show("Match found");
-									}
-								}
+			//using (var stream = File.OpenRead(noteFilePath.Text))
+			//{
+			//	using (var md5 = MD5.Create())
+			//	{
+			//		//TODO: Create accurate sid hash
+			//		byte[] bytes = md5.ComputeHash(stream);
+			//		string hash1 = "";
+			//		foreach (byte b in bytes)
+			//		{
+			//			hash1 += b.ToString("X2");
+			//		}
+			//		hash1 = hash1.ToLower();
+			//		using (StreamReader reader = new StreamReader(parent.tpartyIntegrationForm.SongLengthsPath))
+			//		{
+			//			while (!reader.EndOfStream)
+			//			{
+			//				string line = reader.ReadLine().Trim();
+			//				if (!string.IsNullOrEmpty(line) && line[0] != ';')
+			//				{
+			//					int equalSignIndex = line.IndexOf('=');
+			//					if (equalSignIndex > 0)
+			//					{
+			//						string hash2 = line.Substring(0, equalSignIndex).ToLower();
+			//						if (hash1 == hash2)
+			//						{
+			//							//read song time
+			//							MessageBox.Show("Match found");
+			//						}
+			//					}
 
-							}
-						}
-					}
-				}
+			//				}
+			//			}
+			//		}
+			//	}
 				
-			}
+			//}
 		}
 	}
 }
