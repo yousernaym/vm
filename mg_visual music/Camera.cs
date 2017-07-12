@@ -90,17 +90,18 @@ namespace Visual_Music
 				//Vector3 rotCenter = pos - NonCubeRotMat.Forward * 1;
 				//Vector3 newPos = Vector3.Transform(pos - rotCenter, RotMat) + rotCenter;
 				Vector3 newPos = pos;
-				Vector3 LeftOffset = NonCubeRotMat.Left * EyeOffset * ViewPortSize.X;
+				Vector3 LeftOffset = NonCubeRotMat.Left * EyeOffset;
 				if (Eye == -1)
 					newPos += LeftOffset;
 				else if (Eye == 1)
 					newPos -= LeftOffset;
+				newPos *= ViewportSize.X;
 				Matrix transMat = Matrix.CreateTranslation(newPos);
 				return Matrix.Invert(RotMat * transMat);
 			}
 		}
-		public Vector2 ViewPortSize => new Vector2(SongPanel.GraphicsDevice.Viewport.Width, SongPanel.GraphicsDevice.Viewport.Height);
-		Matrix ViewPortMat
+		public Vector2 ViewportSize => new Vector2(SongPanel.GraphicsDevice.Viewport.Width, SongPanel.GraphicsDevice.Viewport.Height);
+		Matrix ViewportMat
 		{
 			get
 			{
@@ -115,14 +116,14 @@ namespace Visual_Music
 			get
 			{
 				float fov = CubeMapFace >= 0 ? (float)Math.PI / 2.0f : Fov;
-				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, ViewPortSize.X / ViewPortSize.Y, 0.001f, 100000);
+				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, ViewportSize.X / ViewportSize.Y, 0.001f, 100000);
 				if (InvertY)
 					mat.M22 *= -1;
 				return mat;
 			}
 		}
 
-		public Matrix VpMat => ViewPortMat * ViewMat * ProjMat;
+		public Matrix VpMat => ViewportMat * ViewMat * ProjMat;
 		
 		public SongPanel SongPanel { get; set; }
 		
