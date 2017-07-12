@@ -215,6 +215,7 @@ namespace Visual_Music
 			//Spatial props
 			Vector3 posOffset = globalTrackProps.PosOffset + trackProps.PosOffset;
 			posOffset *= 0.01f * songDrawProps.viewportSize.X;
+			posOffset.Z -= projMat.M22 * songDrawProps.viewportSize.Y;
 			fx.Parameters["PosOffset"].SetValue(posOffset);
         }
     }
@@ -494,7 +495,7 @@ namespace Visual_Music
 					continue;
 				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
 				float noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch).X;
-				float z = -2.41f;
+				float z = fx.Parameters["PosOffset"].GetValueVector3().Z;// -songPanel.Camera.ProjMat.M22 * songDrawProps.viewportSize.Y;
 				Vector4 noteStartProj = Vector4.Transform(new Vector4(noteStart.X, noteStart.Y, z, 1), songPanel.Camera.VpMat);
 				Vector3 noteStartScreen = new Vector3(noteStartProj.X, noteStartProj.Y, noteStartProj.Z) / noteStartProj.W;
 				//---------------------------------

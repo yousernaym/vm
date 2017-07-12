@@ -67,28 +67,25 @@ struct VSOutput
 	float2 texCoords : TEXCOORD0;
 };
 
-void VS(in VSInput IN, out VSOutput OUT)				
+void VS(in VSInput IN, out VSOutput OUT)
 {
 	OUT.normal = IN.normal;
 	OUT.normal2 = IN.normal2;
 	OUT.center = IN.center;
-	
+
 	OUT.rawPos = IN.pos.xyz;
 	//OUT.pos.xy -= 0.5;
 	// Compute the texture coordinate.
 	//OUT.texCoords = OUT.rawPos.xy / TexSize;
 	OUT.texCoords = IN.texCoords;
 
-	OUT.pos = float4(IN.pos.xyz, 1);
-	OUT.pos.z = -2.412;
+	OUT.pos = float4(IN.pos.xy, 0, 1);
+	OUT.pos.xyz += PosOffset;
 	OUT.pos = mul(OUT.pos, WvpMat);
 	// Viewport adjustment.
 	//OUT.pos.xy /= ViewportSize;
 	//OUT.pos.xy *= float2(2, -2);
 	//OUT.pos.xy -= float2(1, -1);
-
-	// Apply the matrix transform.
-	//OUT.pos = mul(IN.pos.xyz, transpose(MatrixTransform));
 }
 
 
@@ -107,6 +104,7 @@ void SimplePS(out float4 color : COLOR0, in VSOutput IN)
 	//color.z = tPos.x;
 	//color = float4(IN.normal.x, IN.rawPos.x, 1, 1);
 	//color = float4(0, tPos.y*0.1, 0, 1);
+	//color = float4(1, 1, 1, 1);
 }
 
 void LightingPS(out float4 color : COLOR0, in VSOutput IN)
