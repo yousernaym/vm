@@ -29,12 +29,7 @@ VSOutput VS(VSInput IN)
 	//OUT.pos.w = 1;
 	OUT.texCoords = IN.texCoords.xy + IN.pos * (IN.texCoords.zw - IN.texCoords.xy);
 	OUT.color = IN.color;
-    //float4 worldPosition = mul(input.Position, World);
-    //float4 viewPosition = mul(worldPosition, View);
-    //output.Position = mul(viewPosition, Projection);
-	//output.pos = mul(input.pos, WvpMat);
-
-	return OUT;
+    return OUT;
 }
 
 float4 PS(VSOutput IN) : COLOR0

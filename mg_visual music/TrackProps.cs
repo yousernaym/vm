@@ -559,10 +559,11 @@ namespace Visual_Music
 		}
 		public void drawTrack(SongDrawProps songDrawProps, TrackProps globalTrackProps, bool selectingRegion)
 		{
+			TrackProps texTrackProps = getTexture(false, null) != null ? this : globalTrackProps;
 			if (selectingRegion)
-			    getNoteStyle(NoteStyleEnum.Bar).drawTrack(midiTrack, songDrawProps, this, globalTrackProps, selectingRegion);
+			    getNoteStyle(NoteStyleEnum.Bar).drawTrack(midiTrack, songDrawProps, this, globalTrackProps, selectingRegion, texTrackProps);
             else
-			    SelectedNoteStyle.drawTrack(midiTrack, songDrawProps, this, globalTrackProps, selectingRegion);
+			    SelectedNoteStyle.drawTrack(midiTrack, songDrawProps, this, globalTrackProps, selectingRegion, texTrackProps);
 		}
 
         //public void drawNote(NoteDrawProps drawProps, TrackProps globalProps)

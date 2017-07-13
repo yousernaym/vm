@@ -189,10 +189,12 @@ namespace Visual_Music
         {   //Get currently visible notes in specified track
             return track.getNotes(songDrawProps.songPosT - songDrawProps.viewWidthT / 2 - leftMargin, songDrawProps.songPosT + songDrawProps.viewWidthT / 2 + leftMargin);
         }
-        virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion)
+        virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
 		{
 			Camera cam = selectingRegion ? songPanel.DefaultCamera : songPanel.Camera;
-			
+
+			songPanel.GraphicsDevice.SamplerStates[0] = texTrackProps.TexProps.SamplerState;
+			songPanel.GraphicsDevice.SamplerStates[1] = texTrackProps.HmapProps.SamplerState;
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
@@ -252,15 +254,14 @@ namespace Visual_Music
         {
             fx = songPanel.Content.Load<Effect>("Bar");
         }
-		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion)
+		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
 		{
-            base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion);
+			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps);
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			List<Midi.Note> noteList = midiTrack.Notes;
 			if (noteList.Count == 0)
 				return;
-			TrackProps texTrackProps = trackProps.getTexture(false, null) != null ? trackProps : globalTrackProps;
-			
+						
 			//songPanel.SpriteBatch.Begin(SpriteSortMode.Deferred, songPanel.BlendState, texTrackProps.TexProps.SamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
 			for (int n = 0; n < noteList.Count; n++)
 			{
@@ -917,9 +918,9 @@ namespace Visual_Music
 		//	return typeof(T).GetProperties()[0].Name;
 		//}
 
-		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion)
+		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
 		{
-            base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion);
+			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps);
 			//testVerts[0].pos = new Vector4(1, 0, 0, 0);
 			//testVerts[1].pos = new Vector4(0, 2, 0, 0);
 			//testVerts[2].pos = new Vector4(0, 0, 3, 0);
@@ -962,10 +963,6 @@ namespace Visual_Music
             fx.Parameters["TexSize"].SetValue(texSize);
             fx.Parameters["Texture"].SetValue(texture);
 			
-			TrackProps texTrackProps = trackProps.getTexture(false, null) != null ? trackProps : globalTrackProps;
-			songPanel.GraphicsDevice.SamplerStates[0] = texTrackProps.TexProps.SamplerState;
-			songPanel.GraphicsDevice.SamplerStates[1] = texTrackProps.HmapProps.SamplerState;
-									
 			int numVerts;
 			bool drawHlNote=false;
 			drawTrackLine(out numVerts, out drawHlNote, LineWidth, noteList, midiTrack, songDrawProps, trackProps, texTrackProps, texSize);
