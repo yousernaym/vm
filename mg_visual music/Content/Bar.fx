@@ -13,6 +13,7 @@ struct VSOutput
     float4 pos : POSITION0;
 	float2 texCoords : TEXCOORD0;
 	float4 color : COLOR0;
+	float2 normPos : POSITION1;
 };
 
 VSOutput VS(VSInput IN)
@@ -29,6 +30,7 @@ VSOutput VS(VSInput IN)
 	//OUT.pos.w = 1;
 	OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw;
 	OUT.color = IN.color;
+	OUT.normPos = IN.normPos - 0.5f;
     return OUT;
 }
 
@@ -36,6 +38,9 @@ float4 PS(VSOutput IN) : COLOR0
 {
 	float4 color = IN.color;
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
+	float2 distFromCenter = abs(IN.normPos);
+	float2 border = saturate(distFromCenter - 0.3);
+	color = saturate(color + 4 * max(border.x, border.y));
     return color;
 	//return float4(1, 1, 1, 1);
 }

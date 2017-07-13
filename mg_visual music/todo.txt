@@ -2,7 +2,7 @@
 - Use shader for bar rendering and add rendering options for bar style.
 - Don't clamp brightness before modulating with texture.
 - Bump mapping.
-
+- Common style parameters: border size, border crossfade size, border color, border shape (round, square)
 
 Done:
 - Specify mixdown name to libmikmod so that different projects can be open at the same time (in multiple instances of Visual Music) with their respective mixdown files.
@@ -14,4 +14,4 @@ Done:
 - Refactor effects. TrackProps has LineStyleEnum to determine line style. NoteStyle_Bar/Line instances contains props and fx.
 - Get MonoGame keys to work. (ctrl and shift when selecting notes in SongPanel)
   Switched to winforms onmousedown/up instead.
-(- Swap r and b channels in texture sample in shader when rendering video.) Not needed anymore?
+- Swap r and b channels when rendering video (use bgr rendertarget).
