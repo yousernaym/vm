@@ -299,12 +299,12 @@ namespace Visual_Music
 						float vTexelsPerPixel = (float)srcRect.Height / destRect.Height;
 						if (texTrackProps.TexProps.UTile && !texTrackProps.TexProps.VTile)
 						{
-							srcRect.X = (int)(destRect.X * vTexelsPerPixel);
+							srcRect.X = (int)(srcRect.X * vTexelsPerPixel);
 							srcRect.Width = (int)(destRect.Width * vTexelsPerPixel);
 						}
 						else if (!texTrackProps.TexProps.UTile && texTrackProps.TexProps.VTile)
 						{
-							srcRect.Y = (int)(destRect.Y * uTexelsPerPixel);
+							srcRect.Y = (int)(srcRect.Y * uTexelsPerPixel);
 							srcRect.Height = (int)(destRect.Height * uTexelsPerPixel);
 						}
 					}
