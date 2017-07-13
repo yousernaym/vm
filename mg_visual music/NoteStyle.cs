@@ -312,8 +312,8 @@ namespace Visual_Music
 					srcRect.X -= (int)(texScroll.X * texture.Width);
 					srcRect.Y -= (int)(texScroll.Y * texture.Height);
 				}
-				instanceVerts[n].destRect = new Vector4(destRect.X, destRect.Y, destRect.Right, destRect.Bottom);
-				instanceVerts[n].srcRect = new Vector4(srcRect.X, srcRect.Y, srcRect.Right, srcRect.Bottom);
+				instanceVerts[n].destRect = new Vector4(destRect.X, destRect.Y, destRect.Width, destRect.Height);
+				instanceVerts[n].srcRect = new Vector4(srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height);
 				instanceVerts[n].srcRect.X /= texture.Width;
 				instanceVerts[n].srcRect.Z /= texture.Width;
 				instanceVerts[n].srcRect.Y /= texture.Height;

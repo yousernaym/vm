@@ -2,7 +2,7 @@
 
 struct VSInput
 {
-    float2 pos : POSITION0;
+    float2 normPos : POSITION0;
 	float4 rect : POSITION1;
 	float4 texCoords : TEXCOORD0;
 	float4 color : COLOR0;
@@ -18,7 +18,7 @@ struct VSOutput
 VSOutput VS(VSInput IN)
 {
 	VSOutput OUT;
-	OUT.pos = float4(IN.rect.xy + IN.pos * (IN.rect.zw - IN.rect.xy), 0, 1);
+	OUT.pos = float4(IN.rect.xy + IN.normPos * IN.rect.zw, 0, 1); //top-left + 0|1 * size
 	OUT.pos.xyz += PosOffset;
 	// Viewport adjustment.
 	//OUT.pos.xy /= ViewportSize.xy;
@@ -27,7 +27,7 @@ VSOutput VS(VSInput IN)
 	OUT.pos = mul(OUT.pos, WvpMat);
 	//OUT.pos.z = 0;
 	//OUT.pos.w = 1;
-	OUT.texCoords = IN.texCoords.xy + IN.pos * (IN.texCoords.zw - IN.texCoords.xy);
+	OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw;
 	OUT.color = IN.color;
     return OUT;
 }
