@@ -631,7 +631,7 @@ namespace Visual_Music
                 lineStyleList.SelectedIndex = (int)lineStyle.Style;
 				lineWidthUpDown.Value = lineStyle.LineWidth;
 				qnGapFillUd.Value = (decimal)lineStyle.Qn_gapThreshold;
-				blurredEdgeUd.Value = (decimal)lineStyle.BlurredEdge;
+				borderSizeUd.Value = (decimal)lineStyle.BlurredEdge;
 				
 				lineHlStyleList.SelectedIndex = (int)lineStyle.HlStyle;
 				hlSizeUpDown.Value = lineStyle.HlSize;
@@ -1056,10 +1056,10 @@ namespace Visual_Music
 
 		private void lineStyleList_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (lineStyleList.SelectedIndex != (int)LineStyleEnum.Ribbon)
-				simpleLineStylePanel.Visible = true;
-			else
-				simpleLineStylePanel.Visible = false;
+			//if (lineStyleList.SelectedIndex != (int)LineStyleEnum.Ribbon)
+			//	simpleLineStylePanel.Visible = true;
+			//else
+			//	simpleLineStylePanel.Visible = false;
 			if (updatingControls)
 				return;
 			songPanel.Invalidate();
@@ -1072,7 +1072,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().BlurredEdge = (int)blurredEdgeUd.Value;
+				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().BlurredEdge = (int)borderSizeUd.Value;
 		}
 		private void invalidateSongPanel(object sender, EventArgs e)
 		{

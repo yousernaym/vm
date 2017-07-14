@@ -66,8 +66,18 @@
 			this.defaultPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.leftTrackPropsPanel = new System.Windows.Forms.TabControl();
 			this.tabPage3 = new System.Windows.Forms.TabPage();
+			this.bo = new System.Windows.Forms.Button();
+			this.comboBox1 = new System.Windows.Forms.ComboBox();
+			this.shapePowerUD = new System.Windows.Forms.NumericUpDown();
 			this.defaultStyleBtn = new System.Windows.Forms.Button();
+			this.fadeoutUd = new System.Windows.Forms.NumericUpDown();
+			this.label38 = new System.Windows.Forms.Label();
+			this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+			this.borderSizeUd = new System.Windows.Forms.NumericUpDown();
+			this.label15 = new System.Windows.Forms.Label();
+			this.label16 = new System.Windows.Forms.Label();
 			this.styleList = new System.Windows.Forms.ComboBox();
+			this.label45 = new System.Windows.Forms.Label();
 			this.lineStyleGroup = new System.Windows.Forms.GroupBox();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.hlBorderCb = new System.Windows.Forms.CheckBox();
@@ -78,14 +88,6 @@
 			this.hlSizeUpDown = new System.Windows.Forms.NumericUpDown();
 			this.label27 = new System.Windows.Forms.Label();
 			this.label30 = new System.Windows.Forms.Label();
-			this.blurredEdgeUd = new System.Windows.Forms.NumericUpDown();
-			this.simpleLineStylePanel = new System.Windows.Forms.Panel();
-			this.shapePowerUD = new System.Windows.Forms.NumericUpDown();
-			this.fadeoutUd = new System.Windows.Forms.NumericUpDown();
-			this.label38 = new System.Windows.Forms.Label();
-			this.label15 = new System.Windows.Forms.Label();
-			this.label16 = new System.Windows.Forms.Label();
-			this.label18 = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
 			this.label13 = new System.Windows.Forms.Label();
 			this.lineWidthUpDown = new System.Windows.Forms.NumericUpDown();
@@ -93,9 +95,13 @@
 			this.label17 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
 			this.qnGapFillUd = new System.Windows.Forms.NumericUpDown();
-			this.label19 = new System.Windows.Forms.Label();
 			this.label12 = new System.Windows.Forms.Label();
+			this.label18 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
+			this.label44 = new System.Windows.Forms.Label();
+			this.label43 = new System.Windows.Forms.Label();
+			this.label42 = new System.Windows.Forms.Label();
+			this.label19 = new System.Windows.Forms.Label();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.label37 = new System.Windows.Forms.Label();
@@ -195,19 +201,20 @@
 			this.songPanelBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
+			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
 			this.trackListCM.SuspendLayout();
 			this.leftTrackPropsPanel.SuspendLayout();
 			this.tabPage3.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.shapePowerUD)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.fadeoutUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.borderSizeUd)).BeginInit();
 			this.lineStyleGroup.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.hlSizeUpDown)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.blurredEdgeUd)).BeginInit();
-			this.simpleLineStylePanel.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.shapePowerUD)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.fadeoutUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lineWidthUpDown)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.qnGapFillUd)).BeginInit();
 			this.tabPage1.SuspendLayout();
@@ -588,15 +595,61 @@
 			// 
 			this.tabPage3.AutoScroll = true;
 			this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
+			this.tabPage3.Controls.Add(this.bo);
+			this.tabPage3.Controls.Add(this.comboBox1);
+			this.tabPage3.Controls.Add(this.shapePowerUD);
 			this.tabPage3.Controls.Add(this.defaultStyleBtn);
+			this.tabPage3.Controls.Add(this.fadeoutUd);
+			this.tabPage3.Controls.Add(this.label38);
+			this.tabPage3.Controls.Add(this.numericUpDown1);
+			this.tabPage3.Controls.Add(this.borderSizeUd);
+			this.tabPage3.Controls.Add(this.label15);
+			this.tabPage3.Controls.Add(this.label16);
 			this.tabPage3.Controls.Add(this.styleList);
+			this.tabPage3.Controls.Add(this.label45);
 			this.tabPage3.Controls.Add(this.lineStyleGroup);
+			this.tabPage3.Controls.Add(this.label18);
 			this.tabPage3.Controls.Add(this.label1);
+			this.tabPage3.Controls.Add(this.label44);
+			this.tabPage3.Controls.Add(this.label43);
+			this.tabPage3.Controls.Add(this.label42);
+			this.tabPage3.Controls.Add(this.label19);
 			this.tabPage3.Location = new System.Drawing.Point(4, 22);
 			this.tabPage3.Name = "tabPage3";
 			this.tabPage3.Size = new System.Drawing.Size(200, 10026);
 			this.tabPage3.TabIndex = 2;
 			this.tabPage3.Text = "Style";
+			// 
+			// bo
+			// 
+			this.bo.BackColor = System.Drawing.Color.White;
+			this.bo.Location = new System.Drawing.Point(94, 134);
+			this.bo.Name = "bo";
+			this.bo.Size = new System.Drawing.Size(76, 23);
+			this.bo.TabIndex = 21;
+			this.bo.UseVisualStyleBackColor = false;
+			// 
+			// comboBox1
+			// 
+			this.comboBox1.FormattingEnabled = true;
+			this.comboBox1.Location = new System.Drawing.Point(94, 159);
+			this.comboBox1.Name = "comboBox1";
+			this.comboBox1.Size = new System.Drawing.Size(75, 21);
+			this.comboBox1.TabIndex = 20;
+			// 
+			// shapePowerUD
+			// 
+			this.shapePowerUD.DecimalPlaces = 2;
+			this.shapePowerUD.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+			this.shapePowerUD.Location = new System.Drawing.Point(94, 207);
+			this.shapePowerUD.Name = "shapePowerUD";
+			this.shapePowerUD.Size = new System.Drawing.Size(76, 20);
+			this.shapePowerUD.TabIndex = 18;
+			this.shapePowerUD.ValueChanged += new System.EventHandler(this.shapePowerUD_ValueChanged);
 			// 
 			// defaultStyleBtn
 			// 
@@ -607,6 +660,58 @@
 			this.defaultStyleBtn.Text = "Default Style";
 			this.defaultStyleBtn.UseVisualStyleBackColor = true;
 			this.defaultStyleBtn.Click += new System.EventHandler(this.defaultStyleBtn_Click);
+			// 
+			// fadeoutUd
+			// 
+			this.fadeoutUd.DecimalPlaces = 2;
+			this.fadeoutUd.Location = new System.Drawing.Point(94, 186);
+			this.fadeoutUd.Name = "fadeoutUd";
+			this.fadeoutUd.Size = new System.Drawing.Size(76, 20);
+			this.fadeoutUd.TabIndex = 3;
+			this.fadeoutUd.ValueChanged += new System.EventHandler(this.fadeoutUd_ValueChanged);
+			// 
+			// label38
+			// 
+			this.label38.AutoSize = true;
+			this.label38.Location = new System.Drawing.Point(3, 209);
+			this.label38.Name = "label38";
+			this.label38.Size = new System.Drawing.Size(70, 13);
+			this.label38.TabIndex = 15;
+			this.label38.Text = "Shape power";
+			// 
+			// numericUpDown1
+			// 
+			this.numericUpDown1.Location = new System.Drawing.Point(94, 107);
+			this.numericUpDown1.Name = "numericUpDown1";
+			this.numericUpDown1.Size = new System.Drawing.Size(76, 20);
+			this.numericUpDown1.TabIndex = 19;
+			this.numericUpDown1.ValueChanged += new System.EventHandler(this.blurredEdgeUd_ValueChanged);
+			// 
+			// borderSizeUd
+			// 
+			this.borderSizeUd.Location = new System.Drawing.Point(94, 81);
+			this.borderSizeUd.Name = "borderSizeUd";
+			this.borderSizeUd.Size = new System.Drawing.Size(76, 20);
+			this.borderSizeUd.TabIndex = 19;
+			this.borderSizeUd.ValueChanged += new System.EventHandler(this.blurredEdgeUd_ValueChanged);
+			// 
+			// label15
+			// 
+			this.label15.AutoSize = true;
+			this.label15.Location = new System.Drawing.Point(2, 188);
+			this.label15.Name = "label15";
+			this.label15.Size = new System.Drawing.Size(76, 13);
+			this.label15.TabIndex = 15;
+			this.label15.Text = "Shape amount";
+			// 
+			// label16
+			// 
+			this.label16.AutoSize = true;
+			this.label16.Location = new System.Drawing.Point(177, 188);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(15, 13);
+			this.label16.TabIndex = 17;
+			this.label16.Text = "%";
 			// 
 			// styleList
 			// 
@@ -620,12 +725,18 @@
 			this.styleList.ValueMember = "Value";
 			this.styleList.SelectedIndexChanged += new System.EventHandler(this.styleList_SelectedIndexChanged);
 			// 
+			// label45
+			// 
+			this.label45.AutoSize = true;
+			this.label45.Location = new System.Drawing.Point(177, 109);
+			this.label45.Name = "label45";
+			this.label45.Size = new System.Drawing.Size(15, 13);
+			this.label45.TabIndex = 17;
+			this.label45.Text = "%";
+			// 
 			// lineStyleGroup
 			// 
 			this.lineStyleGroup.Controls.Add(this.groupBox3);
-			this.lineStyleGroup.Controls.Add(this.blurredEdgeUd);
-			this.lineStyleGroup.Controls.Add(this.simpleLineStylePanel);
-			this.lineStyleGroup.Controls.Add(this.label18);
 			this.lineStyleGroup.Controls.Add(this.label14);
 			this.lineStyleGroup.Controls.Add(this.label13);
 			this.lineStyleGroup.Controls.Add(this.lineWidthUpDown);
@@ -633,9 +744,8 @@
 			this.lineStyleGroup.Controls.Add(this.label17);
 			this.lineStyleGroup.Controls.Add(this.label11);
 			this.lineStyleGroup.Controls.Add(this.qnGapFillUd);
-			this.lineStyleGroup.Controls.Add(this.label19);
 			this.lineStyleGroup.Controls.Add(this.label12);
-			this.lineStyleGroup.Location = new System.Drawing.Point(3, 72);
+			this.lineStyleGroup.Location = new System.Drawing.Point(3, 541);
 			this.lineStyleGroup.Name = "lineStyleGroup";
 			this.lineStyleGroup.Size = new System.Drawing.Size(178, 342);
 			this.lineStyleGroup.TabIndex = 10;
@@ -740,85 +850,6 @@
 			this.label30.TabIndex = 17;
 			this.label30.Text = "pixels";
 			// 
-			// blurredEdgeUd
-			// 
-			this.blurredEdgeUd.Location = new System.Drawing.Point(73, 102);
-			this.blurredEdgeUd.Name = "blurredEdgeUd";
-			this.blurredEdgeUd.Size = new System.Drawing.Size(47, 20);
-			this.blurredEdgeUd.TabIndex = 19;
-			this.blurredEdgeUd.ValueChanged += new System.EventHandler(this.blurredEdgeUd_ValueChanged);
-			// 
-			// simpleLineStylePanel
-			// 
-			this.simpleLineStylePanel.Controls.Add(this.shapePowerUD);
-			this.simpleLineStylePanel.Controls.Add(this.fadeoutUd);
-			this.simpleLineStylePanel.Controls.Add(this.label38);
-			this.simpleLineStylePanel.Controls.Add(this.label15);
-			this.simpleLineStylePanel.Controls.Add(this.label16);
-			this.simpleLineStylePanel.Location = new System.Drawing.Point(3, 273);
-			this.simpleLineStylePanel.Name = "simpleLineStylePanel";
-			this.simpleLineStylePanel.Size = new System.Drawing.Size(162, 47);
-			this.simpleLineStylePanel.TabIndex = 18;
-			// 
-			// shapePowerUD
-			// 
-			this.shapePowerUD.DecimalPlaces = 2;
-			this.shapePowerUD.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-			this.shapePowerUD.Location = new System.Drawing.Point(83, 24);
-			this.shapePowerUD.Name = "shapePowerUD";
-			this.shapePowerUD.Size = new System.Drawing.Size(47, 20);
-			this.shapePowerUD.TabIndex = 18;
-			this.shapePowerUD.ValueChanged += new System.EventHandler(this.shapePowerUD_ValueChanged);
-			// 
-			// fadeoutUd
-			// 
-			this.fadeoutUd.DecimalPlaces = 2;
-			this.fadeoutUd.Location = new System.Drawing.Point(83, 3);
-			this.fadeoutUd.Name = "fadeoutUd";
-			this.fadeoutUd.Size = new System.Drawing.Size(47, 20);
-			this.fadeoutUd.TabIndex = 3;
-			this.fadeoutUd.ValueChanged += new System.EventHandler(this.fadeoutUd_ValueChanged);
-			// 
-			// label38
-			// 
-			this.label38.AutoSize = true;
-			this.label38.Location = new System.Drawing.Point(7, 26);
-			this.label38.Name = "label38";
-			this.label38.Size = new System.Drawing.Size(70, 13);
-			this.label38.TabIndex = 15;
-			this.label38.Text = "Shape power";
-			// 
-			// label15
-			// 
-			this.label15.AutoSize = true;
-			this.label15.Location = new System.Drawing.Point(7, 5);
-			this.label15.Name = "label15";
-			this.label15.Size = new System.Drawing.Size(76, 13);
-			this.label15.TabIndex = 15;
-			this.label15.Text = "Shape amount";
-			// 
-			// label16
-			// 
-			this.label16.AutoSize = true;
-			this.label16.Location = new System.Drawing.Point(136, 5);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(15, 13);
-			this.label16.TabIndex = 17;
-			this.label16.Text = "%";
-			// 
-			// label18
-			// 
-			this.label18.AutoSize = true;
-			this.label18.Location = new System.Drawing.Point(125, 104);
-			this.label18.Name = "label18";
-			this.label18.Size = new System.Drawing.Size(33, 13);
-			this.label18.TabIndex = 17;
-			this.label18.Text = "pixels";
-			// 
 			// label14
 			// 
 			this.label14.AutoSize = true;
@@ -839,9 +870,9 @@
 			// 
 			// lineWidthUpDown
 			// 
-			this.lineWidthUpDown.Location = new System.Drawing.Point(73, 50);
+			this.lineWidthUpDown.Location = new System.Drawing.Point(62, 50);
 			this.lineWidthUpDown.Name = "lineWidthUpDown";
-			this.lineWidthUpDown.Size = new System.Drawing.Size(47, 20);
+			this.lineWidthUpDown.Size = new System.Drawing.Size(58, 20);
 			this.lineWidthUpDown.TabIndex = 1;
 			this.lineWidthUpDown.Value = new decimal(new int[] {
             1,
@@ -855,9 +886,9 @@
 			this.lineStyleList.DisplayMember = "Name";
 			this.lineStyleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.lineStyleList.FormattingEnabled = true;
-			this.lineStyleList.Location = new System.Drawing.Point(73, 22);
+			this.lineStyleList.Location = new System.Drawing.Point(62, 22);
 			this.lineStyleList.Name = "lineStyleList";
-			this.lineStyleList.Size = new System.Drawing.Size(95, 21);
+			this.lineStyleList.Size = new System.Drawing.Size(106, 21);
 			this.lineStyleList.TabIndex = 8;
 			this.lineStyleList.ValueMember = "Value";
 			this.lineStyleList.SelectedIndexChanged += new System.EventHandler(this.lineStyleList_SelectedIndexChanged);
@@ -867,9 +898,9 @@
 			this.label17.AutoSize = true;
 			this.label17.Location = new System.Drawing.Point(6, 25);
 			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(30, 13);
+			this.label17.Size = new System.Drawing.Size(51, 13);
 			this.label17.TabIndex = 9;
-			this.label17.Text = "Style";
+			this.label17.Text = "Line style";
 			// 
 			// label11
 			// 
@@ -883,20 +914,11 @@
 			// qnGapFillUd
 			// 
 			this.qnGapFillUd.DecimalPlaces = 1;
-			this.qnGapFillUd.Location = new System.Drawing.Point(73, 76);
+			this.qnGapFillUd.Location = new System.Drawing.Point(62, 76);
 			this.qnGapFillUd.Name = "qnGapFillUd";
-			this.qnGapFillUd.Size = new System.Drawing.Size(47, 20);
+			this.qnGapFillUd.Size = new System.Drawing.Size(58, 20);
 			this.qnGapFillUd.TabIndex = 2;
 			this.qnGapFillUd.ValueChanged += new System.EventHandler(this.qnGapFillUd_ValueChanged);
-			// 
-			// label19
-			// 
-			this.label19.AutoSize = true;
-			this.label19.Location = new System.Drawing.Point(1, 104);
-			this.label19.Name = "label19";
-			this.label19.Size = new System.Drawing.Size(67, 13);
-			this.label19.TabIndex = 15;
-			this.label19.Text = "Blurred edge";
 			// 
 			// label12
 			// 
@@ -907,14 +929,59 @@
 			this.label12.TabIndex = 15;
 			this.label12.Text = "Fill gaps < ";
 			// 
+			// label18
+			// 
+			this.label18.AutoSize = true;
+			this.label18.Location = new System.Drawing.Point(177, 81);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(15, 13);
+			this.label18.TabIndex = 17;
+			this.label18.Text = "%";
+			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
 			this.label1.Location = new System.Drawing.Point(3, 29);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(30, 13);
+			this.label1.Size = new System.Drawing.Size(54, 13);
 			this.label1.TabIndex = 9;
-			this.label1.Text = "Style";
+			this.label1.Text = "Note style";
+			// 
+			// label44
+			// 
+			this.label44.AutoSize = true;
+			this.label44.Location = new System.Drawing.Point(2, 162);
+			this.label44.Name = "label44";
+			this.label44.Size = new System.Drawing.Size(49, 13);
+			this.label44.TabIndex = 15;
+			this.label44.Text = "Dist func";
+			// 
+			// label43
+			// 
+			this.label43.AutoSize = true;
+			this.label43.Location = new System.Drawing.Point(2, 139);
+			this.label43.Name = "label43";
+			this.label43.Size = new System.Drawing.Size(31, 13);
+			this.label43.TabIndex = 15;
+			this.label43.Text = "Color";
+			// 
+			// label42
+			// 
+			this.label42.AutoSize = true;
+			this.label42.Location = new System.Drawing.Point(2, 109);
+			this.label42.Name = "label42";
+			this.label42.Size = new System.Drawing.Size(86, 13);
+			this.label42.TabIndex = 15;
+			this.label42.Text = "Crossfade length";
+			// 
+			// label19
+			// 
+			this.label19.AutoSize = true;
+			this.label19.Location = new System.Drawing.Point(2, 83);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(59, 13);
+			this.label19.TabIndex = 15;
+			this.label19.Text = "Border size";
 			// 
 			// tabPage1
 			// 
@@ -1905,7 +1972,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-2617, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-2651, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1917,7 +1984,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-2729, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-2763, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1927,7 +1994,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-2732, 10040);
+			this.label4.Location = new System.Drawing.Point(-2766, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2154,16 +2221,15 @@
 			this.leftTrackPropsPanel.ResumeLayout(false);
 			this.tabPage3.ResumeLayout(false);
 			this.tabPage3.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.shapePowerUD)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.fadeoutUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.borderSizeUd)).EndInit();
 			this.lineStyleGroup.ResumeLayout(false);
 			this.lineStyleGroup.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.hlSizeUpDown)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.blurredEdgeUd)).EndInit();
-			this.simpleLineStylePanel.ResumeLayout(false);
-			this.simpleLineStylePanel.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.shapePowerUD)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.fadeoutUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.lineWidthUpDown)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.qnGapFillUd)).EndInit();
 			this.tabPage1.ResumeLayout(false);
@@ -2271,8 +2337,7 @@
 		private System.Windows.Forms.TabPage tabPage1;
 		private System.Windows.Forms.TabPage tabPage2;
 		private System.Windows.Forms.GroupBox lineStyleGroup;
-		private System.Windows.Forms.NumericUpDown blurredEdgeUd;
-		private System.Windows.Forms.Panel simpleLineStylePanel;
+		private System.Windows.Forms.NumericUpDown borderSizeUd;
 		private System.Windows.Forms.NumericUpDown fadeoutUd;
 		private System.Windows.Forms.Label label15;
 		private System.Windows.Forms.Label label16;
@@ -2384,6 +2449,14 @@
 		private System.Windows.Forms.Label label39;
 		private System.Windows.Forms.NumericUpDown zoffsetUd;
 		private System.Windows.Forms.NumericUpDown yoffsetUd;
+		private System.Windows.Forms.Label label42;
+		private System.Windows.Forms.Label label43;
+		private System.Windows.Forms.Button bo;
+		private System.Windows.Forms.ComboBox comboBox1;
+		private System.Windows.Forms.NumericUpDown numericUpDown1;
+		private System.Windows.Forms.Label label45;
+		private System.Windows.Forms.Label label44;
+		private System.Windows.Forms.ColorDialog colorDialog1;
 	}
 }
 

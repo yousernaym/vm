@@ -86,6 +86,24 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Controls\BarStyleControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\BarStyleControl.Designer.cs">
+      <DependentUpon>BarStyleControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\LineStyleControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\LineStyleControl.Designer.cs">
+      <DependentUpon>LineStyleControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NoteStyleControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\NoteStyleControl.Designer.cs">
+      <DependentUpon>NoteStyleControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -215,6 +233,12 @@
     <None Include="tparty\xmplay\xmplay.ini" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\BarStyleControl.resx">
+      <DependentUpon>BarStyleControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\NoteStyleControl.resx">
+      <DependentUpon>NoteStyleControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
