@@ -43,6 +43,8 @@ namespace Visual_Music
         Graphics trackListGfxObj;
 		Pen trackListPen = new Pen(System.Drawing.Color.White);
 		bool updatingControls = false;
+		public bool UpdatingControls => updatingControls;
+		public ListViewNF TrackList => trackList;
 
 		TrackProps selectedTrackProps;
 		const string trackPropsBtnText = "&Track Properties";
@@ -58,7 +60,11 @@ namespace Visual_Music
         SongPanel songPanel = new SongPanel();
 		ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
-				
+
+		//BarStyleControl barStyleControl; 
+		//LineStyleControl lineStyleControl;
+		NoteStyleControl currentNoteStyleControl;
+
 		public Form1(string[] args)
 		{
 			InitializeComponent();
@@ -93,18 +99,14 @@ namespace Visual_Music
             Array enumArray = Enum.GetValues(typeof(NoteStyleEnum));
             foreach (NoteStyleEnum nse in enumArray)
                 styleList.Items.Add(nse.ToString());
-   //         styleList.Items.Add(new NoteStyle_Default(null));
-			//styleList.Items.Add(new NoteStyle_Bar(null));
-			//styleList.Items.Add(new NoteStyle_Line(null));
-
-            enumArray = Enum.GetValues(typeof(LineStyleEnum));
-			foreach (LineStyleEnum lse in enumArray)
-				lineStyleList.Items.Add(lse.ToString());
-			enumArray = Enum.GetValues(typeof(LineHlStyleEnum));
-			foreach (LineHlStyleEnum lse in enumArray)
-				lineHlStyleList.Items.Add(lse.ToString());
 
 			addInvalidateEH(this.Controls);
+
+			//barStyleControl = new BarStyleControl(this, songPanel);
+			//lineStyleControl = new LineStyleControl(this, songPanel);
+			//styleTab.Controls.Add(barStyleControl);
+			//styleTab.Controls.Add(lineStyleControl);
+			
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -395,7 +397,7 @@ namespace Visual_Music
 			if (trackList.SelectedIndices.Count == 0)
 			{
 				selectedTrackProps = null;
-				leftTrackPropsPanel.Enabled = false;
+				selectedTrackPropsPanel.Enabled = false;
 				defaultPropertiesToolStripMenuItem.Enabled = false;
 			}
 			else
@@ -405,7 +407,7 @@ namespace Visual_Music
 					transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = false;
 				else
 					transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = true;
-				leftTrackPropsPanel.Enabled = true;
+				selectedTrackPropsPanel.Enabled = true;
 				defaultPropertiesToolStripMenuItem.Enabled = true;
 
 				if (trackList.SelectedIndices.Count == 1 && trackList.SelectedIndices[0] == 0)
@@ -625,22 +627,11 @@ namespace Visual_Music
                 styleList.SelectedIndex = (int)selectedTrackProps.NoteStyleType;
 
                 NoteStyle_Bar barStyle = selectedTrackProps.getBarNoteStyle();
-                //Update bar style controls here
+				//Update bar style controls here
+
+				//lineStyleControl.update(selectedTrackProps.getLineNoteStyle());
+				
                 
-                NoteStyle_Line lineStyle = selectedTrackProps.getLineNoteStyle();
-                lineStyleList.SelectedIndex = (int)lineStyle.Style;
-				lineWidthUpDown.Value = lineStyle.LineWidth;
-				qnGapFillUd.Value = (decimal)lineStyle.Qn_gapThreshold;
-				borderSizeUd.Value = (decimal)lineStyle.BlurredEdge;
-				
-				lineHlStyleList.SelectedIndex = (int)lineStyle.HlStyle;
-				hlSizeUpDown.Value = lineStyle.HlSize;
-				movingHlCb.Checked = lineStyle.MovingHl;
-				shrinkingHlCb.Checked = lineStyle.ShrinkingHl;
-				hlBorderCb.Checked = lineStyle.HlBorder;
-				
-				fadeoutUd.Value = (decimal)(lineStyle.FadeOut * 100);
-				shapePowerUD.Value = (decimal)lineStyle.ShapePower;
                 //-------------------------------
 				
                 //Light---------------------------
@@ -835,10 +826,13 @@ namespace Visual_Music
 
 		private void styleList_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (styleList.SelectedIndex == (int)NoteStyleEnum.Line)
-				lineStyleGroup.Visible = true;
-			else
-				lineStyleGroup.Visible = false;
+			if (currentNoteStyleControl != null)
+				currentNoteStyleControl.Visible = false;
+			//if (styleList.SelectedIndex == (int)NoteStyleEnum.Bar)
+				//currentNoteStyleControl = barStyleControl;
+			//else if (styleList.SelectedIndex == (int)NoteStyleEnum.Line)
+				//currentNoteStyleControl = lineStyleControl;
+			
 			if (updatingControls)
 				return;
 			songPanel.Invalidate();
@@ -1031,49 +1025,7 @@ namespace Visual_Music
 			};
 		}
 
-		private void lineWidthUpDown_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().LineWidth = (int)lineWidthUpDown.Value;
-		}
-
-		private void qnGapFillUd_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().Qn_gapThreshold = (int)qnGapFillUd.Value;
-		}
-		private void fadeoutUd_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().FadeOut = (float)((NumericUpDown)sender).Value / 100.0f;
-		}
-
-		private void lineStyleList_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			//if (lineStyleList.SelectedIndex != (int)LineStyleEnum.Ribbon)
-			//	simpleLineStylePanel.Visible = true;
-			//else
-			//	simpleLineStylePanel.Visible = false;
-			if (updatingControls)
-				return;
-			songPanel.Invalidate();
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().Style = (LineStyleEnum)lineStyleList.SelectedIndex;
-		}
-
-		private void blurredEdgeUd_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().BlurredEdge = (int)borderSizeUd.Value;
-		}
+	
 		private void invalidateSongPanel(object sender, EventArgs e)
 		{
 			songPanel.Invalidate();
@@ -1221,47 +1173,6 @@ namespace Visual_Music
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				songPanel.TrackProps[trackList.SelectedIndices[i]].resetSpatial();
 			updateTrackControls();
-		}
-
-		private void lineHlStyleList_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			songPanel.Invalidate();
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().HlStyle = (LineHlStyleEnum)lineHlStyleList.SelectedIndex;
-		}
-
-		private void hlSizeUpDown_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().HlSize = (int)hlSizeUpDown.Value;
-		}
-
-		private void movingHlCb_CheckedChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().MovingHl = ((CheckBox)sender).Checked;
-		}
-
-		private void shriunkingHlCb_CheckedChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().ShrinkingHl = ((CheckBox)sender).Checked;
-		}
-
-		private void hlBorderCb_CheckedChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[trackList.SelectedIndices[i]].getLineNoteStyle().HlBorder = ((CheckBox)sender).Checked;
 		}
 
 		private void trackPropsCb_CheckedChanged(object sender, EventArgs e)

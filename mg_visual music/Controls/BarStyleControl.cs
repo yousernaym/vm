@@ -6,9 +6,9 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Visual_Music.Controls
+namespace Visual_Music
 {
-	public partial class BarStyleControl : Visual_Music.Controls.NoteStyleControl
+	public partial class BarStyleControl : NoteStyleControl
 	{
 		public BarStyleControl()
 		{

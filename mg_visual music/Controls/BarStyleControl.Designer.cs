@@ -1,4 +1,4 @@
-﻿namespace Visual_Music.Controls
+﻿namespace Visual_Music
 {
 	partial class BarStyleControl
 	{
