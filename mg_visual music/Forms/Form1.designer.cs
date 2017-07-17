@@ -66,6 +66,8 @@
 			this.defaultPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.selectedTrackPropsPanel = new System.Windows.Forms.TabControl();
 			this.styleTab = new System.Windows.Forms.TabPage();
+			this.lineStyleControl = new Visual_Music.LineStyleControl();
+			this.barStyleControl = new Visual_Music.BarStyleControl();
 			this.defaultStyleBtn = new System.Windows.Forms.Button();
 			this.styleList = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -553,6 +555,8 @@
 			// 
 			this.styleTab.AutoScroll = true;
 			this.styleTab.BackColor = System.Drawing.SystemColors.Control;
+			this.styleTab.Controls.Add(this.lineStyleControl);
+			this.styleTab.Controls.Add(this.barStyleControl);
 			this.styleTab.Controls.Add(this.defaultStyleBtn);
 			this.styleTab.Controls.Add(this.styleList);
 			this.styleTab.Controls.Add(this.label1);
@@ -561,6 +565,23 @@
 			this.styleTab.Size = new System.Drawing.Size(200, 10026);
 			this.styleTab.TabIndex = 2;
 			this.styleTab.Text = "Style";
+			// 
+			// lineStyleControl
+			// 
+			this.lineStyleControl.AutoSize = true;
+			this.lineStyleControl.Location = new System.Drawing.Point(3, 72);
+			this.lineStyleControl.Name = "lineStyleControl";
+			this.lineStyleControl.Size = new System.Drawing.Size(194, 820);
+			this.lineStyleControl.TabIndex = 20;
+			this.lineStyleControl.Visible = false;
+			// 
+			// barStyleControl
+			// 
+			this.barStyleControl.AutoSize = true;
+			this.barStyleControl.Location = new System.Drawing.Point(3, 72);
+			this.barStyleControl.Name = "barStyleControl";
+			this.barStyleControl.Size = new System.Drawing.Size(194, 556);
+			this.barStyleControl.TabIndex = 20;
 			// 
 			// defaultStyleBtn
 			// 
@@ -1582,7 +1603,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-2685, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-2736, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1594,7 +1615,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-2797, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-2848, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1604,7 +1625,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-2800, 10040);
+			this.label4.Location = new System.Drawing.Point(-2851, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2023,6 +2044,8 @@
 		private System.Windows.Forms.NumericUpDown zoffsetUd;
 		private System.Windows.Forms.NumericUpDown yoffsetUd;
 		private System.Windows.Forms.ColorDialog colorDialog1;
+		private BarStyleControl barStyleControl;
+		private LineStyleControl lineStyleControl;
 	}
 }
 

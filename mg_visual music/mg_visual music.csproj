@@ -152,6 +152,8 @@
     <Compile Include="Forms\VideoExportForm.Designer.cs">
       <DependentUpon>VideoExportForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NoteStyle_Bar.cs" />
+    <Compile Include="NoteStyle_Line.cs" />
     <Compile Include="Media.cs" />
     <Compile Include="NoteStyle.cs" />
     <Compile Include="Program.cs" />
@@ -230,6 +232,7 @@
     <None Include="app.manifest" />
     <Content Include="Content\NoteStyle.fx" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\SongPanel.datasource" />
     <None Include="tparty\xmplay\xmplay.ini" />
   </ItemGroup>
   <ItemGroup>

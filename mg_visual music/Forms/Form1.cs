@@ -56,8 +56,9 @@ namespace Visual_Music
 		public TpartyIntegrationForm tpartyIntegrationForm;
 		VideoExportForm vidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(Material), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera)};
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackProps), typeof(Material), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackProps>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera), typeof(NoteStyleMod)};
         SongPanel songPanel = new SongPanel();
+		public SongPanel SongPanel => songPanel;
 		ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
 
@@ -106,7 +107,8 @@ namespace Visual_Music
 			//lineStyleControl = new LineStyleControl(this, songPanel);
 			//styleTab.Controls.Add(barStyleControl);
 			//styleTab.Controls.Add(lineStyleControl);
-			
+			//barStyleControl.init(this);
+			//lineStyleControl.init(this);
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -585,7 +587,7 @@ namespace Visual_Music
 				trackTexPb.Image = null;
 			}
 		}
-		void updateTrackControls()
+		public void updateTrackControls()
 		{
 			Invalidate();
 			songPanel.Invalidate();
@@ -625,13 +627,9 @@ namespace Visual_Music
 
                 //Note style-----------------
                 styleList.SelectedIndex = (int)selectedTrackProps.NoteStyleType;
-
-                NoteStyle_Bar barStyle = selectedTrackProps.getBarNoteStyle();
-				//Update bar style controls here
-
-				//lineStyleControl.update(selectedTrackProps.getLineNoteStyle());
-				
-                
+				barStyleControl.update(selectedTrackProps.getBarNoteStyle());
+				lineStyleControl.update(selectedTrackProps.getLineNoteStyle());
+				                
                 //-------------------------------
 				
                 //Light---------------------------
@@ -828,10 +826,16 @@ namespace Visual_Music
 		{
 			if (currentNoteStyleControl != null)
 				currentNoteStyleControl.Visible = false;
-			//if (styleList.SelectedIndex == (int)NoteStyleEnum.Bar)
-				//currentNoteStyleControl = barStyleControl;
-			//else if (styleList.SelectedIndex == (int)NoteStyleEnum.Line)
-				//currentNoteStyleControl = lineStyleControl;
+			if (styleList.SelectedIndex == (int)NoteStyleEnum.Default)
+				currentNoteStyleControl = null;
+			else
+			{
+				if (styleList.SelectedIndex == (int)NoteStyleEnum.Bar)
+					currentNoteStyleControl = barStyleControl;
+				else if (styleList.SelectedIndex == (int)NoteStyleEnum.Line)
+					currentNoteStyleControl = lineStyleControl;
+				currentNoteStyleControl.Visible = true;
+			}
 			
 			if (updatingControls)
 				return;

@@ -23,6 +23,7 @@ namespace Visual_Music
 
 		public void update(NoteStyle_Line lineStyle)
 		{
+			base.update(lineStyle);
 			lineStyleList.SelectedIndex = (int)lineStyle.Style;
 			lineWidthUd.Value = lineStyle.LineWidth;
 			qnGapFillUd.Value = (decimal)lineStyle.Qn_gapThreshold;
@@ -43,9 +44,9 @@ namespace Visual_Music
 			//	simpleLineStylePanel.Visible = false;
 			if (UpdatingControls)
 				return;
-			songPanel.Invalidate();
+			SongPanel.Invalidate();
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().Style = (LineStyleEnum)lineStyleList.SelectedIndex;
+				TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().Style = (LineStyleEnum)lineStyleList.SelectedIndex;
 		}
 
 		private void lineWidthUd_ValueChanged(object sender, EventArgs e)
@@ -53,7 +54,7 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().LineWidth = (int)lineWidthUd.Value;
+				TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().LineWidth = (int)lineWidthUd.Value;
 		}
 
 		private void qnGapFillUd_ValueChanged(object sender, EventArgs e)
@@ -61,16 +62,16 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().Qn_gapThreshold = (int)qnGapFillUd.Value;
+				TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().Qn_gapThreshold = (int)qnGapFillUd.Value;
 		}
 
 		private void lineHlStyleList_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (UpdatingControls)
 				return;
-			songPanel.Invalidate();
+			SongPanel.Invalidate();
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().HlStyle = (LineHlStyleEnum)lineHlStyleList.SelectedIndex;
+				TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().HlStyle = (LineHlStyleEnum)lineHlStyleList.SelectedIndex;
 		}
 
 		private void hlSizeUpDown_ValueChanged(object sender, EventArgs e)
@@ -78,7 +79,7 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().HlSize = (int)hlSizeUpDown.Value;
+				TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().HlSize = (int)hlSizeUpDown.Value;
 		}
 
 		private void movingHlCb_CheckedChanged(object sender, EventArgs e)
@@ -86,7 +87,7 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().MovingHl = ((CheckBox)sender).Checked;
+				TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().MovingHl = ((CheckBox)sender).Checked;
 		}
 
 		private void shrinkingHlCb_CheckedChanged(object sender, EventArgs e)
@@ -94,7 +95,7 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().ShrinkingHl = ((CheckBox)sender).Checked;
+				TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().ShrinkingHl = ((CheckBox)sender).Checked;
 		}
 
 		private void hlBorderCb_CheckedChanged(object sender, EventArgs e)
@@ -102,7 +103,12 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				songPanel.TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().HlBorder = ((CheckBox)sender).Checked;
+				TrackProps[TrackList.SelectedIndices[i]].getLineNoteStyle().HlBorder = ((CheckBox)sender).Checked;
+		}
+
+		private void LineStyleControl_Load(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

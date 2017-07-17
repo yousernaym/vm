@@ -61,7 +61,7 @@
 			this.groupBox3.Controls.Add(this.hlSizeUpDown);
 			this.groupBox3.Controls.Add(this.label27);
 			this.groupBox3.Controls.Add(this.label30);
-			this.groupBox3.Location = new System.Drawing.Point(25, 652);
+			this.groupBox3.Location = new System.Drawing.Point(9, 646);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(166, 139);
 			this.groupBox3.TabIndex = 48;
@@ -151,7 +151,7 @@
 			// label14
 			// 
 			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(146, 617);
+			this.label14.Location = new System.Drawing.Point(135, 622);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(42, 13);
 			this.label14.TabIndex = 51;
@@ -160,7 +160,7 @@
 			// label13
 			// 
 			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(147, 591);
+			this.label13.Location = new System.Drawing.Point(136, 596);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(33, 13);
 			this.label13.TabIndex = 52;
@@ -168,7 +168,7 @@
 			// 
 			// lineWidthUd
 			// 
-			this.lineWidthUd.Location = new System.Drawing.Point(83, 589);
+			this.lineWidthUd.Location = new System.Drawing.Point(72, 594);
 			this.lineWidthUd.Name = "lineWidthUd";
 			this.lineWidthUd.Size = new System.Drawing.Size(58, 20);
 			this.lineWidthUd.TabIndex = 44;
@@ -184,7 +184,7 @@
 			this.lineStyleList.DisplayMember = "Name";
 			this.lineStyleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.lineStyleList.FormattingEnabled = true;
-			this.lineStyleList.Location = new System.Drawing.Point(83, 561);
+			this.lineStyleList.Location = new System.Drawing.Point(68, 561);
 			this.lineStyleList.Name = "lineStyleList";
 			this.lineStyleList.Size = new System.Drawing.Size(106, 21);
 			this.lineStyleList.TabIndex = 46;
@@ -194,7 +194,7 @@
 			// label17
 			// 
 			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(27, 564);
+			this.label17.Location = new System.Drawing.Point(11, 564);
 			this.label17.Name = "label17";
 			this.label17.Size = new System.Drawing.Size(51, 13);
 			this.label17.TabIndex = 47;
@@ -203,7 +203,7 @@
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(22, 591);
+			this.label11.Location = new System.Drawing.Point(11, 596);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(55, 13);
 			this.label11.TabIndex = 49;
@@ -212,7 +212,7 @@
 			// qnGapFillUd
 			// 
 			this.qnGapFillUd.DecimalPlaces = 1;
-			this.qnGapFillUd.Location = new System.Drawing.Point(83, 615);
+			this.qnGapFillUd.Location = new System.Drawing.Point(72, 620);
 			this.qnGapFillUd.Name = "qnGapFillUd";
 			this.qnGapFillUd.Size = new System.Drawing.Size(58, 20);
 			this.qnGapFillUd.TabIndex = 45;
@@ -221,7 +221,7 @@
 			// label12
 			// 
 			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(22, 617);
+			this.label12.Location = new System.Drawing.Point(11, 622);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(57, 13);
 			this.label12.TabIndex = 50;
@@ -240,7 +240,7 @@
 			this.Controls.Add(this.qnGapFillUd);
 			this.Controls.Add(this.label12);
 			this.Name = "LineStyleControl";
-			this.Size = new System.Drawing.Size(237, 820);
+			this.Size = new System.Drawing.Size(194, 820);
 			this.Controls.SetChildIndex(this.label12, 0);
 			this.Controls.SetChildIndex(this.qnGapFillUd, 0);
 			this.Controls.SetChildIndex(this.label11, 0);
