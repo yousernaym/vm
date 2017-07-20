@@ -52,7 +52,12 @@ namespace Visual_Music
 		public int CombineXY { get; set; } 
 		public bool ColorDestEnable { get; set; }
 		public bool AngleDestEnable { get; set; }
-		public uint ColorDest { get; set; } = 0xffffffff;
+		public Vector4 ColorDest { get; set; } = new Vector4(1,1,1,1);
+		public System.Drawing.Color SystemColorDest
+		{
+			get => System.Drawing.Color.FromArgb((int)(ColorDest.W * 255), (int)(ColorDest.X * 255), (int)(ColorDest.Y * 255), (int)(ColorDest.Z * 255));
+			set => ColorDest = new Vector4((float)value.R / 255, (float)value.G / 255, (float)value.B / 255, (float)value.A / 255);
+		}
 		public int AngleDest { get; set; } = 45;
 		public float Start { get; set; }
 		public float Stop { get; set; } = 1;
@@ -83,7 +88,7 @@ namespace Visual_Music
 				else if (entry.Name == "angleDestEnable")
 					AngleDestEnable = (bool)entry.Value;
 				else if (entry.Name == "colorDest")
-					ColorDest = (uint)entry.Value;
+					ColorDest = (Vector4)entry.Value;
 				else if (entry.Name == "angleDest")
 					AngleDest = (int)entry.Value;
 				else if (entry.Name == "start")

@@ -45,8 +45,6 @@ namespace Visual_Music
 		{
 			modEntryBs.DataSource = noteStyle.ModEntries;
 			modEntryCombo.DisplayMember = "Name";
-			//modEntryCombo.ValueMember = "Nameh";
-			//modEntryCombo.SelectedIndex = -1;
 			modEntryCombo.SelectedIndex = noteStyle.SelectedModEntryIndex;
 			NoteStyleMod modEntry = noteStyle.SelectedModEntry;
 			if (modEntry != null)
@@ -55,7 +53,15 @@ namespace Visual_Music
 				ySourceCombo.SelectedIndex = modEntry.YSource;
 				combineCombo.SelectedIndex = modEntry.CombineXY;
 				colorDestCb.Checked = modEntry.ColorDestEnable;
-				colordest
+				angleDestCb.Checked = modEntry.AngleDestEnable;
+				colorDestBtn.BackColor = modEntry.SystemColorDest;
+				angleDestUd.Value = (decimal)modEntry.AngleDest;
+				startUd.Value = (decimal)modEntry.Start;
+				stopUd.Value = (decimal)modEntry.Stop;
+				fadeInUd.Value = (decimal)modEntry.FadeIn;
+				fadeOutUd.Value = (decimal)modEntry.FadeOut;
+				powerUd.Value = (decimal)modEntry.Power;
+				scaleUd.Value = (decimal)modEntry.Scale;
 
 			}
 		}
@@ -90,7 +96,7 @@ namespace Visual_Music
 
 		private void modEntryCombo_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			
+	
 		}
 
 		private void modEntryCombo_SelectedValueChanged(object sender, EventArgs e)
@@ -102,6 +108,7 @@ namespace Visual_Music
 				return;
 			Debug.Assert(TrackList.SelectedIndices.Count == 1);  //modEntryCombo is disabled if more than one track is selected, and the entire track props panel is disabled if no track is selected, and if controls are updating the method will return on the above line.
 			TrackProps[TrackList.SelectedIndices[0]].SelectedNoteStyle.SelectedModEntryIndex = modEntryCombo.SelectedIndex;
+			ParentForm.updateTrackControls();
 		}
 		private void xSourceCombo_SelectedIndexChanged(object sender, EventArgs e)
 		{

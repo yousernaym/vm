@@ -29,8 +29,8 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this.destColor = new System.Windows.Forms.Button();
-			this.powerUD = new System.Windows.Forms.NumericUpDown();
+			this.colorDestBtn = new System.Windows.Forms.Button();
+			this.powerUd = new System.Windows.Forms.NumericUpDown();
 			this.label38 = new System.Windows.Forms.Label();
 			this.fadeInUd = new System.Windows.Forms.NumericUpDown();
 			this.startUd = new System.Windows.Forms.NumericUpDown();
@@ -62,13 +62,13 @@
 			this.modEntryBs = new System.Windows.Forms.BindingSource(this.components);
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.label5 = new System.Windows.Forms.Label();
-			this.destAngleUd = new System.Windows.Forms.NumericUpDown();
+			this.angleDestUd = new System.Windows.Forms.NumericUpDown();
 			this.modGbox = new System.Windows.Forms.GroupBox();
 			this.bypassModEntryPanel = new System.Windows.Forms.Panel();
 			this.bypassModEntryCb = new System.Windows.Forms.CheckBox();
 			this.modEntryPanel = new System.Windows.Forms.Panel();
 			this.label4 = new System.Windows.Forms.Label();
-			((System.ComponentModel.ISupportInitialize)(this.powerUD)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.powerUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.startUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).BeginInit();
@@ -78,33 +78,33 @@
 			this.modEntryCm.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.modEntryBs)).BeginInit();
 			this.groupBox2.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.destAngleUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.angleDestUd)).BeginInit();
 			this.modGbox.SuspendLayout();
 			this.bypassModEntryPanel.SuspendLayout();
 			this.modEntryPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// destColor
+			// colorDestBtn
 			// 
-			this.destColor.BackColor = System.Drawing.Color.White;
-			this.destColor.Location = new System.Drawing.Point(68, 19);
-			this.destColor.Name = "destColor";
-			this.destColor.Size = new System.Drawing.Size(76, 23);
-			this.destColor.TabIndex = 36;
-			this.destColor.UseVisualStyleBackColor = false;
+			this.colorDestBtn.BackColor = System.Drawing.Color.White;
+			this.colorDestBtn.Location = new System.Drawing.Point(68, 19);
+			this.colorDestBtn.Name = "colorDestBtn";
+			this.colorDestBtn.Size = new System.Drawing.Size(76, 23);
+			this.colorDestBtn.TabIndex = 36;
+			this.colorDestBtn.UseVisualStyleBackColor = false;
 			// 
-			// powerUD
+			// powerUd
 			// 
-			this.powerUD.DecimalPlaces = 2;
-			this.powerUD.Increment = new decimal(new int[] {
+			this.powerUd.DecimalPlaces = 2;
+			this.powerUd.Increment = new decimal(new int[] {
             5,
             0,
             0,
             65536});
-			this.powerUD.Location = new System.Drawing.Point(66, 308);
-			this.powerUD.Name = "powerUD";
-			this.powerUD.Size = new System.Drawing.Size(76, 20);
-			this.powerUD.TabIndex = 32;
+			this.powerUd.Location = new System.Drawing.Point(66, 308);
+			this.powerUd.Name = "powerUd";
+			this.powerUd.Size = new System.Drawing.Size(76, 20);
+			this.powerUd.TabIndex = 32;
 			// 
 			// label38
 			// 
@@ -384,8 +384,8 @@
 			this.groupBox2.Controls.Add(this.angleDestCb);
 			this.groupBox2.Controls.Add(this.label5);
 			this.groupBox2.Controls.Add(this.colorDestCb);
-			this.groupBox2.Controls.Add(this.destColor);
-			this.groupBox2.Controls.Add(this.destAngleUd);
+			this.groupBox2.Controls.Add(this.colorDestBtn);
+			this.groupBox2.Controls.Add(this.angleDestUd);
 			this.groupBox2.Location = new System.Drawing.Point(3, 118);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(162, 80);
@@ -402,18 +402,18 @@
 			this.label5.TabIndex = 28;
 			this.label5.Text = "degrees";
 			// 
-			// destAngleUd
+			// angleDestUd
 			// 
-			this.destAngleUd.Location = new System.Drawing.Point(68, 50);
-			this.destAngleUd.Maximum = new decimal(new int[] {
+			this.angleDestUd.Location = new System.Drawing.Point(68, 50);
+			this.angleDestUd.Maximum = new decimal(new int[] {
             90,
             0,
             0,
             0});
-			this.destAngleUd.Name = "destAngleUd";
-			this.destAngleUd.Size = new System.Drawing.Size(39, 20);
-			this.destAngleUd.TabIndex = 34;
-			this.destAngleUd.Value = new decimal(new int[] {
+			this.angleDestUd.Name = "angleDestUd";
+			this.angleDestUd.Size = new System.Drawing.Size(39, 20);
+			this.angleDestUd.TabIndex = 34;
+			this.angleDestUd.Value = new decimal(new int[] {
             45,
             0,
             0,
@@ -471,7 +471,7 @@
 			this.modEntryPanel.Controls.Add(this.stopUd);
 			this.modEntryPanel.Controls.Add(this.fadeOutUd);
 			this.modEntryPanel.Controls.Add(this.label38);
-			this.modEntryPanel.Controls.Add(this.powerUD);
+			this.modEntryPanel.Controls.Add(this.powerUd);
 			this.modEntryPanel.Controls.Add(this.label8);
 			this.modEntryPanel.Controls.Add(this.label3);
 			this.modEntryPanel.Controls.Add(this.label2);
@@ -497,7 +497,7 @@
 			this.Controls.Add(this.modGbox);
 			this.Name = "NoteStyleControl";
 			this.Size = new System.Drawing.Size(194, 474);
-			((System.ComponentModel.ISupportInitialize)(this.powerUD)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.powerUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.startUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).EndInit();
@@ -509,7 +509,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.modEntryBs)).EndInit();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.destAngleUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.angleDestUd)).EndInit();
 			this.modGbox.ResumeLayout(false);
 			this.modGbox.PerformLayout();
 			this.bypassModEntryPanel.ResumeLayout(false);
@@ -523,8 +523,8 @@
 
 		#endregion
 
-		private System.Windows.Forms.Button destColor;
-		private System.Windows.Forms.NumericUpDown powerUD;
+		private System.Windows.Forms.Button colorDestBtn;
+		private System.Windows.Forms.NumericUpDown powerUd;
 		private System.Windows.Forms.Label label38;
 		private System.Windows.Forms.NumericUpDown fadeInUd;
 		private System.Windows.Forms.NumericUpDown startUd;
@@ -557,7 +557,7 @@
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.ContextMenuStrip modEntryCm;
 		private System.Windows.Forms.ToolStripMenuItem newMi;
-		private System.Windows.Forms.NumericUpDown destAngleUd;
+		private System.Windows.Forms.NumericUpDown angleDestUd;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.BindingSource modEntryBs;
 		private System.Windows.Forms.ToolStripMenuItem deleteMi;
