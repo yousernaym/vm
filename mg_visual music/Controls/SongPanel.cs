@@ -138,17 +138,19 @@ namespace Visual_Music
 			get { return blendState; }
 			//set { blendState = value; }
 		}
-		internal TrackProps GlobalTrackProps
+		public TrackProps GlobalTrackProps
 		{
 			get { return trackProps[0]; }
 			set { trackProps[0] = value; }
 		}
 		List<TrackProps> trackProps;
-		internal List<TrackProps> TrackProps
+		public List<TrackProps> TrackProps
 		{
 			get { return trackProps; }
 			set { trackProps = value; }
 		}
+		//TrackProps trackProps_MergedSelection;
+		//public TrackProps TrackProps_MergedSelection;
 
 		Midi.Song notes;
 		public Midi.Song Notes { get { return notes; } }
@@ -1162,6 +1164,14 @@ namespace Visual_Music
 			}
 			if (e.Button == MouseButtons.Right)
 				mousePosScrollSong = false;
+		}
+
+		public TrackProps mergeTrackPropsElements(int[] listIndices)
+		{
+			if (listIndices.Length > 0)
+				return TrackProps[0];
+			else
+				return null;
 		}
 	}
 

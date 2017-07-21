@@ -46,7 +46,7 @@ namespace Visual_Music
 		public bool UpdatingControls => updatingControls;
 		public ListViewNF TrackList => trackList;
 
-		TrackProps selectedTrackProps;
+		TrackProps mergedTrackProps;
 		const string trackPropsBtnText = "&Track Properties";
 		string foldersFileName = Program.Dir+"\\folders";
 		//SourceFileForm sourceFileForm;
@@ -398,13 +398,13 @@ namespace Visual_Music
 		{
 			if (trackList.SelectedIndices.Count == 0)
 			{
-				selectedTrackProps = null;
+				mergedTrackProps = null;
 				selectedTrackPropsPanel.Enabled = false;
 				defaultPropertiesToolStripMenuItem.Enabled = false;
 			}
 			else
 			{
-				selectedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
+				mergedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
 				if (trackList.SelectedIndices[0] == 0 && trackList.SelectedIndices.Count == 1)
 					transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = false;
 				else
@@ -555,7 +555,7 @@ namespace Visual_Music
 		}
 		void loadMtrlTexInPb()
 		{
-			TrackPropsTex texProps = getActiveTexProps(selectedTrackProps);
+			TrackPropsTex texProps = getActiveTexProps(mergedTrackProps);
 			if (!string.IsNullOrEmpty(texProps.Path))
 			{
 				using (FileStream stream = File.Open(texProps.Path, FileMode.Open))
@@ -564,7 +564,7 @@ namespace Visual_Music
 					trackTexPb.Image = new Bitmap(trackTexPb.Width, trackTexPb.Height);
 					using (Graphics g = Graphics.FromImage(trackTexPb.Image))
 					{
-						if (getActiveTexProps(selectedTrackProps).PointSmp)
+						if (getActiveTexProps(mergedTrackProps).PointSmp)
 							g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
 						g.DrawImage(srcImage, new System.Drawing.Rectangle(0, 0, trackTexPb.Width, trackTexPb.Height));
 					}
@@ -592,16 +592,16 @@ namespace Visual_Music
 			Invalidate();
 			songPanel.Invalidate();
 			updatingControls = true;
-			if (selectedTrackProps != null)
+			if (mergedTrackProps != null)
 			{
-				transpTb.Text = ((int)(selectedTrackProps.Transp * 100 + 0.5f)).ToString();
-				hueTb.Text = ((int)(selectedTrackProps.Hue * 99 + 0.5f)).ToString();
-				normalSatTb.Text = ((int)(selectedTrackProps.Normal.Sat * 100 + 0.5f)).ToString();
-				normalLumTb.Text = ((int)(selectedTrackProps.Normal.Lum * 100 + 0.5f)).ToString();
-				hiliteSatTb.Text = ((int)(selectedTrackProps.Hilited.Sat * 100 + 0.5f)).ToString();
-				hiliteLumTb.Text = ((int)(selectedTrackProps.Hilited.Lum * 100 + 0.5f)).ToString();
-				
-				TrackPropsTex texProps = getActiveTexProps(selectedTrackProps);
+				transpTb.Text = ((int)(mergedTrackProps.Transp * 100 + 0.5f)).ToString();
+				hueTb.Text = ((int)(mergedTrackProps.Hue * 99 + 0.5f)).ToString();
+				normalSatTb.Text = ((int)(mergedTrackProps.Normal.Sat * 100 + 0.5f)).ToString();
+				normalLumTb.Text = ((int)(mergedTrackProps.Normal.Lum * 100 + 0.5f)).ToString();
+				hiliteSatTb.Text = ((int)(mergedTrackProps.Hilited.Sat * 100 + 0.5f)).ToString();
+				hiliteLumTb.Text = ((int)(mergedTrackProps.Hilited.Lum * 100 + 0.5f)).ToString();
+
+				TrackPropsTex texProps = getActiveTexProps(mergedTrackProps);
 				texPathTb.Text = texProps.Path;
 				loadMtrlTexInPb();
 				pointSmpCb.Checked = texProps.PointSmp;
@@ -621,31 +621,35 @@ namespace Visual_Music
 					screenVAnchorRb.Checked = true;
 				texUScrollUD.Value = (decimal)texProps.UScroll;
 				texVScrollUD.Value = (decimal)texProps.VScroll;
-                //FixedTexXOriginCb.Checked = selectedTrackProps.FixedTexXOrigin;
-                //FixedTexYOriginCb.Checked = selectedTrackProps.FixedTexYOrigin;
-                //updateTexXYCb(FixedTexOriginCb, FixedTexXOriginCb, FixedTexYOriginCb);
+				//FixedTexXOriginCb.Checked = selectedTrackProps.FixedTexXOrigin;
+				//FixedTexYOriginCb.Checked = selectedTrackProps.FixedTexYOrigin;
+				//updateTexXYCb(FixedTexOriginCb, FixedTexXOriginCb, FixedTexYOriginCb);
 
-                //Note style-----------------
-                styleList.SelectedIndex = (int)selectedTrackProps.NoteStyleType;
-				barStyleControl.update(selectedTrackProps.getBarNoteStyle());
-				lineStyleControl.update(selectedTrackProps.getLineNoteStyle());
-				                
-                //-------------------------------
-				
-                //Light---------------------------
-				globalLightCb.Checked = selectedTrackProps.UseGlobalLight;
-				lightDirxTb.Text = selectedTrackProps.LightDir.X.ToString();
-				lightDiryTb.Text = selectedTrackProps.LightDir.Y.ToString();
-				lightDirzTb.Text = selectedTrackProps.LightDir.Z.ToString();
-				specAmountUd.Value = (decimal)selectedTrackProps.SpecAmount;
-				specPowUd.Value = (decimal)selectedTrackProps.SpecPower;
-				specFovUd.Value = (decimal)selectedTrackProps.SpecFov;
+				//Note style-----------------
+				if (mergedTrackProps.NoteStyleType == null)
+					styleList.SelectedIndex = -1;
+				else
+					styleList.SelectedIndex = (int)mergedTrackProps.NoteStyleType;
+				if (currentNoteStyleControl != null)
+					currentNoteStyleControl.update(mergedTrackProps.SelectedNoteStyle);
+				//barStyleControl.update(selectedTrackProps.getBarNoteStyle());
+				//lineStyleControl.update(selectedTrackProps.getLineNoteStyle());
+//-------------------------------
+
+				//Light---------------------------
+				globalLightCb.Checked = mergedTrackProps.UseGlobalLight;
+				lightDirxTb.Text = mergedTrackProps.LightDir.X.ToString();
+				lightDiryTb.Text = mergedTrackProps.LightDir.Y.ToString();
+				lightDirzTb.Text = mergedTrackProps.LightDir.Z.ToString();
+				specAmountUd.Value = (decimal)mergedTrackProps.SpecAmount;
+				specPowUd.Value = (decimal)mergedTrackProps.SpecPower;
+				specFovUd.Value = (decimal)mergedTrackProps.SpecFov;
 				//---------------------------------
 
 				//Spatial---------------------------------
-				xoffsetUd.Value = (decimal)selectedTrackProps.XOffset;
-				yoffsetUd.Value = (decimal)selectedTrackProps.YOffset;
-				zoffsetUd.Value = (decimal)selectedTrackProps.ZOffset;                  //---------------------------------------------
+				xoffsetUd.Value = (decimal)mergedTrackProps.XOffset;
+				yoffsetUd.Value = (decimal)mergedTrackProps.YOffset;
+				zoffsetUd.Value = (decimal)mergedTrackProps.ZOffset;                  //---------------------------------------------
 			}
 			updatingControls = false;
 		}
@@ -759,7 +763,7 @@ namespace Visual_Music
 						TrackProps dest = songPanel.TrackProps[trackList.SelectedIndices[i]];
 						songPanel.TrackProps[trackList.SelectedIndices[i]] = source.copyTo(dest);
 					}
-					selectedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
+					mergedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
 					updateTrackControls();
 					updateTrackListColors();
 				}
@@ -826,7 +830,7 @@ namespace Visual_Music
 		{
 			if (currentNoteStyleControl != null)
 				currentNoteStyleControl.Visible = false;
-			if (styleList.SelectedIndex == (int)NoteStyleEnum.Default)
+			if (styleList.SelectedIndex == -1 || styleList.SelectedIndex == (int)NoteStyleEnum.Default)
 				currentNoteStyleControl = null;
 			else
 			{

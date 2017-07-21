@@ -21,17 +21,18 @@ namespace Visual_Music
 				lineHlStyleList.Items.Add(lse.ToString());
 		}
 
-		public void update(NoteStyle_Line lineStyle)
+		public override void update(NoteStyle noteStyle)
 		{
-			base.update(lineStyle);
-			lineStyleList.SelectedIndex = (int)lineStyle.Style;
-			lineWidthUd.Value = lineStyle.LineWidth;
-			qnGapFillUd.Value = (decimal)lineStyle.Qn_gapThreshold;
-			lineHlStyleList.SelectedIndex = (int)lineStyle.HlStyle;
-			hlSizeUpDown.Value = lineStyle.HlSize;
-			movingHlCb.Checked = lineStyle.MovingHl;
-			shrinkingHlCb.Checked = lineStyle.ShrinkingHl;
-			hlBorderCb.Checked = lineStyle.HlBorder;
+			base.update(noteStyle);
+			NoteStyle_Line noteStyle_Line = (NoteStyle_Line)noteStyle;
+			lineStyleList.SelectedIndex = (int)noteStyle_Line.Style;
+			lineWidthUd.Value = noteStyle_Line.LineWidth;
+			qnGapFillUd.Value = (decimal)noteStyle_Line.Qn_gapThreshold;
+			lineHlStyleList.SelectedIndex = (int)noteStyle_Line.HlStyle;
+			hlSizeUpDown.Value = noteStyle_Line.HlSize;
+			movingHlCb.Checked = noteStyle_Line.MovingHl;
+			shrinkingHlCb.Checked = noteStyle_Line.ShrinkingHl;
+			hlBorderCb.Checked = noteStyle_Line.HlBorder;
 		}
 
 		

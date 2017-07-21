@@ -246,7 +246,7 @@ namespace Visual_Music
 			get { return hue; }
 			set { hue = value; }
 		}
-        public NoteStyleEnum NoteStyleType { get; set; }
+        public NoteStyleEnum? NoteStyleType { get; set; }
         NoteStyle[] noteStyles = new NoteStyle[Enum.GetNames(typeof(NoteStyleEnum)).Length];
         
         //NoteStyle_Bar barNoteStyle;
@@ -257,7 +257,7 @@ namespace Visual_Music
             {
                 if (NoteStyleType == NoteStyleEnum.Default)
                 {
-                    if (trackNumber == 0)
+                    if (trackNumber == 0)  //Gloval track
                         return getBarNoteStyle();
                     else
                         return globalProps.SelectedNoteStyle;
@@ -577,7 +577,7 @@ namespace Visual_Music
         //    hilited.calcColor(hue, bgr);
         //}
       
-        public NoteStyle getNoteStyle(NoteStyleEnum styleType)
+        public NoteStyle getNoteStyle(NoteStyleEnum? styleType)
         {
             return noteStyles[(int)styleType];
         }
