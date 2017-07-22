@@ -186,7 +186,9 @@ namespace Visual_Music
 	[Serializable()]
 	public class TrackProps : ISerializable
 	{
+		//public int[] testArray { get; set; } = new int[] { 10, 20 };
 		static TrackProps globalProps;
+		static public TrackProps GlobalProps { get => globalProps; set => globalProps = value; }
 		public Vector3 posOffset;
 		public Vector3 PosOffset { get => posOffset; set => posOffset = value; }
 		public float XOffset
@@ -208,11 +210,13 @@ namespace Visual_Music
 		public TrackPropsTex TexProps
 		{
 			get { return texProps; }
+			set { texProps = value; }
 		}
 		TrackPropsTex hmapProps = new TrackPropsTex();
 		public TrackPropsTex HmapProps
 		{
 			get { return hmapProps; }
+			set { hmapProps = value; }
 		}
 		public TrackPropsTex getTexProps(int selector)
 		{
@@ -337,8 +341,8 @@ namespace Visual_Music
 
 			createCurve();
 			resetProps();
-            if (trackNumber == 0)
-                globalProps = this;
+            //if (trackNumber == 0)
+              //  globalProps = this;
         }
 	
 		public TrackProps(SerializationInfo info, StreamingContext ctxt)
@@ -375,8 +379,8 @@ namespace Visual_Music
 				if (entry.Name == "posOffset")
 					posOffset = (Vector3)entry.Value;
 			}
-			if (trackNumber == 0)
-				globalProps = this;
+			//if (trackNumber == 0)
+				//globalProps = this;
 			foreach (NoteStyle ns in noteStyles)
 			{
 				if (ns != null)
@@ -441,7 +445,7 @@ namespace Visual_Music
 			dest.curve = curve;
 			return dest;
 		}
-		TrackProps clone()
+		public TrackProps clone()
 		{
 			DataContractSerializer dcs = new DataContractSerializer(typeof(TrackProps), Form1.projectSerializationTypes);
 			MemoryStream stream = new MemoryStream();
@@ -449,7 +453,7 @@ namespace Visual_Music
 			stream.Flush();
 			stream.Position = 0;
 			TrackProps dest = (TrackProps)dcs.ReadObject(stream);
-			dest.MidiTrack = midiTrack;
+			//dest.MidiTrack = midiTrack;
 			dest.loadNoteStyleFx();
 			return dest;
 		}

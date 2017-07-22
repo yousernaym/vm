@@ -164,7 +164,8 @@ namespace Visual_Music
 
 		//Serializable----------
 		protected NoteStyleEnum styleType; //Set in constructor of inherited class
-		public BindingList<NoteStyleMod> ModEntries { get; set; } = new BindingList<NoteStyleMod>();
+		//public BindingList<NoteStyleMod> ModEntries { get; set; } = new BindingList<NoteStyleMod>();
+		public List<NoteStyleMod> ModEntries { get; set; } = new List<NoteStyleMod>();
 		public int SelectedModEntryIndex { get; set; } = -1;
 		public NoteStyleMod SelectedModEntry
 		{

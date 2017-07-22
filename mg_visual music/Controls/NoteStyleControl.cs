@@ -39,8 +39,13 @@ namespace Visual_Music
 
 		public virtual void update(NoteStyle noteStyle)
 		{
-			modEntryBs.DataSource = noteStyle.ModEntries;
+			//modEntryBs.DataSource = noteStyle.ModEntries;
 			modEntryCombo.DisplayMember = "Name";
+			modEntryCombo.SelectedIndex = -1;
+			modEntryCombo.Items.Clear();
+			//modEntryCombo.Text = "";
+			if (noteStyle.ModEntries.Count > 0)
+				modEntryCombo.Items.AddRange(noteStyle.ModEntries.ToArray());
 			modEntryCombo.SelectedIndex = noteStyle.SelectedModEntryIndex;
 			NoteStyleMod modEntry = noteStyle.SelectedModEntry;
 			if (modEntry != null)

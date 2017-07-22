@@ -7,11 +7,14 @@ using Microsoft.Xna.Framework.Input;
 using WinFormsGraphicsDevice;
 using System;
 using System.Windows.Forms;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Runtime.Serialization;
+using System.Reflection;
+using System.ComponentModel;
 
 #endregion
 
@@ -486,6 +489,7 @@ namespace Visual_Music
 			}
 			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra track props.
 				trackProps.RemoveRange(numTracks, startTrack - numTracks);
+			Visual_Music.TrackProps.GlobalProps = trackProps[0];
 			//Reload all notestyle fx files even if no new track props were created, since there is the possibility that songPanel was recreated with a new graphics device.
 			//foreach (Visual_Music.TrackProps tp in trackProps)
 			// tp.loadNoteStyleFx();
@@ -655,7 +659,7 @@ namespace Visual_Music
 
 					Effect cubeToPlaneFx = Content.Load<Effect>("CubeToPlane");
 					cubeToPlaneFx.Parameters["CubeMap"].SetValue(renderTargetCube);
-					
+
 					UInt64 frameDuration = 0;
 					UInt64 frameStart = 0;
 					int currentTempoEvent = 0;
@@ -678,9 +682,9 @@ namespace Visual_Music
 					const int frameSamples = 2;
 					cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
 					Camera.InvertY = !options.Sphere;
-					
+
 					setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
-					
+
 					while ((int)songPosInTicks < notes.SongLengthT && !progressForm.Cancel)
 					{
 						drawVideoFrame(currentTempoEvent, songPosInSeconds, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d, renderTarget2d8bit, songPosInTicks, cubeToPlaneFx);
@@ -725,7 +729,7 @@ namespace Visual_Music
 			RenderTarget2D rt = null;
 			if (!options.Sphere)
 				frameSamples = 1;
-			for (int i = 0; i<frameSamples; i++)
+			for (int i = 0; i < frameSamples; i++)
 			{
 				rt = renderTarget2d[i % 2];
 				RenderTarget2D tex = null;
@@ -744,7 +748,7 @@ namespace Visual_Music
 			//DrawSceneToVideoFrameFunc drawFunc;
 			GraphicsDevice.SetRenderTarget(renderTarget2d);
 			GraphicsDevice.Clear(Color.Transparent);
-			
+
 			if (options.Sphere)
 			{
 				if (options.Stereo)
@@ -762,7 +766,7 @@ namespace Visual_Music
 				{
 					Camera.Eye = -1;
 					GraphicsDevice.Viewport = new Viewport(0, 0, viewport.Width / 2, viewport.Height);
-					
+
 				}
 				drawSong(options.Resolution, (float)songPosInTicks / notes.SongLengthT);
 				if (options.Stereo)
@@ -778,13 +782,13 @@ namespace Visual_Music
 		void drawSphere(RenderTargetCube renderTargetCube, RenderTarget2D renderTarget2d, Texture2D prevFrame, double songPosInTicks, Effect cubeToPlaneFx, int eye = 0)
 		{
 			Camera.Eye = eye;
-			
+
 			for (int i = 0; i < 6; i++)
 			{
 				GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
 				Camera.CubeMapFace = i;
 				GraphicsDevice.Clear(Color.Transparent);
-				GraphicsDevice.Clear(new Color((uint)i*1000));
+				GraphicsDevice.Clear(new Color((uint)i * 1000));
 				drawSong(new Point(CmFaceSide, CmFaceSide), (float)songPosInTicks / notes.SongLengthT);
 			}
 			Camera.Eye = 0;
@@ -812,11 +816,11 @@ namespace Visual_Music
 			}
 			else
 				throw new Exception("Undefined eye index");
-			
+
 			cubeToPlaneFx.Parameters["ViewportSize"].SetValue(new Vector2(vpBounds.Z, vpBounds.W));
 			cubeToPlaneFx.Parameters["PrevFrameScaleOffset"].SetValue(prevFrameSO);
 			GraphicsDevice.Viewport = new Viewport((int)vpBounds.X, (int)vpBounds.Y, (int)vpBounds.Z, (int)vpBounds.W);
-			
+
 			cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();
 			quad.draw();
 		}
@@ -1166,10 +1170,67 @@ namespace Visual_Music
 				mousePosScrollSong = false;
 		}
 
-		public TrackProps mergeTrackPropsElements(int[] listIndices)
+		public TrackProps mergeTrackProps(ListView.SelectedIndexCollection listIndices)
 		{
-			if (listIndices.Length > 0)
-				return TrackProps[0];
+			if (listIndices.Count == 0)
+				return null;
+			if (listIndices.Count == 1)
+				return TrackProps[listIndices[0]];
+			TrackProps mergedPRops = TrackProps[listIndices[0]].clone();
+			for (int i = 1; i < listIndices.Count; i++)
+				mergedPRops = (TrackProps)mergeObjects(mergedPRops, TrackProps[listIndices[i]]);
+			return mergedPRops;
+		}
+
+		public object mergeObjects(object first, object second)
+		{
+			if (first == null || second == null)
+				return null;
+			PropertyInfo[] props = first.GetType().GetProperties();
+			bool hasSuitableProp = false;
+			if (props.Length > 0)
+			{
+				foreach (PropertyInfo propertyInfo in props)
+				{
+					if (!propertyInfo.CanRead || !propertyInfo.CanWrite || propertyInfo.GetMethod.IsStatic)
+						continue;
+					hasSuitableProp = true;
+
+					object firstValue = propertyInfo.GetValue(first, null);
+					object secondValue = propertyInfo.GetValue(second, null);
+					if (!(firstValue is string) && firstValue is IEnumerable)
+					{
+						continue;
+						//if (!(firstValue is IList && firstValue.GetType().IsGenericType && firstValue.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(List<>))))
+						//	continue;
+
+						//Activator.CreateInstance()
+						//List<object> returnValues = new List<object>();
+						//for (int i = 0; i < ((List<object>)firstValue).Count; i++)
+						//{
+						//	object element = ((List<object>)firstValue)[i];
+						//	if (element != null)
+						//		returnValues.Add(element);
+
+
+						//var firstEnum = ((IEnumerable)firstValue).GetEnumerator();
+						//var secondEnum = ((IEnumerable)secondValue).GetEnumerator();
+						//while (firstEnum.MoveNext() && secondEnum.MoveNext())
+						//{
+						//object value = mergeObjects(firstEnum.Current, secondEnum.Current);
+						//if (value != null)
+						//returnValues.Add(value);
+						//}
+
+						//propertyInfo.SetValue(first, returnValues);
+					}
+					else
+						 propertyInfo.SetValue(first, mergeObjects(firstValue, secondValue));
+				}
+			}
+				
+			if (hasSuitableProp || object.Equals(first, second))
+				return first;
 			else
 				return null;
 		}

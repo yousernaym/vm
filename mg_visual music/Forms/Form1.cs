@@ -398,24 +398,21 @@ namespace Visual_Music
 		{
 			if (trackList.SelectedIndices.Count == 0)
 			{
-				mergedTrackProps = null;
+				//mergedTrackProps = null;
 				selectedTrackPropsPanel.Enabled = false;
 				defaultPropertiesToolStripMenuItem.Enabled = false;
 			}
 			else
 			{
-				mergedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
-				if (trackList.SelectedIndices[0] == 0 && trackList.SelectedIndices.Count == 1)
-					transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = false;
-				else
-					transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = true;
+				//if (trackList.SelectedIndices.Count > 1 && currentNoteStyleControl != null)
+				//currentNoteStyleControl.
+
+				//mergedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
+				//mergedTrackProps = SongPanel.mergeTrackProps(trackList.SelectedIndices);
+				transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = trackList.SelectedIndices[0] != 0;// || trackList.SelectedIndices.Count == 1);
 				selectedTrackPropsPanel.Enabled = true;
 				defaultPropertiesToolStripMenuItem.Enabled = true;
-
-				if (trackList.SelectedIndices.Count == 1 && trackList.SelectedIndices[0] == 0)
-					globalLightCb.Enabled = false;
-				else
-					globalLightCb.Enabled = true;
+				globalLightCb.Enabled = trackList.SelectedIndices[0] != 0; // || trackList.SelectedIndices.Count == 1
 			}
 			updateTrackControls();
 			//songPanel.Invalidate();
@@ -589,13 +586,14 @@ namespace Visual_Music
 		}
 		public void updateTrackControls()
 		{
+			mergedTrackProps = SongPanel.mergeTrackProps(trackList.SelectedIndices);
 			Invalidate();
 			songPanel.Invalidate();
 			updatingControls = true;
 			if (mergedTrackProps != null)
 			{
 				transpTb.Text = ((int)(mergedTrackProps.Transp * 100 + 0.5f)).ToString();
-				hueTb.Text = ((int)(mergedTrackProps.Hue * 99 + 0.5f)).ToString();
+				hueTb.Text = ((int)(mergedTrackProps.Hue * 101 + 0.5f)).ToString();
 				normalSatTb.Text = ((int)(mergedTrackProps.Normal.Sat * 100 + 0.5f)).ToString();
 				normalLumTb.Text = ((int)(mergedTrackProps.Normal.Lum * 100 + 0.5f)).ToString();
 				hiliteSatTb.Text = ((int)(mergedTrackProps.Hilited.Sat * 100 + 0.5f)).ToString();
@@ -763,7 +761,7 @@ namespace Visual_Music
 						TrackProps dest = songPanel.TrackProps[trackList.SelectedIndices[i]];
 						songPanel.TrackProps[trackList.SelectedIndices[i]] = source.copyTo(dest);
 					}
-					mergedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
+					//mergedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
 					updateTrackControls();
 					updateTrackListColors();
 				}
@@ -851,6 +849,7 @@ namespace Visual_Music
 				//if (type == typeof(NoteStyle_Default))
 					//songPanel.TrackProps[trackList.SelectedIndices[i]].NoteStyle = new NoteStyle_Default(null);
 			}
+			updateTrackControls();
 		}
 
 		private void textureBrowseBtn_Click(object sender, EventArgs e)

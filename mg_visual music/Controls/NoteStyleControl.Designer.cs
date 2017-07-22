@@ -371,7 +371,6 @@
 			// modEntryCombo
 			// 
 			this.modEntryCombo.ContextMenuStrip = this.modEntryCm;
-			this.modEntryCombo.DataSource = this.modEntryBs;
 			this.modEntryCombo.FormattingEnabled = true;
 			this.modEntryCombo.Location = new System.Drawing.Point(14, 29);
 			this.modEntryCombo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
