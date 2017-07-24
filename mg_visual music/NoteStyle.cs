@@ -161,6 +161,7 @@ namespace Visual_Music
 		}
 
 		protected static SongPanel songPanel;
+		protected static Project Project => songPanel.Project;
 
 		//Serializable----------
 		protected NoteStyleEnum styleType; //Set in constructor of inherited class
@@ -261,7 +262,7 @@ namespace Visual_Music
 		}
 		virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
 		{
-			Camera cam = selectingRegion ? songPanel.DefaultCamera : songPanel.Camera;
+			Camera cam = selectingRegion ? Project.DefaultCamera : Project.Camera;
 
 			songPanel.GraphicsDevice.SamplerStates[0] = texTrackProps.TexProps.SamplerState;
 			songPanel.GraphicsDevice.SamplerStates[1] = texTrackProps.HmapProps.SamplerState;
@@ -282,7 +283,7 @@ namespace Visual_Music
 			//float angle = lightProps.SpecFov * (float)Math.PI / (360);
 			//float camPosZ = (songDrawProps.viewportSize.X / 2) / (float)Math.Tan(angle);
 			//Vector3 specCamPos = new Vector3(songDrawProps.viewportSize.X / 2, songDrawProps.viewportSize.Y / 2, camPosZ);
-			fx.Parameters["SpecCamPos"].SetValue(songPanel.Camera.Pos);
+			fx.Parameters["SpecCamPos"].SetValue(Project.Camera.Pos);
 
 			//Spatial props
 			Vector3 posOffset = globalTrackProps.PosOffset + trackProps.PosOffset;

@@ -38,7 +38,7 @@ namespace Visual_Music
 			{
 				progress = Math.Min(1, progress);
 				progress = Math.Max(0, progress);
-				int value = (int)(progress * songPanel.SongLengthT);
+				int value = (int)(progress * songPanel.Project.SongLengthT);
 				progressBar1.Value = value;
 				int percent = (int)(100.0 * progress + 0.5);
 				if (percent > 100)
@@ -80,7 +80,7 @@ namespace Visual_Music
 			songPanel = _songPanel;
 			//Application.Idle -= delegate { songPanel.Invalidate(); };
 			Cancel = false;
-			progressBar1.Maximum = songPanel.SongLengthT;// getSongPosInSeconds(1);
+			progressBar1.Maximum = songPanel.Project.SongLengthT;// getSongPosInSeconds(1);
 			taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.Normal);
 			
 			//Delegate_updateProgress delestimatedTimeestimatedTimeegate_updateProgress = new Delegate_updateProgress(updateProgress);

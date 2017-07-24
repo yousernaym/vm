@@ -135,7 +135,7 @@ namespace Visual_Music
 				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
 				float noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch).X;
 				float z = fx.Parameters["PosOffset"].GetValueVector3().Z;// -songPanel.Camera.ProjMat.M22 * songDrawProps.viewportSize.Y;
-				Vector4 noteStartProj = Vector4.Transform(new Vector4(noteStart.X, noteStart.Y, z, 1), songPanel.Camera.VpMat);
+				Vector4 noteStartProj = Vector4.Transform(new Vector4(noteStart.X, noteStart.Y, z, 1), Project.Camera.VpMat);
 				Vector3 noteStartScreen = new Vector3(noteStartProj.X, noteStartProj.Y, noteStartProj.Z) / noteStartProj.W;
 				//---------------------------------
 
@@ -156,7 +156,7 @@ namespace Visual_Music
 						noteEnd = nextNoteStart.X;
 
 					//If notes are too close after transformation, skip to next note
-					Vector4 nextNoteStartProj = Vector4.Transform(new Vector4(nextNoteStart.X, nextNoteStart.Y, z, 1), songPanel.Camera.VpMat);
+					Vector4 nextNoteStartProj = Vector4.Transform(new Vector4(nextNoteStart.X, nextNoteStart.Y, z, 1), Project.Camera.VpMat);
 					nextNoteStartScreen = new Vector3(nextNoteStartProj.X, nextNoteStartProj.Y, nextNoteStartProj.Z) / nextNoteStartProj.W;
 					screenDist = (noteStartScreen - nextNoteStartScreen).LengthSquared();
 					n++;

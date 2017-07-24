@@ -17,7 +17,7 @@ namespace Visual_Music
 		protected bool UpdatingControls => ParentForm == null ? true : ParentForm.UpdatingControls;
 		protected ListViewNF TrackList => ParentForm.TrackList;
 		protected SongPanel SongPanel => ParentForm.SongPanel;
-		protected List<TrackView> TrackViews => SongPanel.TrackViews;
+		protected List<TrackView> TrackViews => ParentForm.Project.TrackViews;
 		//protected TrackProps SelectedTrackProps => SongPanel.TrackProps_MergedSelection;
 		//NoteStyle SelectedNoteStyle => TrackProps_MergedSelection.SelectedNoteStyle;
 
