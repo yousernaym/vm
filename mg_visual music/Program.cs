@@ -22,8 +22,8 @@ namespace Visual_Music
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
 		static void Main(string[] args)
 		{
-			AppDomain currentDomain = AppDomain.CurrentDomain;
-			currentDomain.UnhandledException += new UnhandledExceptionEventHandler(exceptionHandler);
+			//AppDomain currentDomain = AppDomain.CurrentDomain;
+			//currentDomain.UnhandledException += new UnhandledExceptionEventHandler(exceptionHandler);
 
 			if (!Media.initMF())
 			{

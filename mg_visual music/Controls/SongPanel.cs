@@ -143,14 +143,14 @@ namespace Visual_Music
 		}
 		public TrackProps GlobalTrackProps
 		{
-			get { return trackProps[0]; }
-			set { trackProps[0] = value; }
+			get { return trackViews[0].TrackProps; }
+			set { trackViews[0].TrackProps = value; }
 		}
-		List<TrackProps> trackProps;
-		public List<TrackProps> TrackProps
+		List<TrackView> trackViews;
+		public List<TrackView> TrackViews
 		{
-			get { return trackProps; }
-			set { trackProps = value; }
+			get { return trackViews; }
+			set { trackViews = value; }
 		}
 		//TrackProps trackProps_MergedSelection;
 		//public TrackProps TrackProps_MergedSelection;
@@ -234,7 +234,7 @@ namespace Visual_Music
 			insTrack = (bool)info.GetValue("insTrack", typeof(bool));
 			mixdownType = (MixdownType)info.GetValue("mixdownType", typeof(MixdownType));
 			audioFilePath = (string)info.GetValue("audioFilePath", typeof(string));
-			trackProps = (List<TrackProps>)info.GetValue("trackProps", typeof(List<TrackProps>));
+			trackViews = (List<TrackView>)info.GetValue("trackProps", typeof(List<TrackView>));
 			ViewWidthQn = (float)info.GetValue("qn_viewWidth", typeof(float));
 			AudioOffset = (double)info.GetValue("audioOffset", typeof(double));
 			MaxPitch = (int)info.GetValue("maxPitch", typeof(int));
@@ -253,7 +253,7 @@ namespace Visual_Music
 			info.AddValue("audioFilePath", audioFilePath);
 			info.AddValue("insTrack", insTrack);
 			info.AddValue("mixdownType", mixdownType);
-			info.AddValue("trackProps", trackProps);
+			info.AddValue("trackProps", trackViews);
 			info.AddValue("qn_viewWidth", ViewWidthQn);
 			info.AddValue("audioOffset", AudioOffset);
 			info.AddValue("maxPitch", MaxPitch);
@@ -291,10 +291,10 @@ namespace Visual_Music
 			if (!string.IsNullOrWhiteSpace(noteFilePath))
 			{
 				importSong(noteFilePath, audioFilePath, false, insTrack, mixdownType, desiredSongLengthS);
-				if (trackProps != null)
+				if (trackViews != null)
 				{
-					for (int i = 0; i < trackProps.Count; i++)
-						trackProps[i].loadContent(this);
+					for (int i = 0; i < trackViews.Count; i++)
+						trackViews[i].TrackProps.loadContent(this);
 				}
 			}
 			Camera.SongPanel = this;
@@ -397,7 +397,7 @@ namespace Visual_Music
 				int selectedCount = 0;
 				for (int i = 1; i < notes.Tracks.Count; i++)
 				{
-					List<Midi.Note> noteList = trackProps[i].MidiTrack.getNotes(normRect.Left, normRect.Right, normRect.Top, normRect.Bottom);
+					List<Midi.Note> noteList = trackViews[i].MidiTrack.getNotes(normRect.Left, normRect.Right, normRect.Top, normRect.Bottom);
 					if (noteList.Count > 0)
 					{
 						((Form1)Parent).trackListItems[i].Selected = true;
@@ -461,39 +461,37 @@ namespace Visual_Music
 			}
 		}
 
-		public void createTrackProps(int numTracks, bool eraseCurrent)
+		public void createTrackViews(int numTracks, bool eraseCurrent)
 		{
-			Visual_Music.TrackProps.NumTracks = numTracks;
+			TrackView.NumTracks = numTracks;
 			int startTrack; //At which index to start creating new (default) track props
-			if (eraseCurrent || trackProps == null)
+			if (eraseCurrent || trackViews == null)
 			{
 				startTrack = 0;
-				trackProps = new List<TrackProps>(numTracks);
+				trackViews = new List<TrackView>(numTracks);
 			}
 			else
-				startTrack = trackProps.Count; //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props at current song's track count and up.
+				startTrack = trackViews.Count; //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props at current song's track count and up.
 
 			for (int i = 0; i < numTracks; i++)
 			{
-				if (i < startTrack) //Just update notes, not visual props. Also reload note style effects in case a project file is being loaded, causing songPanel to be recreated with a new grapics device.
-				{
-					trackProps[i].MidiTrack = notes.Tracks[trackProps[i].TrackNumber];
-					trackProps[i].createCurve();
-					trackProps[i].loadNoteStyleFx();
+				if (i < startTrack) //If updating source files without creating new projects, or loading project file.
+				{  //No need to update visual props
+					// Update notes
+					trackViews[i].MidiTrack = notes.Tracks[trackViews[i].TrackNumber];
+					trackViews[i].createCurve();
+					//If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
+					trackViews[i].TrackProps.loadNoteStyleFx();
 				}
 				else //New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
 				{
-					TrackProps props = new Visual_Music.TrackProps(i, numTracks, notes);
-					trackProps.Add(props);
+					TrackView view = new TrackView(i, numTracks, notes);
+					trackViews.Add(view);
 				}
 			}
-			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra track props.
-				trackProps.RemoveRange(numTracks, startTrack - numTracks);
-			Visual_Music.TrackProps.GlobalProps = trackProps[0];
-			//Reload all notestyle fx files even if no new track props were created, since there is the possibility that songPanel was recreated with a new graphics device.
-			//foreach (Visual_Music.TrackProps tp in trackProps)
-			// tp.loadNoteStyleFx();
-
+			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
+				trackViews.RemoveRange(numTracks, startTrack - numTracks);
+			TrackProps.GlobalProps = trackViews[0].TrackProps;
 		}
 
 		public void drawSong(Point viewportSize, double normPos)
@@ -513,7 +511,7 @@ namespace Visual_Music
 
 			for (int t = notes.Tracks.Count - 1; t >= 0; t--)
 			{
-				trackProps[t].drawTrack(songDrawProps, GlobalTrackProps, selectingRegion || ForceSimpleDrawMode);
+				trackViews[t].drawTrack(songDrawProps, GlobalTrackProps, selectingRegion || ForceSimpleDrawMode);
 			}
 		}
 		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool _insTrack, MixdownType mixdownType, double songLengthS)
@@ -570,7 +568,7 @@ namespace Visual_Music
 			notes.createNoteBsp();
 
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
-			createTrackProps(notes.Tracks.Count, eraseCurrent);
+			createTrackViews(notes.Tracks.Count, eraseCurrent);
 
 			return true;
 		}
@@ -1130,7 +1128,7 @@ namespace Visual_Music
 		public void resetTrackProps(ListView.SelectedIndexCollection indices)
 		{
 			foreach (int index in indices)
-				trackProps[index].resetProps();
+				trackViews[index].TrackProps.resetProps();
 		}
 		protected override void OnResize(EventArgs e)
 		{
@@ -1175,10 +1173,10 @@ namespace Visual_Music
 			if (listIndices.Count == 0)
 				return null;
 			if (listIndices.Count == 1)
-				return TrackProps[listIndices[0]];
-			TrackProps mergedPRops = TrackProps[listIndices[0]].clone();
+				return TrackViews[listIndices[0]].TrackProps;
+			TrackProps mergedPRops = TrackViews[listIndices[0]].TrackProps.clone();
 			for (int i = 1; i < listIndices.Count; i++)
-				mergedPRops = (TrackProps)mergeObjects(mergedPRops, TrackProps[listIndices[i]]);
+				mergedPRops = (TrackProps)mergeObjects(mergedPRops, TrackViews[listIndices[i]].TrackProps);
 			return mergedPRops;
 		}
 

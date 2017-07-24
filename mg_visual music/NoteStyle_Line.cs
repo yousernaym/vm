@@ -219,10 +219,10 @@ namespace Visual_Music
 						else
 						{
 							float x1 = 0;// songDrawProps.viewportSize.X / 2.0f;
-							float normPitch = trackProps.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x1));
+							float normPitch = trackProps.TrackView.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x1));
 							float y1 = songDrawProps.getPitchScreenPos(normPitch);
 							float x2 = x1 + 1;
-							normPitch = trackProps.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x2));
+							normPitch = trackProps.TrackView.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x2));
 							float y2 = songDrawProps.getPitchScreenPos(normPitch);
 
 							arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
@@ -299,7 +299,7 @@ namespace Visual_Music
 					{
 						points[i] = new Vector3();
 						points[i].X = (float)(x + i - 1);
-						points[i].Y = songDrawProps.getCurveScreenY(points[i].X, trackProps.Curve);
+						points[i].Y = songDrawProps.getCurveScreenY(points[i].X, trackProps.TrackView.Curve);
 						points[i].Z = 0;
 					}
 					float hLineStart = points[1].X;
@@ -341,7 +341,7 @@ namespace Visual_Music
 						do
 						{
 							hLineEnd++;
-						} while ((int)points[1].Y == (int)songDrawProps.getCurveScreenY((float)hLineEnd + 1, trackProps.Curve) && hLineEnd < endDraw);
+						} while ((int)points[1].Y == (int)songDrawProps.getCurveScreenY((float)hLineEnd + 1, trackProps.TrackView.Curve) && hLineEnd < endDraw);
 						if (hLineEnd > hLineStart + halfWidth)
 						{
 							hLineVerts[hLineVertIndex++] = lineVerts[vertIndex];
@@ -517,9 +517,9 @@ namespace Visual_Music
 					}
 					else
 					{
-						float normPitch = trackProps.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x));
+						float normPitch = trackProps.TrackView.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x));
 						y = songDrawProps.getPitchScreenPos(normPitch);
-						normPitch = trackProps.Curve.Evaluate((float)songDrawProps.getSongPosT((int)nextX));
+						normPitch = trackProps.TrackView.Curve.Evaluate((float)songDrawProps.getSongPosT((int)nextX));
 						nextY = songDrawProps.getPitchScreenPos(normPitch);
 					}
 
@@ -632,7 +632,7 @@ namespace Visual_Music
 					if (MovingHl)
 					{
 						float x = 0;// songDrawProps.viewportSize.X / 2.0f;
-						Vector3 circlePos = new Vector3(x, songDrawProps.getCurveScreenY(x, trackProps.Curve), 0);
+						Vector3 circlePos = new Vector3(x, songDrawProps.getCurveScreenY(x, trackProps.TrackView.Curve), 0);
 						setHlCirclePos(circlePos);
 					}
 					songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;

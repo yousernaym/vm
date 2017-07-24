@@ -193,6 +193,7 @@
     <Compile Include="Forms\BaseDialog.Designer.cs">
       <DependentUpon>BaseDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="TrackView.cs" />
     <Compile Include="Xna forms\GraphicsDeviceControl.cs">
       <SubType>Component</SubType>
     </Compile>
