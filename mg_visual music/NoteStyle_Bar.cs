@@ -106,18 +106,18 @@ namespace Visual_Music
 
 				if (texture != null) //Unnecessary because texture is never null. Can revert to default 1x1 white pixel.
 				{
-					setSrcRect(out srcRect.X, out srcRect.Width, texture.Width, songDrawProps.viewportSize.X, destRect.X, destRect.Width, texTrackProps.TexProps.UTile, texTrackProps.TexProps.UAnchor, songDrawProps);
-					setSrcRect(out srcRect.Y, out srcRect.Height, texture.Height, songDrawProps.viewportSize.Y, destRect.Y, destRect.Height, texTrackProps.TexProps.VTile, texTrackProps.TexProps.VAnchor, songDrawProps);
-					if (texTrackProps.TexProps.KeepAspect)
+					setSrcRect(out srcRect.X, out srcRect.Width, texture.Width, songDrawProps.viewportSize.X, destRect.X, destRect.Width, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps);
+					setSrcRect(out srcRect.Y, out srcRect.Height, texture.Height, songDrawProps.viewportSize.Y, destRect.Y, destRect.Height, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor, songDrawProps);
+					if ((bool)texTrackProps.TexProps.KeepAspect)
 					{
 						float uTexelsPerPixel = (float)srcRect.Width / destRect.Width;
 						float vTexelsPerPixel = (float)srcRect.Height / destRect.Height;
-						if (texTrackProps.TexProps.UTile && !texTrackProps.TexProps.VTile)
+						if ((bool)texTrackProps.TexProps.UTile && !(bool)texTrackProps.TexProps.VTile)
 						{
 							srcRect.X = (int)(srcRect.X * vTexelsPerPixel);
 							srcRect.Width = (int)(destRect.Width * vTexelsPerPixel);
 						}
-						else if (!texTrackProps.TexProps.UTile && texTrackProps.TexProps.VTile)
+						else if (!(bool)texTrackProps.TexProps.UTile && (bool)texTrackProps.TexProps.VTile)
 						{
 							srcRect.Y = (int)(srcRect.Y * uTexelsPerPixel);
 							srcRect.Height = (int)(destRect.Height * uTexelsPerPixel);

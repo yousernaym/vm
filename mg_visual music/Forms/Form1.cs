@@ -549,7 +549,7 @@ namespace Visual_Music
 					trackTexPb.Image = new Bitmap(trackTexPb.Width, trackTexPb.Height);
 					using (Graphics g = Graphics.FromImage(trackTexPb.Image))
 					{
-						if (getActiveTexProps(mergedTrackProps).PointSmp)
+						if (getActiveTexProps(mergedTrackProps).PointSmp ?? false)
 							g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
 						g.DrawImage(srcImage, new System.Drawing.Rectangle(0, 0, trackTexPb.Width, trackTexPb.Height));
 					}
@@ -580,34 +580,40 @@ namespace Visual_Music
 			updatingControls = true;
 			if (mergedTrackProps != null)
 			{
-				transpTb.Text = ((int)(mergedTrackProps.Transp * 100 + 0.5f)).ToString();
-				hueTb.Text = ((int)(mergedTrackProps.Hue * 101 + 0.5f)).ToString();
-				normalSatTb.Text = ((int)(mergedTrackProps.Normal.Sat * 100 + 0.5f)).ToString();
-				normalLumTb.Text = ((int)(mergedTrackProps.Normal.Lum * 100 + 0.5f)).ToString();
-				hiliteSatTb.Text = ((int)(mergedTrackProps.Hilited.Sat * 100 + 0.5f)).ToString();
-				hiliteLumTb.Text = ((int)(mergedTrackProps.Hilited.Lum * 100 + 0.5f)).ToString();
-
+				transpTb.Text = normToIntText(mergedTrackProps.Transp);
+				hueTb.Text = normToIntText(mergedTrackProps.Hue, 101);
+				normalSatTb.Text = normToIntText(mergedTrackProps.Normal.Sat);
+				normalLumTb.Text = normToIntText(mergedTrackProps.Normal.Lum);
+				hiliteSatTb.Text = normToIntText(mergedTrackProps.Hilited.Sat);
+				hiliteLumTb.Text = normToIntText(mergedTrackProps.Hilited.Lum);
+				
 				TrackPropsTex texProps = getActiveTexProps(mergedTrackProps);
 				texPathTb.Text = texProps.Path;
 				loadMtrlTexInPb();
-				pointSmpCb.Checked = texProps.PointSmp;
-				texUTileCb.Checked = texProps.UTile;
-				texVTileCb.Checked = texProps.VTile;
+				pointSmpCb.CheckState = toCheckState(texProps.PointSmp);
+					
+				texUTileCb.CheckState = toCheckState(texProps.UTile);
+				texVTileCb.CheckState = toCheckState(texProps.VTile);
 				updateTexUVCb(tileTexCb, texUTileCb, texVTileCb);
-				texKeepAspectCb.Checked = texProps.KeepAspect;
+				texKeepAspectCb.CheckState = toCheckState(texProps.KeepAspect);
 				if (texProps.UAnchor == TexAnchorEnum.Note)
 					noteUAnchorRb.Checked = true;
 				else if (texProps.UAnchor == TexAnchorEnum.Screen)
 					screenUAnchorRb.Checked = true;
-				else
+				else if (texProps.UAnchor == TexAnchorEnum.Song)
 					songAnchorRb.Checked = true;
+				else
+					noteUAnchorRb.Checked = screenUAnchorRb.Checked = songAnchorRb.Checked = false;
 				if (texProps.VAnchor == TexAnchorEnum.Note)
 					noteVAnchorRb.Checked = true;
-				else
+				else if (texProps.VAnchor == TexAnchorEnum.Screen)
 					screenVAnchorRb.Checked = true;
-				texUScrollUD.Value = (decimal)texProps.UScroll;
-				texVScrollUD.Value = (decimal)texProps.VScroll;
+				else
+					noteVAnchorRb.Checked = screenVAnchorRb.Checked = false;
 
+				setNumericUdValue(texUScrollUD, texProps.UScroll);
+				setNumericUdValue(texVScrollUD, texProps.VScroll);
+			
 				//Note style-----------------
 				if (mergedTrackProps.NoteStyleType == null)
 					styleList.SelectedIndex = -1;
@@ -620,19 +626,19 @@ namespace Visual_Music
 //-------------------------------
 
 				//Light---------------------------
-				globalLightCb.Checked = mergedTrackProps.UseGlobalLight;
-				lightDirxTb.Text = mergedTrackProps.LightDir.X.ToString();
-				lightDiryTb.Text = mergedTrackProps.LightDir.Y.ToString();
-				lightDirzTb.Text = mergedTrackProps.LightDir.Z.ToString();
-				specAmountUd.Value = (decimal)mergedTrackProps.SpecAmount;
-				specPowUd.Value = (decimal)mergedTrackProps.SpecPower;
-				specFovUd.Value = (decimal)mergedTrackProps.SpecFov;
+				globalLightCb.CheckState = toCheckState(mergedTrackProps.UseGlobalLight);
+				setNumericUdValue(lightDirXUd, mergedTrackProps.LightDirX);
+				setNumericUdValue(lightDirYUd, mergedTrackProps.LightDirY);
+				setNumericUdValue(lightDirZUd, mergedTrackProps.LightDirZ);
+				setNumericUdValue(specAmountUd, mergedTrackProps.SpecAmount);
+				setNumericUdValue(specPowUd, mergedTrackProps.SpecPower);
+				//specFovUd.Value = (decimal)mergedTrackProps.SpecFov;
 				//---------------------------------
 
 				//Spatial---------------------------------
-				xoffsetUd.Value = (decimal)mergedTrackProps.XOffset;
-				yoffsetUd.Value = (decimal)mergedTrackProps.YOffset;
-				zoffsetUd.Value = (decimal)mergedTrackProps.ZOffset;                  //---------------------------------------------
+				setNumericUdValue(xoffsetUd, mergedTrackProps.XOffset);
+				setNumericUdValue(yoffsetUd, mergedTrackProps.YOffset);
+				setNumericUdValue(zoffsetUd, mergedTrackProps.ZOffset);
 			}
 			updatingControls = false;
 		}
@@ -998,30 +1004,6 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.UseGlobalLight = globalLightCb.Checked;
 		}
 
-		private void lightDirxTb_TextChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.setLightDirX(getTextBoxNumberF(sender));
-		}
-
-		private void lightDiryTb_TextChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.setLightDirY(getTextBoxNumberF(sender));
-		}
-
-		private void lightDirzTb_TextChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.setLightDirZ(getTextBoxNumberF(sender));
-		}
-
 		private void specAmountUd_ValueChanged(object sender, EventArgs e)
 		{
 			if (updatingControls)
@@ -1040,10 +1022,10 @@ namespace Visual_Music
 
 		private void specFovUd_ValueChanged(object sender, EventArgs e)
 		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpecFov = (float)specFovUd.Value;
+			//if (updatingControls)
+			//	return;
+			//for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+			//	Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpecFov = (float)specFovUd.Value;
 		}
 
 		private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1163,7 +1145,8 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).PointSmp = ((CheckBox)sender).Checked;
-			loadMtrlTexInPb();
+			//loadMtrlTexInPb();
+			updateTrackControls();
 		}
 
 		private void tileTexCb_CheckedChanged(object sender, EventArgs e)
@@ -1182,7 +1165,7 @@ namespace Visual_Music
 		}
 		void updateTexUVCb(CheckBox uv, CheckBox u, CheckBox v)
 		{
-			if (u.Checked != v.Checked)
+			if (u.Checked != v.Checked || u.CheckState == CheckState.Indeterminate || v.CheckState == CheckState.Indeterminate)
 			{
 				uv.CheckState = CheckState.Indeterminate;
 				texKeepAspectCb.Enabled = true;
@@ -1386,6 +1369,51 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.ZOffset = (float)zoffsetUd.Value;
+		}
+
+		CheckState toCheckState(bool? value)
+		{
+			return value == null ? CheckState.Indeterminate : ((bool)value ? CheckState.Checked : CheckState.Unchecked);
+		}
+
+		void setNumericUdValue(NumericUpDown ud, float? value)
+		{
+			if (value == null)
+				ud.Text = null;
+			else
+				ud.Value = (decimal)value;
+		}
+
+		string normToIntText(float? value, float scale = 100)
+		{
+			if (value == null)
+				return null;
+			else
+				return ((int)((float)value * scale + 0.5f)).ToString();
+		}
+
+		private void lightDirXUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightDirX = (float)((NumericUpDown)sender).Value;
+		}
+
+		private void lightDirYUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightDirY = (float)((NumericUpDown)sender).Value;
+		}
+
+		private void lightDirZUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightDirZ = (float)((NumericUpDown)sender).Value;
 		}
 	}
 }

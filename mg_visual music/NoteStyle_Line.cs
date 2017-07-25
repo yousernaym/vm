@@ -371,10 +371,10 @@ namespace Visual_Music
 		}
 		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, Vector3 lineCenter, TrackPropsTex texProps, Vector2 texSize, float stepFromNoteStart, float normStepFromNoteStart, SongDrawProps songDrawProps, float lineWidth, Vector3 pos1, Vector3 pos2)
 		{
-			TexAnchorEnum texUAnchor = texProps.UAnchor;
-			TexAnchorEnum texVAnchor = texProps.VAnchor;
-			bool tileU = texProps.UTile;
-			bool tileV = texProps.VTile;
+			TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;
+			TexAnchorEnum texVAnchor = (TexAnchorEnum)texProps.VAnchor;
+			bool tileU = (bool)texProps.UTile;
+			bool tileV = (bool)texProps.VTile;
 			if (texUAnchor == TexAnchorEnum.Note)
 			{
 				if (!tileU)
@@ -428,7 +428,7 @@ namespace Visual_Music
 					vert2TC.Y = pos2.Y / texSize.Y;
 				}
 			}
-			if (texProps.KeepAspect)
+			if ((bool)texProps.KeepAspect)
 			{
 				adjustAspect(ref vert1TC, new Vector2(pos1.X, pos1.Y), texProps);
 				adjustAspect(ref vert2TC, new Vector2(pos2.X, pos2.Y), texProps);
@@ -440,9 +440,9 @@ namespace Visual_Music
 		{
 			double uTexelsPerPixel = (double)tc.X * texProps.Texture.Width / scrPos.X;
 			double vTexelsPerPixel = (double)tc.Y * texProps.Texture.Height / scrPos.Y;
-			if (texProps.UTile && !texProps.VTile)
+			if ((bool)texProps.UTile && !(bool)texProps.VTile)
 				tc.X = (float)(scrPos.X * vTexelsPerPixel / texProps.Texture.Width);
-			else if (!texProps.UTile && texProps.VTile)
+			else if (!(bool)texProps.UTile && (bool)texProps.VTile)
 				tc.Y = (float)(scrPos.Y * uTexelsPerPixel / texProps.Texture.Height);
 		}
 		void setHlCirclePos(Vector3 pos)

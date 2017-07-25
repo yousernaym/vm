@@ -17,27 +17,24 @@ namespace Visual_Music
 	[Serializable()]
 	public class TrackProps : ISerializable
 	{
-		public TrackView TrackView { get; set; }
+		internal TrackView TrackView { get; set; }
 		static int NumTracks { get => TrackView.NumTracks; }
 		int TrackNumber { get => TrackView.TrackNumber; }
 		static public TrackProps GlobalProps { get; set; }
-		public Vector3 posOffset;
-		public Vector3 PosOffset { get => posOffset; set => posOffset = value; }
-		public float XOffset
+		internal Vector3 PosOffset
 		{
-			get => posOffset.X;
-			set => posOffset.X = value;
+			get => new Vector3((float)XOffset, (float)YOffset, (float)ZOffset);
+			private set
+			{
+				XOffset = value.X;
+				YOffset = value.Y;
+				ZOffset = value.Z;
+			}
 		}
-		public float YOffset
-		{
-			get => posOffset.Y;
-			set => posOffset.Y = value;
-		}
-		public float ZOffset
-		{
-			get => posOffset.Z;
-			set => posOffset.Z = value;
-		}
+		public float? XOffset { get; set; }
+		public float? YOffset { get; set; }
+		public float? ZOffset { get; set; }
+
 		TrackPropsTex texProps = new TrackPropsTex();
 		public TrackPropsTex TexProps
 		{
@@ -58,14 +55,14 @@ namespace Visual_Music
 				return hmapProps;
 		}
 
-		float transp;
-		public float Transp
+		float? transp;
+		public float? Transp
 		{
 			get { return transp; }
 			set { transp = value; }
 		}
-		float hue;
-		public float Hue
+		float? hue;
+		public float? Hue
 		{
 			get { return hue; }
 			set { hue = value; }
@@ -92,54 +89,58 @@ namespace Visual_Music
 		}
 
 		Material normal;
-		internal Material Normal
+		public Material Normal
 		{
 			get { return normal; }
 			set { normal = value; }
 		}
 		Material hilited;
-		internal Material Hilited
+		public Material Hilited
 		{
 			get { return hilited; }
 			set { hilited = value; }
 		}
 
-		bool useGlobalLight;
-		public bool UseGlobalLight
+		bool? useGlobalLight;
+		public bool? UseGlobalLight
 		{
 			get { return useGlobalLight; }
 			set { useGlobalLight = value; }
 		}
-		Vector3 lightDir;
-		public Vector3 LightDir
+		
+		internal Vector3 LightDir
 		{
-			get { return lightDir; }
-			set { lightDir = value; }
+			get => new Vector3((float)LightDirX, (float)LightDirY, (float)LightDirZ);
+			set
+			{
+				LightDirX = value.X;
+				LightDirY = value.Y;
+				LightDirZ = value.Z;
+			}
 		}
-		public void setLightDirX(float value)
-		{ lightDir.X = value; }
-		public void setLightDirY(float value)
-		{ lightDir.Y = value; }
-		public void setLightDirZ(float value)
-		{ lightDir.Z = value; }
-		float specAmount;
-		public float SpecAmount
+		
+		public float? LightDirX { get; set; }
+		public float? LightDirY { get; set; }
+		public float? LightDirZ { get; set; }
+		
+		float? specAmount;
+		public float? SpecAmount
 		{
 			get { return specAmount; }
 			set { specAmount = value; }
 		}
-		float specPower;
-		public float SpecPower
+		float? specPower;
+		public float? SpecPower
 		{
 			get { return specPower; }
 			set { specPower = value; }
 		}
-		float specFov;
-		public float SpecFov
-		{
-			get { return specFov; }
-			set { specFov = value; }
-		}
+		//float specFov;
+		//public float SpecFov
+		//{
+		//	get { return specFov; }
+		//	set { specFov = value; }
+		//}
 
 		public TrackProps(TrackView view)
 		{
@@ -168,7 +169,7 @@ namespace Visual_Music
 				if (entry.Name == "noteStyleType")
 					NoteStyleType = (NoteStyleEnum)entry.Value;
 				if (entry.Name == "lightDir")
-					lightDir = (Vector3)entry.Value;
+					LightDir = (Vector3)entry.Value;
 				if (entry.Name == "specAmount")
 					specAmount = (float)entry.Value;
 				if (entry.Name == "specPower")
@@ -177,7 +178,7 @@ namespace Visual_Music
 				if (entry.Name == "useGlobalLight")
 					useGlobalLight = (bool)entry.Value;
 				if (entry.Name == "posOffset")
-					posOffset = (Vector3)entry.Value;
+					PosOffset = (Vector3)entry.Value;
 			}
 			
 			foreach (NoteStyle ns in noteStyles)
@@ -199,12 +200,12 @@ namespace Visual_Music
 			info.AddValue("noteStyleType", NoteStyleType);
 			//info.AddValue("lineStyleProps", lineStyleProps);
 			//info.AddValue("curve", curve);
-			info.AddValue("lightDir", lightDir);
+			info.AddValue("lightDir", LightDir);
 			info.AddValue("specAmount", specAmount);
 			info.AddValue("specPower", specPower);
-			info.AddValue("specFov", specAmount);
+			//info.AddValue("specFov", specFov);
 			info.AddValue("useGlobalLight", useGlobalLight);
-			info.AddValue("posOffset", posOffset);
+			info.AddValue("posOffset", PosOffset);
 		}
 
 		public void loadContent(SongPanel songPanel)
@@ -299,10 +300,10 @@ namespace Visual_Music
 				UseGlobalLight = false;
 			else
 				UseGlobalLight = true;
-			lightDir = new Vector3(-1, -1, 1);
+			LightDir = new Vector3(-1, -1, 1);
 			specAmount = 0.75f;
 			specPower = 50;
-			specFov = 90;
+			//specFov = 90;
 		}
 
 		public void resetSpatial()
@@ -370,16 +371,16 @@ namespace Visual_Music
 				tp2 = normal;
 				globalTp2 = globalProps.normal;
 			}
-			h = hue + globalProps.hue;
+			h = (double)(hue + globalProps.hue);
 			if (h > 1) h -= 1;
 			if (h < 0) h += 1;
-			s = tp2.Sat * globalTp2.Sat;
-			l = tp2.Lum * globalTp2.Lum;
+			s = (double)(tp2.Sat * globalTp2.Sat);
+			l = (double)(tp2.Lum * globalTp2.Lum);
 			if (s > 1)
 				s = 1;
 			if (l > 1)
 				l = 1;
-			Color c = SongPanel.HSLA2RGBA(h, s, l, alpha ? transp * globalProps.transp : 1);
+			Color c = SongPanel.HSLA2RGBA(h, s, l, alpha ? (float)(transp * globalProps.transp) : 1);
 
 			//c *= (transp * globalProps.transp * 255);
 			return c;
@@ -428,66 +429,66 @@ namespace Visual_Music
 			}
 			//set { samplerState = value; }
 		}
-		//bool pointSmp;
-		public bool PointSmp
+		bool? pointSmp = false;
+		public bool? PointSmp
 		{
-			get { return samplerStateBacking.Filter == TextureFilter.Point; }
-			set { SamplerStateBacking.Filter = value ? TextureFilter.Point : TextureFilter.Linear; }
+			get => pointSmp;
+			set
+			{
+				pointSmp = value;
+				if (value != null)
+					SamplerStateBacking.Filter = (bool)value ? TextureFilter.Point : TextureFilter.Linear;
+			}
 		}
-		
-		bool uTile = false;
-		public bool UTile
+
+		bool? uTile = false;
+		public bool? UTile
 		{
 			get { return uTile; }
 			set { uTile = value; }
 		}
-		bool vTile = false;
-		public bool VTile
+		bool? vTile = false;
+		public bool? VTile
 		{
 			get { return vTile; }
 			set { vTile = value; }
 		}
-		bool keepAspect = false;
-		public bool KeepAspect
+		bool? keepAspect = false;
+		public bool? KeepAspect
 		{
 			get { return keepAspect; }
 			set { keepAspect = value; }
 		}
-		Point anchor;
-		public TexAnchorEnum UAnchor
+		Point Anchor
 		{
-			get { return (TexAnchorEnum)anchor.X; }
-			set { anchor.X = (int)value; }
+			get => new Point((int)UAnchor, (int)VAnchor);
+			set
+			{
+				UAnchor = (TexAnchorEnum)value.X;
+				VAnchor = (TexAnchorEnum)value.Y;
+			}
 		}
-		public TexAnchorEnum VAnchor
+		public TexAnchorEnum? UAnchor { get; set; } = TexAnchorEnum.Note;
+		public TexAnchorEnum? VAnchor { get; set; } = TexAnchorEnum.Note;
+
+		//Vector2? scroll;
+		internal Vector2 Scroll
 		{
-			get { return (TexAnchorEnum)anchor.Y; }
-			set { anchor.Y = (int)value; }
+		    get => new Vector2((float)UScroll, (float)VScroll); 
+		    set 
+			{
+				UScroll = value.X;
+				VScroll = value.Y;
+			}
 		}
-		Vector2 scroll;
-		public Vector2 Scroll
-		{
-		    get { return scroll; }
-		    set { scroll = value; }
-		}
-		public float UScroll
-		{
-			get { return scroll.X; }
-			set { scroll.X = value; }
-		}
-		public float VScroll
-		{
-			get { return scroll.Y; }
-			set { scroll.Y = value; }
-		}
+		public float? UScroll { get; set; } = 0;
+		public float? VScroll { get; set; } = 0;
 		
 		//Methods----------------------
 		public TrackPropsTex()
 		{
 			samplerStateBacking.AddressU = TextureAddressMode.Wrap;
 			samplerStateBacking.AddressV = TextureAddressMode.Wrap;
-			anchor.X = (int)TexAnchorEnum.Note;
-			anchor.Y = (int)TexAnchorEnum.Note;
 		}
 		public TrackPropsTex(SerializationInfo info, StreamingContext ctxt)
 		{
@@ -496,8 +497,8 @@ namespace Visual_Music
 			keepAspect = (bool)info.GetValue("keepAspect", typeof(bool));
 			uTile = (bool)info.GetValue("uTile", typeof(bool));
 			vTile = (bool)info.GetValue("vTile", typeof(bool));
-			anchor = (Point)info.GetValue("anchor", typeof(Point));
-			scroll = (Vector2)info.GetValue("scroll", typeof(Vector2));
+			Anchor = (Point)info.GetValue("anchor", typeof(Point));
+			Scroll = (Vector2)info.GetValue("scroll", typeof(Vector2));
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
@@ -506,8 +507,8 @@ namespace Visual_Music
 			info.AddValue("keepAspect", keepAspect);
 			info.AddValue("uTile", uTile);
 			info.AddValue("vTile", vTile);
-			info.AddValue("anchor", anchor);
-			info.AddValue("scroll", scroll);
+			info.AddValue("anchor", Anchor);
+			info.AddValue("scroll", Scroll);
 		}
 		Texture2D createMipLevels(Texture2D tex, SongPanel songPanel)
 		{
@@ -556,17 +557,17 @@ namespace Visual_Music
     }
 
 	[Serializable()]
-	class Material : ISerializable
+	public class Material : ISerializable
 	{
 		//TrackProps parent;
-		float sat = 1;
-		public float Sat
+		float? sat = 1;
+		public float? Sat
 		{
 			get { return sat; }
 			set { sat = value; }
 		}
-		float lum = 1;
-		public float Lum
+		float? lum = 1;
+		public float? Lum
 		{
 			get { return lum; }
 			set { lum = value; }
@@ -612,5 +613,4 @@ namespace Visual_Music
 			info.AddValue("texture", texture);
 		}
 	}
-	
 }

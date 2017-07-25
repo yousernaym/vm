@@ -154,7 +154,6 @@ namespace Visual_Music
 						trackViews[i].TrackProps.loadContent(songPanel);
 				}
 			}
-			
 		}
 
 		public Project(SerializationInfo info, StreamingContext ctxt) : base()
@@ -388,12 +387,6 @@ namespace Visual_Music
 			return mergedPRops;
 		}
 
-		public void resetTrackProps(ListView.SelectedIndexCollection indices)
-		{
-			foreach (int index in indices)
-				trackViews[index].TrackProps.resetProps();
-		}
-
 		public object mergeObjects(object first, object second)
 		{
 			if (first == null || second == null)
@@ -445,6 +438,12 @@ namespace Visual_Music
 				return first;
 			else
 				return null;
+		}
+
+		public void resetTrackProps(ListView.SelectedIndexCollection indices)
+		{
+			foreach (int index in indices)
+				trackViews[index].TrackProps.resetProps();
 		}
 
 		double secondsToTicks(double seconds)

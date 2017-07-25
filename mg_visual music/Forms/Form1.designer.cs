@@ -125,8 +125,6 @@
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.defaultLightBtn = new System.Windows.Forms.Button();
 			this.lightPanel = new System.Windows.Forms.Panel();
-			this.lightDirzTb = new System.Windows.Forms.TextBox();
-			this.somelabel = new System.Windows.Forms.Label();
 			this.specularGb = new System.Windows.Forms.GroupBox();
 			this.specFovUd = new System.Windows.Forms.NumericUpDown();
 			this.specPowUd = new System.Windows.Forms.NumericUpDown();
@@ -135,11 +133,7 @@
 			this.label22 = new System.Windows.Forms.Label();
 			this.label28 = new System.Windows.Forms.Label();
 			this.label21 = new System.Windows.Forms.Label();
-			this.lightDiryTb = new System.Windows.Forms.TextBox();
 			this.label24 = new System.Windows.Forms.Label();
-			this.label26 = new System.Windows.Forms.Label();
-			this.label25 = new System.Windows.Forms.Label();
-			this.lightDirxTb = new System.Windows.Forms.TextBox();
 			this.globalLightCb = new System.Windows.Forms.CheckBox();
 			this.tabPage4 = new System.Windows.Forms.TabPage();
 			this.defaultSpatialBtn = new System.Windows.Forms.Button();
@@ -171,6 +165,12 @@
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+			this.label11 = new System.Windows.Forms.Label();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label13 = new System.Windows.Forms.Label();
+			this.lightDirZUd = new System.Windows.Forms.NumericUpDown();
+			this.lightDirYUd = new System.Windows.Forms.NumericUpDown();
+			this.lightDirXUd = new System.Windows.Forms.NumericUpDown();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -209,6 +209,9 @@
 			this.propsTogglePanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// openProjDialog
@@ -234,7 +237,7 @@
             0,
             65536});
 			this.audioOffsetS.Location = new System.Drawing.Point(122, 116);
-			this.audioOffsetS.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.audioOffsetS.Margin = new System.Windows.Forms.Padding(4);
 			this.audioOffsetS.Maximum = new decimal(new int[] {
             99,
             0,
@@ -455,13 +458,12 @@
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
 			this.trackPropsPanel.Location = new System.Drawing.Point(1275, 35);
-			this.trackPropsPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.trackPropsPanel.Margin = new System.Windows.Forms.Padding(4);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(592, 15077);
 			this.trackPropsPanel.TabIndex = 3;
 			this.trackPropsPanel.Visible = false;
 			this.trackPropsPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.trackPropsPanel_Paint);
-			
 			// 
 			// trackList
 			// 
@@ -477,7 +479,7 @@
 			this.trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.trackList.HideSelection = false;
 			this.trackList.Location = new System.Drawing.Point(3, 0);
-			this.trackList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.trackList.Margin = new System.Windows.Forms.Padding(4);
 			this.trackList.Name = "trackList";
 			this.trackList.Size = new System.Drawing.Size(277, 15077);
 			this.trackList.TabIndex = 0;
@@ -553,7 +555,7 @@
 			this.selectedTrackPropsPanel.Controls.Add(this.tabPage4);
 			this.selectedTrackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
 			this.selectedTrackPropsPanel.Location = new System.Drawing.Point(280, 0);
-			this.selectedTrackPropsPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.selectedTrackPropsPanel.Margin = new System.Windows.Forms.Padding(4);
 			this.selectedTrackPropsPanel.Name = "selectedTrackPropsPanel";
 			this.selectedTrackPropsPanel.SelectedIndex = 0;
 			this.selectedTrackPropsPanel.Size = new System.Drawing.Size(312, 15077);
@@ -569,7 +571,7 @@
 			this.styleTab.Controls.Add(this.styleList);
 			this.styleTab.Controls.Add(this.label1);
 			this.styleTab.Location = new System.Drawing.Point(4, 29);
-			this.styleTab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.styleTab.Margin = new System.Windows.Forms.Padding(4);
 			this.styleTab.Name = "styleTab";
 			this.styleTab.Size = new System.Drawing.Size(304, 15044);
 			this.styleTab.TabIndex = 2;
@@ -598,7 +600,7 @@
 			// defaultStyleBtn
 			// 
 			this.defaultStyleBtn.Location = new System.Drawing.Point(4, 4);
-			this.defaultStyleBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.defaultStyleBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.defaultStyleBtn.Name = "defaultStyleBtn";
 			this.defaultStyleBtn.Size = new System.Drawing.Size(268, 34);
 			this.defaultStyleBtn.TabIndex = 11;
@@ -612,7 +614,7 @@
 			this.styleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.styleList.FormattingEnabled = true;
 			this.styleList.Location = new System.Drawing.Point(9, 68);
-			this.styleList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.styleList.Margin = new System.Windows.Forms.Padding(4);
 			this.styleList.Name = "styleList";
 			this.styleList.Size = new System.Drawing.Size(186, 28);
 			this.styleList.TabIndex = 8;
@@ -644,10 +646,10 @@
 			this.tabPage1.Controls.Add(this.groupBox2);
 			this.tabPage1.Controls.Add(this.transpTb);
 			this.tabPage1.Location = new System.Drawing.Point(4, 29);
-			this.tabPage1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.tabPage1.Margin = new System.Windows.Forms.Padding(4);
 			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-			this.tabPage1.Size = new System.Drawing.Size(304, 15045);
+			this.tabPage1.Padding = new System.Windows.Forms.Padding(4);
+			this.tabPage1.Size = new System.Drawing.Size(304, 15044);
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "Material";
 			// 
@@ -719,7 +721,7 @@
             0,
             131072});
 			this.texVScrollUD.Location = new System.Drawing.Point(84, 536);
-			this.texVScrollUD.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.texVScrollUD.Margin = new System.Windows.Forms.Padding(4);
 			this.texVScrollUD.Maximum = new decimal(new int[] {
             10,
             0,
@@ -756,7 +758,7 @@
             0,
             131072});
 			this.texUScrollUD.Location = new System.Drawing.Point(84, 506);
-			this.texUScrollUD.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.texUScrollUD.Margin = new System.Windows.Forms.Padding(4);
 			this.texUScrollUD.Maximum = new decimal(new int[] {
             10,
             0,
@@ -788,7 +790,7 @@
 			this.tableLayoutPanel1.Controls.Add(this.screenAnchorLabel, 0, 2);
 			this.tableLayoutPanel1.Controls.Add(this.panel1, 2, 1);
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 357);
-			this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.RowCount = 4;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
@@ -886,7 +888,7 @@
 			// 
 			this.songAnchorRb.AutoSize = true;
 			this.songAnchorRb.Location = new System.Drawing.Point(4, 72);
-			this.songAnchorRb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.songAnchorRb.Margin = new System.Windows.Forms.Padding(4);
 			this.songAnchorRb.Name = "songAnchorRb";
 			this.songAnchorRb.Size = new System.Drawing.Size(21, 20);
 			this.songAnchorRb.TabIndex = 24;
@@ -898,7 +900,7 @@
 			// 
 			this.screenUAnchorRb.AutoSize = true;
 			this.screenUAnchorRb.Location = new System.Drawing.Point(4, 38);
-			this.screenUAnchorRb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.screenUAnchorRb.Margin = new System.Windows.Forms.Padding(4);
 			this.screenUAnchorRb.Name = "screenUAnchorRb";
 			this.screenUAnchorRb.Size = new System.Drawing.Size(21, 20);
 			this.screenUAnchorRb.TabIndex = 22;
@@ -910,7 +912,7 @@
 			// 
 			this.noteUAnchorRb.AutoSize = true;
 			this.noteUAnchorRb.Location = new System.Drawing.Point(4, 4);
-			this.noteUAnchorRb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.noteUAnchorRb.Margin = new System.Windows.Forms.Padding(4);
 			this.noteUAnchorRb.Name = "noteUAnchorRb";
 			this.noteUAnchorRb.Size = new System.Drawing.Size(21, 20);
 			this.noteUAnchorRb.TabIndex = 20;
@@ -953,7 +955,7 @@
 			// 
 			this.screenVAnchorRb.AutoSize = true;
 			this.screenVAnchorRb.Location = new System.Drawing.Point(4, 38);
-			this.screenVAnchorRb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.screenVAnchorRb.Margin = new System.Windows.Forms.Padding(4);
 			this.screenVAnchorRb.Name = "screenVAnchorRb";
 			this.screenVAnchorRb.Size = new System.Drawing.Size(21, 20);
 			this.screenVAnchorRb.TabIndex = 23;
@@ -965,7 +967,7 @@
 			// 
 			this.noteVAnchorRb.AutoSize = true;
 			this.noteVAnchorRb.Location = new System.Drawing.Point(4, 4);
-			this.noteVAnchorRb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.noteVAnchorRb.Margin = new System.Windows.Forms.Padding(4);
 			this.noteVAnchorRb.Name = "noteVAnchorRb";
 			this.noteVAnchorRb.Size = new System.Drawing.Size(21, 20);
 			this.noteVAnchorRb.TabIndex = 21;
@@ -978,7 +980,7 @@
 			this.texVTileCb.AutoSize = true;
 			this.texVTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.texVTileCb.Location = new System.Drawing.Point(142, 292);
-			this.texVTileCb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.texVTileCb.Margin = new System.Windows.Forms.Padding(4);
 			this.texVTileCb.Name = "texVTileCb";
 			this.texVTileCb.Size = new System.Drawing.Size(46, 24);
 			this.texVTileCb.TabIndex = 17;
@@ -991,7 +993,7 @@
 			this.texUTileCb.AutoSize = true;
 			this.texUTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.texUTileCb.Location = new System.Drawing.Point(84, 292);
-			this.texUTileCb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.texUTileCb.Margin = new System.Windows.Forms.Padding(4);
 			this.texUTileCb.Name = "texUTileCb";
 			this.texUTileCb.Size = new System.Drawing.Size(47, 24);
 			this.texUTileCb.TabIndex = 16;
@@ -1027,7 +1029,7 @@
 			// 
 			this.loadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.loadTexBtn.Location = new System.Drawing.Point(8, 27);
-			this.loadTexBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.loadTexBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.loadTexBtn.Name = "loadTexBtn";
 			this.loadTexBtn.Size = new System.Drawing.Size(112, 34);
 			this.loadTexBtn.TabIndex = 12;
@@ -1039,7 +1041,7 @@
 			// 
 			this.unloadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.unloadTexBtn.Location = new System.Drawing.Point(138, 27);
-			this.unloadTexBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.unloadTexBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.unloadTexBtn.Name = "unloadTexBtn";
 			this.unloadTexBtn.Size = new System.Drawing.Size(129, 34);
 			this.unloadTexBtn.TabIndex = 12;
@@ -1063,7 +1065,7 @@
 			// 
 			this.trackTexPb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.trackTexPb.Location = new System.Drawing.Point(8, 70);
-			this.trackTexPb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.trackTexPb.Margin = new System.Windows.Forms.Padding(4);
 			this.trackTexPb.Name = "trackTexPb";
 			this.trackTexPb.Size = new System.Drawing.Size(258, 180);
 			this.trackTexPb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -1073,7 +1075,7 @@
 			// defaultMtrlBtn
 			// 
 			this.defaultMtrlBtn.Location = new System.Drawing.Point(3, 9);
-			this.defaultMtrlBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.defaultMtrlBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.defaultMtrlBtn.Name = "defaultMtrlBtn";
 			this.defaultMtrlBtn.Size = new System.Drawing.Size(268, 34);
 			this.defaultMtrlBtn.TabIndex = 11;
@@ -1097,7 +1099,7 @@
 			this.transpSlider.Cursor = System.Windows.Forms.Cursors.Default;
 			this.transpSlider.LargeChange = 10;
 			this.transpSlider.Location = new System.Drawing.Point(8, 74);
-			this.transpSlider.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.transpSlider.Margin = new System.Windows.Forms.Padding(4);
 			this.transpSlider.Maximum = 100;
 			this.transpSlider.Name = "transpSlider";
 			this.transpSlider.Size = new System.Drawing.Size(194, 69);
@@ -1109,7 +1111,7 @@
 			// hueTb
 			// 
 			this.hueTb.Location = new System.Drawing.Point(206, 170);
-			this.hueTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.hueTb.Margin = new System.Windows.Forms.Padding(4);
 			this.hueTb.Name = "hueTb";
 			this.hueTb.Size = new System.Drawing.Size(55, 26);
 			this.hueTb.TabIndex = 4;
@@ -1127,9 +1129,9 @@
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.groupBox1.Location = new System.Drawing.Point(-2, 246);
-			this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
 			this.groupBox1.Size = new System.Drawing.Size(273, 231);
 			this.groupBox1.TabIndex = 5;
 			this.groupBox1.TabStop = false;
@@ -1139,7 +1141,7 @@
 			// 
 			this.normalLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.normalLumTb.Location = new System.Drawing.Point(212, 158);
-			this.normalLumTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.normalLumTb.Margin = new System.Windows.Forms.Padding(4);
 			this.normalLumTb.Name = "normalLumTb";
 			this.normalLumTb.Size = new System.Drawing.Size(55, 26);
 			this.normalLumTb.TabIndex = 8;
@@ -1151,7 +1153,7 @@
 			this.normalLumSlider.Cursor = System.Windows.Forms.Cursors.Default;
 			this.normalLumSlider.LargeChange = 10;
 			this.normalLumSlider.Location = new System.Drawing.Point(9, 158);
-			this.normalLumSlider.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.normalLumSlider.Margin = new System.Windows.Forms.Padding(4);
 			this.normalLumSlider.Maximum = 200;
 			this.normalLumSlider.Name = "normalLumSlider";
 			this.normalLumSlider.Size = new System.Drawing.Size(194, 69);
@@ -1175,7 +1177,7 @@
 			// 
 			this.normalSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.normalSatTb.Location = new System.Drawing.Point(212, 62);
-			this.normalSatTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.normalSatTb.Margin = new System.Windows.Forms.Padding(4);
 			this.normalSatTb.Name = "normalSatTb";
 			this.normalSatTb.Size = new System.Drawing.Size(55, 26);
 			this.normalSatTb.TabIndex = 6;
@@ -1187,7 +1189,7 @@
 			this.normalSatSlider.Cursor = System.Windows.Forms.Cursors.Default;
 			this.normalSatSlider.LargeChange = 10;
 			this.normalSatSlider.Location = new System.Drawing.Point(9, 62);
-			this.normalSatSlider.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.normalSatSlider.Margin = new System.Windows.Forms.Padding(4);
 			this.normalSatSlider.Maximum = 200;
 			this.normalSatSlider.Name = "normalSatSlider";
 			this.normalSatSlider.Size = new System.Drawing.Size(194, 69);
@@ -1213,7 +1215,7 @@
 			this.hueSlider.Cursor = System.Windows.Forms.Cursors.Default;
 			this.hueSlider.LargeChange = 10;
 			this.hueSlider.Location = new System.Drawing.Point(8, 168);
-			this.hueSlider.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.hueSlider.Margin = new System.Windows.Forms.Padding(4);
 			this.hueSlider.Maximum = 100;
 			this.hueSlider.Name = "hueSlider";
 			this.hueSlider.Size = new System.Drawing.Size(194, 69);
@@ -1243,9 +1245,9 @@
 			this.groupBox2.Controls.Add(this.label6);
 			this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.groupBox2.Location = new System.Drawing.Point(-2, 488);
-			this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
 			this.groupBox2.Size = new System.Drawing.Size(273, 232);
 			this.groupBox2.TabIndex = 6;
 			this.groupBox2.TabStop = false;
@@ -1255,7 +1257,7 @@
 			// 
 			this.hiliteLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.hiliteLumTb.Location = new System.Drawing.Point(212, 158);
-			this.hiliteLumTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.hiliteLumTb.Margin = new System.Windows.Forms.Padding(4);
 			this.hiliteLumTb.Name = "hiliteLumTb";
 			this.hiliteLumTb.Size = new System.Drawing.Size(55, 26);
 			this.hiliteLumTb.TabIndex = 12;
@@ -1267,7 +1269,7 @@
 			this.hiliteLumSlider.Cursor = System.Windows.Forms.Cursors.Default;
 			this.hiliteLumSlider.LargeChange = 10;
 			this.hiliteLumSlider.Location = new System.Drawing.Point(9, 158);
-			this.hiliteLumSlider.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.hiliteLumSlider.Margin = new System.Windows.Forms.Padding(4);
 			this.hiliteLumSlider.Maximum = 200;
 			this.hiliteLumSlider.Name = "hiliteLumSlider";
 			this.hiliteLumSlider.Size = new System.Drawing.Size(194, 69);
@@ -1291,7 +1293,7 @@
 			// 
 			this.hiliteSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.hiliteSatTb.Location = new System.Drawing.Point(212, 62);
-			this.hiliteSatTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.hiliteSatTb.Margin = new System.Windows.Forms.Padding(4);
 			this.hiliteSatTb.Name = "hiliteSatTb";
 			this.hiliteSatTb.Size = new System.Drawing.Size(55, 26);
 			this.hiliteSatTb.TabIndex = 10;
@@ -1303,7 +1305,7 @@
 			this.hiliteSatSlider.Cursor = System.Windows.Forms.Cursors.Default;
 			this.hiliteSatSlider.LargeChange = 10;
 			this.hiliteSatSlider.Location = new System.Drawing.Point(9, 62);
-			this.hiliteSatSlider.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.hiliteSatSlider.Margin = new System.Windows.Forms.Padding(4);
 			this.hiliteSatSlider.Maximum = 200;
 			this.hiliteSatSlider.Name = "hiliteSatSlider";
 			this.hiliteSatSlider.Size = new System.Drawing.Size(194, 69);
@@ -1326,7 +1328,7 @@
 			// transpTb
 			// 
 			this.transpTb.Location = new System.Drawing.Point(206, 74);
-			this.transpTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.transpTb.Margin = new System.Windows.Forms.Padding(4);
 			this.transpTb.Name = "transpTb";
 			this.transpTb.Size = new System.Drawing.Size(55, 26);
 			this.transpTb.TabIndex = 2;
@@ -1341,17 +1343,17 @@
 			this.tabPage2.Controls.Add(this.lightPanel);
 			this.tabPage2.Controls.Add(this.globalLightCb);
 			this.tabPage2.Location = new System.Drawing.Point(4, 29);
-			this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.tabPage2.Margin = new System.Windows.Forms.Padding(4);
 			this.tabPage2.Name = "tabPage2";
-			this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-			this.tabPage2.Size = new System.Drawing.Size(304, 15045);
+			this.tabPage2.Padding = new System.Windows.Forms.Padding(4);
+			this.tabPage2.Size = new System.Drawing.Size(304, 15044);
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "Light";
 			// 
 			// defaultLightBtn
 			// 
 			this.defaultLightBtn.Location = new System.Drawing.Point(4, 4);
-			this.defaultLightBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.defaultLightBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.defaultLightBtn.Name = "defaultLightBtn";
 			this.defaultLightBtn.Size = new System.Drawing.Size(268, 34);
 			this.defaultLightBtn.TabIndex = 12;
@@ -1361,39 +1363,20 @@
 			// 
 			// lightPanel
 			// 
-			this.lightPanel.Controls.Add(this.lightDirzTb);
-			this.lightPanel.Controls.Add(this.somelabel);
+			this.lightPanel.Controls.Add(this.label11);
+			this.lightPanel.Controls.Add(this.label12);
+			this.lightPanel.Controls.Add(this.label13);
+			this.lightPanel.Controls.Add(this.lightDirZUd);
+			this.lightPanel.Controls.Add(this.lightDirYUd);
+			this.lightPanel.Controls.Add(this.lightDirXUd);
 			this.lightPanel.Controls.Add(this.specularGb);
-			this.lightPanel.Controls.Add(this.lightDiryTb);
 			this.lightPanel.Controls.Add(this.label24);
-			this.lightPanel.Controls.Add(this.label26);
-			this.lightPanel.Controls.Add(this.label25);
-			this.lightPanel.Controls.Add(this.lightDirxTb);
 			this.lightPanel.Enabled = false;
 			this.lightPanel.Location = new System.Drawing.Point(0, 94);
-			this.lightPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.lightPanel.Margin = new System.Windows.Forms.Padding(4);
 			this.lightPanel.Name = "lightPanel";
 			this.lightPanel.Size = new System.Drawing.Size(270, 264);
 			this.lightPanel.TabIndex = 5;
-			// 
-			// lightDirzTb
-			// 
-			this.lightDirzTb.Location = new System.Drawing.Point(210, 38);
-			this.lightDirzTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-			this.lightDirzTb.Name = "lightDirzTb";
-			this.lightDirzTb.Size = new System.Drawing.Size(54, 26);
-			this.lightDirzTb.TabIndex = 4;
-			this.lightDirzTb.TextChanged += new System.EventHandler(this.lightDirzTb_TextChanged);
-			// 
-			// somelabel
-			// 
-			this.somelabel.AutoSize = true;
-			this.somelabel.Location = new System.Drawing.Point(184, 42);
-			this.somelabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.somelabel.Name = "somelabel";
-			this.somelabel.Size = new System.Drawing.Size(23, 20);
-			this.somelabel.TabIndex = 2;
-			this.somelabel.Text = "Z:";
 			// 
 			// specularGb
 			// 
@@ -1405,9 +1388,9 @@
 			this.specularGb.Controls.Add(this.label28);
 			this.specularGb.Controls.Add(this.label21);
 			this.specularGb.Location = new System.Drawing.Point(4, 102);
-			this.specularGb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.specularGb.Margin = new System.Windows.Forms.Padding(4);
 			this.specularGb.Name = "specularGb";
-			this.specularGb.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.specularGb.Padding = new System.Windows.Forms.Padding(4);
 			this.specularGb.Size = new System.Drawing.Size(255, 154);
 			this.specularGb.TabIndex = 3;
 			this.specularGb.TabStop = false;
@@ -1416,7 +1399,7 @@
 			// specFovUd
 			// 
 			this.specFovUd.Location = new System.Drawing.Point(82, 112);
-			this.specFovUd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.specFovUd.Margin = new System.Windows.Forms.Padding(4);
 			this.specFovUd.Maximum = new decimal(new int[] {
             180,
             0,
@@ -1430,7 +1413,7 @@
 			// specPowUd
 			// 
 			this.specPowUd.Location = new System.Drawing.Point(82, 74);
-			this.specPowUd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.specPowUd.Margin = new System.Windows.Forms.Padding(4);
 			this.specPowUd.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -1450,7 +1433,7 @@
             0,
             65536});
 			this.specAmountUd.Location = new System.Drawing.Point(82, 34);
-			this.specAmountUd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.specAmountUd.Margin = new System.Windows.Forms.Padding(4);
 			this.specAmountUd.Name = "specAmountUd";
 			this.specAmountUd.Size = new System.Drawing.Size(88, 26);
 			this.specAmountUd.TabIndex = 3;
@@ -1496,15 +1479,6 @@
 			this.label21.TabIndex = 2;
 			this.label21.Text = "FOV";
 			// 
-			// lightDiryTb
-			// 
-			this.lightDiryTb.Location = new System.Drawing.Point(120, 38);
-			this.lightDiryTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-			this.lightDiryTb.Name = "lightDiryTb";
-			this.lightDiryTb.Size = new System.Drawing.Size(54, 26);
-			this.lightDiryTb.TabIndex = 4;
-			this.lightDiryTb.TextChanged += new System.EventHandler(this.lightDiryTb_TextChanged);
-			// 
 			// label24
 			// 
 			this.label24.AutoSize = true;
@@ -1515,42 +1489,13 @@
 			this.label24.TabIndex = 2;
 			this.label24.Text = "Direction";
 			// 
-			// label26
-			// 
-			this.label26.AutoSize = true;
-			this.label26.Location = new System.Drawing.Point(94, 42);
-			this.label26.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.label26.Name = "label26";
-			this.label26.Size = new System.Drawing.Size(24, 20);
-			this.label26.TabIndex = 2;
-			this.label26.Text = "Y:";
-			// 
-			// label25
-			// 
-			this.label25.AutoSize = true;
-			this.label25.Location = new System.Drawing.Point(4, 42);
-			this.label25.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.label25.Name = "label25";
-			this.label25.Size = new System.Drawing.Size(24, 20);
-			this.label25.TabIndex = 2;
-			this.label25.Text = "X:";
-			// 
-			// lightDirxTb
-			// 
-			this.lightDirxTb.Location = new System.Drawing.Point(30, 38);
-			this.lightDirxTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-			this.lightDirxTb.Name = "lightDirxTb";
-			this.lightDirxTb.Size = new System.Drawing.Size(54, 26);
-			this.lightDirxTb.TabIndex = 4;
-			this.lightDirxTb.TextChanged += new System.EventHandler(this.lightDirxTb_TextChanged);
-			// 
 			// globalLightCb
 			// 
 			this.globalLightCb.AutoSize = true;
 			this.globalLightCb.Checked = true;
 			this.globalLightCb.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.globalLightCb.Location = new System.Drawing.Point(4, 58);
-			this.globalLightCb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.globalLightCb.Margin = new System.Windows.Forms.Padding(4);
 			this.globalLightCb.Name = "globalLightCb";
 			this.globalLightCb.Size = new System.Drawing.Size(170, 24);
 			this.globalLightCb.TabIndex = 0;
@@ -1569,10 +1514,10 @@
 			this.tabPage4.Controls.Add(this.yoffsetUd);
 			this.tabPage4.Controls.Add(this.xoffsetUd);
 			this.tabPage4.Location = new System.Drawing.Point(4, 29);
-			this.tabPage4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.tabPage4.Margin = new System.Windows.Forms.Padding(4);
 			this.tabPage4.Name = "tabPage4";
-			this.tabPage4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-			this.tabPage4.Size = new System.Drawing.Size(304, 15045);
+			this.tabPage4.Padding = new System.Windows.Forms.Padding(4);
+			this.tabPage4.Size = new System.Drawing.Size(304, 15044);
 			this.tabPage4.TabIndex = 3;
 			this.tabPage4.Text = "Spatial";
 			this.tabPage4.UseVisualStyleBackColor = true;
@@ -1580,7 +1525,7 @@
 			// defaultSpatialBtn
 			// 
 			this.defaultSpatialBtn.Location = new System.Drawing.Point(10, 9);
-			this.defaultSpatialBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.defaultSpatialBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.defaultSpatialBtn.Name = "defaultSpatialBtn";
 			this.defaultSpatialBtn.Size = new System.Drawing.Size(268, 34);
 			this.defaultSpatialBtn.TabIndex = 2;
@@ -1591,7 +1536,7 @@
 			// label41
 			// 
 			this.label41.AutoSize = true;
-			this.label41.Location = new System.Drawing.Point(234, 120);
+			this.label41.Location = new System.Drawing.Point(226, 120);
 			this.label41.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.label41.Name = "label41";
 			this.label41.Size = new System.Drawing.Size(19, 20);
@@ -1601,7 +1546,7 @@
 			// label40
 			// 
 			this.label40.AutoSize = true;
-			this.label40.Location = new System.Drawing.Point(138, 120);
+			this.label40.Location = new System.Drawing.Point(130, 120);
 			this.label40.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.label40.Name = "label40";
 			this.label40.Size = new System.Drawing.Size(20, 20);
@@ -1630,8 +1575,8 @@
 			// 
 			// zoffsetUd
 			// 
-			this.zoffsetUd.Location = new System.Drawing.Point(210, 86);
-			this.zoffsetUd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.zoffsetUd.Location = new System.Drawing.Point(194, 87);
+			this.zoffsetUd.Margin = new System.Windows.Forms.Padding(4);
 			this.zoffsetUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1643,14 +1588,14 @@
             0,
             -2147483648});
 			this.zoffsetUd.Name = "zoffsetUd";
-			this.zoffsetUd.Size = new System.Drawing.Size(81, 26);
+			this.zoffsetUd.Size = new System.Drawing.Size(85, 26);
 			this.zoffsetUd.TabIndex = 0;
 			this.zoffsetUd.ValueChanged += new System.EventHandler(this.zoffsetUd_ValueChanged);
 			// 
 			// yoffsetUd
 			// 
-			this.yoffsetUd.Location = new System.Drawing.Point(106, 86);
-			this.yoffsetUd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.yoffsetUd.Location = new System.Drawing.Point(101, 87);
+			this.yoffsetUd.Margin = new System.Windows.Forms.Padding(4);
 			this.yoffsetUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1662,14 +1607,14 @@
             0,
             -2147483648});
 			this.yoffsetUd.Name = "yoffsetUd";
-			this.yoffsetUd.Size = new System.Drawing.Size(94, 26);
+			this.yoffsetUd.Size = new System.Drawing.Size(85, 26);
 			this.yoffsetUd.TabIndex = 0;
 			this.yoffsetUd.ValueChanged += new System.EventHandler(this.yoffsetUd_ValueChanged);
 			// 
 			// xoffsetUd
 			// 
-			this.xoffsetUd.Location = new System.Drawing.Point(9, 86);
-			this.xoffsetUd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.xoffsetUd.Location = new System.Drawing.Point(8, 86);
+			this.xoffsetUd.Margin = new System.Windows.Forms.Padding(4);
 			this.xoffsetUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1681,15 +1626,15 @@
             0,
             -2147483648});
 			this.xoffsetUd.Name = "xoffsetUd";
-			this.xoffsetUd.Size = new System.Drawing.Size(88, 26);
+			this.xoffsetUd.Size = new System.Drawing.Size(85, 26);
 			this.xoffsetUd.TabIndex = 0;
 			this.xoffsetUd.ValueChanged += new System.EventHandler(this.xoffsetUd_ValueChanged);
 			// 
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-4156, 15082);
-			this.textureBrowseBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-4182, 15082);
+			this.textureBrowseBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(39, 30);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1701,8 +1646,8 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-4324, 15084);
-			this.texPathTb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.texPathTb.Location = new System.Drawing.Point(-4350, 15084);
+			this.texPathTb.Margin = new System.Windows.Forms.Padding(4);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(182, 26);
 			this.texPathTb.TabIndex = 10;
@@ -1712,7 +1657,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-4328, 15060);
+			this.label4.Location = new System.Drawing.Point(-4354, 15060);
 			this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(62, 20);
@@ -1724,7 +1669,7 @@
 			// 
 			this.resetDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.resetDefaultBtn.Location = new System.Drawing.Point(504, 32767);
-			this.resetDefaultBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.resetDefaultBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.resetDefaultBtn.Name = "resetDefaultBtn";
 			this.resetDefaultBtn.Size = new System.Drawing.Size(255, 34);
 			this.resetDefaultBtn.TabIndex = 13;
@@ -1736,7 +1681,7 @@
 			// 
 			this.setDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.setDefaultBtn.Location = new System.Drawing.Point(501, 32767);
-			this.setDefaultBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.setDefaultBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.setDefaultBtn.Name = "setDefaultBtn";
 			this.setDefaultBtn.Size = new System.Drawing.Size(255, 34);
 			this.setDefaultBtn.TabIndex = 12;
@@ -1755,7 +1700,7 @@
 			this.trackPropsCb.AutoSize = true;
 			this.trackPropsCb.FlatAppearance.CheckedBackColor = System.Drawing.Color.White;
 			this.trackPropsCb.Location = new System.Drawing.Point(148, 0);
-			this.trackPropsCb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.trackPropsCb.Margin = new System.Windows.Forms.Padding(4);
 			this.trackPropsCb.Name = "trackPropsCb";
 			this.trackPropsCb.Size = new System.Drawing.Size(133, 30);
 			this.trackPropsCb.TabIndex = 16;
@@ -1778,7 +1723,7 @@
 			this.songPropsPanel.Controls.Add(this.label7);
 			this.songPropsPanel.Dock = System.Windows.Forms.DockStyle.Left;
 			this.songPropsPanel.Location = new System.Drawing.Point(0, 35);
-			this.songPropsPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.songPropsPanel.Margin = new System.Windows.Forms.Padding(4);
 			this.songPropsPanel.Name = "songPropsPanel";
 			this.songPropsPanel.Size = new System.Drawing.Size(314, 15077);
 			this.songPropsPanel.TabIndex = 17;
@@ -1787,7 +1732,7 @@
 			// resetCamBtn
 			// 
 			this.resetCamBtn.Location = new System.Drawing.Point(18, 302);
-			this.resetCamBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.resetCamBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.resetCamBtn.Name = "resetCamBtn";
 			this.resetCamBtn.Size = new System.Drawing.Size(128, 34);
 			this.resetCamBtn.TabIndex = 20;
@@ -1798,7 +1743,7 @@
 			// defaultPitchesBtn
 			// 
 			this.defaultPitchesBtn.Location = new System.Drawing.Point(18, 258);
-			this.defaultPitchesBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.defaultPitchesBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.defaultPitchesBtn.Name = "defaultPitchesBtn";
 			this.defaultPitchesBtn.Size = new System.Drawing.Size(166, 34);
 			this.defaultPitchesBtn.TabIndex = 18;
@@ -1809,7 +1754,7 @@
 			// minPitchUd
 			// 
 			this.minPitchUd.Location = new System.Drawing.Point(106, 219);
-			this.minPitchUd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.minPitchUd.Margin = new System.Windows.Forms.Padding(4);
 			this.minPitchUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1828,7 +1773,7 @@
 			// maxPitchUd
 			// 
 			this.maxPitchUd.Location = new System.Drawing.Point(106, 180);
-			this.maxPitchUd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.maxPitchUd.Margin = new System.Windows.Forms.Padding(4);
 			this.maxPitchUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1873,7 +1818,7 @@
 			this.upDownVpWidth.Decimals2 = 2;
 			this.upDownVpWidth.ExpBase = 2D;
 			this.upDownVpWidth.Location = new System.Drawing.Point(18, 42);
-			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(6);
 			this.upDownVpWidth.Max = 10D;
 			this.upDownVpWidth.Min = 0D;
 			this.upDownVpWidth.Name = "upDownVpWidth";
@@ -1889,7 +1834,7 @@
 			this.songPropsCb.Appearance = System.Windows.Forms.Appearance.Button;
 			this.songPropsCb.AutoSize = true;
 			this.songPropsCb.Location = new System.Drawing.Point(4, 0);
-			this.songPropsCb.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.songPropsCb.Margin = new System.Windows.Forms.Padding(4);
 			this.songPropsCb.Name = "songPropsCb";
 			this.songPropsCb.Size = new System.Drawing.Size(132, 30);
 			this.songPropsCb.TabIndex = 18;
@@ -1903,7 +1848,7 @@
 			this.propsTogglePanel.Controls.Add(this.trackPropsCb);
 			this.propsTogglePanel.Enabled = false;
 			this.propsTogglePanel.Location = new System.Drawing.Point(352, 0);
-			this.propsTogglePanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.propsTogglePanel.Margin = new System.Windows.Forms.Padding(4);
 			this.propsTogglePanel.Name = "propsTogglePanel";
 			this.propsTogglePanel.Size = new System.Drawing.Size(294, 36);
 			this.propsTogglePanel.TabIndex = 19;
@@ -1919,6 +1864,93 @@
 			// saveMixdownDialog
 			// 
 			this.saveMixdownDialog.Filter = "Wav files (*.wav)|*.wav|All files (*.*)|*.*";
+			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(216, 74);
+			this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(19, 20);
+			this.label11.TabIndex = 7;
+			this.label11.Text = "Z";
+			// 
+			// label12
+			// 
+			this.label12.AutoSize = true;
+			this.label12.Location = new System.Drawing.Point(128, 74);
+			this.label12.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(20, 20);
+			this.label12.TabIndex = 8;
+			this.label12.Text = "Y";
+			// 
+			// label13
+			// 
+			this.label13.AutoSize = true;
+			this.label13.Location = new System.Drawing.Point(35, 74);
+			this.label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(20, 20);
+			this.label13.TabIndex = 9;
+			this.label13.Text = "X";
+			// 
+			// lightDirZUd
+			// 
+			this.lightDirZUd.Location = new System.Drawing.Point(190, 40);
+			this.lightDirZUd.Margin = new System.Windows.Forms.Padding(4);
+			this.lightDirZUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.lightDirZUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.lightDirZUd.Name = "lightDirZUd";
+			this.lightDirZUd.Size = new System.Drawing.Size(85, 26);
+			this.lightDirZUd.TabIndex = 4;
+			this.lightDirZUd.ValueChanged += new System.EventHandler(this.lightDirZUd_ValueChanged);
+			// 
+			// lightDirYUd
+			// 
+			this.lightDirYUd.Location = new System.Drawing.Point(97, 40);
+			this.lightDirYUd.Margin = new System.Windows.Forms.Padding(4);
+			this.lightDirYUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.lightDirYUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.lightDirYUd.Name = "lightDirYUd";
+			this.lightDirYUd.Size = new System.Drawing.Size(85, 26);
+			this.lightDirYUd.TabIndex = 5;
+			this.lightDirYUd.ValueChanged += new System.EventHandler(this.lightDirYUd_ValueChanged);
+			// 
+			// lightDirXUd
+			// 
+			this.lightDirXUd.Location = new System.Drawing.Point(4, 40);
+			this.lightDirXUd.Margin = new System.Windows.Forms.Padding(4);
+			this.lightDirXUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.lightDirXUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.lightDirXUd.Name = "lightDirXUd";
+			this.lightDirXUd.Size = new System.Drawing.Size(85, 26);
+			this.lightDirXUd.TabIndex = 6;
+			this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
 			// 
 			// Form1
 			// 
@@ -1938,7 +1970,7 @@
 			this.Controls.Add(this.menuStrip1);
 			this.KeyPreview = true;
 			this.MainMenuStrip = this.menuStrip1;
-			this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "Form1";
 			this.Text = "Visual Music";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -1998,6 +2030,9 @@
 			this.propsTogglePanel.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -2061,8 +2096,6 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TabPage styleTab;
 		private System.Windows.Forms.Panel lightPanel;
-		private System.Windows.Forms.TextBox lightDirzTb;
-		private System.Windows.Forms.Label somelabel;
 		private System.Windows.Forms.GroupBox specularGb;
 		private System.Windows.Forms.NumericUpDown specFovUd;
 		private System.Windows.Forms.NumericUpDown specPowUd;
@@ -2070,11 +2103,7 @@
 		private System.Windows.Forms.Label label23;
 		private System.Windows.Forms.Label label22;
 		private System.Windows.Forms.Label label21;
-		private System.Windows.Forms.TextBox lightDiryTb;
 		private System.Windows.Forms.Label label24;
-		private System.Windows.Forms.Label label26;
-		private System.Windows.Forms.Label label25;
-		private System.Windows.Forms.TextBox lightDirxTb;
 		private System.Windows.Forms.CheckBox globalLightCb;
 		private System.Windows.Forms.Label label28;
 		private System.Windows.Forms.ContextMenuStrip trackListCM;
@@ -2147,6 +2176,12 @@
 		private System.Windows.Forms.ColorDialog colorDialog1;
 		private BarStyleControl barStyleControl;
 		private LineStyleControl lineStyleControl;
+		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.Label label13;
+		private System.Windows.Forms.NumericUpDown lightDirZUd;
+		private System.Windows.Forms.NumericUpDown lightDirYUd;
+		private System.Windows.Forms.NumericUpDown lightDirXUd;
 	}
 }
 
