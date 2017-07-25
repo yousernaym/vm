@@ -461,8 +461,7 @@
 			this.trackPropsPanel.TabIndex = 3;
 			this.trackPropsPanel.Visible = false;
 			this.trackPropsPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.trackPropsPanel_Paint);
-			this.trackPropsPanel.Enter += new System.EventHandler(this.trackPropsPanel_Enter);
-			this.trackPropsPanel.Leave += new System.EventHandler(this.trackPropsPanel_Leave);
+			
 			// 
 			// trackList
 			// 
@@ -489,7 +488,6 @@
 			this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
 			this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
 			this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
-			this.trackList.Enter += new System.EventHandler(this.trackList_Enter);
 			// 
 			// trackColumn
 			// 
@@ -1252,7 +1250,6 @@
 			this.groupBox2.TabIndex = 6;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Highlighted notes";
-			this.groupBox2.Enter += new System.EventHandler(this.groupBox2_Enter);
 			// 
 			// hiliteLumTb
 			// 

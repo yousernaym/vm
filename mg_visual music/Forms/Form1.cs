@@ -17,7 +17,6 @@ using System.IO.Compression;
 namespace Visual_Music
 {
 	using GdiPoint = System.Drawing.Point;
-	
 	//using XnaPoint = Microsoft.Xna.Framework.Point;
 
 	public partial class Form1 : Form
@@ -64,8 +63,6 @@ namespace Visual_Music
 		ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
 
-		//BarStyleControl barStyleControl; 
-		//LineStyleControl lineStyleControl;
 		NoteStyleControl currentNoteStyleControl;
 
 		public Form1(string[] args)
@@ -88,9 +85,6 @@ namespace Visual_Music
             importSidForm = new ImportSidForm(this);
 			tpartyIntegrationForm = new TpartyIntegrationForm();
 			vidExpForm = new VideoExportForm();
-			//trackPropsPanel =  new TrackPropsPanel(songPanel);
-			//showTrackPropsBtn.Text = "Show " + trackPropsBtnText;
-
 			ResizeRedraw = true;
 
             songScrollBar.Dock = DockStyle.Bottom;
@@ -116,14 +110,14 @@ namespace Visual_Music
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			//try
-			//{
+			try
+			{
 				loadSettings();
 			
-				//}
-				//catch
-				//{
-				//}
+				}
+				catch
+				{
+				}
 				//upDownVpWidth.Focus();
 				//upDownVpWidth.Value = songPanel.Qn_viewWidth;
 
@@ -206,7 +200,7 @@ namespace Visual_Music
                 
         void songLoaded(string path)
 		{
-			bool loaded = !isEmpty(path);
+			bool loaded = !string.IsNullOrEmpty(path);
 			propsTogglePanel.Enabled = loaded;
 			if (!loaded)
 			{
@@ -216,7 +210,6 @@ namespace Visual_Music
 			saveSongToolStripMenuItem.Enabled = loaded;
 			saveSongAsToolStripMenuItem.Enabled = loaded;
 			exportVideoToolStripMenuItem.Enabled = loaded;
-            //startStopToolStripMenuItem.Enabled = !isEmpty(sourceFileForm.AudioFilePath);
             playbackToolStripMenuItem.Enabled = AudioLoaded;
 			
 			//if (loaded)
@@ -394,31 +387,23 @@ namespace Visual_Music
 			trackList.Select();
 			trackList.EndUpdate();
 			//updateTrackListColors(null, null);
-			
 		}
 
 		private void trackList_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (trackList.SelectedIndices.Count == 0)
 			{
-				//mergedTrackProps = null;
 				selectedTrackPropsPanel.Enabled = false;
 				defaultPropertiesToolStripMenuItem.Enabled = false;
 			}
 			else
 			{
-				//if (trackList.SelectedIndices.Count > 1 && currentNoteStyleControl != null)
-				//currentNoteStyleControl.
-
-				//mergedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
-				//mergedTrackProps = SongPanel.mergeTrackProps(trackList.SelectedIndices);
 				transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = trackList.SelectedIndices[0] != 0;// || trackList.SelectedIndices.Count == 1);
 				selectedTrackPropsPanel.Enabled = true;
 				defaultPropertiesToolStripMenuItem.Enabled = true;
 				globalLightCb.Enabled = trackList.SelectedIndices[0] != 0; // || trackList.SelectedIndices.Count == 1
 			}
 			updateTrackControls();
-			//songPanel.Invalidate();
 		}
 
 		float getTrackBarValueNorm(object sender)
@@ -622,9 +607,6 @@ namespace Visual_Music
 					screenVAnchorRb.Checked = true;
 				texUScrollUD.Value = (decimal)texProps.UScroll;
 				texVScrollUD.Value = (decimal)texProps.VScroll;
-				//FixedTexXOriginCb.Checked = selectedTrackProps.FixedTexXOrigin;
-				//FixedTexYOriginCb.Checked = selectedTrackProps.FixedTexYOrigin;
-				//updateTexXYCb(FixedTexOriginCb, FixedTexXOriginCb, FixedTexYOriginCb);
 
 				//Note style-----------------
 				if (mergedTrackProps.NoteStyleType == null)
@@ -664,41 +646,7 @@ namespace Visual_Music
 			}
 			trackList.EndUpdate();
 		}
-		static public bool isEmpty(string s)
-		{
-			return s == null || s == "";
-		}
-
-		private void trackPropsPanel_Enter(object sender, EventArgs e)
-		{
-
-		}
-
-		private void leftTrackPropsPanel_Enter(object sender, EventArgs e)
-		{
-
-		}
-
-		private void groupBox2_Enter(object sender, EventArgs e)
-		{
-
-		}
-
-		private void trackList_Enter(object sender, EventArgs e)
-		{
-
-		}
-
-		private void trackPropsPanel_Leave(object sender, EventArgs e)
-		{
-
-		}
-
-		private void leftTrackPropsPanel_Leave(object sender, EventArgs e)
-		{
-
-		}
-
+		
 		ListViewItem getListViewItem(ListView trackList, DragEventArgs e)
 		{
 			ListViewItem item = null;
@@ -750,7 +698,6 @@ namespace Visual_Music
 					for (int i = 0; i < selectedItems.Length; i++)
 					{
 						Project.TrackViews.RemoveAt(selectedItems[i].Index);
-						//songPanel.Notes.Tracks.RemoveAt(selectedItems[i].Index);
 						trackList.Items.Remove(selectedItems[i]);
 					}
 					for (int i = 0; i < selectedItems.Length; i++)
@@ -764,7 +711,6 @@ namespace Visual_Music
 						TrackView dest = Project.TrackViews[trackList.SelectedIndices[i]];
 						source.cloneTrackProps(dest);
 					}
-					//mergedTrackProps = songPanel.TrackProps[trackList.SelectedIndices[0]];
 					updateTrackControls();
 					updateTrackListColors();
 				}
@@ -849,8 +795,6 @@ namespace Visual_Music
 			{
                 NoteStyleEnum type = (NoteStyleEnum)Enum.Parse(typeof(NoteStyleEnum), (string)styleList.SelectedItem);
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.NoteStyleType = type;
-				//if (type == typeof(NoteStyle_Default))
-					//songPanel.TrackProps[trackList.SelectedIndices[i]].NoteStyle = new NoteStyle_Default(null);
 			}
 			updateTrackControls();
 		}
@@ -926,12 +870,9 @@ namespace Visual_Music
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
                 using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
-					//Controls.Remove(songPanel);
-					//songPanel.Dispose();
                     project = (Project)dcs.ReadObject(stream);
 					Project.SongPanel = songPanel;
                 }
-                //initSongPanel(songPanel);
 				updateImportForm();
 				
                 currentProjPath = fileName;
@@ -942,7 +883,7 @@ namespace Visual_Music
 			{
 				MessageBox.Show(ex.Message);
 			}
-}
+		}
 		
 		void updateImportForm()
 		{
@@ -966,12 +907,12 @@ namespace Visual_Music
 		void updateFormTitle(string path)
 		{
 			Text = "Visual Music";
-			if (!isEmpty(path))
+			if (!string.IsNullOrEmpty(path))
 				Text += " - " + Path.GetFileName(path);
 		}
 		private void saveSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (isEmpty(currentProjPath))
+			if (string.IsNullOrEmpty(currentProjPath))
 			{
 				saveSongAs();
 				return;
@@ -1145,16 +1086,6 @@ namespace Visual_Music
 			songScrollBar.Value = songScrollBar.Maximum;
 		}
 
-		private void button1_Click(object sender, EventArgs e)
-		{
-
-		}
-
-		private void button2_Click(object sender, EventArgs e)
-		{
-
-		}
-
 		private void defaultStyleBtn_Click(object sender, EventArgs e)
 		{
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
@@ -1234,21 +1165,6 @@ namespace Visual_Music
 				getActiveTexProps(i).PointSmp = ((CheckBox)sender).Checked;
 			loadMtrlTexInPb();
 		}
-
-		//private void moveTexWithNotesCb_CheckedChanged(object sender, EventArgs e)
-		//{
-		//    if (updatingControls)
-		//        return;
-		//    if (((CheckBox)sender).CheckState != CheckState.Indeterminate)
-		//    {
-		//        for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-		//        {
-		//            songPanel.TrackProps[trackList.SelectedIndices[i]].FixedTexXOrigin = ((CheckBox)sender).Checked;
-		//            songPanel.TrackProps[trackList.SelectedIndices[i]].FixedTexYOrigin = ((CheckBox)sender).Checked;
-		//        }
-		//        updateTrackControls();
-		//    }
-		//}
 
 		private void tileTexCb_CheckedChanged(object sender, EventArgs e)
 		{
@@ -1337,11 +1253,6 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = TexAnchorEnum.Screen;
-		}
-
-		private void songAnchorRb_CheckedChanged(object sender, EventArgs e)
-		{
-			
 		}
 
 		private void screenVAnchorRb_Click(object sender, EventArgs e)

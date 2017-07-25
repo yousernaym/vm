@@ -100,7 +100,6 @@ namespace Visual_Music
 		TimeSpan oldTime = new TimeSpan(0);
 		Stopwatch stopwatch = new Stopwatch();
 		public TimeSpan TotalTimeElapsed => stopwatch.Elapsed;
-		//TimeSpan deltaTime;
 		double deltaTimeS;
 		//double renderInterval = 0.0001;
 		bool leftMbPressed = false;
@@ -114,43 +113,30 @@ namespace Visual_Music
 		Rectangle selectedScreenRegion;
 		public float NormMouseX { get; set; }
 		public float NormMouseY { get; set; }
-		SpriteBatch spriteBatch;
-		public SpriteBatch SpriteBatch
-		{
-			get { return spriteBatch; }
-			//set { spriteBatch = value; }
-		}
+		public SpriteBatch SpriteBatch { get; private set; }
 
-		BlendState blendState;
-		public BlendState BlendState
-		{
-			get { return blendState; }
-			//set { blendState = value; }
-		}
-
+		public BlendState BlendState { get; private set; }
 		Point videoSize = new Point(1920, 1080);
-
 
 		public SongPanel()
 		{
 		}
 
-
 		protected override void Initialize()
 		{
 			stopwatch.Start();
-			spriteBatch = new SpriteBatch(GraphicsDevice);
-			blendState = new BlendState();
+			SpriteBatch = new SpriteBatch(GraphicsDevice);
+			BlendState = new BlendState();
 
-			blendState.AlphaDestinationBlend = Blend.DestinationAlpha;
+			BlendState.AlphaDestinationBlend = Blend.DestinationAlpha;
 			//blendState.AlphaDestinationBlend = Blend.One;
-			blendState.AlphaSourceBlend = Blend.InverseDestinationAlpha;
-			blendState.ColorDestinationBlend = Blend.DestinationAlpha;
+			BlendState.AlphaSourceBlend = Blend.InverseDestinationAlpha;
+			BlendState.ColorDestinationBlend = Blend.DestinationAlpha;
 			//blendState.ColorDestinationBlend = Blend.One;
-			blendState.ColorSourceBlend = Blend.InverseDestinationAlpha;
-			blendState.ColorWriteChannels = ColorWriteChannels.All;
-			blendState.AlphaBlendFunction = BlendFunction.Add;
-			blendState.ColorBlendFunction = BlendFunction.Add;
+			BlendState.ColorSourceBlend = Blend.InverseDestinationAlpha;
+			BlendState.ColorWriteChannels = ColorWriteChannels.All;
+			BlendState.AlphaBlendFunction = BlendFunction.Add;
+			BlendState.ColorBlendFunction = BlendFunction.Add;
 
 			content = new ContentManager(Services, "Content");
 			NoteStyle.sInitAllStyles(this);
@@ -166,7 +152,6 @@ namespace Visual_Music
 			if (Project == null || isRenderingVideo)
 				return;
 			TimeSpan newTime = stopwatch.Elapsed;
-			//Debug.WriteLine(deltaTimeS);
 			deltaTimeS = (newTime - oldTime).TotalSeconds;
 			//if (deltaTimeS < renderInterval)
 			//return;
@@ -191,13 +176,13 @@ namespace Visual_Music
 			GraphicsDevice.Clear(Color.Transparent);
 			if (selectingRegion)
 			{
-				spriteBatch.Begin();
+				SpriteBatch.Begin();
 				Rectangle normRect = normalizeRect(selectedScreenRegion);
-				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
-				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
-				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
-				spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
-				spriteBatch.End();
+				SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
+				SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
+				SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
+				SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
+				SpriteBatch.End();
 			}
 			Project.drawSong(new Point(ClientRectangle.Size.Width, ClientRectangle.Size.Height), Project.NormSongPos);
 		}
@@ -393,7 +378,6 @@ namespace Visual_Music
 		delegate void DrawSceneToVideoFrameFunc();
 		void drawVideoFrameSample(VideoExportForm options, RenderTargetCube renderTargetCube, RenderTarget2D renderTarget2d, Texture2D prevFrame, double songPosInTicks, Effect cubeToPlaneFx)
 		{
-			//DrawSceneToVideoFrameFunc drawFunc;
 			GraphicsDevice.SetRenderTarget(renderTarget2d);
 			GraphicsDevice.Clear(Color.Transparent);
 
@@ -423,7 +407,6 @@ namespace Visual_Music
 					GraphicsDevice.Viewport = new Viewport(viewport.Width / 2, 0, viewport.Width / 2, viewport.Height);
 					Project.drawSong(options.Resolution, (float)songPosInTicks / Project.Notes.SongLengthT);
 				}
-
 			}
 		}
 
@@ -565,9 +548,6 @@ namespace Visual_Music
 			return cmFaces[face][v * faceSide + u];
 		}
 
-		
-		
-		
 		public static Color HSLA2RGBA(double h, double s, double l, float a, bool bgr = false)
 		{
 			double v;

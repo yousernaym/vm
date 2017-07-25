@@ -81,7 +81,7 @@ namespace Visual_Music
 			{
 				if (NoteStyleType == NoteStyleEnum.Default)
 				{
-					if (TrackNumber == 0)  //Gloval track
+					if (TrackNumber == 0)  //Global track
 						return getBarNoteStyle();
 					else
 						return GlobalProps.SelectedNoteStyle;
@@ -346,7 +346,7 @@ namespace Visual_Music
 
 				}
 				else
-					tex = GlobalProps.getTexture(bhilited, null);
+					tex = globalProps.getTexture(bhilited, null);
 			}
 			return tex;
 		}
