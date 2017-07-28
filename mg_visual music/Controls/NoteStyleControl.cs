@@ -62,7 +62,7 @@ namespace Visual_Music
 				fadeInUd.Value = (decimal)modEntry.FadeIn;
 				fadeOutUd.Value = (decimal)modEntry.FadeOut;
 				powerUd.Value = (decimal)modEntry.Power;
-				scaleUd.Value = (decimal)modEntry.Scale;
+				discardStopCb.Checked = modEntry.DiscardAfterStop;
 			}
 		}
 
@@ -206,12 +206,12 @@ namespace Visual_Music
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.Power = (float)powerUd.Value;
 		}
 
-		private void scaleUd_ValueChanged(object sender, EventArgs e)
+		private void discardStopCb_CheckedChanged(object sender, EventArgs e)
 		{
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.Scale = (float)scaleUd.Value;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.DiscardAfterStop = discardStopCb.Checked;
 		}
 	}
 }

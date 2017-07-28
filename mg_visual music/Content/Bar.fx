@@ -11,21 +11,22 @@ struct VSInput
 struct VSOutput
 {
     float4 pos : POSITION0;
+	float2 normPos : POSITION1;
+	float4 worldPos : POSITION2;
 	float2 texCoords : TEXCOORD0;
 	float4 color : COLOR0;
-	float2 normPos : POSITION1;
 };
 
 VSOutput VS(VSInput IN)
 {
 	VSOutput OUT;
-	OUT.pos = float4(IN.rect.xy + IN.normPos * IN.rect.zw, 0, 1); //top-left + 0|1 * size
-	OUT.pos.xyz += PosOffset;
+	OUT.worldPos = float4(IN.rect.xy + IN.normPos * IN.rect.zw, 0, 1); //top-left + 0|1 * size
+	OUT.worldPos.xyz += PosOffset;
 	// Viewport adjustment.
 	//OUT.pos.xy /= ViewportSize.xy;
 	//OUT.pos.xy *= float2(2, -2);
 	//OUT.pos.xy -= float2(1, -1);
-	OUT.pos = mul(OUT.pos, WvpMat);
+	OUT.pos = mul(OUT.worldPos, VpMat);
 	//OUT.pos.z = 0;
 	//OUT.pos.w = 1;
 	OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw;
@@ -38,12 +39,9 @@ float4 PS(VSOutput IN) : COLOR0
 {
 	float4 color = IN.color;
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
-	color.rgb = modulateColor(IN.normPos, color.rgb);
+	color = modulateColor(IN.normPos, color, IN.worldPos);
 	
-	//float2 distFromCenter = abs(IN.normPos - 0.5);
-	//float2 border = saturate(distFromCenter - 0.3);
-	//color = saturate(color + 4 * max(border.x, border.y));
-    return color;
+	return color;
 	//return float4(, 0, 0, color.r*10);
 	//return float4(ColorDest[0])+float4(0,0,0,color.x);
 }

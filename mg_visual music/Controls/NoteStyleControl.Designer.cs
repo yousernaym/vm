@@ -49,8 +49,6 @@
 			this.label7 = new System.Windows.Forms.Label();
 			this.xSourceCombo = new System.Windows.Forms.ComboBox();
 			this.ySourceCombo = new System.Windows.Forms.ComboBox();
-			this.label8 = new System.Windows.Forms.Label();
-			this.scaleUd = new System.Windows.Forms.NumericUpDown();
 			this.label9 = new System.Windows.Forms.Label();
 			this.combineXYCombo = new System.Windows.Forms.ComboBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -69,12 +67,12 @@
 			this.modEntryPanel = new System.Windows.Forms.Panel();
 			this.label4 = new System.Windows.Forms.Label();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+			this.discardStopCb = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.powerUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.startUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.stopUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.scaleUd)).BeginInit();
 			this.groupBox1.SuspendLayout();
 			this.modEntryCm.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.modEntryBs)).BeginInit();
@@ -325,31 +323,6 @@
 			this.ySourceCombo.TabIndex = 39;
 			this.ySourceCombo.SelectedIndexChanged += new System.EventHandler(this.ySourceCombo_SelectedIndexChanged);
 			// 
-			// label8
-			// 
-			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(16, 514);
-			this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(49, 20);
-			this.label8.TabIndex = 23;
-			this.label8.Text = "Scale";
-			// 
-			// scaleUd
-			// 
-			this.scaleUd.DecimalPlaces = 2;
-			this.scaleUd.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-			this.scaleUd.Location = new System.Drawing.Point(99, 514);
-			this.scaleUd.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-			this.scaleUd.Name = "scaleUd";
-			this.scaleUd.Size = new System.Drawing.Size(114, 26);
-			this.scaleUd.TabIndex = 32;
-			this.scaleUd.ValueChanged += new System.EventHandler(this.scaleUd_ValueChanged);
-			// 
 			// label9
 			// 
 			this.label9.AutoSize = true;
@@ -528,6 +501,7 @@
 			// modEntryPanel
 			// 
 			this.modEntryPanel.AutoSize = true;
+			this.modEntryPanel.Controls.Add(this.discardStopCb);
 			this.modEntryPanel.Controls.Add(this.label1);
 			this.modEntryPanel.Controls.Add(this.label19);
 			this.modEntryPanel.Controls.Add(this.label4);
@@ -537,13 +511,11 @@
 			this.modEntryPanel.Controls.Add(this.startUd);
 			this.modEntryPanel.Controls.Add(this.fadeInUd);
 			this.modEntryPanel.Controls.Add(this.label18);
-			this.modEntryPanel.Controls.Add(this.scaleUd);
 			this.modEntryPanel.Controls.Add(this.groupBox1);
 			this.modEntryPanel.Controls.Add(this.stopUd);
 			this.modEntryPanel.Controls.Add(this.fadeOutUd);
 			this.modEntryPanel.Controls.Add(this.label38);
 			this.modEntryPanel.Controls.Add(this.powerUd);
-			this.modEntryPanel.Controls.Add(this.label8);
 			this.modEntryPanel.Controls.Add(this.label3);
 			this.modEntryPanel.Controls.Add(this.label2);
 			this.modEntryPanel.Location = new System.Drawing.Point(8, 40);
@@ -562,6 +534,17 @@
 			this.label4.TabIndex = 30;
 			this.label4.Text = "%";
 			// 
+			// discardStopCb
+			// 
+			this.discardStopCb.AutoSize = true;
+			this.discardStopCb.Location = new System.Drawing.Point(17, 518);
+			this.discardStopCb.Name = "discardStopCb";
+			this.discardStopCb.Size = new System.Drawing.Size(164, 24);
+			this.discardStopCb.TabIndex = 43;
+			this.discardStopCb.Text = "Discard after Stop";
+			this.discardStopCb.UseVisualStyleBackColor = true;
+			this.discardStopCb.CheckedChanged += new System.EventHandler(this.discardStopCb_CheckedChanged);
+			// 
 			// NoteStyleControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -576,7 +559,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.startUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.stopUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.scaleUd)).EndInit();
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
 			this.modEntryCm.ResumeLayout(false);
@@ -617,8 +599,6 @@
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.ComboBox xSourceCombo;
 		private System.Windows.Forms.ComboBox ySourceCombo;
-		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.NumericUpDown scaleUd;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.ComboBox combineXYCombo;
 		private System.Windows.Forms.GroupBox groupBox1;
@@ -637,5 +617,6 @@
 		private System.Windows.Forms.ToolStripMenuItem deleteMi;
 		private System.Windows.Forms.ToolStripMenuItem cloneMi;
 		private System.Windows.Forms.ColorDialog colorDialog1;
+		private System.Windows.Forms.CheckBox discardStopCb;
 	}
 }

@@ -51,6 +51,7 @@ namespace Visual_Music
 		public int YSource { get; set; } 
 		public int CombineXY { get; set; } 
 		public bool ColorDestEnable { get; set; }
+		public bool AlphaDestEnable { get; set; }
 		public bool AngleDestEnable { get; set; }
 		public Vector4 ColorDest { get; set; } = new Vector4(1,1,1,1);
 		public System.Drawing.Color SystemColorDest
@@ -65,7 +66,7 @@ namespace Visual_Music
 		public float FadeIn { get; set; }
 		public float FadeOut { get; set; }
 		public float Power { get; set; } = 1;
-		public float Scale { get; set; } = 1;
+		public bool DiscardAfterStop { get; set; } = true;
 
 		public NoteStyleMod(string _name = "")
 		{
@@ -102,8 +103,8 @@ namespace Visual_Music
 					FadeOut = (float)entry.Value;
 				else if (entry.Name == "power")
 					Power = (float)entry.Value;
-				else if (entry.Name == "scale")
-					Scale = (float)entry.Value;
+				else if (entry.Name == "DiscardAfterStop")
+					DiscardAfterStop = (bool)entry.Value;
 			}
 		}
 
@@ -122,7 +123,7 @@ namespace Visual_Music
 			info.AddValue("fadeIn", FadeIn);
 			info.AddValue("fadeOut", FadeOut);
 			info.AddValue("power", Power);
-			info.AddValue("scale", Scale);
+			info.AddValue("discardAfterStop", DiscardAfterStop);
 		}
 
 		public NoteStyleMod clone()
@@ -189,12 +190,19 @@ namespace Visual_Music
 		}
 		public NoteStyle(SerializationInfo info, StreamingContext ctxt)
 		{
-			styleType = (NoteStyleEnum)info.GetValue("styleType", typeof(NoteStyleEnum));
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "styleType")
+					styleType = (NoteStyleEnum)entry.Value;
+				if (entry.Name == "modEntries")
+					ModEntries = (List<NoteStyleMod>)entry.Value;
+			}
 		}
 
 		virtual public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
 			info.AddValue("styleType", styleType);
+			info.AddValue("ModEntries", ModEntries);
 		}
 
 		public static void sInitAllStyles(SongPanel _songPanel)
@@ -270,7 +278,7 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
-			fx.Parameters["WvpMat"].SetValue(cam.VpMat);
+			fx.Parameters["VpMat"].SetValue(cam.VpMat);
 			Matrix projMat = cam.ProjMat;
 			fx.Parameters["ProjScale"].SetValue(new Vector2(projMat.M11, projMat.M22));
 
@@ -300,16 +308,16 @@ namespace Visual_Music
 				fx.Parameters["Origin"].Elements[i].SetValue(new Vector2(0.5f, 0.5f));
 				fx.Parameters["CombineXY"].Elements[i].SetValue(ModEntries[i].CombineXY);
 				fx.Parameters["ColorDestEnable"].Elements[i].SetValue(ModEntries[i].ColorDestEnable);
-				fx.Parameters["ColorDest"].Elements[i].SetValue(ModEntries[i].ColorDest);
 				fx.Parameters["AngleDestEnable"].Elements[i].SetValue(ModEntries[i].AngleDestEnable);
-				fx.Parameters["AngleDest"].Elements[i].SetValue(ModEntries[i].AngleDest);
+				fx.Parameters["AlphaDestEnable"].Elements[i].SetValue(ModEntries[i].AlphaDestEnable);
+				fx.Parameters["ColorDest"].Elements[i].SetValue(ModEntries[i].ColorDest);
+				fx.Parameters["AngleDest"].Elements[i].SetValue(ModEntries[i].RadAngleDest);
 				fx.Parameters["Start"].Elements[i].SetValue(ModEntries[i].Start);
 				fx.Parameters["Stop"].Elements[i].SetValue(ModEntries[i].Stop);
 				fx.Parameters["FadeIn"].Elements[i].SetValue(ModEntries[i].FadeIn);
 				fx.Parameters["FadeOut"].Elements[i].SetValue(ModEntries[i].FadeOut);
 				fx.Parameters["Power"].Elements[i].SetValue(ModEntries[i].Power);
-				fx.Parameters["Scale"].Elements[i].SetValue(ModEntries[i].Scale);
-
+				fx.Parameters["DiscardAfterStop"].Elements[i].SetValue(ModEntries[i].DiscardAfterStop);
 			}
 
 			//Light props
@@ -322,7 +330,7 @@ namespace Visual_Music
 			//float angle = lightProps.SpecFov * (float)Math.PI / (360);
 			//float camPosZ = (songDrawProps.viewportSize.X / 2) / (float)Math.Tan(angle);
 			//Vector3 specCamPos = new Vector3(songDrawProps.viewportSize.X / 2, songDrawProps.viewportSize.Y / 2, camPosZ);
-			fx.Parameters["SpecCamPos"].SetValue(Project.Camera.Pos);
+			fx.Parameters["CamPos"].SetValue(Project.Camera.Pos);
 
 			//Spatial props
 			Vector3 posOffset = globalTrackProps.PosOffset + trackProps.PosOffset;

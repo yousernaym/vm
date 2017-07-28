@@ -1,4 +1,4 @@
-﻿float4x4 WvpMat;
+﻿float4x4 VpMat;
 float2 ViewportSize;
 float2 TexSize;
 texture Texture;
@@ -15,7 +15,7 @@ float AmbientLum = 0.25f;
 float SpecAmount;
 float SpecPower;
 float SpecFov;
-float3 SpecCamPos;
+float3 CamPos;
 float3 PosOffset;
 
 #define ModEntriesCount 5
@@ -25,15 +25,16 @@ int XSource[ModEntriesCount];
 int YSource[ModEntriesCount];
 int CombineXY[ModEntriesCount];
 bool ColorDestEnable[ModEntriesCount];
+bool AlphaDestEnable[ModEntriesCount];
 bool AngleDestEnable[ModEntriesCount];
 float4 ColorDest[ModEntriesCount];
-int AngleDest[ModEntriesCount];
+float AngleDest[ModEntriesCount];
 float Start[ModEntriesCount];
 float Stop[ModEntriesCount];
 float FadeIn[ModEntriesCount];
 float FadeOut[ModEntriesCount];
 float Power[ModEntriesCount];
-float Scale[ModEntriesCount];
+bool DiscardAfterStop[ModEntriesCount];
 
 //bool bla[4][3];
 int ActiveModEntries;
@@ -41,13 +42,23 @@ int ActiveModEntries;
 //##define Center 1
 //##define BottomRight 2
 #define CombineXY_Add 0
-#define CombineXY_Mul 1
+#define CombineXY_Length 1
 #define CombineXY_Max 2
 #define CombineXY_Min 3
 
-float getInterpolant(float2 pos, int modIndex)
+float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 {
-	float2 transformedPos = pos - Origin[modIndex];
+	float lum = clamp(dot(LightDir, normal), AmbientLum, 1);
+	float3 lightReflection = -reflect(LightDir, normal);
+	color *= lum;
+	float3 viewVec = normalize(CamPos - worldPos);
+	color += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecAmount;
+	return color;
+}
+
+float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
+{
+	float2 transformedPos = normPos - Origin[modIndex];
 	if (transformedPos.x < 0)
 		transformedPos.x /= Origin[modIndex].x;
 	else
@@ -59,18 +70,41 @@ float getInterpolant(float2 pos, int modIndex)
 
 	float2 distFromOrigin = abs(transformedPos);
 	float interpolant = 0;
-	if (CombineXY[modIndex] == CombineXY_Add)
-		interpolant = distFromOrigin.x + distFromOrigin.y;
-	else if (CombineXY[modIndex] == CombineXY_Mul)
-		interpolant = sqrt(distFromOrigin.x * distFromOrigin.y);
-	else if (CombineXY[modIndex] == CombineXY_Max)
+	destNormalDir = float3(0, 0, 0);
+
+	if (CombineXY[modIndex] == CombineXY_Max)
+	{
+		if (distFromOrigin.x > distFromOrigin.y)
+			destNormalDir.x = transformedPos.x;
+		else
+			destNormalDir.y = transformedPos.y;
 		interpolant = max(distFromOrigin.x, distFromOrigin.y);
+	}
 	else if (CombineXY[modIndex] == CombineXY_Min)
+	{
+		if (distFromOrigin.x < distFromOrigin.y)
+			destNormalDir.x = transformedPos.x;
+		else
+			destNormalDir.y = transformedPos.y;
 		interpolant = min(distFromOrigin.x, distFromOrigin.y);
+	}
+	else //Both x and y is used
+	{   
+		destNormalDir = float3(transformedPos, 0);
+		if (CombineXY[modIndex] == CombineXY_Add)
+			interpolant = distFromOrigin.x + distFromOrigin.y;
+		else if (CombineXY[modIndex] == CombineXY_Length)
+			interpolant = sqrt(pow(distFromOrigin.x, 2) + pow(distFromOrigin.y, 2));
+	}
+
+	destNormalDir = normalize(destNormalDir);
 	//interpolant = distFromOrigin.x;
 	
-	if (interpolant < Start[modIndex] || interpolant > Stop[modIndex])
+	if (interpolant < Start[modIndex])
 		return 0;
+	if (interpolant > Stop[modIndex])
+		return DiscardAfterStop[modIndex] ? -1 : 0;
+			
 	interpolant -= Start[modIndex];
 	interpolant /= Stop[modIndex] - Start[modIndex];
 	
@@ -90,20 +124,37 @@ float getInterpolant(float2 pos, int modIndex)
 		fadeOutInterpolant = 1;
 	interpolant = fadeOutInterpolant * fadeInInterpolant;
 	
-	interpolant = pow(interpolant, Power[modIndex]) * Scale[modIndex];
+	interpolant = pow(interpolant, Power[modIndex]);
 	return interpolant;
 }
-float3 modulateColor(float2 coord, float3 colorSource)
+float4 modulateColor(float2 normPos, float4 sourceColor, float3 worldPos)
 {
-	float3 result = colorSource;
+	float4 result = sourceColor;
+	float3 normal = float3(0,0,1);
 	for (int i = 0; i < ActiveModEntries; i++)
 	{
-		if (!ColorDestEnable[i])
-			continue;
-		float interpolant = getInterpolant(coord, i);
-		//return float3(interpolant.xxx);
-		result = lerp(result, ColorDest[i], interpolant);
+		if (ColorDestEnable[i] || AlphaDestEnable[i] || AngleDestEnable[i])
+		{
+			float3 destNormalDir;
+			float interpolant = getInterpolant(normPos, i, destNormalDir);
+			if (interpolant < 0)
+			{
+				result.rgb = 0;
+				continue;
+			}
+			if (ColorDestEnable[i])
+				result.rgb = lerp(result.rgb, ColorDest[i].rgb, interpolant);
+			if (AlphaDestEnable[i])
+				result.a = lerp(result.a, ColorDest[i].a, interpolant);
+			if (AngleDestEnable[i])
+			{
+				float angle = AngleDest[i] * interpolant; //lerp from 0 to AngleDest
+				float xyLength = sin(angle);
+				normal = float3(destNormalDir.x * xyLength, destNormalDir.y * xyLength, normal.z * cos(angle));
+			}
+		}
 	}
+	result.rgb = calcLighting(result.rgb, normal, worldPos);
 	return result;
 }
 

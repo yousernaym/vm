@@ -81,7 +81,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 
 	OUT.pos = float4(IN.pos.xy, 0, 1);
 	OUT.pos.xyz += PosOffset;
-	OUT.pos = mul(OUT.pos, WvpMat);
+	OUT.pos = mul(OUT.pos, VpMat);
 	// Viewport adjustment.
 	//OUT.pos.xy /= ViewportSize;
 	//OUT.pos.xy *= float2(2, -2);
@@ -145,7 +145,7 @@ void LightingPS(out float4 color : COLOR0, in VSOutput IN)
 	float3 lightReflection = -reflect(LightDir, lightingNormal);
 	
 	color.rgb *= lum;
-	float3 viewVec = normalize(SpecCamPos - IN.rawPos);
+	float3 viewVec = normalize(CamPos - IN.rawPos);
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
 	color.rgb += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecAmount;
 	color = blurEdges(color, distFromCenter);

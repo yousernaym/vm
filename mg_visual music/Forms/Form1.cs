@@ -55,7 +55,7 @@ namespace Visual_Music
 		public TpartyIntegrationForm tpartyIntegrationForm;
 		VideoExportForm vidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(Material), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackView>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera), typeof(NoteStyleMod)};
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(Material), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackView>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>)};
         SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
 		Project project;
