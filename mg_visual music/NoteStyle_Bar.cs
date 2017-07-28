@@ -101,34 +101,38 @@ namespace Visual_Music
 				//fx.Parameters["Color"].SetValue(color.ToVector4());
 				instanceVerts[n].color = color;
 				fx.Parameters["Texture"].SetValue(texture);
-				Rectangle destRect = new Rectangle((int)noteStart.X, (int)(noteStart.Y - songDrawProps.noteHeight / 2), (int)(noteEnd.X - noteStart.X + 1), (int)(songDrawProps.noteHeight - 1));
-				Rectangle srcRect = destRect;
+				//Vector4 destRect = new Vector4(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2, noteEnd.X - noteStart.X + 1, songDrawProps.noteHeight - 1);
+				//Vector4 srcRect = destRect;
+				Vector2 topLeft_world = new Vector2(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2);
+				Vector2 size_world = new Vector2(noteEnd.X - noteStart.X + 1, songDrawProps.noteHeight - 1);
+				Vector2 topLeft_tex = topLeft_world;
+				Vector2 size_tex = size_world;
 
 				if (texture != null) //Unnecessary because texture is never null. Can revert to default 1x1 white pixel.
 				{
-					setSrcRect(out srcRect.X, out srcRect.Width, texture.Width, songDrawProps.viewportSize.X, destRect.X, destRect.Width, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps);
-					setSrcRect(out srcRect.Y, out srcRect.Height, texture.Height, songDrawProps.viewportSize.Y, destRect.Y, destRect.Height, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor, songDrawProps);
+					setSrcRect(out topLeft_tex.X, out size_tex.X, texture.Width, songDrawProps.viewportSize.X, topLeft_world.X, size_world.X, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps);
+					setSrcRect(out topLeft_tex.Y, out size_tex.Y, texture.Height, songDrawProps.viewportSize.Y, topLeft_world.Y, size_world.Y, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor, songDrawProps);
 					if ((bool)texTrackProps.TexProps.KeepAspect)
 					{
-						float uTexelsPerPixel = (float)srcRect.Width / destRect.Width;
-						float vTexelsPerPixel = (float)srcRect.Height / destRect.Height;
+						float uTexelsPerPixel = (float)size_tex.X / size_world.X;
+						float vTexelsPerPixel = (float)size_tex.Y / size_world.Y;
 						if ((bool)texTrackProps.TexProps.UTile && !(bool)texTrackProps.TexProps.VTile)
 						{
-							srcRect.X = (int)(srcRect.X * vTexelsPerPixel);
-							srcRect.Width = (int)(destRect.Width * vTexelsPerPixel);
+							topLeft_tex.X = topLeft_tex.X * vTexelsPerPixel;
+							size_tex.X = size_tex.X * vTexelsPerPixel;
 						}
 						else if (!(bool)texTrackProps.TexProps.UTile && (bool)texTrackProps.TexProps.VTile)
 						{
-							srcRect.Y = (int)(srcRect.Y * uTexelsPerPixel);
-							srcRect.Height = (int)(destRect.Height * uTexelsPerPixel);
+							topLeft_tex.Y = topLeft_tex.Y * uTexelsPerPixel;
+							size_tex.Y = size_tex.Y * uTexelsPerPixel;
 						}
 					}
 					Vector2 texScroll = songDrawProps.songPosS * texTrackProps.TexProps.Scroll;
-					srcRect.X -= (int)(texScroll.X * texture.Width);
-					srcRect.Y -= (int)(texScroll.Y * texture.Height);
+					topLeft_tex.X -= (int)(texScroll.X * texture.Width);
+					topLeft_tex.Y -= (int)(texScroll.Y * texture.Height);
 				}
-				instanceVerts[n].destRect = new Vector4(destRect.X, destRect.Y, destRect.Width, destRect.Height);
-				instanceVerts[n].srcRect = new Vector4(srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height);
+				instanceVerts[n].destRect = new Vector4(topLeft_world.X, topLeft_world.Y, size_world.X, size_world.Y);
+				instanceVerts[n].srcRect = new Vector4(topLeft_tex.X, topLeft_tex.Y, size_tex.X, size_tex.Y);
 				instanceVerts[n].srcRect.X /= texture.Width;
 				instanceVerts[n].srcRect.Z /= texture.Width;
 				instanceVerts[n].srcRect.Y /= texture.Height;
@@ -143,7 +147,7 @@ namespace Visual_Music
 			fx.CurrentTechnique.Passes["Pass1"].Apply();
 			songPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, noteList.Count);
 		}
-		void setSrcRect(out int pos, out int size, int texSize, int vpSize, int notePos, int noteSize, bool tile, TexAnchorEnum anchor, SongDrawProps songDrawProps)
+		void setSrcRect(out float pos, out float size, int texSize, int vpSize, float notePos, float noteSize, bool tile, TexAnchorEnum anchor, SongDrawProps songDrawProps)
 		{
 			if (anchor == TexAnchorEnum.Screen)
 			{

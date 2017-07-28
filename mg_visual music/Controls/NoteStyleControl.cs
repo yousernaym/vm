@@ -144,6 +144,8 @@ namespace Visual_Music
 		{
 			if (UpdatingControls)
 				return;
+			colorDialog1.ShowDialog();
+			colorDestBtn.BackColor = colorDialog1.Color;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.SystemColorDest = colorDestBtn.BackColor;
 		}

@@ -59,6 +59,7 @@ namespace Visual_Music
 			set => ColorDest = new Vector4((float)value.R / 255, (float)value.G / 255, (float)value.B / 255, (float)value.A / 255);
 		}
 		public int AngleDest { get; set; } = 45;
+		public float RadAngleDest => AngleDest * (float)Math.PI / 180;
 		public float Start { get; set; }
 		public float Stop { get; set; } = 1;
 		public float FadeIn { get; set; }
@@ -272,6 +273,44 @@ namespace Visual_Music
 			fx.Parameters["WvpMat"].SetValue(cam.VpMat);
 			Matrix projMat = cam.ProjMat;
 			fx.Parameters["ProjScale"].SetValue(new Vector2(projMat.M11, projMat.M22));
+
+			//Common notestyle props
+			//EffectParameterCollection fxModEntries = fx.Parameters["ModEntries"].Elements;
+			fx.Parameters["ActiveModEntries"].SetValue(ModEntries.Count);
+			//fx.Parameters["Origin"].SetValue(new Vector2[1] { new Vector2(1, 2) });
+			for (int i = 0; i < ModEntries.Count; i++)
+			{
+				//EffectParameterCollection fxModEntry = fxModEntries[i].StructureMembers;
+				//fxModEntry["XSource"].SetValue(ModEntries[i].XSource);
+				//fxModEntry["YSource"].SetValue(ModEntries[i].YSource);
+				//fxModEntry["CombineXY"].SetValue(ModEntries[i].CombineXY);
+				//fxModEntry["ColorDestEnable"].SetValue(ModEntries[i].ColorDestEnable);
+				//fxModEntry["ColorDest"].SetValue(ModEntries[i].ColorDest);
+				//fxModEntry["AngleDestEnable"].SetValue(ModEntries[i].AngleDestEnable);
+				//fxModEntry["AngleDest"].SetValue(ModEntries[i].AngleDest);
+				//fxModEntry["Start"].SetValue(ModEntries[i].Start);
+				//fxModEntry["Stop"].SetValue(ModEntries[i].Stop);
+				//fxModEntry["FadeIn"].SetValue(ModEntries[i].FadeIn);
+				//fxModEntry["FadeOut"].SetValue(ModEntries[i].FadeOut);
+				//fxModEntry["Power"].SetValue(ModEntries[i].Power);
+				//fxModEntry["Scale"].SetValue(ModEntries[i].Scale);
+
+				//fx.Parameters["XSource"].Elements[i].SetValue(ModEntries[i].XSource);
+				//fx.Parameters["YSource"].Elements[i].SetValue(ModEntries[i].YSource);
+				fx.Parameters["Origin"].Elements[i].SetValue(new Vector2(0.5f, 0.5f));
+				fx.Parameters["CombineXY"].Elements[i].SetValue(ModEntries[i].CombineXY);
+				fx.Parameters["ColorDestEnable"].Elements[i].SetValue(ModEntries[i].ColorDestEnable);
+				fx.Parameters["ColorDest"].Elements[i].SetValue(ModEntries[i].ColorDest);
+				fx.Parameters["AngleDestEnable"].Elements[i].SetValue(ModEntries[i].AngleDestEnable);
+				fx.Parameters["AngleDest"].Elements[i].SetValue(ModEntries[i].AngleDest);
+				fx.Parameters["Start"].Elements[i].SetValue(ModEntries[i].Start);
+				fx.Parameters["Stop"].Elements[i].SetValue(ModEntries[i].Stop);
+				fx.Parameters["FadeIn"].Elements[i].SetValue(ModEntries[i].FadeIn);
+				fx.Parameters["FadeOut"].Elements[i].SetValue(ModEntries[i].FadeOut);
+				fx.Parameters["Power"].Elements[i].SetValue(ModEntries[i].Power);
+				fx.Parameters["Scale"].Elements[i].SetValue(ModEntries[i].Scale);
+
+			}
 
 			//Light props
 			TrackProps lightProps = (bool)trackProps.UseGlobalLight ? globalTrackProps : trackProps;

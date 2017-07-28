@@ -368,7 +368,7 @@ namespace Visual_Music
 		void createTrackList()
 		{
 			trackList.Items.Clear();
-			if (Project == null || Project.Notes.Tracks.Count == 0)
+			if (Project.Notes == null || Project.Notes.Tracks.Count == 0)
 				return;
 			trackList.BeginUpdate();
 			trackList.Items.Add("Global");

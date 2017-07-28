@@ -68,6 +68,7 @@
 			this.bypassModEntryCb = new System.Windows.Forms.CheckBox();
 			this.modEntryPanel = new System.Windows.Forms.Panel();
 			this.label4 = new System.Windows.Forms.Label();
+			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
 			((System.ComponentModel.ISupportInitialize)(this.powerUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.startUd)).BeginInit();
@@ -122,6 +123,12 @@
 			// 
 			// fadeInUd
 			// 
+			this.fadeInUd.DecimalPlaces = 2;
+			this.fadeInUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
 			this.fadeInUd.Location = new System.Drawing.Point(99, 394);
 			this.fadeInUd.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.fadeInUd.Name = "fadeInUd";
@@ -131,6 +138,12 @@
 			// 
 			// startUd
 			// 
+			this.startUd.DecimalPlaces = 2;
+			this.startUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
 			this.startUd.Location = new System.Drawing.Point(99, 314);
 			this.startUd.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.startUd.Name = "startUd";
@@ -190,6 +203,12 @@
 			// 
 			// fadeOutUd
 			// 
+			this.fadeOutUd.DecimalPlaces = 2;
+			this.fadeOutUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
 			this.fadeOutUd.Location = new System.Drawing.Point(99, 434);
 			this.fadeOutUd.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.fadeOutUd.Name = "fadeOutUd";
@@ -219,6 +238,12 @@
 			// 
 			// stopUd
 			// 
+			this.stopUd.DecimalPlaces = 2;
+			this.stopUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
 			this.stopUd.Location = new System.Drawing.Point(99, 354);
 			this.stopUd.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.stopUd.Name = "stopUd";
@@ -611,5 +636,6 @@
 		private System.Windows.Forms.BindingSource modEntryBs;
 		private System.Windows.Forms.ToolStripMenuItem deleteMi;
 		private System.Windows.Forms.ToolStripMenuItem cloneMi;
+		private System.Windows.Forms.ColorDialog colorDialog1;
 	}
 }

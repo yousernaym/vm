@@ -524,6 +524,7 @@ namespace Visual_Music
 			tex.Dispose();
 			return outTex;
 		}
+
 		public bool loadTexture(string _path, FileStream stream, SongPanel songPanel)
 		{
 			path = _path;
@@ -538,6 +539,7 @@ namespace Visual_Music
 			//trackProps[index].Texture = tex;
 			return tex != null;
 		}
+
 		public bool loadTexture(string _path, SongPanel songPanel)
 		{
 			using (FileStream stream = File.Open(path, FileMode.Open))

@@ -125,6 +125,12 @@
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.defaultLightBtn = new System.Windows.Forms.Button();
 			this.lightPanel = new System.Windows.Forms.Panel();
+			this.label11 = new System.Windows.Forms.Label();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label13 = new System.Windows.Forms.Label();
+			this.lightDirZUd = new System.Windows.Forms.NumericUpDown();
+			this.lightDirYUd = new System.Windows.Forms.NumericUpDown();
+			this.lightDirXUd = new System.Windows.Forms.NumericUpDown();
 			this.specularGb = new System.Windows.Forms.GroupBox();
 			this.specFovUd = new System.Windows.Forms.NumericUpDown();
 			this.specPowUd = new System.Windows.Forms.NumericUpDown();
@@ -165,12 +171,6 @@
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-			this.label11 = new System.Windows.Forms.Label();
-			this.label12 = new System.Windows.Forms.Label();
-			this.label13 = new System.Windows.Forms.Label();
-			this.lightDirZUd = new System.Windows.Forms.NumericUpDown();
-			this.lightDirYUd = new System.Windows.Forms.NumericUpDown();
-			this.lightDirXUd = new System.Windows.Forms.NumericUpDown();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -195,6 +195,9 @@
 			((System.ComponentModel.ISupportInitialize)(this.hiliteSatSlider)).BeginInit();
 			this.tabPage2.SuspendLayout();
 			this.lightPanel.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).BeginInit();
 			this.specularGb.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.specFovUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).BeginInit();
@@ -209,9 +212,6 @@
 			this.propsTogglePanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// openProjDialog
@@ -1378,6 +1378,93 @@
 			this.lightPanel.Size = new System.Drawing.Size(270, 264);
 			this.lightPanel.TabIndex = 5;
 			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(216, 74);
+			this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(19, 20);
+			this.label11.TabIndex = 7;
+			this.label11.Text = "Z";
+			// 
+			// label12
+			// 
+			this.label12.AutoSize = true;
+			this.label12.Location = new System.Drawing.Point(128, 74);
+			this.label12.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(20, 20);
+			this.label12.TabIndex = 8;
+			this.label12.Text = "Y";
+			// 
+			// label13
+			// 
+			this.label13.AutoSize = true;
+			this.label13.Location = new System.Drawing.Point(35, 74);
+			this.label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(20, 20);
+			this.label13.TabIndex = 9;
+			this.label13.Text = "X";
+			// 
+			// lightDirZUd
+			// 
+			this.lightDirZUd.Location = new System.Drawing.Point(190, 40);
+			this.lightDirZUd.Margin = new System.Windows.Forms.Padding(4);
+			this.lightDirZUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.lightDirZUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.lightDirZUd.Name = "lightDirZUd";
+			this.lightDirZUd.Size = new System.Drawing.Size(85, 26);
+			this.lightDirZUd.TabIndex = 4;
+			this.lightDirZUd.ValueChanged += new System.EventHandler(this.lightDirZUd_ValueChanged);
+			// 
+			// lightDirYUd
+			// 
+			this.lightDirYUd.Location = new System.Drawing.Point(97, 40);
+			this.lightDirYUd.Margin = new System.Windows.Forms.Padding(4);
+			this.lightDirYUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.lightDirYUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.lightDirYUd.Name = "lightDirYUd";
+			this.lightDirYUd.Size = new System.Drawing.Size(85, 26);
+			this.lightDirYUd.TabIndex = 5;
+			this.lightDirYUd.ValueChanged += new System.EventHandler(this.lightDirYUd_ValueChanged);
+			// 
+			// lightDirXUd
+			// 
+			this.lightDirXUd.Location = new System.Drawing.Point(4, 40);
+			this.lightDirXUd.Margin = new System.Windows.Forms.Padding(4);
+			this.lightDirXUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.lightDirXUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.lightDirXUd.Name = "lightDirXUd";
+			this.lightDirXUd.Size = new System.Drawing.Size(85, 26);
+			this.lightDirXUd.TabIndex = 6;
+			this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
+			// 
 			// specularGb
 			// 
 			this.specularGb.Controls.Add(this.specFovUd);
@@ -1633,7 +1720,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-4182, 15082);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-4208, 15082);
 			this.textureBrowseBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(39, 30);
@@ -1646,7 +1733,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-4350, 15084);
+			this.texPathTb.Location = new System.Drawing.Point(-4376, 15084);
 			this.texPathTb.Margin = new System.Windows.Forms.Padding(4);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(182, 26);
@@ -1657,7 +1744,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-4354, 15060);
+			this.label4.Location = new System.Drawing.Point(-4380, 15060);
 			this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(62, 20);
@@ -1865,93 +1952,6 @@
 			// 
 			this.saveMixdownDialog.Filter = "Wav files (*.wav)|*.wav|All files (*.*)|*.*";
 			// 
-			// label11
-			// 
-			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(216, 74);
-			this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(19, 20);
-			this.label11.TabIndex = 7;
-			this.label11.Text = "Z";
-			// 
-			// label12
-			// 
-			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(128, 74);
-			this.label12.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(20, 20);
-			this.label12.TabIndex = 8;
-			this.label12.Text = "Y";
-			// 
-			// label13
-			// 
-			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(35, 74);
-			this.label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(20, 20);
-			this.label13.TabIndex = 9;
-			this.label13.Text = "X";
-			// 
-			// lightDirZUd
-			// 
-			this.lightDirZUd.Location = new System.Drawing.Point(190, 40);
-			this.lightDirZUd.Margin = new System.Windows.Forms.Padding(4);
-			this.lightDirZUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-			this.lightDirZUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-			this.lightDirZUd.Name = "lightDirZUd";
-			this.lightDirZUd.Size = new System.Drawing.Size(85, 26);
-			this.lightDirZUd.TabIndex = 4;
-			this.lightDirZUd.ValueChanged += new System.EventHandler(this.lightDirZUd_ValueChanged);
-			// 
-			// lightDirYUd
-			// 
-			this.lightDirYUd.Location = new System.Drawing.Point(97, 40);
-			this.lightDirYUd.Margin = new System.Windows.Forms.Padding(4);
-			this.lightDirYUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-			this.lightDirYUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-			this.lightDirYUd.Name = "lightDirYUd";
-			this.lightDirYUd.Size = new System.Drawing.Size(85, 26);
-			this.lightDirYUd.TabIndex = 5;
-			this.lightDirYUd.ValueChanged += new System.EventHandler(this.lightDirYUd_ValueChanged);
-			// 
-			// lightDirXUd
-			// 
-			this.lightDirXUd.Location = new System.Drawing.Point(4, 40);
-			this.lightDirXUd.Margin = new System.Windows.Forms.Padding(4);
-			this.lightDirXUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-			this.lightDirXUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-			this.lightDirXUd.Name = "lightDirXUd";
-			this.lightDirXUd.Size = new System.Drawing.Size(85, 26);
-			this.lightDirXUd.TabIndex = 6;
-			this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
@@ -2012,6 +2012,9 @@
 			this.tabPage2.PerformLayout();
 			this.lightPanel.ResumeLayout(false);
 			this.lightPanel.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).EndInit();
 			this.specularGb.ResumeLayout(false);
 			this.specularGb.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.specFovUd)).EndInit();
@@ -2030,9 +2033,6 @@
 			this.propsTogglePanel.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

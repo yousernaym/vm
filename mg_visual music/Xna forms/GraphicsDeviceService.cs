@@ -58,7 +58,7 @@ namespace WinFormsGraphicsDevice
             parameters.BackBufferFormat = SurfaceFormat.Color;
             parameters.DepthStencilFormat = DepthFormat.Depth24;
             parameters.DeviceWindowHandle = windowHandle;
-            parameters.PresentationInterval = PresentInterval.One;
+            parameters.PresentationInterval = PresentInterval.Immediate;
             parameters.IsFullScreen = false;
 			parameters.MultiSampleCount = 8;
 			

@@ -149,7 +149,7 @@ namespace Visual_Music
 
 		public void update()
 		{
-			if (Project == null || isRenderingVideo)
+			if (Project.Notes == null || isRenderingVideo)
 				return;
 			TimeSpan newTime = stopwatch.Elapsed;
 			deltaTimeS = (newTime - oldTime).TotalSeconds;
@@ -635,7 +635,7 @@ namespace Visual_Music
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			base.OnMouseDown(e);
-			if (Project == null)
+			if (Project.Notes == null)
 				return;
 			if (e.Button == MouseButtons.Left)
 			{

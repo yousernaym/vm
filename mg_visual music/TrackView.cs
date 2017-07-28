@@ -110,7 +110,6 @@ namespace Visual_Music
 			}
 		}
 
-
 		public void drawTrack(SongDrawProps songDrawProps, TrackProps globalTrackProps, bool selectingRegion)
 		{
 			TrackProps texTrackProps = TrackProps.getTexture(false, null) != null ? TrackProps : globalTrackProps;

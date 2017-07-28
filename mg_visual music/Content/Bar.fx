@@ -30,7 +30,7 @@ VSOutput VS(VSInput IN)
 	//OUT.pos.w = 1;
 	OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw;
 	OUT.color = IN.color;
-	OUT.normPos = IN.normPos - 0.5f;
+	OUT.normPos = IN.normPos;
     return OUT;
 }
 
@@ -38,11 +38,14 @@ float4 PS(VSOutput IN) : COLOR0
 {
 	float4 color = IN.color;
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
-	float2 distFromCenter = abs(IN.normPos);
-	float2 border = saturate(distFromCenter - 0.3);
-	color = saturate(color + 4 * max(border.x, border.y));
+	color.rgb = modulateColor(IN.normPos, color.rgb);
+	
+	//float2 distFromCenter = abs(IN.normPos - 0.5);
+	//float2 border = saturate(distFromCenter - 0.3);
+	//color = saturate(color + 4 * max(border.x, border.y));
     return color;
-	//return float4(1, 1, 1, 1);
+	//return float4(, 0, 0, color.r*10);
+	//return float4(ColorDest[0])+float4(0,0,0,color.x);
 }
 
 technique Technique1
