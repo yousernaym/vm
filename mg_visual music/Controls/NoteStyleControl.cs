@@ -50,8 +50,8 @@ namespace Visual_Music
 			NoteStyleMod modEntry = noteStyle.SelectedModEntry;
 			if (modEntry != null)
 			{
-				xSourceCombo.SelectedIndex = modEntry.XSource;
-				ySourceCombo.SelectedIndex = modEntry.YSource;
+				xOriginUd.Value = (decimal)modEntry.Origin.X;
+				yOriginUd.Value = (decimal)modEntry.Origin.Y;
 				combineXYCombo.SelectedIndex = modEntry.CombineXY;
 				colorDestCb.Checked = modEntry.ColorDestEnable;
 				angleDestCb.Checked = modEntry.AngleDestEnable;
@@ -108,20 +108,21 @@ namespace Visual_Music
 			TrackViews[TrackList.SelectedIndices[0]].TrackProps.SelectedNoteStyle.SelectedModEntryIndex = modEntryCombo.SelectedIndex;
 			ParentForm.updateTrackControls();
 		}
-		private void xSourceCombo_SelectedIndexChanged(object sender, EventArgs e)
+
+		private void xOriginUd_ValueChanged(object sender, EventArgs e)
 		{
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.XSource = xSourceCombo.SelectedIndex;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.XOrigin = (float)xOriginUd.Value;
 		}
 
-		private void ySourceCombo_SelectedIndexChanged(object sender, EventArgs e)
+		private void yOriginUd_ValueChanged(object sender, EventArgs e)
 		{
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.YSource = ySourceCombo.SelectedIndex;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.YOrigin = (float)yOriginUd.Value;
 		}
 
 		private void combineCombo_SelectedIndexChanged(object sender, EventArgs e)

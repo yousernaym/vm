@@ -46,9 +46,18 @@ namespace Visual_Music
 		//	{ "DistFromRight","DistFromBottom" }
 		//};			
 		public string Name { get; set; }
-		//public bool Bypass { get; set; }
-		public int XSource { get; set; }
-		public int YSource { get; set; } 
+		public Vector2 Origin
+		{
+			get => new Vector2(XOrigin, YOrigin);
+			set
+			{
+				XOrigin = value.X;
+				YOrigin = value.Y;
+			}
+		}
+		public float XOrigin { get; set; }
+		public float YOrigin { get; set; }
+
 		public int CombineXY { get; set; } 
 		public bool ColorDestEnable { get; set; }
 		public bool AlphaDestEnable { get; set; }
@@ -79,10 +88,8 @@ namespace Visual_Music
 			{
 				if (entry.Name == "name")
 					Name = (string)entry.Value;
-				else if (entry.Name == "xSource")
-					XSource = (int)entry.Value;
-				else if (entry.Name == "ySource")
-					YSource = (int)entry.Value;
+				else if (entry.Name == "origin")
+					Origin = (Vector2)entry.Value;
 				else if (entry.Name == "combineXY")
 					CombineXY = (int)entry.Value;
 				else if (entry.Name == "colorDestEnable")
@@ -111,8 +118,7 @@ namespace Visual_Music
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
 			info.AddValue("name", Name);
-			info.AddValue("xSource", XSource);
-			info.AddValue("ySource", YSource);
+			info.AddValue("origin", Origin);
 			info.AddValue("combineXY", CombineXY);
 			info.AddValue("colorDestEnable", ColorDestEnable);
 			info.AddValue("angleDestEnable", AngleDestEnable);
@@ -195,14 +201,18 @@ namespace Visual_Music
 				if (entry.Name == "styleType")
 					styleType = (NoteStyleEnum)entry.Value;
 				if (entry.Name == "modEntries")
+				{
 					ModEntries = (List<NoteStyleMod>)entry.Value;
+					if (ModEntries != null && ModEntries.Count > 0)
+						SelectedModEntryIndex = 0;
+				}
 			}
 		}
 
 		virtual public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
 			info.AddValue("styleType", styleType);
-			info.AddValue("ModEntries", ModEntries);
+			info.AddValue("modEntries", ModEntries);
 		}
 
 		public static void sInitAllStyles(SongPanel _songPanel)
@@ -285,7 +295,6 @@ namespace Visual_Music
 			//Common notestyle props
 			//EffectParameterCollection fxModEntries = fx.Parameters["ModEntries"].Elements;
 			fx.Parameters["ActiveModEntries"].SetValue(ModEntries.Count);
-			//fx.Parameters["Origin"].SetValue(new Vector2[1] { new Vector2(1, 2) });
 			for (int i = 0; i < ModEntries.Count; i++)
 			{
 				//EffectParameterCollection fxModEntry = fxModEntries[i].StructureMembers;
@@ -303,9 +312,7 @@ namespace Visual_Music
 				//fxModEntry["Power"].SetValue(ModEntries[i].Power);
 				//fxModEntry["Scale"].SetValue(ModEntries[i].Scale);
 
-				//fx.Parameters["XSource"].Elements[i].SetValue(ModEntries[i].XSource);
-				//fx.Parameters["YSource"].Elements[i].SetValue(ModEntries[i].YSource);
-				fx.Parameters["Origin"].Elements[i].SetValue(new Vector2(0.5f, 0.5f));
+				fx.Parameters["Origin"].Elements[i].SetValue(ModEntries[i].Origin);
 				fx.Parameters["CombineXY"].Elements[i].SetValue(ModEntries[i].CombineXY);
 				fx.Parameters["ColorDestEnable"].Elements[i].SetValue(ModEntries[i].ColorDestEnable);
 				fx.Parameters["AngleDestEnable"].Elements[i].SetValue(ModEntries[i].AngleDestEnable);

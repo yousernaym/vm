@@ -2,9 +2,10 @@
 - Use shader for bar rendering and add rendering options for bar style.
 - Don't clamp brightness before modulating with texture.
 - Bump mapping.
-- Common style parameters: border size, border crossfade size, border color, border shape (round, square)
 
 Done:
+- (Common style parameters: border size, border crossfade size, border color, border shape (round, square))
+  Can do the above with the modulation system.
 - Specify mixdown name to libmikmod so that different projects can be open at the same time (in multiple instances of Visual Music) with their respective mixdown files.
   (Also put files in separate subfolders of temp folder and have last instance delete everything)
 - Point xmplay sid plugin to songlengths.txt.

@@ -47,8 +47,6 @@
 			this.angleDestCb = new System.Windows.Forms.CheckBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
-			this.xSourceCombo = new System.Windows.Forms.ComboBox();
-			this.ySourceCombo = new System.Windows.Forms.ComboBox();
 			this.label9 = new System.Windows.Forms.Label();
 			this.combineXYCombo = new System.Windows.Forms.ComboBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -65,9 +63,12 @@
 			this.bypassModEntryPanel = new System.Windows.Forms.Panel();
 			this.bypassModEntryCb = new System.Windows.Forms.CheckBox();
 			this.modEntryPanel = new System.Windows.Forms.Panel();
+			this.discardStopCb = new System.Windows.Forms.CheckBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-			this.discardStopCb = new System.Windows.Forms.CheckBox();
+			this.xOriginUd = new System.Windows.Forms.NumericUpDown();
+			this.yOriginUd = new System.Windows.Forms.NumericUpDown();
+			this.label8 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.powerUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.startUd)).BeginInit();
@@ -81,6 +82,8 @@
 			this.modGbox.SuspendLayout();
 			this.bypassModEntryPanel.SuspendLayout();
 			this.modEntryPanel.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.xOriginUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.yOriginUd)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// colorDestBtn
@@ -276,57 +279,27 @@
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(9, 34);
+			this.label6.Location = new System.Drawing.Point(91, 66);
 			this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(24, 20);
+			this.label6.Size = new System.Drawing.Size(20, 20);
 			this.label6.TabIndex = 38;
-			this.label6.Text = "X:";
+			this.label6.Text = "X";
 			// 
 			// label7
 			// 
 			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(9, 75);
+			this.label7.Location = new System.Drawing.Point(179, 66);
 			this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(24, 20);
+			this.label7.Size = new System.Drawing.Size(20, 20);
 			this.label7.TabIndex = 38;
-			this.label7.Text = "Y:";
-			// 
-			// xSourceCombo
-			// 
-			this.xSourceCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.xSourceCombo.FormattingEnabled = true;
-			this.xSourceCombo.Items.AddRange(new object[] {
-            "Dist from Left",
-            "Dist from Center",
-            "Dist from Right"});
-			this.xSourceCombo.Location = new System.Drawing.Point(44, 29);
-			this.xSourceCombo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-			this.xSourceCombo.Name = "xSourceCombo";
-			this.xSourceCombo.Size = new System.Drawing.Size(170, 28);
-			this.xSourceCombo.TabIndex = 39;
-			this.xSourceCombo.SelectedIndexChanged += new System.EventHandler(this.xSourceCombo_SelectedIndexChanged);
-			// 
-			// ySourceCombo
-			// 
-			this.ySourceCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ySourceCombo.FormattingEnabled = true;
-			this.ySourceCombo.Items.AddRange(new object[] {
-            "Dist from Left",
-            "Dist from Top",
-            "Dist from Right"});
-			this.ySourceCombo.Location = new System.Drawing.Point(44, 71);
-			this.ySourceCombo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-			this.ySourceCombo.Name = "ySourceCombo";
-			this.ySourceCombo.Size = new System.Drawing.Size(170, 28);
-			this.ySourceCombo.TabIndex = 39;
-			this.ySourceCombo.SelectedIndexChanged += new System.EventHandler(this.ySourceCombo_SelectedIndexChanged);
+			this.label7.Text = "Y";
 			// 
 			// label9
 			// 
 			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(9, 122);
+			this.label9.Location = new System.Drawing.Point(0, 108);
 			this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(76, 20);
@@ -339,32 +312,33 @@
 			this.combineXYCombo.FormattingEnabled = true;
 			this.combineXYCombo.Items.AddRange(new object[] {
             "x + y",
-            "x * y",
+            "sqrt(x^2 + y^2)",
             "Max (x, y) ",
             "Min (x, y)"});
-			this.combineXYCombo.Location = new System.Drawing.Point(94, 117);
+			this.combineXYCombo.Location = new System.Drawing.Point(84, 105);
 			this.combineXYCombo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.combineXYCombo.Name = "combineXYCombo";
-			this.combineXYCombo.Size = new System.Drawing.Size(120, 28);
+			this.combineXYCombo.Size = new System.Drawing.Size(152, 28);
 			this.combineXYCombo.TabIndex = 39;
 			this.combineXYCombo.SelectedIndexChanged += new System.EventHandler(this.combineCombo_SelectedIndexChanged);
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.xSourceCombo);
+			this.groupBox1.Controls.Add(this.label8);
+			this.groupBox1.Controls.Add(this.yOriginUd);
+			this.groupBox1.Controls.Add(this.xOriginUd);
 			this.groupBox1.Controls.Add(this.combineXYCombo);
 			this.groupBox1.Controls.Add(this.label6);
-			this.groupBox1.Controls.Add(this.ySourceCombo);
 			this.groupBox1.Controls.Add(this.label7);
 			this.groupBox1.Controls.Add(this.label9);
 			this.groupBox1.Location = new System.Drawing.Point(4, 5);
 			this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-			this.groupBox1.Size = new System.Drawing.Size(243, 168);
+			this.groupBox1.Size = new System.Drawing.Size(243, 150);
 			this.groupBox1.TabIndex = 40;
 			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "Sources";
+			this.groupBox1.Text = "Pixel position";
 			// 
 			// modEntryCombo
 			// 
@@ -524,16 +498,6 @@
 			this.modEntryPanel.Size = new System.Drawing.Size(252, 566);
 			this.modEntryPanel.TabIndex = 0;
 			// 
-			// label4
-			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(210, 414);
-			this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(23, 20);
-			this.label4.TabIndex = 30;
-			this.label4.Text = "%";
-			// 
 			// discardStopCb
 			// 
 			this.discardStopCb.AutoSize = true;
@@ -544,6 +508,83 @@
 			this.discardStopCb.Text = "Discard after Stop";
 			this.discardStopCb.UseVisualStyleBackColor = true;
 			this.discardStopCb.CheckedChanged += new System.EventHandler(this.discardStopCb_CheckedChanged);
+			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(210, 414);
+			this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(23, 20);
+			this.label4.TabIndex = 30;
+			this.label4.Text = "%";
+			// 
+			// xOriginUd
+			// 
+			this.xOriginUd.DecimalPlaces = 2;
+			this.xOriginUd.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+			this.xOriginUd.Location = new System.Drawing.Point(60, 37);
+			this.xOriginUd.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+			this.xOriginUd.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            -2147483648});
+			this.xOriginUd.Name = "xOriginUd";
+			this.xOriginUd.Size = new System.Drawing.Size(85, 26);
+			this.xOriginUd.TabIndex = 40;
+			this.xOriginUd.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+			this.xOriginUd.ValueChanged += new System.EventHandler(this.xOriginUd_ValueChanged);
+			// 
+			// yOriginUd
+			// 
+			this.yOriginUd.DecimalPlaces = 2;
+			this.yOriginUd.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+			this.yOriginUd.Location = new System.Drawing.Point(151, 37);
+			this.yOriginUd.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+			this.yOriginUd.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            -2147483648});
+			this.yOriginUd.Name = "yOriginUd";
+			this.yOriginUd.Size = new System.Drawing.Size(85, 26);
+			this.yOriginUd.TabIndex = 40;
+			this.yOriginUd.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+			this.yOriginUd.ValueChanged += new System.EventHandler(this.yOriginUd_ValueChanged);
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(0, 39);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(54, 20);
+			this.label8.TabIndex = 41;
+			this.label8.Text = "Origin:";
 			// 
 			// NoteStyleControl
 			// 
@@ -572,6 +613,8 @@
 			this.bypassModEntryPanel.PerformLayout();
 			this.modEntryPanel.ResumeLayout(false);
 			this.modEntryPanel.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.xOriginUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.yOriginUd)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -597,8 +640,6 @@
 		private System.Windows.Forms.CheckBox angleDestCb;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Label label7;
-		private System.Windows.Forms.ComboBox xSourceCombo;
-		private System.Windows.Forms.ComboBox ySourceCombo;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.ComboBox combineXYCombo;
 		private System.Windows.Forms.GroupBox groupBox1;
@@ -618,5 +659,8 @@
 		private System.Windows.Forms.ToolStripMenuItem cloneMi;
 		private System.Windows.Forms.ColorDialog colorDialog1;
 		private System.Windows.Forms.CheckBox discardStopCb;
+		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.NumericUpDown yOriginUd;
+		private System.Windows.Forms.NumericUpDown xOriginUd;
 	}
 }
