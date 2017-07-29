@@ -509,7 +509,6 @@
 
 		#endregion
 		private System.Windows.Forms.ComboBox modEntryCombo;
-		private System.Windows.Forms.GroupBox modGbox;
 		private System.Windows.Forms.ContextMenuStrip modEntryCm;
 		private System.Windows.Forms.ToolStripMenuItem newMi;
 		private System.Windows.Forms.BindingSource modEntryBs;
@@ -542,5 +541,6 @@
 		private System.Windows.Forms.Label label38;
 		private System.Windows.Forms.NumericUpDown powerUd;
 		private System.Windows.Forms.Label label2;
+		protected System.Windows.Forms.GroupBox modGbox;
 	}
 }
