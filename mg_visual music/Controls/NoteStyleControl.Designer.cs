@@ -164,12 +164,13 @@
 			// 
 			this.discardStopCb.AutoSize = true;
 			this.discardStopCb.Location = new System.Drawing.Point(10, 349);
-			this.discardStopCb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.discardStopCb.Margin = new System.Windows.Forms.Padding(2);
 			this.discardStopCb.Name = "discardStopCb";
 			this.discardStopCb.Size = new System.Drawing.Size(111, 17);
 			this.discardStopCb.TabIndex = 43;
 			this.discardStopCb.Text = "Discard after Stop";
 			this.discardStopCb.UseVisualStyleBackColor = true;
+			this.discardStopCb.CheckedChanged += new System.EventHandler(this.discardStopCb_CheckedChanged);
 			// 
 			// label1
 			// 
@@ -212,6 +213,7 @@
 			this.angleDestCb.TabIndex = 37;
 			this.angleDestCb.Text = "Angle";
 			this.angleDestCb.UseVisualStyleBackColor = true;
+			this.angleDestCb.CheckedChanged += new System.EventHandler(this.angleDestCb_CheckedChanged);
 			// 
 			// label5
 			// 
@@ -231,6 +233,7 @@
 			this.colorDestCb.TabIndex = 37;
 			this.colorDestCb.Text = "Color";
 			this.colorDestCb.UseVisualStyleBackColor = true;
+			this.colorDestCb.CheckedChanged += new System.EventHandler(this.colorDestCb_CheckedChanged);
 			// 
 			// colorDestBtn
 			// 
@@ -240,6 +243,7 @@
 			this.colorDestBtn.Size = new System.Drawing.Size(85, 23);
 			this.colorDestBtn.TabIndex = 36;
 			this.colorDestBtn.UseVisualStyleBackColor = false;
+			this.colorDestBtn.Click += new System.EventHandler(this.colorDestBtn_Click);
 			// 
 			// angleDestUd
 			// 
@@ -257,6 +261,7 @@
             0,
             0,
             0});
+			this.angleDestUd.ValueChanged += new System.EventHandler(this.angleDestUd_ValueChanged);
 			// 
 			// label42
 			// 
@@ -279,6 +284,7 @@
 			this.startUd.Name = "startUd";
 			this.startUd.Size = new System.Drawing.Size(76, 20);
 			this.startUd.TabIndex = 34;
+			this.startUd.ValueChanged += new System.EventHandler(this.startUd_ValueChanged);
 			// 
 			// fadeInUd
 			// 
@@ -292,6 +298,7 @@
 			this.fadeInUd.Name = "fadeInUd";
 			this.fadeInUd.Size = new System.Drawing.Size(76, 20);
 			this.fadeInUd.TabIndex = 33;
+			this.fadeInUd.ValueChanged += new System.EventHandler(this.fadeInUd_ValueChanged);
 			// 
 			// groupBox1
 			// 
@@ -328,7 +335,7 @@
             0,
             131072});
 			this.yOriginUd.Location = new System.Drawing.Point(105, 21);
-			this.yOriginUd.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.yOriginUd.Margin = new System.Windows.Forms.Padding(2);
 			this.yOriginUd.Maximum = new decimal(new int[] {
             10,
             0,
@@ -347,6 +354,7 @@
             0,
             0,
             65536});
+			this.yOriginUd.ValueChanged += new System.EventHandler(this.yOriginUd_ValueChanged);
 			// 
 			// xOriginUd
 			// 
@@ -357,7 +365,7 @@
             0,
             131072});
 			this.xOriginUd.Location = new System.Drawing.Point(56, 21);
-			this.xOriginUd.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.xOriginUd.Margin = new System.Windows.Forms.Padding(2);
 			this.xOriginUd.Maximum = new decimal(new int[] {
             10,
             0,
@@ -376,6 +384,7 @@
             0,
             0,
             65536});
+			this.xOriginUd.ValueChanged += new System.EventHandler(this.xOriginUd_ValueChanged);
 			// 
 			// combineXYCombo
 			// 
@@ -383,13 +392,14 @@
 			this.combineXYCombo.FormattingEnabled = true;
 			this.combineXYCombo.Items.AddRange(new object[] {
             "x + y",
-            "sqrt(x^2 + y^2)",
+            "x^2 + y^2",
             "Max (x, y) ",
             "Min (x, y)"});
 			this.combineXYCombo.Location = new System.Drawing.Point(56, 68);
 			this.combineXYCombo.Name = "combineXYCombo";
 			this.combineXYCombo.Size = new System.Drawing.Size(92, 21);
 			this.combineXYCombo.TabIndex = 39;
+			this.combineXYCombo.SelectedIndexChanged += new System.EventHandler(this.combineXYCombo_SelectedIndexChanged);
 			// 
 			// label6
 			// 
@@ -430,6 +440,7 @@
 			this.stopUd.Name = "stopUd";
 			this.stopUd.Size = new System.Drawing.Size(76, 20);
 			this.stopUd.TabIndex = 34;
+			this.stopUd.ValueChanged += new System.EventHandler(this.stopUd_ValueChanged);
 			// 
 			// fadeOutUd
 			// 
@@ -443,6 +454,7 @@
 			this.fadeOutUd.Name = "fadeOutUd";
 			this.fadeOutUd.Size = new System.Drawing.Size(76, 20);
 			this.fadeOutUd.TabIndex = 33;
+			this.fadeOutUd.ValueChanged += new System.EventHandler(this.fadeOutUd_ValueChanged);
 			// 
 			// label38
 			// 
@@ -465,6 +477,7 @@
 			this.powerUd.Name = "powerUd";
 			this.powerUd.Size = new System.Drawing.Size(76, 20);
 			this.powerUd.TabIndex = 32;
+			this.powerUd.ValueChanged += new System.EventHandler(this.powerUd_ValueChanged);
 			// 
 			// label2
 			// 

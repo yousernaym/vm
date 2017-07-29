@@ -124,7 +124,7 @@ namespace Visual_Music
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.YOrigin = (float)yOriginUd.Value;
 		}
 
-		private void combineCombo_SelectedIndexChanged(object sender, EventArgs e)
+		private void combineXYCombo_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (UpdatingControls)
 				return;

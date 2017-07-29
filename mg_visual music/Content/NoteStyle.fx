@@ -48,7 +48,8 @@ int ActiveModEntries;
 
 float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 {
-	float lum = clamp(dot(LightDir, normal), AmbientLum, 1);
+	//float lum = clamp(dot(LightDir, normal), AmbientLum, 1);
+	float lum = dot(LightDir, normal) + AmbientLum;
 	float3 lightReflection = -reflect(LightDir, normal);
 	color *= lum;
 	float3 viewVec = normalize(CamPos - worldPos);
