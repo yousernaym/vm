@@ -94,7 +94,7 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 		if (CombineXY[modIndex] == CombineXY_Add)
 			interpolant = distFromOrigin.x + distFromOrigin.y;
 		else if (CombineXY[modIndex] == CombineXY_Length)
-			interpolant = sqrt(pow(distFromOrigin.x, 2) + pow(distFromOrigin.y, 2));
+			interpolant = pow(distFromOrigin.x, 2) + pow(distFromOrigin.y, 2);
 	}
 
 	destNormalDir = normalize(destNormalDir);

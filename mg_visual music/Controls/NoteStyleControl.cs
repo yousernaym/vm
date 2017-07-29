@@ -25,8 +25,7 @@ namespace Visual_Music
 		{
 			set
 			{
-				bypassModEntryPanel.Visible = value;
-				modGbox.AutoSize = value;
+				modGbox.AutoSize = modEntryPanel.Visible = value;
 			}
 		}
 

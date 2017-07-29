@@ -55,8 +55,8 @@ namespace Visual_Music
 				YOrigin = value.Y;
 			}
 		}
-		public float XOrigin { get; set; }
-		public float YOrigin { get; set; }
+		public float XOrigin { get; set; } = 0.5f;
+		public float YOrigin { get; set; } = 0.5f;
 
 		public int CombineXY { get; set; } 
 		public bool ColorDestEnable { get; set; }
