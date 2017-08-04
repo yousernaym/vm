@@ -55,7 +55,7 @@ namespace Visual_Music
 		public TpartyIntegrationForm tpartyIntegrationForm;
 		VideoExportForm vidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(Material), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackView>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>)};
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackView>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>)};
         SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
 		Project project;
@@ -580,18 +580,31 @@ namespace Visual_Music
 			updatingControls = true;
 			if (mergedTrackProps != null)
 			{
+				//Note style-----------------
+				if (mergedTrackProps.NoteStyleType == null)
+					styleList.SelectedIndex = -1;
+				else
+					styleList.SelectedIndex = (int)mergedTrackProps.NoteStyleType;
+				if (currentNoteStyleControl != null)
+					currentNoteStyleControl.update(mergedTrackProps.SelectedNoteStyle);
+				//barStyleControl.update(selectedTrackProps.getBarNoteStyle());
+				//lineStyleControl.update(selectedTrackProps.getLineNoteStyle());
+				//--------------------------------------------
+
+				//Material-----------------------------------
 				transpTb.Text = normToIntText(mergedTrackProps.Transp);
 				hueTb.Text = normToIntText(mergedTrackProps.Hue, 101);
 				normalSatTb.Text = normToIntText(mergedTrackProps.Normal.Sat);
 				normalLumTb.Text = normToIntText(mergedTrackProps.Normal.Lum);
 				hiliteSatTb.Text = normToIntText(mergedTrackProps.Hilited.Sat);
 				hiliteLumTb.Text = normToIntText(mergedTrackProps.Hilited.Lum);
-				
+
+				//Texture
 				TrackPropsTex texProps = getActiveTexProps(mergedTrackProps);
 				texPathTb.Text = texProps.Path;
 				loadMtrlTexInPb();
 				pointSmpCb.CheckState = toCheckState(texProps.PointSmp);
-					
+
 				texUTileCb.CheckState = toCheckState(texProps.UTile);
 				texVTileCb.CheckState = toCheckState(texProps.VTile);
 				updateTexUVCb(tileTexCb, texUTileCb, texVTileCb);
@@ -613,32 +626,24 @@ namespace Visual_Music
 
 				setNumericUdValue(texUScrollUD, texProps.UScroll);
 				setNumericUdValue(texVScrollUD, texProps.VScroll);
-			
-				//Note style-----------------
-				if (mergedTrackProps.NoteStyleType == null)
-					styleList.SelectedIndex = -1;
-				else
-					styleList.SelectedIndex = (int)mergedTrackProps.NoteStyleType;
-				if (currentNoteStyleControl != null)
-					currentNoteStyleControl.update(mergedTrackProps.SelectedNoteStyle);
-				//barStyleControl.update(selectedTrackProps.getBarNoteStyle());
-				//lineStyleControl.update(selectedTrackProps.getLineNoteStyle());
-//-------------------------------
 
-				//Light---------------------------
-				globalLightCb.CheckState = toCheckState(mergedTrackProps.UseGlobalLight);
-				setNumericUdValue(lightDirXUd, mergedTrackProps.LightDirX);
-				setNumericUdValue(lightDirYUd, mergedTrackProps.LightDirY);
-				setNumericUdValue(lightDirZUd, mergedTrackProps.LightDirZ);
+				//Lighting
+				setNumericUdValue(ambientAmountUd, mergedTrackProps.AmbientAmount);
+				setNumericUdValue(diffuseAmountUd, mergedTrackProps.DiffuseAmount);
 				setNumericUdValue(specAmountUd, mergedTrackProps.SpecAmount);
 				setNumericUdValue(specPowUd, mergedTrackProps.SpecPower);
-				//specFovUd.Value = (decimal)mergedTrackProps.SpecFov;
-				//---------------------------------
+				//-------------------------------
 
 				//Spatial---------------------------------
 				setNumericUdValue(xoffsetUd, mergedTrackProps.XOffset);
 				setNumericUdValue(yoffsetUd, mergedTrackProps.YOffset);
 				setNumericUdValue(zoffsetUd, mergedTrackProps.ZOffset);
+
+				globalLightCb.CheckState = toCheckState(mergedTrackProps.UseGlobalLight);
+				setNumericUdValue(lightDirXUd, mergedTrackProps.LightDirX);
+				setNumericUdValue(lightDirYUd, mergedTrackProps.LightDirY);
+				setNumericUdValue(lightDirZUd, mergedTrackProps.LightDirZ);
+				//-------------------------------
 			}
 			updatingControls = false;
 		}
@@ -1002,30 +1007,6 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.UseGlobalLight = globalLightCb.Checked;
-		}
-
-		private void specAmountUd_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpecAmount = (float)specAmountUd.Value;
-		}
-
-		private void specPowUd_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpecPower = (float)specPowUd.Value;
-		}
-
-		private void specFovUd_ValueChanged(object sender, EventArgs e)
-		{
-			//if (updatingControls)
-			//	return;
-			//for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-			//	Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpecFov = (float)specFovUd.Value;
 		}
 
 		private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1414,6 +1395,38 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightDirZ = (float)((NumericUpDown)sender).Value;
+		}
+
+		private void ambientAmountUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.AmbientAmount = (float)((NumericUpDown)sender).Value;
+		}
+
+		private void diffuseAmountUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.DiffuseAmount = (float)((NumericUpDown)sender).Value;
+		}
+
+		private void specAmountUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpecAmount = (float)specAmountUd.Value;
+		}
+
+		private void specPowUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpecPower = (float)specPowUd.Value;
 		}
 	}
 }

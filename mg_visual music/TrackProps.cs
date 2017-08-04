@@ -88,14 +88,14 @@ namespace Visual_Music
 			}
 		}
 
-		Material normal;
-		public Material Normal
+		NoteTypeMaterial normal;
+		public NoteTypeMaterial Normal
 		{
 			get { return normal; }
 			set { normal = value; }
 		}
-		Material hilited;
-		public Material Hilited
+		NoteTypeMaterial hilited;
+		public NoteTypeMaterial Hilited
 		{
 			get { return hilited; }
 			set { hilited = value; }
@@ -122,7 +122,9 @@ namespace Visual_Music
 		public float? LightDirX { get; set; }
 		public float? LightDirY { get; set; }
 		public float? LightDirZ { get; set; }
-		
+
+		public float? AmbientAmount { get; set; }
+		public float? DiffuseAmount { get; set; }
 		float? specAmount;
 		public float? SpecAmount
 		{
@@ -157,9 +159,9 @@ namespace Visual_Music
 				if (entry.Name == "hue")
 					hue = (float)entry.Value;
 				if (entry.Name == "normal")
-					normal = (Material)entry.Value;
+					normal = (NoteTypeMaterial)entry.Value;
 				if (entry.Name == "hilited")
-					hilited = (Material)entry.Value;
+					hilited = (NoteTypeMaterial)entry.Value;
 				if (entry.Name == "texProps")
 					texProps = (TrackPropsTex)entry.Value;
 				if (entry.Name == "hmapProps")
@@ -170,6 +172,10 @@ namespace Visual_Music
 					NoteStyleType = (NoteStyleEnum)entry.Value;
 				if (entry.Name == "lightDir")
 					LightDir = (Vector3)entry.Value;
+				if (entry.Name == "ambientAmount")
+					AmbientAmount = (float)entry.Value;
+				if (entry.Name == "diffuseAmount")
+					DiffuseAmount = (float)entry.Value;
 				if (entry.Name == "specAmount")
 					specAmount = (float)entry.Value;
 				if (entry.Name == "specPower")
@@ -201,6 +207,8 @@ namespace Visual_Music
 			//info.AddValue("lineStyleProps", lineStyleProps);
 			//info.AddValue("curve", curve);
 			info.AddValue("lightDir", LightDir);
+			info.AddValue("ambientAmount", AmbientAmount);
+			info.AddValue("diffuseAmount", DiffuseAmount);
 			info.AddValue("specAmount", specAmount);
 			info.AddValue("specPower", specPower);
 			//info.AddValue("specFov", specFov);
@@ -281,15 +289,23 @@ namespace Visual_Music
 			{
 				transp = 1;
 				hue = 0.1f;
-				normal = new Material(1, 0.27f);
-				hilited = new Material(0.8f, 0.75f);
+				normal = new NoteTypeMaterial(1, 0.27f);
+				hilited = new NoteTypeMaterial(0.8f, 0.75f);
+				AmbientAmount = 0;
+				DiffuseAmount = 2;
+				specAmount = 1;
+				specPower = 50;
 			}
 			else
 			{
 				transp = 0.5f;
 				hue = (float)(TrackNumber - 1) / (NumTracks - 1);
-				normal = new Material();
-				hilited = new Material(); ;
+				normal = new NoteTypeMaterial();
+				hilited = new NoteTypeMaterial(); ;
+				AmbientAmount = 1;
+				DiffuseAmount = 1;
+				specAmount = 1;
+				specPower = 1;
 			}
 
 		}
@@ -301,9 +317,6 @@ namespace Visual_Music
 			else
 				UseGlobalLight = true;
 			LightDir = new Vector3(-1, -1, 1);
-			specAmount = 0.75f;
-			specPower = 50;
-			//specFov = 90;
 		}
 
 		public void resetSpatial()
@@ -359,8 +372,8 @@ namespace Visual_Music
 		public Color getColor(bool bhilited, TrackProps globalProps, bool alpha)
 		{
 			double h, s, l;
-			Material tp2;
-			Material globalTp2;
+			NoteTypeMaterial tp2;
+			NoteTypeMaterial globalTp2;
 			if (bhilited)
 			{
 				tp2 = hilited;
@@ -559,7 +572,7 @@ namespace Visual_Music
     }
 
 	[Serializable()]
-	public class Material : ISerializable
+	public class NoteTypeMaterial : ISerializable
 	{
 		//TrackProps parent;
 		float? sat = 1;
@@ -580,28 +593,28 @@ namespace Visual_Music
 			get { return texture; }
 			set { texture = value; }
 		}
-		public Color color;
-		public Color Color
-		{
-			get { return color; }
-		}
-		public System.Drawing.Color SysColor
-		{
-			get { return System.Drawing.Color.FromArgb(color.R, color.G, color.B); }
-		}
-		public Material()
+		//public Color color;
+		//public Color Color
+		//{
+		//	get { return color; }
+		//}
+		//public System.Drawing.Color SysColor
+		//{
+		//	get { return System.Drawing.Color.FromArgb(color.R, color.G, color.B); }
+		//}
+		public NoteTypeMaterial()
 		{
 			sat = 1;
 			lum = 1;
 			texture = null;
 		}
-		public Material(float _sat, float _lum, Texture2D tex = null)
+		public NoteTypeMaterial(float _sat, float _lum, Texture2D tex = null)
 		{
 			sat = _sat;
 			lum = _lum;
 			texture = tex;
 		}
-		public Material(SerializationInfo info, StreamingContext ctxt)
+		public NoteTypeMaterial(SerializationInfo info, StreamingContext ctxt)
 		{
 			sat = (float)info.GetValue("sat", typeof(float));
 			lum = (float)info.GetValue("lum", typeof(float));

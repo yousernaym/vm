@@ -131,14 +131,6 @@
 			this.lightDirZUd = new System.Windows.Forms.NumericUpDown();
 			this.lightDirYUd = new System.Windows.Forms.NumericUpDown();
 			this.lightDirXUd = new System.Windows.Forms.NumericUpDown();
-			this.specularGb = new System.Windows.Forms.GroupBox();
-			this.specFovUd = new System.Windows.Forms.NumericUpDown();
-			this.specPowUd = new System.Windows.Forms.NumericUpDown();
-			this.specAmountUd = new System.Windows.Forms.NumericUpDown();
-			this.label23 = new System.Windows.Forms.Label();
-			this.label22 = new System.Windows.Forms.Label();
-			this.label28 = new System.Windows.Forms.Label();
-			this.label21 = new System.Windows.Forms.Label();
 			this.label24 = new System.Windows.Forms.Label();
 			this.globalLightCb = new System.Windows.Forms.CheckBox();
 			this.tabPage4 = new System.Windows.Forms.TabPage();
@@ -171,6 +163,15 @@
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+			this.lightingGb = new System.Windows.Forms.GroupBox();
+			this.specPowUd = new System.Windows.Forms.NumericUpDown();
+			this.ambientAmountUd = new System.Windows.Forms.NumericUpDown();
+			this.diffuseAmountUd = new System.Windows.Forms.NumericUpDown();
+			this.specAmountUd = new System.Windows.Forms.NumericUpDown();
+			this.label15 = new System.Windows.Forms.Label();
+			this.label14 = new System.Windows.Forms.Label();
+			this.label23 = new System.Windows.Forms.Label();
+			this.label22 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -198,10 +199,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).BeginInit();
-			this.specularGb.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.specFovUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).BeginInit();
 			this.tabPage4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).BeginInit();
@@ -212,6 +209,11 @@
 			this.propsTogglePanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).BeginInit();
+			this.lightingGb.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.ambientAmountUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.diffuseAmountUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// openProjDialog
@@ -575,7 +577,7 @@
 			this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
 			this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
 			this.lineStyleControl.Name = "lineStyleControl";
-			this.lineStyleControl.Size = new System.Drawing.Size(185, 788);
+			this.lineStyleControl.Size = new System.Drawing.Size(180, 285);
 			this.lineStyleControl.TabIndex = 20;
 			this.lineStyleControl.Visible = false;
 			// 
@@ -586,7 +588,7 @@
 			this.barStyleControl.Location = new System.Drawing.Point(3, 72);
 			this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.barStyleControl.Name = "barStyleControl";
-			this.barStyleControl.Size = new System.Drawing.Size(186, 66);
+			this.barStyleControl.Size = new System.Drawing.Size(180, 66);
 			this.barStyleControl.TabIndex = 20;
 			// 
 			// defaultStyleBtn
@@ -624,6 +626,7 @@
 			// 
 			this.tabPage1.AutoScroll = true;
 			this.tabPage1.BackColor = System.Drawing.Color.Transparent;
+			this.tabPage1.Controls.Add(this.lightingGb);
 			this.tabPage1.Controls.Add(this.groupBox4);
 			this.tabPage1.Controls.Add(this.defaultMtrlBtn);
 			this.tabPage1.Controls.Add(this.alphaLbl);
@@ -636,8 +639,8 @@
 			this.tabPage1.Controls.Add(this.transpTb);
 			this.tabPage1.Location = new System.Drawing.Point(4, 22);
 			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-			this.tabPage1.Size = new System.Drawing.Size(200, 10025);
+			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage1.Size = new System.Drawing.Size(200, 10026);
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "Material";
 			// 
@@ -660,9 +663,9 @@
 			this.groupBox4.Controls.Add(this.trackTexPb);
 			this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.groupBox4.Location = new System.Drawing.Point(1, 485);
-			this.groupBox4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.groupBox4.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.groupBox4.Padding = new System.Windows.Forms.Padding(2);
 			this.groupBox4.Size = new System.Drawing.Size(182, 397);
 			this.groupBox4.TabIndex = 20;
 			this.groupBox4.TabStop = false;
@@ -976,7 +979,7 @@
 			this.texKeepAspectCb.AutoSize = true;
 			this.texKeepAspectCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.texKeepAspectCb.Location = new System.Drawing.Point(7, 216);
-			this.texKeepAspectCb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.texKeepAspectCb.Margin = new System.Windows.Forms.Padding(2);
 			this.texKeepAspectCb.Name = "texKeepAspectCb";
 			this.texKeepAspectCb.Size = new System.Drawing.Size(109, 17);
 			this.texKeepAspectCb.TabIndex = 15;
@@ -989,7 +992,7 @@
 			this.tileTexCb.AutoSize = true;
 			this.tileTexCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.tileTexCb.Location = new System.Drawing.Point(8, 195);
-			this.tileTexCb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.tileTexCb.Margin = new System.Windows.Forms.Padding(2);
 			this.tileTexCb.Name = "tileTexCb";
 			this.tileTexCb.Size = new System.Drawing.Size(43, 17);
 			this.tileTexCb.TabIndex = 15;
@@ -1024,7 +1027,7 @@
 			this.pointSmpCb.AutoSize = true;
 			this.pointSmpCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.pointSmpCb.Location = new System.Drawing.Point(8, 174);
-			this.pointSmpCb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.pointSmpCb.Margin = new System.Windows.Forms.Padding(2);
 			this.pointSmpCb.Name = "pointSmpCb";
 			this.pointSmpCb.Size = new System.Drawing.Size(94, 17);
 			this.pointSmpCb.TabIndex = 14;
@@ -1291,7 +1294,7 @@
 			this.tabPage2.Controls.Add(this.globalLightCb);
 			this.tabPage2.Location = new System.Drawing.Point(4, 22);
 			this.tabPage2.Name = "tabPage2";
-			this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
 			this.tabPage2.Size = new System.Drawing.Size(200, 10026);
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "Light";
@@ -1314,12 +1317,11 @@
 			this.lightPanel.Controls.Add(this.lightDirZUd);
 			this.lightPanel.Controls.Add(this.lightDirYUd);
 			this.lightPanel.Controls.Add(this.lightDirXUd);
-			this.lightPanel.Controls.Add(this.specularGb);
 			this.lightPanel.Controls.Add(this.label24);
 			this.lightPanel.Enabled = false;
 			this.lightPanel.Location = new System.Drawing.Point(0, 63);
 			this.lightPanel.Name = "lightPanel";
-			this.lightPanel.Size = new System.Drawing.Size(180, 176);
+			this.lightPanel.Size = new System.Drawing.Size(180, 76);
 			this.lightPanel.TabIndex = 5;
 			// 
 			// label11
@@ -1403,98 +1405,6 @@
 			this.lightDirXUd.TabIndex = 6;
 			this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
 			// 
-			// specularGb
-			// 
-			this.specularGb.Controls.Add(this.specFovUd);
-			this.specularGb.Controls.Add(this.specPowUd);
-			this.specularGb.Controls.Add(this.specAmountUd);
-			this.specularGb.Controls.Add(this.label23);
-			this.specularGb.Controls.Add(this.label22);
-			this.specularGb.Controls.Add(this.label28);
-			this.specularGb.Controls.Add(this.label21);
-			this.specularGb.Location = new System.Drawing.Point(3, 68);
-			this.specularGb.Name = "specularGb";
-			this.specularGb.Size = new System.Drawing.Size(170, 103);
-			this.specularGb.TabIndex = 3;
-			this.specularGb.TabStop = false;
-			this.specularGb.Text = "Specular";
-			// 
-			// specFovUd
-			// 
-			this.specFovUd.Location = new System.Drawing.Point(55, 75);
-			this.specFovUd.Maximum = new decimal(new int[] {
-            180,
-            0,
-            0,
-            0});
-			this.specFovUd.Name = "specFovUd";
-			this.specFovUd.Size = new System.Drawing.Size(59, 20);
-			this.specFovUd.TabIndex = 3;
-			this.specFovUd.ValueChanged += new System.EventHandler(this.specFovUd_ValueChanged);
-			// 
-			// specPowUd
-			// 
-			this.specPowUd.Location = new System.Drawing.Point(55, 49);
-			this.specPowUd.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-			this.specPowUd.Name = "specPowUd";
-			this.specPowUd.Size = new System.Drawing.Size(59, 20);
-			this.specPowUd.TabIndex = 3;
-			this.specPowUd.ValueChanged += new System.EventHandler(this.specPowUd_ValueChanged);
-			// 
-			// specAmountUd
-			// 
-			this.specAmountUd.DecimalPlaces = 2;
-			this.specAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-			this.specAmountUd.Location = new System.Drawing.Point(55, 23);
-			this.specAmountUd.Name = "specAmountUd";
-			this.specAmountUd.Size = new System.Drawing.Size(59, 20);
-			this.specAmountUd.TabIndex = 3;
-			this.specAmountUd.ValueChanged += new System.EventHandler(this.specAmountUd_ValueChanged);
-			// 
-			// label23
-			// 
-			this.label23.AutoSize = true;
-			this.label23.Location = new System.Drawing.Point(6, 25);
-			this.label23.Name = "label23";
-			this.label23.Size = new System.Drawing.Size(43, 13);
-			this.label23.TabIndex = 2;
-			this.label23.Text = "Amount";
-			// 
-			// label22
-			// 
-			this.label22.AutoSize = true;
-			this.label22.Location = new System.Drawing.Point(6, 51);
-			this.label22.Name = "label22";
-			this.label22.Size = new System.Drawing.Size(37, 13);
-			this.label22.TabIndex = 2;
-			this.label22.Text = "Power";
-			// 
-			// label28
-			// 
-			this.label28.AutoSize = true;
-			this.label28.Location = new System.Drawing.Point(120, 77);
-			this.label28.Name = "label28";
-			this.label28.Size = new System.Drawing.Size(45, 13);
-			this.label28.TabIndex = 2;
-			this.label28.Text = "degrees";
-			// 
-			// label21
-			// 
-			this.label21.AutoSize = true;
-			this.label21.Location = new System.Drawing.Point(6, 77);
-			this.label21.Name = "label21";
-			this.label21.Size = new System.Drawing.Size(28, 13);
-			this.label21.TabIndex = 2;
-			this.label21.Text = "FOV";
-			// 
 			// label24
 			// 
 			this.label24.AutoSize = true;
@@ -1511,9 +1421,9 @@
 			this.globalLightCb.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.globalLightCb.Location = new System.Drawing.Point(3, 39);
 			this.globalLightCb.Name = "globalLightCb";
-			this.globalLightCb.Size = new System.Drawing.Size(115, 17);
+			this.globalLightCb.Size = new System.Drawing.Size(119, 17);
 			this.globalLightCb.TabIndex = 0;
-			this.globalLightCb.Text = "Use global settings";
+			this.globalLightCb.Text = "Use global direction";
 			this.globalLightCb.UseVisualStyleBackColor = true;
 			this.globalLightCb.CheckedChanged += new System.EventHandler(this.globalLightCb_CheckedChanged);
 			// 
@@ -1529,8 +1439,8 @@
 			this.tabPage4.Controls.Add(this.xoffsetUd);
 			this.tabPage4.Location = new System.Drawing.Point(4, 22);
 			this.tabPage4.Name = "tabPage4";
-			this.tabPage4.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-			this.tabPage4.Size = new System.Drawing.Size(200, 10025);
+			this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage4.Size = new System.Drawing.Size(200, 10026);
 			this.tabPage4.TabIndex = 3;
 			this.tabPage4.Text = "Spatial";
 			this.tabPage4.UseVisualStyleBackColor = true;
@@ -1638,7 +1548,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-2840, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-2857, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1650,7 +1560,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-2952, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-2969, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1660,7 +1570,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-2954, 10040);
+			this.label4.Location = new System.Drawing.Point(-2971, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1670,7 +1580,7 @@
 			// resetDefaultBtn
 			// 
 			this.resetDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.resetDefaultBtn.Location = new System.Drawing.Point(336, 31462);
+			this.resetDefaultBtn.Location = new System.Drawing.Point(336, 32767);
 			this.resetDefaultBtn.Name = "resetDefaultBtn";
 			this.resetDefaultBtn.Size = new System.Drawing.Size(170, 23);
 			this.resetDefaultBtn.TabIndex = 13;
@@ -1681,7 +1591,7 @@
 			// setDefaultBtn
 			// 
 			this.setDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.setDefaultBtn.Location = new System.Drawing.Point(334, 31462);
+			this.setDefaultBtn.Location = new System.Drawing.Point(334, 32767);
 			this.setDefaultBtn.Name = "setDefaultBtn";
 			this.setDefaultBtn.Size = new System.Drawing.Size(170, 23);
 			this.setDefaultBtn.TabIndex = 12;
@@ -1810,7 +1720,7 @@
 			this.upDownVpWidth.Decimals2 = 2;
 			this.upDownVpWidth.ExpBase = 2D;
 			this.upDownVpWidth.Location = new System.Drawing.Point(12, 28);
-			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
 			this.upDownVpWidth.Max = 10D;
 			this.upDownVpWidth.Min = 0D;
 			this.upDownVpWidth.Name = "upDownVpWidth";
@@ -1854,6 +1764,114 @@
 			// saveMixdownDialog
 			// 
 			this.saveMixdownDialog.Filter = "Wav files (*.wav)|*.wav|All files (*.*)|*.*";
+			// 
+			// lightingGb
+			// 
+			this.lightingGb.Controls.Add(this.specPowUd);
+			this.lightingGb.Controls.Add(this.ambientAmountUd);
+			this.lightingGb.Controls.Add(this.diffuseAmountUd);
+			this.lightingGb.Controls.Add(this.specAmountUd);
+			this.lightingGb.Controls.Add(this.label15);
+			this.lightingGb.Controls.Add(this.label14);
+			this.lightingGb.Controls.Add(this.label23);
+			this.lightingGb.Controls.Add(this.label22);
+			this.lightingGb.Location = new System.Drawing.Point(0, 892);
+			this.lightingGb.Name = "lightingGb";
+			this.lightingGb.Size = new System.Drawing.Size(181, 133);
+			this.lightingGb.TabIndex = 21;
+			this.lightingGb.TabStop = false;
+			this.lightingGb.Text = "Lighting";
+			// 
+			// specPowUd
+			// 
+			this.specPowUd.Location = new System.Drawing.Point(111, 101);
+			this.specPowUd.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+			this.specPowUd.Name = "specPowUd";
+			this.specPowUd.Size = new System.Drawing.Size(59, 20);
+			this.specPowUd.TabIndex = 8;
+			this.specPowUd.ValueChanged += new System.EventHandler(this.specPowUd_ValueChanged);
+			// 
+			// ambientAmountUd
+			// 
+			this.ambientAmountUd.DecimalPlaces = 2;
+			this.ambientAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.ambientAmountUd.Location = new System.Drawing.Point(111, 23);
+			this.ambientAmountUd.Name = "ambientAmountUd";
+			this.ambientAmountUd.Size = new System.Drawing.Size(59, 20);
+			this.ambientAmountUd.TabIndex = 9;
+			this.ambientAmountUd.ValueChanged += new System.EventHandler(this.ambientAmountUd_ValueChanged);
+			// 
+			// diffuseAmountUd
+			// 
+			this.diffuseAmountUd.DecimalPlaces = 2;
+			this.diffuseAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.diffuseAmountUd.Location = new System.Drawing.Point(111, 49);
+			this.diffuseAmountUd.Name = "diffuseAmountUd";
+			this.diffuseAmountUd.Size = new System.Drawing.Size(59, 20);
+			this.diffuseAmountUd.TabIndex = 10;
+			this.diffuseAmountUd.ValueChanged += new System.EventHandler(this.diffuseAmountUd_ValueChanged);
+			// 
+			// specAmountUd
+			// 
+			this.specAmountUd.DecimalPlaces = 2;
+			this.specAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.specAmountUd.Location = new System.Drawing.Point(111, 75);
+			this.specAmountUd.Name = "specAmountUd";
+			this.specAmountUd.Size = new System.Drawing.Size(59, 20);
+			this.specAmountUd.TabIndex = 11;
+			this.specAmountUd.ValueChanged += new System.EventHandler(this.specAmountUd_ValueChanged);
+			// 
+			// label15
+			// 
+			this.label15.AutoSize = true;
+			this.label15.Location = new System.Drawing.Point(22, 25);
+			this.label15.Name = "label15";
+			this.label15.Size = new System.Drawing.Size(83, 13);
+			this.label15.TabIndex = 4;
+			this.label15.Text = "Ambient amount";
+			// 
+			// label14
+			// 
+			this.label14.AutoSize = true;
+			this.label14.Location = new System.Drawing.Point(23, 51);
+			this.label14.Name = "label14";
+			this.label14.Size = new System.Drawing.Size(78, 13);
+			this.label14.TabIndex = 5;
+			this.label14.Text = "Diffuse amount";
+			// 
+			// label23
+			// 
+			this.label23.AutoSize = true;
+			this.label23.Location = new System.Drawing.Point(18, 77);
+			this.label23.Name = "label23";
+			this.label23.Size = new System.Drawing.Size(87, 13);
+			this.label23.TabIndex = 6;
+			this.label23.Text = "Specular amount";
+			// 
+			// label22
+			// 
+			this.label22.AutoSize = true;
+			this.label22.Location = new System.Drawing.Point(24, 103);
+			this.label22.Name = "label22";
+			this.label22.Size = new System.Drawing.Size(81, 13);
+			this.label22.TabIndex = 7;
+			this.label22.Text = "Specular power";
 			// 
 			// Form1
 			// 
@@ -1917,11 +1935,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).EndInit();
-			this.specularGb.ResumeLayout(false);
-			this.specularGb.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.specFovUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).EndInit();
 			this.tabPage4.ResumeLayout(false);
 			this.tabPage4.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).EndInit();
@@ -1935,6 +1948,12 @@
 			this.propsTogglePanel.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).EndInit();
+			this.lightingGb.ResumeLayout(false);
+			this.lightingGb.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.ambientAmountUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.diffuseAmountUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1998,16 +2017,8 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TabPage styleTab;
 		private System.Windows.Forms.Panel lightPanel;
-		private System.Windows.Forms.GroupBox specularGb;
-		private System.Windows.Forms.NumericUpDown specFovUd;
-		private System.Windows.Forms.NumericUpDown specPowUd;
-		private System.Windows.Forms.NumericUpDown specAmountUd;
-		private System.Windows.Forms.Label label23;
-		private System.Windows.Forms.Label label22;
-		private System.Windows.Forms.Label label21;
 		private System.Windows.Forms.Label label24;
 		private System.Windows.Forms.CheckBox globalLightCb;
-		private System.Windows.Forms.Label label28;
 		private System.Windows.Forms.ContextMenuStrip trackListCM;
 		private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem invertSelectionToolStripMenuItem;
@@ -2084,6 +2095,15 @@
 		private System.Windows.Forms.NumericUpDown lightDirZUd;
 		private System.Windows.Forms.NumericUpDown lightDirYUd;
 		private System.Windows.Forms.NumericUpDown lightDirXUd;
+		private System.Windows.Forms.GroupBox lightingGb;
+		private System.Windows.Forms.NumericUpDown specPowUd;
+		private System.Windows.Forms.NumericUpDown ambientAmountUd;
+		private System.Windows.Forms.NumericUpDown diffuseAmountUd;
+		private System.Windows.Forms.NumericUpDown specAmountUd;
+		private System.Windows.Forms.Label label15;
+		private System.Windows.Forms.Label label14;
+		private System.Windows.Forms.Label label23;
+		private System.Windows.Forms.Label label22;
 	}
 }
 

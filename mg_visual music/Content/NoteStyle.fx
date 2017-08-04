@@ -11,7 +11,8 @@ sampler  TextureSampler = sampler_state
 float4 Color;
 float BlurredEdge;
 float3 LightDir = normalize(float3(1, 1, 1));
-float AmbientLum = 0.25f;
+float AmbientAmount;
+float DiffuseAmount;
 float SpecAmount;
 float SpecPower;
 float SpecFov;
@@ -49,9 +50,8 @@ int ActiveModEntries;
 float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 {
 	//float lum = clamp(dot(LightDir, normal), AmbientLum, 1);
-	float lum = dot(LightDir, normal) + AmbientLum;
+	color *= saturate(dot(LightDir, normal)) * DiffuseAmount + AmbientAmount;
 	float3 lightReflection = -reflect(LightDir, normal);
-	color *= lum;
 	float3 viewVec = normalize(CamPos - worldPos);
 	color += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecAmount;
 	return color;

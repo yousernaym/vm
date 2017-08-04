@@ -139,7 +139,7 @@ void LightingPS(out float4 color : COLOR0, in VSOutput IN)
 				
 	lightingNormal = normalize(lightingNormal);
 	
-	float lum = clamp(dot(LightDir, lightingNormal), AmbientLum, 1);
+	float lum = clamp(dot(LightDir, lightingNormal), AmbientAmount, 1);
 	//lum = saturate(dot(light, lightingNormal) + AmbientLum);
 	
 	float3 lightReflection = -reflect(LightDir, lightingNormal);
