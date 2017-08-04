@@ -78,6 +78,8 @@ namespace Visual_Music
 
 	public class SongPanel : GraphicsDeviceControl
 	{
+		public delegate void Delegate_songPosChanged();
+		public Delegate_songPosChanged OnSongPosChanged { get; set; }
 		public Project Project { get; set; }
 		const int CmFaceSide = 4096;
 		ScreenQuad quad;
@@ -160,8 +162,6 @@ namespace Visual_Music
 			oldTime = newTime;
 			selectRegion();
 			Project.update(deltaTimeS);
-
-			
 		}
 
 		protected override void Dispose(bool disposing)
@@ -252,7 +252,7 @@ namespace Visual_Music
 			if (mousePosScrollSong && !selectingRegion)
 			{
 				double dNormMouseX = (double)NormMouseX - scrollCenter;
-				Project.NormSongPos += (float)(Math.Pow(dNormMouseX, 2) * Math.Sign(dNormMouseX) * deltaTimeS * 0.13f);
+				Project.NormSongPos += (float)(Math.Pow(dNormMouseX, 2) * Math.Sign(dNormMouseX) * deltaTimeS * 0.3f);
 			}
 		}
 

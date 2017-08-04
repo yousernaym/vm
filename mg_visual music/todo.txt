@@ -1,9 +1,10 @@
 ﻿(- Parse songlengths.txt) Not really needed if a very long songlength is specified for note creation and XmPlay is pointed to songlengths.txt. The notes will be cut off when audio ends.
-- Use shader for bar rendering and add rendering options for bar style.
-- Don't clamp brightness before modulating with texture.
 - Bump mapping.
 
 Done:
+- (Don't clamp brightness before modulating with texture.)
+  Added ambient and diffuse amount controls instead. If brightness gets too low because of a texture, you only need to correct with either of these controls instead of having to adjust brightness of both normal and highlighted notes.
+- Use shader for bar rendering and add rendering options for bar style (rendering options consist of only the modulation controls desctribed below).
 - (Common style parameters: border size, border crossfade size, border color, border shape (round, square))
   Can do the above with the modulation system.
 - Specify mixdown name to libmikmod so that different projects can be open at the same time (in multiple instances of Visual Music) with their respective mixdown files.

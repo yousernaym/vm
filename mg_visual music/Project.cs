@@ -112,19 +112,16 @@ namespace Visual_Music
 			get => normSongPos;
 			set
 			{
-				double oldPos = normSongPos;
-				normSongPos = value;
-				if (oldPos != value)
+				if (normSongPos != value)
 				{
+					normSongPos = value;
 					SongPanel.Invalidate();
-					if (OnSongPosChanged != null)
-						OnSongPosChanged();
+					if (SongPanel.OnSongPosChanged != null)
+						SongPanel.OnSongPosChanged();
 				}
 			}
 		}
-		public delegate void Delegate_songPosChanged();
-		public Delegate_songPosChanged OnSongPosChanged { get; set; }
-
+		
 		bool isPlaying;
 		public bool IsPlaying
 		{
@@ -600,6 +597,8 @@ namespace Visual_Music
 						IsPlaying = false;
 						//bAudioPlayback = false;
 					}
+					else
+						AudioHasStarted = true;
 				}
 				else
 				{

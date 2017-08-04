@@ -60,9 +60,8 @@ namespace Visual_Music
 		public SongPanel SongPanel => songPanel;
 		Project project;
 		public Project Project => project;
-		ScrollBar songScrollBar = new HScrollBar();
 		Settings settings = new Settings();
-
+		ScrollBar songScrollBar = new HScrollBar();
 		NoteStyleControl currentNoteStyleControl;
 
 		public Form1(string[] args)
@@ -981,7 +980,7 @@ namespace Visual_Music
 			songPanel.BringToFront();
 			songPanel.MouseMove += new MouseEventHandler(panel1_MouseMove);
 			songPanel.KeyDown += new KeyEventHandler(panel1_KeyDown);
-			Project.OnSongPosChanged = delegate ()
+			SongPanel.OnSongPosChanged = delegate ()
 			{
 				if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)
 					songScrollBar.Value = Project.SongPosT;
