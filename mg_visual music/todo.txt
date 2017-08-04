@@ -1,7 +1,12 @@
 ﻿(- Parse songlengths.txt) Not really needed if a very long songlength is specified for note creation and XmPlay is pointed to songlengths.txt. The notes will be cut off when audio ends.
 - Bump mapping.
+- Add possibility to select notes with non-default camera settings.
+- Fix modulation for line style.
+- Don't add specular lighting on transparent areas.
+- Fix alpha blending.
 
 Done:
+- Correct specular lighting when camera moves.
 - (Don't clamp brightness before modulating with texture.)
   Added ambient and diffuse amount controls instead. If brightness gets too low because of a texture, you only need to correct with either of these controls instead of having to adjust brightness of both normal and highlighted notes.
 - Use shader for bar rendering and add rendering options for bar style (rendering options consist of only the modulation controls desctribed below).

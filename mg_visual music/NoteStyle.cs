@@ -344,7 +344,7 @@ namespace Visual_Music
 			normLightDir.Normalize();
 			fx.Parameters["LightDir"].SetValue(normLightDir);
 
-			fx.Parameters["CamPos"].SetValue(Project.Camera.Pos);
+			fx.Parameters["CamPos"].SetValue(Project.Camera.ViewportPos * 0.5f);
 		}
 
 		public void addModEntry(bool selectItem, string name = "")

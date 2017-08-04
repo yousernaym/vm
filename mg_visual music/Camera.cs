@@ -29,7 +29,8 @@ namespace Visual_Music
 				}
 			}
 		}
-				
+		public Vector3 ViewportPos => getViewportPos(pos);
+
 		Vector3 angles = new Vector3();
 		public Vector3 Angles { get => angles;
 			set
@@ -95,7 +96,7 @@ namespace Visual_Music
 					newPos += LeftOffset;
 				else if (Eye == 1)
 					newPos -= LeftOffset;
-				newPos *= ViewportSize.X;
+				newPos = getViewportPos(newPos);
 				Matrix transMat = Matrix.CreateTranslation(newPos);
 				return Matrix.Invert(RotMat * transMat);
 			}
@@ -224,7 +225,12 @@ namespace Visual_Music
 			}
 			return keyMatch;
 		}
-		
+
+		public Vector3 getViewportPos(Vector3 _pos)
+		{
+			return _pos * ViewportSize.X;
+		}
+
 		//public void reset()
 		//{
 		//	Pos = new Vector3(0, 0, 0);
