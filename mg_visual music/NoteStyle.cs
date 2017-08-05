@@ -173,7 +173,7 @@ namespace Visual_Music
 
 		//Serializable----------
 		protected NoteStyleEnum styleType; //Set in constructor of inherited class
-		//public BindingList<NoteStyleMod> ModEntries { get; set; } = new BindingList<NoteStyleMod>();
+										   //public BindingList<NoteStyleMod> ModEntries { get; set; } = new BindingList<NoteStyleMod>();
 		public List<NoteStyleMod> ModEntries { get; set; } = new List<NoteStyleMod>();
 		public int SelectedModEntryIndex { get; set; } = -1;
 		public NoteStyleMod SelectedModEntry
@@ -376,6 +376,44 @@ namespace Visual_Music
 			if (selectItem)
 				SelectedModEntryIndex = ModEntries.Count - 1;
 
+		}
+
+		protected Vector2 calcTexCoords(Point texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, TrackProps texTrackProps, SongDrawProps songDrawProps)
+		{
+			Vector2 coords = new Vector2();
+			coords.X = calcTexCoordComponent(texSize.X, songDrawProps.viewportSize.X, notePos.X, noteSize.X, posOffset.X, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps);
+			coords.Y = calcTexCoordComponent(texSize.Y, songDrawProps.viewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor, songDrawProps);
+			return coords;
+		}
+
+		float calcTexCoordComponent(int texSize, int vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor, SongDrawProps songDrawProps)
+		{
+			if (anchor == TexAnchorEnum.Screen)
+			{
+				float screenPos = notePos + posOffset + vpSize / 2;
+				if (!tile)
+					return screenPos / vpSize;
+				else
+					return screenPos / texSize;
+			}
+			else if (anchor == TexAnchorEnum.Note)
+			{
+				if (!tile)
+					return posOffset / noteSize;
+				else
+					return posOffset / texSize;
+			}
+			else //anchor at song start	
+			{
+				float songPos = (int)songDrawProps.getSongPosP((float)notePos + posOffset);
+				if (!tile)
+				{
+					float songLengthP = songDrawProps.getSongLengthP();
+					return songPos / songLengthP;
+				}
+				else
+					return songPos / texSize;
+			}
 		}
 	}
 }

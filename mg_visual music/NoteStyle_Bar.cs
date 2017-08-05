@@ -110,11 +110,10 @@ namespace Visual_Music
 
 				if (texture != null) //Unnecessary because texture is never null. Can revert to default 1x1 white pixel.
 				{
-					//calcTexCoords()
-					topLeft_tex.X = getTexCoordComponent(texture.Width, songDrawProps.viewportSize.X, topLeft_world.X, size_world.X, 0, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps);
-					size_tex.X = getTexCoordComponent(texture.Width, songDrawProps.viewportSize.X, topLeft_world.X, size_world.X, size_world.X, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps) - topLeft_tex.X;
-					topLeft_tex.Y = getTexCoordComponent(texture.Height, songDrawProps.viewportSize.Y, topLeft_world.Y, size_world.Y, 0, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor, songDrawProps);
-					size_tex.Y = getTexCoordComponent(texture.Height, songDrawProps.viewportSize.Y, topLeft_world.Y, size_world.Y, size_world.Y, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor, songDrawProps) - topLeft_tex.Y;
+					Point texSize = new Point(texture.Width, texture.Height);
+					topLeft_tex = calcTexCoords(texSize, topLeft_world, size_world, new Vector2(0,0), texTrackProps, songDrawProps);
+					size_tex = calcTexCoords(texSize, topLeft_world, size_world, size_world, texTrackProps, songDrawProps) - topLeft_tex;
+					
 					if ((bool)texTrackProps.TexProps.KeepAspect)
 					{
 						float uTexelsPerPixel = size_tex.X / size_world.X;
@@ -150,36 +149,7 @@ namespace Visual_Music
 			fx.CurrentTechnique.Passes["Pass1"].Apply();
 			songPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, noteList.Count);
 		}
-		float getTexCoordComponent(int texSize, int vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor, SongDrawProps songDrawProps)
-		{
-			if (anchor == TexAnchorEnum.Screen)
-			{
-				float screenPos = notePos + posOffset + vpSize / 2;
-				if (!tile)
-					return screenPos / vpSize;
-				else
-					return screenPos / texSize;
-			}
-			else if (anchor == TexAnchorEnum.Note)
-			{
-				if (!tile)
-					return posOffset / noteSize;
-				else
-					return posOffset / texSize;
-			}
-			else //anchor at song start	
-			{
-				float songPos = (int)songDrawProps.getSongPosP((float)notePos + posOffset);
-				if (!tile)
-				{
-					float songLengthP = songDrawProps.getSongLengthP();
-					return songPos / songLengthP;
-				}
-				else
-					return songPos / texSize;
-			}
-		}
-
+		
 		public static void sInit()
 		{
 			//Mesh vb
