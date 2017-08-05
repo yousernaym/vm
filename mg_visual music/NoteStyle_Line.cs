@@ -17,19 +17,17 @@ namespace Visual_Music
 	{
 		public Vector3 pos;
 		public Vector3 normal;
-		public Vector3 normal2;
 		public Vector3 center;
 		public Vector2 texCoords;
-		public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Normal, 1), new VertexElement(36, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(48, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
+		public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
 		VertexDeclaration IVertexType.VertexDeclaration
 		{
 			get { return VertexDeclaration; }
 		}
-		public LineVertex(Vector3 _pos, Vector3 _normal, Vector3 _normal2, Vector3 _center, Vector2 _texCoords)
+		public LineVertex(Vector3 _pos, Vector3 _normal, Vector3 _center, Vector2 _texCoords)
 		{
 			pos = _pos;
 			normal = _normal;
-			normal2 = _normal2;
 			center = _center;
 			texCoords = _texCoords;
 		}
@@ -312,24 +310,19 @@ namespace Visual_Music
 					normal = new Vector3(-normal.Y, normal.X, 0);
 					normal.Normalize();
 
-					Vector3 normal1, normal2;
+					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
+
+					Vector3 vertexOffset;
 					if (Style == LineStyleEnum.Ribbon)
-					{
-						//normal1 = normal;
-						normal1 = new Vector3(1, 0, 0);
-						normal2 = normal;
-						lineVerts[vertIndex].normal2 = lineVerts[vertIndex + 1].normal2 = normal2;
-					}
+						vertexOffset = new Vector3(1, 0, 0);
 					else
-						normal1 = normal;
-
-					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal1;
-
+						vertexOffset = normal;
 					float halfWidth = lineWidth / 2.0f;
+					vertexOffset *= halfWidth;
 
 					//Fill vertex buffer
-					lineVerts[vertIndex].pos = new Vector3(hLineStart, points[1].Y, points[1].Z) - normal1 * halfWidth;
-					lineVerts[vertIndex + 1].pos = new Vector3(hLineEnd, points[1].Y, points[1].Z) + normal1 * halfWidth;
+					lineVerts[vertIndex].pos = new Vector3(hLineStart, points[1].Y, points[1].Z) - vertexOffset;
+					lineVerts[vertIndex + 1].pos = new Vector3(hLineEnd, points[1].Y, points[1].Z) + vertexOffset;
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = points[1];
 					//Vector2 ns = songDrawProps.getScreenPosF(note.start, note.pitch);
 					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);

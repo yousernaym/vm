@@ -14,11 +14,10 @@ bool Border;
 //Helper functions------------------
 float4 shadeHlObject(float sgnDistFromEdge, float distFromCenter);
 
-void initPixel(inout float4 color, inout float3 normal, inout float3 normal2, inout float3 tPos, inout float distFromCenter, inout float distSign, inout float height, inout float normDistFromCenter, inout float2 texCoords, float3 rawPos, float3 center, float ShapePower, float fadeoutFromCenter)
+void initPixel(inout float4 color, inout float3 normal, inout float3 tPos, inout float distFromCenter, inout float distSign, inout float height, inout float normDistFromCenter, inout float2 texCoords, float3 rawPos, float3 center, float ShapePower, float fadeoutFromCenter)
 {
 	color = float4(Color.rgb,1);
 	normal = normalize(normal);
-	normal2 = normalize(normal2);
 	tPos = rawPos - center;
 	
 	distFromCenter = dot(tPos, normal);
@@ -52,7 +51,6 @@ struct VSInput
 {
 	float3 pos : POSITION0;
 	float3 normal : NORMAL0;
-	float3 normal2 : NORMAL1;
 	float3 center : POSITION1;
 	float2 texCoords : TEXCOORD0;
 };
@@ -61,7 +59,6 @@ struct VSOutput
 {
 	float4 pos : POSITION0;
 	float3 normal : TEXCOORD1;
-	float3 normal2 : TEXCOORD2;
 	float3 center : POSITION1;
 	float3 rawPos : POSITION2;
 	float2 texCoords : TEXCOORD0;
@@ -70,7 +67,6 @@ struct VSOutput
 void VS(in VSInput IN, out VSOutput OUT)
 {
 	OUT.normal = IN.normal;
-	OUT.normal2 = IN.normal2;
 	OUT.center = IN.center;
 
 	OUT.rawPos = IN.pos.xyz;
@@ -96,7 +92,7 @@ void SimplePS(out float4 color : COLOR0, in VSOutput IN)
 
 	//return;
 	float3 tPos; float distFromCenter; float distSign; float height; float normDistFromCenter;
-	initPixel(color, IN.normal, IN.normal2, tPos, distFromCenter, distSign, height, normDistFromCenter, IN.texCoords, IN.rawPos, IN.center, ShapePower, FadeoutFromCenter);
+	initPixel(color, IN.normal, tPos, distFromCenter, distSign, height, normDistFromCenter, IN.texCoords, IN.rawPos, IN.center, ShapePower, FadeoutFromCenter);
 		
 	color.rgb *= height;
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
@@ -110,21 +106,21 @@ void SimplePS(out float4 color : COLOR0, in VSOutput IN)
 void LightingPS(out float4 color : COLOR0, in VSOutput IN)
 {
 	float3 tPos; float distFromCenter; float distSign; float height; float normDistFromCenter;
-	initPixel(color, IN.normal, IN.normal2, tPos, distFromCenter, distSign, height, normDistFromCenter, IN.texCoords, IN.rawPos, IN.center, ShapePower, FadeoutFromCenter);
+	initPixel(color, IN.normal, tPos, distFromCenter, distSign, height, normDistFromCenter, IN.texCoords, IN.rawPos, IN.center, ShapePower, FadeoutFromCenter);
 
 	float3 lightingNormal;
 	
 	if (Style == 1) //Ribbon
 	{
-		if (IN.normal2.x > 0)
-			IN.normal2 *= -1;
-		if (abs(IN.normal2.x) < 0.000001f)
+		if (IN.normal.x > 0)
+			IN.normal *= -1;
+		if (abs(IN.normal.x) < 0.000001f)
 		{
 			//normal2.x = 0;
-			IN.normal2.y = 1;
+			IN.normal.y = 1;
 		}
-		lightingNormal = lerp(IN.normal2, float3(0,0,1), abs(IN.normal2.x));
-		//lightingNormal = normal2 + float3(0,0,1);
+		lightingNormal = lerp(IN.normal, float3(0,0,1), abs(IN.normal.x));
+		//lightingNormal = normal + float3(0,0,1);
 	}
 	else if (Style == 2) //Tube, formerly known as Clamped Tube
 	{
