@@ -134,17 +134,13 @@ void LightingPS(out float4 color : COLOR0, in VSOutput IN)
 	}
 				
 	lightingNormal = normalize(lightingNormal);
-	
-	float lum = clamp(dot(LightDir, lightingNormal), AmbientAmount, 1);
-	//lum = saturate(dot(light, lightingNormal) + AmbientLum);
-	
-	float3 lightReflection = -reflect(LightDir, lightingNormal);
-	
-	color.rgb *= lum;
-	float3 viewVec = normalize(CamPos - IN.rawPos);
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
-	color.rgb += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecAmount;
-	color = blurEdges(color, distFromCenter);
+	
+	float3 normal = normalize(IN.normal);
+	normDistFromCenter = dot(IN.rawPos - IN.center, normal) / Radius * 0.5f + 0.5f;
+	
+	color = modulateColor(IN.texCoords, color, IN.rawPos);
+	//color = blurEdges(color, distFromCenter);
 }
 
 float ClipPercent;

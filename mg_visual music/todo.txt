@@ -4,6 +4,8 @@
 - Fix modulation for line style.
 - Don't add specular lighting on transparent areas.
 - Fix alpha blending.
+- Texture coords (tiled) independent of screen resolution
+- Fix update loop
 
 Done:
 - Correct specular lighting when camera moves.

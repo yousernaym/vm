@@ -110,12 +110,15 @@ namespace Visual_Music
 
 				if (texture != null) //Unnecessary because texture is never null. Can revert to default 1x1 white pixel.
 				{
-					setSrcRect(out topLeft_tex.X, out size_tex.X, texture.Width, songDrawProps.viewportSize.X, topLeft_world.X, size_world.X, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps);
-					setSrcRect(out topLeft_tex.Y, out size_tex.Y, texture.Height, songDrawProps.viewportSize.Y, topLeft_world.Y, size_world.Y, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor, songDrawProps);
+					//calcTexCoords()
+					topLeft_tex.X = getTexCoordComponent(texture.Width, songDrawProps.viewportSize.X, topLeft_world.X, size_world.X, 0, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps);
+					size_tex.X = getTexCoordComponent(texture.Width, songDrawProps.viewportSize.X, topLeft_world.X, size_world.X, size_world.X, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps) - topLeft_tex.X;
+					topLeft_tex.Y = getTexCoordComponent(texture.Height, songDrawProps.viewportSize.Y, topLeft_world.Y, size_world.Y, 0, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor, songDrawProps);
+					size_tex.Y = getTexCoordComponent(texture.Height, songDrawProps.viewportSize.Y, topLeft_world.Y, size_world.Y, size_world.Y, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor, songDrawProps) - topLeft_tex.Y;
 					if ((bool)texTrackProps.TexProps.KeepAspect)
 					{
-						float uTexelsPerPixel = (float)size_tex.X / size_world.X;
-						float vTexelsPerPixel = (float)size_tex.Y / size_world.Y;
+						float uTexelsPerPixel = size_tex.X / size_world.X;
+						float vTexelsPerPixel = size_tex.Y / size_world.Y;
 						if ((bool)texTrackProps.TexProps.UTile && !(bool)texTrackProps.TexProps.VTile)
 						{
 							topLeft_tex.X = topLeft_tex.X * vTexelsPerPixel;
@@ -128,15 +131,15 @@ namespace Visual_Music
 						}
 					}
 					Vector2 texScroll = songDrawProps.songPosS * texTrackProps.TexProps.Scroll;
-					topLeft_tex.X -= (int)(texScroll.X * texture.Width);
-					topLeft_tex.Y -= (int)(texScroll.Y * texture.Height);
+					topLeft_tex.X -= texScroll.X;
+					topLeft_tex.Y -= texScroll.Y;
 				}
 				instanceVerts[n].destRect = new Vector4(topLeft_world.X, topLeft_world.Y, size_world.X, size_world.Y);
 				instanceVerts[n].srcRect = new Vector4(topLeft_tex.X, topLeft_tex.Y, size_tex.X, size_tex.Y);
-				instanceVerts[n].srcRect.X /= texture.Width;
-				instanceVerts[n].srcRect.Z /= texture.Width;
-				instanceVerts[n].srcRect.Y /= texture.Height;
-				instanceVerts[n].srcRect.W /= texture.Height;
+				//instanceVerts[n].srcRect.X /= texture.Width;
+				//instanceVerts[n].srcRect.Z /= texture.Width;
+				//instanceVerts[n].srcRect.Y /= texture.Height;
+				//instanceVerts[n].srcRect.W /= texture.Height;
 				//songPanel.SpriteBatch.Draw(texture, destRect, srcRect,color);
 			}
 			//songPanel.SpriteBatch.End();
@@ -147,45 +150,33 @@ namespace Visual_Music
 			fx.CurrentTechnique.Passes["Pass1"].Apply();
 			songPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, noteList.Count);
 		}
-		void setSrcRect(out float pos, out float size, int texSize, int vpSize, float notePos, float noteSize, bool tile, TexAnchorEnum anchor, SongDrawProps songDrawProps)
+		float getTexCoordComponent(int texSize, int vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor, SongDrawProps songDrawProps)
 		{
 			if (anchor == TexAnchorEnum.Screen)
 			{
+				float screenPos = notePos + posOffset + vpSize / 2;
 				if (!tile)
-				{
-					float f = (float)texSize / vpSize;
-					pos = (int)(notePos * f);
-					size = (int)(noteSize * f);
-				}
+					return screenPos / vpSize;
 				else
-				{
-					pos = notePos;
-					size = noteSize;
-				}
+					return screenPos / texSize;
 			}
 			else if (anchor == TexAnchorEnum.Note)
 			{
-				pos = 0;
 				if (!tile)
-				{
-					size = texSize;
-				}
+					return posOffset / noteSize;
 				else
-				{
-					size = noteSize;
-				}
+					return posOffset / texSize;
 			}
 			else //anchor at song start	
 			{
-				//tile
-				pos = (int)songDrawProps.getSongPosP((float)notePos);
-				size = noteSize;
+				float songPos = (int)songDrawProps.getSongPosP((float)notePos + posOffset);
 				if (!tile)
 				{
 					float songLengthP = songDrawProps.getSongLengthP();
-					pos = (int)((pos * texSize) / songLengthP);
-					size = (int)((size * texSize) / songLengthP);
+					return songPos / songLengthP;
 				}
+				else
+					return songPos / texSize;
 			}
 		}
 

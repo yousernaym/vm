@@ -54,7 +54,7 @@ namespace Visual_Music
 		}
 		public float getPitchScreenPos(float pitch)
 		{
-			return (float)viewportSize.Y - (pitch - minPitch) * (float)noteHeight - noteHeight / 2.0f - yMargin - viewportSize.Y / 2.0f;
+			return viewportSize.Y - (pitch - minPitch) * noteHeight - noteHeight / 2.0f - yMargin - viewportSize.Y / 2.0f;
 		}
 		public float getSongPosT(float screenX)
 		{ //Returns song pos in ticks

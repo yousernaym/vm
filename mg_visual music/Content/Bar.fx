@@ -31,7 +31,7 @@ VSOutput VS(VSInput IN)
 	//OUT.pos.w = 1;
 	OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw;
 	OUT.color = IN.color;
-	OUT.normPos = IN.normPos;
+	OUT.normPos = IN.normPos;// *2 - 1;
     return OUT;
 }
 
