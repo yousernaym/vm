@@ -116,17 +116,18 @@ namespace Visual_Music
 					
 					if ((bool)texTrackProps.TexProps.KeepAspect)
 					{
-						float uTexelsPerPixel = size_tex.X / size_world.X;
-						float vTexelsPerPixel = size_tex.Y / size_world.Y;
+						float uTexelsPerPixel = size_tex.X * texture.Width / size_world.X;
+						float vTexelsPerPixel = size_tex.Y * texture.Height / size_world.Y;
+						float uvRatio = uTexelsPerPixel / vTexelsPerPixel;
 						if ((bool)texTrackProps.TexProps.UTile && !(bool)texTrackProps.TexProps.VTile)
 						{
-							topLeft_tex.X = topLeft_tex.X * vTexelsPerPixel;
-							size_tex.X = size_tex.X * vTexelsPerPixel;
+							topLeft_tex.X = topLeft_tex.X * uvRatio;
+							size_tex.X = size_tex.X * uvRatio;
 						}
 						else if (!(bool)texTrackProps.TexProps.UTile && (bool)texTrackProps.TexProps.VTile)
 						{
-							topLeft_tex.Y = topLeft_tex.Y * uTexelsPerPixel;
-							size_tex.Y = size_tex.Y * uTexelsPerPixel;
+							topLeft_tex.Y = topLeft_tex.Y * uvRatio;
+							size_tex.Y = size_tex.Y * uvRatio;
 						}
 					}
 					Vector2 texScroll = songDrawProps.songPosS * texTrackProps.TexProps.Scroll;

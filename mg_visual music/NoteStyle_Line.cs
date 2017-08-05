@@ -434,9 +434,9 @@ namespace Visual_Music
 			double uTexelsPerPixel = (double)tc.X * texProps.Texture.Width / scrPos.X;
 			double vTexelsPerPixel = (double)tc.Y * texProps.Texture.Height / scrPos.Y;
 			if ((bool)texProps.UTile && !(bool)texProps.VTile)
-				tc.X = (float)(scrPos.X * vTexelsPerPixel / texProps.Texture.Width);
+				tc.X = (float)(tc.X * vTexelsPerPixel / texProps.Texture.Width);
 			else if (!(bool)texProps.UTile && (bool)texProps.VTile)
-				tc.Y = (float)(scrPos.Y * uTexelsPerPixel / texProps.Texture.Height);
+				tc.Y = (float)(tc.Y * uTexelsPerPixel / texProps.Texture.Height);
 		}
 		void setHlCirclePos(Vector3 pos)
 		{
