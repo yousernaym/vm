@@ -661,8 +661,8 @@ namespace Visual_Music
 					else
 						fx.CurrentTechnique = fx.Techniques["Lighting"];
 					fx.CurrentTechnique.Passes[0].Apply();
-					//if (numHLineVerts > 1)
-					//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
+					if (numHLineVerts > 1)
+						songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
 					if (numVerts > 5)
 						songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
 				}
