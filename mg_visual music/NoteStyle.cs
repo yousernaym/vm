@@ -378,6 +378,33 @@ namespace Visual_Music
 
 		}
 
+		protected void calcRectTexCoords(out Vector2 topLeft_tex, out Vector2 size_tex, Texture2D texture, Vector2 topLeft_world, Vector2 size_world, TrackProps texTrackProps, SongDrawProps songDrawProps)
+		{
+			Point texSize = new Point(texture.Width, texture.Height);
+			topLeft_tex = calcTexCoords(texSize, topLeft_world, size_world, new Vector2(0, 0), texTrackProps, songDrawProps);
+			size_tex = calcTexCoords(texSize, topLeft_world, size_world, size_world, texTrackProps, songDrawProps) - topLeft_tex;
+
+			if ((bool)texTrackProps.TexProps.KeepAspect)
+			{
+				float uTexelsPerPixel = size_tex.X * texture.Width / size_world.X;
+				float vTexelsPerPixel = size_tex.Y * texture.Height / size_world.Y;
+				float uvRatio = uTexelsPerPixel / vTexelsPerPixel;
+				if ((bool)texTrackProps.TexProps.UTile && !(bool)texTrackProps.TexProps.VTile)
+				{
+					topLeft_tex.X = topLeft_tex.X / uvRatio;
+					size_tex.X = size_tex.X / uvRatio;
+				}
+				else if (!(bool)texTrackProps.TexProps.UTile && (bool)texTrackProps.TexProps.VTile)
+				{
+					topLeft_tex.Y = topLeft_tex.Y * uvRatio;
+					size_tex.Y = size_tex.Y * uvRatio;
+				}
+			}
+			Vector2 texScroll = songDrawProps.songPosS * texTrackProps.TexProps.Scroll;
+			topLeft_tex.X -= texScroll.X;
+			topLeft_tex.Y -= texScroll.Y;
+		}
+
 		protected Vector2 calcTexCoords(Point texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, TrackProps texTrackProps, SongDrawProps songDrawProps)
 		{
 			Vector2 coords = new Vector2();

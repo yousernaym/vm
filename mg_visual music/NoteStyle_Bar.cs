@@ -110,29 +110,7 @@ namespace Visual_Music
 
 				if (texture != null) //Unnecessary because texture is never null. Can revert to default 1x1 white pixel.
 				{
-					Point texSize = new Point(texture.Width, texture.Height);
-					topLeft_tex = calcTexCoords(texSize, topLeft_world, size_world, new Vector2(0,0), texTrackProps, songDrawProps);
-					size_tex = calcTexCoords(texSize, topLeft_world, size_world, size_world, texTrackProps, songDrawProps) - topLeft_tex;
-					
-					if ((bool)texTrackProps.TexProps.KeepAspect)
-					{
-						float uTexelsPerPixel = size_tex.X * texture.Width / size_world.X;
-						float vTexelsPerPixel = size_tex.Y * texture.Height / size_world.Y;
-						float uvRatio = uTexelsPerPixel / vTexelsPerPixel;
-						if ((bool)texTrackProps.TexProps.UTile && !(bool)texTrackProps.TexProps.VTile)
-						{
-							topLeft_tex.X = topLeft_tex.X * uvRatio;
-							size_tex.X = size_tex.X * uvRatio;
-						}
-						else if (!(bool)texTrackProps.TexProps.UTile && (bool)texTrackProps.TexProps.VTile)
-						{
-							topLeft_tex.Y = topLeft_tex.Y * uvRatio;
-							size_tex.Y = size_tex.Y * uvRatio;
-						}
-					}
-					Vector2 texScroll = songDrawProps.songPosS * texTrackProps.TexProps.Scroll;
-					topLeft_tex.X -= texScroll.X;
-					topLeft_tex.Y -= texScroll.Y;
+					calcRectTexCoords(out topLeft_tex, out size_tex, texture, topLeft_world, size_world, texTrackProps, songDrawProps);
 				}
 				instanceVerts[n].destRect = new Vector4(topLeft_world.X, topLeft_world.Y, size_world.X, size_world.Y);
 				instanceVerts[n].srcRect = new Vector4(topLeft_tex.X, topLeft_tex.Y, size_tex.X, size_tex.Y);

@@ -434,7 +434,7 @@ namespace Visual_Music
 			double uTexelsPerPixel = (double)tc.X * texProps.Texture.Width / scrPos.X;
 			double vTexelsPerPixel = (double)tc.Y * texProps.Texture.Height / scrPos.Y;
 			if ((bool)texProps.UTile && !(bool)texProps.VTile)
-				tc.X = (float)(tc.X * vTexelsPerPixel / texProps.Texture.Width);
+				tc.X = (float)(tc.X * uTexelsPerPixel / vTexelsPerPixel);
 			else if (!(bool)texProps.UTile && (bool)texProps.VTile)
 				tc.Y = (float)(tc.Y * uTexelsPerPixel / texProps.Texture.Height);
 		}
