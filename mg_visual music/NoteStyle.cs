@@ -161,12 +161,12 @@ namespace Visual_Music
 
 		protected Effect fx;
 
-		protected TrackProps trackProps = null;
-		public TrackProps TrackProps
-		{
-			get { return trackProps; }
-			set { trackProps = value; }
-		}
+		//protected TrackProps trackProps = null;
+		//public TrackProps TrackProps
+		//{
+		//	get { return trackProps; }
+		//	set { trackProps = value; }
+		//}
 
 		protected static SongPanel songPanel;
 		protected static Project Project => songPanel.Project;
@@ -192,7 +192,7 @@ namespace Visual_Music
 		}
 		public NoteStyle(TrackProps tprops)
 		{
-			trackProps = tprops;
+			//trackProps = tprops;
 		}
 		public NoteStyle(SerializationInfo info, StreamingContext ctxt)
 		{

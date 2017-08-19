@@ -231,7 +231,6 @@ namespace Visual_Music
 							arrowStart = new Vector3(x1, y1, 0);
 						}
 
-
 						float arrowWidth = HlSize * 0.5f;
 
 						lineHlVerts[0].pos = arrowStart + arrowNormal * arrowWidth;
@@ -284,6 +283,9 @@ namespace Visual_Music
 				//startDraw = 960;
 				//endDraw = 1000;
 
+				//calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, lineVerts[vertIndex].center, texTrackProps.TexProps, texSize, x - startDraw, (float)(x - startDraw) / (float)(nextNoteStart.X - noteStart.X), songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
+				Vector2 topLeft_tex, size_tex;
+				//calcRectTexCoords(out topLeft_tex, out size_tex, texture, )
 				float step = ((endDraw - startDraw) / startEndXDist);
 				if (step < 1 || !bSkipPoints)
 					step = 1;
@@ -291,24 +293,11 @@ namespace Visual_Music
 				for (float x = startDraw; x < endDraw; x += step)
 				{
 					//Vector2 scale = new Vector2(lineWidth / texture.Width, (float)curLineWidth / texture.Height);
-					Vector3[] points = new Vector3[3];
-					Vector3[] tangents = new Vector3[2];
-					for (int i = 0; i < points.Length; i++)
-					{
-						points[i] = new Vector3();
-						points[i].X = (float)(x + i - 1);
-						points[i].Y = songDrawProps.getCurveScreenY(points[i].X, trackProps.TrackView.Curve);
-						points[i].Z = 0;
-					}
-					float hLineStart = points[1].X;
+					Vector3 pos;
+					Vector3 normal;
+					getCurvePoint(out pos, out normal, x, songDrawProps, trackProps);
+					float hLineStart = pos.X;
 					float hLineEnd = hLineStart;
-
-					for (int i = 0; i < tangents.Length; i++)
-						tangents[i] = points[i + 1] - points[i];
-
-					Vector3 normal = tangents[0] + tangents[1];
-					normal = new Vector3(-normal.Y, normal.X, 0);
-					normal.Normalize();
 
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
 
@@ -321,9 +310,9 @@ namespace Visual_Music
 					vertexOffset *= halfWidth;
 
 					//Fill vertex buffer
-					lineVerts[vertIndex].pos = new Vector3(hLineStart, points[1].Y, points[1].Z) - vertexOffset;
-					lineVerts[vertIndex + 1].pos = new Vector3(hLineEnd, points[1].Y, points[1].Z) + vertexOffset;
-					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = points[1];
+					lineVerts[vertIndex].pos = new Vector3(hLineStart, pos.Y, pos.Z) - vertexOffset;
+					lineVerts[vertIndex + 1].pos = new Vector3(hLineEnd, pos.Y, pos.Z) + vertexOffset;
+					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = pos;
 					//Vector2 ns = songDrawProps.getScreenPosF(note.start, note.pitch);
 					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
 					if (texTrackProps.TexProps.Texture != null)
@@ -334,7 +323,7 @@ namespace Visual_Music
 						do
 						{
 							hLineEnd++;
-						} while ((int)points[1].Y == (int)songDrawProps.getCurveScreenY((float)hLineEnd + 1, trackProps.TrackView.Curve) && hLineEnd < endDraw);
+						} while ((int)pos.Y == (int)songDrawProps.getCurveScreenY((float)hLineEnd + 1, trackProps.TrackView.Curve) && hLineEnd < endDraw);
 						if (hLineEnd > hLineStart + halfWidth)
 						{
 							hLineVerts[hLineVertIndex++] = lineVerts[vertIndex];
@@ -362,6 +351,28 @@ namespace Visual_Music
 			Debug.WriteLine("Skipped points: " + skippedPoints);
 			Debug.WriteLine("Vertices: " + totalVerts);
 		}
+
+		void getCurvePoint(out Vector3 pos, out Vector3 normal, float x, SongDrawProps songDrawProps, TrackProps trackProps)
+		{
+			Vector3[] points = new Vector3[3];
+			Vector3[] tangents = new Vector3[2];
+			for (int i = 0; i < points.Length; i++)
+			{
+				points[i] = new Vector3();
+				points[i].X = x + i - 1;
+				points[i].Y = songDrawProps.getCurveScreenY(points[i].X, trackProps.TrackView.Curve);
+				points[i].Z = 0;
+			}
+			
+			for (int i = 0; i < tangents.Length; i++)
+				tangents[i] = points[i + 1] - points[i];
+
+			normal = tangents[0] + tangents[1];
+			normal = new Vector3(-normal.Y, normal.X, 0);
+			normal.Normalize();
+			pos = points[1];
+		}
+
 		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, Vector3 lineCenter, TrackPropsTex texProps, Vector2 texSize, float stepFromNoteStart, float normStepFromNoteStart, SongDrawProps songDrawProps, float lineWidth, Vector3 pos1, Vector3 pos2)
 		{
 			TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;

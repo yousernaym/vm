@@ -187,11 +187,11 @@ namespace Visual_Music
 					PosOffset = (Vector3)entry.Value;
 			}
 			
-			foreach (NoteStyle ns in noteStyles)
-			{
-				if (ns != null)
-					ns.TrackProps = this;
-			}
+			//foreach (NoteStyle ns in noteStyles)
+			//{
+			//	if (ns != null)
+			//		ns.TrackProps = this;
+			//}
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
