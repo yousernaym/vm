@@ -1,5 +1,4 @@
-﻿(- Parse songlengths.txt) Not really needed if a very long songlength is specified for note creation and XmPlay is pointed to songlengths.txt. The notes will be cut off when audio ends.
-- Bump mapping.
+﻿- Bump mapping.
 - Add possibility to select notes with non-default camera settings.
 - Fix modulation for line style.
 - Don't add specular lighting on transparent areas.
@@ -24,3 +23,5 @@ Done:
 - Get MonoGame keys to work. (ctrl and shift when selecting notes in SongPanel)
   Switched to winforms onmousedown/up instead.
 - Swap r and b channels when rendering video (use bgr rendertarget).
+
+(- Parse songlengths.txt) Not really needed if a very long songlength is specified for note creation and XmPlay is pointed to songlengths.txt. The notes will be cut off when audio ends.

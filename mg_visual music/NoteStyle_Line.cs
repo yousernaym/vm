@@ -283,12 +283,6 @@ namespace Visual_Music
 				//startDraw = 960;
 				//endDraw = 1000;
 
-				Vector2 topLeft_tex, size_tex, size_world, bottomLeft_tex, topRight_tex, bottomRight_tex;
-				
-				//calcTexCoords(out topLeft_tex, out bottomLeft_tex, texTrackProps.TexProps, 0, 0, songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
-				//calcTexCoords(out topRight_tex, out bottomRight_tex, texTrackProps.TexProps, nextNoteStart.X - noteStart.X, 1, songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
-				
-				//calcRectTexCoords(out size_tex, out size_world, texSize, startDraw, endDraw, texTrackProps, songDrawProps, trackProps);
 				float step = ((endDraw - startDraw) / startEndXDist);
 				if (step < 1 || !bSkipPoints)
 					step = 1;
@@ -307,29 +301,7 @@ namespace Visual_Music
 					//Vector2 ns = songDrawProps.getScreenPosF(note.start, note.pitch);
 					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
 					if (texTrackProps.TexProps.Texture != null)
-					{
 						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, (float)(x - startDraw) / (float)(nextNoteStart.X - noteStart.X), songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
-						//adjustAspect(ref lineVerts[vertIndex].texCoords, ref lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, (float)(x - startDraw) / (float)(nextNoteStart.X - noteStart.X), songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos, size_tex, size_world);
-						
-						//float xLength = nextNoteStart.X - noteStart.X;
-						//Vector2 normPos1 = new Vector2(), normPos2 = new Vector2();
-						//if (texTrackProps.TexProps.VAnchor == TexAnchorEnum.Note)
-						//{
-						//	normPos1.X = normPos2.X = (center.X - startDraw) / xLength;
-						//	normPos1.Y = 0;
-						//	normPos2.Y = 1;
-						//}
-						//else
-						//{
-						//	normPos1.X = (center.X - vertexOffset.X - startDraw) / xLength;
-						//	normPos2.X = (center.X + vertexOffset.X - startDraw) / xLength;
-						//	float yLength = nextNoteStart.Y - noteStart.Y;
-						//	normPos1.Y = (center.Y - vertexOffset.Y - noteStart.Y) / yLength;
-						//	normPos2.Y = (center.Y + vertexOffset.Y - noteStart.Y) / yLength;
-						//}
-						//lineVerts[vertIndex].texCoords = new Vector2(topLeft_tex.X + normPos1.X * size_tex.X, topLeft_tex.Y + normPos1.Y * size_tex.Y);
-						//lineVerts[vertIndex + 1].texCoords = new Vector2(topLeft_tex.X + normPos2.X * size_tex.X, topLeft_tex.Y + normPos2.Y * size_tex.Y);
-					}
 
 					if (Style == LineStyleEnum.Ribbon)
 					{
@@ -506,15 +478,6 @@ namespace Visual_Music
 			{
 				Vector2 tiledTc1 = new Vector2(), tiledTc2 = new Vector2();
 				calcTexCoords(out tiledTc1, out tiledTc2, texProps, stepFromNoteStart, normStepFromNoteStart, songDrawProps, lineWidth, worldPos1, worldPos2, true);
-				//adjustCompAspect(ref vert1TC, new Vector2(worldPos1.X, worldPos1.Y), texProps, tiledTc1);
-				//adjustCompAspect(ref vert2TC, new Vector2(worldPos2.X, worldPos2.Y), texProps, tiledTc2);
-
-				Vector2 texSize = new Vector2(texProps.Texture.Width, texProps.Texture.Height);
-				Vector2 texelCount = (vert1TC - vert2TC) * texSize;
-				Vector2 pixelCount = new Vector2(worldPos1.X - worldPos2.X, worldPos1.Y - worldPos2.Y);
-				Vector2 texelsPerPixel = texelCount / pixelCount;
-				float uvRatio = texelsPerPixel.X / texelsPerPixel.Y;
-
 				Vector2 tcDiff = vert1TC - vert2TC;
 				Vector2 tiledTcDiff = tiledTc1 - tiledTc2;
 
@@ -523,8 +486,6 @@ namespace Visual_Music
 					float ratio = tcDiff.Y / tiledTcDiff.Y;
 					vert1TC.X *= ratio;
 					vert2TC.X *= ratio;
-					//vert1TC.X /= uvRatio;
-					//vert2TC.X /= uvRatio;
 				}
 				else if (!(bool)texProps.UTile && (bool)texProps.VTile)
 				{
@@ -535,29 +496,10 @@ namespace Visual_Music
 						ratio = tcDiff.X / tiledTcDiff.X;
 					vert1TC.Y *= ratio;
 					vert2TC.Y *= ratio;
-					//vert1TC.Y *= tcDiff.X / tiledTcDiff.X;
-					//vert2TC.Y *= tcDiff.X / tiledTcDiff.X;
-					//vert1TC.Y *= uvRatio;
-					//vert2TC.Y *= uvRatio;
 				}
 			}
 		}
-		void adjustCompAspect(ref Vector2 tc, Vector2 scrPos, TrackPropsTex texProps, Vector2 tiledTc)
-		{
-			//Vector2 texSize = new Vector2(texProps.Texture.Width, texProps.Texture.Height);
-			//Vector2 texelsPerPixel = size_tex * texSize / size_world;
-			//float uvRatio = Math.Abs(texelsPerPixel.X / texelsPerPixel.Y);
-			if ((bool)texProps.UTile && !(bool)texProps.VTile)
-			{
-				if (tiledTc.Y != 0)
-					tc.X *= tc.Y / tiledTc.Y;
-			}
-			else if (!(bool)texProps.UTile && (bool)texProps.VTile)
-			{
-				if (tiledTc.X != 0)
-					tc.Y *= tc.X / tiledTc.X;
-			}
-		}
+		
 		void setHlCirclePos(Vector3 pos)
 		{
 			fx.Parameters["WorldPos"].SetValue(pos);
