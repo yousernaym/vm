@@ -378,16 +378,15 @@ namespace Visual_Music
 
 		}
 
-		protected void calcRectTexCoords(out Vector2 topLeft_tex, out Vector2 size_tex, Texture2D texture, Vector2 topLeft_world, Vector2 size_world, TrackProps texTrackProps, SongDrawProps songDrawProps)
+		protected void calcRectTexCoords(out Vector2 topLeft_tex, out Vector2 size_tex, Vector2 texSize, Vector2 topLeft_world, Vector2 size_world, TrackProps texTrackProps, SongDrawProps songDrawProps)
 		{
-			Point texSize = new Point(texture.Width, texture.Height);
 			topLeft_tex = calcTexCoords(texSize, topLeft_world, size_world, new Vector2(0, 0), texTrackProps, songDrawProps);
 			size_tex = calcTexCoords(texSize, topLeft_world, size_world, size_world, texTrackProps, songDrawProps) - topLeft_tex;
 
 			if ((bool)texTrackProps.TexProps.KeepAspect)
 			{
-				float uTexelsPerPixel = size_tex.X * texture.Width / size_world.X;
-				float vTexelsPerPixel = size_tex.Y * texture.Height / size_world.Y;
+				float uTexelsPerPixel = size_tex.X * texSize.X / size_world.X;
+				float vTexelsPerPixel = size_tex.Y * texSize.Y / size_world.Y;
 				float uvRatio = uTexelsPerPixel / vTexelsPerPixel;
 				if ((bool)texTrackProps.TexProps.UTile && !(bool)texTrackProps.TexProps.VTile)
 				{
@@ -405,7 +404,7 @@ namespace Visual_Music
 			topLeft_tex.Y -= texScroll.Y;
 		}
 
-		protected Vector2 calcTexCoords(Point texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, TrackProps texTrackProps, SongDrawProps songDrawProps)
+		protected Vector2 calcTexCoords(Vector2 texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, TrackProps texTrackProps, SongDrawProps songDrawProps)
 		{
 			Vector2 coords = new Vector2();
 			coords.X = calcTexCoordComponent(texSize.X, songDrawProps.viewportSize.X, notePos.X, noteSize.X, posOffset.X, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor, songDrawProps);
@@ -413,7 +412,7 @@ namespace Visual_Music
 			return coords;
 		}
 
-		float calcTexCoordComponent(int texSize, int vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor, SongDrawProps songDrawProps)
+		float calcTexCoordComponent(float texSize, int vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor, SongDrawProps songDrawProps)
 		{
 			if (anchor == TexAnchorEnum.Screen)
 			{

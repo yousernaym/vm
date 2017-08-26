@@ -110,7 +110,8 @@ namespace Visual_Music
 
 				if (texture != null) //Unnecessary because texture is never null. Can revert to default 1x1 white pixel.
 				{
-					calcRectTexCoords(out topLeft_tex, out size_tex, texture, topLeft_world, size_world, texTrackProps, songDrawProps);
+					Vector2 texSize = new Vector2(texture.Width, texture.Height);
+					calcRectTexCoords(out topLeft_tex, out size_tex, texSize, topLeft_world, size_world, texTrackProps, songDrawProps);
 				}
 				instanceVerts[n].destRect = new Vector4(topLeft_world.X, topLeft_world.Y, size_world.X, size_world.Y);
 				instanceVerts[n].srcRect = new Vector4(topLeft_tex.X, topLeft_tex.Y, size_tex.X, size_tex.Y);
