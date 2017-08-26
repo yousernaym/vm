@@ -423,9 +423,8 @@ namespace Visual_Music
 				uTile = (bool)texProps.UTile;
 				vTile = (bool)texProps.VTile;
 			}
-			worldPos1.X += songDrawProps.viewportSize.X / 2; worldPos1.Y += songDrawProps.viewportSize.Y / 2;
-			worldPos2.X += songDrawProps.viewportSize.X / 2; worldPos2.Y += songDrawProps.viewportSize.Y / 2;
 
+			//UAnchor
 			if (texUAnchor == TexAnchorEnum.Note)
 			{
 				if (!uTile)
@@ -435,6 +434,9 @@ namespace Visual_Music
 			}
 			else if (texUAnchor == TexAnchorEnum.Screen)
 			{
+				worldPos1.X += songDrawProps.viewportSize.X / 2;
+				worldPos2.X += songDrawProps.viewportSize.X / 2;
+
 				//if (!tileU)
 				//    vert1TC.X = vert2TC.X = lineCenter.X / songDrawProps.viewportSize.X;
 				//else
@@ -450,7 +452,7 @@ namespace Visual_Music
 					vert2TC.X = worldPos2.X / texSize.X;
 				}
 			}
-			else
+			else if (texUAnchor == TexAnchorEnum.Song)
 			{
 				if (!uTile)
 				{
@@ -458,12 +460,15 @@ namespace Visual_Music
 					vert2TC.X = songDrawProps.getSongPosP(worldPos2.X) / songDrawProps.getSongLengthP();
 				}
 				else
-				{ 
+				{
 					vert1TC.X = songDrawProps.getSongPosP(worldPos1.X) / texSize.X;
 					vert2TC.X = songDrawProps.getSongPosP(worldPos2.X) / texSize.X;
 				}
 			}
+			else
+				throw new NotImplementedException();
 
+			//VAnchor
 			if (texVAnchor == TexAnchorEnum.Note)
 			{
 				vert1TC.Y = 0;
@@ -472,8 +477,10 @@ namespace Visual_Music
 				else
 					vert2TC.Y = lineWidth / texSize.Y;
 			}
-			else
+			else if (texVAnchor == TexAnchorEnum.Screen)
 			{
+				worldPos1.Y += songDrawProps.viewportSize.Y / 2;
+				worldPos2.Y += songDrawProps.viewportSize.Y / 2;
 				if (!vTile)
 				{
 					vert1TC.Y = worldPos1.Y / songDrawProps.viewportSize.Y;
@@ -485,6 +492,8 @@ namespace Visual_Music
 					vert2TC.Y = worldPos2.Y / texSize.Y;
 				}
 			}
+			else
+				throw new NotImplementedException();
 			if (!adjustingAspect)
 				adjustAspect(ref vert1TC, ref vert2TC, texProps, stepFromNoteStart, normStepFromNoteStart, songDrawProps, lineWidth, worldPos1, worldPos2);
 			vert1TC -= songDrawProps.songPosS * texProps.Scroll;
@@ -511,15 +520,21 @@ namespace Visual_Music
 
 				if ((bool)texProps.UTile && !(bool)texProps.VTile)
 				{
-					vert1TC.X *= tcDiff.Y / tiledTcDiff.Y;
-					vert2TC.X *= tcDiff.Y / tiledTcDiff.Y;
+					float ratio = tcDiff.Y / tiledTcDiff.Y;
+					vert1TC.X *= ratio;
+					vert2TC.X *= ratio;
 					//vert1TC.X /= uvRatio;
 					//vert2TC.X /= uvRatio;
 				}
 				else if (!(bool)texProps.UTile && (bool)texProps.VTile)
 				{
-					vert1TC.Y *= vert1TC.X / tiledTc1.X;
-					vert2TC.Y *= vert2TC.X / tiledTc2.X;
+					float ratio;
+					if (tiledTcDiff.X == 0)
+						ratio = vert1TC.X / tiledTc1.X;
+					else
+						ratio = tcDiff.X / tiledTcDiff.X;
+					vert1TC.Y *= ratio;
+					vert2TC.Y *= ratio;
 					//vert1TC.Y *= tcDiff.X / tiledTcDiff.X;
 					//vert2TC.Y *= tcDiff.X / tiledTcDiff.X;
 					//vert1TC.Y *= uvRatio;
