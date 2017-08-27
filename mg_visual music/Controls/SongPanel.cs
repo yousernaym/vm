@@ -265,6 +265,7 @@ namespace Visual_Music
 			{
 				int vrWidth = 1024;
 				Point videoFrameSize = options.Sphere ? new Point(vrWidth, vrWidth / (options.Stereo ? 1 : 2)) : options.Resolution;
+				//videoFrameSize = new Point(vrWidth, vrWidth / 2);
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
 				//videoFormat.bitRate = 160000000;
 				videoFormat.fps = 30;
@@ -282,8 +283,8 @@ namespace Visual_Music
 				{
 					isRenderingVideo = true;
 					RenderTarget2D[] renderTarget2d = { new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents), new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents) };
-					RenderTarget2D renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgr32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
-					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgr32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					RenderTarget2D renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 
 					uint[] frameData = new uint[videoFrameSize.X * videoFrameSize.Y];
 					//uint[][] cubeMapData = new uint[6][];
@@ -323,6 +324,7 @@ namespace Visual_Music
 						drawVideoFrame(currentTempoEvent, songPosInSeconds, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d, renderTarget2d8bit, songPosInTicks, cubeToPlaneFx);
 						GraphicsDevice.SetRenderTarget(null);
 						renderTarget2d8bit.GetData<uint>(frameData);
+												
 						bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, Project.AudioOffset);
 						if (!b)
 						{
@@ -380,7 +382,7 @@ namespace Visual_Music
 		{
 			GraphicsDevice.SetRenderTarget(renderTarget2d);
 			GraphicsDevice.Clear(Color.Transparent);
-
+			
 			if (options.Sphere)
 			{
 				if (options.Stereo)
@@ -419,7 +421,7 @@ namespace Visual_Music
 				GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
 				Project.Camera.CubeMapFace = i;
 				GraphicsDevice.Clear(Color.Transparent);
-				GraphicsDevice.Clear(new Color((uint)i * 1000));
+				//GraphicsDevice.Clear(new Color((uint)i * 1000));
 				Project.drawSong(new Point(CmFaceSide, CmFaceSide), (float)songPosInTicks / Project.Notes.SongLengthT);
 			}
 			Project.Camera.Eye = 0;

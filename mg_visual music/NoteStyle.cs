@@ -336,7 +336,7 @@ namespace Visual_Music
 			//Spatial props
 			Vector3 posOffset = globalTrackProps.PosOffset + trackProps.PosOffset;
 			posOffset *= 0.01f * songDrawProps.viewportSize.X;
-			posOffset.Z -= projMat.M22 * songDrawProps.viewportSize.Y;
+			posOffset.Z -= Math.Abs(projMat.M22) * songDrawProps.viewportSize.Y;
 			fx.Parameters["PosOffset"].SetValue(posOffset);
 
 			TrackProps lightProps = (bool)trackProps.UseGlobalLight ? globalTrackProps : trackProps;

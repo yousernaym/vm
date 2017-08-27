@@ -42,7 +42,7 @@ float4 PS(VSOutput IN) : COLOR0
 	color = modulateColor(IN.normPos, color, IN.worldPos);
 	
 	return color;
-	//return float4(, 0, 0, color.r*10);
+	//return float4(1, 1, 1, color.r*10);
 	//return float4(ColorDest[0])+float4(0,0,0,color.x);
 }
 
