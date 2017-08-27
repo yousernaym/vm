@@ -219,8 +219,8 @@ namespace Visual_Music
 
 			upDownVpWidth.Value = Project.ViewWidthQn;
 			audioOffsetS.Value = (decimal)Project.AudioOffset;
-			maxPitchUd.Value = Project.Notes.MaxPitch;
-			minPitchUd.Value = Project.Notes.MinPitch;
+			maxPitchUd.Value = Project.MaxPitch;
+			minPitchUd.Value = Project.MinPitch;
 
             songScrollBar.Maximum = Project.SongLengthT;
             songScrollBar.Value = Project.SongPosT;
