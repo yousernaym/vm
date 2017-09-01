@@ -18,17 +18,19 @@ namespace Visual_Music
 		public Vector3 pos;
 		public Vector3 normal;
 		public Vector3 center;
+		public float normStepFromNoteStart;
 		public Vector2 texCoords;
-		public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
+		public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Single, VertexElementUsage.Position, 2), new VertexElement(40, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
 		VertexDeclaration IVertexType.VertexDeclaration
 		{
 			get { return VertexDeclaration; }
 		}
-		public LineVertex(Vector3 _pos, Vector3 _normal, Vector3 _center, Vector2 _texCoords)
+		public LineVertex(Vector3 _pos, Vector3 _normal, Vector3 _center, float _normStepFromNoteStart, Vector2 _texCoords)
 		{
 			pos = _pos;
 			normal = _normal;
 			center = _center;
+			normStepFromNoteStart = _normStepFromNoteStart;
 			texCoords = _texCoords;
 		}
 		//static public DynamicVertexBuffer vertexBuffer;
@@ -298,10 +300,11 @@ namespace Visual_Music
 					lineVerts[vertIndex].pos = center - vertexOffset;
 					lineVerts[vertIndex + 1].pos = center + vertexOffset;
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
+					lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = (x - startDraw) / (nextNoteStart.X - noteStart.X);
 					//Vector2 ns = songDrawProps.getScreenPosF(note.start, note.pitch);
 					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
 					if (texTrackProps.TexProps.Texture != null)
-						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, (float)(x - startDraw) / (float)(nextNoteStart.X - noteStart.X), songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
+						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, lineVerts[vertIndex].normStepFromNoteStart, songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
 					if (Style == LineStyleEnum.Ribbon)
 					{

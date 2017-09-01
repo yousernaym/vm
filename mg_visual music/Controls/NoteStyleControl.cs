@@ -51,6 +51,8 @@ namespace Visual_Music
 			{
 				xOriginUd.Value = (decimal)modEntry.Origin.X;
 				yOriginUd.Value = (decimal)modEntry.Origin.Y;
+				xOriginCb.Checked = modEntry.XOriginEnable;
+				yOriginCb.Checked = modEntry.YOriginEnable;
 				combineXYCombo.SelectedIndex = modEntry.CombineXY;
 				colorDestCb.Checked = modEntry.ColorDestEnable;
 				angleDestCb.Checked = modEntry.AngleDestEnable;
@@ -212,6 +214,22 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.DiscardAfterStop = discardStopCb.Checked;
+		}
+
+		private void xOriginCb_CheckedChanged(object sender, EventArgs e)
+		{
+			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
+			xOriginUd.Enabled = xOriginCb.Checked;
+			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.XOriginEnable = xOriginCb.Checked;
+		}
+
+		private void yOriginCb_CheckedChanged(object sender, EventArgs e)
+		{
+			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
+			yOriginUd.Enabled = yOriginCb.Checked;
+			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.YOriginEnable = yOriginCb.Checked;
 		}
 	}
 }

@@ -54,8 +54,6 @@
 			this.yOriginUd = new System.Windows.Forms.NumericUpDown();
 			this.xOriginUd = new System.Windows.Forms.NumericUpDown();
 			this.combineXYCombo = new System.Windows.Forms.ComboBox();
-			this.label6 = new System.Windows.Forms.Label();
-			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.stopUd = new System.Windows.Forms.NumericUpDown();
 			this.fadeOutUd = new System.Windows.Forms.NumericUpDown();
@@ -63,6 +61,8 @@
 			this.powerUd = new System.Windows.Forms.NumericUpDown();
 			this.label2 = new System.Windows.Forms.Label();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+			this.xOriginCb = new System.Windows.Forms.CheckBox();
+			this.yOriginCb = new System.Windows.Forms.CheckBox();
 			this.modEntryCm.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.modEntryBs)).BeginInit();
 			this.modGbox.SuspendLayout();
@@ -302,12 +302,12 @@
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.yOriginCb);
+			this.groupBox1.Controls.Add(this.xOriginCb);
 			this.groupBox1.Controls.Add(this.label8);
 			this.groupBox1.Controls.Add(this.yOriginUd);
 			this.groupBox1.Controls.Add(this.xOriginUd);
 			this.groupBox1.Controls.Add(this.combineXYCombo);
-			this.groupBox1.Controls.Add(this.label6);
-			this.groupBox1.Controls.Add(this.label7);
 			this.groupBox1.Controls.Add(this.label9);
 			this.groupBox1.Location = new System.Drawing.Point(3, 3);
 			this.groupBox1.Name = "groupBox1";
@@ -401,24 +401,6 @@
 			this.combineXYCombo.TabIndex = 39;
 			this.combineXYCombo.SelectedIndexChanged += new System.EventHandler(this.combineXYCombo_SelectedIndexChanged);
 			// 
-			// label6
-			// 
-			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(71, 43);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(14, 13);
-			this.label6.TabIndex = 38;
-			this.label6.Text = "X";
-			// 
-			// label7
-			// 
-			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(118, 43);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(14, 13);
-			this.label7.TabIndex = 38;
-			this.label7.Text = "Y";
-			// 
 			// label9
 			// 
 			this.label9.AutoSize = true;
@@ -488,6 +470,28 @@
 			this.label2.TabIndex = 28;
 			this.label2.Text = "Stop";
 			// 
+			// xOriginCb
+			// 
+			this.xOriginCb.AutoSize = true;
+			this.xOriginCb.Location = new System.Drawing.Point(56, 46);
+			this.xOriginCb.Name = "xOriginCb";
+			this.xOriginCb.Size = new System.Drawing.Size(33, 17);
+			this.xOriginCb.TabIndex = 42;
+			this.xOriginCb.Text = "X";
+			this.xOriginCb.UseVisualStyleBackColor = true;
+			this.xOriginCb.CheckedChanged += new System.EventHandler(this.xOriginCb_CheckedChanged);
+			// 
+			// yOriginCb
+			// 
+			this.yOriginCb.AutoSize = true;
+			this.yOriginCb.Location = new System.Drawing.Point(105, 46);
+			this.yOriginCb.Name = "yOriginCb";
+			this.yOriginCb.Size = new System.Drawing.Size(33, 17);
+			this.yOriginCb.TabIndex = 42;
+			this.yOriginCb.Text = "Y";
+			this.yOriginCb.UseVisualStyleBackColor = true;
+			this.yOriginCb.CheckedChanged += new System.EventHandler(this.yOriginCb_CheckedChanged);
+			// 
 			// NoteStyleControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -546,8 +550,6 @@
 		private System.Windows.Forms.NumericUpDown yOriginUd;
 		private System.Windows.Forms.NumericUpDown xOriginUd;
 		private System.Windows.Forms.ComboBox combineXYCombo;
-		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.NumericUpDown stopUd;
 		private System.Windows.Forms.NumericUpDown fadeOutUd;
@@ -555,5 +557,7 @@
 		private System.Windows.Forms.NumericUpDown powerUd;
 		private System.Windows.Forms.Label label2;
 		protected System.Windows.Forms.GroupBox modGbox;
+		private System.Windows.Forms.CheckBox yOriginCb;
+		private System.Windows.Forms.CheckBox xOriginCb;
 	}
 }

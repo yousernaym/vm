@@ -57,6 +57,8 @@ namespace Visual_Music
 		}
 		public float XOrigin { get; set; } = 0.5f;
 		public float YOrigin { get; set; } = 0.5f;
+		public bool XOriginEnable { get; set; } = true;
+		public bool YOriginEnable { get; set; } = true;
 
 		public int CombineXY { get; set; } 
 		public bool ColorDestEnable { get; set; }
@@ -90,6 +92,10 @@ namespace Visual_Music
 					Name = (string)entry.Value;
 				else if (entry.Name == "origin")
 					Origin = (Vector2)entry.Value;
+				else if (entry.Name == "xOriginEnable")
+					XOriginEnable = (bool)entry.Value;
+				else if (entry.Name == "yOriginEnable")
+					YOriginEnable = (bool)entry.Value;
 				else if (entry.Name == "combineXY")
 					CombineXY = (int)entry.Value;
 				else if (entry.Name == "colorDestEnable")
@@ -110,7 +116,7 @@ namespace Visual_Music
 					FadeOut = (float)entry.Value;
 				else if (entry.Name == "power")
 					Power = (float)entry.Value;
-				else if (entry.Name == "DiscardAfterStop")
+				else if (entry.Name == "discardAfterStop")
 					DiscardAfterStop = (bool)entry.Value;
 			}
 		}
@@ -119,6 +125,8 @@ namespace Visual_Music
 		{
 			info.AddValue("name", Name);
 			info.AddValue("origin", Origin);
+			info.AddValue("xOriginEnable", XOriginEnable);
+			info.AddValue("yOriginEnable", YOriginEnable);
 			info.AddValue("combineXY", CombineXY);
 			info.AddValue("colorDestEnable", ColorDestEnable);
 			info.AddValue("angleDestEnable", AngleDestEnable);
@@ -313,6 +321,8 @@ namespace Visual_Music
 				//fxModEntry["Scale"].SetValue(ModEntries[i].Scale);
 
 				fx.Parameters["Origin"].Elements[i].SetValue(ModEntries[i].Origin);
+				fx.Parameters["XOriginEnable"].Elements[i].SetValue(ModEntries[i].XOriginEnable);
+				fx.Parameters["YOriginEnable"].Elements[i].SetValue(ModEntries[i].YOriginEnable);
 				fx.Parameters["CombineXY"].Elements[i].SetValue(ModEntries[i].CombineXY);
 				fx.Parameters["ColorDestEnable"].Elements[i].SetValue(ModEntries[i].ColorDestEnable);
 				fx.Parameters["AngleDestEnable"].Elements[i].SetValue(ModEntries[i].AngleDestEnable);

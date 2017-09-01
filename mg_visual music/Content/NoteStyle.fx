@@ -22,8 +22,8 @@ float3 PosOffset;
 #define ModEntriesCount 5
 
 float2 Origin[ModEntriesCount];
-int XSource[ModEntriesCount];
-int YSource[ModEntriesCount];
+bool XOriginEnable[ModEntriesCount];
+bool YOriginEnable[ModEntriesCount];
 int CombineXY[ModEntriesCount];
 bool ColorDestEnable[ModEntriesCount];
 bool AlphaDestEnable[ModEntriesCount];
@@ -73,30 +73,46 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 	float interpolant = 0;
 	destNormalDir = float3(0, 0, 0);
 
-	if (CombineXY[modIndex] == CombineXY_Max)
+	if (XOriginEnable[modIndex] && YOriginEnable[modIndex])
 	{
-		if (distFromOrigin.x > distFromOrigin.y)
-			destNormalDir.x = transformedPos.x;
-		else
-			destNormalDir.y = transformedPos.y;
-		interpolant = max(distFromOrigin.x, distFromOrigin.y);
+		if (CombineXY[modIndex] == CombineXY_Max)
+		{
+			if (distFromOrigin.x > distFromOrigin.y)
+				destNormalDir.x = transformedPos.x;
+			else
+				destNormalDir.y = transformedPos.y;
+			interpolant = max(distFromOrigin.x, distFromOrigin.y);
+		}
+		else if (CombineXY[modIndex] == CombineXY_Min)
+		{
+			if (distFromOrigin.x < distFromOrigin.y)
+				destNormalDir.x = transformedPos.x;
+			else
+				destNormalDir.y = transformedPos.y;
+			interpolant = min(distFromOrigin.x, distFromOrigin.y);
+		}
+		else //Both x and y is used
+		{
+			destNormalDir = float3(transformedPos, 0);
+			if (CombineXY[modIndex] == CombineXY_Add)
+				interpolant = distFromOrigin.x + distFromOrigin.y;
+			else if (CombineXY[modIndex] == CombineXY_Length)
+				interpolant = pow(distFromOrigin.x, 2) + pow(distFromOrigin.y, 2);
+		}
 	}
-	else if (CombineXY[modIndex] == CombineXY_Min)
+	else if (XOriginEnable[modIndex])
 	{
-		if (distFromOrigin.x < distFromOrigin.y)
-			destNormalDir.x = transformedPos.x;
-		else
-			destNormalDir.y = transformedPos.y;
-		interpolant = min(distFromOrigin.x, distFromOrigin.y);
+		destNormalDir.x = transformedPos.x;
+		interpolant = distFromOrigin.x;
 	}
-	else //Both x and y is used
-	{   
-		destNormalDir = float3(transformedPos, 0);
-		if (CombineXY[modIndex] == CombineXY_Add)
-			interpolant = distFromOrigin.x + distFromOrigin.y;
-		else if (CombineXY[modIndex] == CombineXY_Length)
-			interpolant = pow(distFromOrigin.x, 2) + pow(distFromOrigin.y, 2);
+	else if (YOriginEnable[modIndex])
+	{
+		destNormalDir.y = transformedPos.y;
+		interpolant = distFromOrigin.y;
 	}
+	else
+		return 0;
+
 
 	destNormalDir = normalize(destNormalDir);
 	//interpolant = distFromOrigin.x;

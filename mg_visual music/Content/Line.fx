@@ -52,6 +52,7 @@ struct VSInput
 	float3 pos : POSITION0;
 	float3 normal : NORMAL0;
 	float3 center : POSITION1;
+	float normStepFromNoteStart : POSITION2;
 	float2 texCoords : TEXCOORD0;
 };
 
@@ -61,6 +62,7 @@ struct VSOutput
 	float3 normal : TEXCOORD1;
 	float3 center : POSITION1;
 	float3 rawPos : POSITION2;
+	float normStepFromNoteStart : POSITION3;
 	float2 texCoords : TEXCOORD0;
 };
 
@@ -70,6 +72,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.center = IN.center;
 
 	OUT.rawPos = IN.pos.xyz;
+	OUT.normStepFromNoteStart = IN.normStepFromNoteStart;
 	//OUT.pos.xy -= 0.5;
 	// Compute the texture coordinate.
 	//OUT.texCoords = OUT.rawPos.xy / TexSize;
@@ -133,9 +136,12 @@ void LightingPS(out float4 color : COLOR0, in VSOutput IN)
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
 	
 	float3 normal = normalize(IN.normal);
-	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f + sqrt(2);
-	float2 normDistFromEdgeVec = float2(normDistFromEdge, normDistFromEdge);
-	color = modulateColor(normDistFromEdgeVec/sqrt(2)/2, color, lightingNormal, IN.rawPos);
+	//float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f + sqrt(2);
+	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f;
+	float2 normPos = float2(IN.normStepFromNoteStart, normDistFromEdge);
+	//color = modulateColor(normDistFromEdgeVec/sqrt(2)/2, color, lightingNormal, IN.rawPos);
+	color = modulateColor(normPos, color, lightingNormal, IN.rawPos);
+	
 	//color = modulateColor(IN.texCoords, color, IN.rawPos);
 	//color = blurEdges(color, distFromCenter);
 }
