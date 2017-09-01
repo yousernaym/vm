@@ -128,10 +128,10 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 	interpolant = pow(interpolant, Power[modIndex]);
 	return interpolant;
 }
-float4 modulateColor(float2 normPos, float4 sourceColor, float3 worldPos)
+float4 modulateColor(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 worldPos)
 {
 	float4 result = sourceColor;
-	float3 normal = float3(0,0,1);
+	float3 destNormal = float3(0,0,0);
 	for (int i = 0; i < ActiveModEntries; i++)
 	{
 		if (ColorDestEnable[i] || AlphaDestEnable[i] || AngleDestEnable[i])
@@ -150,12 +150,17 @@ float4 modulateColor(float2 normPos, float4 sourceColor, float3 worldPos)
 			if (AngleDestEnable[i])
 			{
 				float angle = AngleDest[i] * interpolant; //lerp from 0 to AngleDest
-				float xyLength = sin(angle);
-				normal = float3(destNormalDir.x * xyLength, destNormalDir.y * xyLength, normal.z * cos(angle));
+				float3 perpSourceDest = cross(sourceNormal, destNormalDir);
+				float3 perpSource = normalize(cross(perpSourceDest, sourceNormal));
+				destNormal += cos(angle) * sourceNormal + sin(angle) * perpSource;
+				//float xyLength = sin(angle);
+				//destNormal = float3(destNormalDir.x * xyLength, destNormalDir.y * xyLength, sourceNormal.z * cos(angle));
 			}
 		}
 	}
-	result.rgb = calcLighting(result.rgb, normal, worldPos);
+	if (!any(destNormal))
+		destNormal = sourceNormal;
+	result.rgb = calcLighting(result.rgb, destNormal, worldPos);
 	return result;
 }
 

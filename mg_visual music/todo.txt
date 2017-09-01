@@ -1,6 +1,7 @@
 ﻿- Bump mapping.
 - Add possibility to select notes with non-default camera settings.
 - Fix modulation for line style.
+- Option to invert modulation.
 - Don't add specular lighting on transparent areas.
 - Fix alpha blending.
 - Texture coords (tiled) independent of screen resolution

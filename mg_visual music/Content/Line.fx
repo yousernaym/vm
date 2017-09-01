@@ -119,27 +119,24 @@ void LightingPS(out float4 color : COLOR0, in VSOutput IN)
 			//normal2.x = 0;
 			IN.normal.y = 1;
 		}
-		lightingNormal = lerp(IN.normal, float3(0,0,1), abs(IN.normal.x));
+		lightingNormal = lerp(IN.normal, float3(0, 0, 1), abs(IN.normal.x));
 		//lightingNormal = normal + float3(0,0,1);
 	}
-	else if (Style == 2) //Tube, formerly known as Clamped Tube
-	{
-		lightingNormal = lerp(IN.normal*distSign, float3(0,0,1), height);
-	}
-	else if (Style == 3) //Old Tube
-	{
-		lightingNormal = IN.normal*distSign * normDistFromCenter;
-		lightingNormal.z = height;
-		//lightingNormal = float3(0,0,1);
-	}
+	//else if (Style == 2) //Tube, formerly known as Clamped Tube
+	//{
+	//	lightingNormal = lerp(IN.normal*distSign, float3(0,0,1), height);
+	//}
+	else
+		lightingNormal = float3(0, 0, 1);
 				
 	lightingNormal = normalize(lightingNormal);
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
 	
 	float3 normal = normalize(IN.normal);
-	normDistFromCenter = dot(IN.rawPos - IN.center, normal) / Radius * 0.5f + 0.5f;
-	
-	color = modulateColor(IN.texCoords, color, IN.rawPos);
+	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f + sqrt(2);
+	float2 normDistFromEdgeVec = float2(normDistFromEdge, normDistFromEdge);
+	color = modulateColor(normDistFromEdgeVec/sqrt(2)/2, color, lightingNormal, IN.rawPos);
+	//color = modulateColor(IN.texCoords, color, IN.rawPos);
 	//color = blurEdges(color, distFromCenter);
 }
 

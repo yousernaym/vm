@@ -39,7 +39,7 @@ float4 PS(VSOutput IN) : COLOR0
 {
 	float4 color = IN.color;
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
-	color = modulateColor(IN.normPos, color, IN.worldPos);
+	color = modulateColor(IN.normPos, color, float3(0,0,1), IN.worldPos);
 	
 	return color;
 	//return float4(1, 1, 1, color.r*10);
