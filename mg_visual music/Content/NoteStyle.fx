@@ -53,7 +53,8 @@ float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 	color *= saturate(dot(LightDir, normal)) * DiffuseAmount + AmbientAmount;
 	float3 lightReflection = -reflect(LightDir, normal);
 	float3 viewVec = normalize(CamPos - worldPos);
-	color += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecAmount;
+	if (any(color))
+		color += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecAmount;
 	return color;
 }
 
