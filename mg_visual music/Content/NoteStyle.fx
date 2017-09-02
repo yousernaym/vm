@@ -144,7 +144,7 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 	interpolant = pow(interpolant, Power[modIndex]);
 	return interpolant;
 }
-float4 modulateColor(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 worldPos)
+float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 worldPos)
 {
 	float4 result = sourceColor;
 	float3 destNormal = float3(0,0,0);

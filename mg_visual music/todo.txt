@@ -3,6 +3,7 @@
 - Option to invert modulation.
 - Don't add specular lighting on transparent areas.
 - Fix alpha blending.
+- Modulation antialiasing.
 - Texture coords (tiled) independent of screen resolution
 - Fix update loop
 

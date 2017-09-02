@@ -139,10 +139,10 @@ void LightingPS(out float4 color : COLOR0, in VSOutput IN)
 	//float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f + sqrt(2);
 	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f;
 	float2 normPos = float2(IN.normStepFromNoteStart, normDistFromEdge);
-	//color = modulateColor(normDistFromEdgeVec/sqrt(2)/2, color, lightingNormal, IN.rawPos);
-	color = modulateColor(normPos, color, lightingNormal, IN.rawPos);
+	//color = modulate(normDistFromEdgeVec/sqrt(2)/2, color, lightingNormal, IN.rawPos);
+	color = modulate(normPos, color, lightingNormal, IN.rawPos);
 	
-	//color = modulateColor(IN.texCoords, color, IN.rawPos);
+	//color = modulate(IN.texCoords, color, IN.rawPos);
 	//color = blurEdges(color, distFromCenter);
 }
 
