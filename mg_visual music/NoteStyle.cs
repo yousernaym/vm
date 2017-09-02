@@ -78,6 +78,7 @@ namespace Visual_Music
 		public float FadeOut { get; set; }
 		public float Power { get; set; } = 1;
 		public bool DiscardAfterStop { get; set; } = true;
+		public bool Invert { get; set; }
 
 		public NoteStyleMod(string _name = "")
 		{
@@ -118,6 +119,8 @@ namespace Visual_Music
 					Power = (float)entry.Value;
 				else if (entry.Name == "discardAfterStop")
 					DiscardAfterStop = (bool)entry.Value;
+				else if (entry.Name == "invert")
+					Invert = (bool)entry.Value;
 			}
 		}
 
@@ -138,6 +141,7 @@ namespace Visual_Music
 			info.AddValue("fadeOut", FadeOut);
 			info.AddValue("power", Power);
 			info.AddValue("discardAfterStop", DiscardAfterStop);
+			info.AddValue("invert", Invert);
 		}
 
 		public NoteStyleMod clone()
@@ -335,6 +339,7 @@ namespace Visual_Music
 				fx.Parameters["FadeOut"].Elements[i].SetValue(ModEntries[i].FadeOut);
 				fx.Parameters["Power"].Elements[i].SetValue(ModEntries[i].Power);
 				fx.Parameters["DiscardAfterStop"].Elements[i].SetValue(ModEntries[i].DiscardAfterStop);
+				fx.Parameters["Invert"].Elements[i].SetValue(ModEntries[i].Invert);
 			}
 
 			//Material

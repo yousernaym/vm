@@ -1,12 +1,12 @@
 ﻿- Bump mapping.
 - Add possibility to select notes with non-default camera settings.
-- Option to invert modulation.
 - Fix alpha blending.
 - Modulation antialiasing.
 - Texture coords (tiled) independent of screen resolution
 - Fix update loop
 
 Done:
+- Option to invert modulation.
 - Don't add specular lighting on transparent areas.
 - Fix modulation for line style.
 - Correct specular lighting when camera moves.

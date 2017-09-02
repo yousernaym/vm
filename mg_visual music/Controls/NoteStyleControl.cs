@@ -64,6 +64,7 @@ namespace Visual_Music
 				fadeOutUd.Value = (decimal)modEntry.FadeOut;
 				powerUd.Value = (decimal)modEntry.Power;
 				discardStopCb.Checked = modEntry.DiscardAfterStop;
+				invertCb.Checked = modEntry.Invert;
 			}
 		}
 
@@ -125,6 +126,27 @@ namespace Visual_Music
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.YOrigin = (float)yOriginUd.Value;
 		}
+
+		private void xOriginCb_CheckedChanged(object sender, EventArgs e)
+		{
+			if (UpdatingControls)
+				return;
+			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
+			xOriginUd.Enabled = xOriginCb.Checked;
+			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.XOriginEnable = xOriginCb.Checked;
+		}
+
+		private void yOriginCb_CheckedChanged(object sender, EventArgs e)
+		{
+			if (UpdatingControls)
+				return;
+			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
+			yOriginUd.Enabled = yOriginCb.Checked;
+			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.YOriginEnable = yOriginCb.Checked;
+		}
+
 
 		private void combineXYCombo_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -215,25 +237,13 @@ namespace Visual_Music
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.DiscardAfterStop = discardStopCb.Checked;
 		}
-
-		private void xOriginCb_CheckedChanged(object sender, EventArgs e)
+		
+		private void invertCb_CheckedChanged(object sender, EventArgs e)
 		{
 			if (UpdatingControls)
 				return;
-			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
-			xOriginUd.Enabled = xOriginCb.Checked;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.XOriginEnable = xOriginCb.Checked;
-		}
-
-		private void yOriginCb_CheckedChanged(object sender, EventArgs e)
-		{
-			if (UpdatingControls)
-				return;
-			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
-			yOriginUd.Enabled = yOriginCb.Checked;
-			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.YOriginEnable = yOriginCb.Checked;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.Invert = invertCb.Checked;
 		}
 	}
 }

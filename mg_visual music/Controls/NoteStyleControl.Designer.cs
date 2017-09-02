@@ -50,6 +50,8 @@
 			this.startUd = new System.Windows.Forms.NumericUpDown();
 			this.fadeInUd = new System.Windows.Forms.NumericUpDown();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.yOriginCb = new System.Windows.Forms.CheckBox();
+			this.xOriginCb = new System.Windows.Forms.CheckBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.yOriginUd = new System.Windows.Forms.NumericUpDown();
 			this.xOriginUd = new System.Windows.Forms.NumericUpDown();
@@ -61,8 +63,7 @@
 			this.powerUd = new System.Windows.Forms.NumericUpDown();
 			this.label2 = new System.Windows.Forms.Label();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-			this.xOriginCb = new System.Windows.Forms.CheckBox();
-			this.yOriginCb = new System.Windows.Forms.CheckBox();
+			this.invertCb = new System.Windows.Forms.CheckBox();
 			this.modEntryCm.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.modEntryBs)).BeginInit();
 			this.modGbox.SuspendLayout();
@@ -134,7 +135,7 @@
 			this.modGbox.Controls.Add(this.modEntryCombo);
 			this.modGbox.Location = new System.Drawing.Point(0, 0);
 			this.modGbox.Name = "modGbox";
-			this.modGbox.Size = new System.Drawing.Size(177, 433);
+			this.modGbox.Size = new System.Drawing.Size(177, 456);
 			this.modGbox.TabIndex = 43;
 			this.modGbox.TabStop = false;
 			this.modGbox.Text = "Modulation";
@@ -142,6 +143,7 @@
 			// modEntryPanel
 			// 
 			this.modEntryPanel.AutoSize = true;
+			this.modEntryPanel.Controls.Add(this.invertCb);
 			this.modEntryPanel.Controls.Add(this.discardStopCb);
 			this.modEntryPanel.Controls.Add(this.label1);
 			this.modEntryPanel.Controls.Add(this.label19);
@@ -157,7 +159,7 @@
 			this.modEntryPanel.Controls.Add(this.label2);
 			this.modEntryPanel.Location = new System.Drawing.Point(3, 46);
 			this.modEntryPanel.Name = "modEntryPanel";
-			this.modEntryPanel.Size = new System.Drawing.Size(168, 368);
+			this.modEntryPanel.Size = new System.Drawing.Size(168, 391);
 			this.modEntryPanel.TabIndex = 42;
 			// 
 			// discardStopCb
@@ -316,6 +318,28 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Pixel position";
 			// 
+			// yOriginCb
+			// 
+			this.yOriginCb.AutoSize = true;
+			this.yOriginCb.Location = new System.Drawing.Point(105, 46);
+			this.yOriginCb.Name = "yOriginCb";
+			this.yOriginCb.Size = new System.Drawing.Size(33, 17);
+			this.yOriginCb.TabIndex = 42;
+			this.yOriginCb.Text = "Y";
+			this.yOriginCb.UseVisualStyleBackColor = true;
+			this.yOriginCb.CheckedChanged += new System.EventHandler(this.yOriginCb_CheckedChanged);
+			// 
+			// xOriginCb
+			// 
+			this.xOriginCb.AutoSize = true;
+			this.xOriginCb.Location = new System.Drawing.Point(56, 46);
+			this.xOriginCb.Name = "xOriginCb";
+			this.xOriginCb.Size = new System.Drawing.Size(33, 17);
+			this.xOriginCb.TabIndex = 42;
+			this.xOriginCb.Text = "X";
+			this.xOriginCb.UseVisualStyleBackColor = true;
+			this.xOriginCb.CheckedChanged += new System.EventHandler(this.xOriginCb_CheckedChanged);
+			// 
 			// label8
 			// 
 			this.label8.AutoSize = true;
@@ -470,27 +494,16 @@
 			this.label2.TabIndex = 28;
 			this.label2.Text = "Stop";
 			// 
-			// xOriginCb
+			// invertCb
 			// 
-			this.xOriginCb.AutoSize = true;
-			this.xOriginCb.Location = new System.Drawing.Point(56, 46);
-			this.xOriginCb.Name = "xOriginCb";
-			this.xOriginCb.Size = new System.Drawing.Size(33, 17);
-			this.xOriginCb.TabIndex = 42;
-			this.xOriginCb.Text = "X";
-			this.xOriginCb.UseVisualStyleBackColor = true;
-			this.xOriginCb.CheckedChanged += new System.EventHandler(this.xOriginCb_CheckedChanged);
-			// 
-			// yOriginCb
-			// 
-			this.yOriginCb.AutoSize = true;
-			this.yOriginCb.Location = new System.Drawing.Point(105, 46);
-			this.yOriginCb.Name = "yOriginCb";
-			this.yOriginCb.Size = new System.Drawing.Size(33, 17);
-			this.yOriginCb.TabIndex = 42;
-			this.yOriginCb.Text = "Y";
-			this.yOriginCb.UseVisualStyleBackColor = true;
-			this.yOriginCb.CheckedChanged += new System.EventHandler(this.yOriginCb_CheckedChanged);
+			this.invertCb.AutoSize = true;
+			this.invertCb.Location = new System.Drawing.Point(10, 371);
+			this.invertCb.Name = "invertCb";
+			this.invertCb.Size = new System.Drawing.Size(53, 17);
+			this.invertCb.TabIndex = 44;
+			this.invertCb.Text = "Invert";
+			this.invertCb.UseVisualStyleBackColor = true;
+			this.invertCb.CheckedChanged += new System.EventHandler(this.invertCb_CheckedChanged);
 			// 
 			// NoteStyleControl
 			// 
@@ -500,7 +513,7 @@
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.Controls.Add(this.modGbox);
 			this.Name = "NoteStyleControl";
-			this.Size = new System.Drawing.Size(180, 436);
+			this.Size = new System.Drawing.Size(180, 459);
 			this.modEntryCm.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.modEntryBs)).EndInit();
 			this.modGbox.ResumeLayout(false);
@@ -559,5 +572,6 @@
 		protected System.Windows.Forms.GroupBox modGbox;
 		private System.Windows.Forms.CheckBox yOriginCb;
 		private System.Windows.Forms.CheckBox xOriginCb;
+		private System.Windows.Forms.CheckBox invertCb;
 	}
 }

@@ -36,6 +36,7 @@ float FadeIn[ModEntriesCount];
 float FadeOut[ModEntriesCount];
 float Power[ModEntriesCount];
 bool DiscardAfterStop[ModEntriesCount];
+bool Invert[ModEntriesCount];
 
 //bool bla[4][3];
 int ActiveModEntries;
@@ -116,10 +117,11 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 
 	destNormalDir = normalize(destNormalDir);
 		
+	//Outside Start - Stop?
 	if (interpolant < Start[modIndex])
-		return 0;
+		return  Invert[modIndex] && DiscardAfterStop[modIndex] ? -1 : 0;
 	if (interpolant > Stop[modIndex])
-		return DiscardAfterStop[modIndex] ? -1 : 0;
+		return !Invert[modIndex] && DiscardAfterStop[modIndex] ? -1 : 0;
 			
 	interpolant -= Start[modIndex];
 	interpolant /= Stop[modIndex] - Start[modIndex];
@@ -153,11 +155,13 @@ float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 
 		{
 			float3 destNormalDir;
 			float interpolant = getInterpolant(normPos, i, destNormalDir);
-			if (interpolant < 0)
+			if (interpolant == -1) //Discard after stop
 			{
 				result.rgb = 0;
 				continue;
 			}
+			if (Invert[i])
+				interpolant = 1 - interpolant;
 			if (ColorDestEnable[i])
 				result.rgb = lerp(result.rgb, ColorDest[i].rgb, interpolant);
 			if (AlphaDestEnable[i])
