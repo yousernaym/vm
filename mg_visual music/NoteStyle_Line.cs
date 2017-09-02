@@ -300,11 +300,12 @@ namespace Visual_Music
 					lineVerts[vertIndex].pos = center - vertexOffset;
 					lineVerts[vertIndex + 1].pos = center + vertexOffset;
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
-					lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = (x - startDraw) / (nextNoteStart.X - noteStart.X);
+					float normStepFromNoteStart = (x - startDraw) / (nextNoteStart.X - noteStart.X);
+					lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = normStepFromNoteStart;
 					//Vector2 ns = songDrawProps.getScreenPosF(note.start, note.pitch);
 					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
 					if (texTrackProps.TexProps.Texture != null)
-						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, lineVerts[vertIndex].normStepFromNoteStart, songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
+						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, songDrawProps, lineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
 					if (Style == LineStyleEnum.Ribbon)
 					{
@@ -328,6 +329,7 @@ namespace Visual_Music
 					//break;
 					skippedPoints--;
 				}
+				endOfSegment = true; //One draw call per note to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
 				skippedPoints += (int)(endDraw - startDraw + 1);
 				if (endOfSegment || vertIndex > NumDynamicVerts - 10000)
 					drawLineSegment(ref vertIndex, ref hLineVertIndex);
