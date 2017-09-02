@@ -25,7 +25,7 @@ namespace Visual_Music
 		int TrackTexPbHeight;
 		int MaxTrackTexPbWidth;
 		
-		EventHandler eh_invalidateSongPanel;
+		//EventHandler eh_invalidateSongPanel;
 		public string ProjectFolder
         { get => openProjDialog.InitialDirectory;
           set => openProjDialog.InitialDirectory = saveProjDialog.InitialDirectory = value; 
@@ -73,7 +73,7 @@ namespace Visual_Music
 			startupArgs = args;
 			TrackTexPbHeight = trackTexPb.Height;
 			MaxTrackTexPbWidth = trackTexPb.Width;
-			eh_invalidateSongPanel = new EventHandler(invalidateSongPanel);
+			//eh_invalidateSongPanel = new EventHandler(invalidateSongPanel);
 			trackListGfxObj = trackList.CreateGraphics();
 			SetStyle(ControlStyles.OptimizedDoubleBuffer |
 			ControlStyles.UserPaint |
@@ -180,6 +180,8 @@ namespace Visual_Music
 					((Button)control).Click += invalidateSongPanel;
 				else if (control is RadioButton)
 					((RadioButton)control).CheckedChanged += invalidateSongPanel;
+				else if (control is ComboBox)
+					((ComboBox)control).SelectedValueChanged += invalidateSongPanel;
 				
 				if (control.Controls.Count > 0)
 					addInvalidateEH(control.Controls);
@@ -802,7 +804,7 @@ namespace Visual_Music
 			
 			if (updatingControls)
 				return;
-			songPanel.Invalidate();
+			//songPanel.Invalidate();
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 			{
                 NoteStyleEnum type = (NoteStyleEnum)Enum.Parse(typeof(NoteStyleEnum), (string)styleList.SelectedItem);

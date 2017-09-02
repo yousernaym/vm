@@ -42,7 +42,7 @@ namespace Visual_Music
 		{
 			if (UpdatingControls)
 				return;
-			SongPanel.Invalidate();
+			//SongPanel.Invalidate();
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().Style = (LineStyleEnum)lineStyleList.SelectedIndex;
 		}
@@ -67,7 +67,7 @@ namespace Visual_Music
 		{
 			if (UpdatingControls)
 				return;
-			SongPanel.Invalidate();
+			//SongPanel.Invalidate();
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().HlStyle = (LineHlStyleEnum)lineHlStyleList.SelectedIndex;
 		}
