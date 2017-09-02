@@ -44,6 +44,7 @@
 			this.qnGapFillUd = new System.Windows.Forms.NumericUpDown();
 			this.label12 = new System.Windows.Forms.Label();
 			this.lineControlsPanel = new System.Windows.Forms.Panel();
+			this.continuousCb = new System.Windows.Forms.CheckBox();
 			this.groupBox3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.hlSizeUpDown)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lineWidthUd)).BeginInit();
@@ -53,7 +54,7 @@
 			// 
 			// modGbox
 			// 
-			this.modGbox.Location = new System.Drawing.Point(0, 242);
+			this.modGbox.Location = new System.Drawing.Point(0, 292);
 			this.modGbox.Margin = new System.Windows.Forms.Padding(2);
 			this.modGbox.Padding = new System.Windows.Forms.Padding(2);
 			this.modGbox.Size = new System.Drawing.Size(177, 41);
@@ -67,7 +68,7 @@
 			this.groupBox3.Controls.Add(this.label29);
 			this.groupBox3.Controls.Add(this.hlSizeUpDown);
 			this.groupBox3.Controls.Add(this.label27);
-			this.groupBox3.Location = new System.Drawing.Point(0, 91);
+			this.groupBox3.Location = new System.Drawing.Point(0, 131);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(177, 139);
 			this.groupBox3.TabIndex = 48;
@@ -148,7 +149,7 @@
 			// label14
 			// 
 			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(128, 61);
+			this.label14.Location = new System.Drawing.Point(129, 61);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(42, 13);
 			this.label14.TabIndex = 51;
@@ -200,7 +201,7 @@
 			// qnGapFillUd
 			// 
 			this.qnGapFillUd.DecimalPlaces = 1;
-			this.qnGapFillUd.Location = new System.Drawing.Point(63, 59);
+			this.qnGapFillUd.Location = new System.Drawing.Point(64, 59);
 			this.qnGapFillUd.Name = "qnGapFillUd";
 			this.qnGapFillUd.Size = new System.Drawing.Size(59, 20);
 			this.qnGapFillUd.TabIndex = 45;
@@ -209,7 +210,7 @@
 			// label12
 			// 
 			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(0, 61);
+			this.label12.Location = new System.Drawing.Point(1, 61);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(57, 13);
 			this.label12.TabIndex = 50;
@@ -217,6 +218,9 @@
 			// 
 			// lineControlsPanel
 			// 
+			this.lineControlsPanel.AutoSize = true;
+			this.lineControlsPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.lineControlsPanel.Controls.Add(this.continuousCb);
 			this.lineControlsPanel.Controls.Add(this.label17);
 			this.lineControlsPanel.Controls.Add(this.groupBox3);
 			this.lineControlsPanel.Controls.Add(this.label12);
@@ -227,8 +231,19 @@
 			this.lineControlsPanel.Controls.Add(this.lineStyleList);
 			this.lineControlsPanel.Location = new System.Drawing.Point(0, 0);
 			this.lineControlsPanel.Name = "lineControlsPanel";
-			this.lineControlsPanel.Size = new System.Drawing.Size(177, 234);
+			this.lineControlsPanel.Size = new System.Drawing.Size(180, 273);
 			this.lineControlsPanel.TabIndex = 53;
+			// 
+			// continuousCb
+			// 
+			this.continuousCb.AutoSize = true;
+			this.continuousCb.Location = new System.Drawing.Point(6, 94);
+			this.continuousCb.Name = "continuousCb";
+			this.continuousCb.Size = new System.Drawing.Size(79, 17);
+			this.continuousCb.TabIndex = 52;
+			this.continuousCb.Text = "Continuous";
+			this.continuousCb.UseVisualStyleBackColor = true;
+			this.continuousCb.CheckedChanged += new System.EventHandler(this.continuousCb_CheckedChanged);
 			// 
 			// LineStyleControl
 			// 
@@ -236,7 +251,7 @@
 			this.Controls.Add(this.lineControlsPanel);
 			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "LineStyleControl";
-			this.Size = new System.Drawing.Size(180, 285);
+			this.Size = new System.Drawing.Size(183, 335);
 			this.Controls.SetChildIndex(this.modGbox, 0);
 			this.Controls.SetChildIndex(this.lineControlsPanel, 0);
 			this.groupBox3.ResumeLayout(false);
@@ -247,6 +262,7 @@
 			this.lineControlsPanel.ResumeLayout(false);
 			this.lineControlsPanel.PerformLayout();
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -268,5 +284,6 @@
 		private System.Windows.Forms.NumericUpDown qnGapFillUd;
 		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.Panel lineControlsPanel;
+		private System.Windows.Forms.CheckBox continuousCb;
 	}
 }

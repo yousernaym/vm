@@ -50,8 +50,9 @@ namespace Visual_Music
 		//protected static LineVertex[] arrowAreaVerts = new LineVertex[3];
 		//protected static LineVertex[] arrowBorderVerts = new LineVertex[3];
 		protected static LineVertex[] lineHlVerts = new LineVertex[4];
-		public float Qn_gapThreshold { get; set; } = 5;
 		public int LineWidth = 5;
+		public float Qn_gapThreshold { get; set; } = 5;
+		public bool Continuous { get; set; } = true;
 		public float FadeOut = 1;
 		public int BlurredEdge = 2;
 		public float ShapePower = 1;
@@ -329,7 +330,8 @@ namespace Visual_Music
 					//break;
 					skippedPoints--;
 				}
-				endOfSegment = true; //One draw call per note to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
+				if (!Continuous)
+					endOfSegment = true; //One draw call per note. Can be used to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
 				skippedPoints += (int)(endDraw - startDraw + 1);
 				if (endOfSegment || vertIndex > NumDynamicVerts - 10000)
 					drawLineSegment(ref vertIndex, ref hLineVertIndex);

@@ -218,6 +218,8 @@ namespace Visual_Music
 
 		private void xOriginCb_CheckedChanged(object sender, EventArgs e)
 		{
+			if (UpdatingControls)
+				return;
 			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
 			xOriginUd.Enabled = xOriginCb.Checked;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
@@ -226,6 +228,8 @@ namespace Visual_Music
 
 		private void yOriginCb_CheckedChanged(object sender, EventArgs e)
 		{
+			if (UpdatingControls)
+				return;
 			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
 			yOriginUd.Enabled = yOriginCb.Checked;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)

@@ -28,6 +28,7 @@ namespace Visual_Music
 			lineStyleList.SelectedIndex = (int)noteStyle_Line.Style;
 			lineWidthUd.Value = noteStyle_Line.LineWidth;
 			qnGapFillUd.Value = (decimal)noteStyle_Line.Qn_gapThreshold;
+			continuousCb.Checked = noteStyle_Line.Continuous;
 			lineHlStyleList.SelectedIndex = (int)noteStyle_Line.HlStyle;
 			hlSizeUpDown.Value = noteStyle_Line.HlSize;
 			movingHlCb.Checked = noteStyle_Line.MovingHl;
@@ -110,6 +111,14 @@ namespace Visual_Music
 		private void LineStyleControl_Load(object sender, EventArgs e)
 		{
 
+		}
+
+		private void continuousCb_CheckedChanged(object sender, EventArgs e)
+		{
+			if (UpdatingControls)
+				return;
+			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().Continuous = ((CheckBox)sender).Checked;
 		}
 	}
 }
