@@ -156,34 +156,33 @@ namespace Visual_Music
 			{
 				if (entry.Name == "transp")
 					transp = (float)entry.Value;
-				if (entry.Name == "hue")
+				else if (entry.Name == "hue")
 					hue = (float)entry.Value;
-				if (entry.Name == "normal")
+				else if (entry.Name == "normal")
 					normal = (NoteTypeMaterial)entry.Value;
-				if (entry.Name == "hilited")
+				else if (entry.Name == "hilited")
 					hilited = (NoteTypeMaterial)entry.Value;
-				if (entry.Name == "texProps")
+				else if (entry.Name == "texProps")
 					texProps = (TrackPropsTex)entry.Value;
-				if (entry.Name == "hmapProps")
+				else if (entry.Name == "hmapProps")
 					hmapProps = (TrackPropsTex)entry.Value;
-				if (entry.Name == "noteStyles")
+				else if (entry.Name == "noteStyles")
 					noteStyles = (NoteStyle[])entry.Value;
-				if (entry.Name == "noteStyleType")
+				else if (entry.Name == "noteStyleType")
 					NoteStyleType = (NoteStyleEnum)entry.Value;
-				if (entry.Name == "lightDir")
+				else if (entry.Name == "lightDir")
 					LightDir = (Vector3)entry.Value;
-				if (entry.Name == "ambientAmount")
+				else if (entry.Name == "ambientAmount")
 					AmbientAmount = (float)entry.Value;
-				if (entry.Name == "diffuseAmount")
+				else if (entry.Name == "diffuseAmount")
 					DiffuseAmount = (float)entry.Value;
-				if (entry.Name == "specAmount")
+				else if (entry.Name == "specAmount")
 					specAmount = (float)entry.Value;
-				if (entry.Name == "specPower")
+				else if (entry.Name == "specPower")
 					specPower = (float)entry.Value;
-				//specFov = (float)info.GetValue("specFov", typeof(float));
-				if (entry.Name == "useGlobalLight")
+				else if (entry.Name == "useGlobalLight")
 					useGlobalLight = (bool)entry.Value;
-				if (entry.Name == "posOffset")
+				else if (entry.Name == "posOffset")
 					PosOffset = (Vector3)entry.Value;
 			}
 			

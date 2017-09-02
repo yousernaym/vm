@@ -1250,14 +1250,6 @@ namespace Visual_Music
 				getActiveTexProps(i).VScroll = (float)((NumericUpDown)sender).Value;
 		}
 
-		private void shapePowerUD_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().ShapePower = (float)((NumericUpDown)sender).Value;
-		}
-
 		private void texKeepAspect_CheckedChanged(object sender, EventArgs e)
 		{
 			if (updatingControls)

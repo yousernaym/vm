@@ -53,9 +53,6 @@ namespace Visual_Music
 		public int LineWidth = 5;
 		public float Qn_gapThreshold { get; set; } = 5;
 		public bool Continuous { get; set; } = true;
-		public float FadeOut = 1;
-		public int BlurredEdge = 2;
-		public float ShapePower = 1;
 		public LineStyleEnum Style = LineStyleEnum.Simple;
 		public LineHlStyleEnum HlStyle = LineHlStyleEnum.Arrow;
 		public int HlSize = 25;
@@ -75,26 +72,34 @@ namespace Visual_Music
 		public NoteStyle_Line(SerializationInfo info, StreamingContext ctxt)
 			: base(info, ctxt)
 		{
-			Qn_gapThreshold = (float)info.GetValue("qn_gapThreshold", typeof(float));
-			LineWidth = (int)info.GetValue("lineWidth", typeof(int));
-			FadeOut = (float)info.GetValue("fadeOutFromCenter", typeof(float));
-			ShapePower = (float)info.GetValue("shapePower", typeof(float));
-			BlurredEdge = (int)info.GetValue("blurredEdge", typeof(int));
-			Style = (LineStyleEnum)info.GetValue("style", typeof(LineStyleEnum));
-			HlStyle = (LineHlStyleEnum)info.GetValue("hlStyle", typeof(LineHlStyleEnum));
-			HlSize = (int)info.GetValue("hlSize", typeof(int));
-			MovingHl = (bool)info.GetValue("movingHl", typeof(bool));
-			ShrinkingHl = (bool)info.GetValue("shrinkingHl", typeof(bool));
-			HlBorder = (bool)info.GetValue("hlBorder", typeof(bool));
+			foreach (var entry in info)
+			{
+				if (entry.Name == "lineWidth")
+					LineWidth = (int)entry.Value;
+				else if (entry.Name == "qn_gapThreshold")
+					Qn_gapThreshold = (float)entry.Value;
+				else if (entry.Name == "continuous")
+					Continuous = (bool)entry.Value;
+				else if(entry.Name == "style")
+					Style = (LineStyleEnum)entry.Value;
+				else if (entry.Name == "hlStyle")
+					HlStyle = (LineHlStyleEnum)entry.Value;
+				else if (entry.Name == "hlSize")
+					HlSize = (int)entry.Value;
+				else if (entry.Name == "movingHl")
+					MovingHl = (bool)entry.Value;
+				else if (entry.Name == "shrinkingHl")
+					ShrinkingHl = (bool)entry.Value;
+				else if (entry.Name == "hlBorder")
+					HlBorder = (bool)entry.Value;
+			}
 		}
 		override public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
 			base.GetObjectData(info, ctxt);
-			info.AddValue("qn_gapThreshold", Qn_gapThreshold);
 			info.AddValue("lineWidth", LineWidth);
-			info.AddValue("fadeOutFromCenter", FadeOut);
-			info.AddValue("shapePower", ShapePower);
-			info.AddValue("blurredEdge", BlurredEdge);
+			info.AddValue("qn_gapThreshold", Qn_gapThreshold);
+			info.AddValue("continuous", Continuous);
 			info.AddValue("style", Style);
 			info.AddValue("hlStyle", HlStyle);
 			info.AddValue("hlSize", HlSize);
@@ -191,7 +196,7 @@ namespace Visual_Music
 				}
 
 				#region Fill vertBuf with highlight vertices
-				//Fill verrtbuf with highlight vertices
+				//Fill vertbuf with highlight vertices
 				int vpCenterX = 0; // songDrawProps.viewportSize.X/2;
 				if (noteStart.X < vpCenterX && noteEnd > vpCenterX)
 				{
@@ -293,6 +298,8 @@ namespace Visual_Music
 				for (float x = startDraw; x < endDraw; x += step)
 				{
 					//Vector2 scale = new Vector2(lineWidth / texture.Width, (float)curLineWidth / texture.Height);
+					
+					
 					Vector3 center, normal, vertexOffset;
 					getCurvePoint(out center, out normal, out vertexOffset, lineWidth, x, songDrawProps, trackProps);
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
@@ -323,6 +330,11 @@ namespace Visual_Music
 						}
 					}
 
+					if (x == startDraw && vertIndex > 3)
+					{
+						lineVerts[vertIndex].pos = lineVerts[vertIndex - 2].pos;
+						lineVerts[vertIndex + 1].pos = lineVerts[vertIndex - 1].pos;
+					}
 					vertIndex += 2;
 					totalVerts += 2;
 
@@ -330,6 +342,7 @@ namespace Visual_Music
 					//break;
 					skippedPoints--;
 				}
+
 				if (!Continuous)
 					endOfSegment = true; //One draw call per note. Can be used to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
 				skippedPoints += (int)(endDraw - startDraw + 1);
@@ -637,20 +650,11 @@ namespace Visual_Music
 
 			//this.trackProps = trackProps;
 
-			float fadeout = 0;
-			if (FadeOut > 0)
-				fadeout = LineWidth / (2.0f * FadeOut);
-			fx.Parameters["FadeoutFromCenter"].SetValue(fadeout);
-			fx.Parameters["ShapePower"].SetValue(ShapePower);
-			fx.Parameters["BlurredEdge"].SetValue((float)BlurredEdge);
 			fx.Parameters["Style"].SetValue((int)Style);
 			fx.Parameters["HlSize"].SetValue((float)HlSize / 2.0f);
-			//lineFx.Parameters["TexAnchor"].SetValue(new int[]{(int)trackProps.TexUAnchor, (int)trackProps.TexVAnchor});
-
+			
 			songPanel.GraphicsDevice.BlendState = songPanel.BlendState;
 			float radius = LineWidth / 2.0f;
-			//if (radius < 0.5f)
-			//radius = 0.5f;
 			fx.Parameters["Radius"].SetValue(radius);
 			Color color;
 			Texture2D texture;
@@ -724,10 +728,7 @@ namespace Visual_Music
 			{
 				if (numVerts > 5 || numHLineVerts > 1)
 				{
-					if (Style == LineStyleEnum.Simple)
-						fx.CurrentTechnique = fx.Techniques["Simple"];
-					else
-						fx.CurrentTechnique = fx.Techniques["Lighting"];
+					fx.CurrentTechnique = fx.Techniques["Line"];
 					fx.CurrentTechnique.Passes[0].Apply();
 					if (numHLineVerts > 1)
 						songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);

@@ -208,7 +208,7 @@ namespace Visual_Music
 			{
 				if (entry.Name == "styleType")
 					styleType = (NoteStyleEnum)entry.Value;
-				if (entry.Name == "modEntries")
+				else if (entry.Name == "modEntries")
 				{
 					ModEntries = (List<NoteStyleMod>)entry.Value;
 					if (ModEntries != null && ModEntries.Count > 0)

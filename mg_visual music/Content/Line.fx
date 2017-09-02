@@ -3,8 +3,6 @@
 // Input parameters
 
 float Radius;
-float FadeoutFromCenter;
-float ShapePower;
 int Style;
 float3 WorldPos;
 float HlSize;
@@ -87,30 +85,11 @@ void VS(in VSInput IN, out VSOutput OUT)
 	//OUT.pos.xy -= float2(1, -1);
 }
 
-
-// Pixel shader for rendering sprites (shared between Windows and Xbox).
-void SimplePS(out float4 color : COLOR0, in VSOutput IN)
-{
-	//color = float4(IN.normal,1);
-
-	//return;
-	float3 tPos; float distFromCenter; float distSign; float height; float normDistFromCenter;
-	initPixel(color, IN.normal, tPos, distFromCenter, distSign, height, normDistFromCenter, IN.texCoords, IN.rawPos, IN.center, ShapePower, FadeoutFromCenter);
-		
-	color.rgb *= height;
-	color.rgb *= tex2D(TextureSampler, IN.texCoords);
-	color = blurEdges(color, distFromCenter);
-	//color.z = tPos.x;
-	//color = float4(IN.normal.x, IN.rawPos.x, 1, 1);
-	//color = float4(0, tPos.y*0.1, 0, 1);
-	//color = float4(1, 1, 1, 1);
-}
-
-void LightingPS(out float4 color : COLOR0, in VSOutput IN)
+void PS(out float4 color : COLOR0, in VSOutput IN)
 {
 	float3 tPos; float distFromCenter; float distSign; float height; float normDistFromCenter;
-	initPixel(color, IN.normal, tPos, distFromCenter, distSign, height, normDistFromCenter, IN.texCoords, IN.rawPos, IN.center, ShapePower, FadeoutFromCenter);
-
+	//initPixel(color, IN.normal, tPos, distFromCenter, distSign, height, normDistFromCenter, IN.texCoords, IN.rawPos, IN.center, ShapePower, FadeoutFromCenter);
+	color = float4(Color.rgb, 1);
 	float3 lightingNormal;
 	
 	if (Style == 1) //Ribbon
@@ -118,32 +97,20 @@ void LightingPS(out float4 color : COLOR0, in VSOutput IN)
 		if (IN.normal.x > 0)
 			IN.normal *= -1;
 		if (abs(IN.normal.x) < 0.000001f)
-		{
-			//normal2.x = 0;
 			IN.normal.y = 1;
-		}
 		lightingNormal = lerp(IN.normal, float3(0, 0, 1), abs(IN.normal.x));
-		//lightingNormal = normal + float3(0,0,1);
 	}
-	//else if (Style == 2) //Tube, formerly known as Clamped Tube
-	//{
-	//	lightingNormal = lerp(IN.normal*distSign, float3(0,0,1), height);
-	//}
 	else
 		lightingNormal = float3(0, 0, 1);
 				
 	lightingNormal = normalize(lightingNormal);
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
-	
+		
 	float3 normal = normalize(IN.normal);
-	//float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f + sqrt(2);
+	tPos = IN.rawPos - IN.center;
 	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f;
 	float2 normPos = float2(IN.normStepFromNoteStart, normDistFromEdge);
-	//color = modulate(normDistFromEdgeVec/sqrt(2)/2, color, lightingNormal, IN.rawPos);
 	color = modulate(normPos, color, lightingNormal, IN.rawPos);
-	
-	//color = modulate(IN.texCoords, color, IN.rawPos);
-	//color = blurEdges(color, distFromCenter);
 }
 
 float ClipPercent;
@@ -268,23 +235,13 @@ float4 shadeHlObject(float sgnDistFromEdge, float distFromCenter)
 	return color;
 }
 
-technique Simple
+technique Line
 {
 	pass
 	{
 		CullMode = None;
 		VertexShader = compile vs_5_0 VS();
-		PixelShader  = compile ps_5_0 SimplePS();
-	}
-}
-
-technique Lighting
-{
-	pass
-	{
-		CullMode = None;
-		VertexShader = compile vs_5_0 VS();
-		PixelShader  = compile ps_5_0 LightingPS();
+		PixelShader  = compile ps_5_0 PS();
 	}
 }
 

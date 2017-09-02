@@ -114,10 +114,8 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 	else
 		return 0;
 
-
 	destNormalDir = normalize(destNormalDir);
-	//interpolant = distFromOrigin.x;
-	
+		
 	if (interpolant < Start[modIndex])
 		return 0;
 	if (interpolant > Stop[modIndex])
@@ -142,7 +140,7 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 		fadeOutInterpolant = 1;
 	interpolant = fadeOutInterpolant * fadeInInterpolant;
 	
-	interpolant = pow(interpolant, Power[modIndex]);
+	interpolant = pow(saturate(interpolant), Power[modIndex]);
 	return interpolant;
 }
 float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 worldPos)
