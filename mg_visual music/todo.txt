@@ -1,6 +1,6 @@
 ﻿- Bump mapping.
 - Add possibility to select notes with non-default camera settings.
-- Fix alpha blending.
+- (Fix alpha blending.) Fix line vertices at turns.
 - Modulation antialiasing.
 - Texture coords (tiled) independent of screen resolution
 - Fix update loop

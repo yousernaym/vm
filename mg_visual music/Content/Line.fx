@@ -77,6 +77,7 @@ void PS(out float4 color : COLOR0, in VSOutput IN)
 	//color = float4(Color.rgb, 1);
 	color = Color;
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
+	//color.a *= (Color.r + Color.g + Color.b) / 3;
 		
 	float3 normal = normalize(IN.normal);
 	float3 tPos = IN.rawPos - IN.center;

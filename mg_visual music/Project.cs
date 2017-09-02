@@ -374,9 +374,9 @@ namespace Visual_Music
 		public int getPitch(float normPosY)
 		{
 			normPosY = 1 - normPosY;
-			int height = 1 - (int)(normPitchMargin * 2);
-			float noteHeight = (float)height / Notes.NumPitches;
-			int pos = (int)((normPosY - normPitchMargin));
+			float height = 1 - normPitchMargin * 2;
+			float noteHeight = height / Notes.NumPitches;
+			float pos = normPosY - normPitchMargin;
 			return MinPitch + (int)(pos / noteHeight);
 		}
 		public TrackProps mergeTrackProps(ListView.SelectedIndexCollection listIndices)

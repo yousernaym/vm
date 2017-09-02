@@ -172,6 +172,7 @@
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+			this.debugLabel = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -1873,6 +1874,15 @@
 			// 
 			this.saveMixdownDialog.Filter = "Wav files (*.wav)|*.wav|All files (*.*)|*.*";
 			// 
+			// debugLabel
+			// 
+			this.debugLabel.AutoSize = true;
+			this.debugLabel.Location = new System.Drawing.Point(460, 5);
+			this.debugLabel.Name = "debugLabel";
+			this.debugLabel.Size = new System.Drawing.Size(41, 13);
+			this.debugLabel.TabIndex = 20;
+			this.debugLabel.Text = "label16";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -1880,6 +1890,7 @@
 			this.AutoScroll = true;
 			this.AutoSize = true;
 			this.ClientSize = new System.Drawing.Size(1279, 407);
+			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);
 			this.Controls.Add(this.resetDefaultBtn);
@@ -2104,6 +2115,7 @@
 		private System.Windows.Forms.Label label14;
 		private System.Windows.Forms.Label label23;
 		private System.Windows.Forms.Label label22;
+		public System.Windows.Forms.Label debugLabel;
 	}
 }
 

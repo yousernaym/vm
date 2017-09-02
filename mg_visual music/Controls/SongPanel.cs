@@ -206,6 +206,8 @@ namespace Visual_Music
 
 				Rectangle normRect = normalizeRect(selectedSongRegion);
 				int selectedCount = 0;
+				((Form1)Parent).debugLabel.Text = normRect.ToString();
+				((Form1)Parent).debugLabel.Text += "   " + selectedScreenRegion.ToString();
 				for (int i = 1; i < Project.Notes.Tracks.Count; i++)
 				{
 					List<Midi.Note> noteList = Project.TrackViews[i].MidiTrack.getNotes(normRect.Left, normRect.Right, normRect.Top, normRect.Bottom);
