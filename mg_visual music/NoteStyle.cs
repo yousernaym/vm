@@ -16,7 +16,7 @@ using System.ComponentModel;
 namespace Visual_Music
 {
 	public enum NoteStyleEnum { Default, Bar, Line };
-	public enum LineStyleEnum { Simple, Ribbon, Tube };
+	public enum LineStyleEnum { Simple, Ribbon };
 	public enum LineHlStyleEnum { Arrow, Circle };
 	//public enum ModXSourceEnum { DistFromLeft, DistFromCenter, DistFromRight };
 	//public enum ModYSourceEnum { DistFromTop, DistFromCenter, DistFromBottom };

@@ -12,32 +12,6 @@ bool Border;
 //Helper functions------------------
 float4 shadeHlObject(float sgnDistFromEdge, float distFromCenter);
 
-void initPixel(inout float4 color, inout float3 normal, inout float3 tPos, inout float distFromCenter, inout float distSign, inout float height, inout float normDistFromCenter, inout float2 texCoords, float3 rawPos, float3 center, float ShapePower, float fadeoutFromCenter)
-{
-	color = float4(Color.rgb,1);
-	normal = normalize(normal);
-	tPos = rawPos - center;
-	
-	distFromCenter = dot(tPos, normal);
-	distSign = sign(distFromCenter);
-	distFromCenter = abs(distFromCenter);
-	
-	//float distFromCenter = length(tPos);
-	
-	if (fadeoutFromCenter == 0)
-	{
-		height = 1;
-		normDistFromCenter = 0;
-	}
-	else
-	{
-		normDistFromCenter = distFromCenter / fadeoutFromCenter;
-		height = saturate(1 - pow(abs(normDistFromCenter), ShapePower));  //Use abs to prevent compiler warning
-	}
-	//texCoords.x = (rawPos.x - normal.x * distFromCenter * distSign) / TexSize.x;
-	//texCoords.y = normDistFromCenter * distSign * 0.5f + 0.5f;
-}
-
 float4 blurEdges(float4 color, float distFromCenter)
 {
 	float distFromEdge = max(distFromCenter - (Radius - BlurredEdge), 0);
@@ -87,11 +61,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 
 void PS(out float4 color : COLOR0, in VSOutput IN)
 {
-	float3 tPos; float distFromCenter; float distSign; float height; float normDistFromCenter;
-	//initPixel(color, IN.normal, tPos, distFromCenter, distSign, height, normDistFromCenter, IN.texCoords, IN.rawPos, IN.center, ShapePower, FadeoutFromCenter);
-	color = float4(Color.rgb, 1);
 	float3 lightingNormal;
-	
 	if (Style == 1) //Ribbon
 	{
 		if (IN.normal.x > 0)
@@ -104,10 +74,12 @@ void PS(out float4 color : COLOR0, in VSOutput IN)
 		lightingNormal = float3(0, 0, 1);
 				
 	lightingNormal = normalize(lightingNormal);
+	//color = float4(Color.rgb, 1);
+	color = Color;
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
 		
 	float3 normal = normalize(IN.normal);
-	tPos = IN.rawPos - IN.center;
+	float3 tPos = IN.rawPos - IN.center;
 	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f;
 	float2 normPos = float2(IN.normStepFromNoteStart, normDistFromEdge);
 	color = modulate(normPos, color, lightingNormal, IN.rawPos);

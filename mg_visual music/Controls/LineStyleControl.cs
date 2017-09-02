@@ -40,10 +40,6 @@ namespace Visual_Music
 		
 		private void lineStyleList_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			//if (lineStyleList.SelectedIndex != (int)LineStyleEnum.Ribbon)
-			//	simpleLineStylePanel.Visible = true;
-			//else
-			//	simpleLineStylePanel.Visible = false;
 			if (UpdatingControls)
 				return;
 			SongPanel.Invalidate();
