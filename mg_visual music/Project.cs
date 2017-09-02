@@ -275,6 +275,13 @@ namespace Visual_Music
 				notes.SongLengthT = (int)secondsToTicks(Media.getAudioLength());
 			return true;
 		}
+
+		public void resetPitchLimits()
+		{
+			MaxPitch = Notes.MaxPitch;
+			MinPitch = Notes.MinPitch;
+		}
+
 		public void showNoteInfo(GdiPoint location)
 		{
 			//if (noteMap != null)

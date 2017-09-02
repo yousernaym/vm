@@ -233,13 +233,15 @@ namespace Visual_Music
 			
 			if (Project.importSong(notePath, audioPath, eraseCurrent, modInsTrack, mixdownType, songLengthS))
             {
-				songLoaded(notePath);
-                if (eraseCurrent)
-                {
-                    currentProjPath = "";
-                    updateFormTitle("");
+				if (eraseCurrent)
+				{
+					defaultPitchesBtn.PerformClick();
+					project.resetPitchLimits();
+					currentProjPath = "";
+					updateFormTitle("");
                 }
-                return true;
+				songLoaded(notePath);
+				return true;
             }
             else
                 return false;
@@ -1115,8 +1117,9 @@ namespace Visual_Music
 
 		private void defaultPitchesBtn_Click(object sender, EventArgs e)
 		{
-			maxPitchUd.Value = (decimal)(Project.MaxPitch = Project.Notes.MaxPitch);
-			minPitchUd.Value = (decimal)(Project.MinPitch = Project.Notes.MinPitch);
+			project.resetPitchLimits();
+			maxPitchUd.Value = (decimal)Project.MaxPitch;
+			minPitchUd.Value = (decimal)Project.MinPitch;
         }
 
 		private void pointSmpCb_CheckedChanged(object sender, EventArgs e)
