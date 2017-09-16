@@ -43,6 +43,10 @@ namespace Visual_Music
 	[Serializable()]
 	public class NoteStyle_Line : NoteStyle
 	{
+		const int MaxLineVerts = 30000;
+		const int MaxHLineVerts = 30000; 
+		//static Stack vbPool = new Stack(1000)
+		static VertexDeclaration lineVertDecl;
 		static TestVertex[] testVerts = new TestVertex[30];
 		static LineVertex[] lineVerts = new LineVertex[NumDynamicVerts];
 		static LineVertex[] hLineVerts = new LineVertex[NumDynamicVerts];
@@ -50,6 +54,8 @@ namespace Visual_Music
 		//protected static LineVertex[] arrowAreaVerts = new LineVertex[3];
 		//protected static LineVertex[] arrowBorderVerts = new LineVertex[3];
 		protected static LineVertex[] lineHlVerts = new LineVertex[4];
+		OcTree<LineGeo> ocTree;
+
 		public int LineWidth = 5;
 		public float Qn_gapThreshold { get; set; } = 5;
 		public bool Continuous { get; set; } = true;
@@ -111,16 +117,18 @@ namespace Visual_Music
 		{
 			fx = songPanel.Content.Load<Effect>("Line");
 		}
-		void drawTrackPass(int lineWidth, Vector4 colorMod, List<Midi.Note> noteList, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool bHilited, Effect effect, BlendState blendState)
+
+		override public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps)
 		{
-			Color color;
-			Texture2D dummyTexture;
-			getMaterial(songDrawProps, trackProps, globalTrackProps, bHilited, out color, out dummyTexture);
-			color.R = (byte)(color.R * colorMod.X); color.G = (byte)(color.G * colorMod.Y); color.B = (byte)(color.B * colorMod.Z); color.A = (byte)(color.A * colorMod.W);
-			if (bHilited)
-				color.A = 255;
-			drawTrackPass(lineWidth, color, noteList, midiTrack, songDrawProps, trackProps, globalTrackProps, bHilited, effect, blendState);
+			//LineGeo lineGeo = new LineGeo();
+			//lineGeo.lineVb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, MaxLineVerts, BufferUsage.WriteOnly);
+			//lineGeo.hLineVb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, MaxHLineVerts, BufferUsage.WriteOnly);
+			if (ocTree != null)
+				ocTree.dispose();
+			ocTree = new OcTree<LineGeo>(minPos, size, new Vector3(1000, 1000, 1000), createGeoChunk);
+			ocTree.createGeo(midiTrack, songDrawProps, trackProps, globalTrackProps, texTrackProps);
 		}
+
 		void drawTrackLine(out int vertIndex, out bool drawHlNote, int lineWidth, List<Midi.Note> noteList, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps texTrackProps, Vector2 texSize)
 		{
 			int skippedNotes = 0;
@@ -353,10 +361,10 @@ namespace Visual_Music
 				//break;
 			}
 			drawLineSegment(ref vertIndex, ref hLineVertIndex);
-			Debug.WriteLine("Skipped notes: " + skippedNotes);
-			Debug.WriteLine("Culled notes: " + culledNotes);
-			Debug.WriteLine("Skipped points: " + skippedPoints);
-			Debug.WriteLine("Vertices: " + totalVerts);
+			//Debug.WriteLine("Skipped notes: " + skippedNotes);
+			//Debug.WriteLine("Culled notes: " + culledNotes);
+			//Debug.WriteLine("Skipped points: " + skippedPoints);
+			//Debug.WriteLine("Vertices: " + totalVerts);
 		}
 
 		void calcRectTexCoords(out Vector2 size_tex, out Vector2 size_world, Vector2 texSize, float startDraw, float endDraw, TrackProps texTrackProps, SongDrawProps songDrawProps, TrackProps trackProps)
@@ -529,15 +537,34 @@ namespace Visual_Music
 			lineHlVerts[2].pos = new Vector3(-halfHlSize, halfHlSize, 0) + pos;
 			lineHlVerts[3].pos = new Vector3(halfHlSize, halfHlSize, 0) + pos;
 		}
-		void drawTrackPass(int lineWidth, Color color, List<Midi.Note> noteList, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool bHilited, Effect effect, BlendState blendState)
-		{
-			Color dummyColor;
-			Texture2D texture;
-			getMaterial(songDrawProps, trackProps, globalTrackProps, bHilited, out dummyColor, out texture);
 
+		//static string GetName<T>(T item) where T : class
+		//{
+		//	return typeof(T).GetProperties()[0].Name;
+		//}
+
+		
+
+		public void createGeoChunk(out LineGeo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
+		{
+			geo = new LineGeo();
+			List<Midi.Note> noteList = midiTrack.Notes;
+			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
+			if (noteList.Count == 0)
+				return;
+
+			Color color;
+			Texture2D texture;
+			getMaterial(songDrawProps, trackProps, globalTrackProps, false, out color, out texture);
+			
+			Vector2 texSize = new Vector2(texture.Width, texture.Height);
+			
+			int vertIndex = 3;
+			int hLineVertIndex = 0;
 			int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
 			for (int n = 0; n < noteList.Count; n++)
 			{
+				//Get current note
 				Midi.Note note = noteList[n], nextNote;
 				if (note.start > songDrawProps.song.SongLengthT) //only  if audio ends before the notes end
 					continue;
@@ -549,87 +576,102 @@ namespace Visual_Music
 				else
 					nextNote = note;
 
-				Point noteStart = songDrawProps.getScreenPos(note.start, note.pitch);
-				int noteEnd = songDrawProps.getScreenPos(note.stop, note.pitch).X;
-				Point nextNoteStart = songDrawProps.getScreenPos(nextNote.start, nextNote.pitch);
-
+				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
+				float noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch).X;
+				
+				Vector2 nextNoteStart = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
+				if (noteEnd > nextNoteStart.X && completeNoteListIndex < midiTrack.Notes.Count - 1)
+					noteEnd = nextNoteStart.X;
+				
+				bool endOfSegment = false;
 				if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * songDrawProps.song.TicksPerBeat || note == nextNote)
 				{
+					if (nextNoteStart.X != noteStart.X)
+						nextNoteStart.Y = (int)MathHelper.Lerp(noteStart.Y, nextNoteStart.Y, (float)(noteEnd - noteStart.X) / (nextNoteStart.X - noteStart.X));
 					nextNoteStart.X = noteEnd;
-					nextNoteStart.Y = noteStart.Y;
+					endOfSegment = true;
 				}
 
-				int startDraw = noteStart.X;
-				int endDraw = nextNoteStart.X;
-				int hlTail = 100;
-				if (bHilited)
+				float startDraw = noteStart.X;
+				float endDraw = nextNoteStart.X;
+
+				float step = 10;
+
+				for (float x = startDraw; x < endDraw; x += step)
 				{
-					startDraw = songDrawProps.viewportSize.X / 2 - hlTail;
-					if (startDraw < noteStart.X)
-						startDraw = noteStart.X;
-					endDraw = songDrawProps.viewportSize.X / 2 + 1;
-				}
-				for (int x = startDraw; x < endDraw; x++)
-				{
-					float curLineWidth = lineWidth;
-					if (bHilited)
-					{
-						if (endDraw - x > 1)
-							curLineWidth *= (x - startDraw) / (float)(endDraw - noteStart.X); //tail fadeout
-						curLineWidth *= (noteEnd - endDraw) / (float)(noteEnd - noteStart.X); //note pos fadeout
-					}
-					Vector2 scale = new Vector2(curLineWidth / texture.Width, (float)curLineWidth / texture.Height);
+					Vector3 center, normal, vertexOffset;
+					getCurvePoint(out center, out normal, out vertexOffset, LineWidth, x, songDrawProps, trackProps);
+					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
 
-					float nextX = (float)x + 1;
-					float y, nextY;
-					string interpMethod = "notcosine";
-					if (interpMethod == "cosine")
-					{
-						float lerpFactor = calcLerpFactor(x, noteStart.X, nextNoteStart.X);
-						y = MathHelper.Lerp((float)noteStart.Y, (float)nextNoteStart.Y, lerpFactor);
-						float nextLerpFactor = calcLerpFactor(x + 1, noteStart.X, nextNoteStart.X);
-						nextY = MathHelper.Lerp((float)noteStart.Y, (float)nextNoteStart.Y, nextLerpFactor);
-					}
-					else
-					{
-						float normPitch = trackProps.TrackView.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x));
-						y = songDrawProps.getPitchScreenPos(normPitch);
-						normPitch = trackProps.TrackView.Curve.Evaluate((float)songDrawProps.getSongPosT((int)nextX));
-						nextY = songDrawProps.getPitchScreenPos(normPitch);
-					}
+					//Fill vertex buffer
+					lineVerts[vertIndex].pos = center - vertexOffset;
+					lineVerts[vertIndex + 1].pos = center + vertexOffset;
+					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
+					float normStepFromNoteStart = (x - startDraw) / (nextNoteStart.X - noteStart.X);
+					lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = normStepFromNoteStart;
+					//Vector2 ns = songDrawProps.getScreenPosF(note.start, note.pitch);
+					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
+					if (texTrackProps.TexProps.Texture != null)
+						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, songDrawProps, LineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
-					Vector2 tangent = new Vector2((float)1, nextY - y);
-					tangent.Normalize();
-					//lineFx.Parameters["Normal"].SetValue(new Vector2(tangent.Y, -tangent.X));
-					float angle = (float)Math.Asin((double)tangent.Y);
-					angle = 0;
-
-					for (float i = 0; i <= Math.Abs(nextY - y); i += 1)
+					if (Style == LineStyleEnum.Ribbon)
 					{
-						//lineFx.Parameters["Center"].SetValue(new Vector2((float)x - 0.5f, y - 0.5f));
-						//circleFx.Parameters["Center"].SetValue(new Vector2((float)x - 0.5f, y - 0.5f));
-						try
+						float hLineStart = center.X;
+						float hLineEnd = hLineStart;
+						do
 						{
-							songPanel.SpriteBatch.Begin(SpriteSortMode.Deferred, blendState, null, null, null, effect);
-							songPanel.SpriteBatch.Draw(texture, new Vector2((float)x - scale.X * texture.Width * 0.5f, y - scale.Y * texture.Height * 0.5f) + tangent * i, null, color, angle, new Vector2(0, 0)/*new Vector2(0, (float)texture.Height*scale/2.0f)*/, scale, SpriteEffects.None, 0);
-							songPanel.SpriteBatch.End();
-						}
-						catch (Exception e)
+							hLineEnd++;
+						} while ((int)center.Y == (int)songDrawProps.getCurveScreenY((float)hLineEnd + 1, trackProps.TrackView.Curve) && hLineEnd < endDraw);
+						if (hLineEnd > hLineStart + LineWidth / 2)
 						{
-							MessageBox.Show(e.Message);
-							throw e;
+							hLineVerts[hLineVertIndex++] = lineVerts[vertIndex];
+							hLineVerts[hLineVertIndex++] = lineVerts[vertIndex + 1];
 						}
 					}
+
+					if (x == startDraw && vertIndex > 3)
+					{
+						lineVerts[vertIndex].pos = lineVerts[vertIndex - 2].pos;
+						lineVerts[vertIndex + 1].pos = lineVerts[vertIndex - 1].pos;
+					}
+					vertIndex += 2;
 				}
-				//if (bHilited)
-				//songPanel.SpriteBatch.Draw(texture, new Vector2((float)x - scale.X * texture.Width * 0.5f, y - scale.Y * texture.Height * 0.5f) + angleVec * i, null, color, angle, new Vector2(0, 0)/*new Vector2(0, (float)texture.Height*scale/2.0f)*/, scale, SpriteEffects.None, 0);
+
+				if (!Continuous)
+					endOfSegment = true; //One draw call per note. Can be used to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
+				if (endOfSegment || vertIndex > MaxLineVerts - 10000 || hLineVertIndex > MaxHLineVerts - 10000)
+					createLineSegment(ref vertIndex, ref hLineVertIndex, geo);
+
 				completeNoteListIndex++;
 			}
+			createLineSegment(ref vertIndex, ref hLineVertIndex, geo);
 		}
-		//static string GetName<T>(T item) where T : class
-		//{
-		//	return typeof(T).GetProperties()[0].Name;
-		//}
+
+		private void createLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo)
+		{
+			if (LineWidth > 0)
+			{
+				if (numVerts > 5 || numHLineVerts > 1)
+				{
+					if (numHLineVerts > 1)
+					{
+						geo.hLineVb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
+						geo.hLineVb.SetData(hLineVerts, 0, numHLineVerts);
+						numHLineVerts = 0;
+					}
+					//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
+					if (numVerts > 5)
+					{
+						geo.lineVb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, numVerts, BufferUsage.WriteOnly);
+						geo.lineVb.SetData(lineVerts, 0, numVerts);
+						numVerts = 3;
+					}
+					//songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
+				}
+			}
+			
+			
+		}
 
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
 		{
@@ -706,22 +748,8 @@ namespace Visual_Music
 					songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, lineHlVerts, 0, 2);
 				}
 			}
-
-
-
-
-			////drawTrackPass(LineWidth + 2, new Vector4(1, 1, 1, 1), noteList, midiTrack, songDrawProps, trackProps, globalTrackProps, false, lineFx, songPanel.BlendState);
-
-			//noteList = midiTrack.getNotes(songDrawProps.songPosT, songDrawProps.songPosT + 1, 0, 127);
-			//if (noteList.Count == 0)
-			//    return;
-
-			//circleFx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
-			//circleFx.Parameters["Radius"].SetValue(8);
-			////songPanel.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, circleFx);
-			//drawTrackPass(23, new Vector4(1, 1, 1, 1), noteList, midiTrack, songDrawProps, trackProps, globalTrackProps, true, circleFx, BlendState.AlphaBlend);
-			////songPanel.SpriteBatch.End();
 		}
+
 		void drawLineSegment(ref int numVerts, ref int numHLineVerts)
 		{
 			if (LineWidth > 0)
@@ -749,9 +777,34 @@ namespace Visual_Music
 
 		public static void sInit()
 		{
+			lineVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Single, VertexElementUsage.Position, 2), new VertexElement(40, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
 			for (short i = 0; i < lineInds.Length; i++)
 				lineInds[i] = i;
 		}
 	}
+
+	public class LineGeo : IDisposable
+	{
+		public VertexBuffer lineVb;
+		public VertexBuffer hLineVb;
+		public void Dispose()
+		{
+			if (lineVb != null)
+			{
+				lineVb.Dispose();
+				lineVb = null;
+			}
+			if (hLineVb != null)
+			{
+				hLineVb.Dispose();
+				hLineVb = null;
+			}
+		}
+	}
+
+	//public class LineOcTree : OcTree<LineGeo>
+	//{
+		
+	//}
 }
 

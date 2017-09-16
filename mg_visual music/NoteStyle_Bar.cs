@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Microsoft.Xna.Framework.Content;
 using WinFormsGraphicsDevice;
 using System.Diagnostics;
+using Midi;
 
 namespace Visual_Music
 {
@@ -129,7 +130,16 @@ namespace Visual_Music
 			fx.CurrentTechnique.Passes["Pass1"].Apply();
 			songPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, noteList.Count);
 		}
-		
+
+		override public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps)
+		{
+
+		}
+		public void createGeoChunk(BoundingBox bbox, Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
+		{
+			throw new NotImplementedException();
+		}
+
 		public static void sInit()
 		{
 			//Mesh vb

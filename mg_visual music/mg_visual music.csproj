@@ -156,6 +156,7 @@
     <Compile Include="NoteStyle_Line.cs" />
     <Compile Include="Media.cs" />
     <Compile Include="NoteStyle.cs" />
+    <Compile Include="OcTree.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

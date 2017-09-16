@@ -879,8 +879,8 @@ namespace Visual_Music
 		}
 		void openSongFile(string fileName)
 		{
-			try
-			{
+			//try
+			//{
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
                 using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
@@ -892,11 +892,11 @@ namespace Visual_Music
                 currentProjPath = fileName;
 				songLoaded(currentProjPath);
 				updateFormTitle(currentProjPath);
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message);
-			}
+			//}
+			//catch (Exception ex)
+			//{
+			//	MessageBox.Show(ex.Message);
+			//}
 		}
 		
 		void updateImportForm()

@@ -118,5 +118,22 @@ namespace Visual_Music
 			else
 				TrackProps.SelectedNoteStyle.drawTrack(midiTrack, songDrawProps, TrackProps, globalTrackProps, selectingRegion, texTrackProps);
 		}
+
+		public void createOcTree(SongDrawProps songDrawProps, TrackProps globalTrackProps)
+		{
+			if (MidiTrack.Notes.Count == 0)
+				return;
+			Midi.Note firstNote = midiTrack.Notes[0];
+			Midi.Note lastNote = midiTrack.Notes[midiTrack.Notes.Count - 1];
+			Vector2 minPos2d = songDrawProps.getScreenPosF(firstNote.start, songDrawProps.minPitch);
+			Vector2 maxPos2d = songDrawProps.getScreenPosF(lastNote.start, 127); //Todo: use maxPitch
+
+			//Todo: use posOffset.z for z-component
+			Vector3 minPos = new Vector3(minPos2d.X, minPos2d.Y, -100);
+			Vector3 maxPos = new Vector3(maxPos2d.X, maxPos2d.Y, 100);
+			TrackProps texTrackProps = TrackProps.getTexture(false, null) != null ? TrackProps : globalTrackProps;
+
+			TrackProps.SelectedNoteStyle.createOcTree(minPos, maxPos - minPos, midiTrack, songDrawProps, TrackProps, globalTrackProps, texTrackProps);
+		}
 	}		
 }
