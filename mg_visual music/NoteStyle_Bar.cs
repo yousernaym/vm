@@ -66,10 +66,22 @@ namespace Visual_Music
 		{
 			base.GetObjectData(info, ctxt);
 		}
+
 		override public void loadFx()
 		{
 			fx = songPanel.Content.Load<Effect>("Bar");
 		}
+
+		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
+		{
+			geo = new BarGeo();
+		}
+
+		public override void drawGeoChunk(Geo geo)
+		{
+
+		}
+
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
 		{
 			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps);
@@ -131,15 +143,11 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, noteList.Count);
 		}
 
-		override public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps)
-		{
+		//override public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps)
+		//{
 
-		}
-		public void createGeoChunk(BoundingBox bbox, Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
-		{
-			throw new NotImplementedException();
-		}
-
+		//}
+		
 		public static void sInit()
 		{
 			//Mesh vb
@@ -170,5 +178,13 @@ namespace Visual_Music
 		//    texture = textures[index];
 		//songPanel.SpriteBatch.Draw(texture, new Rectangle(drawProps.x1, drawProps.y - drawProps.noteHeight / 2, drawProps.x2 - drawProps.x1 + 1, drawProps.noteHeight), color);
 		//}
+	}
+
+	public class BarGeo : Geo
+	{
+		public override void Dispose()
+		{
+			
+		}
 	}
 }

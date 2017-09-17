@@ -260,8 +260,10 @@ namespace Visual_Music
 			defaultTextures[(int)NoteStyleEnum.Line].hilited = defaultTextures[(int)NoteStyleEnum.Bar].normal;
 			defaultTextures[(int)NoteStyleEnum.Line].normal = defaultTextures[(int)NoteStyleEnum.Bar].normal;
 		}
-		abstract public void loadFx();
-		abstract public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps);
+		public abstract void loadFx();
+		//abstract public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps);
+		public abstract void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps);
+		public abstract void drawGeoChunk(Geo geo);
 
 		protected void getMaterial(SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, int x1, int x2, out Color color, out Texture2D texture)
 		{
@@ -453,6 +455,11 @@ namespace Visual_Music
 					return songPos / texSize;
 			}
 		}
+	}
+
+	public abstract class Geo : IDisposable
+	{
+		public abstract void Dispose();
 	}
 }
 	
