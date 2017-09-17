@@ -352,7 +352,8 @@ namespace Visual_Music
 			songDrawProps.viewWidthT = viewWidthT;
 			songDrawProps.song = notes;
 			songDrawProps.minPitch = MinPitch;
-			for (int i = TrackViews.Count - 1; i >= 0; i--)
+			//for (int i = TrackViews.Count - 1; i > 0; i--)
+			for (int i = 1; i < trackViews.Count; i++)
 				TrackViews[i].createOcTree(songDrawProps, GlobalTrackProps);
 		}
 

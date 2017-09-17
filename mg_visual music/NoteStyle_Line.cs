@@ -13,18 +13,36 @@ using System.Diagnostics;
 
 namespace Visual_Music
 {
-	public struct LineVertex : IVertexType
+	public struct LineHlVertex : IVertexType
 	{
 		public Vector3 pos;
 		public Vector3 normal;
 		public Vector3 center;
 		public float normStepFromNoteStart;
 		public Vector2 texCoords;
+		public LineHlVertex(Vector3 _pos, Vector3 _normal, Vector3 _center, float _normStepFromNoteStart, Vector2 _texCoords)
+		{
+			pos = _pos;
+			normal = _normal;
+			center = _center;
+			normStepFromNoteStart = _normStepFromNoteStart;
+			texCoords = _texCoords;
+		}
 		public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Single, VertexElementUsage.Position, 2), new VertexElement(40, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
 		VertexDeclaration IVertexType.VertexDeclaration
 		{
 			get { return VertexDeclaration; }
 		}
+	}
+
+	public struct LineVertex 
+	{
+		public Vector3 pos;
+		public Vector3 normal;
+		public Vector3 center;
+		public float normStepFromNoteStart;
+		public Vector2 texCoords;
+		
 		public LineVertex(Vector3 _pos, Vector3 _normal, Vector3 _center, float _normStepFromNoteStart, Vector2 _texCoords)
 		{
 			pos = _pos;
@@ -53,7 +71,7 @@ namespace Visual_Music
 		static short[] lineInds = new short[lineVerts.Length];
 		//protected static LineVertex[] arrowAreaVerts = new LineVertex[3];
 		//protected static LineVertex[] arrowBorderVerts = new LineVertex[3];
-		protected static LineVertex[] lineHlVerts = new LineVertex[4];
+		protected static LineHlVertex[] lineHlVerts = new LineHlVertex[4];
 		OcTree<LineGeo> ocTree;
 
 		public int LineWidth = 5;
@@ -597,7 +615,7 @@ namespace Visual_Music
 				float endDraw = nextNoteStart.X;
 
 				float step = 1;
-
+				
 				for (float x = startDraw; x < endDraw; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
@@ -789,10 +807,10 @@ namespace Visual_Music
 				{
 					fx.CurrentTechnique = fx.Techniques["Line"];
 					fx.CurrentTechnique.Passes[0].Apply();
-					if (numHLineVerts > 1)
-						songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
-					if (numVerts > 5)
-						songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
+					//if (numHLineVerts > 1)
+						//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
+					//if (numVerts > 5)
+						//songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
 				}
 			}
 			numVerts = 3;
