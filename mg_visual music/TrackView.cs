@@ -133,7 +133,7 @@ namespace Visual_Music
 			Vector3 maxPos = new Vector3(maxPos2d.X, maxPos2d.Y, 100);
 			TrackProps texTrackProps = TrackProps.getTexture(false, null) != null ? TrackProps : globalTrackProps;
 
-			TrackProps.SelectedNoteStyle.createOcTree(minPos, maxPos - minPos, midiTrack, songDrawProps, TrackProps, globalTrackProps, texTrackProps);
+			TrackProps.SelectedNoteStyle.createOcTree(minPos, maxPos - minPos, midiTrack, songDrawProps, globalTrackProps, TrackProps, texTrackProps);
 		}
 	}		
 }

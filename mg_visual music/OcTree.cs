@@ -7,31 +7,35 @@ namespace Visual_Music
 {
 	public class OcTree<Geo> where Geo : IDisposable
 	{
-		protected OcTree<Geo>[] _nodes = new OcTree<Geo>[8];
+		protected OcTree<Geo>[] _nodes;
 		protected bool _isEmpty = true;
 		protected BoundingBox _bbox;
 		protected List<BoundingBox> _objects = new List<BoundingBox>();
-		protected Geo _geo;
+		public Geo _geo;
 		//protected VertexBuffer vertexBuffers;
 		protected Vector3 _minSize;
 
 		public delegate void CreateGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps);
+		public delegate void DrawGeoChunk(Geo geo);
 		CreateGeoChunk _createGeoChunk;
+		DrawGeoChunk _drawGeoChunk;
 
 		//public OcTree()
 		//{
 
 		//}
 
-		public OcTree(Vector3 minPos, Vector3 size, Vector3 minSize, CreateGeoChunk createGeoChunk)
+		public OcTree(Vector3 minPos, Vector3 size, Vector3 minSize, CreateGeoChunk createGeoChunk, DrawGeoChunk drawGeoChunk)
 		{
 			_minSize = minSize;
 			_bbox = new BoundingBox(minPos, minPos + size);
 			_createGeoChunk = createGeoChunk;
+			_drawGeoChunk = drawGeoChunk;
 			if (size.X <= minSize.X && size.Y <= minSize.Y && size.Z <= minSize.Z)
 				return;
 
 			#region Create sub-nodes
+			 _nodes = new OcTree<Geo>[8];
 			Vector3 subNodeSize;
 			subNodeSize.X = size.X > minSize.X ? size.X / 2 : size.X;
 			subNodeSize.Y = size.Y > minSize.Y ? size.Y / 2 : size.Y;
@@ -44,13 +48,13 @@ namespace Visual_Music
 			for (int i = 0; i < 2; i++)
 			{
 				int index = i * 2;
-				_nodes[index] = new OcTree<Geo>(minPos, subNodeSize, minSize, createGeoChunk); //top-left
+				_nodes[index] = new OcTree<Geo>(minPos, subNodeSize, minSize, createGeoChunk, drawGeoChunk); //top-left
 				if (subNodeSize.X < size.X)
-					_nodes[index + 1] = new OcTree<Geo>(minPos + subNodeSizeX, subNodeSize, minSize, createGeoChunk); //top-right
+					_nodes[index + 1] = new OcTree<Geo>(minPos + subNodeSizeX, subNodeSize, minSize, createGeoChunk, drawGeoChunk); //top-right
 				if (subNodeSize.Y < size.Y)
-					_nodes[index + 2] = new OcTree<Geo>(minPos + subNodeSizeY, subNodeSize, minSize, createGeoChunk); //bottom-left
+					_nodes[index + 2] = new OcTree<Geo>(minPos + subNodeSizeY, subNodeSize, minSize, createGeoChunk, drawGeoChunk); //bottom-left
 				if (subNodeSize.X < size.X && subNodeSize.Y < size.Y)
-					_nodes[index + 3] = new OcTree<Geo>(minPos + subNodeSizeX + subNodeSizeY, subNodeSize, minSize, createGeoChunk); //bottom-right
+					_nodes[index + 3] = new OcTree<Geo>(minPos + subNodeSizeX + subNodeSizeY, subNodeSize, minSize, createGeoChunk, drawGeoChunk); //bottom-right
 				if (subNodeSize.Z == size.Z)
 					break;
 				minPos.Z += subNodeSize.Z;
@@ -77,21 +81,47 @@ namespace Visual_Music
 		public void createGeo(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
 		{
 			_createGeoChunk(out _geo, _bbox, midiTrack, songDrawProps, trackProps, globalTrackProps, texTrackProps);
-			foreach (var node in _nodes)
+			return;
+			if (_nodes != null)
 			{
-				if (node == null)
-					continue;
-				node.createGeo(midiTrack, songDrawProps, trackProps, globalTrackProps, texTrackProps);
+				foreach (var node in _nodes)
+				{
+					if (node == null)
+						continue;
+					node.createGeo(midiTrack, songDrawProps, trackProps, globalTrackProps, texTrackProps);
+				}
 			}
 		}
 
-		internal void dispose()
+		public void drawGeo(Camera cam)
 		{
-			_geo.Dispose();
-			foreach (var node in _nodes)
+			//if (!cam.Frustum.Intersects(_bbox))
+			//return;
+			_drawGeoChunk(_geo);
+			return;
+			if (_nodes == null)
+				_drawGeoChunk(_geo);
+			else
 			{
-				if (node != null)
-					node.dispose();
+				foreach (var node in _nodes)
+				{
+					if (node != null)
+						node.drawGeo(cam);
+				}
+			}
+		}
+
+		public void dispose()
+		{
+			if (_geo != null)
+				_geo.Dispose();
+			if (_nodes != null)
+			{
+				foreach (var node in _nodes)
+				{
+					if (node != null)
+						node.dispose();
+				}
 			}
 		}
 	}

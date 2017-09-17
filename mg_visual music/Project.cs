@@ -342,7 +342,7 @@ namespace Visual_Music
 			createOcTrees();
 		}
 
-		void createOcTrees()
+		public void createOcTrees()
 		{
 			Point viewportSize = new Point(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
 			SongDrawProps songDrawProps = new SongDrawProps();
@@ -352,8 +352,8 @@ namespace Visual_Music
 			songDrawProps.viewWidthT = viewWidthT;
 			songDrawProps.song = notes;
 			songDrawProps.minPitch = MinPitch;
-			foreach(var view in TrackViews)
-				view.createOcTree(songDrawProps, GlobalTrackProps);
+			for (int i = TrackViews.Count - 1; i >= 0; i--)
+				TrackViews[i].createOcTree(songDrawProps, GlobalTrackProps);
 		}
 
 		public void drawSong(Point viewportSize, double normPos)

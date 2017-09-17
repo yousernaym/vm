@@ -120,17 +120,20 @@ namespace Visual_Music
 
 		override public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps)
 		{
-			//LineGeo lineGeo = new LineGeo();
-			//lineGeo.lineVb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, MaxLineVerts, BufferUsage.WriteOnly);
-			//lineGeo.hLineVb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, MaxHLineVerts, BufferUsage.WriteOnly);
 			if (ocTree != null)
 				ocTree.dispose();
-			ocTree = new OcTree<LineGeo>(minPos, size, new Vector3(1000, 1000, 1000), createGeoChunk);
+			ocTree = new OcTree<LineGeo>(minPos, size, new Vector3(1000, 1000, 1000), createGeoChunk, drawGeoChunk);
 			ocTree.createGeo(midiTrack, songDrawProps, trackProps, globalTrackProps, texTrackProps);
 		}
 
 		void drawTrackLine(out int vertIndex, out bool drawHlNote, int lineWidth, List<Midi.Note> noteList, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps texTrackProps, Vector2 texSize)
 		{
+			fx.CurrentTechnique = fx.Techniques["Line"];
+			fx.CurrentTechnique.Passes[0].Apply();
+			ocTree.drawGeo(Project.Camera);
+			vertIndex = 0;
+			drawHlNote = true;
+			return;
 			int skippedNotes = 0;
 			int culledNotes = 0;
 			int skippedPoints = 0;
@@ -543,8 +546,6 @@ namespace Visual_Music
 		//	return typeof(T).GetProperties()[0].Name;
 		//}
 
-		
-
 		public void createGeoChunk(out LineGeo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
 		{
 			geo = new LineGeo();
@@ -595,7 +596,7 @@ namespace Visual_Music
 				float startDraw = noteStart.X;
 				float endDraw = nextNoteStart.X;
 
-				float step = 10;
+				float step = 1;
 
 				for (float x = startDraw; x < endDraw; x += step)
 				{
@@ -647,23 +648,46 @@ namespace Visual_Music
 			createLineSegment(ref vertIndex, ref hLineVertIndex, geo);
 		}
 
-		private void createLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo)
+		public void drawGeoChunk(LineGeo geo)
+		{
+			foreach (var vb in geo.lineVb)
+			{
+				songPanel.GraphicsDevice.SetVertexBuffer(vb);
+				songPanel.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, 3, vb.VertexCount - 5);
+			}
+			foreach (var vb in geo.hLineVb)
+			{
+				songPanel.GraphicsDevice.SetVertexBuffer(vb);
+				songPanel.GraphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, vb.VertexCount);
+			}
+		}
+
+		void createLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo)
 		{
 			if (LineWidth > 0)
 			{
 				if (numVerts > 5 || numHLineVerts > 1)
 				{
+					fx.CurrentTechnique = fx.Techniques["Line"];
+					fx.CurrentTechnique.Passes[0].Apply();
 					if (numHLineVerts > 1)
 					{
-						geo.hLineVb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
-						geo.hLineVb.SetData(hLineVerts, 0, numHLineVerts);
+						VertexBuffer vb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
+						vb.SetData(hLineVerts, 0, numHLineVerts);
+						geo.hLineVb.Add(vb);
+						//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
 						numHLineVerts = 0;
 					}
 					//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
 					if (numVerts > 5)
 					{
-						geo.lineVb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, numVerts, BufferUsage.WriteOnly);
-						geo.lineVb.SetData(lineVerts, 0, numVerts);
+						VertexBuffer vb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, numVerts, BufferUsage.WriteOnly);
+						vb.SetData(lineVerts, 0, numVerts);
+						geo.lineVb.Add(vb);
+						
+						//songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
+						//songPanel.GraphicsDevice.SetVertexBuffer(geo.lineVb);
+						//songPanel.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, 3, geo.lineVb.VertexCount-5);
 						numVerts = 3;
 					}
 					//songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
@@ -710,6 +734,13 @@ namespace Visual_Music
 
 			int numVerts;
 			bool drawHlNote = false;
+
+			fx.CurrentTechnique = fx.Techniques["Line"];
+			fx.CurrentTechnique.Passes[0].Apply();
+			//if (ocTree._geo != null)
+				//ocTree._geo.Dispose();
+			//createGeoChunk(out ocTree._geo, new BoundingBox(), midiTrack, songDrawProps, trackProps, globalTrackProps, texTrackProps);
+
 			drawTrackLine(out numVerts, out drawHlNote, LineWidth, noteList, midiTrack, songDrawProps, trackProps, texTrackProps, texSize);
 
 			Color hlColor;
@@ -785,20 +816,14 @@ namespace Visual_Music
 
 	public class LineGeo : IDisposable
 	{
-		public VertexBuffer lineVb;
-		public VertexBuffer hLineVb;
+		public List<VertexBuffer> lineVb = new List<VertexBuffer>();
+		public List<VertexBuffer> hLineVb = new List<VertexBuffer>();
 		public void Dispose()
 		{
-			if (lineVb != null)
-			{
-				lineVb.Dispose();
-				lineVb = null;
-			}
-			if (hLineVb != null)
-			{
-				hLineVb.Dispose();
-				hLineVb = null;
-			}
+			foreach (var vb in lineVb)
+				vb.Dispose();
+			foreach (var vb in hLineVb)
+				vb.Dispose();
 		}
 	}
 

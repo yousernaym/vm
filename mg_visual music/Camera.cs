@@ -13,6 +13,7 @@ namespace Visual_Music
 	[Serializable]
 	public class Camera : ISerializable
 	{
+		public BoundingFrustum Frustum => new BoundingFrustum(VpMat);
 		public int Eye { get; set; } = 0;   //Stereoscopic rendering: -1 = left, 0 = center(monoscopic), 1 = right
 		public float EyeOffset { get; set; } = 0.25f;   //1 = 100% of viewport width
 		public bool InvertY { get; set; } = false;
