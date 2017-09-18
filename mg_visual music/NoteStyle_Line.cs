@@ -167,7 +167,7 @@ namespace Visual_Music
 					continue;
 				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
 				float noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch).X;
-				float z = fx.Parameters["PosOffset"].GetValueVector3().Z;// -songPanel.Camera.ProjMat.M22 * songDrawProps.viewportSize.Y;
+				float z = fx.Parameters["PosfOffset"].GetValueVector3().Z;// -songPanel.Camera.ProjMat.M22 * songDrawProps.viewportSize.Y;
 				Vector4 noteStartProj = Vector4.Transform(new Vector4(noteStart.X, noteStart.Y, z, 1), Project.Camera.VpMat);
 				Vector3 noteStartScreen = new Vector3(noteStartProj.X, noteStartProj.Y, noteStartProj.Z) / noteStartProj.W;
 				//---------------------------------
@@ -736,10 +736,12 @@ namespace Visual_Music
 			getMaterial(songDrawProps, trackProps, globalTrackProps, false, out color, out texture);
 			fx.Parameters["Color"].SetValue(color.ToVector4());
 
+			fx.Parameters["SongPos"].SetValue(songDrawProps.getTimeTPosF(0));
 			fx.Parameters["InnerHlSize"].SetValue(0.0f);
 			Vector2 texSize = new Vector2(texture.Width, texture.Height);
 			fx.Parameters["TexSize"].SetValue(texSize);
 			fx.Parameters["Texture"].SetValue(texture);
+
 
 			int numVerts;
 			bool drawHlNote = false;
