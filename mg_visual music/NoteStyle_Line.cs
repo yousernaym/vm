@@ -564,11 +564,13 @@ namespace Visual_Music
 				}
 				else
 				{
-					float x1 = 0;// songDrawProps.viewportSize.X / 2.0f;
-					float normPitch = trackProps.TrackView.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x1));
+					//float x1 = 0;// songDrawProps.viewportSize.X / 2.0f;
+					float x1 = songPosP;
+					float normPitch = trackProps.TrackView.Curve.Evaluate(Project.SongPosT);
+					//float normPitch = trackProps.TrackView.Curve.Evaluate(songDrawProps.getSongPosT(x1));
 					float y1 = songDrawProps.getPitchScreenPos(normPitch);
 					float x2 = x1 + 1;
-					normPitch = trackProps.TrackView.Curve.Evaluate((float)songDrawProps.getSongPosT((int)x2));
+					normPitch = trackProps.TrackView.Curve.Evaluate(songDrawProps.getSongPosT(1));
 					float y2 = songDrawProps.getPitchScreenPos(normPitch);
 
 					arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
@@ -641,8 +643,8 @@ namespace Visual_Music
 			{
 				if (MovingHl)
 				{
-					float x = 0;// songDrawProps.viewportSize.X / 2.0f;
-					Vector3 circlePos = new Vector3(x, songDrawProps.getCurveScreenY(x, trackProps.TrackView.Curve), 0);
+					float x = songPosP;// songDrawProps.viewportSize.X / 2.0f;
+					Vector3 circlePos = new Vector3(x, songDrawProps.getCurveScreenY(0, trackProps.TrackView.Curve), 0);
 					setHlCirclePos(circlePos);
 				}
 				songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
