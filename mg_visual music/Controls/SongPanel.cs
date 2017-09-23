@@ -36,6 +36,7 @@ namespace Visual_Music
 			Vector2 v = getScreenPosF(timeT, pitch);
 			return new Point((int)v.X, (int)v.Y);
 		}
+
 		public Vector2 getScreenPosF(int timeT, int pitch)
 		{
 			Vector2 p = new Vector2();
@@ -46,7 +47,7 @@ namespace Visual_Music
 		}
 		public float getTimeTPosF(int timeT)
 		{
-			return (float)((double)(timeT - songPosT) / viewWidthT + 0.5) * viewportSize.X - viewportSize.X / 2.0f;
+			return (float)((double)(timeT) / viewWidthT + 0.5) * viewportSize.X - viewportSize.X / 2.0f;
 		}
 		public int getPitchScreenPos(int pitch)
 		{

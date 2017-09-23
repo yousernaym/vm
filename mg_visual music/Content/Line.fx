@@ -42,8 +42,8 @@ void VS(in VSInput IN, out VSOutput OUT)
 {
 	OUT.normal = IN.normal;
 	OUT.center = IN.center;
-	OUT.center.x += SongPos;
-	IN.pos.x += SongPos;
+	OUT.center.x -= SongPos;
+	IN.pos.x -= SongPos;
 	OUT.rawPos = IN.pos.xyz;
 	OUT.normStepFromNoteStart = IN.normStepFromNoteStart;
 	//OUT.pos.xy -= 0.5;
