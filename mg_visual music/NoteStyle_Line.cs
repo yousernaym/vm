@@ -499,8 +499,6 @@ namespace Visual_Music
 			getMaterial(songDrawProps, trackProps, globalTrackProps, false, out color, out texture);
 			fx.Parameters["Color"].SetValue(color.ToVector4());
 
-			float songPosP = songDrawProps.getTimeTPosF(Project.SongPosT);
-			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["InnerHlSize"].SetValue(0.0f);
 			Vector2 texSize = new Vector2(texture.Width, texture.Height);
 			fx.Parameters["TexSize"].SetValue(texSize);

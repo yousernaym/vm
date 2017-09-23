@@ -22,6 +22,7 @@ VSOutput VS(VSInput IN)
 	VSOutput OUT;
 	OUT.worldPos = float4(IN.rect.xy + IN.normPos * IN.rect.zw, 0, 1); //top-left + 0|1 * size
 	OUT.worldPos.xyz += PosOffset;
+	OUT.worldPos.x -= SongPos;
 	// Viewport adjustment.
 	//OUT.pos.xy /= ViewportSize.xy;
 	//OUT.pos.xy *= float2(2, -2);

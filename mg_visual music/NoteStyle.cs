@@ -296,6 +296,9 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.SamplerStates[1] = texTrackProps.HmapProps.SamplerState;
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+			float songPosP = songDrawProps.getTimeTPosF(Project.SongPosT);
+			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
 			fx.Parameters["VpMat"].SetValue(cam.VpMat);
 			Matrix projMat = cam.ProjMat;
