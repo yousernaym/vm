@@ -47,12 +47,9 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.rawPos = IN.pos.xyz;
 	OUT.normStepFromNoteStart = IN.normStepFromNoteStart;
 	//OUT.pos.xy -= 0.5;
-	// Compute the texture coordinate.
-	//OUT.texCoords = OUT.rawPos.xy / TexSize;
 	OUT.texCoords = IN.texCoords;
 
 	OUT.pos = float4(IN.pos.xy, 0, 1);
-	//OUT.pos.x += SongPos;
 	OUT.pos.xyz += PosOffset;
 	OUT.pos = mul(OUT.pos, VpMat);
 	// Viewport adjustment.

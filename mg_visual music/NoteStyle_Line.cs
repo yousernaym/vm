@@ -506,17 +506,16 @@ namespace Visual_Music
 			fx.Parameters["TexSize"].SetValue(texSize);
 			fx.Parameters["Texture"].SetValue(texture);
 
-
-			int numVerts;
-			bool drawHlNote = false;
-
 			fx.CurrentTechnique = fx.Techniques["Line"];
 			fx.CurrentTechnique.Passes[0].Apply();
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
-			//drawTrackLine(out numVerts, out drawHlNote, LineWidth, noteList, midiTrack, songDrawProps, trackProps, texTrackProps, texSize);
 
-			//fx.Parameters["SongPos"].SetValue(0.0f);
+			drawHighLights(midiTrack, songDrawProps, trackProps, globalTrackProps);
+		}
 
+		void drawHighLights(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
+		{
+			List<Midi.Note> noteList = midiTrack.Notes;
 			int hlNoteIndex = midiTrack.getLastNoteIndexAtTime(Project.SongPosT);
 			if (hlNoteIndex < 0)
 				return;
@@ -544,7 +543,6 @@ namespace Visual_Music
 			}
 
 			Vector3 noteStartVec = new Vector3(noteStart.X, noteStart.Y, 0);
-			drawHlNote = true;
 			if (HlStyle == LineHlStyleEnum.Arrow)
 			{
 				float arrowLength;
@@ -605,56 +603,53 @@ namespace Visual_Music
 			{
 				setHlCirclePos(noteStartVec);
 			}
-				//For shrinking highlights
-				float leftLength = -noteStart.X - 1;
-				float shrinkPercent = leftLength / (noteEnd - noteStart.X);
-				if (!ShrinkingHl)
-				{
-					shrinkPercent = 0;
-					if (HlBorder)
-						shrinkPercent = 1;
-				}
+			//For shrinking highlights
+			float leftLength = -noteStart.X - 1;
+			float shrinkPercent = leftLength / (noteEnd - noteStart.X);
+			if (!ShrinkingHl)
+			{
+				shrinkPercent = 0;
+				if (HlBorder)
+					shrinkPercent = 1;
+			}
 
-				fx.Parameters["ClipPercent"].SetValue(shrinkPercent);
-				float innerHlSize = HlSize * 0.5f * (1 - shrinkPercent);
-				fx.Parameters["InnerHlSize"].SetValue(innerHlSize);
-			
+			fx.Parameters["ClipPercent"].SetValue(shrinkPercent);
+			float innerHlSize = HlSize * 0.5f * (1 - shrinkPercent);
+			fx.Parameters["InnerHlSize"].SetValue(innerHlSize);
 
 			Color hlColor;
 			Texture2D hlTexture;
 			getMaterial(songDrawProps, trackProps, globalTrackProps, true, out hlColor, out hlTexture);
 			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
-			if (drawHlNote)
+			
+			fx.Parameters["Border"].SetValue(HlBorder);
+			if (HlStyle == LineHlStyleEnum.Arrow)
 			{
-				fx.Parameters["Border"].SetValue(HlBorder);
-				if (HlStyle == LineHlStyleEnum.Arrow)
-				{
-					//Calc shortest dist to incenter from border, ie. the inscribed circle's radius
-					float a = (lineHlVerts[0].pos - lineHlVerts[1].pos).Length();
-					float b = (lineHlVerts[0].pos - lineHlVerts[2].pos).Length();
-					float c = (lineHlVerts[1].pos - lineHlVerts[2].pos).Length();
-					float k = (a + b + c) / 2.0f;
-					float icRadius = (float)Math.Sqrt(k * (k - a) * (k - b) * (k - c)) / k;
-					fx.Parameters["DistToCenter"].SetValue(icRadius);
+				//Calc shortest dist to incenter from border, ie. the inscribed circle's radius
+				float a = (lineHlVerts[0].pos - lineHlVerts[1].pos).Length();
+				float b = (lineHlVerts[0].pos - lineHlVerts[2].pos).Length();
+				float c = (lineHlVerts[1].pos - lineHlVerts[2].pos).Length();
+				float k = (a + b + c) / 2.0f;
+				float icRadius = (float)Math.Sqrt(k * (k - a) * (k - b) * (k - c)) / k;
+				fx.Parameters["DistToCenter"].SetValue(icRadius);
 
-					songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
-					fx.CurrentTechnique = fx.Techniques["Arrow"];
-					fx.CurrentTechnique.Passes["Area"].Apply();
-					songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
-				}
-				else if (HlStyle == LineHlStyleEnum.Circle)
+				songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
+				fx.CurrentTechnique = fx.Techniques["Arrow"];
+				fx.CurrentTechnique.Passes["Area"].Apply();
+				songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
+			}
+			else if (HlStyle == LineHlStyleEnum.Circle)
+			{
+				if (MovingHl)
 				{
-					if (MovingHl)
-					{
-						float x = 0;// songDrawProps.viewportSize.X / 2.0f;
-						Vector3 circlePos = new Vector3(x, songDrawProps.getCurveScreenY(x, trackProps.TrackView.Curve), 0);
-						setHlCirclePos(circlePos);
-					}
-					songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
-					fx.CurrentTechnique = fx.Techniques["Circle"];
-					fx.CurrentTechnique.Passes[0].Apply();
-					songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, lineHlVerts, 0, 2);
+					float x = 0;// songDrawProps.viewportSize.X / 2.0f;
+					Vector3 circlePos = new Vector3(x, songDrawProps.getCurveScreenY(x, trackProps.TrackView.Curve), 0);
+					setHlCirclePos(circlePos);
 				}
+				songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
+				fx.CurrentTechnique = fx.Techniques["Circle"];
+				fx.CurrentTechnique.Passes[0].Apply();
+				songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, lineHlVerts, 0, 2);
 			}
 		}
 
