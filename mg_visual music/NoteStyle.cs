@@ -288,7 +288,10 @@ namespace Visual_Music
 		{   //Get currently visible notes in specified track
 			return track.getNotes(songDrawProps.songPosT - songDrawProps.viewWidthT / 2 - leftMargin, songDrawProps.songPosT + songDrawProps.viewWidthT / 2 + leftMargin);
 		}
-		virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
+
+		abstract public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps);
+
+		protected void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps, out float songPosP)
 		{
 			Camera cam = selectingRegion ? Project.DefaultCamera : Project.Camera;
 
@@ -298,7 +301,7 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
 			fx.Parameters["BlurredEdge"].SetValue(2.0f);
-			float songPosP = songDrawProps.getTimeTPosF(Project.SongPosT);
+			songPosP = songDrawProps.getTimeTPosF(Project.SongPosT);
 			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
 			fx.Parameters["VpMat"].SetValue(cam.VpMat);

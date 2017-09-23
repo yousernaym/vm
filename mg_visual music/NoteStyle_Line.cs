@@ -480,7 +480,8 @@ namespace Visual_Music
 
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
 		{
-			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps);
+			float songPosP;
+			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps, out songPosP);
 			List<Midi.Note> noteList = midiTrack.Notes;
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			if (noteList.Count == 0)
@@ -508,10 +509,10 @@ namespace Visual_Music
 			fx.CurrentTechnique.Passes[0].Apply();
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
 
-			drawHighLights(midiTrack, songDrawProps, trackProps, globalTrackProps);
+			drawHighLights(midiTrack, songDrawProps, trackProps, globalTrackProps, songPosP);
 		}
 
-		void drawHighLights(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps)
+		void drawHighLights(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, float songPosP)
 		{
 			List<Midi.Note> noteList = midiTrack.Notes;
 			int hlNoteIndex = midiTrack.getLastNoteIndexAtTime(Project.SongPosT);
@@ -602,7 +603,6 @@ namespace Visual_Music
 				setHlCirclePos(noteStartVec);
 			}
 			//For shrinking highlights
-			float songPosP = songDrawProps.getTimeTPosF(Project.SongPosT);
 			float leftLength = -(noteStart.X - songPosP) - 1;
 			float shrinkPercent = leftLength / (noteEnd - noteStart.X);
 			if (!ShrinkingHl)

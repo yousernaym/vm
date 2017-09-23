@@ -84,7 +84,8 @@ namespace Visual_Music
 
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
 		{
-			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps);
+			float songPosP;
+			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps, out songPosP);
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			List<Midi.Note> noteList = midiTrack.Notes;
 			if (noteList.Count == 0)
@@ -110,7 +111,8 @@ namespace Visual_Music
 
 				Color color;
 				Texture2D texture;
-				getMaterial(songDrawProps, trackProps, globalTrackProps, (int)noteStart.X, (int)noteEnd.X, out color, out texture);
+
+				getMaterial(songDrawProps, trackProps, globalTrackProps, (int)(noteStart.X - songPosP), (int)(noteEnd.X - songPosP), out color, out texture);
 				//fx.Parameters["Color"].SetValue(color.ToVector4());
 				instanceVerts[n].color = color;
 				fx.Parameters["Texture"].SetValue(texture);
