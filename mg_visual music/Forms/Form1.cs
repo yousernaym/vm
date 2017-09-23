@@ -357,7 +357,8 @@ namespace Visual_Music
 			Project.ViewWidthQn = (float)((TbSlider)sender).Value;
             songScrollBar.SmallChange = Project.ViewWidthT / 16;
             songScrollBar.LargeChange = Project.ViewWidthT / 1;
-			//project.createOcTrees();
+			
+			project.createOcTrees();
 		}
 
 		private void audioOffsetS_ValueChanged(object sender, EventArgs e)
@@ -1110,7 +1111,7 @@ namespace Visual_Music
 			if ((int)maxPitchUd.Value < Project.Notes.MinPitch)
 				maxPitchUd.Value = Project.Notes.MinPitch ;
 			Project.MaxPitch = (int)maxPitchUd.Value;
-			//project.createOcTrees();
+			project.createOcTrees();
 		}
 
 		private void minPitchUd_ValueChanged(object sender, EventArgs e)
@@ -1118,7 +1119,7 @@ namespace Visual_Music
 			if ((int)minPitchUd.Value > Project.Notes.MaxPitch)
 				minPitchUd.Value = Project.Notes.MaxPitch;
 			Project.MinPitch = (int)minPitchUd.Value;
-			//project.createOcTrees();
+			project.createOcTrees();
 		}
 
 		private void defaultPitchesBtn_Click(object sender, EventArgs e)

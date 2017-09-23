@@ -42,7 +42,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 {
 	OUT.normal = IN.normal;
 	OUT.center = IN.center;
-
+	OUT.center.x += SongPos;
 	IN.pos.x += SongPos;
 	OUT.rawPos = IN.pos.xyz;
 	OUT.normStepFromNoteStart = IN.normStepFromNoteStart;
@@ -52,6 +52,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.texCoords = IN.texCoords;
 
 	OUT.pos = float4(IN.pos.xy, 0, 1);
+	//OUT.pos.x += SongPos;
 	OUT.pos.xyz += PosOffset;
 	OUT.pos = mul(OUT.pos, VpMat);
 	// Viewport adjustment.

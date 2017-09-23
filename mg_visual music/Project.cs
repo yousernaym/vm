@@ -344,6 +344,8 @@ namespace Visual_Music
 
 		public void createOcTrees()
 		{
+			if (trackViews == null)
+				return;
 			Point viewportSize = new Point(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
 			SongDrawProps songDrawProps = new SongDrawProps();
 			songDrawProps.yMargin = (int)(normPitchMargin * viewportSize.Y);
