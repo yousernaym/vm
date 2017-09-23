@@ -602,7 +602,8 @@ namespace Visual_Music
 				setHlCirclePos(noteStartVec);
 			}
 			//For shrinking highlights
-			float leftLength = -noteStart.X - 1;
+			float songPosP = songDrawProps.getTimeTPosF(Project.SongPosT);
+			float leftLength = -(noteStart.X - songPosP) - 1;
 			float shrinkPercent = leftLength / (noteEnd - noteStart.X);
 			if (!ShrinkingHl)
 			{

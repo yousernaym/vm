@@ -67,7 +67,7 @@ namespace Visual_Music
 		public Form1(string[] args)
 		{
 			InitializeComponent();
-			Application.Idle += delegate { songPanel.update(); };
+			//Application.Idle += delegate { songPanel.update(); };
 
 			project = new Project(SongPanel);
 			startupArgs = args;

@@ -115,7 +115,8 @@ namespace Visual_Music
 				if (normSongPos != value)
 				{
 					normSongPos = value;
-					SongPanel.Invalidate();
+					//SongPanel.paint();
+					songPanel.Invalidate();
 					if (SongPanel.OnSongPosChanged != null)
 						SongPanel.OnSongPosChanged();
 				}

@@ -79,6 +79,8 @@ namespace Visual_Music
 
 	public class SongPanel : GraphicsDeviceControl
 	{
+		Jdlc.Timers.TimerQueueTimer timer = new Jdlc.Timers.TimerQueueTimer();
+		object updateLock = new object();
 		public delegate void Delegate_songPosChanged();
 		public Delegate_songPosChanged OnSongPosChanged { get; set; }
 		public Project Project { get; set; }
@@ -113,6 +115,12 @@ namespace Visual_Music
 		bool mergeRegionSelection = false;
 		bool mousePosScrollSong = false;
 		Rectangle selectedSongRegion;
+
+		//public void paint()
+		//{
+		//	OnPaint(null);
+		//}
+
 		Rectangle selectedScreenRegion;
 		public float NormMouseX { get; set; }
 		public float NormMouseY { get; set; }
@@ -148,12 +156,24 @@ namespace Visual_Music
 			regionSelectTexture.SetData(new[] { Color.White });
 
 			quad = new ScreenQuad(this);
+
+			//System.Timers.Timer timer = new System.Timers.Timer(1000 / 60);
+			//System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+			
+			timer.Interval = 1000 / 60;
+			timer.Elapsed += delegate { update(); };
+			timer.SynchronizingObject = this;
+			timer.Tick += delegate { update(); };
+			timer.Start();
 		}
 
 		public void update()
 		{
+			//if (!Monitor.TryEnter(updateLock, 0))
+			//return;
 			if (Project.Notes == null || isRenderingVideo)
 				return;
+			timer.Stop();
 			TimeSpan newTime = stopwatch.Elapsed;
 			deltaTimeS = (newTime - oldTime).TotalSeconds;
 			//if (deltaTimeS < renderInterval)
@@ -163,6 +183,8 @@ namespace Visual_Music
 			oldTime = newTime;
 			selectRegion();
 			Project.update(deltaTimeS);
+			timer.Start();
+			//Monitor.Exit(updateLock);
 		}
 
 		protected override void Dispose(bool disposing)
