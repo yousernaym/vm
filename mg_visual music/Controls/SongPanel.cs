@@ -26,29 +26,22 @@ namespace Visual_Music
 		public int songPosT;
 		public float songPosS;
 		public float noteHeight;
-		public int yMargin;
+		public float yMargin;
 		public Point viewportSize;
 		public int viewWidthT;
 		public Midi.Song song;
 		public int minPitch;
 
-		public Point getScreenPos(int timeT, int pitch)
-		{
-			Vector2 v = getScreenPosF(timeT, pitch);
-			return new Point((int)v.X, (int)v.Y);
-		}
-
 		public Vector2 getScreenPosF(int timeT, int pitch)
 		{
 			Vector2 p = new Vector2();
 			p.X = getTimeTPosF(timeT);
-			//p.Y = (int)((float)viewportSize.Y - (float)(pitch - song.MinPitch) * (float)noteHeight - (float)noteHeight / 2.0f - (float)yMargin);
 			p.Y = getPitchScreenPos((float)pitch);
 			return p;
 		}
 		public float getTimeTPosF(int timeT)
 		{
-			return (float)((double)(timeT) / viewWidthT + 0.5) * viewportSize.X - viewportSize.X / 2.0f;
+			return ((float)timeT / viewWidthT) * 2;
 		}
 		public int getPitchScreenPos(int pitch)
 		{
@@ -56,7 +49,7 @@ namespace Visual_Music
 		}
 		public float getPitchScreenPos(float pitch)
 		{
-			return viewportSize.Y - (pitch - minPitch) * noteHeight - noteHeight / 2.0f - yMargin - viewportSize.Y / 2.0f;
+			return (pitch - minPitch) * noteHeight + noteHeight / 2.0f + yMargin - Camera.ViewportSize.Y / 2;
 		}
 		public float getSongPosT(float screenX)
 		{ //Returns song pos in ticks
@@ -205,7 +198,7 @@ namespace Visual_Music
 				SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
 				SpriteBatch.End();
 			}
-			Project.drawSong(new Point(ClientRectangle.Size.Width, ClientRectangle.Size.Height), Project.NormSongPos);
+			Project.drawSong(new Point(2, 1), Project.NormSongPos);
 		}
 
 		void selectRegion()

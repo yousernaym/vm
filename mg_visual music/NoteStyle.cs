@@ -354,8 +354,8 @@ namespace Visual_Music
 
 			//Spatial props
 			Vector3 posOffset = globalTrackProps.PosOffset + trackProps.PosOffset;
-			posOffset *= 0.01f * songDrawProps.viewportSize.X;
-			posOffset.Z -= Math.Abs(projMat.M22) * songDrawProps.viewportSize.Y;
+			posOffset *= 0.01f * Camera.ViewportSize.X;
+			posOffset.Z -= Math.Abs(projMat.M11);
 			fx.Parameters["PosOffset"].SetValue(posOffset);
 
 			TrackProps lightProps = (bool)trackProps.UseGlobalLight ? globalTrackProps : trackProps;
@@ -363,7 +363,7 @@ namespace Visual_Music
 			normLightDir.Normalize();
 			fx.Parameters["LightDir"].SetValue(normLightDir);
 
-			fx.Parameters["CamPos"].SetValue(Project.Camera.ViewportPos * 0.5f);
+			fx.Parameters["CamPos"].SetValue(Project.Camera.Pos);
 		}
 
 		//public abstract void createGeoChunk(BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps);

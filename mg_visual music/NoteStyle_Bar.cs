@@ -126,7 +126,7 @@ namespace Visual_Music
 				//Vector4 destRect = new Vector4(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2, noteEnd.X - noteStart.X + 1, songDrawProps.noteHeight - 1);
 				//Vector4 srcRect = destRect;
 				Vector2 topLeft_world = new Vector2(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2);
-				Vector2 size_world = new Vector2(noteEnd.X - noteStart.X + 1, songDrawProps.noteHeight - 1);
+				Vector2 size_world = new Vector2(noteEnd.X - noteStart.X + 0.001f, songDrawProps.noteHeight - 0.001f);
 				Vector2 topLeft_tex = topLeft_world;
 				Vector2 size_tex = size_world;
 

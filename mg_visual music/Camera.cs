@@ -102,17 +102,7 @@ namespace Visual_Music
 				return Matrix.Invert(RotMat * transMat);
 			}
 		}
-		public Vector2 ViewportSize => new Vector2(SongPanel.GraphicsDevice.Viewport.Width, SongPanel.GraphicsDevice.Viewport.Height);
-		Matrix ViewportMat
-		{
-			get
-			{
-				return new Matrix(2 , 0, 0, 0,
-											0, -2 , 0, 0,
-											0, 0, 1, 0,
-											0, 0, 0, 1);
-			}
-		}
+		public static Vector2 ViewportSize { get; } = new Vector2(2, 18.0f / 16);
 		public Matrix ProjMat
 		{
 			get
@@ -125,10 +115,8 @@ namespace Visual_Music
 			}
 		}
 
-		public Matrix VpMat => ViewportMat * ViewMat * ProjMat;
-		
+		public Matrix VpMat => ViewMat * ProjMat;
 		public SongPanel SongPanel { get; set; }
-		
 
 		//Methods/////////////////////////////////
 		public Camera(SongPanel spanel = null)

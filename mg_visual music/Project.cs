@@ -366,8 +366,8 @@ namespace Visual_Music
 				return;
 
 			SongDrawProps songDrawProps = new SongDrawProps();
-			songDrawProps.yMargin = (int)(normPitchMargin * viewportSize.Y);
-			songDrawProps.noteHeight = (float)(viewportSize.Y - songDrawProps.yMargin * 2) / (NumPitches);
+			songDrawProps.yMargin = normPitchMargin * Camera.ViewportSize.Y;
+			songDrawProps.noteHeight = (float)(Camera.ViewportSize.Y - songDrawProps.yMargin * 2) / (NumPitches);
 			songDrawProps.songPosT = SongPosT;
 			songDrawProps.songPosS = (float)getSongPosInSeconds();
 			songDrawProps.viewportSize = viewportSize;
