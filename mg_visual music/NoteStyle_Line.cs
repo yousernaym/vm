@@ -463,22 +463,15 @@ namespace Visual_Music
 						VertexBuffer vb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
 						vb.SetData(hLineVerts, 0, numHLineVerts);
 						geo.hLineVb.Add(vb);
-						//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
 						numHLineVerts = 0;
 					}
-					//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
 					if (numVerts > 5)
 					{
 						VertexBuffer vb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, numVerts, BufferUsage.WriteOnly);
 						vb.SetData(lineVerts, 0, numVerts);
 						geo.lineVb.Add(vb);
-						
-						//songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
-						//songPanel.GraphicsDevice.SetVertexBuffer(geo.lineVb);
-						//songPanel.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, 3, geo.lineVb.VertexCount-5);
 						numVerts = 3;
 					}
-					//songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
 				}
 			}
 		}
