@@ -75,6 +75,21 @@ namespace Visual_Music
 		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
 		{
 			geo = new BarGeo();
+			List<Midi.Note> noteList = midiTrack.Notes;
+			if (noteList.Count == 0)
+				return;
+			for (int n = 0; n < noteList.Count; n++)
+			{
+				Midi.Note note = noteList[n];
+				if (note.start > songDrawProps.song.SongLengthT) //only if audio ends before the notes end
+					continue;
+				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
+				Vector2 noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch);
+				float z = fx.Parameters["PosOffset"].GetValueVector3().Z;
+				Vector3 boxMin = new Vector3(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2, z);
+				Vector3 boxMax = new Vector3(noteEnd.X, boxMin.Y + songDrawProps.noteHeight, z);
+				geo.bboxes.Add(new BoundingBox(boxMin, boxMax));
+			}
 		}
 
 		public override void drawGeoChunk(Geo geo)
@@ -94,20 +109,12 @@ namespace Visual_Music
 			//songPanel.SpriteBatch.Begin(SpriteSortMode.Deferred, songPanel.BlendState, texTrackProps.TexProps.SamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
 			for (int n = 0; n < noteList.Count; n++)
 			{
-				Midi.Note note = noteList[n], nextNote;
+				Midi.Note note = noteList[n];
 				if (note.start > songDrawProps.song.SongLengthT) //only if audio ends before the notes end
 					continue;
 
-				if (n < noteList.Count - 1)
-					nextNote = noteList[n + 1];
-				else
-					nextNote = note;
-
 				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
 				Vector2 noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch);
-
-				//noteDrawProps.nextNoteX = (int)(((float)(nextNote.start - songPos) / viewWidthT + 0.5) * viewportSize.X);
-				//noteDrawProps.nextNoteY = viewportSize.Y - (nextNote.pitch - notes.MinPitch) * noteHeight - noteHeight / 2 - yMargin;
 
 				Color color;
 				Texture2D texture;

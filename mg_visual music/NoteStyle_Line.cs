@@ -412,11 +412,11 @@ namespace Visual_Music
 					}
 
 					//Create bounding box
-					Vector3 bboxMin = lineVerts[vertIndex].pos;
-					Vector3 bboxMax = lineVerts[vertIndex + 1].pos;
-					bboxMin.Z = bboxMax.Z = fx.Parameters["PosOffset"].GetValueVector3().Z;
-					geo.bboxes.Add(BoundingBox.CreateFromPoints(new Vector3[2] { bboxMin, bboxMax }));
-
+					Vector3 bboxCorner1 = lineVerts[vertIndex].pos;
+					Vector3 bboxCorner2 = lineVerts[vertIndex + 1].pos;
+					bboxCorner1.Z = bboxCorner2.Z = fx.Parameters["PosOffset"].GetValueVector3().Z;
+					geo.bboxes.Add(BoundingBox.CreateFromPoints(new Vector3[2] { bboxCorner1, bboxCorner2 }));
+					
 					vertIndex += 2;
 					if (vertIndex >= MaxLineVerts - 2 || hLineVertIndex >= MaxHLineVerts - 2)
 					{
