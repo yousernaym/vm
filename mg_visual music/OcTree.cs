@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Visual_Music
 {
-	public class OcTree<Geo> where Geo : IDisposable
+	public class OcTree<Geo> where Geo : Visual_Music.Geo
 	{
 		protected OcTree<Geo>[] _nodes;
 		protected bool _isEmpty = true;
@@ -123,6 +123,19 @@ namespace Visual_Music
 						node.dispose();
 				}
 			}
+		}
+
+		public bool areObjectsInFrustum(BoundingFrustum frustum, float songPos)
+		{
+			foreach (var bbox in _geo.bboxes)
+			{
+				BoundingBox bb = bbox;
+				bb.Min.X -= songPos;
+				bb.Max.X -= songPos;
+				if (bb.Intersects(frustum))
+					return true;
+			}
+			return false;			
 		}
 	}
 }

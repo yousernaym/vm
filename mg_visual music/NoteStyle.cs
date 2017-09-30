@@ -464,8 +464,9 @@ namespace Visual_Music
 		}
 	}
 
-	public abstract class Geo : IDisposable
+	public abstract class Geo
 	{
+		public List<BoundingBox> bboxes = new List<BoundingBox>();
 		public abstract void Dispose();
 	}
 }

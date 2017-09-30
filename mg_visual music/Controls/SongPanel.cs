@@ -19,6 +19,7 @@ namespace Visual_Music
 {
 	//using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
 	using WinKeys = System.Windows.Forms.Keys;
+	using RectangleF = System.Drawing.RectangleF;
 	
 	public class SongDrawProps
 	{
@@ -212,6 +213,7 @@ namespace Visual_Music
 		{
 			if (Parent == null || ((Form1)Parent).trackListItems.Count == 0)
 				return;
+			//Project.TrackViews[i].ocTree.
 			if (leftMbPressed)
 			{
 				Invalidate();
@@ -224,23 +226,59 @@ namespace Visual_Music
 				Point mousePos = new Point((int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width), (int)(NormMouseY * ClientRectangle.Height));
 				selectedScreenRegion.Width = mousePos.X - selectedScreenRegion.X;
 				selectedScreenRegion.Height = mousePos.Y - selectedScreenRegion.Y;
-
-				Rectangle normRect = normalizeRect(selectedSongRegion);
+				
+				Rectangle normSongRect = normalizeRect(selectedSongRegion);
 				int selectedCount = 0;
-				((Form1)Parent).debugLabel.Text = normRect.ToString();
+				((Form1)Parent).debugLabel.Text = normSongRect.ToString();
 				((Form1)Parent).debugLabel.Text += "   " + selectedScreenRegion.ToString();
-				for (int i = 1; i < Project.Notes.Tracks.Count; i++)
+				//for (int i = 1; i < Project.Notes.Tracks.Count; i++)
+				//{
+				//	List<Midi.Note> noteList = Project.TrackViews[i].MidiTrack.getNotes(normRect.Left, normRect.Right, normRect.Top, normRect.Bottom);
+				//	if (noteList.Count > 0)
+				//	{
+				//		((Form1)Parent).trackListItems[i].Selected = true;
+				//		selectedCount++;
+				//	}
+				//	else if (!mergeRegionSelection && ((Form1)Parent).trackListItems.Count > 1)
+				//		((Form1)Parent).trackListItems[i].Selected = false;
+				//	//trackProps[i].Selected = false;
+				//}
+
+				//Frustum check----------------
+				if (selectedScreenRegion.Width == 0 || selectedScreenRegion.Height == 0)
+					return;
+				Matrix selectionFrustumMat = Project.Camera.VpMat;
+				float scaleX = (float)ClientRectangle.Width / Math.Abs(selectedScreenRegion.Width), scaleY = (float)ClientRectangle.Height / Math.Abs(selectedScreenRegion.Height);
+				RectangleF normScreenSelection = new RectangleF((float)selectedScreenRegion.X / ClientRectangle.Width, (float)selectedScreenRegion.Y / ClientRectangle.Height, (float)selectedScreenRegion.Width / ClientRectangle.Width, (float)selectedScreenRegion.Height / ClientRectangle.Height);
+				//((Form1)Parent).debugLabel.Text += "   ***   NormScreen: " + normScreenSelection;
+				//((Form1)Parent).debugLabel.Text += "   ***   After inflate: " + normScreenSelection;
+				normScreenSelection.X *= 2;  normScreenSelection.Y *= -2;
+				normScreenSelection.Width *= 2; normScreenSelection.Height *= -2;
+				normScreenSelection.Offset(-1, 1);
+
+				Vector2 normCenter = new Vector2(normScreenSelection.X + normScreenSelection.Width / 2, normScreenSelection.Y + normScreenSelection.Height / 2);
+				selectionFrustumMat *= Matrix.CreateScale(scaleX, scaleY, 1);
+				//scaleX = scaleY = 1;
+				selectionFrustumMat *= Matrix.CreateTranslation(-normCenter.X * scaleX, -normCenter.Y * scaleY, 0);
+				((Form1)Parent).debugLabel.Text += "   ***   " + normCenter;
+				((Form1)Parent).debugLabel.Text += "   ***   " + normScreenSelection; 
+				BoundingFrustum selectionFrustum = new BoundingFrustum(selectionFrustumMat);
+				//BoundingFrustum selectionFrustum = new BoundingFrustum(Project.Camera.ProjMat);
+
+				float songPos = ((float)Project.SongPosT / Project.ViewWidthT + 0.5f) * ClientRectangle.Width - ClientRectangle.Width / 2.0f;
+				for (int i = 1; i < Project.TrackViews.Count; i++)
 				{
-					List<Midi.Note> noteList = Project.TrackViews[i].MidiTrack.getNotes(normRect.Left, normRect.Right, normRect.Top, normRect.Bottom);
-					if (noteList.Count > 0)
+					if (Project.TrackViews[i].MidiTrack.Notes.Count > 0 &&
+						Project.TrackViews[i].ocTree.areObjectsInFrustum(selectionFrustum, songPos))
 					{
 						((Form1)Parent).trackListItems[i].Selected = true;
-						selectedCount++;
+						selectedCount++; ;
 					}
 					else if (!mergeRegionSelection && ((Form1)Parent).trackListItems.Count > 1)
 						((Form1)Parent).trackListItems[i].Selected = false;
-					//trackProps[i].Selected = false;
 				}
+				//----------------------
+
 				if (selectedCount == 0 && !mergeRegionSelection)
 					((Form1)Parent).trackListItems[0].Selected = true;
 				else if (selectedCount > 0)

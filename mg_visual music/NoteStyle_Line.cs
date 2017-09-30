@@ -410,6 +410,13 @@ namespace Visual_Music
 						lineVerts[vertIndex].pos = lineVerts[vertIndex - 2].pos;
 						lineVerts[vertIndex + 1].pos = lineVerts[vertIndex - 1].pos;
 					}
+
+					//Create bounding box
+					Vector3 bboxMin = lineVerts[vertIndex].pos;
+					Vector3 bboxMax = lineVerts[vertIndex + 1].pos;
+					bboxMin.Z = bboxMax.Z = fx.Parameters["PosOffset"].GetValueVector3().Z;
+					geo.bboxes.Add(BoundingBox.CreateFromPoints(new Vector3[2] { bboxMin, bboxMax }));
+
 					vertIndex += 2;
 					if (vertIndex >= MaxLineVerts - 2 || hLineVertIndex >= MaxHLineVerts - 2)
 					{
@@ -474,8 +481,6 @@ namespace Visual_Music
 					//songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
 				}
 			}
-			
-			
 		}
 
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
