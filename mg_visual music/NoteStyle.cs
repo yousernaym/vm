@@ -39,12 +39,6 @@ namespace Visual_Music
 	[Serializable()]
 	public class NoteStyleMod : ISerializable
 	{
-		//static string[,] SourceType =
-		//{
-		//	{ "DistFromLeft","DistFromTop" },
-		//	{ "DistFromCenter","DistFromCenter" },
-		//	{ "DistFromRight","DistFromBottom" }
-		//};			
 		public string Name { get; set; }
 		public Vector2 Origin
 		{
@@ -172,7 +166,7 @@ namespace Visual_Music
 		protected static Textures[] defaultTextures = new Textures[Enum.GetValues(typeof(NoteStyleEnum)).GetLength(0)];
 
 		protected Effect fx;
-
+		
 		//protected TrackProps trackProps = null;
 		//public TrackProps TrackProps
 		//{
@@ -182,7 +176,7 @@ namespace Visual_Music
 
 		protected static SongPanel songPanel;
 		protected static Project Project => songPanel.Project;
-
+		
 		//Serializable----------
 		protected NoteStyleEnum styleType; //Set in constructor of inherited class
 										   //public BindingList<NoteStyleMod> ModEntries { get; set; } = new BindingList<NoteStyleMod>();
@@ -266,7 +260,10 @@ namespace Visual_Music
 			defaultTextures[(int)NoteStyleEnum.Line].hilited = defaultTextures[(int)NoteStyleEnum.Bar].normal;
 			defaultTextures[(int)NoteStyleEnum.Line].normal = defaultTextures[(int)NoteStyleEnum.Bar].normal;
 		}
-		abstract public void loadFx();
+		public abstract void loadFx();
+		//abstract public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps);
+		public abstract void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps);
+		public abstract void drawGeoChunk(Geo geo);
 
 		protected void getMaterial(SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, int x1, int x2, out Color color, out Texture2D texture)
 		{
@@ -291,7 +288,10 @@ namespace Visual_Music
 		{   //Get currently visible notes in specified track
 			return track.getNotes(songDrawProps.songPosT - songDrawProps.viewWidthT / 2 - leftMargin, songDrawProps.songPosT + songDrawProps.viewWidthT / 2 + leftMargin);
 		}
-		virtual public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
+
+		abstract public void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps);
+
+		protected void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps, out float songPosP)
 		{
 			Camera cam = selectingRegion ? Project.DefaultCamera : Project.Camera;
 
@@ -299,6 +299,10 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.SamplerStates[1] = texTrackProps.HmapProps.SamplerState;
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+			fx.Parameters["BlurredEdge"].SetValue(2.0f);
+			songPosP = songDrawProps.getTimeTPosF(Project.SongPosT);
+			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(songDrawProps.viewportSize.X, songDrawProps.viewportSize.Y));
 			fx.Parameters["VpMat"].SetValue(cam.VpMat);
 			Matrix projMat = cam.ProjMat;
@@ -362,6 +366,8 @@ namespace Visual_Music
 			fx.Parameters["CamPos"].SetValue(Project.Camera.ViewportPos * 0.5f);
 		}
 
+		//public abstract void createGeoChunk(BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps);
+		
 		public void addModEntry(bool selectItem, string name = "")
 		{
 			if (string.IsNullOrWhiteSpace(name))
@@ -456,6 +462,12 @@ namespace Visual_Music
 					return songPos / texSize;
 			}
 		}
+	}
+
+	public abstract class Geo
+	{
+		public List<BoundingBox> bboxes = new List<BoundingBox>();
+		public abstract void Dispose();
 	}
 }
 	

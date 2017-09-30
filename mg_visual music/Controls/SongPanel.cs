@@ -19,6 +19,7 @@ namespace Visual_Music
 {
 	//using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
 	using WinKeys = System.Windows.Forms.Keys;
+	using RectangleF = System.Drawing.RectangleF;
 	
 	public class SongDrawProps
 	{
@@ -36,6 +37,7 @@ namespace Visual_Music
 			Vector2 v = getScreenPosF(timeT, pitch);
 			return new Point((int)v.X, (int)v.Y);
 		}
+
 		public Vector2 getScreenPosF(int timeT, int pitch)
 		{
 			Vector2 p = new Vector2();
@@ -46,7 +48,7 @@ namespace Visual_Music
 		}
 		public float getTimeTPosF(int timeT)
 		{
-			return (float)((double)(timeT - songPosT) / viewWidthT + 0.5) * viewportSize.X - viewportSize.X / 2.0f;
+			return (float)((double)(timeT) / viewWidthT + 0.5) * viewportSize.X - viewportSize.X / 2.0f;
 		}
 		public int getPitchScreenPos(int pitch)
 		{
@@ -78,6 +80,8 @@ namespace Visual_Music
 
 	public class SongPanel : GraphicsDeviceControl
 	{
+		//Jdlc.Timers.TimerQueueTimer timer = new Jdlc.Timers.TimerQueueTimer();
+		System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
 		public delegate void Delegate_songPosChanged();
 		public Delegate_songPosChanged OnSongPosChanged { get; set; }
 		public Project Project { get; set; }
@@ -111,7 +115,12 @@ namespace Visual_Music
 		public bool SelectingRegion => selectingRegion;
 		bool mergeRegionSelection = false;
 		bool mousePosScrollSong = false;
-		Rectangle selectedSongRegion;
+		
+		//public void paint()
+		//{
+		//	OnPaint(null);
+		//}
+
 		Rectangle selectedScreenRegion;
 		public float NormMouseX { get; set; }
 		public float NormMouseY { get; set; }
@@ -147,12 +156,22 @@ namespace Visual_Music
 			regionSelectTexture.SetData(new[] { Color.White });
 
 			quad = new ScreenQuad(this);
+
+			timer.Interval = 1000 / 120;
+			//timer.Elapsed += delegate { update(); };
+			//timer.SynchronizingObject = this;
+			timer.Tick += delegate { update(); };
+			timer.Start();
 		}
 
 		public void update()
 		{
 			if (Project.Notes == null || isRenderingVideo)
 				return;
+			timer.Stop();
+						
+			//Thread.Sleep(100);
+
 			TimeSpan newTime = stopwatch.Elapsed;
 			deltaTimeS = (newTime - oldTime).TotalSeconds;
 			//if (deltaTimeS < renderInterval)
@@ -162,6 +181,8 @@ namespace Visual_Music
 			oldTime = newTime;
 			selectRegion();
 			Project.update(deltaTimeS);
+
+			timer.Start();
 		}
 
 		protected override void Dispose(bool disposing)
@@ -195,31 +216,47 @@ namespace Visual_Music
 			{
 				Invalidate();
 				selectingRegion = true;
-				int x = Project.screenPosToSongPos(NormMouseX);
-				selectedSongRegion.Width = x - selectedSongRegion.X;
-				int y = Project.getPitch(NormMouseY);
-				selectedSongRegion.Height = y - selectedSongRegion.Y;
 
 				Point mousePos = new Point((int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width), (int)(NormMouseY * ClientRectangle.Height));
 				selectedScreenRegion.Width = mousePos.X - selectedScreenRegion.X;
 				selectedScreenRegion.Height = mousePos.Y - selectedScreenRegion.Y;
-
-				Rectangle normRect = normalizeRect(selectedSongRegion);
+				
 				int selectedCount = 0;
-				((Form1)Parent).debugLabel.Text = normRect.ToString();
-				((Form1)Parent).debugLabel.Text += "   " + selectedScreenRegion.ToString();
-				for (int i = 1; i < Project.Notes.Tracks.Count; i++)
+
+				//Frustum check----------------
+				if (selectedScreenRegion.Width == 0 || selectedScreenRegion.Height == 0)
+					return;
+				Matrix selectionFrustumMat = Project.Camera.VpMat;
+				RectangleF normScreenSelection = new RectangleF((float)selectedScreenRegion.X / ClientRectangle.Width, (float)selectedScreenRegion.Y / ClientRectangle.Height, (float)selectedScreenRegion.Width / ClientRectangle.Width, (float)selectedScreenRegion.Height / ClientRectangle.Height);
+				normScreenSelection.X *= 2;  normScreenSelection.Y *= -2;
+				normScreenSelection.Width *= 2; normScreenSelection.Height *= -2;
+				normScreenSelection.Offset(-1, 1);
+
+				//Scale
+				float scaleX = 2 / Math.Abs(normScreenSelection.Width), scaleY = 2.0f / Math.Abs(normScreenSelection.Height);
+				selectionFrustumMat *= Matrix.CreateScale(scaleX, scaleY, 1);
+
+				//Translation
+				Vector2 normCenter = new Vector2(normScreenSelection.X + normScreenSelection.Width / 2, normScreenSelection.Y + normScreenSelection.Height / 2);
+				selectionFrustumMat *= Matrix.CreateTranslation(-normCenter.X * scaleX, -normCenter.Y * scaleY, 0);
+
+				//Create frustum
+				BoundingFrustum selectionFrustum = new BoundingFrustum(selectionFrustumMat);
+
+				float songPos = ((float)Project.SongPosT / Project.ViewWidthT + 0.5f) * ClientRectangle.Width - ClientRectangle.Width / 2.0f;
+				for (int i = 1; i < Project.TrackViews.Count; i++)
 				{
-					List<Midi.Note> noteList = Project.TrackViews[i].MidiTrack.getNotes(normRect.Left, normRect.Right, normRect.Top, normRect.Bottom);
-					if (noteList.Count > 0)
+					if (Project.TrackViews[i].MidiTrack.Notes.Count > 0 &&
+						Project.TrackViews[i].ocTree.areObjectsInFrustum(selectionFrustum, songPos))
 					{
 						((Form1)Parent).trackListItems[i].Selected = true;
-						selectedCount++;
+						selectedCount++; ;
 					}
 					else if (!mergeRegionSelection && ((Form1)Parent).trackListItems.Count > 1)
 						((Form1)Parent).trackListItems[i].Selected = false;
-					//trackProps[i].Selected = false;
 				}
+				//----------------------
+
 				if (selectedCount == 0 && !mergeRegionSelection)
 					((Form1)Parent).trackListItems[0].Selected = true;
 				else if (selectedCount > 0)
@@ -231,6 +268,7 @@ namespace Visual_Music
 				Invalidate();
 			}
 		}
+
 		Rectangle normalizeRect(Rectangle _rect)
 		{
 			Rectangle rect = new Rectangle(_rect.X, _rect.Y, _rect.Width, _rect.Height);
@@ -634,6 +672,7 @@ namespace Visual_Music
 		protected override void OnResize(EventArgs e)
 		{
 			Invalidate();
+			Project.createOcTrees();
 		}
 
 		protected override void OnMouseDown(MouseEventArgs e)
@@ -646,8 +685,6 @@ namespace Visual_Music
 				leftMbPressed = true;
 				if (ModifierKeys.HasFlag(WinKeys.Shift))
 					mergeRegionSelection = true;
-				selectedSongRegion.X = Project.screenPosToSongPos(NormMouseX);
-				selectedSongRegion.Y = Project.getPitch(NormMouseY);
 				selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width);
 				selectedScreenRegion.Y = (int)(NormMouseY * ClientRectangle.Height);
 			}

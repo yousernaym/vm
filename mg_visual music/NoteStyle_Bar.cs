@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Microsoft.Xna.Framework.Content;
 using WinFormsGraphicsDevice;
 using System.Diagnostics;
+using Midi;
 
 namespace Visual_Music
 {
@@ -65,13 +66,41 @@ namespace Visual_Music
 		{
 			base.GetObjectData(info, ctxt);
 		}
+
 		override public void loadFx()
 		{
 			fx = songPanel.Content.Load<Effect>("Bar");
 		}
+
+		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
+		{
+			geo = new BarGeo();
+			List<Midi.Note> noteList = midiTrack.Notes;
+			if (noteList.Count == 0)
+				return;
+			for (int n = 0; n < noteList.Count; n++)
+			{
+				Midi.Note note = noteList[n];
+				if (note.start > songDrawProps.song.SongLengthT) //only if audio ends before the notes end
+					continue;
+				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
+				Vector2 noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch);
+				float z = fx.Parameters["PosOffset"].GetValueVector3().Z;
+				Vector3 boxMin = new Vector3(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2, z);
+				Vector3 boxMax = new Vector3(noteEnd.X, boxMin.Y + songDrawProps.noteHeight, z);
+				geo.bboxes.Add(new BoundingBox(boxMin, boxMax));
+			}
+		}
+
+		public override void drawGeoChunk(Geo geo)
+		{
+
+		}
+
 		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
 		{
-			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps);
+			float songPosP;
+			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps, out songPosP);
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			List<Midi.Note> noteList = midiTrack.Notes;
 			if (noteList.Count == 0)
@@ -80,24 +109,17 @@ namespace Visual_Music
 			//songPanel.SpriteBatch.Begin(SpriteSortMode.Deferred, songPanel.BlendState, texTrackProps.TexProps.SamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
 			for (int n = 0; n < noteList.Count; n++)
 			{
-				Midi.Note note = noteList[n], nextNote;
+				Midi.Note note = noteList[n];
 				if (note.start > songDrawProps.song.SongLengthT) //only if audio ends before the notes end
 					continue;
-
-				if (n < noteList.Count - 1)
-					nextNote = noteList[n + 1];
-				else
-					nextNote = note;
 
 				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
 				Vector2 noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch);
 
-				//noteDrawProps.nextNoteX = (int)(((float)(nextNote.start - songPos) / viewWidthT + 0.5) * viewportSize.X);
-				//noteDrawProps.nextNoteY = viewportSize.Y - (nextNote.pitch - notes.MinPitch) * noteHeight - noteHeight / 2 - yMargin;
-
 				Color color;
 				Texture2D texture;
-				getMaterial(songDrawProps, trackProps, globalTrackProps, (int)noteStart.X, (int)noteEnd.X, out color, out texture);
+
+				getMaterial(songDrawProps, trackProps, globalTrackProps, (int)(noteStart.X - songPosP), (int)(noteEnd.X - songPosP), out color, out texture);
 				//fx.Parameters["Color"].SetValue(color.ToVector4());
 				instanceVerts[n].color = color;
 				fx.Parameters["Texture"].SetValue(texture);
@@ -129,6 +151,11 @@ namespace Visual_Music
 			fx.CurrentTechnique.Passes["Pass1"].Apply();
 			songPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, noteList.Count);
 		}
+
+		//override public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps)
+		//{
+
+		//}
 		
 		public static void sInit()
 		{
@@ -160,5 +187,13 @@ namespace Visual_Music
 		//    texture = textures[index];
 		//songPanel.SpriteBatch.Draw(texture, new Rectangle(drawProps.x1, drawProps.y - drawProps.noteHeight / 2, drawProps.x2 - drawProps.x1 + 1, drawProps.noteHeight), color);
 		//}
+	}
+
+	public class BarGeo : Geo
+	{
+		public override void Dispose()
+		{
+			
+		}
 	}
 }

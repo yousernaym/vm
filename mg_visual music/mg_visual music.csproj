@@ -156,6 +156,7 @@
     <Compile Include="NoteStyle_Line.cs" />
     <Compile Include="Media.cs" />
     <Compile Include="NoteStyle.cs" />
+    <Compile Include="OcTree.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -186,6 +187,8 @@
     </Compile>
     <Compile Include="ScreenQuad.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="tparty\Timer.cs" />
+    <Compile Include="tparty\TimerQueueTimer.cs" />
     <Compile Include="TrackProps.cs" />
     <Compile Include="Forms\BaseDialog.cs">
       <SubType>Form</SubType>
@@ -194,11 +197,11 @@
       <DependentUpon>BaseDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="TrackView.cs" />
-    <Compile Include="Xna forms\GraphicsDeviceControl.cs">
+    <Compile Include="tparty\Xna forms\GraphicsDeviceControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Xna forms\GraphicsDeviceService.cs" />
-    <Compile Include="Xna forms\ServiceContainer.cs" />
+    <Compile Include="tparty\Xna forms\GraphicsDeviceService.cs" />
+    <Compile Include="tparty\Xna forms\ServiceContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
@@ -232,9 +235,9 @@
     <None Include="app.config" />
     <None Include="app.manifest" />
     <Content Include="Content\NoteStyle.fx" />
+    <None Include="Distribute\Tparty\xmplay\xmplay.ini" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\SongPanel.datasource" />
-    <None Include="tparty\xmplay\xmplay.ini" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Controls\BarStyleControl.resx">

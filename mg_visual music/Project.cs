@@ -115,7 +115,8 @@ namespace Visual_Music
 				if (normSongPos != value)
 				{
 					normSongPos = value;
-					SongPanel.Invalidate();
+					//SongPanel.paint();
+					songPanel.Invalidate();
 					if (SongPanel.OnSongPosChanged != null)
 						SongPanel.OnSongPosChanged();
 				}
@@ -339,6 +340,24 @@ namespace Visual_Music
 			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
 				trackViews.RemoveRange(numTracks, startTrack - numTracks);
 			TrackProps.GlobalProps = trackViews[0].TrackProps;
+			createOcTrees();
+		}
+
+		public void createOcTrees()
+		{
+			if (trackViews == null)
+				return;
+			Point viewportSize = new Point(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
+			SongDrawProps songDrawProps = new SongDrawProps();
+			songDrawProps.yMargin = (int)(normPitchMargin * viewportSize.Y);
+			songDrawProps.noteHeight = (float)(viewportSize.Y - songDrawProps.yMargin * 2) / (NumPitches);
+			songDrawProps.viewportSize = viewportSize;
+			songDrawProps.viewWidthT = viewWidthT;
+			songDrawProps.song = notes;
+			songDrawProps.minPitch = MinPitch;
+			//for (int i = TrackViews.Count - 1; i > 0; i--)
+			for (int i = 1; i < trackViews.Count; i++)
+				TrackViews[i].createOcTree(songDrawProps, GlobalTrackProps);
 		}
 
 		public void drawSong(Point viewportSize, double normPos)

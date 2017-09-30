@@ -42,16 +42,16 @@ void VS(in VSInput IN, out VSOutput OUT)
 {
 	OUT.normal = IN.normal;
 	OUT.center = IN.center;
-
+	//OUT.center.x -= SongPos;
+	//IN.pos.x -= SongPos;
 	OUT.rawPos = IN.pos.xyz;
 	OUT.normStepFromNoteStart = IN.normStepFromNoteStart;
 	//OUT.pos.xy -= 0.5;
-	// Compute the texture coordinate.
-	//OUT.texCoords = OUT.rawPos.xy / TexSize;
 	OUT.texCoords = IN.texCoords;
 
 	OUT.pos = float4(IN.pos.xy, 0, 1);
 	OUT.pos.xyz += PosOffset;
+	OUT.pos.x -= SongPos;
 	OUT.pos = mul(OUT.pos, VpMat);
 	// Viewport adjustment.
 	//OUT.pos.xy /= ViewportSize;
@@ -83,6 +83,7 @@ void PS(out float4 color : COLOR0, in VSOutput IN)
 	float3 tPos = IN.rawPos - IN.center;
 	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f;
 	float2 normPos = float2(IN.normStepFromNoteStart, normDistFromEdge);
+	IN.rawPos.x -= SongPos;
 	color = modulate(normPos, color, lightingNormal, IN.rawPos);
 }
 

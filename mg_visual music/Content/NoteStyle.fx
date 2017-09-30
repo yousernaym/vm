@@ -3,6 +3,7 @@ float2 ViewportSize;
 float2 TexSize;
 texture Texture;
 float2 ProjScale;
+float SongPos;
 
 sampler  TextureSampler = sampler_state
 {

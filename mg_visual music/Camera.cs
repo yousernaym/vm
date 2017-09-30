@@ -13,6 +13,7 @@ namespace Visual_Music
 	[Serializable]
 	public class Camera : ISerializable
 	{
+		public BoundingFrustum Frustum => new BoundingFrustum(VpMat);
 		public int Eye { get; set; } = 0;   //Stereoscopic rendering: -1 = left, 0 = center(monoscopic), 1 = right
 		public float EyeOffset { get; set; } = 0.25f;   //1 = 100% of viewport width
 		public bool InvertY { get; set; } = false;
@@ -117,7 +118,7 @@ namespace Visual_Music
 			get
 			{
 				float fov = CubeMapFace >= 0 ? (float)Math.PI / 2.0f : Fov;
-				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, ViewportSize.X / ViewportSize.Y, 0.001f, 100000);
+				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, ViewportSize.X / ViewportSize.Y, 1, 1000000);
 				if (InvertY)
 					mat.M22 *= -1;
 				return mat;

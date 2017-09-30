@@ -53,6 +53,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().LineWidth = (int)lineWidthUd.Value;
+			SongPanel.Project.createOcTrees();
 		}
 
 		private void qnGapFillUd_ValueChanged(object sender, EventArgs e)
@@ -61,6 +62,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().Qn_gapThreshold = (int)qnGapFillUd.Value;
+			SongPanel.Project.createOcTrees();
 		}
 
 		private void lineHlStyleList_SelectedIndexChanged(object sender, EventArgs e)
