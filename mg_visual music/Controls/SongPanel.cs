@@ -240,7 +240,9 @@ namespace Visual_Music
 				Vector2 normCenter = new Vector2(normScreenSelection.X + normScreenSelection.Width / 2, normScreenSelection.Y + normScreenSelection.Height / 2);
 				selectionFrustumMat *= Matrix.CreateTranslation(-normCenter.X * scaleX, -normCenter.Y * scaleY, 0);
 
+				//Create frustum
 				BoundingFrustum selectionFrustum = new BoundingFrustum(selectionFrustumMat);
+
 				float songPos = ((float)Project.SongPosT / Project.ViewWidthT + 0.5f) * ClientRectangle.Width - ClientRectangle.Width / 2.0f;
 				for (int i = 1; i < Project.TrackViews.Count; i++)
 				{
