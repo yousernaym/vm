@@ -361,20 +361,8 @@ namespace Visual_Music
 			if (notes == null)
 				return;
 
-			SongDrawProps songDrawProps = new SongDrawProps();
-			songDrawProps.yMargin = NormPitchMargin * Camera.ViewportSize.Y;
-			songDrawProps.noteHeight = (float)(Camera.ViewportSize.Y - songDrawProps.yMargin * 2) / (NumPitches);
-			songDrawProps.songPosT = SongPosT;
-			songDrawProps.songPosS = (float)getSongPosInSeconds();
-			songDrawProps.viewportSize = viewportSize;
-			songDrawProps.viewWidthT = viewWidthT;
-			//songDrawProps.song = notes;
-			songDrawProps.minPitch = MinPitch;
-
 			for (int t = notes.Tracks.Count - 1; t >= 0; t--)
-			{
-				trackViews[t].drawTrack(songDrawProps, GlobalTrackProps, SongPanel.SelectingRegion || SongPanel.ForceSimpleDrawMode);
-			}
+				trackViews[t].drawTrack(GlobalTrackProps, SongPanel.ForceDefaultNoteStyle);
 		}
 
 		public int screenPosToSongPos(float normScreenPos)
@@ -640,41 +628,40 @@ namespace Visual_Music
 			NormSongPos = 0;
 		}
 
-		public Vector2 getScreenPosF(int timeT, int pitch)
+		public Vector2 getScreenPos(int timeT, int pitch)
 		{
 			Vector2 p = new Vector2();
-			p.X = getTimeTPosF(timeT);
-			p.Y = getPitchScreenPos((float)pitch);
+			p.X = getScreenPosX(timeT);
+			p.Y = getScreenPosY((float)pitch);
 			return p;
 		}
-		public float getTimeTPosF(int timeT)
+		public float getScreenPosX(int timeT)
 		{
 			return ((float)timeT / viewWidthT) * 2;
 		}
 		public int getPitchScreenPos(int pitch)
 		{
-			return (int)getPitchScreenPos((float)pitch);
+			return (int)getScreenPosY((float)pitch);
 		}
-		public float getPitchScreenPos(float pitch)
+		public float getScreenPosY(float pitch)
 		{
 			return (pitch - MinPitch) * NoteHeight + NoteHeight / 2.0f + PitchMargin - Camera.ViewportSize.Y / 2;
 		}
-		public float getSongPosT(float screenX)
-		{ //Returns song pos in ticks
-			return (float)screenX / Camera.ViewportSize.X * (float)viewWidthT + (float)SongPosT; //Far right -> screenX = viewPortSize/2
+		public float getTimeT(float screenX)
+		{ //Returns time in ticks
+			return (float)screenX / Camera.ViewportSize.X * (float)viewWidthT; //Far right -> screenX = viewPortSize / 2
 		}
-		public float getSongPosP(float screenX)
-		{ //Returns song pos in pixels
-			return getSongPosT(screenX) * Camera.ViewportSize.X / viewWidthT;
+		public float getSongPosP(float screenXOffset)
+		{ //Returns song pos in pixels 
+			return (getTimeT(screenXOffset) + SongPosT) * Camera.ViewportSize.X / viewWidthT;
 		}
-		public float getSongLengthP()
-		{
-			return (float)(notes.SongLengthT * Camera.ViewportSize.X) / viewWidthT;
-		}
+		public float SongLengthP =>
+			(float)(notes.SongLengthT * Camera.ViewportSize.X) / viewWidthT;
+		
 		public float getCurveScreenY(float x, Curve curve)
 		{
-			float pitch = curve.Evaluate((float)getSongPosT(x));
-			return getPitchScreenPos(pitch);
+			float pitch = curve.Evaluate((float)getTimeT(x));
+			return getScreenPosY(pitch);
 		}
 	}
 

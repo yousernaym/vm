@@ -61,6 +61,7 @@ namespace Visual_Music
 	[Serializable()]
 	public class NoteStyle_Line : NoteStyle
 	{
+		const float EvalStep = 0.001f;
 		const int MaxLineVerts = 100000;
 		const int MaxHLineVerts = 30000; 
 		//static Stack vbPool = new Stack(1000)
@@ -136,14 +137,14 @@ namespace Visual_Music
 			fx = songPanel.Content.Load<Effect>("Line");
 		}
 
-		void getCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset, float lineWidth, float x, TrackProps trackProps)
+		void getCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset, float step, float x, TrackProps trackProps)
 		{
 			Vector3[] points = new Vector3[3];
 			Vector3[] tangents = new Vector3[2];
 			for (int i = 0; i < points.Length; i++)
 			{
 				points[i] = new Vector3();
-				points[i].X = x + i - 1;
+				points[i].X = x + i * step - step;
 				points[i].Y = Project.getCurveScreenY(points[i].X, trackProps.TrackView.Curve);
 				points[i].Z = 0;
 			}
@@ -160,7 +161,7 @@ namespace Visual_Music
 				vertexOffset = new Vector3(1, 0, 0);
 			else
 				vertexOffset = normal;
-			float halfWidth = lineWidth / 2.0f;
+			float halfWidth = LineWidth * 0.001f / 2.0f;
 			vertexOffset *= halfWidth;
 		}
 
@@ -208,8 +209,8 @@ namespace Visual_Music
 			{
 				if (!uTile)
 				{
-					vert1TC.X = Project.getSongPosP(worldPos1.X) / Project.getSongLengthP();
-					vert2TC.X = Project.getSongPosP(worldPos2.X) / Project.getSongLengthP();
+					vert1TC.X = Project.getSongPosP(worldPos1.X) / Project.SongLengthP;
+					vert2TC.X = Project.getSongPosP(worldPos2.X) / Project.SongLengthP;
 				}
 				else
 				{
@@ -328,10 +329,10 @@ namespace Visual_Music
 				else
 					nextNote = note;
 
-				Vector2 noteStart = Project.getScreenPosF(note.start, note.pitch);
-				float noteEnd = Project.getScreenPosF(note.stop, note.pitch).X;
+				Vector2 noteStart = Project.getScreenPos(note.start, note.pitch);
+				float noteEnd = Project.getScreenPos(note.stop, note.pitch).X;
 				
-				Vector2 nextNoteStart = Project.getScreenPosF(nextNote.start, nextNote.pitch);
+				Vector2 nextNoteStart = Project.getScreenPos(nextNote.start, nextNote.pitch);
 				if (noteEnd > nextNoteStart.X && completeNoteListIndex < midiTrack.Notes.Count - 1)
 					noteEnd = nextNoteStart.X;
 				
@@ -347,12 +348,12 @@ namespace Visual_Music
 				float startDraw = noteStart.X;
 				float endDraw = nextNoteStart.X;
 
-				float step = 1;
+				float step = EvalStep;
 				
 				for (float x = startDraw; x < endDraw; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
-					getCurvePoint(out center, out normal, out vertexOffset, LineWidth, x, trackProps);
+					getCurvePoint(out center, out normal, out vertexOffset, step, x, trackProps);
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
 
 					//Fill vertex buffer
@@ -501,10 +502,10 @@ namespace Visual_Music
 			else
 				nextNote = note;
 
-			Vector2 noteStart = Project.getScreenPosF(note.start, note.pitch);
-			float noteEnd = Project.getScreenPosF(note.stop, note.pitch).X;
+			Vector2 noteStart = Project.getScreenPos(note.start, note.pitch);
+			float noteEnd = Project.getScreenPos(note.stop, note.pitch).X;
 
-			Vector2 nextNoteStart = Project.getScreenPosF(nextNote.start, nextNote.pitch);
+			Vector2 nextNoteStart = Project.getScreenPos(nextNote.start, nextNote.pitch);
 			if (noteEnd > nextNoteStart.X && hlNoteIndex < noteList.Count - 1)
 				noteEnd = nextNoteStart.X;
 
@@ -542,10 +543,10 @@ namespace Visual_Music
 					float x1 = songPosP;
 					float normPitch = trackProps.TrackView.Curve.Evaluate(Project.SongPosT);
 					//float normPitch = trackProps.TrackView.Curve.Evaluate(songDrawProps.getSongPosT(x1));
-					float y1 = Project.getPitchScreenPos(normPitch);
+					float y1 = Project.getScreenPosY(normPitch);
 					float x2 = x1 + 1;
-					normPitch = trackProps.TrackView.Curve.Evaluate(Project.getSongPosT(1));
-					float y2 = Project.getPitchScreenPos(normPitch);
+					normPitch = trackProps.TrackView.Curve.Evaluate(Project.getTimeT(1));
+					float y2 = Project.getScreenPosY(normPitch);
 
 					arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
 					arrowDir.Normalize();

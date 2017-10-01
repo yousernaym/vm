@@ -284,9 +284,9 @@ namespace Visual_Music
 					texture = defaultTextures[(int)styleType].normal;
 			}
 		}
-		protected List<Midi.Note> getNotes(int leftMargin, Midi.Track track, SongDrawProps songDrawProps)
+		protected List<Midi.Note> getNotes(int leftMargin, Midi.Track track)
 		{   //Get currently visible notes in specified track
-			return track.getNotes(songDrawProps.songPosT - songDrawProps.viewWidthT / 2 - leftMargin, songDrawProps.songPosT + songDrawProps.viewWidthT / 2 + leftMargin);
+			return track.getNotes(Project.SongPosT - Project.ViewWidthT / 2 - leftMargin, Project.SongPosT + Project.ViewWidthT / 2 + leftMargin);
 		}
 
 		abstract public void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps);
@@ -299,7 +299,7 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
 			fx.Parameters["BlurredEdge"].SetValue(2.0f);
-			songPosP = Project.getTimeTPosF(Project.SongPosT);
+			songPosP = Project.getScreenPosX(Project.SongPosT);
 			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Camera.ViewportSize.X, Project.Camera.ViewportSize.Y));
 			fx.Parameters["VpMat"].SetValue(Project.Camera.VpMat);
@@ -447,12 +447,9 @@ namespace Visual_Music
 			}
 			else //anchor at song start	
 			{
-				float songPos = (int)Project.getSongPosP((float)notePos + posOffset);
+				float songPos = Project.getSongPosP((float)notePos + posOffset);
 				if (!tile)
-				{
-					float songLengthP = Project.getSongLengthP();
-					return songPos / songLengthP;
-				}
+					return songPos / Project.SongLengthP;
 				else
 					return songPos / texSize;
 			}

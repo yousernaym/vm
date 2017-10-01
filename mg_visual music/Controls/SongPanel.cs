@@ -21,20 +21,6 @@ namespace Visual_Music
 	using WinKeys = System.Windows.Forms.Keys;
 	using RectangleF = System.Drawing.RectangleF;
 	
-	public class SongDrawProps
-	{
-		public int songPosT;
-		public float songPosS;
-		public float noteHeight;
-		public float yMargin;
-		public Point viewportSize;
-		public int viewWidthT;
-		//public Midi.Song song;
-		public int minPitch;
-
-		
-	}
-
 	public class SongPanel : GraphicsDeviceControl
 	{
 		//Jdlc.Timers.TimerQueueTimer timer = new Jdlc.Timers.TimerQueueTimer();
@@ -47,13 +33,13 @@ namespace Visual_Music
 		bool isRenderingVideo = false;
 		ContentManager content;
 		public ContentManager Content { get { return content; } }
-		bool forceSimpleDrawMode = false;
-		public bool ForceSimpleDrawMode
+		bool forceDefaultNoteStyle = false;
+		public bool ForceDefaultNoteStyle
 		{
-			get => forceSimpleDrawMode;
+			get => forceDefaultNoteStyle;
 			set
 			{
-				forceSimpleDrawMode = value;
+				forceDefaultNoteStyle = value;
 				Invalidate();
 			}
 		}

@@ -341,14 +341,16 @@ namespace Visual_Music
 				startStopToolStripMenuItem_Click(null, null);
 				e.SuppressKeyPress = true;
 			}
-			//Toggle simple rendering mode (default camera and bar bar style)
+			//Toggle force default note style
 			if (e.KeyCode == Keys.Z)
-				songPanel.ForceSimpleDrawMode = !songPanel.ForceSimpleDrawMode;
+				songPanel.ForceDefaultNoteStyle = true;
 		}
 
 		private void Form1_KeyUp(object sender, KeyEventArgs e)
 		{
 			Project.Camera.control(e.KeyCode, false);
+			if (e.KeyCode == Keys.Z)
+				songPanel.ForceDefaultNoteStyle = false;
 		}
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)

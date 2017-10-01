@@ -111,11 +111,10 @@ namespace Visual_Music
 			}
 		}
 
-		public void drawTrack(SongDrawProps songDrawProps, TrackProps globalTrackProps, bool selectingRegion)
+		public void drawTrack(TrackProps globalTrackProps, bool defaultStyle)
 		{
 			TrackProps texTrackProps = TrackProps.getTexture(false, null) != null ? TrackProps : globalTrackProps;
-			selectingRegion = false;
-			if (selectingRegion)
+			if (defaultStyle)
 				TrackProps.getNoteStyle(NoteStyleEnum.Bar).drawTrack(midiTrack, TrackProps, texTrackProps);
 			else
 				TrackProps.SelectedNoteStyle.drawTrack(midiTrack, TrackProps, texTrackProps);
@@ -127,8 +126,8 @@ namespace Visual_Music
 				return;
 			Midi.Note firstNote = midiTrack.Notes[0];
 			Midi.Note lastNote = midiTrack.Notes[midiTrack.Notes.Count - 1];
-			Vector2 minPos2d = project.getScreenPosF(firstNote.start, project.MinPitch);
-			Vector2 maxPos2d = project.getScreenPosF(lastNote.start, project.MaxPitch);
+			Vector2 minPos2d = project.getScreenPos(firstNote.start, project.MinPitch);
+			Vector2 maxPos2d = project.getScreenPos(lastNote.start, project.MaxPitch);
 
 			//Todo: use posOffset.z for z-component
 			Vector3 minPos = new Vector3(minPos2d.X, minPos2d.Y, 0);

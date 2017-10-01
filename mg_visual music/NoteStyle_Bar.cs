@@ -85,8 +85,8 @@ namespace Visual_Music
 				Midi.Note note = noteList[n];
 				if (note.start > Project.Notes.SongLengthT) //only if audio ends before the notes end
 					continue;
-				Vector2 noteStart = Project.getScreenPosF(note.start, note.pitch);
-				Vector2 noteEnd = Project.getScreenPosF(note.stop, note.pitch);
+				Vector2 noteStart = Project.getScreenPos(note.start, note.pitch);
+				Vector2 noteEnd = Project.getScreenPos(note.stop, note.pitch);
 				float z = fx.Parameters["PosOffset"].GetValueVector3().Z;
 				
 				Vector3 boxMin = new Vector3(noteStart.X, noteStart.Y -  halfNoteHeight, z);
@@ -116,8 +116,8 @@ namespace Visual_Music
 				if (note.start > Project.Notes.SongLengthT) //only if audio ends before the notes end
 					continue;
 
-				Vector2 noteStart = Project.getScreenPosF(note.start, note.pitch);
-				Vector2 noteEnd = Project.getScreenPosF(note.stop, note.pitch);
+				Vector2 noteStart = Project.getScreenPos(note.start, note.pitch);
+				Vector2 noteEnd = Project.getScreenPos(note.stop, note.pitch);
 
 				Color color;
 				Texture2D texture;
