@@ -15,7 +15,7 @@ namespace Visual_Music
 		//protected VertexBuffer vertexBuffers;
 		protected Vector3 _minSize;
 
-		public delegate void CreateGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps);
+		public delegate void CreateGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps);
 		public delegate void DrawGeoChunk(Geo geo);
 		CreateGeoChunk _createGeoChunk;
 		DrawGeoChunk _drawGeoChunk;
@@ -78,9 +78,9 @@ namespace Visual_Music
 			return true;
 		}
 
-		public void createGeo(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
+		public void createGeo(Midi.Track midiTrack, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
 		{
-			_createGeoChunk(out _geo, _bbox, midiTrack, songDrawProps, trackProps, globalTrackProps, texTrackProps);
+			_createGeoChunk(out _geo, _bbox, midiTrack, trackProps, texTrackProps);
 			return;
 			if (_nodes != null)
 			{
@@ -88,7 +88,7 @@ namespace Visual_Music
 				{
 					if (node == null)
 						continue;
-					node.createGeo(midiTrack, songDrawProps, trackProps, globalTrackProps, texTrackProps);
+					node.createGeo(midiTrack, trackProps, globalTrackProps, texTrackProps);
 				}
 			}
 		}

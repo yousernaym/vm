@@ -136,32 +136,7 @@ namespace Visual_Music
 			fx = songPanel.Content.Load<Effect>("Line");
 		}
 
-		//override public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps)
-		//{
-		//	if (ocTree != null)
-		//		ocTree.dispose();
-		//	ocTree = new OcTree<LineGeo>(minPos, size, new Vector3(1000, 1000, 1000), createGeoChunk, drawGeoChunk);
-		//	ocTree.createGeo(midiTrack, songDrawProps, trackProps, globalTrackProps, texTrackProps);
-		//}
-
-		void calcRectTexCoords(out Vector2 size_tex, out Vector2 size_world, Vector2 texSize, float startDraw, float endDraw, TrackProps texTrackProps, SongDrawProps songDrawProps, TrackProps trackProps)
-		{
-			Vector3 pos, normal, vertexOffset;
-			getCurvePoint(out pos, out normal, out vertexOffset, LineWidth, startDraw, songDrawProps, trackProps);
-			Vector3 topLeft_world3 = pos - vertexOffset;
-			Vector2 topLeft_world = new Vector2(topLeft_world3.X, topLeft_world3.Y);
-			getCurvePoint(out pos, out normal, out vertexOffset, LineWidth, endDraw, songDrawProps, trackProps);
-			Vector3 size_world3 = pos + vertexOffset - topLeft_world3;
-			size_world = new Vector2(size_world3.X, size_world3.Y);
-			//base.calcRectTexCoords(out topLeft_tex, out size_tex, texSize, new Vector2(topLeft_world.X, topLeft_world.Y), size_world, texTrackProps, songDrawProps);
-			//topLeft_tex = base.calcTexCoords(texSize, topLeft_world, size_world, new Vector2(0, 0), texTrackProps, songDrawProps);
-			//size_tex = base.calcTexCoords(texSize, topLeft_world, size_world, size_world, texTrackProps, songDrawProps) - topLeft_tex;
-			Vector2 topLeft_tex, bottomLeft_tex, topRight_tex, bottomRight_tex;
-			calcTexCoords(out topLeft_tex, out bottomLeft_tex, texTrackProps.TexProps, 0, 0, songDrawProps, LineWidth, topLeft_world3, topLeft_world3);
-			calcTexCoords(out topRight_tex, out bottomRight_tex, texTrackProps.TexProps, endDraw - startDraw, 1, songDrawProps, LineWidth, topLeft_world3 + size_world3, topLeft_world3);
-			size_tex = bottomRight_tex - topLeft_tex;
-		}
-		void getCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset, float lineWidth, float x, SongDrawProps songDrawProps, TrackProps trackProps)
+		void getCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset, float lineWidth, float x, TrackProps trackProps)
 		{
 			Vector3[] points = new Vector3[3];
 			Vector3[] tangents = new Vector3[2];
@@ -169,7 +144,7 @@ namespace Visual_Music
 			{
 				points[i] = new Vector3();
 				points[i].X = x + i - 1;
-				points[i].Y = songDrawProps.getCurveScreenY(points[i].X, trackProps.TrackView.Curve);
+				points[i].Y = Project.getCurveScreenY(points[i].X, trackProps.TrackView.Curve);
 				points[i].Z = 0;
 			}
 			
@@ -189,7 +164,7 @@ namespace Visual_Music
 			vertexOffset *= halfWidth;
 		}
 
-		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, SongDrawProps songDrawProps, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
+		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
 		{
 			Vector2 texSize = new Vector2(texProps.Texture.Width, texProps.Texture.Height);
 			TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;
@@ -211,8 +186,8 @@ namespace Visual_Music
 			}
 			else if (texUAnchor == TexAnchorEnum.Screen)
 			{
-				worldPos1.X += songDrawProps.viewportSize.X / 2;
-				worldPos2.X += songDrawProps.viewportSize.X / 2;
+				worldPos1.X += Project.Camera.ViewportSize.X / 2;
+				worldPos2.X += Project.Camera.ViewportSize.X / 2;
 
 				//if (!tileU)
 				//    vert1TC.X = vert2TC.X = lineCenter.X / songDrawProps.viewportSize.X;
@@ -220,8 +195,8 @@ namespace Visual_Music
 				//    vert1TC.X = vert2TC.X = lineCenter.X / texSize.X;
 				if (!uTile)
 				{
-					vert1TC.X = worldPos1.X / songDrawProps.viewportSize.X;
-					vert2TC.X = worldPos2.X / songDrawProps.viewportSize.X;
+					vert1TC.X = worldPos1.X / Project.Camera.ViewportSize.X;
+					vert2TC.X = worldPos2.X / Project.Camera.ViewportSize.X;
 				}
 				else
 				{
@@ -233,13 +208,13 @@ namespace Visual_Music
 			{
 				if (!uTile)
 				{
-					vert1TC.X = songDrawProps.getSongPosP(worldPos1.X) / songDrawProps.getSongLengthP();
-					vert2TC.X = songDrawProps.getSongPosP(worldPos2.X) / songDrawProps.getSongLengthP();
+					vert1TC.X = Project.getSongPosP(worldPos1.X) / Project.getSongLengthP();
+					vert2TC.X = Project.getSongPosP(worldPos2.X) / Project.getSongLengthP();
 				}
 				else
 				{
-					vert1TC.X = songDrawProps.getSongPosP(worldPos1.X) / texSize.X;
-					vert2TC.X = songDrawProps.getSongPosP(worldPos2.X) / texSize.X;
+					vert1TC.X = Project.getSongPosP(worldPos1.X) / texSize.X;
+					vert2TC.X = Project.getSongPosP(worldPos2.X) / texSize.X;
 				}
 			}
 			else
@@ -256,12 +231,12 @@ namespace Visual_Music
 			}
 			else if (texVAnchor == TexAnchorEnum.Screen)
 			{
-				worldPos1.Y += songDrawProps.viewportSize.Y / 2;
-				worldPos2.Y += songDrawProps.viewportSize.Y / 2;
+				worldPos1.Y += Project.Camera.ViewportSize.Y / 2;
+				worldPos2.Y += Project.Camera.ViewportSize.Y / 2;
 				if (!vTile)
 				{
-					vert1TC.Y = worldPos1.Y / songDrawProps.viewportSize.Y;
-					vert2TC.Y = worldPos2.Y / songDrawProps.viewportSize.Y;
+					vert1TC.Y = worldPos1.Y / Project.Camera.ViewportSize.Y;
+					vert2TC.Y = worldPos2.Y / Project.Camera.ViewportSize.Y;
 				}
 				else
 				{
@@ -272,17 +247,18 @@ namespace Visual_Music
 			else
 				throw new NotImplementedException();
 			if (!adjustingAspect)
-				adjustAspect(ref vert1TC, ref vert2TC, texProps, stepFromNoteStart, normStepFromNoteStart, songDrawProps, lineWidth, worldPos1, worldPos2);
-			vert1TC -= songDrawProps.songPosS * texProps.Scroll;
-			vert2TC -= songDrawProps.songPosS * texProps.Scroll;
+				adjustAspect(ref vert1TC, ref vert2TC, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2);
+			Vector2 scrollOffset = Project.SongPosB * texProps.Scroll;
+			vert1TC -= scrollOffset;
+			vert2TC -= scrollOffset;
 		}
 
-		void adjustAspect(ref Vector2 vert1TC, ref Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, SongDrawProps songDrawProps, float lineWidth, Vector3 worldPos1, Vector3 worldPos2)
+		void adjustAspect(ref Vector2 vert1TC, ref Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2)
 		{
 			if ((bool)texProps.KeepAspect)
 			{
 				Vector2 tiledTc1 = new Vector2(), tiledTc2 = new Vector2();
-				calcTexCoords(out tiledTc1, out tiledTc2, texProps, stepFromNoteStart, normStepFromNoteStart, songDrawProps, lineWidth, worldPos1, worldPos2, true);
+				calcTexCoords(out tiledTc1, out tiledTc2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true);
 				Vector2 tcDiff = vert1TC - vert2TC;
 				Vector2 tiledTcDiff = tiledTc1 - tiledTc2;
 
@@ -320,7 +296,7 @@ namespace Visual_Music
 		//	return typeof(T).GetProperties()[0].Name;
 		//}
 
-		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
+		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
 		{
 			LineGeo lineGeo = new LineGeo();
 			geo = lineGeo;
@@ -331,7 +307,7 @@ namespace Visual_Music
 
 			Color color;
 			Texture2D texture;
-			getMaterial(songDrawProps, trackProps, globalTrackProps, false, out color, out texture);
+			getMaterial(trackProps, false, out color, out texture);
 			
 			Vector2 texSize = new Vector2(texture.Width, texture.Height);
 			
@@ -342,7 +318,7 @@ namespace Visual_Music
 			{
 				//Get current note
 				Midi.Note note = noteList[n], nextNote;
-				if (note.start > songDrawProps.song.SongLengthT) //only  if audio ends before the notes end
+				if (note.start > Project.Notes.SongLengthT) //only  if audio ends before the notes end
 					continue;
 
 				if (n < noteList.Count - 1)
@@ -352,15 +328,15 @@ namespace Visual_Music
 				else
 					nextNote = note;
 
-				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
-				float noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch).X;
+				Vector2 noteStart = Project.getScreenPosF(note.start, note.pitch);
+				float noteEnd = Project.getScreenPosF(note.stop, note.pitch).X;
 				
-				Vector2 nextNoteStart = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
+				Vector2 nextNoteStart = Project.getScreenPosF(nextNote.start, nextNote.pitch);
 				if (noteEnd > nextNoteStart.X && completeNoteListIndex < midiTrack.Notes.Count - 1)
 					noteEnd = nextNoteStart.X;
 				
 				bool endOfSegment = false;
-				if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * songDrawProps.song.TicksPerBeat || note == nextNote)
+				if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * Project.Notes.TicksPerBeat || note == nextNote)
 				{
 					if (nextNoteStart.X != noteStart.X)
 						nextNoteStart.Y = (int)MathHelper.Lerp(noteStart.Y, nextNoteStart.Y, (float)(noteEnd - noteStart.X) / (nextNoteStart.X - noteStart.X));
@@ -376,7 +352,7 @@ namespace Visual_Music
 				for (float x = startDraw; x < endDraw; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
-					getCurvePoint(out center, out normal, out vertexOffset, LineWidth, x, songDrawProps, trackProps);
+					getCurvePoint(out center, out normal, out vertexOffset, LineWidth, x, trackProps);
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
 
 					//Fill vertex buffer
@@ -388,7 +364,7 @@ namespace Visual_Music
 					//Vector2 ns = songDrawProps.getScreenPosF(note.start, note.pitch);
 					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
 					if (texTrackProps.TexProps.Texture != null)
-						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, songDrawProps, LineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
+						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, LineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
 					if (Style == LineStyleEnum.Ribbon)
 					{
@@ -397,7 +373,7 @@ namespace Visual_Music
 						do
 						{
 							hLineEnd++;
-						} while ((int)center.Y == (int)songDrawProps.getCurveScreenY((float)hLineEnd + 1, trackProps.TrackView.Curve) && hLineEnd < endDraw);
+						} while ((int)center.Y == (int)Project.getCurveScreenY((float)hLineEnd + 1, trackProps.TrackView.Curve) && hLineEnd < endDraw);
 						if (hLineEnd > hLineStart + LineWidth / 2)
 						{
 							hLineVerts[hLineVertIndex++] = lineVerts[vertIndex];
@@ -476,10 +452,10 @@ namespace Visual_Music
 			}
 		}
 
-		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
+		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
 		{
 			float songPosP;
-			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps, out songPosP);
+			base.drawTrack(midiTrack, trackProps, texTrackProps, out songPosP);
 			List<Midi.Note> noteList = midiTrack.Notes;
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			if (noteList.Count == 0)
@@ -495,7 +471,7 @@ namespace Visual_Music
 			fx.Parameters["Radius"].SetValue(radius);
 			Color color;
 			Texture2D texture;
-			getMaterial(songDrawProps, trackProps, globalTrackProps, false, out color, out texture);
+			getMaterial(trackProps, false, out color, out texture);
 			fx.Parameters["Color"].SetValue(color.ToVector4());
 
 			fx.Parameters["InnerHlSize"].SetValue(0.0f);
@@ -507,17 +483,17 @@ namespace Visual_Music
 			fx.CurrentTechnique.Passes[0].Apply();
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
 
-			drawHighLights(midiTrack, songDrawProps, trackProps, globalTrackProps, songPosP);
+			drawHighLights(midiTrack, trackProps, songPosP);
 		}
 
-		void drawHighLights(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, float songPosP)
+		void drawHighLights(Midi.Track midiTrack, TrackProps trackProps, float songPosP)
 		{
 			List<Midi.Note> noteList = midiTrack.Notes;
 			int hlNoteIndex = midiTrack.getLastNoteIndexAtTime(Project.SongPosT);
 			if (hlNoteIndex < 0)
 				return;
 			Midi.Note note = noteList[hlNoteIndex], nextNote;
-			if (note.start > songDrawProps.song.SongLengthT) //only  if audio ends before the notes end
+			if (note.start > Project.Notes.SongLengthT) //only  if audio ends before the notes end
 				return;
 
 			if (hlNoteIndex < noteList.Count - 1)
@@ -525,14 +501,14 @@ namespace Visual_Music
 			else
 				nextNote = note;
 
-			Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
-			float noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch).X;
+			Vector2 noteStart = Project.getScreenPosF(note.start, note.pitch);
+			float noteEnd = Project.getScreenPosF(note.stop, note.pitch).X;
 
-			Vector2 nextNoteStart = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
+			Vector2 nextNoteStart = Project.getScreenPosF(nextNote.start, nextNote.pitch);
 			if (noteEnd > nextNoteStart.X && hlNoteIndex < noteList.Count - 1)
 				noteEnd = nextNoteStart.X;
 
-			if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * songDrawProps.song.TicksPerBeat || note == nextNote)
+			if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * Project.Notes.TicksPerBeat || note == nextNote)
 			{
 				if (nextNoteStart.X != noteStart.X)
 					nextNoteStart.Y = (int)MathHelper.Lerp(noteStart.Y, nextNoteStart.Y, (float)(noteEnd - noteStart.X) / (nextNoteStart.X - noteStart.X));
@@ -566,10 +542,10 @@ namespace Visual_Music
 					float x1 = songPosP;
 					float normPitch = trackProps.TrackView.Curve.Evaluate(Project.SongPosT);
 					//float normPitch = trackProps.TrackView.Curve.Evaluate(songDrawProps.getSongPosT(x1));
-					float y1 = songDrawProps.getPitchScreenPos(normPitch);
+					float y1 = Project.getPitchScreenPos(normPitch);
 					float x2 = x1 + 1;
-					normPitch = trackProps.TrackView.Curve.Evaluate(songDrawProps.getSongPosT(1));
-					float y2 = songDrawProps.getPitchScreenPos(normPitch);
+					normPitch = trackProps.TrackView.Curve.Evaluate(Project.getSongPosT(1));
+					float y2 = Project.getPitchScreenPos(normPitch);
 
 					arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
 					arrowDir.Normalize();
@@ -618,7 +594,7 @@ namespace Visual_Music
 
 			Color hlColor;
 			Texture2D hlTexture;
-			getMaterial(songDrawProps, trackProps, globalTrackProps, true, out hlColor, out hlTexture);
+			getMaterial(trackProps, true, out hlColor, out hlTexture);
 			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
 			
 			fx.Parameters["Border"].SetValue(HlBorder);
@@ -642,7 +618,7 @@ namespace Visual_Music
 				if (MovingHl)
 				{
 					float x = songPosP;// songDrawProps.viewportSize.X / 2.0f;
-					Vector3 circlePos = new Vector3(x, songDrawProps.getCurveScreenY(0, trackProps.TrackView.Curve), 0);
+					Vector3 circlePos = new Vector3(x, Project.getCurveScreenY(0, trackProps.TrackView.Curve), 0);
 					setHlCirclePos(circlePos);
 				}
 				songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;

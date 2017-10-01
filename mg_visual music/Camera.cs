@@ -102,13 +102,32 @@ namespace Visual_Music
 				return Matrix.Invert(RotMat * transMat);
 			}
 		}
-		public static Vector2 ViewportSize { get; } = new Vector2(2, 18.0f / 16);
+		float xyRatio;
+		public float XYRatio
+		{
+			get => xyRatio;
+			set
+			{
+				xyRatio = value;
+				viewportSize = new Vector2(2, 2 / xyRatio); 
+			}
+		}
+		Vector2 viewportSize;
+		public Vector2 ViewportSize
+		{
+			get => viewportSize;
+			set
+			{
+				viewportSize = value;
+				xyRatio = viewportSize.X / viewportSize.Y;
+			}
+		}
 		public Matrix ProjMat
 		{
 			get
 			{
 				float fov = CubeMapFace >= 0 ? (float)Math.PI / 2.0f : Fov;
-				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, ViewportSize.X / ViewportSize.Y, 1, 1000000);
+				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, ViewportSize.X / ViewportSize.Y, 0.0001f, 1000);
 				if (InvertY)
 					mat.M22 *= -1;
 				return mat;
@@ -122,6 +141,8 @@ namespace Visual_Music
 		public Camera(SongPanel spanel = null)
 		{
 			SongPanel = spanel;
+			XYRatio = 16.0f / 9;
+			pos.Z = Math.Abs(ProjMat.M11) / 2;
 			if (SongPanel != null)
 				SongPanel.Invalidate();
 		}
@@ -136,6 +157,8 @@ namespace Visual_Music
 					pos = (Vector3)entry.Value;
 				else if (entry.Name == "angles")
 					angles = (Vector3)entry.Value;
+				else if (entry.Name == "xyRatio")
+					XYRatio = (float)entry.Value;
 			}
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -143,6 +166,7 @@ namespace Visual_Music
 			info.AddValue("fov", Fov);
 			info.AddValue("pos", pos);
 			info.AddValue("angles", angles);
+			info.AddValue("xyRatio", xyRatio);
 		}
 
 		public void update(float deltaTime)

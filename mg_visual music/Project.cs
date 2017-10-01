@@ -19,7 +19,10 @@ namespace Visual_Music
 	[Serializable()]
 	public class Project : ISerializable
 	{
-		const float normPitchMargin = 1 / 50.0f;
+		const float NormPitchMargin = 1 / 100.0f;
+		float PitchMargin => NormPitchMargin * Camera.ViewportSize.Y;
+		public float NoteHeight => (Camera.ViewportSize.Y - PitchMargin * 2) / NumPitches;
+
 		SongPanel songPanel;
 		public SongPanel SongPanel
 		{
@@ -105,7 +108,8 @@ namespace Visual_Music
 		public Midi.Song Notes { get { return notes; } }
 
 		public int SongLengthT { get { return notes != null ? notes.SongLengthT : 0; } } //Song length in ticks
-		public int SongPosT { get { return (int)(normSongPos * SongLengthT); } } //Current song position at center of screen
+		public int SongPosT => (int)(normSongPos * SongLengthT); //Current song position in ticks
+		public float SongPosB => (float)SongPosT / Notes.TicksPerBeat; //Current song position in beats
 		double normSongPos; //Song position normalized to [0,1]
 		public double NormSongPos
 		{
@@ -135,7 +139,7 @@ namespace Visual_Music
 			}
 		}
 		public bool AudioHasStarted { get; set; }
-
+		
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
@@ -347,17 +351,9 @@ namespace Visual_Music
 		{
 			if (trackViews == null)
 				return;
-			Point viewportSize = new Point(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
-			SongDrawProps songDrawProps = new SongDrawProps();
-			songDrawProps.yMargin = (int)(normPitchMargin * viewportSize.Y);
-			songDrawProps.noteHeight = (float)(viewportSize.Y - songDrawProps.yMargin * 2) / (NumPitches);
-			songDrawProps.viewportSize = viewportSize;
-			songDrawProps.viewWidthT = viewWidthT;
-			songDrawProps.song = notes;
-			songDrawProps.minPitch = MinPitch;
 			//for (int i = TrackViews.Count - 1; i > 0; i--)
 			for (int i = 1; i < trackViews.Count; i++)
-				TrackViews[i].createOcTree(songDrawProps, GlobalTrackProps);
+				TrackViews[i].createOcTree(this, GlobalTrackProps);
 		}
 
 		public void drawSong(Point viewportSize, double normPos)
@@ -366,13 +362,13 @@ namespace Visual_Music
 				return;
 
 			SongDrawProps songDrawProps = new SongDrawProps();
-			songDrawProps.yMargin = normPitchMargin * Camera.ViewportSize.Y;
+			songDrawProps.yMargin = NormPitchMargin * Camera.ViewportSize.Y;
 			songDrawProps.noteHeight = (float)(Camera.ViewportSize.Y - songDrawProps.yMargin * 2) / (NumPitches);
 			songDrawProps.songPosT = SongPosT;
 			songDrawProps.songPosS = (float)getSongPosInSeconds();
 			songDrawProps.viewportSize = viewportSize;
 			songDrawProps.viewWidthT = viewWidthT;
-			songDrawProps.song = notes;
+			//songDrawProps.song = notes;
 			songDrawProps.minPitch = MinPitch;
 
 			for (int t = notes.Tracks.Count - 1; t >= 0; t--)
@@ -393,9 +389,9 @@ namespace Visual_Music
 		public int getPitch(float normPosY)
 		{
 			normPosY = 1 - normPosY;
-			float height = 1 - normPitchMargin * 2;
+			float height = 1 - NormPitchMargin * 2;
 			float noteHeight = height / Notes.NumPitches;
-			float pos = normPosY - normPitchMargin;
+			float pos = normPosY - NormPitchMargin;
 			return MinPitch + (int)(pos / noteHeight);
 		}
 		public TrackProps mergeTrackProps(ListView.SelectedIndexCollection listIndices)
@@ -642,6 +638,43 @@ namespace Visual_Music
 			if (!Media.stopPlayback())
 				MessageBox.Show("An error occured while stopping playback.");
 			NormSongPos = 0;
+		}
+
+		public Vector2 getScreenPosF(int timeT, int pitch)
+		{
+			Vector2 p = new Vector2();
+			p.X = getTimeTPosF(timeT);
+			p.Y = getPitchScreenPos((float)pitch);
+			return p;
+		}
+		public float getTimeTPosF(int timeT)
+		{
+			return ((float)timeT / viewWidthT) * 2;
+		}
+		public int getPitchScreenPos(int pitch)
+		{
+			return (int)getPitchScreenPos((float)pitch);
+		}
+		public float getPitchScreenPos(float pitch)
+		{
+			return (pitch - MinPitch) * NoteHeight + NoteHeight / 2.0f + PitchMargin - Camera.ViewportSize.Y / 2;
+		}
+		public float getSongPosT(float screenX)
+		{ //Returns song pos in ticks
+			return (float)screenX / Camera.ViewportSize.X * (float)viewWidthT + (float)SongPosT; //Far right -> screenX = viewPortSize/2
+		}
+		public float getSongPosP(float screenX)
+		{ //Returns song pos in pixels
+			return getSongPosT(screenX) * Camera.ViewportSize.X / viewWidthT;
+		}
+		public float getSongLengthP()
+		{
+			return (float)(notes.SongLengthT * Camera.ViewportSize.X) / viewWidthT;
+		}
+		public float getCurveScreenY(float x, Curve curve)
+		{
+			float pitch = curve.Evaluate((float)getSongPosT(x));
+			return getPitchScreenPos(pitch);
 		}
 	}
 

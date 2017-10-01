@@ -72,22 +72,25 @@ namespace Visual_Music
 			fx = songPanel.Content.Load<Effect>("Bar");
 		}
 
-		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps)
+		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
 		{
 			geo = new BarGeo();
 			List<Midi.Note> noteList = midiTrack.Notes;
 			if (noteList.Count == 0)
 				return;
+
+			float halfNoteHeight = Project.NoteHeight / 2;
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				Midi.Note note = noteList[n];
-				if (note.start > songDrawProps.song.SongLengthT) //only if audio ends before the notes end
+				if (note.start > Project.Notes.SongLengthT) //only if audio ends before the notes end
 					continue;
-				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
-				Vector2 noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch);
+				Vector2 noteStart = Project.getScreenPosF(note.start, note.pitch);
+				Vector2 noteEnd = Project.getScreenPosF(note.stop, note.pitch);
 				float z = fx.Parameters["PosOffset"].GetValueVector3().Z;
-				Vector3 boxMin = new Vector3(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2, z);
-				Vector3 boxMax = new Vector3(noteEnd.X, boxMin.Y + songDrawProps.noteHeight, z);
+				
+				Vector3 boxMin = new Vector3(noteStart.X, noteStart.Y -  halfNoteHeight, z);
+				Vector3 boxMax = new Vector3(noteEnd.X, noteEnd.Y + halfNoteHeight, z);
 				geo.bboxes.Add(new BoundingBox(boxMin, boxMax));
 			}
 		}
@@ -97,43 +100,43 @@ namespace Visual_Music
 
 		}
 
-		public override void drawTrack(Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, bool selectingRegion, TrackProps texTrackProps)
+		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
 		{
 			float songPosP;
-			base.drawTrack(midiTrack, songDrawProps, trackProps, globalTrackProps, selectingRegion, texTrackProps, out songPosP);
+			base.drawTrack(midiTrack, trackProps, texTrackProps, out songPosP);
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			List<Midi.Note> noteList = midiTrack.Notes;
 			if (noteList.Count == 0)
 				return;
 
-			//songPanel.SpriteBatch.Begin(SpriteSortMode.Deferred, songPanel.BlendState, texTrackProps.TexProps.SamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+			float halfNoteHeight = Project.NoteHeight / 2;
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				Midi.Note note = noteList[n];
-				if (note.start > songDrawProps.song.SongLengthT) //only if audio ends before the notes end
+				if (note.start > Project.Notes.SongLengthT) //only if audio ends before the notes end
 					continue;
 
-				Vector2 noteStart = songDrawProps.getScreenPosF(note.start, note.pitch);
-				Vector2 noteEnd = songDrawProps.getScreenPosF(note.stop, note.pitch);
+				Vector2 noteStart = Project.getScreenPosF(note.start, note.pitch);
+				Vector2 noteEnd = Project.getScreenPosF(note.stop, note.pitch);
 
 				Color color;
 				Texture2D texture;
 
-				getMaterial(songDrawProps, trackProps, globalTrackProps, (int)(noteStart.X - songPosP), (int)(noteEnd.X - songPosP), out color, out texture);
+				getMaterial(trackProps, (int)(noteStart.X - songPosP), (int)(noteEnd.X - songPosP), out color, out texture);
 				//fx.Parameters["Color"].SetValue(color.ToVector4());
 				instanceVerts[n].color = color;
 				fx.Parameters["Texture"].SetValue(texture);
 				//Vector4 destRect = new Vector4(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2, noteEnd.X - noteStart.X + 1, songDrawProps.noteHeight - 1);
 				//Vector4 srcRect = destRect;
-				Vector2 topLeft_world = new Vector2(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2);
-				Vector2 size_world = new Vector2(noteEnd.X - noteStart.X + 0.001f, songDrawProps.noteHeight - 0.001f);
+				Vector2 topLeft_world = new Vector2(noteStart.X, noteStart.Y - halfNoteHeight);
+				Vector2 size_world = new Vector2(noteEnd.X - noteStart.X + 0.001f, halfNoteHeight * 2 - 0.001f);
 				Vector2 topLeft_tex = topLeft_world;
 				Vector2 size_tex = size_world;
 
 				if (texture != null) //Unnecessary because texture is never null. Can revert to default 1x1 white pixel.
 				{
 					Vector2 texSize = new Vector2(texture.Width, texture.Height);
-					calcRectTexCoords(out topLeft_tex, out size_tex, texSize, topLeft_world, size_world, texTrackProps, songDrawProps);
+					calcRectTexCoords(out topLeft_tex, out size_tex, texSize, topLeft_world, size_world, texTrackProps);
 				}
 				instanceVerts[n].destRect = new Vector4(topLeft_world.X, topLeft_world.Y, size_world.X, size_world.Y);
 				instanceVerts[n].srcRect = new Vector4(topLeft_tex.X, topLeft_tex.Y, size_tex.X, size_tex.Y);

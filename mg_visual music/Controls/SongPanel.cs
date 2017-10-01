@@ -29,46 +29,10 @@ namespace Visual_Music
 		public float yMargin;
 		public Point viewportSize;
 		public int viewWidthT;
-		public Midi.Song song;
+		//public Midi.Song song;
 		public int minPitch;
 
-		public Vector2 getScreenPosF(int timeT, int pitch)
-		{
-			Vector2 p = new Vector2();
-			p.X = getTimeTPosF(timeT);
-			p.Y = getPitchScreenPos((float)pitch);
-			return p;
-		}
-		public float getTimeTPosF(int timeT)
-		{
-			return ((float)timeT / viewWidthT) * 2;
-		}
-		public int getPitchScreenPos(int pitch)
-		{
-			return (int)getPitchScreenPos((float)pitch);
-		}
-		public float getPitchScreenPos(float pitch)
-		{
-			return (pitch - minPitch) * noteHeight + noteHeight / 2.0f + yMargin - Camera.ViewportSize.Y / 2;
-		}
-		public float getSongPosT(float screenX)
-		{ //Returns song pos in ticks
-			return (float)screenX / (float)viewportSize.X * (float)viewWidthT + (float)songPosT; //Far right -> screenX = viewPortSize/2
-		}
-		public float getSongPosP(float screenX)
-		{ //Returns song pos in pixels
-			return getSongPosT(screenX) * viewportSize.X / viewWidthT;
-		}
-		public float getSongLengthP()
-		{
-			return (float)(song.SongLengthT * viewportSize.X) / viewWidthT;
-		}
-
-		public float getCurveScreenY(float x, Curve curve)
-		{
-			float pitch = curve.Evaluate((float)getSongPosT(x));
-			return getPitchScreenPos(pitch);
-		}
+		
 	}
 
 	public class SongPanel : GraphicsDeviceControl
