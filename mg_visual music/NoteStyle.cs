@@ -265,7 +265,7 @@ namespace Visual_Music
 		public abstract void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps);
 		public abstract void drawGeoChunk(Geo geo);
 
-		protected void getMaterial(TrackProps trackProps, int x1, int x2, out Color color, out Texture2D texture)
+		protected void getMaterial(TrackProps trackProps, float x1, float x2, out Color color, out Texture2D texture)
 		{
 			bool bHilited = false;
 			if (x1 < 0 && x2 > 0)
@@ -405,7 +405,7 @@ namespace Visual_Music
 			{
 				float uTexelsPerPixel = size_tex.X * texSize.X / size_world.X;
 				float vTexelsPerPixel = size_tex.Y * texSize.Y / size_world.Y;
-				float uvRatio = uTexelsPerPixel / vTexelsPerPixel;
+				float uvRatio = -uTexelsPerPixel / vTexelsPerPixel;
 				if ((bool)texTrackProps.TexProps.UTile && !(bool)texTrackProps.TexProps.VTile)
 				{
 					topLeft_tex.X = topLeft_tex.X / uvRatio;
@@ -423,13 +423,24 @@ namespace Visual_Music
 		protected Vector2 calcTexCoords(Vector2 texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, TrackProps texTrackProps)
 		{
 			Vector2 coords = new Vector2();
-			coords.X = calcTexCoordComponent(texSize.X, Project.Camera.ViewportSize.X, notePos.X, noteSize.X, posOffset.X, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor);
+			float songPosP = Project.getScreenPosX(Project.SongPosT);
+			coords.X = calcTexCoordComponent(texSize.X, Project.Camera.ViewportSize.X, notePos.X - songPosP, noteSize.X, posOffset.X, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor);
 			coords.Y = calcTexCoordComponent(texSize.Y, Project.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor);
+			coords.Y *= -1;
 			return coords;
 		}
 
 		float calcTexCoordComponent(float texSize, float vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor)
 		{
+			float pixelScale = 1920 / 2;
+			if (tile)
+			{
+				texSize /= pixelScale;
+				//notePos *= pixelScale;
+				//noteSize *= pixelScale;
+				//posOffset *= pixelScale;
+				//vpSize *= pixelScale;
+			}
 			if (anchor == TexAnchorEnum.Screen)
 			{
 				float screenPos = notePos + posOffset + vpSize / 2;
@@ -447,11 +458,12 @@ namespace Visual_Music
 			}
 			else //anchor at song start	
 			{
-				float songPos = Project.getSongPosP((float)notePos + posOffset);
+				//float songPos = Project.getSongPosP((float)notePos + posOffset);
+				float x = Project.getScreenPosX(Project.SongPosT) + notePos + posOffset;
 				if (!tile)
-					return songPos / Project.SongLengthP;
+					return x / Project.SongLengthP;
 				else
-					return songPos / texSize;
+					return x / texSize;
 			}
 		}
 	}

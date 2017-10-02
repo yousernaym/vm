@@ -122,7 +122,7 @@ namespace Visual_Music
 				Color color;
 				Texture2D texture;
 
-				getMaterial(trackProps, (int)(noteStart.X - songPosP), (int)(noteEnd.X - songPosP), out color, out texture);
+				getMaterial(trackProps, noteStart.X - songPosP, noteEnd.X - songPosP, out color, out texture);
 				//fx.Parameters["Color"].SetValue(color.ToVector4());
 				instanceVerts[n].color = color;
 				fx.Parameters["Texture"].SetValue(texture);
