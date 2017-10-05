@@ -4,6 +4,7 @@ float2 TexSize;
 texture Texture;
 float2 ProjScale;
 float SongPos;
+float2 TexScrollOffset;
 
 sampler  TextureSampler = sampler_state
 {

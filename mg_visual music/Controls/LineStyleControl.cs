@@ -10,6 +10,7 @@ namespace Visual_Music
 {
 	public partial class LineStyleControl : NoteStyleControl
 	{
+		float SizeScale => SongPanel.Project.Camera.ViewportSize.X / 1000;
 		public LineStyleControl()
 		{
 			InitializeComponent();
@@ -26,11 +27,11 @@ namespace Visual_Music
 			base.update(noteStyle);
 			NoteStyle_Line noteStyle_Line = (NoteStyle_Line)noteStyle;
 			lineStyleList.SelectedIndex = (int)noteStyle_Line.Style;
-			lineWidthUd.Value = noteStyle_Line.LineWidth;
+			lineWidthUd.Value = (decimal)(noteStyle_Line.LineWidth / SizeScale);
 			qnGapFillUd.Value = (decimal)noteStyle_Line.Qn_gapThreshold;
 			continuousCb.Checked = noteStyle_Line.Continuous;
 			lineHlStyleList.SelectedIndex = (int)noteStyle_Line.HlStyle;
-			hlSizeUpDown.Value = noteStyle_Line.HlSize;
+			hlSizeUpDown.Value = (decimal)(noteStyle_Line.HlSize / SizeScale);
 			movingHlCb.Checked = noteStyle_Line.MovingHl;
 			shrinkingHlCb.Checked = noteStyle_Line.ShrinkingHl;
 			hlBorderCb.Checked = noteStyle_Line.HlBorder;
@@ -52,7 +53,7 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().LineWidth = (int)lineWidthUd.Value;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().LineWidth = (float)lineWidthUd.Value * SizeScale;
 			SongPanel.Project.createOcTrees();
 		}
 
@@ -79,7 +80,7 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().HlSize = (int)hlSizeUpDown.Value;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().HlSize = (float)hlSizeUpDown.Value * SizeScale;
 		}
 
 		private void movingHlCb_CheckedChanged(object sender, EventArgs e)

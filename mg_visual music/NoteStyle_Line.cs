@@ -75,12 +75,12 @@ namespace Visual_Music
 		protected static LineHlVertex[] lineHlVerts = new LineHlVertex[4];
 		//OcTree<LineGeo> ocTree;
 
-		public int LineWidth = 5;
+		public float LineWidth = 5 / 1000.0f;
 		public float Qn_gapThreshold { get; set; } = 5;
 		public bool Continuous { get; set; } = true;
 		public LineStyleEnum Style = LineStyleEnum.Simple;
 		public LineHlStyleEnum HlStyle = LineHlStyleEnum.Arrow;
-		public int HlSize = 25;
+		public float HlSize = 25 / 1000.0f;
 		public bool MovingHl = false;
 		public bool ShrinkingHl = false;
 		public bool HlBorder = false;
@@ -100,7 +100,7 @@ namespace Visual_Music
 			foreach (var entry in info)
 			{
 				if (entry.Name == "lineWidth")
-					LineWidth = (int)entry.Value;
+					LineWidth = (float)entry.Value;
 				else if (entry.Name == "qn_gapThreshold")
 					Qn_gapThreshold = (float)entry.Value;
 				else if (entry.Name == "continuous")
@@ -110,7 +110,7 @@ namespace Visual_Music
 				else if (entry.Name == "hlStyle")
 					HlStyle = (LineHlStyleEnum)entry.Value;
 				else if (entry.Name == "hlSize")
-					HlSize = (int)entry.Value;
+					HlSize = (float)entry.Value;
 				else if (entry.Name == "movingHl")
 					MovingHl = (bool)entry.Value;
 				else if (entry.Name == "shrinkingHl")
@@ -161,13 +161,12 @@ namespace Visual_Music
 				vertexOffset = new Vector3(1, 0, 0);
 			else
 				vertexOffset = normal;
-			float halfWidth = LineWidth * 0.001f / 2.0f;
-			vertexOffset *= halfWidth;
+			vertexOffset *= LineWidth / 2.0f;
 		}
 
 		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
 		{
-			Vector2 texSize = new Vector2(texProps.Texture.Width, texProps.Texture.Height);
+			Vector2 texSize = new Vector2(texProps.Texture.Width, texProps.Texture.Height) * TexTileScale;
 			TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;
 			TexAnchorEnum texVAnchor = (TexAnchorEnum)texProps.VAnchor;
 			bool uTile = true, vTile = true;
@@ -187,8 +186,9 @@ namespace Visual_Music
 			}
 			else if (texUAnchor == TexAnchorEnum.Screen)
 			{
-				worldPos1.X += Project.Camera.ViewportSize.X / 2;
-				worldPos2.X += Project.Camera.ViewportSize.X / 2;
+				float songPosP = Project.getScreenPosX(Project.SongPosT);
+				worldPos1.X -= songPosP + Project.Camera.ViewportSize.X / 2;
+				worldPos2.X -= songPosP + Project.Camera.ViewportSize.X / 2;
 
 				//if (!tileU)
 				//    vert1TC.X = vert2TC.X = lineCenter.X / songDrawProps.viewportSize.X;
@@ -209,8 +209,8 @@ namespace Visual_Music
 			{
 				if (!uTile)
 				{
-					vert1TC.X = Project.getSongPosP(worldPos1.X) / Project.SongLengthP;
-					vert2TC.X = Project.getSongPosP(worldPos2.X) / Project.SongLengthP;
+					vert1TC.X = worldPos1.X / Project.SongLengthP;
+					vert2TC.X = worldPos2.X / Project.SongLengthP;
 				}
 				else
 				{
@@ -249,9 +249,11 @@ namespace Visual_Music
 				throw new NotImplementedException();
 			if (!adjustingAspect)
 				adjustAspect(ref vert1TC, ref vert2TC, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2);
-			Vector2 scrollOffset = Project.SongPosB * texProps.Scroll;
-			vert1TC -= scrollOffset;
-			vert2TC -= scrollOffset;
+			//Vector2 scrollOffset = Project.SongPosB * texProps.Scroll;
+			//vert1TC -= scrollOffset;
+			//vert2TC -= scrollOffset;
+			vert1TC.Y *= -1;
+			vert2TC.Y *= -1;
 		}
 
 		void adjustAspect(ref Vector2 vert1TC, ref Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2)
@@ -265,7 +267,7 @@ namespace Visual_Music
 
 				if ((bool)texProps.UTile && !(bool)texProps.VTile)
 				{
-					float ratio = tcDiff.Y / tiledTcDiff.Y;
+					float ratio = -tcDiff.Y / tiledTcDiff.Y;
 					vert1TC.X *= ratio;
 					vert2TC.X *= ratio;
 				}
@@ -365,7 +367,11 @@ namespace Visual_Music
 					//Vector2 ns = songDrawProps.getScreenPosF(note.start, note.pitch);
 					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
 					if (texTrackProps.TexProps.Texture != null)
+					{
 						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, LineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
+						//lineVerts[vertIndex].texCoords.Y *= -1;
+						//lineVerts[vertIndex+1].texCoords.Y *= -1;
+					}							
 
 					if (Style == LineStyleEnum.Ribbon)
 					{
@@ -466,10 +472,10 @@ namespace Visual_Music
 
 			fx.Parameters["Style"].SetValue((int)Style);
 			fx.Parameters["HlSize"].SetValue((float)HlSize / 2.0f);
-			
 			songPanel.GraphicsDevice.BlendState = songPanel.BlendState;
 			float radius = LineWidth / 2.0f;
 			fx.Parameters["Radius"].SetValue(radius);
+			fx.Parameters["TexScrollOffset"].SetValue(Project.SongPosB * texTrackProps.TexProps.Scroll);
 			Color color;
 			Texture2D texture;
 			getMaterial(trackProps, false, out color, out texture);
@@ -539,14 +545,12 @@ namespace Visual_Music
 				}
 				else
 				{
-					//float x1 = 0;// songDrawProps.viewportSize.X / 2.0f;
 					float x1 = songPosP;
-					float normPitch = trackProps.TrackView.Curve.Evaluate(Project.SongPosT);
-					//float normPitch = trackProps.TrackView.Curve.Evaluate(songDrawProps.getSongPosT(x1));
-					float y1 = Project.getScreenPosY(normPitch);
-					float x2 = x1 + 1;
-					normPitch = trackProps.TrackView.Curve.Evaluate(Project.getTimeT(1));
-					float y2 = Project.getScreenPosY(normPitch);
+					float pitch1 = trackProps.TrackView.Curve.Evaluate(Project.SongPosT);
+					float y1 = Project.getScreenPosY(pitch1);
+					float x2 = x1 + 0.001f;
+					float pitch2 = trackProps.TrackView.Curve.Evaluate(Project.getTimeT(x2));
+					float y2 = Project.getScreenPosY(pitch2);
 
 					arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
 					arrowDir.Normalize();
@@ -580,7 +584,7 @@ namespace Visual_Music
 				setHlCirclePos(noteStartVec);
 			}
 			//For shrinking highlights
-			float leftLength = -(noteStart.X - songPosP) - 1;
+			float leftLength = -(noteStart.X - songPosP) - 0.0011f;
 			float shrinkPercent = leftLength / (noteEnd - noteStart.X);
 			if (!ShrinkingHl)
 			{
@@ -619,7 +623,7 @@ namespace Visual_Music
 				if (MovingHl)
 				{
 					float x = songPosP;// songDrawProps.viewportSize.X / 2.0f;
-					Vector3 circlePos = new Vector3(x, Project.getCurveScreenY(0, trackProps.TrackView.Curve), 0);
+					Vector3 circlePos = new Vector3(x, Project.getCurveScreenY(x, trackProps.TrackView.Curve), 0);
 					setHlCirclePos(circlePos);
 				}
 				songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;

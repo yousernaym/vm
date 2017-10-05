@@ -49,6 +49,7 @@ namespace Visual_Music
 				YOrigin = value.Y;
 			}
 		}
+		
 		public float XOrigin { get; set; } = 0.5f;
 		public float YOrigin { get; set; } = 0.5f;
 		public bool XOriginEnable { get; set; } = true;
@@ -154,6 +155,7 @@ namespace Visual_Music
 	[Serializable()]
 	abstract public class NoteStyle : ISerializable
 	{
+		public const float TexTileScale = 2.0f / 1920;
 		public static bool bCull = true;
 		public static bool bSkipClose = false;
 		public static bool bSkipPoints = true;
@@ -298,7 +300,7 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-			fx.Parameters["BlurredEdge"].SetValue(2.0f);
+			fx.Parameters["BlurredEdge"].SetValue(Project.Camera.ViewportSize.X * 2.0f / 1000);
 			songPosP = Project.getScreenPosX(Project.SongPosT);
 			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Camera.ViewportSize.X, Project.Camera.ViewportSize.Y));
@@ -350,11 +352,9 @@ namespace Visual_Music
 			fx.Parameters["SpecPower"].SetValue((float)(Project.GlobalTrackProps.SpecPower * trackProps.SpecPower));
 
 			//Spatial props
-			Vector3 posOffset = Project.GlobalTrackProps.PosOffset + trackProps.PosOffset;
-			posOffset *= 0.01f * Project.Camera.ViewportSize.X; //Pos offset is in percent of screen width
-			//posOffset.Z -= Math.Abs(projMat.M11);
-			fx.Parameters["PosOffset"].SetValue(posOffset);
+			fx.Parameters["PosOffset"].SetValue(Project.GlobalTrackProps.PosOffset + trackProps.PosOffset);
 
+			//Light
 			TrackProps lightProps = (bool)trackProps.UseGlobalLight ? Project.GlobalTrackProps : trackProps;
 			Vector3 normLightDir = lightProps.LightDir;
 			normLightDir.Normalize();
@@ -432,15 +432,9 @@ namespace Visual_Music
 
 		float calcTexCoordComponent(float texSize, float vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor)
 		{
-			float pixelScale = 1920 / 2;
 			if (tile)
-			{
-				texSize /= pixelScale;
-				//notePos *= pixelScale;
-				//noteSize *= pixelScale;
-				//posOffset *= pixelScale;
-				//vpSize *= pixelScale;
-			}
+				texSize *= TexTileScale;
+
 			if (anchor == TexAnchorEnum.Screen)
 			{
 				float screenPos = notePos + posOffset + vpSize / 2;
