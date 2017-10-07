@@ -637,7 +637,7 @@ namespace Visual_Music
 		}
 		public float getScreenPosX(int timeT)
 		{
-			return ((float)timeT / viewWidthT) * 2;
+			return ((float)timeT / viewWidthT) * Camera.ViewportSize.X;
 		}
 		public int getPitchScreenPos(int pitch)
 		{

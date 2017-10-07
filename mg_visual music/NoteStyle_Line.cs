@@ -134,6 +134,9 @@ namespace Visual_Music
 
 		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
 		{
+			worldPos1.X += Project.Camera.ViewportSize.X / 2;
+			worldPos2.X += Project.Camera.ViewportSize.X / 2;
+			
 			Vector2 texSize = new Vector2(texProps.Texture.Width, texProps.Texture.Height) * TexTileScale;
 			TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;
 			TexAnchorEnum texVAnchor = (TexAnchorEnum)texProps.VAnchor;
@@ -155,8 +158,8 @@ namespace Visual_Music
 			else if (texUAnchor == TexAnchorEnum.Screen)
 			{
 				float songPosP = Project.getScreenPosX(Project.SongPosT);
-				worldPos1.X -= songPosP + Project.Camera.ViewportSize.X / 2;
-				worldPos2.X -= songPosP + Project.Camera.ViewportSize.X / 2;
+				//worldPos1.X -= songPosP + Project.Camera.ViewportSize.X / 2;
+				//worldPos2.X -= songPosP + Project.Camera.ViewportSize.X / 2;
 
 				if (!uTile)
 				{
@@ -178,8 +181,8 @@ namespace Visual_Music
 				}
 				else
 				{
-					vert1TC.X = Project.getSongPosP(worldPos1.X) / texSize.X;
-					vert2TC.X = Project.getSongPosP(worldPos2.X) / texSize.X;
+					vert1TC.X = worldPos1.X / texSize.X;
+					vert2TC.X = worldPos2.X / texSize.X;
 				}
 			}
 			else
@@ -431,16 +434,21 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.BlendState = songPanel.BlendState;
 			float radius = LineWidth / 2.0f;
 			fx.Parameters["Radius"].SetValue(radius);
-			fx.Parameters["TexScrollOffset"].SetValue(Project.SongPosB * texTrackProps.TexProps.Scroll);
+			fx.Parameters["InnerHlSize"].SetValue(0.0f);
+
 			Color color;
 			Texture2D texture;
 			getMaterial(trackProps, false, out color, out texture);
 			fx.Parameters["Color"].SetValue(color.ToVector4());
-
-			fx.Parameters["InnerHlSize"].SetValue(0.0f);
-			Vector2 texSize = new Vector2(texture.Width, texture.Height);
-			fx.Parameters["TexSize"].SetValue(texSize);
 			fx.Parameters["Texture"].SetValue(texture);
+
+			//Texture scrolling including adjustment for screen anchoring
+			Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
+			TrackPropsTex texProps = texTrackProps.TexProps;
+			Vector2 texScrollOffset = Project.SongPosB * texProps.Scroll;
+			if (texProps.UAnchor == TexAnchorEnum.Screen)
+				texScrollOffset.X += songPosP / ((bool)texProps.UTile ? texSize.X : Project.Camera.ViewportSize.X);
+			fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
 
 			fx.CurrentTechnique = fx.Techniques["Line"];
 			fx.CurrentTechnique.Passes[0].Apply();
