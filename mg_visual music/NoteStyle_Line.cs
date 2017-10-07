@@ -16,19 +16,7 @@ namespace Visual_Music
 	public struct LineHlVertex : IVertexType
 	{
 		public Vector3 pos;
-		public Vector3 normal;
-		public Vector3 center;
-		public float normStepFromNoteStart;
-		public Vector2 texCoords;
-		public LineHlVertex(Vector3 _pos, Vector3 _normal, Vector3 _center, float _normStepFromNoteStart, Vector2 _texCoords)
-		{
-			pos = _pos;
-			normal = _normal;
-			center = _center;
-			normStepFromNoteStart = _normStepFromNoteStart;
-			texCoords = _texCoords;
-		}
-		public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Single, VertexElementUsage.Position, 2), new VertexElement(40, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
+		public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0));
 		VertexDeclaration IVertexType.VertexDeclaration
 		{
 			get { return VertexDeclaration; }
@@ -42,20 +30,6 @@ namespace Visual_Music
 		public Vector3 center;
 		public float normStepFromNoteStart;
 		public Vector2 texCoords;
-		
-		public LineVertex(Vector3 _pos, Vector3 _normal, Vector3 _center, float _normStepFromNoteStart, Vector2 _texCoords)
-		{
-			pos = _pos;
-			normal = _normal;
-			center = _center;
-			normStepFromNoteStart = _normStepFromNoteStart;
-			texCoords = _texCoords;
-		}
-		//static public DynamicVertexBuffer vertexBuffer;
-		//static public void init(GraphicsDevice gfxDevice, int numVerts)
-		//{
-		//vertexBuffer = new DynamicVertexBuffer(gfxDevice, typeof(LineVertex), numVerts, BufferUsage.None);
-		//}
 	}
 
 	[Serializable()]
@@ -64,16 +38,10 @@ namespace Visual_Music
 		const float EvalStep = 0.001f;
 		const int MaxLineVerts = 100000;
 		const int MaxHLineVerts = 30000; 
-		//static Stack vbPool = new Stack(1000)
 		static VertexDeclaration lineVertDecl;
-		static TestVertex[] testVerts = new TestVertex[30];
 		static LineVertex[] lineVerts = new LineVertex[MaxLineVerts];
 		static LineVertex[] hLineVerts = new LineVertex[MaxHLineVerts];
-		//static short[] lineInds = new short[lineVerts.Length];
-		//protected static LineVertex[] arrowAreaVerts = new LineVertex[3];
-		//protected static LineVertex[] arrowBorderVerts = new LineVertex[3];
 		protected static LineHlVertex[] lineHlVerts = new LineHlVertex[4];
-		//OcTree<LineGeo> ocTree;
 
 		public float LineWidth = 5 / 1000.0f;
 		public float Qn_gapThreshold { get; set; } = 5;
@@ -190,10 +158,6 @@ namespace Visual_Music
 				worldPos1.X -= songPosP + Project.Camera.ViewportSize.X / 2;
 				worldPos2.X -= songPosP + Project.Camera.ViewportSize.X / 2;
 
-				//if (!tileU)
-				//    vert1TC.X = vert2TC.X = lineCenter.X / songDrawProps.viewportSize.X;
-				//else
-				//    vert1TC.X = vert2TC.X = lineCenter.X / texSize.X;
 				if (!uTile)
 				{
 					vert1TC.X = worldPos1.X / Project.Camera.ViewportSize.X;
@@ -249,9 +213,6 @@ namespace Visual_Music
 				throw new NotImplementedException();
 			if (!adjustingAspect)
 				adjustAspect(ref vert1TC, ref vert2TC, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2);
-			//Vector2 scrollOffset = Project.SongPosB * texProps.Scroll;
-			//vert1TC -= scrollOffset;
-			//vert2TC -= scrollOffset;
 			vert1TC.Y *= -1;
 			vert2TC.Y *= -1;
 		}
@@ -364,14 +325,9 @@ namespace Visual_Music
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
 					float normStepFromNoteStart = (x - startDraw) / (nextNoteStart.X - noteStart.X);
 					lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = normStepFromNoteStart;
-					//Vector2 ns = songDrawProps.getScreenPosF(note.start, note.pitch);
-					//Vector2 nns = songDrawProps.getScreenPosF(nextNote.start, nextNote.pitch);
+
 					if (texTrackProps.TexProps.Texture != null)
-					{
 						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, LineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
-						//lineVerts[vertIndex].texCoords.Y *= -1;
-						//lineVerts[vertIndex+1].texCoords.Y *= -1;
-					}							
 
 					if (Style == LineStyleEnum.Ribbon)
 					{
@@ -615,7 +571,7 @@ namespace Visual_Music
 
 				songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
 				fx.CurrentTechnique = fx.Techniques["Arrow"];
-				fx.CurrentTechnique.Passes["Area"].Apply();
+				fx.CurrentTechnique.Passes[0].Apply();
 				songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
 			}
 			else if (HlStyle == LineHlStyleEnum.Circle)
@@ -641,10 +597,6 @@ namespace Visual_Music
 				{
 					fx.CurrentTechnique = fx.Techniques["Line"];
 					fx.CurrentTechnique.Passes[0].Apply();
-					//if (numHLineVerts > 1)
-						//songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, hLineVerts, 0, numHLineVerts / 2);
-					//if (numVerts > 5)
-						//songPanel.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, lineVerts, 3, numVerts - 3, lineInds, 0, numVerts - 5);
 				}
 			}
 			numVerts = 3;
@@ -655,7 +607,6 @@ namespace Visual_Music
 		{
 			float f = (float)(x - x1) / (float)(x2 - x1);
 			return (1 - (float)Math.Cos((double)f * Math.PI)) * 0.5f;
-			//return f;
 		}
 
 		public static void sInit()
@@ -678,10 +629,5 @@ namespace Visual_Music
 				vb.Dispose();
 		}
 	}
-
-	//public class LineOcTree : OcTree<LineGeo>
-	//{
-		
-	//}
 }
 
