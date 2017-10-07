@@ -1153,6 +1153,7 @@ namespace Visual_Music
 					getActiveTexProps(i).UTile = ((CheckBox)sender).Checked;
 					getActiveTexProps(i).VTile = ((CheckBox)sender).Checked;
 				}
+				project.createOcTrees();
 				updateTrackControls();
 			}
 		}
@@ -1178,6 +1179,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UTile = ((CheckBox)sender).Checked;
+			project.createOcTrees();
 			updateTrackControls();
 		}
 
@@ -1187,24 +1189,38 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).VTile = ((CheckBox)sender).Checked;
+			project.createOcTrees();
 			updateTrackControls();
 		}
 
 		private void noteAnchorLabel_Click(object sender, EventArgs e)
 		{
-			noteUAnchorRb.PerformClick();
-			noteVAnchorRb.PerformClick();
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				getActiveTexProps(i).UAnchor = getActiveTexProps(i).VAnchor = TexAnchorEnum.Note;
+			project.createOcTrees();
+			updateTrackControls();
 		}
 
 		private void screenAnchorLabel_Click(object sender, EventArgs e)
 		{
-			screenUAnchorRb.PerformClick();
-			screenVAnchorRb.PerformClick();
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				getActiveTexProps(i).UAnchor = getActiveTexProps(i).VAnchor = TexAnchorEnum.Screen;
+			project.createOcTrees();
+			updateTrackControls();
 		}
 
 		private void songAnchorLabel_Click(object sender, EventArgs e)
 		{
-			songAnchorRb.PerformClick();
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				getActiveTexProps(i).UAnchor = TexAnchorEnum.Song;
+			project.createOcTrees();
+			updateTrackControls();
 		}
 
 		private void noteUAnchorRb_Click(object sender, EventArgs e)
@@ -1213,6 +1229,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = TexAnchorEnum.Note;
+			project.createOcTrees();
 		}
 
 		private void noteVAnchorRb_Click(object sender, EventArgs e)
@@ -1221,6 +1238,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).VAnchor = TexAnchorEnum.Note;
+			project.createOcTrees();
 		}
 
 		private void screenUAnchorRb_Click(object sender, EventArgs e)
@@ -1229,6 +1247,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = TexAnchorEnum.Screen;
+			project.createOcTrees();
 		}
 
 		private void screenVAnchorRb_Click(object sender, EventArgs e)
@@ -1237,6 +1256,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).VAnchor = TexAnchorEnum.Screen;
+			project.createOcTrees();
 		}
 
 		private void songAnchorRb_Click(object sender, EventArgs e)
@@ -1245,6 +1265,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = TexAnchorEnum.Song;
+			project.createOcTrees();
 		}
 
 		private void texUScrollUD_ValueChanged(object sender, EventArgs e)
@@ -1269,6 +1290,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).KeepAspect = ((CheckBox)sender).Checked;
+			project.createOcTrees();
 		}
 
         private void importSidSongToolStripMenuItem_Click(object sender, EventArgs e)
