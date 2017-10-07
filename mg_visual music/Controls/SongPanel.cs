@@ -186,7 +186,7 @@ namespace Visual_Music
 				//Create frustum
 				BoundingFrustum selectionFrustum = new BoundingFrustum(selectionFrustumMat);
 
-				float songPos = ((float)Project.SongPosT / Project.ViewWidthT + 0.5f) * ClientRectangle.Width - ClientRectangle.Width / 2.0f;
+				float songPos = ((float)Project.SongPosT / Project.ViewWidthT + 0.5f) * Project.Camera.ViewportSize.X - Project.Camera.ViewportSize.X / 2.0f;
 				for (int i = 1; i < Project.TrackViews.Count; i++)
 				{
 					if (Project.TrackViews[i].MidiTrack.Notes.Count > 0 &&
