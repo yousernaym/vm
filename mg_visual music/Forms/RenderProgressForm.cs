@@ -27,10 +27,10 @@ namespace Visual_Music
 		//TimeSpan startTime;
 		Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager taskBarProgress = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
 		StopRenderingMb cancelMb = new StopRenderingMb();
-		static int progressBufIndex0 = 1;
-		static int progressBufIndex1 = 0;
-		static ProgressAtTime[] progressBuf = new ProgressAtTime[100];
-		static int frame = 0;
+		int progressBufIndex0 = 1;
+		int progressBufIndex1 = 0;
+		ProgressAtTime[] progressBuf = new ProgressAtTime[100];
+		int frame = 0;
 						
 		void _updateProgress(double progress)
 		{
