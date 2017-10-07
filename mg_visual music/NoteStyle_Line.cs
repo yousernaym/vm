@@ -134,9 +134,8 @@ namespace Visual_Music
 
 		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
 		{
-			worldPos1.X += Project.Camera.ViewportSize.X / 2;
-			worldPos2.X += Project.Camera.ViewportSize.X / 2;
-			
+			Vector2 vpSize = Project.Camera.ViewportSize;
+						
 			Vector2 texSize = new Vector2(texProps.Texture.Width, texProps.Texture.Height) * TexTileScale;
 			TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;
 			TexAnchorEnum texVAnchor = (TexAnchorEnum)texProps.VAnchor;
@@ -157,14 +156,12 @@ namespace Visual_Music
 			}
 			else if (texUAnchor == TexAnchorEnum.Screen)
 			{
-				float songPosP = Project.getScreenPosX(Project.SongPosT);
-				//worldPos1.X -= songPosP + Project.Camera.ViewportSize.X / 2;
-				//worldPos2.X -= songPosP + Project.Camera.ViewportSize.X / 2;
-
+				worldPos1.X += vpSize.X / 2;
+				worldPos2.X += vpSize.X / 2;
 				if (!uTile)
 				{
-					vert1TC.X = worldPos1.X / Project.Camera.ViewportSize.X;
-					vert2TC.X = worldPos2.X / Project.Camera.ViewportSize.X;
+					vert1TC.X = worldPos1.X / vpSize.X;
+					vert2TC.X = worldPos2.X / vpSize.X;
 				}
 				else
 				{
