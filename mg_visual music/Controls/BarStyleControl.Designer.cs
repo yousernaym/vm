@@ -30,10 +30,15 @@
 		{
 			this.SuspendLayout();
 			// 
+			// modGbox
+			// 
+			this.modGbox.Size = new System.Drawing.Size(177, 41);
+			// 
 			// BarStyleControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.Name = "BarStyleControl";
+			this.Size = new System.Drawing.Size(180, 44);
 			this.ResumeLayout(false);
 
 		}

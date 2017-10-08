@@ -579,7 +579,7 @@
 			this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
 			this.lineStyleControl.Name = "lineStyleControl";
 			this.lineStyleControl.Size = new System.Drawing.Size(183, 335);
-			this.lineStyleControl.TabIndex = 20;
+			this.lineStyleControl.TabIndex = 2;
 			this.lineStyleControl.Visible = false;
 			// 
 			// barStyleControl
@@ -590,14 +590,14 @@
 			this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.barStyleControl.Name = "barStyleControl";
 			this.barStyleControl.Size = new System.Drawing.Size(180, 66);
-			this.barStyleControl.TabIndex = 20;
+			this.barStyleControl.TabIndex = 2;
 			// 
 			// defaultStyleBtn
 			// 
 			this.defaultStyleBtn.Location = new System.Drawing.Point(1, 1);
 			this.defaultStyleBtn.Name = "defaultStyleBtn";
 			this.defaultStyleBtn.Size = new System.Drawing.Size(179, 23);
-			this.defaultStyleBtn.TabIndex = 11;
+			this.defaultStyleBtn.TabIndex = 0;
 			this.defaultStyleBtn.Text = "Default Style";
 			this.defaultStyleBtn.UseVisualStyleBackColor = true;
 			this.defaultStyleBtn.Click += new System.EventHandler(this.defaultStyleBtn_Click);
@@ -610,7 +610,7 @@
 			this.styleList.Location = new System.Drawing.Point(4, 45);
 			this.styleList.Name = "styleList";
 			this.styleList.Size = new System.Drawing.Size(113, 21);
-			this.styleList.TabIndex = 8;
+			this.styleList.TabIndex = 1;
 			this.styleList.ValueMember = "Value";
 			this.styleList.SelectedIndexChanged += new System.EventHandler(this.styleList_SelectedIndexChanged);
 			// 
@@ -1657,7 +1657,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-2993, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-3010, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1669,7 +1669,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-3105, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-3122, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1679,7 +1679,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-3107, 10040);
+			this.label4.Location = new System.Drawing.Point(-3124, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
