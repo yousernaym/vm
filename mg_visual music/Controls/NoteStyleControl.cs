@@ -33,7 +33,7 @@ namespace Visual_Music
 		{
 			InitializeComponent();
 			modGbox.AutoSize = false;
-			modGbox.Height = modEntryCombo.Height * 3;
+			modGbox.Height = (int)((float)modEntryCombo.Height * 2.5f);
 		}
 
 		public virtual void update(NoteStyle noteStyle)

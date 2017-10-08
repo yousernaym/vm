@@ -152,6 +152,7 @@
 			this.modEntryPanel.Name = "modEntryPanel";
 			this.modEntryPanel.Size = new System.Drawing.Size(168, 407);
 			this.modEntryPanel.TabIndex = 42;
+			this.modEntryPanel.Visible = false;
 			// 
 			// interpolationGb
 			// 

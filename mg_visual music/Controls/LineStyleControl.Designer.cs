@@ -56,10 +56,6 @@
 			// modGbox
 			// 
 			this.modGbox.Location = new System.Drawing.Point(0, 292);
-			this.modGbox.Margin = new System.Windows.Forms.Padding(2);
-			this.modGbox.Padding = new System.Windows.Forms.Padding(2);
-			this.modGbox.Size = new System.Drawing.Size(177, 41);
-			this.modGbox.TabIndex = 20;
 			// 
 			// groupBox3
 			// 

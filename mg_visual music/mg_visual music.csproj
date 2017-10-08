@@ -242,9 +242,6 @@
     <None Include="Properties\DataSources\SongPanel.datasource" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Controls\BarStyleControl.resx">
-      <DependentUpon>BarStyleControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Controls\NoteStyleControl.resx">
       <DependentUpon>NoteStyleControl.cs</DependentUpon>
     </EmbeddedResource>
