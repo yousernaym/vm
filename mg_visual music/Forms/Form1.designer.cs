@@ -578,7 +578,7 @@
 			this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
 			this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
 			this.lineStyleControl.Name = "lineStyleControl";
-			this.lineStyleControl.Size = new System.Drawing.Size(183, 335);
+			this.lineStyleControl.Size = new System.Drawing.Size(183, 347);
 			this.lineStyleControl.TabIndex = 2;
 			this.lineStyleControl.Visible = false;
 			// 
@@ -589,7 +589,7 @@
 			this.barStyleControl.Location = new System.Drawing.Point(3, 72);
 			this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.barStyleControl.Name = "barStyleControl";
-			this.barStyleControl.Size = new System.Drawing.Size(180, 66);
+			this.barStyleControl.Size = new System.Drawing.Size(180, 55);
 			this.barStyleControl.TabIndex = 2;
 			// 
 			// defaultStyleBtn
@@ -658,7 +658,7 @@
 			this.lightingGb.Location = new System.Drawing.Point(0, 892);
 			this.lightingGb.Name = "lightingGb";
 			this.lightingGb.Size = new System.Drawing.Size(181, 133);
-			this.lightingGb.TabIndex = 21;
+			this.lightingGb.TabIndex = 70;
 			this.lightingGb.TabStop = false;
 			this.lightingGb.Text = "Lighting";
 			// 
@@ -672,7 +672,7 @@
             0});
 			this.specPowUd.Name = "specPowUd";
 			this.specPowUd.Size = new System.Drawing.Size(59, 20);
-			this.specPowUd.TabIndex = 8;
+			this.specPowUd.TabIndex = 40;
 			this.specPowUd.ValueChanged += new System.EventHandler(this.specPowUd_ValueChanged);
 			// 
 			// ambientAmountUd
@@ -686,7 +686,7 @@
 			this.ambientAmountUd.Location = new System.Drawing.Point(111, 23);
 			this.ambientAmountUd.Name = "ambientAmountUd";
 			this.ambientAmountUd.Size = new System.Drawing.Size(59, 20);
-			this.ambientAmountUd.TabIndex = 9;
+			this.ambientAmountUd.TabIndex = 10;
 			this.ambientAmountUd.ValueChanged += new System.EventHandler(this.ambientAmountUd_ValueChanged);
 			// 
 			// diffuseAmountUd
@@ -700,7 +700,7 @@
 			this.diffuseAmountUd.Location = new System.Drawing.Point(111, 49);
 			this.diffuseAmountUd.Name = "diffuseAmountUd";
 			this.diffuseAmountUd.Size = new System.Drawing.Size(59, 20);
-			this.diffuseAmountUd.TabIndex = 10;
+			this.diffuseAmountUd.TabIndex = 20;
 			this.diffuseAmountUd.ValueChanged += new System.EventHandler(this.diffuseAmountUd_ValueChanged);
 			// 
 			// specAmountUd
@@ -714,7 +714,7 @@
 			this.specAmountUd.Location = new System.Drawing.Point(111, 75);
 			this.specAmountUd.Name = "specAmountUd";
 			this.specAmountUd.Size = new System.Drawing.Size(59, 20);
-			this.specAmountUd.TabIndex = 11;
+			this.specAmountUd.TabIndex = 30;
 			this.specAmountUd.ValueChanged += new System.EventHandler(this.specAmountUd_ValueChanged);
 			// 
 			// label15
@@ -776,7 +776,7 @@
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Padding = new System.Windows.Forms.Padding(2);
 			this.groupBox4.Size = new System.Drawing.Size(182, 397);
-			this.groupBox4.TabIndex = 20;
+			this.groupBox4.TabIndex = 60;
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "Texture";
 			// 
@@ -832,7 +832,7 @@
             -2147483648});
 			this.texVScrollUD.Name = "texVScrollUD";
 			this.texVScrollUD.Size = new System.Drawing.Size(55, 20);
-			this.texVScrollUD.TabIndex = 21;
+			this.texVScrollUD.TabIndex = 51;
 			this.texVScrollUD.ValueChanged += new System.EventHandler(this.texVScrollUD_ValueChanged);
 			// 
 			// label33
@@ -867,7 +867,7 @@
             -2147483648});
 			this.texUScrollUD.Name = "texUScrollUD";
 			this.texUScrollUD.Size = new System.Drawing.Size(55, 20);
-			this.texUScrollUD.TabIndex = 20;
+			this.texUScrollUD.TabIndex = 50;
 			this.texUScrollUD.ValueChanged += new System.EventHandler(this.texUScrollUD_ValueChanged);
 			// 
 			// tableLayoutPanel1
@@ -893,7 +893,7 @@
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(112, 93);
-			this.tableLayoutPanel1.TabIndex = 18;
+			this.tableLayoutPanel1.TabIndex = 40;
 			// 
 			// label31
 			// 
@@ -953,7 +953,7 @@
 			this.noteAnchorLabel.Location = new System.Drawing.Point(6, 25);
 			this.noteAnchorLabel.Name = "noteAnchorLabel";
 			this.noteAnchorLabel.Size = new System.Drawing.Size(54, 19);
-			this.noteAnchorLabel.TabIndex = 17;
+			this.noteAnchorLabel.TabIndex = 1;
 			this.noteAnchorLabel.Text = "Note";
 			this.noteAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			this.noteAnchorLabel.Click += new System.EventHandler(this.noteAnchorLabel_Click);
@@ -1066,7 +1066,7 @@
 			this.texVTileCb.Location = new System.Drawing.Point(95, 195);
 			this.texVTileCb.Name = "texVTileCb";
 			this.texVTileCb.Size = new System.Drawing.Size(33, 17);
-			this.texVTileCb.TabIndex = 17;
+			this.texVTileCb.TabIndex = 32;
 			this.texVTileCb.Text = "V";
 			this.texVTileCb.UseVisualStyleBackColor = true;
 			this.texVTileCb.CheckedChanged += new System.EventHandler(this.texVTileCb_CheckedChanged);
@@ -1078,7 +1078,7 @@
 			this.texUTileCb.Location = new System.Drawing.Point(56, 195);
 			this.texUTileCb.Name = "texUTileCb";
 			this.texUTileCb.Size = new System.Drawing.Size(34, 17);
-			this.texUTileCb.TabIndex = 16;
+			this.texUTileCb.TabIndex = 31;
 			this.texUTileCb.Text = "U";
 			this.texUTileCb.UseVisualStyleBackColor = true;
 			this.texUTileCb.CheckedChanged += new System.EventHandler(this.texUTileCb_CheckedChanged);
@@ -1091,7 +1091,7 @@
 			this.texKeepAspectCb.Margin = new System.Windows.Forms.Padding(2);
 			this.texKeepAspectCb.Name = "texKeepAspectCb";
 			this.texKeepAspectCb.Size = new System.Drawing.Size(109, 17);
-			this.texKeepAspectCb.TabIndex = 15;
+			this.texKeepAspectCb.TabIndex = 33;
 			this.texKeepAspectCb.Text = "Keep aspect ratio";
 			this.texKeepAspectCb.UseVisualStyleBackColor = true;
 			this.texKeepAspectCb.CheckedChanged += new System.EventHandler(this.texKeepAspect_CheckedChanged);
@@ -1104,7 +1104,7 @@
 			this.tileTexCb.Margin = new System.Windows.Forms.Padding(2);
 			this.tileTexCb.Name = "tileTexCb";
 			this.tileTexCb.Size = new System.Drawing.Size(43, 17);
-			this.tileTexCb.TabIndex = 15;
+			this.tileTexCb.TabIndex = 30;
 			this.tileTexCb.Text = "Tile";
 			this.tileTexCb.UseVisualStyleBackColor = true;
 			this.tileTexCb.CheckedChanged += new System.EventHandler(this.tileTexCb_CheckedChanged);
@@ -1115,7 +1115,7 @@
 			this.loadTexBtn.Location = new System.Drawing.Point(5, 18);
 			this.loadTexBtn.Name = "loadTexBtn";
 			this.loadTexBtn.Size = new System.Drawing.Size(75, 23);
-			this.loadTexBtn.TabIndex = 12;
+			this.loadTexBtn.TabIndex = 10;
 			this.loadTexBtn.Text = "&Load texture";
 			this.loadTexBtn.UseVisualStyleBackColor = true;
 			this.loadTexBtn.Click += new System.EventHandler(this.textureLoadBtn_Click);
@@ -1126,7 +1126,7 @@
 			this.unloadTexBtn.Location = new System.Drawing.Point(92, 18);
 			this.unloadTexBtn.Name = "unloadTexBtn";
 			this.unloadTexBtn.Size = new System.Drawing.Size(86, 23);
-			this.unloadTexBtn.TabIndex = 12;
+			this.unloadTexBtn.TabIndex = 15;
 			this.unloadTexBtn.Text = "&Unload texture";
 			this.unloadTexBtn.UseVisualStyleBackColor = true;
 			this.unloadTexBtn.Click += new System.EventHandler(this.unloadTexBtn_Click);
@@ -1139,7 +1139,7 @@
 			this.pointSmpCb.Margin = new System.Windows.Forms.Padding(2);
 			this.pointSmpCb.Name = "pointSmpCb";
 			this.pointSmpCb.Size = new System.Drawing.Size(94, 17);
-			this.pointSmpCb.TabIndex = 14;
+			this.pointSmpCb.TabIndex = 20;
 			this.pointSmpCb.Text = "Point sampling";
 			this.pointSmpCb.UseVisualStyleBackColor = true;
 			this.pointSmpCb.CheckedChanged += new System.EventHandler(this.pointSmpCb_CheckedChanged);
@@ -1156,10 +1156,10 @@
 			// 
 			// defaultMtrlBtn
 			// 
-			this.defaultMtrlBtn.Location = new System.Drawing.Point(2, 6);
+			this.defaultMtrlBtn.Location = new System.Drawing.Point(1, 1);
 			this.defaultMtrlBtn.Name = "defaultMtrlBtn";
 			this.defaultMtrlBtn.Size = new System.Drawing.Size(179, 23);
-			this.defaultMtrlBtn.TabIndex = 11;
+			this.defaultMtrlBtn.TabIndex = 10;
 			this.defaultMtrlBtn.Text = "Default Material";
 			this.defaultMtrlBtn.UseVisualStyleBackColor = true;
 			this.defaultMtrlBtn.Click += new System.EventHandler(this.resetBtn_Click);
@@ -1182,7 +1182,7 @@
 			this.transpSlider.Maximum = 100;
 			this.transpSlider.Name = "transpSlider";
 			this.transpSlider.Size = new System.Drawing.Size(129, 45);
-			this.transpSlider.TabIndex = 1;
+			this.transpSlider.TabIndex = 20;
 			this.transpSlider.TickFrequency = 10;
 			this.transpSlider.Value = 50;
 			this.transpSlider.Scroll += new System.EventHandler(this.transpSlider_Scroll);
@@ -1192,7 +1192,7 @@
 			this.hueTb.Location = new System.Drawing.Point(137, 113);
 			this.hueTb.Name = "hueTb";
 			this.hueTb.Size = new System.Drawing.Size(38, 20);
-			this.hueTb.TabIndex = 4;
+			this.hueTb.TabIndex = 31;
 			this.hueTb.Text = "notset";
 			this.hueTb.TextChanged += new System.EventHandler(this.hueTb_TextChanged);
 			// 
@@ -1209,7 +1209,7 @@
 			this.groupBox1.Location = new System.Drawing.Point(-1, 164);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(182, 154);
-			this.groupBox1.TabIndex = 5;
+			this.groupBox1.TabIndex = 40;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Normal notes";
 			// 
@@ -1219,7 +1219,7 @@
 			this.normalLumTb.Location = new System.Drawing.Point(141, 105);
 			this.normalLumTb.Name = "normalLumTb";
 			this.normalLumTb.Size = new System.Drawing.Size(38, 20);
-			this.normalLumTb.TabIndex = 8;
+			this.normalLumTb.TabIndex = 21;
 			this.normalLumTb.Text = "notset";
 			this.normalLumTb.TextChanged += new System.EventHandler(this.normalLumTb_TextChanged);
 			// 
@@ -1231,7 +1231,7 @@
 			this.normalLumSlider.Maximum = 200;
 			this.normalLumSlider.Name = "normalLumSlider";
 			this.normalLumSlider.Size = new System.Drawing.Size(129, 45);
-			this.normalLumSlider.TabIndex = 7;
+			this.normalLumSlider.TabIndex = 20;
 			this.normalLumSlider.TickFrequency = 10;
 			this.normalLumSlider.Value = 50;
 			this.normalLumSlider.Scroll += new System.EventHandler(this.normalLumSlider_Scroll);
@@ -1252,7 +1252,7 @@
 			this.normalSatTb.Location = new System.Drawing.Point(141, 41);
 			this.normalSatTb.Name = "normalSatTb";
 			this.normalSatTb.Size = new System.Drawing.Size(38, 20);
-			this.normalSatTb.TabIndex = 6;
+			this.normalSatTb.TabIndex = 11;
 			this.normalSatTb.Text = "notset";
 			this.normalSatTb.TextChanged += new System.EventHandler(this.normalSatTb_TextChanged);
 			// 
@@ -1264,7 +1264,7 @@
 			this.normalSatSlider.Maximum = 200;
 			this.normalSatSlider.Name = "normalSatSlider";
 			this.normalSatSlider.Size = new System.Drawing.Size(129, 45);
-			this.normalSatSlider.TabIndex = 5;
+			this.normalSatSlider.TabIndex = 10;
 			this.normalSatSlider.TickFrequency = 10;
 			this.normalSatSlider.Value = 50;
 			this.normalSatSlider.Scroll += new System.EventHandler(this.normalSatSlider_Scroll);
@@ -1288,7 +1288,7 @@
 			this.hueSlider.Maximum = 100;
 			this.hueSlider.Name = "hueSlider";
 			this.hueSlider.Size = new System.Drawing.Size(129, 45);
-			this.hueSlider.TabIndex = 3;
+			this.hueSlider.TabIndex = 30;
 			this.hueSlider.TickFrequency = 10;
 			this.hueSlider.Value = 50;
 			this.hueSlider.Scroll += new System.EventHandler(this.hueSlider_Scroll);
@@ -1315,7 +1315,7 @@
 			this.groupBox2.Location = new System.Drawing.Point(-1, 325);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(182, 155);
-			this.groupBox2.TabIndex = 6;
+			this.groupBox2.TabIndex = 50;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Highlighted notes";
 			// 
@@ -1325,7 +1325,7 @@
 			this.hiliteLumTb.Location = new System.Drawing.Point(141, 105);
 			this.hiliteLumTb.Name = "hiliteLumTb";
 			this.hiliteLumTb.Size = new System.Drawing.Size(38, 20);
-			this.hiliteLumTb.TabIndex = 12;
+			this.hiliteLumTb.TabIndex = 21;
 			this.hiliteLumTb.Text = "notset";
 			this.hiliteLumTb.TextChanged += new System.EventHandler(this.hiliteLumTb_TextChanged);
 			// 
@@ -1337,7 +1337,7 @@
 			this.hiliteLumSlider.Maximum = 200;
 			this.hiliteLumSlider.Name = "hiliteLumSlider";
 			this.hiliteLumSlider.Size = new System.Drawing.Size(129, 45);
-			this.hiliteLumSlider.TabIndex = 11;
+			this.hiliteLumSlider.TabIndex = 20;
 			this.hiliteLumSlider.TickFrequency = 10;
 			this.hiliteLumSlider.Value = 50;
 			this.hiliteLumSlider.Scroll += new System.EventHandler(this.hiliteLumSlider_Scroll);
@@ -1358,7 +1358,7 @@
 			this.hiliteSatTb.Location = new System.Drawing.Point(141, 41);
 			this.hiliteSatTb.Name = "hiliteSatTb";
 			this.hiliteSatTb.Size = new System.Drawing.Size(38, 20);
-			this.hiliteSatTb.TabIndex = 10;
+			this.hiliteSatTb.TabIndex = 11;
 			this.hiliteSatTb.Text = "notset";
 			this.hiliteSatTb.TextChanged += new System.EventHandler(this.hiliteSatTb_TextChanged);
 			// 
@@ -1370,7 +1370,7 @@
 			this.hiliteSatSlider.Maximum = 200;
 			this.hiliteSatSlider.Name = "hiliteSatSlider";
 			this.hiliteSatSlider.Size = new System.Drawing.Size(129, 45);
-			this.hiliteSatSlider.TabIndex = 9;
+			this.hiliteSatSlider.TabIndex = 10;
 			this.hiliteSatSlider.TickFrequency = 10;
 			this.hiliteSatSlider.Value = 50;
 			this.hiliteSatSlider.Scroll += new System.EventHandler(this.hiliteSatSlider_Scroll);
@@ -1390,7 +1390,7 @@
 			this.transpTb.Location = new System.Drawing.Point(137, 49);
 			this.transpTb.Name = "transpTb";
 			this.transpTb.Size = new System.Drawing.Size(38, 20);
-			this.transpTb.TabIndex = 2;
+			this.transpTb.TabIndex = 21;
 			this.transpTb.Text = "notset";
 			this.transpTb.TextChanged += new System.EventHandler(this.transpTb_TextChanged);
 			// 
@@ -1410,10 +1410,10 @@
 			// 
 			// defaultLightBtn
 			// 
-			this.defaultLightBtn.Location = new System.Drawing.Point(3, 3);
+			this.defaultLightBtn.Location = new System.Drawing.Point(1, 1);
 			this.defaultLightBtn.Name = "defaultLightBtn";
 			this.defaultLightBtn.Size = new System.Drawing.Size(179, 23);
-			this.defaultLightBtn.TabIndex = 12;
+			this.defaultLightBtn.TabIndex = 10;
 			this.defaultLightBtn.Text = "Default Light";
 			this.defaultLightBtn.UseVisualStyleBackColor = true;
 			this.defaultLightBtn.Click += new System.EventHandler(this.defaultLightBtn_Click);
@@ -1428,10 +1428,10 @@
 			this.lightPanel.Controls.Add(this.lightDirXUd);
 			this.lightPanel.Controls.Add(this.label24);
 			this.lightPanel.Enabled = false;
-			this.lightPanel.Location = new System.Drawing.Point(0, 63);
+			this.lightPanel.Location = new System.Drawing.Point(1, 60);
 			this.lightPanel.Name = "lightPanel";
-			this.lightPanel.Size = new System.Drawing.Size(180, 76);
-			this.lightPanel.TabIndex = 5;
+			this.lightPanel.Size = new System.Drawing.Size(179, 76);
+			this.lightPanel.TabIndex = 30;
 			// 
 			// label11
 			// 
@@ -1462,7 +1462,7 @@
 			// 
 			// lightDirZUd
 			// 
-			this.lightDirZUd.Location = new System.Drawing.Point(127, 27);
+			this.lightDirZUd.Location = new System.Drawing.Point(121, 25);
 			this.lightDirZUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1475,12 +1475,12 @@
             -2147483648});
 			this.lightDirZUd.Name = "lightDirZUd";
 			this.lightDirZUd.Size = new System.Drawing.Size(57, 20);
-			this.lightDirZUd.TabIndex = 4;
+			this.lightDirZUd.TabIndex = 30;
 			this.lightDirZUd.ValueChanged += new System.EventHandler(this.lightDirZUd_ValueChanged);
 			// 
 			// lightDirYUd
 			// 
-			this.lightDirYUd.Location = new System.Drawing.Point(65, 27);
+			this.lightDirYUd.Location = new System.Drawing.Point(61, 25);
 			this.lightDirYUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1493,12 +1493,12 @@
             -2147483648});
 			this.lightDirYUd.Name = "lightDirYUd";
 			this.lightDirYUd.Size = new System.Drawing.Size(57, 20);
-			this.lightDirYUd.TabIndex = 5;
+			this.lightDirYUd.TabIndex = 20;
 			this.lightDirYUd.ValueChanged += new System.EventHandler(this.lightDirYUd_ValueChanged);
 			// 
 			// lightDirXUd
 			// 
-			this.lightDirXUd.Location = new System.Drawing.Point(3, 27);
+			this.lightDirXUd.Location = new System.Drawing.Point(1, 25);
 			this.lightDirXUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1511,7 +1511,7 @@
             -2147483648});
 			this.lightDirXUd.Name = "lightDirXUd";
 			this.lightDirXUd.Size = new System.Drawing.Size(57, 20);
-			this.lightDirXUd.TabIndex = 6;
+			this.lightDirXUd.TabIndex = 10;
 			this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
 			// 
 			// label24
@@ -1528,10 +1528,10 @@
 			this.globalLightCb.AutoSize = true;
 			this.globalLightCb.Checked = true;
 			this.globalLightCb.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.globalLightCb.Location = new System.Drawing.Point(3, 39);
+			this.globalLightCb.Location = new System.Drawing.Point(1, 37);
 			this.globalLightCb.Name = "globalLightCb";
 			this.globalLightCb.Size = new System.Drawing.Size(119, 17);
-			this.globalLightCb.TabIndex = 0;
+			this.globalLightCb.TabIndex = 20;
 			this.globalLightCb.Text = "Use global direction";
 			this.globalLightCb.UseVisualStyleBackColor = true;
 			this.globalLightCb.CheckedChanged += new System.EventHandler(this.globalLightCb_CheckedChanged);
@@ -1556,10 +1556,10 @@
 			// 
 			// defaultSpatialBtn
 			// 
-			this.defaultSpatialBtn.Location = new System.Drawing.Point(7, 6);
+			this.defaultSpatialBtn.Location = new System.Drawing.Point(1, 1);
 			this.defaultSpatialBtn.Name = "defaultSpatialBtn";
 			this.defaultSpatialBtn.Size = new System.Drawing.Size(179, 23);
-			this.defaultSpatialBtn.TabIndex = 2;
+			this.defaultSpatialBtn.TabIndex = 10;
 			this.defaultSpatialBtn.Text = "Default Spatial";
 			this.defaultSpatialBtn.UseVisualStyleBackColor = true;
 			this.defaultSpatialBtn.Click += new System.EventHandler(this.defaultSpatialBtn_Click);
@@ -1594,7 +1594,7 @@
 			// label20
 			// 
 			this.label20.AutoSize = true;
-			this.label20.Location = new System.Drawing.Point(6, 41);
+			this.label20.Location = new System.Drawing.Point(-3, 41);
 			this.label20.Name = "label20";
 			this.label20.Size = new System.Drawing.Size(73, 13);
 			this.label20.TabIndex = 1;
@@ -1602,7 +1602,7 @@
 			// 
 			// zoffsetUd
 			// 
-			this.zoffsetUd.Location = new System.Drawing.Point(129, 58);
+			this.zoffsetUd.Location = new System.Drawing.Point(121, 57);
 			this.zoffsetUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1615,12 +1615,12 @@
             -2147483648});
 			this.zoffsetUd.Name = "zoffsetUd";
 			this.zoffsetUd.Size = new System.Drawing.Size(57, 20);
-			this.zoffsetUd.TabIndex = 0;
+			this.zoffsetUd.TabIndex = 40;
 			this.zoffsetUd.ValueChanged += new System.EventHandler(this.zoffsetUd_ValueChanged);
 			// 
 			// yoffsetUd
 			// 
-			this.yoffsetUd.Location = new System.Drawing.Point(67, 58);
+			this.yoffsetUd.Location = new System.Drawing.Point(61, 57);
 			this.yoffsetUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1633,12 +1633,12 @@
             -2147483648});
 			this.yoffsetUd.Name = "yoffsetUd";
 			this.yoffsetUd.Size = new System.Drawing.Size(57, 20);
-			this.yoffsetUd.TabIndex = 0;
+			this.yoffsetUd.TabIndex = 30;
 			this.yoffsetUd.ValueChanged += new System.EventHandler(this.yoffsetUd_ValueChanged);
 			// 
 			// xoffsetUd
 			// 
-			this.xoffsetUd.Location = new System.Drawing.Point(5, 57);
+			this.xoffsetUd.Location = new System.Drawing.Point(1, 57);
 			this.xoffsetUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1651,13 +1651,13 @@
             -2147483648});
 			this.xoffsetUd.Name = "xoffsetUd";
 			this.xoffsetUd.Size = new System.Drawing.Size(57, 20);
-			this.xoffsetUd.TabIndex = 0;
+			this.xoffsetUd.TabIndex = 20;
 			this.xoffsetUd.ValueChanged += new System.EventHandler(this.xoffsetUd_ValueChanged);
 			// 
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-3010, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-3027, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1669,7 +1669,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-3122, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-3139, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1679,7 +1679,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-3124, 10040);
+			this.label4.Location = new System.Drawing.Point(-3141, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
