@@ -1,10 +1,11 @@
 ﻿float4x4 VpMat;
 float2 ViewportSize;
-//float2 TexSize;
 texture Texture;
 float2 ProjScale;
 float SongPos;
 float2 TexScrollOffset;
+float VertWidthScale;
+float TexWidthScale;
 
 
 sampler  TextureSampler = sampler_state

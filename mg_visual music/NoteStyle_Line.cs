@@ -156,8 +156,6 @@ namespace Visual_Music
 			}
 			else if (texUAnchor == TexAnchorEnum.Screen)
 			{
-				worldPos1.X += vpSize.X / 2;
-				worldPos2.X += vpSize.X / 2;
 				if (!uTile)
 				{
 					vert1TC.X = worldPos1.X / vpSize.X;
@@ -262,6 +260,9 @@ namespace Visual_Music
 
 		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
 		{
+			float viewWidthBackup = Project.ViewWidthQn;
+			Project.ViewWidthQn = 16;
+
 			LineGeo lineGeo = new LineGeo();
 			geo = lineGeo;
 			List<Midi.Note> noteList = midiTrack.Notes;
@@ -311,7 +312,7 @@ namespace Visual_Music
 				float startDraw = noteStart.X;
 				float endDraw = nextNoteStart.X;
 
-				float step = EvalStep;
+				float step = EvalStep;// / WidthScale;
 				
 				for (float x = startDraw; x < endDraw; x += step)
 				{
@@ -372,6 +373,8 @@ namespace Visual_Music
 				completeNoteListIndex++;
 			}
 			createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
+
+			Project.ViewWidthQn = viewWidthBackup;
 		}
 
 		public override void drawGeoChunk(Geo geo)
@@ -418,6 +421,7 @@ namespace Visual_Music
 		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
 		{
 			float songPosP;
+
 			base.drawTrack(midiTrack, trackProps, texTrackProps, out songPosP);
 			List<Midi.Note> noteList = midiTrack.Notes;
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
@@ -444,7 +448,7 @@ namespace Visual_Music
 			TrackPropsTex texProps = texTrackProps.TexProps;
 			Vector2 texScrollOffset = Project.SongPosB * texProps.Scroll;
 			if (texProps.UAnchor == TexAnchorEnum.Screen)
-				texScrollOffset.X += songPosP / ((bool)texProps.UTile ? texSize.X : Project.Camera.ViewportSize.X);
+				texScrollOffset.X += (songPosP + Project.Camera.ViewportSize.X / 2) / ((bool)texProps.UTile ? texSize.X : Project.Camera.ViewportSize.X);
 			fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
 
 			fx.CurrentTechnique = fx.Techniques["Line"];

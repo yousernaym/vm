@@ -356,12 +356,9 @@ namespace Visual_Music
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
 		{
-			//songPanel.Invalidate();
 			Project.ViewWidthQn = (float)((TbSlider)sender).Value;
             songScrollBar.SmallChange = Project.ViewWidthT / 16;
             songScrollBar.LargeChange = Project.ViewWidthT / 1;
-			
-			project.createOcTrees();
 		}
 
 		private void audioOffsetS_ValueChanged(object sender, EventArgs e)

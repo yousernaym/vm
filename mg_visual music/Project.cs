@@ -71,9 +71,9 @@ namespace Visual_Music
 			get { return trackViews; }
 			set { trackViews = value; }
 		}
+
 		const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen
 		float viewWidthQn = DefaultViewWidthQn;
-
 		public float ViewWidthQn
 		{
 			get { return viewWidthQn; }
@@ -84,7 +84,7 @@ namespace Visual_Music
 					viewWidthT = (int)(viewWidthQn * notes.TicksPerBeat);
 			}
 		}
-
+		float vertViewWidthQn;
 		int viewWidthT; ////Number of ticks that fits on screen
 		public int ViewWidthT { get => viewWidthT; }
 		public double AudioOffset { get; set; }
@@ -351,6 +351,7 @@ namespace Visual_Music
 		{
 			if (trackViews == null)
 				return;
+			vertViewWidthQn = viewWidthQn;
 			//for (int i = TrackViews.Count - 1; i > 0; i--)
 			for (int i = 1; i < trackViews.Count; i++)
 				TrackViews[i].createOcTree(this, GlobalTrackProps);
@@ -639,10 +640,7 @@ namespace Visual_Music
 		{
 			return ((float)timeT / viewWidthT) * Camera.ViewportSize.X;
 		}
-		public int getPitchScreenPos(int pitch)
-		{
-			return (int)getScreenPosY((float)pitch);
-		}
+	
 		public float getScreenPosY(float pitch)
 		{
 			return (pitch - MinPitch) * NoteHeight + NoteHeight / 2.0f + PitchMargin - Camera.ViewportSize.Y / 2;

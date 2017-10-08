@@ -41,10 +41,12 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.center = IN.center;
 	OUT.rawPos = IN.pos.xyz;
 	OUT.normStepFromNoteStart = IN.normStepFromNoteStart;
-	//OUT.pos.xy -= 0.5;
+	
+	IN.texCoords.x *= TexWidthScale;
 	OUT.texCoords = IN.texCoords - TexScrollOffset;
-
+	
 	OUT.pos = float4(IN.pos.xy, 0, 1);
+	OUT.pos.x *= VertWidthScale;
 	OUT.pos.xyz += PosOffset;
 	OUT.pos.x -= SongPos;
 	OUT.pos = mul(OUT.pos, VpMat);
