@@ -371,8 +371,8 @@
 			// 
 			this.startStopToolStripMenuItem.Name = "startStopToolStripMenuItem";
 			this.startStopToolStripMenuItem.ShowShortcutKeys = false;
-			this.startStopToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
-			this.startStopToolStripMenuItem.Text = "Start/Stop      Space";
+			this.startStopToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+			this.startStopToolStripMenuItem.Text = "Start/Stop                          Space";
 			this.startStopToolStripMenuItem.Click += new System.EventHandler(this.startStopToolStripMenuItem_Click);
 			// 
 			// beginningToolStripMenuItem
@@ -1750,9 +1750,9 @@
 			// 
 			this.resetCamBtn.Location = new System.Drawing.Point(12, 201);
 			this.resetCamBtn.Name = "resetCamBtn";
-			this.resetCamBtn.Size = new System.Drawing.Size(85, 23);
+			this.resetCamBtn.Size = new System.Drawing.Size(111, 23);
 			this.resetCamBtn.TabIndex = 5;
-			this.resetCamBtn.Text = "&Reset camera";
+			this.resetCamBtn.Text = "Reset camera";
 			this.resetCamBtn.UseVisualStyleBackColor = true;
 			this.resetCamBtn.Click += new System.EventHandler(this.resetCamBtn_Click);
 			// 
@@ -1762,13 +1762,13 @@
 			this.defaultPitchesBtn.Name = "defaultPitchesBtn";
 			this.defaultPitchesBtn.Size = new System.Drawing.Size(111, 23);
 			this.defaultPitchesBtn.TabIndex = 4;
-			this.defaultPitchesBtn.Text = "Default pitches";
+			this.defaultPitchesBtn.Text = "Reset pitches";
 			this.defaultPitchesBtn.UseVisualStyleBackColor = true;
 			this.defaultPitchesBtn.Click += new System.EventHandler(this.defaultPitchesBtn_Click);
 			// 
 			// minPitchUd
 			// 
-			this.minPitchUd.Location = new System.Drawing.Point(71, 146);
+			this.minPitchUd.Location = new System.Drawing.Point(81, 129);
 			this.minPitchUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1786,7 +1786,7 @@
 			// 
 			// maxPitchUd
 			// 
-			this.maxPitchUd.Location = new System.Drawing.Point(71, 120);
+			this.maxPitchUd.Location = new System.Drawing.Point(81, 103);
 			this.maxPitchUd.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -1805,7 +1805,7 @@
 			// label8
 			// 
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(12, 148);
+			this.label8.Location = new System.Drawing.Point(25, 131);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(50, 13);
 			this.label8.TabIndex = 3;
@@ -1814,7 +1814,7 @@
 			// hnotelabel
 			// 
 			this.hnotelabel.AutoSize = true;
-			this.hnotelabel.Location = new System.Drawing.Point(12, 122);
+			this.hnotelabel.Location = new System.Drawing.Point(22, 105);
 			this.hnotelabel.Name = "hnotelabel";
 			this.hnotelabel.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.hnotelabel.Size = new System.Drawing.Size(53, 13);
@@ -1849,7 +1849,7 @@
 			this.songPropsCb.Name = "songPropsCb";
 			this.songPropsCb.Size = new System.Drawing.Size(91, 23);
 			this.songPropsCb.TabIndex = 0;
-			this.songPropsCb.Text = "Song &properties";
+			this.songPropsCb.Text = "&Song properties";
 			this.songPropsCb.UseVisualStyleBackColor = true;
 			this.songPropsCb.CheckedChanged += new System.EventHandler(this.songPropsCb_CheckedChanged);
 			// 
@@ -1883,6 +1883,7 @@
 			this.debugLabel.Size = new System.Drawing.Size(41, 13);
 			this.debugLabel.TabIndex = 20;
 			this.debugLabel.Text = "label16";
+			this.debugLabel.Visible = false;
 			// 
 			// Form1
 			// 
