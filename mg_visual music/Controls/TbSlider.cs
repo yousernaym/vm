@@ -136,12 +136,13 @@ namespace Visual_Music
 			}
 			catch
 			{
+				return;
 			}
 			
 			if (ivalue > trackBar1.Maximum)
 				ivalue = trackBar1.Maximum;
 			if (ivalue < trackBar1.Minimum)
-				ivalue = trackBar1.Maximum;
+				ivalue = trackBar1.Minimum;
 			trackBar1.Value = ivalue;
 			
 			if (ValueChanged != null)

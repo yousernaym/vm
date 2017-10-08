@@ -354,7 +354,7 @@ namespace Visual_Music
 
 		public void createOcTrees()
 		{
-			if (trackViews == null)
+			if (trackViews == null || viewWidthQn == 0)
 				return;
 			vertViewWidthQn = viewWidthQn;
 			//for (int i = TrackViews.Count - 1; i > 0; i--)
