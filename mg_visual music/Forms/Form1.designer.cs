@@ -1657,7 +1657,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-2959, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-2993, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1669,7 +1669,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-3071, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-3105, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1679,7 +1679,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-3073, 10040);
+			this.label4.Location = new System.Drawing.Point(-3107, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1721,7 +1721,7 @@
 			this.trackPropsCb.Location = new System.Drawing.Point(99, 0);
 			this.trackPropsCb.Name = "trackPropsCb";
 			this.trackPropsCb.Size = new System.Drawing.Size(94, 23);
-			this.trackPropsCb.TabIndex = 16;
+			this.trackPropsCb.TabIndex = 1;
 			this.trackPropsCb.Text = "&Track properties";
 			this.trackPropsCb.UseVisualStyleBackColor = true;
 			this.trackPropsCb.CheckedChanged += new System.EventHandler(this.trackPropsCb_CheckedChanged);
@@ -1751,7 +1751,7 @@
 			this.resetCamBtn.Location = new System.Drawing.Point(12, 201);
 			this.resetCamBtn.Name = "resetCamBtn";
 			this.resetCamBtn.Size = new System.Drawing.Size(85, 23);
-			this.resetCamBtn.TabIndex = 20;
+			this.resetCamBtn.TabIndex = 5;
 			this.resetCamBtn.Text = "&Reset camera";
 			this.resetCamBtn.UseVisualStyleBackColor = true;
 			this.resetCamBtn.Click += new System.EventHandler(this.resetCamBtn_Click);
@@ -1761,7 +1761,7 @@
 			this.defaultPitchesBtn.Location = new System.Drawing.Point(12, 172);
 			this.defaultPitchesBtn.Name = "defaultPitchesBtn";
 			this.defaultPitchesBtn.Size = new System.Drawing.Size(111, 23);
-			this.defaultPitchesBtn.TabIndex = 18;
+			this.defaultPitchesBtn.TabIndex = 4;
 			this.defaultPitchesBtn.Text = "Default pitches";
 			this.defaultPitchesBtn.UseVisualStyleBackColor = true;
 			this.defaultPitchesBtn.Click += new System.EventHandler(this.defaultPitchesBtn_Click);
@@ -1781,7 +1781,7 @@
             -2147483648});
 			this.minPitchUd.Name = "minPitchUd";
 			this.minPitchUd.Size = new System.Drawing.Size(52, 20);
-			this.minPitchUd.TabIndex = 17;
+			this.minPitchUd.TabIndex = 3;
 			this.minPitchUd.ValueChanged += new System.EventHandler(this.minPitchUd_ValueChanged);
 			// 
 			// maxPitchUd
@@ -1799,7 +1799,7 @@
             -2147483648});
 			this.maxPitchUd.Name = "maxPitchUd";
 			this.maxPitchUd.Size = new System.Drawing.Size(52, 20);
-			this.maxPitchUd.TabIndex = 17;
+			this.maxPitchUd.TabIndex = 2;
 			this.maxPitchUd.ValueChanged += new System.EventHandler(this.maxPitchUd_ValueChanged);
 			// 
 			// label8
@@ -1834,11 +1834,12 @@
 			this.upDownVpWidth.Min = 0D;
 			this.upDownVpWidth.Name = "upDownVpWidth";
 			this.upDownVpWidth.Size = new System.Drawing.Size(180, 48);
-			this.upDownVpWidth.TabIndex = 16;
+			this.upDownVpWidth.TabIndex = 0;
 			this.upDownVpWidth.TbWidth = 50;
 			this.upDownVpWidth.TickFreq = 1D;
 			this.upDownVpWidth.Value = 16D;
 			this.upDownVpWidth.ValueChanged += new System.EventHandler(this.upDownVpWidth_ValueChanged);
+			this.upDownVpWidth.CommitChanges += new System.EventHandler(this.upDownVpWidth_CommitChanges);
 			// 
 			// songPropsCb
 			// 
@@ -1847,7 +1848,7 @@
 			this.songPropsCb.Location = new System.Drawing.Point(3, 0);
 			this.songPropsCb.Name = "songPropsCb";
 			this.songPropsCb.Size = new System.Drawing.Size(91, 23);
-			this.songPropsCb.TabIndex = 18;
+			this.songPropsCb.TabIndex = 0;
 			this.songPropsCb.Text = "Song &properties";
 			this.songPropsCb.UseVisualStyleBackColor = true;
 			this.songPropsCb.CheckedChanged += new System.EventHandler(this.songPropsCb_CheckedChanged);

@@ -166,7 +166,9 @@
     <Compile Include="Forms\RenderProgressForm.designer.cs">
       <DependentUpon>RenderProgressForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\SongPanel.cs" />
+    <Compile Include="Controls\SongPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\sourceFileForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -248,6 +250,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\NoteStyleControl.resx">
       <DependentUpon>NoteStyleControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TbSlider.resx">
+      <DependentUpon>TbSlider.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

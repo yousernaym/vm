@@ -361,6 +361,11 @@ namespace Visual_Music
             songScrollBar.LargeChange = Project.ViewWidthT / 1;
 		}
 
+		private void upDownVpWidth_MouseUp(object sender, MouseEventArgs e)
+		{
+			project.createOcTrees();
+		}
+
 		private void audioOffsetS_ValueChanged(object sender, EventArgs e)
 		{
 			Project.AudioOffset = (float)audioOffsetS.Value;
@@ -1450,6 +1455,13 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpecPower = (float)specPowUd.Value;
+		}
+
+		private void upDownVpWidth_CommitChanges(object sender, EventArgs e)
+		{
+			if (project.VertWidthScale != 1)
+				project.createOcTrees();
+			songPanel.Invalidate();
 		}
 	}
 }

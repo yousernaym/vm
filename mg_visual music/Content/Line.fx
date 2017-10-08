@@ -42,7 +42,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.rawPos = IN.pos.xyz;
 	OUT.normStepFromNoteStart = IN.normStepFromNoteStart;
 	
-	IN.texCoords.x *= TexWidthScale;
+	//IN.texCoords.x *= TexWidthScale;
 	OUT.texCoords = IN.texCoords - TexScrollOffset;
 	
 	OUT.pos = float4(IN.pos.xy, 0, 1);

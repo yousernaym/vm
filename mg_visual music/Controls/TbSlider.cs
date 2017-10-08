@@ -22,8 +22,10 @@ namespace Visual_Music
 		}
 		
 		public event EventHandler ValueChanged;
+		public event EventHandler CommitChanges;
+
 		int decimalScale;
-		
+
 		int decimals;
 		public int Decimals
 		{
@@ -146,9 +148,28 @@ namespace Visual_Music
 				ValueChanged(this, e);
 		}
 
-		private void TbSlider_Load(object sender, EventArgs e)
+		private void trackBar1_MouseUp(object sender, MouseEventArgs e)
 		{
+			OnCommitChanges(this, e);
 		}
 
+		private void trackBar1_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+				OnCommitChanges(this, e);
+		}
+
+		private void textBox1_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+				OnCommitChanges(this, e);
+		}
+
+		protected virtual void OnCommitChanges(object sender, EventArgs e)
+		{
+			var commitChanges = CommitChanges;
+			if (commitChanges != null)
+				commitChanges(this, e);
+		}
 	}
 }

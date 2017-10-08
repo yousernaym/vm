@@ -260,9 +260,6 @@ namespace Visual_Music
 
 		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
 		{
-			float viewWidthBackup = Project.ViewWidthQn;
-			Project.ViewWidthQn = 16;
-
 			LineGeo lineGeo = new LineGeo();
 			geo = lineGeo;
 			List<Midi.Note> noteList = midiTrack.Notes;
@@ -312,8 +309,11 @@ namespace Visual_Music
 				float startDraw = noteStart.X;
 				float endDraw = nextNoteStart.X;
 
-				float step = EvalStep;// / WidthScale;
-				
+				float stepScale = Math.Max(Project.ViewWidthQn, Project.DefaultViewWidthQn);
+				//stepScale = Math.Min(stepScale, Project.DefaultViewWidthQn * 8);
+				stepScale /= Project.ViewWidthQn;
+				float step = EvalStep * stepScale;
+								
 				for (float x = startDraw; x < endDraw; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
@@ -373,8 +373,6 @@ namespace Visual_Music
 				completeNoteListIndex++;
 			}
 			createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
-
-			Project.ViewWidthQn = viewWidthBackup;
 		}
 
 		public override void drawGeoChunk(Geo geo)

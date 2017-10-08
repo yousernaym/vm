@@ -155,7 +155,6 @@ namespace Visual_Music
 	[Serializable()]
 	abstract public class NoteStyle : ISerializable
 	{
-		float VertWidthScale => 16.0f / Project.ViewWidthQn;
 		public float TexTileScale => Project.Camera.ViewportSize.X / 1920;
 		public static bool bCull = true;
 		public static bool bSkipClose = false;
@@ -308,7 +307,7 @@ namespace Visual_Music
 			fx.Parameters["VpMat"].SetValue(Project.Camera.VpMat);
 			fx.Parameters["ProjScale"].SetValue(new Vector2(Project.Camera.ProjMat.M11, Project.Camera.ProjMat.M22));
 
-			fx.Parameters["VertWidthScale"].SetValue(VertWidthScale);
+			fx.Parameters["VertWidthScale"].SetValue(Project.VertWidthScale);
 			//fx.Parameters["TexWidthScale"].SetValue(texTrackProps.TexProps.UAnchor == TexAnchorEnum.Screen ? VertWidthScale : 1);
 
 			//Common notestyle props

@@ -72,7 +72,8 @@ namespace Visual_Music
 			set { trackViews = value; }
 		}
 
-		const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen
+		public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen
+
 		float viewWidthQn = DefaultViewWidthQn;
 		public float ViewWidthQn
 		{
@@ -85,8 +86,12 @@ namespace Visual_Music
 			}
 		}
 		float vertViewWidthQn;
+		public float VertWidthScale => vertViewWidthQn / viewWidthQn;
+
 		int viewWidthT; ////Number of ticks that fits on screen
 		public int ViewWidthT { get => viewWidthT; }
+
+		
 		public double AudioOffset { get; set; }
 		public int MinPitch { get; set; }
 		public int MaxPitch { get; set; }
