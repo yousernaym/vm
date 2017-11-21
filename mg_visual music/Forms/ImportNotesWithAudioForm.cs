@@ -75,7 +75,7 @@ namespace Visual_Music
                 tpartyAudioTb.Text = openTpartyAudioDlg.FileName;
         }
 
-        protected void importFiles(bool insTrack, bool internalMixdownSupported, bool xmPlayMixdownSupported, double songLengthS)
+        protected void importFiles(bool insTrack, bool internalMixdownSupported, bool xmPlayMixdownSupported, double songLengthS, Midi.FileType noteFileType)
         {
 			if (!checkNoteFile())
 				return;
@@ -91,17 +91,18 @@ namespace Visual_Music
 						importUsingTpartyMixdown(insTrack, TpartyIntegrationForm.XmPlayPath,
 								   "\"" + noteFilePath.Text + "\" -boost",
 								   TpartyIntegrationForm.XmPlayOutputDir,
-								   songLengthS);
+								   songLengthS,
+								   noteFileType);
 						
                     }
                     else
                     {   //Mixdown internally if possible, otherwise there will be no audio
-                        base.importFiles(insTrack, internalMixdownSupported ? MixdownType.Internal : MixdownType.None, "", songLengthS);
+                        base.importFiles(insTrack, internalMixdownSupported ? MixdownType.Internal : MixdownType.None, "", songLengthS, noteFileType);
                     }
                 }
                 else
                 {   //Existing audio file specified
-                    base.importFiles(insTrack, MixdownType.None, AudioFilePath, songLengthS);
+                    base.importFiles(insTrack, MixdownType.None, AudioFilePath, songLengthS, noteFileType);
                 }
             }
             else 
@@ -109,7 +110,8 @@ namespace Visual_Music
 				importUsingTpartyMixdown(insTrack, tpartyAppTb.Text,
 					   tpartyArgsTb.Text.Replace("%notefilepath", "\"" + noteFilePath.Text + "\""),
 					   tpartyAudioTb.Text,
-					   songLengthS);
+					   songLengthS,
+					   noteFileType);
             }
         }
 
@@ -138,12 +140,12 @@ namespace Visual_Music
 			}
 			return TpartyOutputFile;
 		}
-		void importUsingTpartyMixdown(bool insTrack, string appPath, string arguments, string outputDir, double songLengthS)
+		void importUsingTpartyMixdown(bool insTrack, string appPath, string arguments, string outputDir, double songLengthS, Midi.FileType noteFileType)
 		{
 			tpartyApp = appPath;
 			tpartyArgs = arguments;
 			tpartyOutputDir = outputDir;
-			base.importFiles(insTrack, MixdownType.Tparty, "", songLengthS);
+			base.importFiles(insTrack, MixdownType.Tparty, "", songLengthS, noteFileType);
 		}
 		static bool createTpartyProcess()
         {

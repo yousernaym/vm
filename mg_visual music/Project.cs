@@ -91,16 +91,16 @@ namespace Visual_Music
 		int viewWidthT; ////Number of ticks that fits on screen
 		public int ViewWidthT { get => viewWidthT; }
 
-		
 		public double AudioOffset { get; set; }
 		public int MinPitch { get; set; }
 		public int MaxPitch { get; set; }
 		int NumPitches { get { return MaxPitch - MinPitch + 1; } }
-		SourceSongType sourceSongType;
-		public SourceSongType SourceSongType { get => sourceSongType; set => sourceSongType = value; }
+		Midi.FileType sourceSongType;
+		public Midi.FileType SourceSongType => sourceSongType;
 		double desiredSongLengthS = 0; //Desired song length in seconds when importing note file. 0 = not specified. Currently not used.
 		public Camera Camera { get; set; } = new Camera();
 		public Camera DefaultCamera { get; } = new Camera();
+		//Midi.FileType noteFileType;
 		//----------------------------------------------------
 
 		public TrackProps GlobalTrackProps
@@ -154,7 +154,7 @@ namespace Visual_Music
 		{
 			if (!string.IsNullOrWhiteSpace(noteFilePath))
 			{
-				importSong(noteFilePath, audioFilePath, false, insTrack, mixdownType, desiredSongLengthS);
+				importSong(noteFilePath, audioFilePath, false, insTrack, mixdownType, desiredSongLengthS, sourceSongType);
 				if (trackViews != null)
 				{
 					for (int i = 0; i < trackViews.Count; i++)
@@ -165,23 +165,40 @@ namespace Visual_Music
 
 		public Project(SerializationInfo info, StreamingContext ctxt) : base()
 		{
-			SongFormat.readVersion = (int)info.GetValue("version", typeof(int));
-			noteFilePath = (string)info.GetValue("noteFilePath", typeof(string));
-			audioFilePath = (string)info.GetValue("audioFilePath", typeof(string));
-			insTrack = (bool)info.GetValue("insTrack", typeof(bool));
-			mixdownType = (MixdownType)info.GetValue("mixdownType", typeof(MixdownType));
-
-			trackViews = (List<TrackView>)info.GetValue("trackProps", typeof(List<TrackView>));
-			ViewWidthQn = (float)info.GetValue("qn_viewWidth", typeof(float));
-			AudioOffset = (double)info.GetValue("audioOffset", typeof(double));
-			MaxPitch = (int)info.GetValue("maxPitch", typeof(int));
-			MinPitch = (int)info.GetValue("minPitch", typeof(int));
-			sourceSongType = (SourceSongType)info.GetValue("sourceSongType", typeof(SourceSongType));
-			ImportNotesWithAudioForm.TpartyApp = info.GetString("tpartyApp");
-			ImportNotesWithAudioForm.TpartyArgs = info.GetString("tpartyArgs");
-			ImportNotesWithAudioForm.TpartyOutputDir = info.GetString("tpartyOutputDir");
-			desiredSongLengthS = info.GetDouble("desiredSongLengthS");
-			Camera = (Camera)info.GetValue("camera", typeof(Camera));
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "version")
+					SongFormat.readVersion = (int)entry.Value;
+				else if (entry.Name == "noteFilePath")
+					noteFilePath = (string)entry.Value;
+				else if (entry.Name == "audioFilePath")
+					audioFilePath = (string)entry.Value;
+				else if (entry.Name == "mixdownType")
+					mixdownType = (MixdownType)entry.Value;
+				else if (entry.Name == "trackViews")
+					trackViews = (List<TrackView>)entry.Value;
+				else if (entry.Name == "qn_viewWidth")
+					ViewWidthQn = (float)entry.Value;
+				else if (entry.Name == "audioOffset")
+					AudioOffset = (double)entry.Value;
+				else if (entry.Name == "maxPitch")
+					MaxPitch = (int)entry.Value;
+				else if (entry.Name == "minPitch")
+					MinPitch = (int)entry.Value;
+				else if (entry.Name == "sourceSongType")
+					sourceSongType = (Midi.FileType)entry.Value;
+				else if (entry.Name == "tpartyApp")
+					ImportNotesWithAudioForm.TpartyApp = (string)entry.Value;
+				else if (entry.Name == "tpartyArgs")
+					ImportNotesWithAudioForm.TpartyArgs = (string)entry.Value;
+				else if (entry.Name == "tpartyOutputDir")
+					ImportNotesWithAudioForm.TpartyOutputDir = (string)entry.Value;
+				else if (entry.Name == "desiredSongLengthS")
+					desiredSongLengthS = (double)entry.Value;
+				else if (entry.Name == "camera")
+					Camera = (Camera)entry.Value;
+			}
+			//noteFileType = (Midi.FileType)info.GetValue("noteFileType", typeof(Midi.FileType));
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -191,7 +208,7 @@ namespace Visual_Music
 			info.AddValue("audioFilePath", audioFilePath);
 			info.AddValue("insTrack", insTrack);
 			info.AddValue("mixdownType", mixdownType);
-			info.AddValue("trackProps", trackViews);
+			info.AddValue("trackViews", trackViews);
 			info.AddValue("qn_viewWidth", ViewWidthQn);
 			info.AddValue("audioOffset", AudioOffset);
 			info.AddValue("maxPitch", MaxPitch);
@@ -202,10 +219,12 @@ namespace Visual_Music
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
 			info.AddValue("desiredSongLengthS", desiredSongLengthS);
 			info.AddValue("camera", Camera);
+			//info.AddValue("noteFileType", noteFileType);
 		}
 
-		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool _insTrack, MixdownType mixdownType, double songLengthS)
+		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool _insTrack, MixdownType mixdownType, double songLengthS, Midi.FileType _noteFileType)
 		{
+			sourceSongType = _noteFileType;
 			desiredSongLengthS = songLengthS;
 			Media.closeAudioFile();
 			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, _insTrack, mixdownType == MixdownType.Internal, songLengthS))
@@ -238,7 +257,7 @@ namespace Visual_Music
 			Midi.Song newNotes = new Midi.Song();
 			try
 			{
-				newNotes.openFile(noteFilePath, ref audioFile, _insTrack, mixdown, songLengthS);
+				newNotes.openFile(noteFilePath, ref audioFile, _insTrack, mixdown, songLengthS, sourceSongType);
 			}
 			catch (Exception)
 			{
@@ -643,7 +662,7 @@ namespace Visual_Music
 		}
 		public float getScreenPosX(int timeT)
 		{
-			return ((float)timeT / viewWidthT) * Camera.ViewportSize.X;
+			return (float)(((double)timeT / viewWidthT) * (Camera.ViewportSize.X));
 		}
 	
 		public float getScreenPosY(float pitch)

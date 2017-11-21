@@ -55,7 +55,7 @@ namespace Visual_Music
 		public TpartyIntegrationForm tpartyIntegrationForm;
 		VideoExportForm vidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackView>), typeof(SourceSongType), typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>)};
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackView>), typeof(Midi.FileType), typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType) };
         SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
 		Project project;
@@ -191,13 +191,11 @@ namespace Visual_Music
 
 		private void importMidiSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-            if (importMidiForm.ShowDialog(this) == DialogResult.OK)
-                Project.SourceSongType = SourceSongType.Midi;
+			importMidiForm.ShowDialog(this);
 		}
         private void importModuleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (importModForm.ShowDialog(this) == DialogResult.OK)
-				Project.SourceSongType = SourceSongType.Mod;
+			importModForm.ShowDialog(this);
         }
                 
         void songLoaded(string path)
@@ -230,11 +228,11 @@ namespace Visual_Music
             upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
         }
         
-		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType, double songLengthS)
+		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType, double songLengthS, Midi.FileType noteFileType)
 		{
 			saveSettings();
 			
-			if (Project.importSong(notePath, audioPath, eraseCurrent, modInsTrack, mixdownType, songLengthS))
+			if (Project.importSong(notePath, audioPath, eraseCurrent, modInsTrack, mixdownType, songLengthS, noteFileType))
             {
 				if (eraseCurrent)
 				{
@@ -909,18 +907,18 @@ namespace Visual_Music
 		
 		void updateImportForm()
 		{
-			if (Project.SourceSongType == SourceSongType.Midi)
+			if (Project.SourceSongType == Midi.FileType.Midi)
             {
                 importMidiForm.NoteFilePath = Project.NoteFilePath;
                 importMidiForm.AudioFilePath = Project.AudioFilePath;
             }
-            else if (Project.SourceSongType == SourceSongType.Mod)
+            else if (Project.SourceSongType == Midi.FileType.Mod)
             {
                 importModForm.NoteFilePath = Project.NoteFilePath;
                 importModForm.AudioFilePath = Project.AudioFilePath;
                 importModForm.InsTrack = Project.InsTrack;
             }
-            else if (Project.SourceSongType == SourceSongType.Sid)
+            else if (Project.SourceSongType == Midi.FileType.Sid)
             {
                 importSidForm.NoteFilePath = Project.NoteFilePath;
                 importSidForm.AudioFilePath = Project.AudioFilePath;
@@ -1297,8 +1295,7 @@ namespace Visual_Music
 
         private void importSidSongToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (importSidForm.ShowDialog(this) == DialogResult.OK)
-				Project.SourceSongType = SourceSongType.Sid;
+			importSidForm.ShowDialog(this);
         }
 
 		private void tpartyToolStripMenuItem_Click(object sender, EventArgs e)

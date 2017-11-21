@@ -379,7 +379,7 @@
 			// 
 			this.beginningToolStripMenuItem.Name = "beginningToolStripMenuItem";
 			this.beginningToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Home)));
-			this.beginningToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+			this.beginningToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
 			this.beginningToolStripMenuItem.Text = "Beginning";
 			this.beginningToolStripMenuItem.Click += new System.EventHandler(this.beginningToolStripMenuItem_Click);
 			// 
@@ -387,7 +387,7 @@
 			// 
 			this.endToolStripMenuItem.Name = "endToolStripMenuItem";
 			this.endToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End)));
-			this.endToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+			this.endToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
 			this.endToolStripMenuItem.Text = "End";
 			this.endToolStripMenuItem.Click += new System.EventHandler(this.endToolStripMenuItem_Click);
 			// 
@@ -395,7 +395,7 @@
 			// 
 			this.nudgeBackwardsToolStripMenuItem.Name = "nudgeBackwardsToolStripMenuItem";
 			this.nudgeBackwardsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Left)));
-			this.nudgeBackwardsToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+			this.nudgeBackwardsToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
 			this.nudgeBackwardsToolStripMenuItem.Text = "Nudge backwards";
 			this.nudgeBackwardsToolStripMenuItem.Click += new System.EventHandler(this.nudgeBackwardsToolStripMenuItem_Click);
 			// 
@@ -403,7 +403,7 @@
 			// 
 			this.nudgeForwardToolStripMenuItem.Name = "nudgeForwardToolStripMenuItem";
 			this.nudgeForwardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Right)));
-			this.nudgeForwardToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+			this.nudgeForwardToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
 			this.nudgeForwardToolStripMenuItem.Text = "Nudge forward";
 			this.nudgeForwardToolStripMenuItem.Click += new System.EventHandler(this.nudgeForwardToolStripMenuItem_Click);
 			// 
@@ -411,7 +411,7 @@
 			// 
 			this.jumpBackwardsToolStripMenuItem.Name = "jumpBackwardsToolStripMenuItem";
 			this.jumpBackwardsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Down)));
-			this.jumpBackwardsToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+			this.jumpBackwardsToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
 			this.jumpBackwardsToolStripMenuItem.Text = "Jump backwards";
 			this.jumpBackwardsToolStripMenuItem.Click += new System.EventHandler(this.jumpBackwardsToolStripMenuItem_Click);
 			// 
@@ -419,7 +419,7 @@
 			// 
 			this.jumpForwardToolStripMenuItem.Name = "jumpForwardToolStripMenuItem";
 			this.jumpForwardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Up)));
-			this.jumpForwardToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+			this.jumpForwardToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
 			this.jumpForwardToolStripMenuItem.Text = "Jump forward";
 			this.jumpForwardToolStripMenuItem.Click += new System.EventHandler(this.jumpForwardToolStripMenuItem_Click);
 			// 
@@ -1657,7 +1657,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-3027, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-3044, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1669,7 +1669,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-3139, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-3156, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1679,7 +1679,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-3141, 10040);
+			this.label4.Location = new System.Drawing.Point(-3158, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;

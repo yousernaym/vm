@@ -28,7 +28,7 @@ namespace Visual_Music
 			double songLengthS = 0; //song length in seconds. //0 = NoteExtractor default
 			//if (parent.tpartyIntegrationForm.HvscSongLengths)
 				//songLengthS = getSongLength();
-			importFiles(false, false, parent.tpartyIntegrationForm.SidMixdown, songLengthS);
+			importFiles(false, false, parent.tpartyIntegrationForm.SidMixdown, songLengthS, Midi.FileType.Sid);
         }
 
 		private void ImportSidForm_Shown(object sender, EventArgs e)
