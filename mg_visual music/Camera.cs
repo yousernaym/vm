@@ -126,8 +126,19 @@ namespace Visual_Music
 		{
 			get
 			{
-				float fov = CubeMapFace >= 0 ? (float)Math.PI / 2.0f : Fov;
-				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, ViewportSize.X / ViewportSize.Y, 0.0001f, 1000);
+				float fov, ratio;
+				if (CubeMapFace >= 0)
+				{
+					fov = (float)Math.PI / 2.0f;
+					ratio = 1;
+				}
+				else
+				{
+					fov = Fov;
+					ratio = XYRatio;
+				}
+
+				Matrix mat = Matrix.CreatePerspectiveFieldOfView(fov, ratio, 0.0001f, 1000);
 				if (InvertY)
 					mat.M22 *= -1;
 				return mat;
