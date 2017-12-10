@@ -40,9 +40,9 @@ namespace Visual_Music
 	public class NoteStyleMod : ISerializable
 	{
 		public string Name { get; set; }
-		public Vector2 Origin
+		internal Vector2 Origin
 		{
-			get => new Vector2(XOrigin, YOrigin);
+			get => new Vector2((float)XOrigin, (float)YOrigin);
 			set
 			{
 				XOrigin = value.X;
@@ -50,30 +50,36 @@ namespace Visual_Music
 			}
 		}
 		
-		public float XOrigin { get; set; } = 0.5f;
-		public float YOrigin { get; set; } = 0.5f;
-		public bool XOriginEnable { get; set; } = true;
-		public bool YOriginEnable { get; set; } = true;
+		public float? XOrigin { get; set; } = 0.5f;
+		public float? YOrigin { get; set; } = 0.5f;
+		public bool? XOriginEnable { get; set; } = true;
+		public bool? YOriginEnable { get; set; } = true;
 
-		public int CombineXY { get; set; } 
-		public bool ColorDestEnable { get; set; }
-		public bool AlphaDestEnable { get; set; }
-		public bool AngleDestEnable { get; set; }
+		public int? CombineXY { get; set; } = 0;
+		public bool? ColorDestEnable { get; set; } = false;
+		public bool? AlphaDestEnable { get; set; } = false;
+		public bool? AngleDestEnable { get; set; } = false;
 		public Vector4 ColorDest { get; set; } = new Vector4(1,1,1,1);
 		public System.Drawing.Color SystemColorDest
 		{
-			get => System.Drawing.Color.FromArgb((int)(ColorDest.W * 255), (int)(ColorDest.X * 255), (int)(ColorDest.Y * 255), (int)(ColorDest.Z * 255));
+			get
+			{
+				if (ColorDest == null)
+					return System.Drawing.Color.Empty;
+				else
+					return System.Drawing.Color.FromArgb((int)(ColorDest.W * 255), (int)(ColorDest.X * 255), (int)(ColorDest.Y * 255), (int)(ColorDest.Z * 255));
+			}
 			set => ColorDest = new Vector4((float)value.R / 255, (float)value.G / 255, (float)value.B / 255, (float)value.A / 255);
 		}
-		public int AngleDest { get; set; } = 45;
-		public float RadAngleDest => AngleDest * (float)Math.PI / 180;
-		public float Start { get; set; }
-		public float Stop { get; set; } = 1;
-		public float FadeIn { get; set; }
-		public float FadeOut { get; set; }
-		public float Power { get; set; } = 1;
-		public bool DiscardAfterStop { get; set; } = true;
-		public bool Invert { get; set; }
+		public int? AngleDest { get; set; } = 45;
+		public float RadAngleDest => (float)AngleDest * (float)Math.PI / 180;
+		public float? Start { get; set; } = 0;
+		public float? Stop { get; set; } = 1;
+		public float? FadeIn { get; set; } = 0;
+		public float? FadeOut { get; set; } = 0;
+		public float? Power { get; set; } = 1;
+		public bool? DiscardAfterStop { get; set; } = true;
+		public bool? Invert { get; set; } = false;
 
 		public NoteStyleMod(string _name = "")
 		{
@@ -182,16 +188,20 @@ namespace Visual_Music
 		//Serializable----------
 		protected NoteStyleEnum styleType; //Set in constructor of inherited class
 										   //public BindingList<NoteStyleMod> ModEntries { get; set; } = new BindingList<NoteStyleMod>();
-		public List<NoteStyleMod> ModEntries { get; set; } = new List<NoteStyleMod>();
-		public int SelectedModEntryIndex { get; set; } = -1;
-		public NoteStyleMod SelectedModEntry
+		internal List<NoteStyleMod> ModEntries { get; set; } = new List<NoteStyleMod>();
+		public int? SelectedModEntryIndex { get; set; } = -1;
+		internal NoteStyleMod SelectedModEntry
 		{
 			get
 			{
-				if (SelectedModEntryIndex < 0 || SelectedModEntryIndex >= ModEntries.Count)
+				if (ModEntries == null  || SelectedModEntryIndex == null || SelectedModEntryIndex < 0 || SelectedModEntryIndex >= ModEntries.Count)
 					return null;
 				else
-					return ModEntries[SelectedModEntryIndex];
+					return ModEntries[(int)SelectedModEntryIndex];
+			}
+			set
+			{
+				ModEntries[(int)SelectedModEntryIndex] = value;
 			}
 		}
 
@@ -211,9 +221,11 @@ namespace Visual_Music
 				else if (entry.Name == "modEntries")
 				{
 					ModEntries = (List<NoteStyleMod>)entry.Value;
-					if (ModEntries != null && ModEntries.Count > 0)
-						SelectedModEntryIndex = 0;
+					//if (ModEntries != null && ModEntries.Count > 0)
+					//SelectedModEntryIndex = 0;
 				}
+				else if (entry.Name == "selectedModEntryIndex")
+					SelectedModEntryIndex = (int)entry.Value;
 			}
 		}
 
@@ -221,6 +233,7 @@ namespace Visual_Music
 		{
 			info.AddValue("styleType", styleType);
 			info.AddValue("modEntries", ModEntries);
+			info.AddValue("selectedModEntryIndex", SelectedModEntryIndex);
 		}
 
 		public static void sInitAllStyles(SongPanel _songPanel)
@@ -331,21 +344,21 @@ namespace Visual_Music
 				//fxModEntry["Scale"].SetValue(ModEntries[i].Scale);
 
 				fx.Parameters["Origin"].Elements[i].SetValue(ModEntries[i].Origin);
-				fx.Parameters["XOriginEnable"].Elements[i].SetValue(ModEntries[i].XOriginEnable);
-				fx.Parameters["YOriginEnable"].Elements[i].SetValue(ModEntries[i].YOriginEnable);
-				fx.Parameters["CombineXY"].Elements[i].SetValue(ModEntries[i].CombineXY);
-				fx.Parameters["ColorDestEnable"].Elements[i].SetValue(ModEntries[i].ColorDestEnable);
-				fx.Parameters["AngleDestEnable"].Elements[i].SetValue(ModEntries[i].AngleDestEnable);
-				fx.Parameters["AlphaDestEnable"].Elements[i].SetValue(ModEntries[i].AlphaDestEnable);
+				fx.Parameters["XOriginEnable"].Elements[i].SetValue((bool)ModEntries[i].XOriginEnable);
+				fx.Parameters["YOriginEnable"].Elements[i].SetValue((bool)ModEntries[i].YOriginEnable);
+				fx.Parameters["CombineXY"].Elements[i].SetValue((int)ModEntries[i].CombineXY);
+				fx.Parameters["ColorDestEnable"].Elements[i].SetValue((bool)ModEntries[i].ColorDestEnable);
+				fx.Parameters["AngleDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AngleDestEnable);
+				fx.Parameters["AlphaDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AlphaDestEnable);
 				fx.Parameters["ColorDest"].Elements[i].SetValue(ModEntries[i].ColorDest);
 				fx.Parameters["AngleDest"].Elements[i].SetValue(ModEntries[i].RadAngleDest);
-				fx.Parameters["Start"].Elements[i].SetValue(ModEntries[i].Start);
-				fx.Parameters["Stop"].Elements[i].SetValue(ModEntries[i].Stop);
-				fx.Parameters["FadeIn"].Elements[i].SetValue(ModEntries[i].FadeIn);
-				fx.Parameters["FadeOut"].Elements[i].SetValue(ModEntries[i].FadeOut);
-				fx.Parameters["Power"].Elements[i].SetValue(ModEntries[i].Power);
-				fx.Parameters["DiscardAfterStop"].Elements[i].SetValue(ModEntries[i].DiscardAfterStop);
-				fx.Parameters["Invert"].Elements[i].SetValue(ModEntries[i].Invert);
+				fx.Parameters["Start"].Elements[i].SetValue((float)ModEntries[i].Start);
+				fx.Parameters["Stop"].Elements[i].SetValue((float)ModEntries[i].Stop);
+				fx.Parameters["FadeIn"].Elements[i].SetValue((float)ModEntries[i].FadeIn);
+				fx.Parameters["FadeOut"].Elements[i].SetValue((float)ModEntries[i].FadeOut);
+				fx.Parameters["Power"].Elements[i].SetValue((float)ModEntries[i].Power);
+				fx.Parameters["DiscardAfterStop"].Elements[i].SetValue((bool)ModEntries[i].DiscardAfterStop);
+				fx.Parameters["Invert"].Elements[i].SetValue((bool)ModEntries[i].Invert);
 			}
 
 			//Material
@@ -381,7 +394,7 @@ namespace Visual_Music
 		public void deleteModEntry(int entry = -1)
 		{
 			if (entry < 0)
-				entry = SelectedModEntryIndex;
+				entry = (int)SelectedModEntryIndex;
 			if (ModEntries.Count > 0)
 			{
 				ModEntries.RemoveAt(entry);
@@ -392,7 +405,7 @@ namespace Visual_Music
 		public void cloneModEntry(bool selectItem, int entry = -1)
 		{
 			if (entry < 0)
-				entry = SelectedModEntryIndex;
+				entry = (int)SelectedModEntryIndex;
 			ModEntries.Add(ModEntries[entry].clone());
 			if (selectItem)
 				SelectedModEntryIndex = ModEntries.Count - 1;

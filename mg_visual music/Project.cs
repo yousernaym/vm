@@ -431,52 +431,24 @@ namespace Visual_Music
 			{
 				foreach (PropertyInfo propertyInfo in props)
 				{
-					//bool isNoteStyle = propertyInfo.PropertyType == typeof(NoteStyle);
-					if (!propertyInfo.CanRead || !propertyInfo.CanWrite || propertyInfo.GetMethod.IsStatic)
-					{
-						//if (!isNoteStyle)
+					if (!propertyInfo.CanRead || !propertyInfo.CanWrite || propertyInfo.GetMethod.IsStatic || propertyInfo.GetType() is IEnumerable)
 						continue;
-						//else
-						//	;
-					}
 					hasSuitableProp = true;
 
 					object firstValue, secondValue;
 					firstValue = propertyInfo.GetValue(first, null);
 					secondValue = propertyInfo.GetValue(second, null);
-					if (!(firstValue is string) && firstValue is IEnumerable)
+
+					object subMerge = mergeObjects(firstValue, secondValue);
+					propertyInfo.SetValue(first, subMerge);
+					if (propertyInfo.Name == "NoteStyleType" && subMerge != null && (NoteStyleEnum)subMerge != NoteStyleEnum.Default)
 					{
-						continue;
-						//if (!(firstValue is IList && firstValue.GetType().IsGenericType && firstValue.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(List<>))))
-						//	continue;
-
-						//Activator.CreateInstance()
-						//List<object> returnValues = new List<object>();
-						//for (int i = 0; i < ((List<object>)firstValue).Count; i++)
-						//{
-						//	object element = ((List<object>)firstValue)[i];
-						//	if (element != null)
-						//		returnValues.Add(element);
-
-
-						//var firstEnum = ((IEnumerable)firstValue).GetEnumerator();
-						//var secondEnum = ((IEnumerable)secondValue).GetEnumerator();
-						//while (firstEnum.MoveNext() && secondEnum.MoveNext())
-						//{
-						//object value = mergeObjects(firstEnum.Current, secondEnum.Current);
-						//if (value != null)
-						//returnValues.Add(value);
-						//}
-
-						//propertyInfo.SetValue(first, returnValues);
+						((TrackProps)first).SelectedNoteStyle = (NoteStyle)mergeObjects(((TrackProps)first).SelectedNoteStyle, ((TrackProps)second).SelectedNoteStyle);
+						if (((TrackProps)first).SelectedNoteStyle.ModEntries.Count != ((TrackProps)second).SelectedNoteStyle.ModEntries.Count)
+							((TrackProps)first).SelectedNoteStyle.ModEntries = null;
 					}
-					else
-					{
-						object subMerge = mergeObjects(firstValue, secondValue);
-						propertyInfo.SetValue(first, subMerge);
-						if (propertyInfo.Name == "NoteStyleType" && subMerge != null && (NoteStyleEnum)subMerge != NoteStyleEnum.Default)
-							((TrackProps)first).SelectedNoteStyle = (NoteStyle)mergeObjects(((TrackProps)first).SelectedNoteStyle, ((TrackProps)second).SelectedNoteStyle);
-					}
+					else if (propertyInfo.Name == "SelectedModEntryIndex" && subMerge != null && (int)subMerge != -1)
+						((NoteStyle)first).SelectedModEntry = (NoteStyleMod)mergeObjects(((NoteStyle)first).SelectedModEntry, ((NoteStyle)second).SelectedModEntry);
 				}
 			}
 

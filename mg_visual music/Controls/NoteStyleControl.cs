@@ -43,28 +43,44 @@ namespace Visual_Music
 			modEntryCombo.SelectedIndex = -1;
 			modEntryCombo.Items.Clear();
 			//modEntryCombo.Text = "";
-			if (noteStyle.ModEntries.Count > 0)
-				modEntryCombo.Items.AddRange(noteStyle.ModEntries.ToArray());
-			modEntryCombo.SelectedIndex = noteStyle.SelectedModEntryIndex;
+			if (noteStyle.ModEntries == null)
+			{
+				modEntryCombo.Enabled = false;
+				modEntryCombo.SelectedIndex = -1;
+			}
+			else
+			{
+				if (noteStyle.ModEntries.Count > 0)
+					modEntryCombo.Items.AddRange(noteStyle.ModEntries.ToArray());
+				if (noteStyle.SelectedModEntryIndex == null)
+					modEntryCombo.SelectedIndex = -1;
+				else
+					modEntryCombo.SelectedIndex = (int)noteStyle.SelectedModEntryIndex;
+				modEntryCombo.Enabled = true;
+			}
+			
 			NoteStyleMod modEntry = noteStyle.SelectedModEntry;
 			if (modEntry != null)
 			{
-				xOriginUd.Value = (decimal)modEntry.Origin.X;
-				yOriginUd.Value = (decimal)modEntry.Origin.Y;
-				xOriginCb.Checked = modEntry.XOriginEnable;
-				yOriginCb.Checked = modEntry.YOriginEnable;
-				combineXYCombo.SelectedIndex = modEntry.CombineXY;
-				colorDestCb.Checked = modEntry.ColorDestEnable;
-				angleDestCb.Checked = modEntry.AngleDestEnable;
+				Form1.setNumericUdValue(xOriginUd, modEntry.Origin.X);
+				Form1.setNumericUdValue(yOriginUd, modEntry.Origin.Y);
+				xOriginCb.CheckState = Form1.toCheckState(modEntry.XOriginEnable);
+				yOriginCb.CheckState = Form1.toCheckState(modEntry.YOriginEnable);
+				if (modEntry.CombineXY == null)
+					combineXYCombo.SelectedIndex = -1;
+				else
+					combineXYCombo.SelectedIndex = (int)modEntry.CombineXY;
+				colorDestCb.CheckState = Form1.toCheckState(modEntry.ColorDestEnable);
+				angleDestCb.CheckState = Form1.toCheckState(modEntry.AngleDestEnable);
 				colorDestBtn.BackColor = modEntry.SystemColorDest;
-				angleDestUd.Value = (decimal)modEntry.AngleDest;
-				startUd.Value = (decimal)modEntry.Start;
-				stopUd.Value = (decimal)modEntry.Stop;
-				fadeInUd.Value = (decimal)modEntry.FadeIn;
-				fadeOutUd.Value = (decimal)modEntry.FadeOut;
-				powerUd.Value = (decimal)modEntry.Power;
-				discardStopCb.Checked = modEntry.DiscardAfterStop;
-				invertCb.Checked = modEntry.Invert;
+				Form1.setNumericUdValue(angleDestUd, modEntry.AngleDest);
+				Form1.setNumericUdValue(startUd, modEntry.Start);
+				Form1.setNumericUdValue(stopUd, modEntry.Stop);
+				Form1.setNumericUdValue(fadeInUd, modEntry.FadeIn);
+				Form1.setNumericUdValue(fadeOutUd, modEntry.FadeOut);
+				Form1.setNumericUdValue(powerUd, modEntry.Power);
+				discardStopCb.CheckState = Form1.toCheckState(modEntry.DiscardAfterStop);
+				invertCb.CheckState = Form1.toCheckState(modEntry.Invert);
 			}
 		}
 
@@ -107,7 +123,8 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			//Debug.Assert(TrackList.SelectedIndices.Count == 1);  //modEntryCombo is disabled if more than one track is selected, and the entire track props panel is disabled if no track is selected, and if controls are updating, the method will return on the above line.
-			TrackViews[TrackList.SelectedIndices[0]].TrackProps.SelectedNoteStyle.SelectedModEntryIndex = modEntryCombo.SelectedIndex;
+			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntryIndex = modEntryCombo.SelectedIndex;
 			ParentForm.updateTrackControls();
 		}
 
