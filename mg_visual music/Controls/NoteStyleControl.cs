@@ -106,7 +106,7 @@ namespace Visual_Music
 
 			if (UpdatingControls)
 				return;
-			Debug.Assert(TrackList.SelectedIndices.Count == 1);  //modEntryCombo is disabled if more than one track is selected, and the entire track props panel is disabled if no track is selected, and if controls are updating the method will return on the above line.
+			//Debug.Assert(TrackList.SelectedIndices.Count == 1);  //modEntryCombo is disabled if more than one track is selected, and the entire track props panel is disabled if no track is selected, and if controls are updating, the method will return on the above line.
 			TrackViews[TrackList.SelectedIndices[0]].TrackProps.SelectedNoteStyle.SelectedModEntryIndex = modEntryCombo.SelectedIndex;
 			ParentForm.updateTrackControls();
 		}
@@ -146,7 +146,6 @@ namespace Visual_Music
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.YOriginEnable = yOriginCb.Checked;
 		}
-
 
 		private void combineXYCombo_SelectedIndexChanged(object sender, EventArgs e)
 		{

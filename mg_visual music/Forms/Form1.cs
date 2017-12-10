@@ -1377,12 +1377,12 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.ZOffset = (float)zoffsetUd.Value * PosOffsetScale;
 		}
 
-		CheckState toCheckState(bool? value)
+		public static CheckState toCheckState(bool? value)
 		{
 			return value == null ? CheckState.Indeterminate : ((bool)value ? CheckState.Checked : CheckState.Unchecked);
 		}
 
-		void setNumericUdValue(NumericUpDown ud, float? value)
+		public static void setNumericUdValue(NumericUpDown ud, float? value)
 		{
 			if (value == null)
 				ud.Text = null;

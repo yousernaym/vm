@@ -72,7 +72,7 @@ namespace Visual_Music
 
 		//NoteStyle_Bar barNoteStyle;
 		//NoteStyle_Line lineNoteStyle;
-		public NoteStyle SelectedNoteStyle
+		internal NoteStyle SelectedNoteStyle
 		{
 			get
 			{
@@ -85,6 +85,21 @@ namespace Visual_Music
 				}
 				else
 					return getNoteStyle(NoteStyleType);
+			}
+			set
+			{
+				if (value.GetType() == typeof(NoteStyle_Bar))
+				{
+					NoteStyleType = NoteStyleEnum.Bar;
+					noteStyles[(int)NoteStyleEnum.Bar] = value;
+				}
+				else if (value.GetType() == typeof(NoteStyle_Bar))
+				{
+					NoteStyleType = NoteStyleEnum.Line;
+					noteStyles[(int)NoteStyleEnum.Line] = value;
+				}
+				else if (value == null)
+					NoteStyleType = NoteStyleEnum.Default;
 			}
 		}
 
@@ -240,9 +255,11 @@ namespace Visual_Music
 			dcs.WriteObject(stream, this);
 			stream.Flush();
 			stream.Position = 0;
+			TrackView tv = TrackView;
 			TrackProps dest = (TrackProps)dcs.ReadObject(stream);
 			//dest.MidiTrack = midiTrack;
 			dest.loadNoteStyleFx();
+			dest.TrackView = tv;
 			return dest;
 		}
 

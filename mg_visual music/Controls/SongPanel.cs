@@ -239,14 +239,11 @@ namespace Visual_Music
 			}
 		}
 
-
-
-
 		public void renderVideo(string videoFilePath, RenderProgressForm progressForm, VideoExportForm options)
 		{
 			lock (renderLock)
 			{
-				int vrWidth = 1024;
+				int vrWidth = 4096;
 				Point videoFrameSize = options.Sphere ? new Point(vrWidth, vrWidth / (options.Stereo ? 1 : 2)) : options.Resolution;
 				//videoFrameSize = new Point(vrWidth, vrWidth / 2);
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);

@@ -43,15 +43,15 @@ namespace Visual_Music
 		static LineVertex[] hLineVerts = new LineVertex[MaxHLineVerts];
 		protected static LineHlVertex[] lineHlVerts = new LineHlVertex[4];
 
-		public float LineWidth = 5 / 1000.0f;
-		public float Qn_gapThreshold { get; set; } = 5;
-		public bool Continuous { get; set; } = true;
-		public LineStyleEnum Style = LineStyleEnum.Simple;
-		public LineHlStyleEnum HlStyle = LineHlStyleEnum.Arrow;
-		public float HlSize = 25 / 1000.0f;
-		public bool MovingHl = false;
-		public bool ShrinkingHl = false;
-		public bool HlBorder = false;
+		public float? LineWidth { get; set; } = 5 / 1000.0f;
+		public float? Qn_gapThreshold { get; set; } = 5;
+		public bool? Continuous { get; set; } = true;
+		public LineStyleEnum? Style { get; set; } = LineStyleEnum.Simple;
+		public LineHlStyleEnum? HlStyle { get; set; } = LineHlStyleEnum.Arrow;
+		public float? HlSize { get; set; } = 25 / 1000.0f;
+		public bool? MovingHl { get; set; } = false;
+		public bool? ShrinkingHl { get; set; } = false;
+		public bool? HlBorder { get; set; } = false;
 
 		public NoteStyle_Line()
 		{
@@ -129,7 +129,7 @@ namespace Visual_Music
 				vertexOffset = new Vector3(1, 0, 0);
 			else
 				vertexOffset = normal;
-			vertexOffset *= LineWidth / 2.0f;
+			vertexOffset *= (float)LineWidth / 2.0f;
 		}
 
 		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
@@ -246,7 +246,7 @@ namespace Visual_Music
 		void setHlCirclePos(Vector3 pos)
 		{
 			fx.Parameters["WorldPos"].SetValue(pos);
-			float halfHlSize = HlSize / 2.0f;
+			float halfHlSize = (float)HlSize / 2.0f;
 			lineHlVerts[0].pos = new Vector3(-halfHlSize, -halfHlSize, 0) + pos;
 			lineHlVerts[1].pos = new Vector3(halfHlSize, -halfHlSize, 0) + pos;
 			lineHlVerts[2].pos = new Vector3(-halfHlSize, halfHlSize, 0) + pos;
@@ -320,7 +320,7 @@ namespace Visual_Music
 					getCurvePoint(out center, out normal, out vertexOffset, step, x, trackProps);
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
 
-					//Fill vertex buffer
+					//Create vertices
 					lineVerts[vertIndex].pos = center - vertexOffset;
 					lineVerts[vertIndex + 1].pos = center + vertexOffset;
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
@@ -328,7 +328,7 @@ namespace Visual_Music
 					lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = normStepFromNoteStart;
 
 					if (texTrackProps.TexProps.Texture != null)
-						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, LineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
+						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, (float)LineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
 					if (Style == LineStyleEnum.Ribbon)
 					{
@@ -365,7 +365,7 @@ namespace Visual_Music
 					}
 				}
 
-				if (!Continuous)
+				if (!(bool)Continuous)
 					endOfSegment = true; //One draw call per note. Can be used to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
 				if (endOfSegment)
 					createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
@@ -431,7 +431,7 @@ namespace Visual_Music
 			fx.Parameters["Style"].SetValue((int)Style);
 			fx.Parameters["HlSize"].SetValue((float)HlSize / 2.0f);
 			songPanel.GraphicsDevice.BlendState = songPanel.BlendState;
-			float radius = LineWidth / 2.0f;
+			float radius = (float)LineWidth / 2.0f;
 			fx.Parameters["Radius"].SetValue(radius);
 			fx.Parameters["InnerHlSize"].SetValue(0.0f);
 
@@ -492,7 +492,7 @@ namespace Visual_Music
 				Vector3 arrowDir;
 				Vector3 arrowNormal;
 				Vector3 arrowStart;
-				if (!MovingHl)
+				if (!(bool)MovingHl)
 				{
 					Vector3 nextNoteStartVec = new Vector3(nextNoteStart.X, nextNoteStart.Y, 0);
 					Vector3 nextNoteOffset = nextNoteStartVec - noteStartVec;
@@ -519,11 +519,11 @@ namespace Visual_Music
 					arrowDir.Normalize();
 					arrowNormal = new Vector3(-arrowDir.Y, arrowDir.X, 0);
 					arrowNormal.Normalize();
-					arrowLength = HlSize;
+					arrowLength = (float)HlSize;
 					arrowStart = new Vector3(x1, y1, 0);
 				}
 
-				float arrowWidth = HlSize * 0.5f;
+				float arrowWidth = (float)HlSize * 0.5f;
 
 				lineHlVerts[0].pos = arrowStart + arrowNormal * arrowWidth;
 				lineHlVerts[1].pos = arrowStart - arrowNormal * arrowWidth;
@@ -542,22 +542,22 @@ namespace Visual_Music
 				side2Normal.Normalize();
 				fx.Parameters["Side2Normal"].SetValue(side2Normal);
 			}
-			else if (HlStyle == LineHlStyleEnum.Circle && !MovingHl)
+			else if (HlStyle == LineHlStyleEnum.Circle && !(bool)MovingHl)
 			{
 				setHlCirclePos(noteStartVec);
 			}
 			//For shrinking highlights
 			float leftLength = -(noteStart.X - songPosP) - 0.0011f;
 			float shrinkPercent = leftLength / (noteEnd - noteStart.X);
-			if (!ShrinkingHl)
+			if (!(bool)ShrinkingHl)
 			{
 				shrinkPercent = 0;
-				if (HlBorder)
+				if ((bool)HlBorder)
 					shrinkPercent = 1;
 			}
 
 			fx.Parameters["ClipPercent"].SetValue(shrinkPercent);
-			float innerHlSize = HlSize * 0.5f * (1 - shrinkPercent);
+			float innerHlSize = (float)HlSize * 0.5f * (1 - shrinkPercent);
 			fx.Parameters["InnerHlSize"].SetValue(innerHlSize);
 
 			Color hlColor;
@@ -565,7 +565,7 @@ namespace Visual_Music
 			getMaterial(trackProps, true, out hlColor, out hlTexture);
 			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
 			
-			fx.Parameters["Border"].SetValue(HlBorder);
+			fx.Parameters["Border"].SetValue((bool)HlBorder);
 			if (HlStyle == LineHlStyleEnum.Arrow)
 			{
 				//Calc shortest dist to incenter from border, ie. the inscribed circle's radius
@@ -583,7 +583,7 @@ namespace Visual_Music
 			}
 			else if (HlStyle == LineHlStyleEnum.Circle)
 			{
-				if (MovingHl)
+				if ((bool)MovingHl)
 				{
 					float x = songPosP;// songDrawProps.viewportSize.X / 2.0f;
 					Vector3 circlePos = new Vector3(x, Project.getCurveScreenY(x, trackProps.TrackView.Curve), 0);

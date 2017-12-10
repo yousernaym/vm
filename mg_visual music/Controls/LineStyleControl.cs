@@ -26,15 +26,23 @@ namespace Visual_Music
 		{
 			base.update(noteStyle);
 			NoteStyle_Line noteStyle_Line = (NoteStyle_Line)noteStyle;
-			lineStyleList.SelectedIndex = (int)noteStyle_Line.Style;
-			lineWidthUd.Value = (decimal)(noteStyle_Line.LineWidth / SizeScale);
-			qnGapFillUd.Value = (decimal)noteStyle_Line.Qn_gapThreshold;
-			continuousCb.Checked = noteStyle_Line.Continuous;
-			lineHlStyleList.SelectedIndex = (int)noteStyle_Line.HlStyle;
-			hlSizeUpDown.Value = (decimal)(noteStyle_Line.HlSize / SizeScale);
-			movingHlCb.Checked = noteStyle_Line.MovingHl;
-			shrinkingHlCb.Checked = noteStyle_Line.ShrinkingHl;
-			hlBorderCb.Checked = noteStyle_Line.HlBorder;
+			if (noteStyle_Line.Style == null)
+				lineStyleList.SelectedIndex = -1;
+			else
+				lineStyleList.SelectedIndex = (int)noteStyle_Line.Style;
+
+			Form1.setNumericUdValue(lineWidthUd, noteStyle_Line.LineWidth / SizeScale);
+			Form1.setNumericUdValue(qnGapFillUd, noteStyle_Line.Qn_gapThreshold);
+			continuousCb.CheckState = Form1.toCheckState(noteStyle_Line.Continuous);
+			if (noteStyle_Line.HlStyle == null)
+				lineHlStyleList.SelectedIndex = -1;
+			else
+				lineHlStyleList.SelectedIndex = (int)noteStyle_Line.HlStyle;
+
+			Form1.setNumericUdValue(hlSizeUpDown, noteStyle_Line.HlSize / SizeScale);
+			movingHlCb.CheckState = Form1.toCheckState(noteStyle_Line.MovingHl);
+			shrinkingHlCb.CheckState = Form1.toCheckState(noteStyle_Line.ShrinkingHl);
+			hlBorderCb.CheckState = Form1.toCheckState(noteStyle_Line.HlBorder);
 		}
 
 		

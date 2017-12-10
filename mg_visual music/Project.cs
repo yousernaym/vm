@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace Visual_Music
 {
@@ -411,12 +412,13 @@ namespace Visual_Music
 		{
 			if (listIndices.Count == 0)
 				return null;
+			TrackProps outProps = TrackViews[listIndices[0]].TrackProps;
 			if (listIndices.Count == 1)
-				return TrackViews[listIndices[0]].TrackProps;
-			TrackProps mergedPRops = TrackViews[listIndices[0]].TrackProps.clone();
+				return outProps;
+			outProps = outProps.clone();
 			for (int i = 1; i < listIndices.Count; i++)
-				mergedPRops = (TrackProps)mergeObjects(mergedPRops, TrackViews[listIndices[i]].TrackProps);
-			return mergedPRops;
+				outProps = (TrackProps)mergeObjects(outProps, TrackViews[listIndices[i]].TrackProps);
+			return outProps;
 		}
 
 		public object mergeObjects(object first, object second)
@@ -429,12 +431,19 @@ namespace Visual_Music
 			{
 				foreach (PropertyInfo propertyInfo in props)
 				{
+					//bool isNoteStyle = propertyInfo.PropertyType == typeof(NoteStyle);
 					if (!propertyInfo.CanRead || !propertyInfo.CanWrite || propertyInfo.GetMethod.IsStatic)
+					{
+						//if (!isNoteStyle)
 						continue;
+						//else
+						//	;
+					}
 					hasSuitableProp = true;
 
-					object firstValue = propertyInfo.GetValue(first, null);
-					object secondValue = propertyInfo.GetValue(second, null);
+					object firstValue, secondValue;
+					firstValue = propertyInfo.GetValue(first, null);
+					secondValue = propertyInfo.GetValue(second, null);
 					if (!(firstValue is string) && firstValue is IEnumerable)
 					{
 						continue;
@@ -462,7 +471,12 @@ namespace Visual_Music
 						//propertyInfo.SetValue(first, returnValues);
 					}
 					else
-						propertyInfo.SetValue(first, mergeObjects(firstValue, secondValue));
+					{
+						object subMerge = mergeObjects(firstValue, secondValue);
+						propertyInfo.SetValue(first, subMerge);
+						if (propertyInfo.Name == "NoteStyleType" && subMerge != null && (NoteStyleEnum)subMerge != NoteStyleEnum.Default)
+							((TrackProps)first).SelectedNoteStyle = (NoteStyle)mergeObjects(((TrackProps)first).SelectedNoteStyle, ((TrackProps)second).SelectedNoteStyle);
+					}
 				}
 			}
 
