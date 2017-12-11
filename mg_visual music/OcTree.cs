@@ -125,11 +125,13 @@ namespace Visual_Music
 			}
 		}
 
-		public bool areObjectsInFrustum(BoundingFrustum frustum, float songPos)
+		public bool areObjectsInFrustum(BoundingFrustum frustum, float songPos, TrackProps trackProps)
 		{
 			foreach (var bbox in _geo.bboxes)
 			{
 				BoundingBox bb = bbox;
+				bb.Min += trackProps.PosOffset + TrackProps.GlobalProps.PosOffset;
+				bb.Max += trackProps.PosOffset + TrackProps.GlobalProps.PosOffset;
 				bb.Min.X -= songPos;
 				bb.Max.X -= songPos;
 				if (bb.Intersects(frustum))
