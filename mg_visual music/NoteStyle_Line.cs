@@ -28,7 +28,8 @@ namespace Visual_Music
 		public Vector3 pos;
 		public Vector3 normal;
 		public Vector3 center;
-		public float normStepFromNoteStart;
+		//public float normStepFromNoteStart;
+		public Vector2 normPos;
 		public Vector2 texCoords;
 	}
 
@@ -321,11 +322,15 @@ namespace Visual_Music
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
 
 					//Create vertices
-					lineVerts[vertIndex].pos = center - vertexOffset;
-					lineVerts[vertIndex + 1].pos = center + vertexOffset;
+					adjustCurvePoint(center, vertexOffset, -1, trackProps, lineVerts, vertIndex, step);
+					adjustCurvePoint(center, vertexOffset, 1, trackProps, lineVerts, vertIndex + 1, step);
+					//lineVerts[vertIndex].pos = center - vertexOffset;
+					//lineVerts[vertIndex + 1].pos = center + vertexOffset;
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
 					float normStepFromNoteStart = (x - startDraw) / (nextNoteStart.X - noteStart.X);
-					lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = normStepFromNoteStart;
+					//lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = normStepFromNoteStart;
+					lineVerts[vertIndex].normPos = new Vector2(normStepFromNoteStart, 0);
+					lineVerts[vertIndex + 1].normPos = new Vector2(normStepFromNoteStart, 1);
 
 					if (texTrackProps.TexProps.Texture != null)
 						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, (float)LineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
@@ -373,6 +378,25 @@ namespace Visual_Music
 				completeNoteListIndex++;
 			}
 			createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
+		}
+
+		void adjustCurvePoint(Vector3 center, Vector3 vertexOffset, int side, TrackProps trackProps, LineVertex[] lineVerts, int vertIndex, float step)
+		{
+			Vector3 curPos = center + vertexOffset * side;
+			Vector3 dummyCenter, dummyNormal, newVerteexOffset;
+			getCurvePoint(out dummyCenter, out dummyNormal, out newVerteexOffset, step, curPos.X, trackProps);
+			float newPosX = curPos.X + newVerteexOffset.X * side;
+
+			if (curPos.X > center.X == newPosX > curPos.X)
+				lineVerts[vertIndex].pos = curPos;
+			else
+			{
+				int prevIndex = Math.Max(vertIndex - 2, 3);
+				Vector3 prevPos = lineVerts[prevIndex].pos;
+				lineVerts[vertIndex].pos = prevPos;
+			}
+			lineVerts[vertIndex].normal = (lineVerts[vertIndex].pos - center) * -side;
+			lineVerts[vertIndex].normal.Normalize();
 		}
 
 		public override void drawGeoChunk(Geo geo)
@@ -618,7 +642,7 @@ namespace Visual_Music
 
 		public static void sInit()
 		{
-			lineVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Single, VertexElementUsage.Position, 2), new VertexElement(40, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
+			lineVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Vector2, VertexElementUsage.Position, 2), new VertexElement(44, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
 			//for (short i = 0; i < lineInds.Length; i++)
 				//lineInds[i] = i;
 		}

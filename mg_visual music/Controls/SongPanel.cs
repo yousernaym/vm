@@ -250,7 +250,7 @@ namespace Visual_Music
 				//videoFormat.bitRate = 160000000;
 				videoFormat.fps = 30;
 				videoFormat.aspectNumerator = 1;
-				videoFormat.audioSampleRate = 48000;
+				videoFormat.audioSampleRate = 44100;
 				//videoFormat.audioSampleRate = 44100;
 				//Media.closeAudioFile();
 				if (!Media.beginVideoEnc(videoFilePath, videoFormat, true))

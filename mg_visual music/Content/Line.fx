@@ -21,7 +21,7 @@ struct VSInput
 	float3 pos : POSITION0;
 	float3 normal : NORMAL0;
 	float3 center : POSITION1;
-	float normStepFromNoteStart : POSITION2;
+	float2 normPos : POSITION2;
 	float2 texCoords : TEXCOORD0;
 };
 
@@ -31,7 +31,7 @@ struct VSOutput
 	float3 normal : TEXCOORD1;
 	float3 center : POSITION1;
 	float3 rawPos : POSITION2;
-	float normStepFromNoteStart : POSITION3;
+	float2 normPos : POSITION3;
 	float2 texCoords : TEXCOORD0;
 };
 
@@ -40,7 +40,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.normal = IN.normal;
 	OUT.center = IN.center;
 	OUT.rawPos = IN.pos.xyz;
-	OUT.normStepFromNoteStart = IN.normStepFromNoteStart;
+	OUT.normPos = IN.normPos;
 	
 	//IN.texCoords.x *= TexWidthScale;
 	OUT.texCoords = IN.texCoords - TexScrollOffset;
@@ -75,7 +75,9 @@ void PS(out float4 color : COLOR0, in VSOutput IN)
 	float3 normal = normalize(IN.normal);
 	float3 tPos = IN.rawPos - IN.center;
 	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f;
-	float2 normPos = float2(IN.normStepFromNoteStart, normDistFromEdge);
+	float2 normPos = IN.normPos;
+	//normPos.y = normPos.y * 0.5f + 0.5f;
+	//normPos.y = normDistFromEdge;
 	IN.rawPos.x -= SongPos;
 	color = modulate(normPos, color, lightingNormal, IN.rawPos);
 }
