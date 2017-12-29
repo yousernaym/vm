@@ -267,7 +267,7 @@ namespace Visual_Music
 				MessageBox.Show("Couldn't load note file " + Path.GetFileName(NoteFilePath), "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
 			}
-
+			
 			notes = newNotes;
 			if (eraseCurrent)
 			{
@@ -378,6 +378,7 @@ namespace Visual_Music
 				return;
 			vertViewWidthQn = viewWidthQn;
 			//for (int i = TrackViews.Count - 1; i > 0; i--)
+			
 			for (int i = 1; i < trackViews.Count; i++)
 				TrackViews[i].createOcTree(this, GlobalTrackProps);
 		}

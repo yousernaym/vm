@@ -110,6 +110,7 @@ namespace Visual_Music
 		{
 			Vector3[] points = new Vector3[3];
 			Vector3[] tangents = new Vector3[2];
+			step *= 0.1f;
 			for (int i = 0; i < points.Length; i++)
 			{
 				points[i] = new Vector3();
@@ -382,18 +383,34 @@ namespace Visual_Music
 
 		void adjustCurvePoint(Vector3 center, Vector3 vertexOffset, int side, TrackProps trackProps, LineVertex[] lineVerts, int vertIndex, float step)
 		{
+			//List<int> list = new List<int>();
+			//list.Add(0);
+			//int a = list[1];
+			//int[] a = new int[0];
+			//a[1] = 4;
 			Vector3 curPos = center + vertexOffset * side;
 			Vector3 dummyCenter, dummyNormal, newVerteexOffset;
 			getCurvePoint(out dummyCenter, out dummyNormal, out newVerteexOffset, step, curPos.X, trackProps);
 			float newPosX = curPos.X + newVerteexOffset.X * side;
 
-			if (curPos.X > center.X == newPosX > curPos.X)
-				lineVerts[vertIndex].pos = curPos;
-			else
+			lineVerts[vertIndex].pos = curPos;
+			if (curPos.X > center.X != newPosX > curPos.X)
 			{
 				int prevIndex = Math.Max(vertIndex - 2, 3);
 				Vector3 prevPos = lineVerts[prevIndex].pos;
 				lineVerts[vertIndex].pos = prevPos;
+				//int keyIndex;
+				//float timeT = Project.getTimeT(center.X);
+				//keyIndex = trackProps.TrackView.Curve.Keys.IndexAtPosition(timeT);
+				//if (curPos.X < center.X)
+				//	keyIndex--;
+				//if (keyIndex < trackProps.TrackView.Curve.Keys.Count)
+				//{
+				//	CurveKey key = trackProps.TrackView.Curve.Keys[keyIndex];
+				//	lineVerts[vertIndex].pos.X = Project.getScreenPosX((int)key.Position);
+				//	//lineVerts[vertIndex].pos.Y = Project.getScreenPosY(key.Value) + (float)LineWidth / 2 * side;
+				//	lineVerts[vertIndex].pos.Y = lineVerts[vertIndex-2].pos.Y;
+				//}
 			}
 			lineVerts[vertIndex].normal = (lineVerts[vertIndex].pos - center) * -side;
 			lineVerts[vertIndex].normal.Normalize();
