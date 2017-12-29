@@ -323,10 +323,10 @@ namespace Visual_Music
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
 
 					//Create vertices
-					adjustCurvePoint(center, vertexOffset, -1, trackProps, lineVerts, vertIndex, step);
-					adjustCurvePoint(center, vertexOffset, 1, trackProps, lineVerts, vertIndex + 1, step);
-					//lineVerts[vertIndex].pos = center - vertexOffset;
-					//lineVerts[vertIndex + 1].pos = center + vertexOffset;
+					//adjustCurvePoint(center, vertexOffset, -1, trackProps, lineVerts, vertIndex, step);
+					//adjustCurvePoint(center, vertexOffset, 1, trackProps, lineVerts, vertIndex + 1, step);
+					lineVerts[vertIndex].pos = center - vertexOffset;
+					lineVerts[vertIndex + 1].pos = center + vertexOffset;
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
 					float normStepFromNoteStart = (x - startDraw) / (nextNoteStart.X - noteStart.X);
 					//lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = normStepFromNoteStart;
@@ -383,11 +383,6 @@ namespace Visual_Music
 
 		void adjustCurvePoint(Vector3 center, Vector3 vertexOffset, int side, TrackProps trackProps, LineVertex[] lineVerts, int vertIndex, float step)
 		{
-			//List<int> list = new List<int>();
-			//list.Add(0);
-			//int a = list[1];
-			//int[] a = new int[0];
-			//a[1] = 4;
 			Vector3 curPos = center + vertexOffset * side;
 			Vector3 dummyCenter, dummyNormal, newVerteexOffset;
 			getCurvePoint(out dummyCenter, out dummyNormal, out newVerteexOffset, step, curPos.X, trackProps);
