@@ -1,8 +1,10 @@
-﻿- Bump mapping.
+﻿Todo:
+- Bump mapping.
 - (Fix alpha blending.) Fix line vertices at turns.
-- Modulation antialiasing.
+- Use static vertex buffers for bar style.
 
 Done:
+- Antialiasing through blurring of line edges and mod discarding if FadeOut > 0.
 - Add possibility to select notes with non-default camera settings.
 - Texture coords (tiled) independent of screen resolution
 - Fix update loop

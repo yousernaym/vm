@@ -85,8 +85,9 @@ float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 	return color;
 }
 
-float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
+float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir, out bool discardFade)
 {
+	discardFade = false;
 	float2 transformedPos = normPos - Origin[modIndex];
 	if (transformedPos.x < 0)
 		transformedPos.x /= Origin[modIndex].x;
@@ -145,6 +146,7 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 		
 	//Outside Start - Stop?
 	bool discardBeforeStart = Invert[modIndex] && DiscardAfterStop[modIndex];
+	//bool discardBeforeStart = DiscardAfterStop[modIndex];
 	bool discardAfterStop = !Invert[modIndex] && DiscardAfterStop[modIndex];
 	if (interpolant < Start[modIndex])
 		return discardBeforeStart ? -1 : 0;
@@ -159,13 +161,21 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 	
 	float fadeInInterpolant;
 	if (FadeIn[modIndex] > 0 && interpolant < FadeIn[modIndex])
-		fadeInInterpolant =  interpolant / FadeIn[modIndex];
+	{
+		fadeInInterpolant = interpolant / FadeIn[modIndex];
+		if (discardBeforeStart)
+			discardFade = true;
+	}
 	else
 		fadeInInterpolant = 1;
 
 	float fadeOutInterpolant;
 	if (FadeOut[modIndex] > 0 && 1 - interpolant < FadeOut[modIndex])
+	{
 		fadeOutInterpolant = (1 - interpolant) / FadeOut[modIndex];
+		if (discardAfterStop)
+			discardFade = true;
+	}
 	else
 		fadeOutInterpolant = 1;
 	interpolant = fadeOutInterpolant * fadeInInterpolant;
@@ -184,10 +194,11 @@ float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 
 		if (ColorDestEnable[i] || AlphaDestEnable[i] || AngleDestEnable[i])
 		{
 			float3 destNormalDir;
-			float interpolant = getInterpolant(normPos, i, destNormalDir);
+			bool discardFade;
+			float interpolant = getInterpolant(normPos, i, destNormalDir, discardFade);
 			if (interpolant < 0) //Discard after stop
 			{
-				result.rgb = 0;
+				result = 0;
 				//result = blurEdges(result, -interpolant);
 				continue;
 			}
@@ -206,6 +217,8 @@ float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 
 				//float xyLength = sin(angle);
 				//destNormal = float3(destNormalDir.x * xyLength, destNormalDir.y * xyLength, sourceNormal.z * cos(angle));
 			}
+			if (discardFade)
+				result *= interpolant;
 		}
 	}
 	if (!any(destNormal))
