@@ -9,13 +9,6 @@ float HlSize;
 float InnerHlSize;
 bool Border;
 
-float4 blurEdges(float4 color, float distFromCenter)
-{
-	float distFromEdge = max(distFromCenter - (Radius - BlurredEdge), 0);
-	float lum = saturate(1 - distFromEdge / BlurredEdge);
-	return color * lum;
-}
-
 struct VSInput
 {
 	float3 pos : POSITION0;
@@ -80,6 +73,7 @@ void PS(out float4 color : COLOR0, in VSOutput IN)
 	//normPos.y = normDistFromEdge;
 	IN.rawPos.x -= SongPos;
 	color = modulate(normPos, color, lightingNormal, IN.rawPos);
+	color = blurEdges(color, normPos.y);
 }
 
 

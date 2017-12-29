@@ -52,6 +52,28 @@ int ActiveModEntries;
 #define CombineXY_Max 2
 #define CombineXY_Min 3
 
+float4 blurEdges(float4 color, float normPosY)
+{
+	float normDistFromCenter = abs(normPosY - 0.5f) * 2; // 1 at edge, 0 at center
+
+	float BlurredEdgePixels = 2;
+	float ddxy = length(float2(ddx(normDistFromCenter), ddy(normDistFromCenter)));
+
+	//If line radius is less than number of pixels to blur + 2, than decrease number of pixels to blur accordingly
+	if (ddxy > 1 / (BlurredEdgePixels + 2))
+		BlurredEdgePixels = 1 / ddxy - 2;
+	if (BlurredEdgePixels < 1.5f)
+		return color;
+
+	float blurredEdgePercent = BlurredEdgePixels * ddxy;
+
+	float shadeAmount = max(normDistFromCenter - (1 - blurredEdgePercent), 0) / blurredEdgePercent; // 0 from center to blur start, 1 at edge
+																									//if (shadeAmount > 0)
+																									//return float4(0, 1, 0, 1);
+	float lum = saturate(1 - shadeAmount);
+	return color * lum;
+}
+
 float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 {
 	//float lum = clamp(dot(LightDir, normal), AmbientLum, 1);
@@ -122,10 +144,12 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir)
 	destNormalDir = normalize(destNormalDir);
 		
 	//Outside Start - Stop?
+	bool discardBeforeStart = Invert[modIndex] && DiscardAfterStop[modIndex];
+	bool discardAfterStop = !Invert[modIndex] && DiscardAfterStop[modIndex];
 	if (interpolant < Start[modIndex])
-		return  Invert[modIndex] && DiscardAfterStop[modIndex] ? -1 : 0;
+		return discardBeforeStart ? -1 : 0;
 	if (interpolant > Stop[modIndex])
-		return !Invert[modIndex] && DiscardAfterStop[modIndex] ? -1 : 0;
+		return discardAfterStop ? -1 : 0;
 			
 	interpolant -= Start[modIndex];
 	interpolant /= Stop[modIndex] - Start[modIndex];
@@ -153,15 +177,18 @@ float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 
 {
 	float4 result = sourceColor;
 	float3 destNormal = float3(0,0,0);
+	
+	float2 gradLength = ddx(normPos);
 	for (int i = 0; i < ActiveModEntries; i++)
 	{
 		if (ColorDestEnable[i] || AlphaDestEnable[i] || AngleDestEnable[i])
 		{
 			float3 destNormalDir;
 			float interpolant = getInterpolant(normPos, i, destNormalDir);
-			if (interpolant == -1) //Discard after stop
+			if (interpolant < 0) //Discard after stop
 			{
 				result.rgb = 0;
+				//result = blurEdges(result, -interpolant);
 				continue;
 			}
 			if (Invert[i])
