@@ -44,8 +44,8 @@ namespace Visual_Music
 			hvscDirDialog.IsFolderPicker = true;
 			hvscDirDialog.EnsurePathExists = true;
 			//hvscDirDialog.FileOk += new System.ComponentModel.CancelEventHandler(hvscDirDialog_FileOk);
-			hvscDirDialog.Title = "Browae to <HVSC root>\\C64Music\\DOCUMENTS";
-
+			hvscDirDialog.Title = "Browse to <HVSC path>\\DOCUMENTS";
+			
 			setXmPlayIni_outputPath();
 		}
 

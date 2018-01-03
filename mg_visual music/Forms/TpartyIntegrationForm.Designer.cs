@@ -39,10 +39,8 @@
 			this.sidsCb = new System.Windows.Forms.CheckBox();
 			this.songLengthCb = new System.Windows.Forms.CheckBox();
 			this.openXmPlayDialog = new System.Windows.Forms.OpenFileDialog();
-			this.hvscFolderBrowseDialog = new System.Windows.Forms.FolderBrowserDialog();
 			this.openXmPlaySidPluginDialog = new System.Windows.Forms.OpenFileDialog();
 			this.hvscDirTb = new System.Windows.Forms.TextBox();
-			this.openHvscDialog = new System.Windows.Forms.OpenFileDialog();
 			this.SuspendLayout();
 			// 
 			// importXmPlayBtn
@@ -158,11 +156,6 @@
 			this.openXmPlayDialog.Filter = "XMPlay (XMPlay*.zip)|xmplay*.zip|Zip files (*.zip)|*.zip";
 			this.openXmPlayDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openXmPlayDialog_FileOk);
 			// 
-			// hvscFolderBrowseDialog
-			// 
-			this.hvscFolderBrowseDialog.Description = "Browse to C64Music\\DOCUMENTS";
-			this.hvscFolderBrowseDialog.ShowNewFolderButton = false;
-			// 
 			// openXmPlaySidPluginDialog
 			// 
 			this.openXmPlaySidPluginDialog.Filter = "XMPlay SID plugin (xmp-sid.zip)|xmp-sid.zip|Zip files (*.zip)|*.zip";
@@ -176,12 +169,6 @@
 			this.hvscDirTb.Size = new System.Drawing.Size(234, 20);
 			this.hvscDirTb.TabIndex = 10;
 			this.hvscDirTb.TabStop = false;
-			// 
-			// openHvscDialog
-			// 
-			this.openHvscDialog.CheckFileExists = false;
-			this.openHvscDialog.FileName = "Folder Selection";
-			this.openHvscDialog.ValidateNames = false;
 			// 
 			// TpartyIntegrationForm
 			// 
@@ -219,12 +206,10 @@
 		private System.Windows.Forms.LinkLabel hvscLink;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.OpenFileDialog openXmPlayDialog;
-		private System.Windows.Forms.FolderBrowserDialog hvscFolderBrowseDialog;
 		public System.Windows.Forms.CheckBox modulesCb;
 		public System.Windows.Forms.CheckBox sidsCb;
 		public System.Windows.Forms.CheckBox songLengthCb;
 		private System.Windows.Forms.OpenFileDialog openXmPlaySidPluginDialog;
 		private System.Windows.Forms.TextBox hvscDirTb;
-		private System.Windows.Forms.OpenFileDialog openHvscDialog;
 	}
 }
