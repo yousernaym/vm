@@ -116,6 +116,7 @@ namespace Visual_Music
 		public int SongLengthT { get { return notes != null ? notes.SongLengthT : 0; } } //Song length in ticks
 		public int SongPosT => (int)(normSongPos * SongLengthT); //Current song position in ticks
 		public float SongPosB => (float)SongPosT / Notes.TicksPerBeat; //Current song position in beats
+		public float SongPosP => getScreenPosX(SongPosT); //Current song position in pixels
 		double normSongPos; //Song position normalized to [0,1]
 		public double NormSongPos
 		{
@@ -388,7 +389,7 @@ namespace Visual_Music
 			if (notes == null)
 				return;
 
-			for (int t = notes.Tracks.Count - 1; t >= 0; t--)
+			for (int t = 1; t < notes.Tracks.Count; t++)
 				trackViews[t].drawTrack(GlobalTrackProps, SongPanel.ForceDefaultNoteStyle);
 		}
 

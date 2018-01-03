@@ -42,12 +42,12 @@ namespace Visual_Music
 	public class NoteStyle_Bar : NoteStyle
 	{
 		static VertexBuffer meshVb;
-		static DynamicVertexBuffer instanceVb;
 		static VertexDeclaration meshVertDecl;
 		static VertexDeclaration instanceVertDecl;
-		static BarInstanceVertex[] instanceVerts = new BarInstanceVertex[NumDynamicVerts];
+		const int MaxInstances = 30000;
+		static BarInstanceVertex[] instanceVerts = new BarInstanceVertex[MaxInstances];
 		static IndexBuffer indexBuf;
-		static VertexBufferBinding[] vbBindings = new VertexBufferBinding[2];
+		static VertexBufferBinding meshBinding;
 
 		public NoteStyle_Bar()
 		{
@@ -74,12 +74,15 @@ namespace Visual_Music
 
 		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
 		{
-			geo = new BarGeo();
+			BarGeo barGeo = new BarGeo();
+			geo = barGeo;
 			List<Midi.Note> noteList = midiTrack.Notes;
 			if (noteList.Count == 0)
 				return;
 
 			float halfNoteHeight = Project.NoteHeight / 2;
+			int instanceIndex = 0;
+			float songPosP = Project.SongPosP;
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				Midi.Note note = noteList[n];
@@ -87,47 +90,19 @@ namespace Visual_Music
 					continue;
 				Vector2 noteStart = Project.getScreenPos(note.start, note.pitch);
 				Vector2 noteEnd = Project.getScreenPos(note.stop, note.pitch);
-				float z = 0;// fx.Parameters["PosOffset"].GetValueVector3().Z;
-				
-				Vector3 boxMin = new Vector3(noteStart.X, noteStart.Y -  halfNoteHeight, z);
-				Vector3 boxMax = new Vector3(noteEnd.X, noteEnd.Y + halfNoteHeight, z);
+
+				//Create bounding boxes
+				Vector3 boxMin = new Vector3(noteStart.X, noteStart.Y -  halfNoteHeight, 0);
+				Vector3 boxMax = new Vector3(noteEnd.X, noteEnd.Y + halfNoteHeight, 0);
 				geo.bboxes.Add(new BoundingBox(boxMin, boxMax));
-			}
-		}
 
-		public override void drawGeoChunk(Geo geo)
-		{
-
-		}
-
-		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
-		{
-			float songPosP;
-			base.drawTrack(midiTrack, trackProps, texTrackProps, out songPosP);
-			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
-			List<Midi.Note> noteList = midiTrack.Notes;
-			if (noteList.Count == 0)
-				return;
-
-			float halfNoteHeight = Project.NoteHeight / 2;
-			for (int n = 0; n < noteList.Count; n++)
-			{
-				Midi.Note note = noteList[n];
-				if (note.start > Project.Notes.SongLengthT) //only if audio ends before the notes end
-					continue;
-
-				Vector2 noteStart = Project.getScreenPos(note.start, note.pitch);
-				Vector2 noteEnd = Project.getScreenPos(note.stop, note.pitch);
-
+				//Create inctance data
 				Color color;
 				Texture2D texture;
 
 				getMaterial(trackProps, noteStart.X - songPosP, noteEnd.X - songPosP, out color, out texture);
-				//fx.Parameters["Color"].SetValue(color.ToVector4());
-				instanceVerts[n].color = color;
-				fx.Parameters["Texture"].SetValue(texture);
-				//Vector4 destRect = new Vector4(noteStart.X, noteStart.Y - songDrawProps.noteHeight / 2, noteEnd.X - noteStart.X + 1, songDrawProps.noteHeight - 1);
-				//Vector4 srcRect = destRect;
+				instanceVerts[instanceIndex].color = color;
+
 				Vector2 topLeft_world = new Vector2(noteStart.X, noteStart.Y - halfNoteHeight);
 				Vector2 size_world = new Vector2(noteEnd.X - noteStart.X + 0.001f, halfNoteHeight * 2 - 0.001f);
 				Vector2 topLeft_tex = topLeft_world;
@@ -138,28 +113,48 @@ namespace Visual_Music
 					Vector2 texSize = new Vector2(texture.Width, texture.Height);
 					calcRectTexCoords(out topLeft_tex, out size_tex, texSize, topLeft_world, size_world, texTrackProps);
 				}
-				instanceVerts[n].destRect = new Vector4(topLeft_world.X, topLeft_world.Y, size_world.X, size_world.Y);
-				instanceVerts[n].srcRect = new Vector4(topLeft_tex.X, topLeft_tex.Y, size_tex.X, size_tex.Y);
-				//instanceVerts[n].srcRect.X /= texture.Width;
-				//instanceVerts[n].srcRect.Z /= texture.Width;
-				//instanceVerts[n].srcRect.Y /= texture.Height;
-				//instanceVerts[n].srcRect.W /= texture.Height;
-				//songPanel.SpriteBatch.Draw(texture, destRect, srcRect,color);
+				instanceVerts[instanceIndex].destRect = new Vector4(topLeft_world.X, topLeft_world.Y, size_world.X, size_world.Y);
+				instanceVerts[instanceIndex].srcRect = new Vector4(topLeft_tex.X, topLeft_tex.Y, size_tex.X, size_tex.Y);
+				if (++instanceIndex >= MaxInstances - 1)
+					createVb(ref instanceIndex, barGeo);
 			}
-			//songPanel.SpriteBatch.End();
-			instanceVb.SetData(instanceVerts, 0, noteList.Count, SetDataOptions.Discard);
-			songPanel.GraphicsDevice.SetVertexBuffers(vbBindings);
+			createVb(ref instanceIndex, barGeo);
+		}
+
+		void createVb(ref int count, BarGeo geo)
+		{
+			VertexBuffer vb = new VertexBuffer(songPanel.GraphicsDevice, instanceVertDecl, count, BufferUsage.WriteOnly);
+			vb.SetData(instanceVerts, 0, count);
+			geo.instanceBindingList.Add(new VertexBufferBinding(vb, 0, 1));
+			count = 0;
+		}
+
+		public override void drawGeoChunk(Geo geo)
+		{
+			BarGeo barGeo = (BarGeo)geo;
 			songPanel.GraphicsDevice.Indices = indexBuf;
 			fx.CurrentTechnique = fx.Techniques["Technique1"];
 			fx.CurrentTechnique.Passes["Pass1"].Apply();
-			songPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, noteList.Count);
+			
+			foreach (var instanceBinding in barGeo.instanceBindingList)
+			{
+				songPanel.GraphicsDevice.SetVertexBuffers(meshBinding, instanceBinding);
+				songPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, instanceBinding.VertexBuffer.VertexCount);
+			}
 		}
 
-		//override public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps)
-		//{
+		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
+		{
+			float songPosP;
+			base.drawTrack(midiTrack, trackProps, texTrackProps, out songPosP);
+			Color dummyColor;
+			Texture2D texture;
+			getMaterial(trackProps, false, out dummyColor, out texture);
+			fx.Parameters["Texture"].SetValue(texture);
 
-		//}
-		
+			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
+		}
+				
 		public static void sInit()
 		{
 			//Mesh vb
@@ -167,7 +162,7 @@ namespace Visual_Music
 			meshVb = new VertexBuffer(songPanel.GraphicsDevice, meshVertDecl, 4, BufferUsage.WriteOnly);
 			//Instance vb
 			instanceVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.Position, 1), new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 0), new VertexElement(32, VertexElementFormat.Color, VertexElementUsage.Color, 0));
-			instanceVb = new DynamicVertexBuffer(songPanel.GraphicsDevice, instanceVertDecl, NumDynamicVerts, BufferUsage.WriteOnly);
+			//instanceVb = new DynamicVertexBuffer(songPanel.GraphicsDevice, instanceVertDecl, NumDynamicVerts, BufferUsage.WriteOnly);
 			BarMeshVertex[] meshVerts =
 			{
 				new BarMeshVertex(0,0),
@@ -181,8 +176,7 @@ namespace Visual_Music
 			short[] indices = { 0, 1, 2, 3 };
 			indexBuf.SetData(indices);
 			//Bindings
-			vbBindings[0] = new VertexBufferBinding(meshVb);
-			vbBindings[1] = new VertexBufferBinding(instanceVb, 0, 1);
+			meshBinding = new VertexBufferBinding(meshVb);
 		}
 		//public override void draw(NoteDrawProps drawProps, Color color, Texture2D texture, int pass)
 		//{
@@ -194,9 +188,11 @@ namespace Visual_Music
 
 	public class BarGeo : Geo
 	{
+		public List<VertexBufferBinding> instanceBindingList = new List<VertexBufferBinding>();
 		public override void Dispose()
 		{
-			
+			foreach (var vb in instanceBindingList)
+				vb.VertexBuffer.Dispose();
 		}
 	}
 }

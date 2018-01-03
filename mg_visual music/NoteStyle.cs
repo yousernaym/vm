@@ -314,7 +314,7 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
 			fx.Parameters["BlurredEdge"].SetValue(Project.Camera.ViewportSize.X * 2.0f / 1000);
-			songPosP = Project.getScreenPosX(Project.SongPosT);
+			songPosP = Project.SongPosP;
 			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Camera.ViewportSize.X, Project.Camera.ViewportSize.Y));
 			fx.Parameters["VpMat"].SetValue(Project.Camera.VpMat);

@@ -432,8 +432,6 @@ namespace Visual_Music
 			{
 				if (numVerts > 5 || numHLineVerts > 1)
 				{
-					fx.CurrentTechnique = fx.Techniques["Line"];
-					fx.CurrentTechnique.Passes[0].Apply();
 					if (numHLineVerts > 1)
 					{
 						VertexBuffer vb = new VertexBuffer(songPanel.GraphicsDevice, lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
