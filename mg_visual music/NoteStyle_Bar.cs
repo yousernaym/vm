@@ -87,7 +87,7 @@ namespace Visual_Music
 					continue;
 				Vector2 noteStart = Project.getScreenPos(note.start, note.pitch);
 				Vector2 noteEnd = Project.getScreenPos(note.stop, note.pitch);
-				float z = fx.Parameters["PosOffset"].GetValueVector3().Z;
+				float z = 0;// fx.Parameters["PosOffset"].GetValueVector3().Z;
 				
 				Vector3 boxMin = new Vector3(noteStart.X, noteStart.Y -  halfNoteHeight, z);
 				Vector3 boxMax = new Vector3(noteEnd.X, noteEnd.Y + halfNoteHeight, z);

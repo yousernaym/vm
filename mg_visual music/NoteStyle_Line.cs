@@ -360,7 +360,7 @@ namespace Visual_Music
 					//Create bounding box
 					Vector3 bboxCorner1 = lineVerts[vertIndex].pos;
 					Vector3 bboxCorner2 = lineVerts[vertIndex + 1].pos;
-					bboxCorner1.Z = bboxCorner2.Z = fx.Parameters["PosOffset"].GetValueVector3().Z;
+					bboxCorner1.Z = bboxCorner2.Z = 0;// fx.Parameters["PosOffset"].GetValueVector3().Z;
 					geo.bboxes.Add(BoundingBox.CreateFromPoints(new Vector3[2] { bboxCorner1, bboxCorner2 }));
 					
 					vertIndex += 2;
