@@ -1,11 +1,11 @@
 #include "notestyle.fx"
+float4 HlColor;
 
 struct VSInput
 {
     float2 normPos : POSITION0;
 	float4 rect : POSITION1;
 	float4 texCoords : TEXCOORD0;
-	float4 color : COLOR0;
 };
 
 struct VSOutput
@@ -31,7 +31,10 @@ VSOutput VS(VSInput IN)
 	//OUT.pos.z = 0;
 	//OUT.pos.w = 1;
 	OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw;
-	OUT.color = IN.color;
+	if (IN.rect.x  < SongPos && IN.rect.x + IN.rect.z > SongPos)
+		OUT.color = HlColor;
+	else
+		OUT.color = Color;
 	OUT.normPos = IN.normPos;// *2 - 1;
     return OUT;
 }

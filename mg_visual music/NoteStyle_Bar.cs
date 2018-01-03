@@ -29,12 +29,10 @@ namespace Visual_Music
 	{
 		public Vector4 destRect;
 		public Vector4 srcRect;
-		public Color color;
 		public BarInstanceVertex(Vector4 _destRect, Vector4 _srcRect, Color _color)
 		{
 			destRect = _destRect;
 			srcRect = _srcRect;
-			color = _color;
 		}
 	}
 
@@ -83,6 +81,10 @@ namespace Visual_Music
 			float halfNoteHeight = Project.NoteHeight / 2;
 			int instanceIndex = 0;
 			float songPosP = Project.SongPosP;
+			Color dummyColor;
+			Texture2D texture;
+			getMaterial(trackProps, false, out dummyColor, out texture);
+
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				Midi.Note note = noteList[n];
@@ -97,12 +99,6 @@ namespace Visual_Music
 				geo.bboxes.Add(new BoundingBox(boxMin, boxMax));
 
 				//Create inctance data
-				Color color;
-				Texture2D texture;
-
-				getMaterial(trackProps, noteStart.X - songPosP, noteEnd.X - songPosP, out color, out texture);
-				instanceVerts[instanceIndex].color = color;
-
 				Vector2 topLeft_world = new Vector2(noteStart.X, noteStart.Y - halfNoteHeight);
 				Vector2 size_world = new Vector2(noteEnd.X - noteStart.X + 0.001f, halfNoteHeight * 2 - 0.001f);
 				Vector2 topLeft_tex = topLeft_world;
@@ -147,10 +143,13 @@ namespace Visual_Music
 		{
 			float songPosP;
 			base.drawTrack(midiTrack, trackProps, texTrackProps, out songPosP);
-			Color dummyColor;
+			Color color;
 			Texture2D texture;
-			getMaterial(trackProps, false, out dummyColor, out texture);
+			getMaterial(trackProps, false, out color, out texture);
 			fx.Parameters["Texture"].SetValue(texture);
+			fx.Parameters["Color"].SetValue(color.ToVector4());
+			Color hlColor = trackProps.getColor(true, Project.GlobalTrackProps, true);
+			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
 
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
 		}
@@ -161,7 +160,7 @@ namespace Visual_Music
 			meshVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0));
 			meshVb = new VertexBuffer(songPanel.GraphicsDevice, meshVertDecl, 4, BufferUsage.WriteOnly);
 			//Instance vb
-			instanceVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.Position, 1), new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 0), new VertexElement(32, VertexElementFormat.Color, VertexElementUsage.Color, 0));
+			instanceVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.Position, 1), new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 0));
 			//instanceVb = new DynamicVertexBuffer(songPanel.GraphicsDevice, instanceVertDecl, NumDynamicVerts, BufferUsage.WriteOnly);
 			BarMeshVertex[] meshVerts =
 			{
