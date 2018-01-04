@@ -29,22 +29,20 @@
 		private void InitializeComponent()
 		{
 			this.sphereCb = new System.Windows.Forms.CheckBox();
-			this.fullHdRb = new System.Windows.Forms.RadioButton();
-			this.resolutionGroup = new System.Windows.Forms.GroupBox();
-			this.fourkRb = new System.Windows.Forms.RadioButton();
 			this.StereoscopicCb = new System.Windows.Forms.CheckBox();
 			this.vrMetadataCb = new System.Windows.Forms.CheckBox();
-			this.resolutionGroup.SuspendLayout();
+			this.resoCb = new System.Windows.Forms.ComboBox();
+			this.label1 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// okBtn
 			// 
-			this.okBtn.Location = new System.Drawing.Point(116, 151);
+			this.okBtn.Location = new System.Drawing.Point(116, 112);
 			this.okBtn.TabIndex = 50;
 			// 
 			// cancelBtn
 			// 
-			this.cancelBtn.Location = new System.Drawing.Point(197, 151);
+			this.cancelBtn.Location = new System.Drawing.Point(197, 112);
 			this.cancelBtn.TabIndex = 60;
 			// 
 			// sphereCb
@@ -58,39 +56,6 @@
 			this.sphereCb.UseVisualStyleBackColor = true;
 			this.sphereCb.CheckedChanged += new System.EventHandler(this.sphereCb_CheckedChanged);
 			// 
-			// fullHdRb
-			// 
-			this.fullHdRb.AutoSize = true;
-			this.fullHdRb.Location = new System.Drawing.Point(6, 42);
-			this.fullHdRb.Name = "fullHdRb";
-			this.fullHdRb.Size = new System.Drawing.Size(84, 17);
-			this.fullHdRb.TabIndex = 20;
-			this.fullHdRb.Text = "1920 x 1080";
-			this.fullHdRb.UseVisualStyleBackColor = true;
-			this.fullHdRb.CheckedChanged += new System.EventHandler(this.fullHdRb_CheckedChanged);
-			// 
-			// resolutionGroup
-			// 
-			this.resolutionGroup.Controls.Add(this.fourkRb);
-			this.resolutionGroup.Controls.Add(this.fullHdRb);
-			this.resolutionGroup.Location = new System.Drawing.Point(12, 58);
-			this.resolutionGroup.Name = "resolutionGroup";
-			this.resolutionGroup.Size = new System.Drawing.Size(165, 69);
-			this.resolutionGroup.TabIndex = 40;
-			this.resolutionGroup.TabStop = false;
-			this.resolutionGroup.Text = "Resolution";
-			// 
-			// fourkRb
-			// 
-			this.fourkRb.AutoSize = true;
-			this.fourkRb.Location = new System.Drawing.Point(6, 19);
-			this.fourkRb.Name = "fourkRb";
-			this.fourkRb.Size = new System.Drawing.Size(84, 17);
-			this.fourkRb.TabIndex = 10;
-			this.fourkRb.Text = "3840 x 2160";
-			this.fourkRb.UseVisualStyleBackColor = true;
-			this.fourkRb.CheckedChanged += new System.EventHandler(this.fourkRb_CheckedChanged);
-			// 
 			// StereoscopicCb
 			// 
 			this.StereoscopicCb.AutoSize = true;
@@ -100,6 +65,7 @@
 			this.StereoscopicCb.TabIndex = 30;
 			this.StereoscopicCb.Text = "Stereoscopic";
 			this.StereoscopicCb.UseVisualStyleBackColor = true;
+			this.StereoscopicCb.CheckedChanged += new System.EventHandler(this.StereoscopicCb_CheckedChanged);
 			// 
 			// vrMetadataCb
 			// 
@@ -112,34 +78,52 @@
 			this.vrMetadataCb.Text = "Inject metadata";
 			this.vrMetadataCb.UseVisualStyleBackColor = true;
 			// 
+			// resoCb
+			// 
+			this.resoCb.FormattingEnabled = true;
+			this.resoCb.Location = new System.Drawing.Point(75, 65);
+			this.resoCb.Name = "resoCb";
+			this.resoCb.Size = new System.Drawing.Size(121, 21);
+			this.resoCb.TabIndex = 61;
+			this.resoCb.TextChanged += new System.EventHandler(this.resoCb_TextChanged);
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(12, 68);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(57, 13);
+			this.label1.TabIndex = 62;
+			this.label1.Text = "Resolution";
+			// 
 			// VideoExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(284, 186);
-			this.Controls.Add(this.resolutionGroup);
+			this.ClientSize = new System.Drawing.Size(284, 147);
+			this.Controls.Add(this.label1);
+			this.Controls.Add(this.resoCb);
 			this.Controls.Add(this.vrMetadataCb);
 			this.Controls.Add(this.StereoscopicCb);
 			this.Controls.Add(this.sphereCb);
 			this.Name = "VideoExportForm";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.VideoExportForm_FormClosing);
 			this.Controls.SetChildIndex(this.okBtn, 0);
 			this.Controls.SetChildIndex(this.cancelBtn, 0);
 			this.Controls.SetChildIndex(this.sphereCb, 0);
 			this.Controls.SetChildIndex(this.StereoscopicCb, 0);
 			this.Controls.SetChildIndex(this.vrMetadataCb, 0);
-			this.Controls.SetChildIndex(this.resolutionGroup, 0);
-			this.resolutionGroup.ResumeLayout(false);
-			this.resolutionGroup.PerformLayout();
+			this.Controls.SetChildIndex(this.resoCb, 0);
+			this.Controls.SetChildIndex(this.label1, 0);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 		}
 
 		#endregion
-		private System.Windows.Forms.RadioButton fullHdRb;
-		private System.Windows.Forms.GroupBox resolutionGroup;
 		public System.Windows.Forms.CheckBox StereoscopicCb;
 		private System.Windows.Forms.CheckBox sphereCb;
 		public System.Windows.Forms.CheckBox vrMetadataCb;
-		private System.Windows.Forms.RadioButton fourkRb;
+		private System.Windows.Forms.ComboBox resoCb;
+		private System.Windows.Forms.Label label1;
 	}
 }

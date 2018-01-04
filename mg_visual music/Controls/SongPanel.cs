@@ -243,15 +243,12 @@ namespace Visual_Music
 		{
 			lock (renderLock)
 			{
-				int vrWidth = options.Stereo ? 3060 : 4320;
-				Point videoFrameSize = options.Sphere ? new Point(vrWidth, vrWidth / (options.Stereo ? 1 : 2)) : options.Resolution;
-				//videoFrameSize = new Point(vrWidth, vrWidth / 2);
+				Point videoFrameSize = options.Resolution;
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
 				//videoFormat.bitRate = 160000000;
 				videoFormat.fps = 30;
 				videoFormat.aspectNumerator = 1;
 				videoFormat.audioSampleRate = 44100;
-				//videoFormat.audioSampleRate = 44100;
 				//Media.closeAudioFile();
 				if (!Media.beginVideoEnc(videoFilePath, videoFormat, true))
 				{
