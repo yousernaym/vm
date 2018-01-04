@@ -13,6 +13,7 @@ sampler  TextureSampler = sampler_state
 	texture = <Texture>;
 };
 float4 Color;
+float BlurredEdgePixels = 2;
 float BlurredEdge;
 float3 LightDir = normalize(float3(1, 1, 1));
 float AmbientAmount;
@@ -56,7 +57,6 @@ float4 blurEdges(float4 color, float normPosY)
 {
 	float normDistFromCenter = abs(normPosY - 0.5f) * 2; // 1 at edge, 0 at center
 
-	float BlurredEdgePixels = 2;
 	float ddxy = length(float2(ddx(normDistFromCenter), ddy(normDistFromCenter)));
 
 	//If line radius is less than number of pixels to blur + 2, than decrease number of pixels to blur accordingly

@@ -243,7 +243,7 @@ namespace Visual_Music
 		{
 			lock (renderLock)
 			{
-				int vrWidth = 4096;
+				int vrWidth = options.Stereo ? 3060 : 4320;
 				Point videoFrameSize = options.Sphere ? new Point(vrWidth, vrWidth / (options.Stereo ? 1 : 2)) : options.Resolution;
 				//videoFrameSize = new Point(vrWidth, vrWidth / 2);
 				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);

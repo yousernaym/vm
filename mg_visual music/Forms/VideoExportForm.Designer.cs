@@ -39,10 +39,12 @@
 			// 
 			// okBtn
 			// 
+			this.okBtn.Location = new System.Drawing.Point(116, 151);
 			this.okBtn.TabIndex = 50;
 			// 
 			// cancelBtn
 			// 
+			this.cancelBtn.Location = new System.Drawing.Point(197, 151);
 			this.cancelBtn.TabIndex = 60;
 			// 
 			// sphereCb
@@ -73,7 +75,7 @@
 			this.resolutionGroup.Controls.Add(this.fullHdRb);
 			this.resolutionGroup.Location = new System.Drawing.Point(12, 58);
 			this.resolutionGroup.Name = "resolutionGroup";
-			this.resolutionGroup.Size = new System.Drawing.Size(165, 76);
+			this.resolutionGroup.Size = new System.Drawing.Size(165, 69);
 			this.resolutionGroup.TabIndex = 40;
 			this.resolutionGroup.TabStop = false;
 			this.resolutionGroup.Text = "Resolution";
@@ -83,9 +85,9 @@
 			this.fourkRb.AutoSize = true;
 			this.fourkRb.Location = new System.Drawing.Point(6, 19);
 			this.fourkRb.Name = "fourkRb";
-			this.fourkRb.Size = new System.Drawing.Size(78, 17);
+			this.fourkRb.Size = new System.Drawing.Size(84, 17);
 			this.fourkRb.TabIndex = 10;
-			this.fourkRb.Text = "3840x2160";
+			this.fourkRb.Text = "3840 x 2160";
 			this.fourkRb.UseVisualStyleBackColor = true;
 			this.fourkRb.CheckedChanged += new System.EventHandler(this.fourkRb_CheckedChanged);
 			// 
@@ -113,7 +115,7 @@
 			// VideoExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(284, 261);
+			this.ClientSize = new System.Drawing.Size(284, 186);
 			this.Controls.Add(this.resolutionGroup);
 			this.Controls.Add(this.vrMetadataCb);
 			this.Controls.Add(this.StereoscopicCb);
