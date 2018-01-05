@@ -342,14 +342,34 @@ namespace Visual_Music
 			}
 			//Toggle force default note style
 			if (e.KeyCode == Keys.Z)
+			{
 				songPanel.ForceDefaultNoteStyle = true;
+				for (int t = 1; t < project.TrackViews.Count; t++)
+				{
+					TrackProps tprops = project.TrackViews[t].TrackProps;
+					NoteStyleEnum currentNoteStyle = (NoteStyleEnum)tprops.NoteStyleType;
+					if (tprops.SelectedNoteStyle.GetType() != typeof(NoteStyle_Bar))
+					{
+						tprops.NoteStyleType = NoteStyleEnum.Bar;
+						Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
+						tprops.NoteStyleType = currentNoteStyle;
+					}
+				}
+			}
 		}
 
 		private void Form1_KeyUp(object sender, KeyEventArgs e)
 		{
 			Project.Camera.control(e.KeyCode, false);
 			if (e.KeyCode == Keys.Z)
+			{
 				songPanel.ForceDefaultNoteStyle = false;
+				for (int t = 1; t < project.TrackViews.Count; t++)
+				{
+					TrackProps tprops = project.TrackViews[t].TrackProps;
+					Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
+				}
+			}
 		}
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)

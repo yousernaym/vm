@@ -389,7 +389,7 @@ namespace Visual_Music
 			if (notes == null)
 				return;
 
-			for (int t = 1; t < notes.Tracks.Count; t++)
+			for (int t = 1; t < trackViews.Count; t++)
 				trackViews[t].drawTrack(GlobalTrackProps, SongPanel.ForceDefaultNoteStyle);
 		}
 
