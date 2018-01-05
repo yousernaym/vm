@@ -511,7 +511,7 @@ namespace Visual_Music
 			Vector2 nextNoteStart = Project.getScreenPos(nextNote.start, nextNote.pitch);
 			if (noteEnd > nextNoteStart.X && hlNoteIndex < noteList.Count - 1)
 				noteEnd = nextNoteStart.X;
-
+			
 			if ((float)(nextNote.start - note.stop) > Qn_gapThreshold * Project.Notes.TicksPerBeat || note == nextNote)
 			{
 				if (nextNoteStart.X != noteStart.X)
@@ -531,9 +531,7 @@ namespace Visual_Music
 					Vector3 nextNoteStartVec = new Vector3(nextNoteStart.X, nextNoteStart.Y, 0);
 					Vector3 nextNoteOffset = nextNoteStartVec - noteStartVec;
 					float nextNoteOffsetLength = nextNoteOffset.Length();
-					arrowLength = nextNoteOffsetLength * ((float)noteEnd - noteStart.X) / (nextNoteStart.X - noteStart.X);
-					if (noteEnd > nextNoteStart.X)
-						arrowLength = nextNoteOffsetLength;
+					arrowLength = nextNoteOffsetLength;
 
 					arrowNormal = new Vector3(-nextNoteOffset.Y, nextNoteOffset.X, 0);
 					arrowNormal /= nextNoteOffsetLength;
@@ -553,7 +551,7 @@ namespace Visual_Music
 					arrowDir.Normalize();
 					arrowNormal = new Vector3(-arrowDir.Y, arrowDir.X, 0);
 					arrowNormal.Normalize();
-					arrowLength = (float)HlSize;
+					arrowLength = (float)HlSize*1.25f;
 					arrowStart = new Vector3(x1, y1, 0);
 				}
 
