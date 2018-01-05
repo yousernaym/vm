@@ -49,7 +49,7 @@ namespace Visual_Music
 		public bool? Continuous { get; set; } = true;
 		public LineStyleEnum? Style { get; set; } = LineStyleEnum.Simple;
 		public LineHlStyleEnum? HlStyle { get; set; } = LineHlStyleEnum.Arrow;
-		public float? HlSize { get; set; } = 25 / 1000.0f;
+		public float? HlSize { get; set; } = 40 / 1000.0f;
 		public bool? MovingHl { get; set; } = false;
 		public bool? ShrinkingHl { get; set; } = false;
 		public bool? HlBorder { get; set; } = false;
