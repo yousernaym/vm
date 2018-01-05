@@ -148,7 +148,7 @@ namespace Visual_Music
 		{
 			if (UpdatingControls)
 				return;
-			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
+			combineXYCombo.Enabled = xOriginCb.Checked && yOriginCb.Checked;
 			xOriginUd.Enabled = xOriginCb.Checked;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.XOriginEnable = xOriginCb.Checked;
@@ -158,7 +158,7 @@ namespace Visual_Music
 		{
 			if (UpdatingControls)
 				return;
-			combineXYCombo.Enabled = xOriginCb.Checked || yOriginCb.Checked;
+			combineXYCombo.Enabled = xOriginCb.Checked && yOriginCb.Checked;
 			yOriginUd.Enabled = yOriginCb.Checked;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.SelectedNoteStyle.SelectedModEntry.YOriginEnable = yOriginCb.Checked;

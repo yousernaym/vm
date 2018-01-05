@@ -854,6 +854,7 @@ namespace Visual_Music
 				getActiveTexProps(i).Path = "";
 				MessageBox.Show(ex.Message);
 			}
+			project.createOcTrees();
 			updateTrackControls();
 		}
 

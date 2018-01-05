@@ -234,10 +234,10 @@
 			// 
 			this.powerUd.DecimalPlaces = 2;
 			this.powerUd.Increment = new decimal(new int[] {
-            5,
+            25,
             0,
             0,
-            65536});
+            131072});
 			this.powerUd.Location = new System.Drawing.Point(69, 125);
 			this.powerUd.Name = "powerUd";
 			this.powerUd.Size = new System.Drawing.Size(76, 20);
