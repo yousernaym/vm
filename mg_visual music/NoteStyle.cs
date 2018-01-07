@@ -368,7 +368,7 @@ namespace Visual_Music
 			fx.Parameters["SpecPower"].SetValue((float)(Project.GlobalTrackProps.SpecPower * trackProps.SpecPower));
 
 			//Spatial props
-			fx.Parameters["PosOffset"].SetValue(Project.GlobalTrackProps.PosOffset + trackProps.PosOffset);
+			fx.Parameters["PosOffset"].SetValue((Project.GlobalTrackProps.PosOffset + trackProps.PosOffset) * Project.Camera.ViewportSize.X / 1000.0f);
 
 			//Light
 			TrackProps lightProps = (bool)trackProps.UseGlobalLight ? Project.GlobalTrackProps : trackProps;

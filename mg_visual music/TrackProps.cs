@@ -21,6 +21,7 @@ namespace Visual_Music
 		static int NumTracks { get => TrackView.NumTracks; }
 		int TrackNumber { get => TrackView.TrackNumber; }
 		static public TrackProps GlobalProps { get; set; }
+
 		internal Vector3 PosOffset
 		{
 			get => new Vector3((float)XOffset, (float)YOffset, (float)ZOffset);

@@ -44,13 +44,13 @@ namespace Visual_Music
 		static LineVertex[] hLineVerts = new LineVertex[MaxHLineVerts];
 		protected static LineHlVertex[] lineHlVerts = new LineHlVertex[4];
 
-		public float VpLineWidth => (float)LineWidth * Project.Camera.ViewportSize.X / 1000.0f;
+		float VpLineWidth => (float)LineWidth * Project.Camera.ViewportSize.X / 1000.0f;
 		public float? LineWidth { get; set; } = 5;
 		public float? Qn_gapThreshold { get; set; } = 3;
 		public bool? Continuous { get; set; } = true;
 		public LineStyleEnum? Style { get; set; } = LineStyleEnum.Simple;
 		public LineHlStyleEnum? HlStyle { get; set; } = LineHlStyleEnum.Arrow;
-		public float VpHlSize => (float)HlSize * Project.Camera.ViewportSize.X / 1000.0f;
+		float VpHlSize => (float)HlSize * Project.Camera.ViewportSize.X / 1000.0f;
 		public float? HlSize { get; set; } = 20;
 		public bool? MovingHl { get; set; } = false;
 		public bool? ShrinkingHl { get; set; } = false;

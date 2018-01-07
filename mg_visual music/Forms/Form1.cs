@@ -60,7 +60,7 @@ namespace Visual_Music
 		public SongPanel SongPanel => songPanel;
 		Project project;
 		public Project Project => project;
-		float PosOffsetScale => Project.Camera.ViewportSize.X / 100.0f; //Pos offset is in percent of screen width
+		//float PosOffsetScale => Project.Camera.ViewportSize.X / 100.0f; //Pos offset is in percent of screen width
 		Settings settings = new Settings();
 		ScrollBar songScrollBar = new HScrollBar();
 		NoteStyleControl currentNoteStyleControl;
@@ -663,9 +663,9 @@ namespace Visual_Music
 				//-------------------------------
 
 				//Spatial---------------------------------
-				setNumericUdValue(xoffsetUd, mergedTrackProps.XOffset / PosOffsetScale);
-				setNumericUdValue(yoffsetUd, mergedTrackProps.YOffset / PosOffsetScale);
-				setNumericUdValue(zoffsetUd, mergedTrackProps.ZOffset / PosOffsetScale);
+				setNumericUdValue(xoffsetUd, mergedTrackProps.XOffset);
+				setNumericUdValue(yoffsetUd, mergedTrackProps.YOffset);
+				setNumericUdValue(zoffsetUd, mergedTrackProps.ZOffset);
 
 				globalLightCb.CheckState = toCheckState(mergedTrackProps.UseGlobalLight);
 				setNumericUdValue(lightDirXUd, mergedTrackProps.LightDirX);
@@ -1379,7 +1379,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.XOffset = (float)xoffsetUd.Value * PosOffsetScale;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.XOffset = (float)xoffsetUd.Value;
 		}
 
 		private void yoffsetUd_ValueChanged(object sender, EventArgs e)
@@ -1387,7 +1387,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.YOffset = (float)yoffsetUd.Value * PosOffsetScale;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.YOffset = (float)yoffsetUd.Value;
 		}
 
 		private void zoffsetUd_ValueChanged(object sender, EventArgs e)
@@ -1395,7 +1395,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.ZOffset = (float)zoffsetUd.Value * PosOffsetScale;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.ZOffset = (float)zoffsetUd.Value;
 		}
 
 		public static CheckState toCheckState(bool? value)
