@@ -109,7 +109,7 @@ namespace Visual_Music
 			set
 			{
 				xyRatio = value;
-				viewportSize = new Vector2(2, 2 / xyRatio); 
+				viewportSize = new Vector2(1, 1 / xyRatio); 
 			}
 		}
 		Vector2 viewportSize;
@@ -168,8 +168,8 @@ namespace Visual_Music
 					pos = (Vector3)entry.Value;
 				else if (entry.Name == "angles")
 					angles = (Vector3)entry.Value;
-				else if (entry.Name == "xyRatio")
-					XYRatio = (float)entry.Value;
+				else if (entry.Name == "viewportSize")
+					ViewportSize = (Vector2)entry.Value;
 			}
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -177,7 +177,7 @@ namespace Visual_Music
 			info.AddValue("fov", Fov);
 			info.AddValue("pos", pos);
 			info.AddValue("angles", angles);
-			info.AddValue("xyRatio", xyRatio);
+			info.AddValue("viewportSize", ViewportSize);
 		}
 
 		public void update(float deltaTime)

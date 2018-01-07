@@ -45,7 +45,6 @@
 			this.label12 = new System.Windows.Forms.Label();
 			this.lineControlsPanel = new System.Windows.Forms.Panel();
 			this.continuousCb = new System.Windows.Forms.CheckBox();
-			this.modGbox.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.hlSizeUpDown)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lineWidthUd)).BeginInit();
@@ -156,6 +155,11 @@
 			// lineWidthUd
 			// 
 			this.lineWidthUd.Location = new System.Drawing.Point(64, 33);
+			this.lineWidthUd.Maximum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
 			this.lineWidthUd.Name = "lineWidthUd";
 			this.lineWidthUd.Size = new System.Drawing.Size(58, 20);
 			this.lineWidthUd.TabIndex = 20;
@@ -249,11 +253,9 @@
 			this.Controls.Add(this.lineControlsPanel);
 			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "LineStyleControl";
-			this.Size = new System.Drawing.Size(183, 335);
+			this.Size = new System.Drawing.Size(183, 347);
 			this.Controls.SetChildIndex(this.modGbox, 0);
 			this.Controls.SetChildIndex(this.lineControlsPanel, 0);
-			this.modGbox.ResumeLayout(false);
-			this.modGbox.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.hlSizeUpDown)).EndInit();
