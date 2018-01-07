@@ -44,12 +44,14 @@ namespace Visual_Music
 		static LineVertex[] hLineVerts = new LineVertex[MaxHLineVerts];
 		protected static LineHlVertex[] lineHlVerts = new LineHlVertex[4];
 
-		public float? LineWidth { get; set; } = 5 / 1000.0f;
-		public float? Qn_gapThreshold { get; set; } = 5;
+		public float VpLineWidth => (float)LineWidth * Project.Camera.ViewportSize.X / 1000.0f;
+		public float? LineWidth { get; set; } = 5;
+		public float? Qn_gapThreshold { get; set; } = 3;
 		public bool? Continuous { get; set; } = true;
 		public LineStyleEnum? Style { get; set; } = LineStyleEnum.Simple;
 		public LineHlStyleEnum? HlStyle { get; set; } = LineHlStyleEnum.Arrow;
-		public float? HlSize { get; set; } = 40 / 1000.0f;
+		public float VpHlSize => (float)HlSize * Project.Camera.ViewportSize.X / 1000.0f;
+		public float? HlSize { get; set; } = 20;
 		public bool? MovingHl { get; set; } = false;
 		public bool? ShrinkingHl { get; set; } = false;
 		public bool? HlBorder { get; set; } = false;
@@ -106,7 +108,7 @@ namespace Visual_Music
 			fx = songPanel.Content.Load<Effect>("Line");
 		}
 
-		void getCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset, float step, float x, TrackProps trackProps)
+		void getCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset, float step, float x, TrackProps trackProps, float lineWidth)
 		{
 			Vector3[] points = new Vector3[3];
 			Vector3[] tangents = new Vector3[2];
@@ -131,7 +133,7 @@ namespace Visual_Music
 				vertexOffset = new Vector3(1, 0, 0);
 			else
 				vertexOffset = normal;
-			vertexOffset *= (float)LineWidth / 2.0f;
+			vertexOffset *= lineWidth / 2.0f;
 		}
 
 		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
@@ -248,7 +250,7 @@ namespace Visual_Music
 		void setHlCirclePos(Vector3 pos)
 		{
 			fx.Parameters["WorldPos"].SetValue(pos);
-			float halfHlSize = (float)HlSize / 2.0f;
+			float halfHlSize = VpHlSize / 2.0f;
 			lineHlVerts[0].pos = new Vector3(-halfHlSize, -halfHlSize, 0) + pos;
 			lineHlVerts[1].pos = new Vector3(halfHlSize, -halfHlSize, 0) + pos;
 			lineHlVerts[2].pos = new Vector3(-halfHlSize, halfHlSize, 0) + pos;
@@ -278,6 +280,7 @@ namespace Visual_Music
 			int vertIndex = 3;
 			int hLineVertIndex = 0;
 			int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
+			float vpLineWidth = VpLineWidth;
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				//Get current note
@@ -319,12 +322,12 @@ namespace Visual_Music
 				for (float x = startDraw; x < endDraw; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
-					getCurvePoint(out center, out normal, out vertexOffset, step, x, trackProps);
+					getCurvePoint(out center, out normal, out vertexOffset, step, x, trackProps, vpLineWidth);
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
 
 					//Create vertices
-					//adjustCurvePoint(center, vertexOffset, -1, trackProps, lineVerts, vertIndex, step);
-					//adjustCurvePoint(center, vertexOffset, 1, trackProps, lineVerts, vertIndex + 1, step);
+					//adjustCurvePoint(center, vertexOffset, -1, trackProps, lineVerts, vertIndex, step, vpLineWidth);
+					//adjustCurvePoint(center, vertexOffset, 1, trackProps, lineVerts, vertIndex + 1, step, vpLineWidth);
 					lineVerts[vertIndex].pos = center - vertexOffset;
 					lineVerts[vertIndex + 1].pos = center + vertexOffset;
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
@@ -334,7 +337,7 @@ namespace Visual_Music
 					lineVerts[vertIndex + 1].normPos = new Vector2(normStepFromNoteStart, 1);
 
 					if (texTrackProps.TexProps.Texture != null)
-						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, (float)LineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
+						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
 					if (Style == LineStyleEnum.Ribbon)
 					{
@@ -366,7 +369,7 @@ namespace Visual_Music
 					vertIndex += 2;
 					if (vertIndex >= MaxLineVerts - 2 || hLineVertIndex >= MaxHLineVerts - 2)
 					{
-						createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
+						createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
 						x -= step;
 					}
 				}
@@ -374,18 +377,18 @@ namespace Visual_Music
 				if (!(bool)Continuous)
 					endOfSegment = true; //One draw call per note. Can be used to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
 				if (endOfSegment)
-					createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
+					createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
 
 				completeNoteListIndex++;
 			}
-			createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
+			createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
 		}
 
-		void adjustCurvePoint(Vector3 center, Vector3 vertexOffset, int side, TrackProps trackProps, LineVertex[] lineVerts, int vertIndex, float step)
+		void adjustCurvePoint(Vector3 center, Vector3 vertexOffset, int side, TrackProps trackProps, LineVertex[] lineVerts, int vertIndex, float step, float lineWidth)
 		{
 			Vector3 curPos = center + vertexOffset * side;
 			Vector3 dummyCenter, dummyNormal, newVerteexOffset;
-			getCurvePoint(out dummyCenter, out dummyNormal, out newVerteexOffset, step, curPos.X, trackProps);
+			getCurvePoint(out dummyCenter, out dummyNormal, out newVerteexOffset, step, curPos.X, trackProps, lineWidth);
 			float newPosX = curPos.X + newVerteexOffset.X * side;
 
 			lineVerts[vertIndex].pos = curPos;
@@ -426,9 +429,9 @@ namespace Visual_Music
 			}
 		}
 
-		void createLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo)
+		void createLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo, float lineWidth)
 		{
-			if (LineWidth > 0)
+			if (lineWidth > 0)
 			{
 				if (numVerts > 5 || numHLineVerts > 1)
 				{
@@ -463,9 +466,9 @@ namespace Visual_Music
 			//this.trackProps = trackProps;
 
 			fx.Parameters["Style"].SetValue((int)Style);
-			fx.Parameters["HlSize"].SetValue((float)HlSize / 2.0f);
+			fx.Parameters["HlSize"].SetValue(VpHlSize / 2.0f);
 			songPanel.GraphicsDevice.BlendState = songPanel.BlendState;
-			float radius = (float)LineWidth / 2.0f;
+			float radius = (float)VpLineWidth / 2.0f;
 			fx.Parameters["Radius"].SetValue(radius);
 			fx.Parameters["InnerHlSize"].SetValue(0.0f);
 
@@ -551,14 +554,14 @@ namespace Visual_Music
 					arrowDir.Normalize();
 					arrowNormal = new Vector3(-arrowDir.Y, arrowDir.X, 0);
 					arrowNormal.Normalize();
-					arrowLength = (float)HlSize*1.25f;
+					arrowLength = VpHlSize * 1.25f;  //Make arrow 25% longer than wide
 					arrowStart = new Vector3(x1, y1, 0);
 				}
 
-				float arrowWidth = (float)HlSize * 0.5f;
+				float halfArrowWidth = VpHlSize * 0.5f;
 
-				lineHlVerts[0].pos = arrowStart + arrowNormal * arrowWidth;
-				lineHlVerts[1].pos = arrowStart - arrowNormal * arrowWidth;
+				lineHlVerts[0].pos = arrowStart + arrowNormal * halfArrowWidth;
+				lineHlVerts[1].pos = arrowStart - arrowNormal * halfArrowWidth;
 				lineHlVerts[2].pos = arrowStart + arrowDir * arrowLength;
 
 				fx.Parameters["ArrowDir"].SetValue(arrowDir);
@@ -589,7 +592,7 @@ namespace Visual_Music
 			}
 
 			fx.Parameters["ClipPercent"].SetValue(shrinkPercent);
-			float innerHlSize = (float)HlSize * 0.5f * (1 - shrinkPercent);
+			float innerHlSize = VpHlSize * 0.5f * (1 - shrinkPercent);
 			fx.Parameters["InnerHlSize"].SetValue(innerHlSize);
 
 			Color hlColor;
@@ -626,20 +629,6 @@ namespace Visual_Music
 				fx.CurrentTechnique.Passes[0].Apply();
 				songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, lineHlVerts, 0, 2);
 			}
-		}
-
-		void drawLineSegment(ref int numVerts, ref int numHLineVerts)
-		{
-			if (LineWidth > 0)
-			{
-				if (numVerts > 5 || numHLineVerts > 1)
-				{
-					fx.CurrentTechnique = fx.Techniques["Line"];
-					fx.CurrentTechnique.Passes[0].Apply();
-				}
-			}
-			numVerts = 3;
-			numHLineVerts = 0;
 		}
 
 		float calcLerpFactor(int x, int x1, int x2)

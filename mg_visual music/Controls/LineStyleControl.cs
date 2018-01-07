@@ -10,7 +10,7 @@ namespace Visual_Music
 {
 	public partial class LineStyleControl : NoteStyleControl
 	{
-		float SizeScale => SongPanel.Project.Camera.ViewportSize.X / 1000;
+		//float SizeScale => SongPanel.Project.Camera.ViewportSize.X / 1000;
 		public LineStyleControl()
 		{
 			InitializeComponent();
@@ -31,7 +31,7 @@ namespace Visual_Music
 			else
 				lineStyleList.SelectedIndex = (int)noteStyle_Line.Style;
 
-			Form1.setNumericUdValue(lineWidthUd, noteStyle_Line.LineWidth / SizeScale);
+			Form1.setNumericUdValue(lineWidthUd, noteStyle_Line.LineWidth);
 			Form1.setNumericUdValue(qnGapFillUd, noteStyle_Line.Qn_gapThreshold);
 			continuousCb.CheckState = Form1.toCheckState(noteStyle_Line.Continuous);
 			if (noteStyle_Line.HlStyle == null)
@@ -39,7 +39,7 @@ namespace Visual_Music
 			else
 				lineHlStyleList.SelectedIndex = (int)noteStyle_Line.HlStyle;
 
-			Form1.setNumericUdValue(hlSizeUpDown, noteStyle_Line.HlSize / SizeScale);
+			Form1.setNumericUdValue(hlSizeUpDown, noteStyle_Line.HlSize);
 			movingHlCb.CheckState = Form1.toCheckState(noteStyle_Line.MovingHl);
 			shrinkingHlCb.CheckState = Form1.toCheckState(noteStyle_Line.ShrinkingHl);
 			hlBorderCb.CheckState = Form1.toCheckState(noteStyle_Line.HlBorder);
@@ -61,7 +61,7 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().LineWidth = (float)lineWidthUd.Value * SizeScale;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().LineWidth = (float)lineWidthUd.Value;
 			SongPanel.Project.createOcTrees();
 		}
 
@@ -88,7 +88,7 @@ namespace Visual_Music
 			if (UpdatingControls)
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().HlSize = (float)hlSizeUpDown.Value * SizeScale;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.getLineNoteStyle().HlSize = (float)hlSizeUpDown.Value;
 		}
 
 		private void movingHlCb_CheckedChanged(object sender, EventArgs e)
