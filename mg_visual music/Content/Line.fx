@@ -39,8 +39,8 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.texCoords = IN.texCoords - TexScrollOffset;
 	
 	OUT.pos = float4(IN.pos.xy, 0, 1);
-	OUT.pos.x *= VertWidthScale;
 	OUT.pos.xyz += PosOffset;
+	OUT.pos.x *= VertWidthScale;
 	OUT.pos.x -= SongPos;
 	OUT.pos = mul(OUT.pos, VpMat);
 }

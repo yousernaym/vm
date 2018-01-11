@@ -464,6 +464,7 @@ namespace Visual_Music
 		{
 			foreach (int index in indices)
 				trackViews[index].TrackProps.resetProps();
+			createOcTrees();
 		}
 
 		double secondsToTicks(double seconds)

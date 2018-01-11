@@ -1083,12 +1083,13 @@ namespace Visual_Music
 		{
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.resetStyle();
+			project.createOcTrees();
 			updateTrackControls();
 		}
 
 		private void resetBtn_Click(object sender, EventArgs e)
 		{
-			unloadTexBtn_Click(null, null);
+			unloadTexBtn.PerformClick();// _Click(null, null);
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.resetMaterial();
 			updateTrackControls();
