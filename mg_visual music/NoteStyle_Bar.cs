@@ -70,7 +70,7 @@ namespace Visual_Music
 			fx = songPanel.Content.Load<Effect>("Bar");
 		}
 
-		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
+		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, Material texMaterial)
 		{
 			BarGeo barGeo = new BarGeo();
 			geo = barGeo;
@@ -107,7 +107,7 @@ namespace Visual_Music
 				if (texture != null) //Unnecessary because texture is never null. Can revert to default 1x1 white pixel.
 				{
 					Vector2 texSize = new Vector2(texture.Width, texture.Height);
-					calcRectTexCoords(out topLeft_tex, out size_tex, texSize, topLeft_world, size_world, texTrackProps);
+					calcRectTexCoords(out topLeft_tex, out size_tex, texSize, topLeft_world, size_world, texMaterial);
 				}
 				instanceVerts[instanceIndex].destRect = new Vector4(topLeft_world.X, topLeft_world.Y, size_world.X, size_world.Y);
 				instanceVerts[instanceIndex].srcRect = new Vector4(topLeft_tex.X, topLeft_tex.Y, size_tex.X, size_tex.Y);
@@ -139,16 +139,16 @@ namespace Visual_Music
 			}
 		}
 
-		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
+		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, Material texMaterial)
 		{
 			float songPosP;
-			base.drawTrack(midiTrack, trackProps, texTrackProps, out songPosP);
+			base.drawTrack(midiTrack, trackProps, texMaterial, out songPosP);
 			Color color;
 			Texture2D texture;
 			getMaterial(trackProps, false, out color, out texture);
 			fx.Parameters["Texture"].SetValue(texture);
 			fx.Parameters["Color"].SetValue(color.ToVector4());
-			Color hlColor = trackProps.getColor(true, Project.GlobalTrackProps, true);
+			Color hlColor = trackProps.Material.getColor(true, Project.GlobalTrackProps.Material, true);
 			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
 
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);

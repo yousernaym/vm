@@ -22,57 +22,9 @@ namespace Visual_Music
 		int TrackNumber { get => TrackView.TrackNumber; }
 		static public TrackProps GlobalProps { get; set; }
 
-		internal Vector3 PosOffset
-		{
-			get => new Vector3((float)XOffset, (float)YOffset, (float)ZOffset);
-			private set
-			{
-				XOffset = value.X;
-				YOffset = value.Y;
-				ZOffset = value.Z;
-			}
-		}
-		public float? XOffset { get; set; }
-		public float? YOffset { get; set; }
-		public float? ZOffset { get; set; }
-
-		TrackPropsTex texProps = new TrackPropsTex();
-		public TrackPropsTex TexProps
-		{
-			get { return texProps; }
-			set { texProps = value; }
-		}
-		TrackPropsTex hmapProps = new TrackPropsTex();
-		public TrackPropsTex HmapProps
-		{
-			get { return hmapProps; }
-			set { hmapProps = value; }
-		}
-		public TrackPropsTex getTexProps(int selector)
-		{
-			if (selector == 0)
-				return texProps;
-			else
-				return hmapProps;
-		}
-
-		float? transp;
-		public float? Transp
-		{
-			get { return transp; }
-			set { transp = value; }
-		}
-		float? hue;
-		public float? Hue
-		{
-			get { return hue; }
-			set { hue = value; }
-		}
 		public NoteStyleEnum? NoteStyleType { get; set; }
 		NoteStyle[] noteStyles = new NoteStyle[Enum.GetNames(typeof(NoteStyleEnum)).Length];
 
-		//NoteStyle_Bar barNoteStyle;
-		//NoteStyle_Line lineNoteStyle;
 		internal NoteStyle SelectedNoteStyle
 		{
 			get
@@ -104,61 +56,9 @@ namespace Visual_Music
 			}
 		}
 
-		NoteTypeMaterial normal;
-		public NoteTypeMaterial Normal
-		{
-			get { return normal; }
-			set { normal = value; }
-		}
-		NoteTypeMaterial hilited;
-		public NoteTypeMaterial Hilited
-		{
-			get { return hilited; }
-			set { hilited = value; }
-		}
-
-		bool? useGlobalLight;
-		public bool? UseGlobalLight
-		{
-			get { return useGlobalLight; }
-			set { useGlobalLight = value; }
-		}
-		
-		internal Vector3 LightDir
-		{
-			get => new Vector3((float)LightDirX, (float)LightDirY, (float)LightDirZ);
-			set
-			{
-				LightDirX = value.X;
-				LightDirY = value.Y;
-				LightDirZ = value.Z;
-			}
-		}
-		
-		public float? LightDirX { get; set; }
-		public float? LightDirY { get; set; }
-		public float? LightDirZ { get; set; }
-
-		public float? AmbientAmount { get; set; }
-		public float? DiffuseAmount { get; set; }
-		float? specAmount;
-		public float? SpecAmount
-		{
-			get { return specAmount; }
-			set { specAmount = value; }
-		}
-		float? specPower;
-		public float? SpecPower
-		{
-			get { return specPower; }
-			set { specPower = value; }
-		}
-		//float specFov;
-		//public float SpecFov
-		//{
-		//	get { return specFov; }
-		//	set { specFov = value; }
-		//}
+		public Material Material { get; set; } = new Material();
+		public Light Light { get; set; } = new Light();
+		public Spatial Spatial { get; set; } = new Spatial();
 
 		public TrackProps(TrackView view)
 		{
@@ -170,83 +70,31 @@ namespace Visual_Music
 		{
 			foreach (SerializationEntry entry in info)
 			{
-				if (entry.Name == "transp")
-					transp = (float)entry.Value;
-				else if (entry.Name == "hue")
-					hue = (float)entry.Value;
-				else if (entry.Name == "normal")
-					normal = (NoteTypeMaterial)entry.Value;
-				else if (entry.Name == "hilited")
-					hilited = (NoteTypeMaterial)entry.Value;
-				else if (entry.Name == "texProps")
-					texProps = (TrackPropsTex)entry.Value;
-				else if (entry.Name == "hmapProps")
-					hmapProps = (TrackPropsTex)entry.Value;
-				else if (entry.Name == "noteStyles")
+				if (entry.Name == "noteStyles")
 					noteStyles = (NoteStyle[])entry.Value;
 				else if (entry.Name == "noteStyleType")
 					NoteStyleType = (NoteStyleEnum)entry.Value;
-				else if (entry.Name == "lightDir")
-					LightDir = (Vector3)entry.Value;
-				else if (entry.Name == "ambientAmount")
-					AmbientAmount = (float)entry.Value;
-				else if (entry.Name == "diffuseAmount")
-					DiffuseAmount = (float)entry.Value;
-				else if (entry.Name == "specAmount")
-					specAmount = (float)entry.Value;
-				else if (entry.Name == "specPower")
-					specPower = (float)entry.Value;
-				else if (entry.Name == "useGlobalLight")
-					useGlobalLight = (bool)entry.Value;
-				else if (entry.Name == "posOffset")
-					PosOffset = (Vector3)entry.Value;
+				else if (entry.Name == "material")
+					Material = (Material)entry.Value;
+				else if (entry.Name == "light")
+					Light = (Light)entry.Value;
+				else if (entry.Name == "spatial")
+					Spatial = (Spatial)entry.Value;
 			}
-			
-			//foreach (NoteStyle ns in noteStyles)
-			//{
-			//	if (ns != null)
-			//		ns.TrackProps = this;
-			//}
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
-			info.AddValue("transp", transp);
-			info.AddValue("hue", hue);
-			info.AddValue("normal", normal);
-			info.AddValue("hilited", hilited);
-			info.AddValue("texProps", texProps);
-			info.AddValue("hmapProps", hmapProps);
 			info.AddValue("noteStyles", noteStyles);
 			info.AddValue("noteStyleType", NoteStyleType);
-			//info.AddValue("lineStyleProps", lineStyleProps);
-			//info.AddValue("curve", curve);
-			info.AddValue("lightDir", LightDir);
-			info.AddValue("ambientAmount", AmbientAmount);
-			info.AddValue("diffuseAmount", DiffuseAmount);
-			info.AddValue("specAmount", specAmount);
-			info.AddValue("specPower", specPower);
-			//info.AddValue("specFov", specFov);
-			info.AddValue("useGlobalLight", useGlobalLight);
-			info.AddValue("posOffset", PosOffset);
+			info.AddValue("material", Material);
+			info.AddValue("light", Light);
+			info.AddValue("spatial", Spatial);
 		}
 
 		public void loadContent(SongPanel songPanel)
 		{
-			//Deserialization inits trackProps.texPath but not trackProps.texture because Texture2D is not serializable, and you can't load texture before the device is created.
-			string path = TexProps.Path;
-			try
-			{
-				if (!string.IsNullOrEmpty(path))
-					TexProps.loadTexture(path, songPanel);
-				path = HmapProps.Path;
-				if (!string.IsNullOrEmpty(path))
-					HmapProps.loadTexture(path, songPanel);
-			}
-			catch (Exception)
-			{
-				MessageBox.Show("Failed to load texture " + path);
-			}
+			Material.loadContent(songPanel);
 		}
 
 		public TrackProps clone()
@@ -289,56 +137,28 @@ namespace Visual_Music
 			if (TrackNumber == 0)
 			{
 				NoteStyleType = NoteStyleEnum.Bar;
-				UseGlobalLight = false;
+				//UseGlobalLight = false;
 			}
 			else
 			{
 				NoteStyleType = NoteStyleEnum.Default;
-				UseGlobalLight = true;
+				//UseGlobalLight = true;
 			}
 		}
 
 		public void resetMaterial()
 		{
-			texProps.unloadTexture();
-			texProps = new TrackPropsTex();
-			if (TrackNumber == 0)
-			{
-				transp = 1;
-				hue = 0.1f;
-				normal = new NoteTypeMaterial(1, 0.27f);
-				hilited = new NoteTypeMaterial(0.8f, 0.75f);
-				AmbientAmount = 0;
-				DiffuseAmount = 2;
-				specAmount = 1;
-				specPower = 50;
-			}
-			else
-			{
-				transp = 0.5f;
-				hue = (float)(TrackNumber - 1) / (NumTracks - 1);
-				normal = new NoteTypeMaterial();
-				hilited = new NoteTypeMaterial(); ;
-				AmbientAmount = 1;
-				DiffuseAmount = 1;
-				specAmount = 1;
-				specPower = 1;
-			}
-
+			Material.reset(TrackNumber, NumTracks);
 		}
 
 		public void resetLight()
 		{
-			if (TrackNumber == 0)
-				UseGlobalLight = false;
-			else
-				UseGlobalLight = true;
-			LightDir = new Vector3(-1, -1, 1);
+			Light.reset(TrackNumber);
 		}
 
 		public void resetSpatial()
 		{
-			PosOffset = new Vector3();
+			Spatial.reset();
 		}
 
 		public void resetProps()
@@ -361,77 +181,14 @@ namespace Visual_Music
 		{
 			return (NoteStyle_Line)noteStyles[(int)NoteStyleEnum.Line];
 		}
-		public Texture2D getTexture(bool bhilited, TrackProps globalProps)
-		{
-			Texture2D tex;
-			if (bhilited && hilited.Texture != null)
-				tex = hilited.Texture;
-			else if (!bhilited && normal.Texture != null)
-				tex = normal.Texture;
-			else
-				tex = texProps.Texture;
-			if (tex == null)
-			{
-				if (globalProps == null) //This means texture in globalProps was null, so use default noteStyle texture
-				{
-
-				}
-				else
-					tex = globalProps.getTexture(bhilited, null);
-			}
-			return tex;
-		}
-		public System.Drawing.Color getSysColor(bool bhilited, TrackProps globalProps)
-		{
-			Color c = getColor(bhilited, globalProps, false);
-			return System.Drawing.Color.FromArgb(c.R, c.G, c.B);
-		}
-		public Color getColor(bool bhilited, TrackProps globalProps, bool alpha)
-		{
-			double h, s, l;
-			NoteTypeMaterial tp2;
-			NoteTypeMaterial globalTp2;
-			if (bhilited)
-			{
-				tp2 = hilited;
-				globalTp2 = globalProps.hilited;
-			}
-			else
-			{
-				tp2 = normal;
-				globalTp2 = globalProps.normal;
-			}
-			h = (double)(hue + globalProps.hue);
-			if (h > 1) h -= 1;
-			if (h < 0) h += 1;
-			s = (double)(tp2.Sat * globalTp2.Sat);
-			l = (double)(tp2.Lum * globalTp2.Lum);
-			if (s > 1)
-				s = 1;
-			if (l > 1)
-				l = 1;
-			Color c = SongPanel.HSLA2RGBA(h, s, l, alpha ? (float)(transp * globalProps.transp) : 1);
-
-			//c *= (transp * globalProps.transp * 255);
-			return c;
-		}
 	}
 
 	[Serializable()]
 	public class TrackPropsTex : ISerializable
 	{
-		Texture2D texture = null;
-		public Texture2D Texture
-		{
-			get { return texture; }
-			set { texture = value; }
-		}
-		string path = "";
-		public string Path
-		{
-			get { return path; }
-			set { path = value; }
-		}
+		public Texture2D Texture { get; set; } = null;
+		public string Path { get; set; } = "";
+		
 		SamplerState samplerState = new SamplerState();
 		SamplerState samplerStateBacking = new SamplerState();
 		bool dirtySamplerState = true;
@@ -522,7 +279,7 @@ namespace Visual_Music
 		}
 		public TrackPropsTex(SerializationInfo info, StreamingContext ctxt)
 		{
-			path = (string)info.GetValue("path", typeof(string));
+			Path = (string)info.GetValue("path", typeof(string));
 			PointSmp = (bool)info.GetValue("PointSmp", typeof(bool));
 			keepAspect = (bool)info.GetValue("keepAspect", typeof(bool));
 			uTile = (bool)info.GetValue("uTile", typeof(bool));
@@ -532,7 +289,7 @@ namespace Visual_Music
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
-			info.AddValue("path", path);
+			info.AddValue("path", Path);
 			info.AddValue("PointSmp", PointSmp);
 			info.AddValue("keepAspect", keepAspect);
 			info.AddValue("uTile", uTile);
@@ -555,38 +312,52 @@ namespace Visual_Music
 			return outTex;
 		}
 
-		public bool loadTexture(string _path, FileStream stream, SongPanel songPanel)
+		public bool loadTexture(string path, FileStream stream, SongPanel songPanel)
 		{
-			path = _path;
-			Texture2D tex = texture;
+			Path = path;
+			Texture2D tex = Texture;
 			if (tex != null)
 			{
 				tex.Dispose();
 				tex = null;
 			}
 			tex = Texture2D.FromStream(songPanel.GraphicsDevice, stream);
-			texture = createMipLevels(tex, songPanel);
+			Texture = createMipLevels(tex, songPanel);
 			//trackProps[index].Texture = tex;
 			return tex != null;
 		}
 
-		public bool loadTexture(string _path, SongPanel songPanel)
+		public bool loadTexture(string path, SongPanel songPanel)
 		{
 			using (FileStream stream = File.Open(path, FileMode.Open))
 			{
-				return loadTexture(_path, stream, songPanel);
+				return loadTexture(path, stream, songPanel);
 			}
 		}
 		public void unloadTexture()
 		{
-			path = "";
-			if (texture != null)
+			Path = "";
+			if (Texture != null)
 			{
-				texture.Dispose();
-				texture = null;
+				Texture.Dispose();
+				Texture = null;
 			}
 		}
-    }
+
+		internal void loadContent(SongPanel songPanel)
+		{
+			//Deserialization inits PJath but not Texture because Texture2D is not serializable, and you can't load texture before the device is created.
+			try
+			{
+				if (!string.IsNullOrEmpty(Path))
+					loadTexture(Path, songPanel);
+			}
+			catch (Exception)
+			{
+				MessageBox.Show("Failed to load texture " + Path);
+			}
+		}
+	}
 
 	[Serializable()]
 	public class NoteTypeMaterial : ISerializable
@@ -645,4 +416,261 @@ namespace Visual_Music
 			info.AddValue("texture", texture);
 		}
 	}
+
+	//---------------------------------------
+	//Tab props
+
+	[Serializable()]
+	public class Material : ISerializable
+	{
+		public float? Transp { get; set; }
+		public float? Hue { get; set; }
+		NoteTypeMaterial normal;
+		public NoteTypeMaterial Normal { get => normal; set => normal = value; }
+		public NoteTypeMaterial Hilited { get; set; }
+		public TrackPropsTex TexProps { get; set; } = new TrackPropsTex();
+		public TrackPropsTex HmapProps { get; set; } = new TrackPropsTex();
+		
+		public float? AmbientAmount { get; set; }
+		public float? DiffuseAmount { get; set; }
+		public float? SpecAmount { get; set; }
+		public float? SpecPower { get; set; }
+
+		public Material()
+		{
+
+		}
+
+		public Material(SerializationInfo info, StreamingContext ctxt)
+		{
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "transp")
+					Transp = (float)entry.Value;
+				else if (entry.Name == "hue")
+					Hue = (float)entry.Value;
+				else if (entry.Name == "normal")
+					Normal = (NoteTypeMaterial)entry.Value;
+				else if (entry.Name == "hilited")
+					Hilited = (NoteTypeMaterial)entry.Value;
+				else if (entry.Name == "texProps")
+					TexProps = (TrackPropsTex)entry.Value;
+				else if (entry.Name == "hmapProps")
+					HmapProps = (TrackPropsTex)entry.Value;
+				else if (entry.Name == "ambientAmount")
+					AmbientAmount = (float)entry.Value;
+				else if (entry.Name == "diffuseAmount")
+					DiffuseAmount = (float)entry.Value;
+				else if (entry.Name == "specAmount")
+					SpecAmount = (float)entry.Value;
+				else if (entry.Name == "specPower")
+					SpecPower = (float)entry.Value;
+			}
+		}
+
+		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+		{
+			info.AddValue("transp", Transp);
+			info.AddValue("hue", Hue);
+			info.AddValue("normal", Normal);
+			info.AddValue("hilited", Hilited);
+			info.AddValue("texProps", TexProps);
+			info.AddValue("hmapProps", HmapProps);
+			info.AddValue("ambientAmount", AmbientAmount);
+			info.AddValue("diffuseAmount", DiffuseAmount);
+			info.AddValue("specAmount", SpecAmount);
+			info.AddValue("specPower", SpecPower);
+		}
+
+		internal void loadContent(SongPanel songPanel)
+		{
+			TexProps.loadContent(songPanel);
+			HmapProps.loadContent(songPanel);
+		}
+
+		public Texture2D getTexture(bool bhilited, Material globalMaterial)
+		{
+			Texture2D tex;
+			if (bhilited && Hilited.Texture != null)
+				tex = Hilited.Texture;
+			else if (!bhilited && Normal.Texture != null)
+				tex = Normal.Texture;
+			else
+				tex = TexProps.Texture;
+			if (tex == null)
+			{
+				if (globalMaterial == null) //This means texture in globalProps was null, so use default note type texture
+				{
+
+				}
+				else
+					tex = globalMaterial.getTexture(bhilited, null);
+			}
+			return tex;
+		}
+		public System.Drawing.Color getSysColor(bool bhilited, Material globalMaterial)
+		{
+			Color c = getColor(bhilited, globalMaterial, false);
+			return System.Drawing.Color.FromArgb(c.R, c.G, c.B);
+		}
+		public Color getColor(bool bhilited, Material globalMaterial, bool alpha)
+		{
+			double h, s, l;
+			NoteTypeMaterial tp2;
+			NoteTypeMaterial globalTp2;
+			if (bhilited)
+			{
+				tp2 = Hilited;
+				globalTp2 = globalMaterial.Hilited;
+			}
+			else
+			{
+				tp2 = Normal;
+				globalTp2 = globalMaterial.Normal;
+			}
+			h = (double)(Hue + globalMaterial.Hue);
+			if (h > 1) h -= 1;
+			if (h < 0) h += 1;
+			s = (double)(tp2.Sat * globalTp2.Sat);
+			l = (double)(tp2.Lum * globalTp2.Lum);
+			if (s > 1)
+				s = 1;
+			if (l > 1)
+				l = 1;
+			Color c = SongPanel.HSLA2RGBA(h, s, l, alpha ? (float)(Transp * globalMaterial.Transp) : 1);
+
+			//c *= (transp * globalProps.transp * 255);
+			return c;
+		}
+
+		public TrackPropsTex getTexProps(int selector)
+		{
+			if (selector == 0)
+				return TexProps;
+			else
+				return HmapProps;
+		}
+
+		public void reset(int trackNumber, int numTracks)
+		{
+			TexProps.unloadTexture();
+			TexProps = new TrackPropsTex();
+			if (trackNumber == 0)
+			{
+				Transp = 1;
+				Hue = 0.1f;
+				Normal = new NoteTypeMaterial(1, 0.27f);
+				Hilited = new NoteTypeMaterial(0.8f, 0.75f);
+				AmbientAmount = 0;
+				DiffuseAmount = 2;
+				SpecAmount = 1;
+				SpecPower = 50;
+			}
+			else
+			{
+				Transp = 0.5f;
+				Hue = (float)(trackNumber - 1) / (numTracks - 1);
+				Normal = new NoteTypeMaterial();
+				Hilited = new NoteTypeMaterial(); ;
+				AmbientAmount = 1;
+				DiffuseAmount = 1;
+				SpecAmount = 1;
+				SpecPower = 1;
+			}
+		}
+	}
+
+	[Serializable()]
+	public class Light : ISerializable
+	{
+		public bool? UseGlobalLight { get; set; }
+		internal Vector3 Dir
+		{
+			get => new Vector3((float)DirX, (float)DirY, (float)DirZ);
+			set
+			{
+				DirX = value.X;
+				DirY = value.Y;
+				DirZ = value.Z;
+			}
+		}
+
+		public float? DirX { get; set; }
+		public float? DirY { get; set; }
+		public float? DirZ { get; set; }
+
+		public Light()
+		{
+
+		}
+
+		public Light(SerializationInfo info, StreamingContext ctxt)
+		{
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "dir")
+					Dir = (Vector3)entry.Value;
+				else if (entry.Name == "useGlobalLight")
+					UseGlobalLight = (bool)entry.Value;
+			}
+		}
+
+		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+		{
+			info.AddValue("dir", Dir);
+			info.AddValue("useGlobalLight", UseGlobalLight);
+		}
+
+		public void reset(int trackNumber)
+		{
+			if (trackNumber == 0)
+				UseGlobalLight = false;
+			else
+				UseGlobalLight = true;
+			Dir = new Vector3(-1, -1, 1);
+		}
+	}
+
+	[Serializable()]
+	public class Spatial : ISerializable
+	{
+		internal Vector3 PosOffset
+		{
+			get => new Vector3((float)XOffset, (float)YOffset, (float)ZOffset);
+			private set
+			{
+				XOffset = value.X;
+				YOffset = value.Y;
+				ZOffset = value.Z;
+			}
+		}
+		public float? XOffset { get; set; }
+		public float? YOffset { get; set; }
+		public float? ZOffset { get; set; }
+
+		public Spatial()
+		{
+
+		}
+
+		public Spatial(SerializationInfo info, StreamingContext ctxt)
+		{
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "posOffset")
+					PosOffset = (Vector3)entry.Value;
+			}
+		}
+
+		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+		{
+			info.AddValue("posOffset", PosOffset);
+		}
+
+		public void reset()
+		{
+			PosOffset = new Vector3();
+		}
+	}
+
 }

@@ -262,7 +262,7 @@ namespace Visual_Music
 		//	return typeof(T).GetProperties()[0].Name;
 		//}
 
-		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
+		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, Material texMaterial)
 		{
 			LineGeo lineGeo = new LineGeo();
 			geo = lineGeo;
@@ -336,8 +336,8 @@ namespace Visual_Music
 					lineVerts[vertIndex].normPos = new Vector2(normStepFromNoteStart, 0);
 					lineVerts[vertIndex + 1].normPos = new Vector2(normStepFromNoteStart, 1);
 
-					if (texTrackProps.TexProps.Texture != null)
-						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texTrackProps.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
+					if (texMaterial.TexProps.Texture != null)
+						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texMaterial.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
 					if (Style == LineStyleEnum.Ribbon)
 					{
@@ -453,11 +453,11 @@ namespace Visual_Music
 			}
 		}
 
-		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps)
+		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, Material texMaterial)
 		{
 			float songPosP;
 
-			base.drawTrack(midiTrack, trackProps, texTrackProps, out songPosP);
+			base.drawTrack(midiTrack, trackProps, texMaterial, out songPosP);
 			List<Midi.Note> noteList = midiTrack.Notes;
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			if (noteList.Count == 0)
@@ -480,7 +480,7 @@ namespace Visual_Music
 
 			//Texture scrolling including adjustment for screen anchoring
 			Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
-			TrackPropsTex texProps = texTrackProps.TexProps;
+			TrackPropsTex texProps = texMaterial.TexProps;
 			Vector2 texScrollOffset = Project.SongPosB * texProps.Scroll;
 			if (texProps.UAnchor == TexAnchorEnum.Screen)
 				texScrollOffset.X += (songPosP + Project.Camera.ViewportSize.X / 2) / ((bool)texProps.UTile ? texSize.X : Project.Camera.ViewportSize.X);

@@ -276,8 +276,8 @@ namespace Visual_Music
 			defaultTextures[(int)NoteStyleEnum.Line].normal = defaultTextures[(int)NoteStyleEnum.Bar].normal;
 		}
 		public abstract void loadFx();
-		//abstract public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, TrackProps texTrackProps);
-		public abstract void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps);
+		//abstract public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, Material texMaterial);
+		public abstract void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, Material texMaterial);
 		public abstract void drawGeoChunk(Geo geo);
 
 		protected void getMaterial(TrackProps trackProps, float x1, float x2, out Color color, out Texture2D texture)
@@ -289,8 +289,8 @@ namespace Visual_Music
 		}
 		protected void getMaterial(TrackProps trackProps, bool bHilited, out Color color, out Texture2D texture)
 		{
-			color = trackProps.getColor(bHilited, Project.GlobalTrackProps, true);
-			texture = trackProps.getTexture(bHilited, Project.GlobalTrackProps);
+			color = trackProps.Material.getColor(bHilited, Project.GlobalTrackProps.Material, true);
+			texture = trackProps.Material.getTexture(bHilited, Project.GlobalTrackProps.Material);
 			if (texture == null)
 			{
 				if (bHilited)
@@ -304,12 +304,12 @@ namespace Visual_Music
 			return track.getNotes(Project.SongPosT - Project.ViewWidthT / 2 - leftMargin, Project.SongPosT + Project.ViewWidthT / 2 + leftMargin);
 		}
 
-		abstract public void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps);
+		abstract public void drawTrack(Midi.Track midiTrack, TrackProps trackProps, Material texMaterial);
 
-		protected void drawTrack(Midi.Track midiTrack, TrackProps trackProps, TrackProps texTrackProps, out float songPosP)
+		protected void drawTrack(Midi.Track midiTrack, TrackProps trackProps, Material texMaterial, out float songPosP)
 		{
-			songPanel.GraphicsDevice.SamplerStates[0] = texTrackProps.TexProps.SamplerState;
-			songPanel.GraphicsDevice.SamplerStates[1] = texTrackProps.HmapProps.SamplerState;
+			songPanel.GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
+			songPanel.GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
@@ -321,7 +321,7 @@ namespace Visual_Music
 			fx.Parameters["ProjScale"].SetValue(new Vector2(Project.Camera.ProjMat.M11, Project.Camera.ProjMat.M22));
 
 			fx.Parameters["VertWidthScale"].SetValue(Project.VertWidthScale);
-			//fx.Parameters["TexWidthScale"].SetValue(texTrackProps.TexProps.UAnchor == TexAnchorEnum.Screen ? VertWidthScale : 1);
+			//fx.Parameters["TexWidthScale"].SetValue(texMaterial.TexProps.UAnchor == TexAnchorEnum.Screen ? VertWidthScale : 1);
 
 			//Common notestyle props
 			//EffectParameterCollection fxModEntries = fx.Parameters["ModEntries"].Elements;
@@ -362,25 +362,25 @@ namespace Visual_Music
 			}
 
 			//Material
-			fx.Parameters["AmbientAmount"].SetValue((float)(Project.GlobalTrackProps.AmbientAmount * trackProps.AmbientAmount));
-			fx.Parameters["DiffuseAmount"].SetValue((float)(Project.GlobalTrackProps.DiffuseAmount * trackProps.DiffuseAmount));
-			fx.Parameters["SpecAmount"].SetValue((float)(Project.GlobalTrackProps.SpecAmount * trackProps.SpecAmount));
-			fx.Parameters["SpecPower"].SetValue((float)(Project.GlobalTrackProps.SpecPower * trackProps.SpecPower));
-
-			//Spatial props
-			fx.Parameters["PosOffset"].SetValue((Project.GlobalTrackProps.PosOffset + trackProps.PosOffset) * Project.Camera.ViewportSize.X / 1000.0f);
+			fx.Parameters["AmbientAmount"].SetValue((float)(Project.GlobalTrackProps.Material.AmbientAmount * trackProps.Material.AmbientAmount));
+			fx.Parameters["DiffuseAmount"].SetValue((float)(Project.GlobalTrackProps.Material.DiffuseAmount * trackProps.Material.DiffuseAmount));
+			fx.Parameters["SpecAmount"].SetValue((float)(Project.GlobalTrackProps.Material.SpecAmount * trackProps.Material.SpecAmount));
+			fx.Parameters["SpecPower"].SetValue((float)(Project.GlobalTrackProps.Material.SpecPower * trackProps.Material.SpecPower));
 
 			//Light
-			TrackProps lightProps = (bool)trackProps.UseGlobalLight ? Project.GlobalTrackProps : trackProps;
-			Vector3 normLightDir = lightProps.LightDir;
+			TrackProps lightProps = (bool)trackProps.Light.UseGlobalLight ? Project.GlobalTrackProps : trackProps;
+			Vector3 normLightDir = lightProps.Light.Dir;
 			normLightDir.Normalize();
 			fx.Parameters["LightDir"].SetValue(normLightDir);
+
+			//Spatial props
+			fx.Parameters["PosOffset"].SetValue((Project.GlobalTrackProps.Spatial.PosOffset + trackProps.Spatial.PosOffset) * Project.Camera.ViewportSize.X / 1000.0f);
 
 			fx.Parameters["CamPos"].SetValue(Project.Camera.Pos);
 		}
 
-		//public abstract void createGeoChunk(BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, TrackProps texTrackProps);
-		
+		//public abstract void createGeoChunk(BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, Material texMaterial);
+
 		public void addModEntry(bool selectItem, string name = "")
 		{
 			if (string.IsNullOrWhiteSpace(name))
@@ -412,36 +412,36 @@ namespace Visual_Music
 
 		}
 
-		protected void calcRectTexCoords(out Vector2 topLeft_tex, out Vector2 size_tex, Vector2 texSize, Vector2 topLeft_world, Vector2 size_world, TrackProps texTrackProps)
+		protected void calcRectTexCoords(out Vector2 topLeft_tex, out Vector2 size_tex, Vector2 texSize, Vector2 topLeft_world, Vector2 size_world, Material texMaterial)
 		{
-			topLeft_tex = calcTexCoords(texSize, topLeft_world, size_world, new Vector2(0, 0), texTrackProps);
-			size_tex = calcTexCoords(texSize, topLeft_world, size_world, size_world, texTrackProps) - topLeft_tex;
+			topLeft_tex = calcTexCoords(texSize, topLeft_world, size_world, new Vector2(0, 0), texMaterial);
+			size_tex = calcTexCoords(texSize, topLeft_world, size_world, size_world, texMaterial) - topLeft_tex;
 
-			if ((bool)texTrackProps.TexProps.KeepAspect)
+			if ((bool)texMaterial.TexProps.KeepAspect)
 			{
 				float uTexelsPerPixel = size_tex.X * texSize.X / size_world.X;
 				float vTexelsPerPixel = size_tex.Y * texSize.Y / size_world.Y;
 				float uvRatio = -uTexelsPerPixel / vTexelsPerPixel;
-				if ((bool)texTrackProps.TexProps.UTile && !(bool)texTrackProps.TexProps.VTile)
+				if ((bool)texMaterial.TexProps.UTile && !(bool)texMaterial.TexProps.VTile)
 				{
 					topLeft_tex.X = topLeft_tex.X / uvRatio;
 					size_tex.X = size_tex.X / uvRatio;
 				}
-				else if (!(bool)texTrackProps.TexProps.UTile && (bool)texTrackProps.TexProps.VTile)
+				else if (!(bool)texMaterial.TexProps.UTile && (bool)texMaterial.TexProps.VTile)
 				{
 					topLeft_tex.Y = topLeft_tex.Y * uvRatio;
 					size_tex.Y = size_tex.Y * uvRatio;
 				}
 			}
-			topLeft_tex -= Project.SongPosB * texTrackProps.TexProps.Scroll;
+			topLeft_tex -= Project.SongPosB * texMaterial.TexProps.Scroll;
 		}
 
-		protected Vector2 calcTexCoords(Vector2 texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, TrackProps texTrackProps)
+		protected Vector2 calcTexCoords(Vector2 texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, Material texMaterial)
 		{
 			Vector2 coords = new Vector2();
 			float songPosP = Project.getScreenPosX(Project.SongPosT);
-			coords.X = calcTexCoordComponent(texSize.X, Project.Camera.ViewportSize.X, notePos.X - songPosP, noteSize.X, posOffset.X, (bool)texTrackProps.TexProps.UTile, (TexAnchorEnum)texTrackProps.TexProps.UAnchor);
-			coords.Y = calcTexCoordComponent(texSize.Y, Project.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texTrackProps.TexProps.VTile, (TexAnchorEnum)texTrackProps.TexProps.VAnchor);
+			coords.X = calcTexCoordComponent(texSize.X, Project.Camera.ViewportSize.X, notePos.X - songPosP, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor);
+			coords.Y = calcTexCoordComponent(texSize.Y, Project.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texMaterial.TexProps.VTile, (TexAnchorEnum)texMaterial.TexProps.VAnchor);
 			coords.Y *= -1;
 			return coords;
 		}
