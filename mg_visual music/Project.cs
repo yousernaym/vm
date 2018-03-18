@@ -445,9 +445,11 @@ namespace Visual_Music
 					propertyInfo.SetValue(first, subMerge);
 					if (propertyInfo.Name == "NoteStyleType" && subMerge != null && (NoteStyleEnum)subMerge != NoteStyleEnum.Default)
 					{
-						((TrackProps)first).SelectedNoteStyle = (NoteStyle)mergeObjects(((TrackProps)first).SelectedNoteStyle, ((TrackProps)second).SelectedNoteStyle);
-						if (((TrackProps)first).SelectedNoteStyle.ModEntries.Count != ((TrackProps)second).SelectedNoteStyle.ModEntries.Count)
-							((TrackProps)first).SelectedNoteStyle.ModEntries = null;
+						TrackProps firstProps = (TrackProps)first;
+						NoteStyle secondStyle = ((TrackProps)second).SelectedNoteStyle;
+						firstProps.SelectedNoteStyle = (NoteStyle)mergeObjects(firstProps.SelectedNoteStyle, secondStyle);
+						if (secondStyle == null || firstProps.SelectedNoteStyle.ModEntries != null && firstProps.SelectedNoteStyle.ModEntries.Count != secondStyle.ModEntries.Count)
+							firstProps.SelectedNoteStyle.ModEntries = null;
 					}
 					else if (propertyInfo.Name == "SelectedModEntryIndex" && subMerge != null && (int)subMerge != -1)
 						((NoteStyle)first).SelectedModEntry = (NoteStyleMod)mergeObjects(((NoteStyle)first).SelectedModEntry, ((NoteStyle)second).SelectedModEntry);

@@ -113,6 +113,8 @@ namespace Visual_Music
 
 		public void drawTrack(TrackProps globalTrackProps, bool defaultStyle)
 		{
+			if (midiTrack.Notes.Count == 0)
+				return;
 			TrackProps texTrackProps = TrackProps.getTexture(false, null) != null ? TrackProps : globalTrackProps;
 			if (defaultStyle)
 				TrackProps.getNoteStyle(NoteStyleEnum.Bar).drawTrack(midiTrack, TrackProps, texTrackProps);
