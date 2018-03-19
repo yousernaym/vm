@@ -1,6 +1,7 @@
 ﻿Todo:
 - Bump mapping.
 - (Fix alpha blending.) Fix line vertices at turns.
+- Fix fadeout-to-discard. Non-black edges.
 
 Done:
 - Use static vertex buffers for bar style.

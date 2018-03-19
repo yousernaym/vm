@@ -115,11 +115,11 @@ namespace Visual_Music
 		{
 			if (midiTrack.Notes.Count == 0)
 				return;
-			Material texMaterial = TrackProps.Material.getTexture(false, null) != null ? TrackProps.Material : globalTrackProps.Material;
+			MaterialProps texMaterial = TrackProps.MaterialProps.getTexture(false, null) != null ? TrackProps.MaterialProps : globalTrackProps.MaterialProps;
 			if (defaultStyle)
-				TrackProps.getNoteStyle(NoteStyleEnum.Bar).drawTrack(midiTrack, TrackProps, texMaterial);
+				TrackProps.StyleProps.getStyle(NoteStyleType.Bar).drawTrack(midiTrack, TrackProps, texMaterial);
 			else
-				TrackProps.SelectedNoteStyle.drawTrack(midiTrack, TrackProps, texMaterial);
+				TrackProps.ActiveNoteStyle.drawTrack(midiTrack, TrackProps, texMaterial);
 		}
 
 		public void createOcTree(Project project, TrackProps globalTrackProps)
@@ -134,11 +134,11 @@ namespace Visual_Music
 			//Todo: use posOffset.z for z-component
 			Vector3 minPos = new Vector3(minPos2d.X, minPos2d.Y, 0);
 			Vector3 maxPos = new Vector3(maxPos2d.X, maxPos2d.Y, 0);
-			Material texMaterial = TrackProps.Material.getTexture(false, null) != null ? TrackProps.Material : globalTrackProps.Material;
+			MaterialProps texMaterial = TrackProps.MaterialProps.getTexture(false, null) != null ? TrackProps.MaterialProps : globalTrackProps.MaterialProps;
 
 			if (ocTree != null)
 				ocTree.dispose();
-			NoteStyle noteStyle = TrackProps.SelectedNoteStyle;
+			NoteStyle noteStyle = TrackProps.ActiveNoteStyle;
 			ocTree = new OcTree<Geo>(minPos, maxPos - minPos, new Vector3(1000, 1000, 1000), noteStyle.createGeoChunk, noteStyle.drawGeoChunk);
 			ocTree.createGeo(midiTrack, TrackProps, globalTrackProps, texMaterial);
 			//TrackProps.SelectedNoteStyle.createOcTree(minPos, maxPos - minPos, midiTrack, songDrawProps, globalTrackProps, TrackProps, texMaterial);

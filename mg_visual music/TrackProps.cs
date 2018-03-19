@@ -15,50 +15,23 @@ namespace Visual_Music
 	public enum TexAnchorEnum { Note = 0, Screen, Song };
 
 	[Serializable()]
-	public class TrackProps : ISerializable
+	public class TrackProps : CloneableProps<TrackProps>, ISerializable
 	{
 		internal TrackView TrackView { get; set; }
 		static int NumTracks { get => TrackView.NumTracks; }
 		int TrackNumber { get => TrackView.TrackNumber; }
 		static public TrackProps GlobalProps { get; set; }
 
-		public NoteStyleEnum? NoteStyleType { get; set; }
-		NoteStyle[] noteStyles = new NoteStyle[Enum.GetNames(typeof(NoteStyleEnum)).Length];
-
-		internal NoteStyle SelectedNoteStyle
+		internal NoteStyle ActiveNoteStyle
 		{
-			get
-			{
-				if (NoteStyleType == NoteStyleEnum.Default)
-				{
-					if (TrackNumber == 0)  //Global track
-						return getBarNoteStyle();
-					else
-						return GlobalProps.SelectedNoteStyle;
-				}
-				else
-					return getNoteStyle(NoteStyleType);
-			}
-			set
-			{
-				if (value.GetType() == typeof(NoteStyle_Bar))
-				{
-					NoteStyleType = NoteStyleEnum.Bar;
-					noteStyles[(int)NoteStyleEnum.Bar] = value;
-				}
-				else if (value.GetType() == typeof(NoteStyle_Bar))
-				{
-					NoteStyleType = NoteStyleEnum.Line;
-					noteStyles[(int)NoteStyleEnum.Line] = value;
-				}
-				else if (value == null)
-					NoteStyleType = NoteStyleEnum.Default;
-			}
+			get => StyleProps.getActiveStyle(TrackNumber, GlobalProps);
+			//set => Style.setSelectedNoteStyle(value);
 		}
 
-		public Material Material { get; set; } = new Material();
-		public Light Light { get; set; } = new Light();
-		public Spatial Spatial { get; set; } = new Spatial();
+		public StyleProps StyleProps { get; set; } = new StyleProps();
+		public MaterialProps MaterialProps { get; set; } = new MaterialProps();
+		public LightProps LightProps { get; set; } = new LightProps();
+		public SpatialProps SpatialProps { get; set; } = new SpatialProps();
 
 		public TrackProps(TrackView view)
 		{
@@ -70,95 +43,57 @@ namespace Visual_Music
 		{
 			foreach (SerializationEntry entry in info)
 			{
-				if (entry.Name == "noteStyles")
-					noteStyles = (NoteStyle[])entry.Value;
-				else if (entry.Name == "noteStyleType")
-					NoteStyleType = (NoteStyleEnum)entry.Value;
+				if (entry.Name == "style")
+					StyleProps = (StyleProps)entry.Value;
 				else if (entry.Name == "material")
-					Material = (Material)entry.Value;
+					MaterialProps = (MaterialProps)entry.Value;
 				else if (entry.Name == "light")
-					Light = (Light)entry.Value;
+					LightProps = (LightProps)entry.Value;
 				else if (entry.Name == "spatial")
-					Spatial = (Spatial)entry.Value;
+					SpatialProps = (SpatialProps)entry.Value;
 			}
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
-			info.AddValue("noteStyles", noteStyles);
-			info.AddValue("noteStyleType", NoteStyleType);
-			info.AddValue("material", Material);
-			info.AddValue("light", Light);
-			info.AddValue("spatial", Spatial);
+			info.AddValue("style", StyleProps);
+			info.AddValue("material", MaterialProps);
+			info.AddValue("light", LightProps);
+			info.AddValue("spatial", SpatialProps);
 		}
 
 		public void loadContent(SongPanel songPanel)
 		{
-			Material.loadContent(songPanel);
+			MaterialProps.loadContent(songPanel);
 		}
 
-		public TrackProps clone()
+		new public TrackProps clone()
 		{
-			DataContractSerializer dcs = new DataContractSerializer(typeof(TrackProps), Form1.projectSerializationTypes);
-			MemoryStream stream = new MemoryStream();
-			dcs.WriteObject(stream, this);
-			stream.Flush();
-			stream.Position = 0;
 			TrackView tv = TrackView;
-			TrackProps dest = (TrackProps)dcs.ReadObject(stream);
-			//dest.MidiTrack = midiTrack;
-			dest.loadNoteStyleFx();
+			TrackProps dest = base.clone();
+			dest.StyleProps.loadFx();
 			dest.TrackView = tv;
 			return dest;
 		}
 
-		public void loadNoteStyleFx()
-		{
-			foreach (NoteStyle ns in noteStyles)
-			{
-				if (ns != null)
-					ns.loadFx();
-			}
-		}
-
-
 		public void resetStyle()
 		{
-			int[] styleTypes = (int[])Enum.GetValues(typeof(NoteStyleEnum));
-			string[] styleNames = (string[])Enum.GetNames(typeof(NoteStyleEnum));
-			for (int i = 0; i < noteStyles.Length; i++)
-			{
-				if ((NoteStyleEnum)styleTypes[i] != NoteStyleEnum.Default)
-				{
-					noteStyles[i] = (NoteStyle)Activator.CreateInstance(Type.GetType("Visual_Music.NoteStyle_" + styleNames[i]));
-					noteStyles[i].loadFx();
-				}
-			}
-			if (TrackNumber == 0)
-			{
-				NoteStyleType = NoteStyleEnum.Bar;
-				//UseGlobalLight = false;
-			}
-			else
-			{
-				NoteStyleType = NoteStyleEnum.Default;
-				//UseGlobalLight = true;
-			}
+			StyleProps.reset(TrackNumber);
 		}
 
 		public void resetMaterial()
 		{
-			Material.reset(TrackNumber, NumTracks);
+			MaterialProps.reset(TrackNumber, NumTracks);
 		}
 
 		public void resetLight()
 		{
-			Light.reset(TrackNumber);
+			LightProps.reset(TrackNumber);
 		}
 
 		public void resetSpatial()
 		{
-			Spatial.reset();
+			SpatialProps.reset();
 		}
 
 		public void resetProps()
@@ -167,19 +102,6 @@ namespace Visual_Music
 			resetStyle();
 			resetLight();
 			resetSpatial();
-		}
-
-		public NoteStyle getNoteStyle(NoteStyleEnum? styleType)
-		{
-			return noteStyles[(int)styleType];
-		}
-		public NoteStyle_Bar getBarNoteStyle()
-		{
-			return (NoteStyle_Bar)noteStyles[(int)NoteStyleEnum.Bar];
-		}
-		public NoteStyle_Line getLineNoteStyle()
-		{
-			return (NoteStyle_Line)noteStyles[(int)NoteStyleEnum.Line];
 		}
 	}
 
@@ -421,7 +343,122 @@ namespace Visual_Music
 	//Tab props
 
 	[Serializable()]
-	public class Material : ISerializable
+	public class StyleProps : CloneableProps<StyleProps>, ISerializable
+	{
+		public NoteStyleType? Type { get; set; }
+		NoteStyle[] styles = new NoteStyle[Enum.GetNames(typeof(NoteStyleType)).Length];
+
+		public StyleProps()
+		{
+
+		}
+		public StyleProps(SerializationInfo info, StreamingContext ctxt)
+		{
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "noteStyles")
+					styles = (NoteStyle[])entry.Value;
+				else if (entry.Name == "noteStyleType")
+					Type = (NoteStyleType)entry.Value;
+			}
+		}
+
+		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+		{
+			info.AddValue("noteStyles", styles);
+			info.AddValue("noteStyleType", Type);
+		}
+
+		public NoteStyle getActiveStyle(int trackNumber, TrackProps globalProps)
+		{
+			if (Type == NoteStyleType.Default)
+			{
+				if (trackNumber == 0)  //Global track
+					return getBarStyle();
+				else
+					return globalProps.ActiveNoteStyle;
+			}
+			else
+				return getStyle(Type);
+		}
+
+		internal NoteStyle SelectedStyle
+		{
+			get => getStyle(Type);
+			set
+			{
+				if (value.GetType() == typeof(NoteStyle_Bar))
+				{
+					Type = NoteStyleType.Bar;
+					styles[(int)NoteStyleType.Bar] = value;
+				}
+				else if (value.GetType() == typeof(NoteStyle_Line))
+				{
+					Type = NoteStyleType.Line;
+					styles[(int)NoteStyleType.Line] = value;
+				}
+				else if (value == null)
+					Type = NoteStyleType.Default;
+			}
+		}
+
+		public NoteStyle getStyle(NoteStyleType? type)
+		{
+			return styles[(int)type];
+		}
+		public NoteStyle_Bar getBarStyle()
+		{
+			return (NoteStyle_Bar)styles[(int)NoteStyleType.Bar];
+		}
+		public NoteStyle_Line getLineStyle()
+		{
+			return (NoteStyle_Line)styles[(int)NoteStyleType.Line];
+		}
+
+		public void loadFx()
+		{
+			foreach (NoteStyle ns in styles)
+			{
+				if (ns != null)
+					ns.loadFx();
+			}
+		}
+
+
+		public void reset(int trackNumber)
+		{
+			int[] styleTypes = (int[])Enum.GetValues(typeof(NoteStyleType));
+			string[] styleNames = (string[])Enum.GetNames(typeof(NoteStyleType));
+			for (int i = 0; i < styles.Length; i++)
+			{
+				if ((NoteStyleType)styleTypes[i] != NoteStyleType.Default)
+				{
+					styles[i] = (NoteStyle)Activator.CreateInstance(System.Type.GetType("Visual_Music.NoteStyle_" + styleNames[i]));
+					styles[i].loadFx();
+				}
+			}
+			if (trackNumber == 0)
+			{
+				Type = NoteStyleType.Bar;
+				//UseGlobalLight = false;
+			}
+			else
+			{
+				Type = NoteStyleType.Default;
+				//UseGlobalLight = true;
+			}
+		}
+
+		new public StyleProps clone()
+		{
+			StyleProps dest = base.clone();
+			dest.loadFx();
+			return dest;
+		}
+	}
+
+	[Serializable()]
+	public class MaterialProps : CloneableProps<MaterialProps>, ISerializable
 	{
 		public float? Transp { get; set; }
 		public float? Hue { get; set; }
@@ -436,12 +473,12 @@ namespace Visual_Music
 		public float? SpecAmount { get; set; }
 		public float? SpecPower { get; set; }
 
-		public Material()
+		public MaterialProps()
 		{
 
 		}
 
-		public Material(SerializationInfo info, StreamingContext ctxt)
+		public MaterialProps(SerializationInfo info, StreamingContext ctxt)
 		{
 			foreach (SerializationEntry entry in info)
 			{
@@ -488,7 +525,7 @@ namespace Visual_Music
 			HmapProps.loadContent(songPanel);
 		}
 
-		public Texture2D getTexture(bool bhilited, Material globalMaterial)
+		public Texture2D getTexture(bool bhilited, MaterialProps globalMaterial)
 		{
 			Texture2D tex;
 			if (bhilited && Hilited.Texture != null)
@@ -508,12 +545,12 @@ namespace Visual_Music
 			}
 			return tex;
 		}
-		public System.Drawing.Color getSysColor(bool bhilited, Material globalMaterial)
+		public System.Drawing.Color getSysColor(bool bhilited, MaterialProps globalMaterial)
 		{
 			Color c = getColor(bhilited, globalMaterial, false);
 			return System.Drawing.Color.FromArgb(c.R, c.G, c.B);
 		}
-		public Color getColor(bool bhilited, Material globalMaterial, bool alpha)
+		public Color getColor(bool bhilited, MaterialProps globalMaterial, bool alpha)
 		{
 			double h, s, l;
 			NoteTypeMaterial tp2;
@@ -581,7 +618,7 @@ namespace Visual_Music
 	}
 
 	[Serializable()]
-	public class Light : ISerializable
+	public class LightProps : CloneableProps<LightProps>, ISerializable
 	{
 		public bool? UseGlobalLight { get; set; }
 		internal Vector3 Dir
@@ -599,12 +636,12 @@ namespace Visual_Music
 		public float? DirY { get; set; }
 		public float? DirZ { get; set; }
 
-		public Light()
+		public LightProps()
 		{
 
 		}
 
-		public Light(SerializationInfo info, StreamingContext ctxt)
+		public LightProps(SerializationInfo info, StreamingContext ctxt)
 		{
 			foreach (SerializationEntry entry in info)
 			{
@@ -632,7 +669,7 @@ namespace Visual_Music
 	}
 
 	[Serializable()]
-	public class Spatial : ISerializable
+	public class SpatialProps : CloneableProps<SpatialProps>, ISerializable
 	{
 		internal Vector3 PosOffset
 		{
@@ -648,12 +685,12 @@ namespace Visual_Music
 		public float? YOffset { get; set; }
 		public float? ZOffset { get; set; }
 
-		public Spatial()
+		public SpatialProps()
 		{
 
 		}
 
-		public Spatial(SerializationInfo info, StreamingContext ctxt)
+		public SpatialProps(SerializationInfo info, StreamingContext ctxt)
 		{
 			foreach (SerializationEntry entry in info)
 			{
@@ -670,6 +707,19 @@ namespace Visual_Music
 		public void reset()
 		{
 			PosOffset = new Vector3();
+		}
+	}
+
+	abstract public class CloneableProps<T>
+	{
+		public T clone()
+		{
+			DataContractSerializer dcs = new DataContractSerializer(typeof(T), Form1.projectSerializationTypes);
+			MemoryStream stream = new MemoryStream();
+			dcs.WriteObject(stream, this);
+			stream.Flush();
+			stream.Position = 0;
+			return (T)dcs.ReadObject(stream);
 		}
 	}
 

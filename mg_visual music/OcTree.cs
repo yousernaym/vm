@@ -15,7 +15,7 @@ namespace Visual_Music
 		//protected VertexBuffer vertexBuffers;
 		protected Vector3 _minSize;
 
-		public delegate void CreateGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, Material texMaterial);
+		public delegate void CreateGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
 		public delegate void DrawGeoChunk(Geo geo);
 		CreateGeoChunk _createGeoChunk;
 		DrawGeoChunk _drawGeoChunk;
@@ -78,7 +78,7 @@ namespace Visual_Music
 			return true;
 		}
 
-		public void createGeo(Midi.Track midiTrack, TrackProps trackProps, TrackProps globalTrackProps, Material texMaterial)
+		public void createGeo(Midi.Track midiTrack, TrackProps trackProps, TrackProps globalTrackProps, MaterialProps texMaterial)
 		{
 			_createGeoChunk(out _geo, _bbox, midiTrack, trackProps, texMaterial);
 			return;
@@ -130,8 +130,8 @@ namespace Visual_Music
 			foreach (var bbox in _geo.bboxes)
 			{
 				BoundingBox bb = bbox;
-				bb.Min += trackProps.Spatial.PosOffset + TrackProps.GlobalProps.Spatial.PosOffset;
-				bb.Max += trackProps.Spatial.PosOffset + TrackProps.GlobalProps.Spatial.PosOffset;
+				bb.Min += trackProps.SpatialProps.PosOffset + TrackProps.GlobalProps.SpatialProps.PosOffset;
+				bb.Max += trackProps.SpatialProps.PosOffset + TrackProps.GlobalProps.SpatialProps.PosOffset;
 				bb.Min.X -= songPos;
 				bb.Max.X -= songPos;
 				if (bb.Intersects(frustum))

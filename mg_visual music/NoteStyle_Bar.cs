@@ -49,12 +49,12 @@ namespace Visual_Music
 
 		public NoteStyle_Bar()
 		{
-			styleType = NoteStyleEnum.Bar;
+			styleType = NoteStyleType.Bar;
 		}
 		public NoteStyle_Bar(TrackProps tprops)
 			: base(tprops)
 		{
-			styleType = NoteStyleEnum.Bar;
+			styleType = NoteStyleType.Bar;
 		}
 		public NoteStyle_Bar(SerializationInfo info, StreamingContext ctxt)
 			: base(info, ctxt)
@@ -70,7 +70,7 @@ namespace Visual_Music
 			fx = songPanel.Content.Load<Effect>("Bar");
 		}
 
-		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, Material texMaterial)
+		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)
 		{
 			BarGeo barGeo = new BarGeo();
 			geo = barGeo;
@@ -139,7 +139,7 @@ namespace Visual_Music
 			}
 		}
 
-		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, Material texMaterial)
+		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)
 		{
 			float songPosP;
 			base.drawTrack(midiTrack, trackProps, texMaterial, out songPosP);
@@ -148,7 +148,7 @@ namespace Visual_Music
 			getMaterial(trackProps, false, out color, out texture);
 			fx.Parameters["Texture"].SetValue(texture);
 			fx.Parameters["Color"].SetValue(color.ToVector4());
-			Color hlColor = trackProps.Material.getColor(true, Project.GlobalTrackProps.Material, true);
+			Color hlColor = trackProps.MaterialProps.getColor(true, Project.GlobalTrackProps.MaterialProps, true);
 			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
 
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);

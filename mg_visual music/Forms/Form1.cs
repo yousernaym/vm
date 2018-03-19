@@ -55,7 +55,7 @@ namespace Visual_Music
 		public TpartyIntegrationForm tpartyIntegrationForm;
 		VideoExportForm vidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(Material), typeof(Light), typeof(Spatial), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleEnum), typeof(List<TrackView>), typeof(Midi.FileType), typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType) };
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineStyleEnum), typeof(LineHlStyleEnum), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType) };
         SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
 		Project project;
@@ -94,8 +94,8 @@ namespace Visual_Music
             songScrollBar.BringToFront();
 
             initSongPanel(songPanel);
-            Array enumArray = Enum.GetValues(typeof(NoteStyleEnum));
-            foreach (NoteStyleEnum nse in enumArray)
+            Array enumArray = Enum.GetValues(typeof(NoteStyleType));
+            foreach (NoteStyleType nse in enumArray)
                 styleList.Items.Add(nse.ToString());
 
 			addInvalidateEH(this.Controls);
@@ -347,12 +347,12 @@ namespace Visual_Music
 				for (int t = 1; t < project.TrackViews.Count; t++)
 				{
 					TrackProps tprops = project.TrackViews[t].TrackProps;
-					NoteStyleEnum currentNoteStyle = (NoteStyleEnum)tprops.NoteStyleType;
-					if (tprops.SelectedNoteStyle.GetType() != typeof(NoteStyle_Bar))
+					NoteStyleType currentNoteStyle = (NoteStyleType)tprops.StyleProps.Type;
+					if (tprops.ActiveNoteStyle.GetType() != typeof(NoteStyle_Bar))
 					{
-						tprops.NoteStyleType = NoteStyleEnum.Bar;
+						tprops.StyleProps.Type = NoteStyleType.Bar;
 						Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
-						tprops.NoteStyleType = currentNoteStyle;
+						tprops.StyleProps.Type = currentNoteStyle;
 					}
 				}
 			}
@@ -507,7 +507,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i=0;i<trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.Transp = value / 100.0f;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.Transp = value / 100.0f;
 			updateTrackListColors();
 		}
 
@@ -518,7 +518,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.Hue = value / (float)(hueSlider.Maximum + 1);
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.Hue = value / (float)(hueSlider.Maximum + 1);
 			updateTrackListColors();
 		}
 
@@ -529,7 +529,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.Normal.Sat = value / 100.0f;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.Normal.Sat = value / 100.0f;
 			updateTrackListColors();
 
 		}
@@ -541,7 +541,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.Normal.Lum = value / 100.0f;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.Normal.Lum = value / 100.0f;
 			updateTrackListColors();
 		}
 
@@ -552,7 +552,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.Hilited.Sat = value / 100.0f;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.Hilited.Sat = value / 100.0f;
 			updateTrackListColors();
 		}
 
@@ -563,7 +563,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.Hilited.Lum = value / 100.0f;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.Hilited.Lum = value / 100.0f;
 			updateTrackListColors();
 		}
 		void loadMtrlTexInPb()
@@ -609,23 +609,23 @@ namespace Visual_Music
 			if (mergedTrackProps != null)
 			{
 				//Note style-----------------
-				if (mergedTrackProps.NoteStyleType == null)
+				if (mergedTrackProps.StyleProps.Type == null)
 					styleList.SelectedIndex = -1;
 				else
-					styleList.SelectedIndex = (int)mergedTrackProps.NoteStyleType;
+					styleList.SelectedIndex = (int)mergedTrackProps.StyleProps.Type;
 				if (currentNoteStyleControl != null)
-					currentNoteStyleControl.update(mergedTrackProps.SelectedNoteStyle);
+					currentNoteStyleControl.update(mergedTrackProps.ActiveNoteStyle);
 				//barStyleControl.update(selectedTrackProps.getBarNoteStyle());
 				//lineStyleControl.update(selectedTrackProps.getLineNoteStyle());
 				//--------------------------------------------
 
 				//Material-----------------------------------
-				transpTb.Text = normToIntText(mergedTrackProps.Material.Transp);
-				hueTb.Text = normToIntText(mergedTrackProps.Material.Hue, 101);
-				normalSatTb.Text = normToIntText(mergedTrackProps.Material.Normal.Sat);
-				normalLumTb.Text = normToIntText(mergedTrackProps.Material.Normal.Lum);
-				hiliteSatTb.Text = normToIntText(mergedTrackProps.Material.Hilited.Sat);
-				hiliteLumTb.Text = normToIntText(mergedTrackProps.Material.Hilited.Lum);
+				transpTb.Text = normToIntText(mergedTrackProps.MaterialProps.Transp);
+				hueTb.Text = normToIntText(mergedTrackProps.MaterialProps.Hue, 101);
+				normalSatTb.Text = normToIntText(mergedTrackProps.MaterialProps.Normal.Sat);
+				normalLumTb.Text = normToIntText(mergedTrackProps.MaterialProps.Normal.Lum);
+				hiliteSatTb.Text = normToIntText(mergedTrackProps.MaterialProps.Hilited.Sat);
+				hiliteLumTb.Text = normToIntText(mergedTrackProps.MaterialProps.Hilited.Lum);
 
 				//Texture
 				TrackPropsTex texProps = getActiveTexProps(mergedTrackProps);
@@ -656,21 +656,21 @@ namespace Visual_Music
 				setNumericUdValue(texVScrollUD, texProps.VScroll);
 
 				//Lighting
-				setNumericUdValue(ambientAmountUd, mergedTrackProps.Material.AmbientAmount);
-				setNumericUdValue(diffuseAmountUd, mergedTrackProps.Material.DiffuseAmount);
-				setNumericUdValue(specAmountUd, mergedTrackProps.Material.SpecAmount);
-				setNumericUdValue(specPowUd, mergedTrackProps.Material.SpecPower);
+				setNumericUdValue(ambientAmountUd, mergedTrackProps.MaterialProps.AmbientAmount);
+				setNumericUdValue(diffuseAmountUd, mergedTrackProps.MaterialProps.DiffuseAmount);
+				setNumericUdValue(specAmountUd, mergedTrackProps.MaterialProps.SpecAmount);
+				setNumericUdValue(specPowUd, mergedTrackProps.MaterialProps.SpecPower);
 				//-------------------------------
 
 				//Spatial---------------------------------
-				setNumericUdValue(xoffsetUd, mergedTrackProps.Spatial.XOffset);
-				setNumericUdValue(yoffsetUd, mergedTrackProps.Spatial.YOffset);
-				setNumericUdValue(zoffsetUd, mergedTrackProps.Spatial.ZOffset);
+				setNumericUdValue(xoffsetUd, mergedTrackProps.SpatialProps.XOffset);
+				setNumericUdValue(yoffsetUd, mergedTrackProps.SpatialProps.YOffset);
+				setNumericUdValue(zoffsetUd, mergedTrackProps.SpatialProps.ZOffset);
 
-				globalLightCb.CheckState = toCheckState(mergedTrackProps.Light.UseGlobalLight);
-				setNumericUdValue(lightDirXUd, mergedTrackProps.Light.DirX);
-				setNumericUdValue(lightDirYUd, mergedTrackProps.Light.DirY);
-				setNumericUdValue(lightDirZUd, mergedTrackProps.Light.DirZ);
+				globalLightCb.CheckState = toCheckState(mergedTrackProps.LightProps.UseGlobalLight);
+				setNumericUdValue(lightDirXUd, mergedTrackProps.LightProps.DirX);
+				setNumericUdValue(lightDirYUd, mergedTrackProps.LightProps.DirY);
+				setNumericUdValue(lightDirZUd, mergedTrackProps.LightProps.DirZ);
 				//-------------------------------
 			}
 			updatingControls = false;
@@ -680,8 +680,8 @@ namespace Visual_Music
 			trackList.BeginUpdate();
 			for (int i = 1; i < trackList.Items.Count; i++)
 			{
-				trackList.Items[i].SubItems[1].BackColor = Project.TrackViews[i].TrackProps.Material.getSysColor(false, Project.GlobalTrackProps.Material);
-				trackList.Items[i].SubItems[2].BackColor = Project.TrackViews[i].TrackProps.Material.getSysColor(true, Project.GlobalTrackProps.Material);
+				trackList.Items[i].SubItems[1].BackColor = Project.TrackViews[i].TrackProps.MaterialProps.getSysColor(false, Project.GlobalTrackProps.MaterialProps);
+				trackList.Items[i].SubItems[2].BackColor = Project.TrackViews[i].TrackProps.MaterialProps.getSysColor(true, Project.GlobalTrackProps.MaterialProps);
 			}
 			trackList.EndUpdate();
 		}
@@ -720,7 +720,7 @@ namespace Visual_Music
 				ListViewItem[] newItems = new ListViewItem[trackList.SelectedIndices.Count];
 
 				trackList.BeginUpdate();
-				if ((e.KeyState & 8) != 8)
+				if ((e.KeyState & 8) != 8) //CTRL not pressed
 				{
 					for (int i = 0; i < selectedItems.Length; i++)
 						selectedItems[i] = trackList.SelectedItems[i];
@@ -742,13 +742,32 @@ namespace Visual_Music
 					for (int i = 0; i < selectedItems.Length; i++)
 						newItems[i].Selected = true;	//After removal of old items it's now safe to select new items
 				}
-				else
+				else //CTRL pressed
 				{
+					bool onlyCopyCurrentTab = (e.KeyState & 4) != 4; //SHIFT not pressed
+					TrackView sourceTrackView = Project.TrackViews[dropIndex];
+					TrackProps sourceTrackProps = sourceTrackView.TrackProps;
 					for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 					{
-						TrackView source = Project.TrackViews[dropIndex];
-						TrackView dest = Project.TrackViews[trackList.SelectedIndices[i]];
-						source.cloneTrackProps(dest);
+						TrackView destTrackView = Project.TrackViews[trackList.SelectedIndices[i]];
+						if (onlyCopyCurrentTab)
+						{
+							string tabName = selectedTrackPropsPanel.SelectedTab.Name;
+							TrackProps destTrackProps = destTrackView.TrackProps;
+							if (tabName == "style")
+							{
+								destTrackProps.StyleProps = sourceTrackProps.StyleProps.clone();
+								project.createOcTrees();
+							}
+							else if (tabName == "material")
+								destTrackProps.MaterialProps = sourceTrackProps.MaterialProps.clone();
+							else if (tabName == "light")
+								destTrackProps.LightProps = sourceTrackProps.LightProps.clone();
+							else if (tabName == "spatial")
+								destTrackProps.SpatialProps = sourceTrackProps.SpatialProps.clone();
+						}
+						else
+							sourceTrackView.cloneTrackProps(destTrackView);
 					}
 					updateTrackControls();
 					updateTrackListColors();
@@ -816,13 +835,13 @@ namespace Visual_Music
 		{
 			if (currentNoteStyleControl != null)
 				currentNoteStyleControl.Visible = false;
-			if (styleList.SelectedIndex == -1 || styleList.SelectedIndex == (int)NoteStyleEnum.Default)
+			if (styleList.SelectedIndex == -1 || styleList.SelectedIndex == (int)NoteStyleType.Default)
 				currentNoteStyleControl = null;
 			else
 			{
-				if (styleList.SelectedIndex == (int)NoteStyleEnum.Bar)
+				if (styleList.SelectedIndex == (int)NoteStyleType.Bar)
 					currentNoteStyleControl = barStyleControl;
-				else if (styleList.SelectedIndex == (int)NoteStyleEnum.Line)
+				else if (styleList.SelectedIndex == (int)NoteStyleType.Line)
 					currentNoteStyleControl = lineStyleControl;
 				currentNoteStyleControl.Visible = true;
 			}
@@ -832,8 +851,8 @@ namespace Visual_Music
 			//songPanel.Invalidate();
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 			{
-                NoteStyleEnum type = (NoteStyleEnum)Enum.Parse(typeof(NoteStyleEnum), (string)styleList.SelectedItem);
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.NoteStyleType = type;
+                NoteStyleType type = (NoteStyleType)Enum.Parse(typeof(NoteStyleType), (string)styleList.SelectedItem);
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.StyleProps.Type = type;
 			}
 			project.createOcTrees();
 			updateTrackControls();
@@ -885,7 +904,7 @@ namespace Visual_Music
 		private TrackPropsTex getActiveTexProps(TrackProps trackProps)
 		{
 			//TODO: return texProps (0) or hmapProps (1) depending on which of the two is currently being edited.
-			return trackProps.Material.getTexProps(0);
+			return trackProps.MaterialProps.getTexProps(0);
 		}
 		private void unloadTexBtn_Click(object sender, EventArgs e)
 		{
@@ -1036,7 +1055,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Light.UseGlobalLight = globalLightCb.Checked;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.UseGlobalLight = globalLightCb.Checked;
 		}
 
 		private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1380,7 +1399,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Spatial.XOffset = (float)xoffsetUd.Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpatialProps.XOffset = (float)xoffsetUd.Value;
 		}
 
 		private void yoffsetUd_ValueChanged(object sender, EventArgs e)
@@ -1388,7 +1407,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Spatial.YOffset = (float)yoffsetUd.Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpatialProps.YOffset = (float)yoffsetUd.Value;
 		}
 
 		private void zoffsetUd_ValueChanged(object sender, EventArgs e)
@@ -1396,7 +1415,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Spatial.ZOffset = (float)zoffsetUd.Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.SpatialProps.ZOffset = (float)zoffsetUd.Value;
 		}
 
 		public static CheckState toCheckState(bool? value)
@@ -1425,7 +1444,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Light.DirX = (float)((NumericUpDown)sender).Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.DirX = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void lightDirYUd_ValueChanged(object sender, EventArgs e)
@@ -1433,7 +1452,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Light.DirY = (float)((NumericUpDown)sender).Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.DirY = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void lightDirZUd_ValueChanged(object sender, EventArgs e)
@@ -1441,7 +1460,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Light.DirZ = (float)((NumericUpDown)sender).Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.DirZ = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void ambientAmountUd_ValueChanged(object sender, EventArgs e)
@@ -1449,7 +1468,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.AmbientAmount = (float)((NumericUpDown)sender).Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.AmbientAmount = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void diffuseAmountUd_ValueChanged(object sender, EventArgs e)
@@ -1457,7 +1476,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.DiffuseAmount = (float)((NumericUpDown)sender).Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.DiffuseAmount = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void specAmountUd_ValueChanged(object sender, EventArgs e)
@@ -1465,7 +1484,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.SpecAmount = (float)specAmountUd.Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.SpecAmount = (float)specAmountUd.Value;
 		}
 
 		private void specPowUd_ValueChanged(object sender, EventArgs e)
@@ -1473,7 +1492,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.Material.SpecPower = (float)specPowUd.Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.SpecPower = (float)specPowUd.Value;
 		}
 
 		private void upDownVpWidth_CommitChanges(object sender, EventArgs e)

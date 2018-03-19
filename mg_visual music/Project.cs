@@ -359,7 +359,7 @@ namespace Visual_Music
 					trackViews[i].MidiTrack = notes.Tracks[trackViews[i].TrackNumber];
 					trackViews[i].createCurve();
 					//If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
-					trackViews[i].TrackProps.loadNoteStyleFx();
+					trackViews[i].TrackProps.StyleProps.loadFx();
 				}
 				else //New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
 				{
@@ -443,13 +443,15 @@ namespace Visual_Music
 
 					object subMerge = mergeObjects(firstValue, secondValue);
 					propertyInfo.SetValue(first, subMerge);
-					if (propertyInfo.Name == "NoteStyleType" && subMerge != null && (NoteStyleEnum)subMerge != NoteStyleEnum.Default)
+					if (propertyInfo.Name == "Type" && subMerge != null && (NoteStyleType)subMerge != NoteStyleType.Default)
 					{
-						TrackProps firstProps = (TrackProps)first;
-						NoteStyle secondStyle = ((TrackProps)second).SelectedNoteStyle;
-						firstProps.SelectedNoteStyle = (NoteStyle)mergeObjects(firstProps.SelectedNoteStyle, secondStyle);
-						if (secondStyle == null || firstProps.SelectedNoteStyle.ModEntries != null && firstProps.SelectedNoteStyle.ModEntries.Count != secondStyle.ModEntries.Count)
-							firstProps.SelectedNoteStyle.ModEntries = null;
+						if (propertyInfo.DeclaringType == typeof(StyleProps)) //parent type
+						{
+							NoteStyle firstStyle = ((StyleProps)first).SelectedStyle;
+							NoteStyle secondStyle = ((StyleProps)second).SelectedStyle;
+							if (firstStyle.ModEntries != null && secondStyle.ModEntries != null && firstStyle.ModEntries.Count != secondStyle.ModEntries.Count)
+								firstStyle.ModEntries = null;
+						}
 					}
 					else if (propertyInfo.Name == "SelectedModEntryIndex" && subMerge != null && (int)subMerge != -1)
 						((NoteStyle)first).SelectedModEntry = (NoteStyleMod)mergeObjects(((NoteStyle)first).SelectedModEntry, ((NoteStyle)second).SelectedModEntry);

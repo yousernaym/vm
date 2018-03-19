@@ -48,8 +48,8 @@ namespace Visual_Music
 		public float? LineWidth { get; set; } = 5;
 		public float? Qn_gapThreshold { get; set; } = 3;
 		public bool? Continuous { get; set; } = true;
-		public LineStyleEnum? Style { get; set; } = LineStyleEnum.Simple;
-		public LineHlStyleEnum? HlStyle { get; set; } = LineHlStyleEnum.Arrow;
+		public LineStyleEnum? LineType { get; set; } = LineStyleEnum.Simple;
+		public LineHlStyleEnum? HlType { get; set; } = LineHlStyleEnum.Arrow;
 		float VpHlSize => (float)HlSize * Project.Camera.ViewportSize.X / 1000.0f;
 		public float? HlSize { get; set; } = 20;
 		public bool? MovingHl { get; set; } = false;
@@ -58,12 +58,12 @@ namespace Visual_Music
 
 		public NoteStyle_Line()
 		{
-			styleType = NoteStyleEnum.Line;
+			styleType = NoteStyleType.Line;
 		}
 		public NoteStyle_Line(TrackProps tprops)
 			: base(tprops)
 		{
-			styleType = NoteStyleEnum.Line;
+			styleType = NoteStyleType.Line;
 		}
 		public NoteStyle_Line(SerializationInfo info, StreamingContext ctxt)
 			: base(info, ctxt)
@@ -77,9 +77,9 @@ namespace Visual_Music
 				else if (entry.Name == "continuous")
 					Continuous = (bool)entry.Value;
 				else if(entry.Name == "style")
-					Style = (LineStyleEnum)entry.Value;
+					LineType = (LineStyleEnum)entry.Value;
 				else if (entry.Name == "hlStyle")
-					HlStyle = (LineHlStyleEnum)entry.Value;
+					HlType = (LineHlStyleEnum)entry.Value;
 				else if (entry.Name == "hlSize")
 					HlSize = (float)entry.Value;
 				else if (entry.Name == "movingHl")
@@ -96,8 +96,8 @@ namespace Visual_Music
 			info.AddValue("lineWidth", LineWidth);
 			info.AddValue("qn_gapThreshold", Qn_gapThreshold);
 			info.AddValue("continuous", Continuous);
-			info.AddValue("style", Style);
-			info.AddValue("hlStyle", HlStyle);
+			info.AddValue("style", LineType);
+			info.AddValue("hlStyle", HlType);
 			info.AddValue("hlSize", HlSize);
 			info.AddValue("movingHl", MovingHl);
 			info.AddValue("shrinkingHl", ShrinkingHl);
@@ -129,7 +129,7 @@ namespace Visual_Music
 			normal.Normalize();
 			pos = points[1];
 
-			if (Style == LineStyleEnum.Ribbon)
+			if (LineType == LineStyleEnum.Ribbon)
 				vertexOffset = new Vector3(1, 0, 0);
 			else
 				vertexOffset = normal;
@@ -262,7 +262,7 @@ namespace Visual_Music
 		//	return typeof(T).GetProperties()[0].Name;
 		//}
 
-		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, Material texMaterial)
+		public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)
 		{
 			LineGeo lineGeo = new LineGeo();
 			geo = lineGeo;
@@ -339,7 +339,7 @@ namespace Visual_Music
 					if (texMaterial.TexProps.Texture != null)
 						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texMaterial.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
-					if (Style == LineStyleEnum.Ribbon)
+					if (LineType == LineStyleEnum.Ribbon)
 					{
 						float hLineStart = center.X;
 						float hLineEnd = hLineStart;
@@ -453,7 +453,7 @@ namespace Visual_Music
 			}
 		}
 
-		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, Material texMaterial)
+		public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)
 		{
 			float songPosP;
 
@@ -465,7 +465,7 @@ namespace Visual_Music
 
 			//this.trackProps = trackProps;
 
-			fx.Parameters["Style"].SetValue((int)Style);
+			fx.Parameters["Style"].SetValue((int)LineType);
 			fx.Parameters["HlSize"].SetValue(VpHlSize / 2.0f);
 			songPanel.GraphicsDevice.BlendState = songPanel.BlendState;
 			float radius = (float)VpLineWidth / 2.0f;
@@ -523,7 +523,7 @@ namespace Visual_Music
 			}
 
 			Vector3 noteStartVec = new Vector3(noteStart.X, noteStart.Y, 0);
-			if (HlStyle == LineHlStyleEnum.Arrow)
+			if (HlType == LineHlStyleEnum.Arrow)
 			{
 				float arrowLength;
 				Vector3 arrowDir;
@@ -577,7 +577,7 @@ namespace Visual_Music
 				side2Normal.Normalize();
 				fx.Parameters["Side2Normal"].SetValue(side2Normal);
 			}
-			else if (HlStyle == LineHlStyleEnum.Circle && !(bool)MovingHl)
+			else if (HlType == LineHlStyleEnum.Circle && !(bool)MovingHl)
 			{
 				setHlCirclePos(noteStartVec);
 			}
@@ -601,7 +601,7 @@ namespace Visual_Music
 			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
 			
 			fx.Parameters["Border"].SetValue((bool)HlBorder);
-			if (HlStyle == LineHlStyleEnum.Arrow)
+			if (HlType == LineHlStyleEnum.Arrow)
 			{
 				//Calc shortest dist to incenter from border, ie. the inscribed circle's radius
 				float a = (lineHlVerts[0].pos - lineHlVerts[1].pos).Length();
@@ -616,7 +616,7 @@ namespace Visual_Music
 				fx.CurrentTechnique.Passes[0].Apply();
 				songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
 			}
-			else if (HlStyle == LineHlStyleEnum.Circle)
+			else if (HlType == LineHlStyleEnum.Circle)
 			{
 				if ((bool)MovingHl)
 				{
