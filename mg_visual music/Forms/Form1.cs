@@ -807,7 +807,7 @@ namespace Visual_Music
 					return;
 				}
 
-				trackList.RedrawItems(0, trackList.Items.Count-1, false);
+				trackList.RedrawItems(0, trackList.Items.Count - 1, false);
 				System.Drawing.Rectangle bounds = dragToItem.GetBounds(ItemBoundsPortion.Entire);
 				bounds.Offset(0, -1);
 				if ((e.KeyState & 8) != 8)
@@ -823,7 +823,6 @@ namespace Visual_Music
 					trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Left, bounds.Top), new GdiPoint(bounds.Left, bounds.Bottom));
 					trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Right, bounds.Top), new GdiPoint(bounds.Right, bounds.Bottom));
 				}
-					
 			}
 			catch (Exception ex)
 			{

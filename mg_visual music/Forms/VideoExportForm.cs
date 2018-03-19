@@ -56,7 +56,7 @@ namespace Visual_Music
 					resoCb.Items.Add("3060 x 3060");
 
 				else
-					resoCb.Items.Add("4320 x 4320");
+					resoCb.Items.Add("4320 x 2160");
 			}
 			else
 			{
