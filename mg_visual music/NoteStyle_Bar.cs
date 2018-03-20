@@ -114,7 +114,8 @@ namespace Visual_Music
 				if (++instanceIndex >= MaxInstances - 1)
 					createVb(ref instanceIndex, barGeo);
 			}
-			createVb(ref instanceIndex, barGeo);
+			if (instanceIndex > 0)
+				createVb(ref instanceIndex, barGeo);
 		}
 
 		void createVb(ref int count, BarGeo geo)

@@ -233,6 +233,7 @@ namespace Visual_Music
 				return false;
 			if (!openAudioFile(audioFile, mixdownType))
 				return false;
+			createTrackViews(notes.Tracks.Count, eraseCurrent);
 			return true;
 		}
 		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _insTrack, bool mixdown, double songLengthS)
@@ -279,8 +280,7 @@ namespace Visual_Music
 			notes.createNoteBsp();
 
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
-			createTrackViews(notes.Tracks.Count, eraseCurrent);
-
+			
 			return true;
 		}
 		public bool openAudioFile(string file, MixdownType _mixdownType)
