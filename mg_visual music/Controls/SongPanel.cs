@@ -289,6 +289,7 @@ namespace Visual_Music
 						int pitchChange = (int)((Project.MaxPitch - Project.MinPitch) / 5.0f);
 						Project.MaxPitch -= (int)(pitchChange / 1.3f);
 						Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
+						Project.createOcTrees();
 					}
 					const int frameSamples = 2;
 					cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
@@ -319,6 +320,7 @@ namespace Visual_Music
 					Project.ViewWidthQn = viewWidthQnBackup;
 					Project.MaxPitch = maxPitchBackup;
 					Project.MinPitch = minPitchBackup;
+					Project.createOcTrees();
 					endVideoRender();
 					if (options.VrMetadata)
 					{
