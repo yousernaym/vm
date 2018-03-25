@@ -688,7 +688,12 @@ namespace Visual_Music
 				setNumericUdValue(texUScrollUD, texProps.UScroll);
 				setNumericUdValue(texVScrollUD, texProps.VScroll);
 
-				//Lighting
+				//Light
+				globalLightCb.CheckState = toCheckState(mergedTrackProps.LightProps.UseGlobalLight);
+				setNumericUdValue(lightDirXUd, mergedTrackProps.LightProps.DirX);
+				setNumericUdValue(lightDirYUd, mergedTrackProps.LightProps.DirY);
+				setNumericUdValue(lightDirZUd, mergedTrackProps.LightProps.DirZ);
+
 				setNumericUdValue(ambientAmountUd, mergedTrackProps.LightProps.AmbientAmount);
 				setNumericUdValue(diffuseAmountUd, mergedTrackProps.LightProps.DiffuseAmount);
 				setNumericUdValue(specAmountUd, mergedTrackProps.LightProps.SpecAmount);
@@ -699,11 +704,6 @@ namespace Visual_Music
 				setNumericUdValue(xoffsetUd, mergedTrackProps.SpatialProps.XOffset);
 				setNumericUdValue(yoffsetUd, mergedTrackProps.SpatialProps.YOffset);
 				setNumericUdValue(zoffsetUd, mergedTrackProps.SpatialProps.ZOffset);
-
-				globalLightCb.CheckState = toCheckState(mergedTrackProps.LightProps.UseGlobalLight);
-				setNumericUdValue(lightDirXUd, mergedTrackProps.LightProps.DirX);
-				setNumericUdValue(lightDirYUd, mergedTrackProps.LightProps.DirY);
-				setNumericUdValue(lightDirZUd, mergedTrackProps.LightProps.DirZ);
 				//-------------------------------
 			}
 			updatingControls = false;
