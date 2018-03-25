@@ -291,7 +291,7 @@ namespace Visual_Music
 						Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
 						Project.createOcTrees();
 					}
-					const int frameSamples = 2;
+					const int frameSamples = 1;
 					cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
 					Project.Camera.InvertY = !options.Sphere;
 
