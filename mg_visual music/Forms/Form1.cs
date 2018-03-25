@@ -269,7 +269,7 @@ namespace Visual_Music
 			}			
 		}
 		
-		private void panel1_MouseMove(object sender, MouseEventArgs e)
+		private void songPanel_MouseMove(object sender, MouseEventArgs e)
 		{
 			//GdiPoint clientP = songPanel.PointToClient(e.Location);
 			GdiPoint clientP = e.Location;
@@ -292,7 +292,7 @@ namespace Visual_Music
 			renderProgressForm.ShowDialog();
 	}
 		
-		private void panel1_KeyDown(object sender, KeyEventArgs e)
+		private void songPanel_KeyDown(object sender, KeyEventArgs e)
 		{
 
 		}
@@ -1027,8 +1027,8 @@ namespace Visual_Music
 			songPanel.Visible = true;
 			Controls.Add(songPanel);
 			songPanel.BringToFront();
-			songPanel.MouseMove += new MouseEventHandler(panel1_MouseMove);
-			songPanel.KeyDown += new KeyEventHandler(panel1_KeyDown);
+			songPanel.MouseMove += new MouseEventHandler(songPanel_MouseMove);
+			songPanel.KeyDown += new KeyEventHandler(songPanel_KeyDown);
 			SongPanel.OnSongPosChanged = delegate ()
 			{
 				if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)

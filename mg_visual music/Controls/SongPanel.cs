@@ -58,6 +58,7 @@ namespace Visual_Music
 		public bool SelectingRegion => selectingRegion;
 		bool mergeRegionSelection = false;
 		bool mousePosScrollSong = false;
+		bool isPausingWhileScrolling = false;
 		
 		//public void paint()
 		//{
@@ -630,6 +631,11 @@ namespace Visual_Music
 			if (e.Button == MouseButtons.Right)
 			{
 				mousePosScrollSong = true;
+				if (Project.IsPlaying)
+				{
+					isPausingWhileScrolling = true;
+					Project.togglePlayback();
+				}
 			}
 
 		}
@@ -642,7 +648,14 @@ namespace Visual_Music
 				mergeRegionSelection = false;
 			}
 			if (e.Button == MouseButtons.Right)
+			{
 				mousePosScrollSong = false;
+				if (isPausingWhileScrolling && !Project.IsPlaying)
+				{
+					Project.togglePlayback();
+					isPausingWhileScrolling = false;
+				}
+			}
 		}
 
 	}	

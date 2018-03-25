@@ -138,7 +138,7 @@ namespace Visual_Music
 		public bool IsPlaying
 		{
 			get => isPlaying;
-			set
+			private set
 			{
 				isPlaying = value;
 				if (!value)
@@ -594,8 +594,8 @@ namespace Visual_Music
 				if (NormSongPos > 1)
 					togglePlayback();
 			}
-			else
-				SongPanel.scrollSong();
+			//else
+			SongPanel.scrollSong();
 
 			if (NormSongPos < 0)
 				NormSongPos = 0;
