@@ -28,10 +28,10 @@ namespace Visual_Music
 			//set => Style.setSelectedNoteStyle(value);
 		}
 
-		public StyleProps StyleProps { get; set; } = new StyleProps();
-		public MaterialProps MaterialProps { get; set; } = new MaterialProps();
-		public LightProps LightProps { get; set; } = new LightProps();
-		public SpatialProps SpatialProps { get; set; } = new SpatialProps();
+		public StyleProps StyleProps { get; set; }
+		public MaterialProps MaterialProps { get; set; }
+		public LightProps LightProps { get; set; }
+		public SpatialProps SpatialProps { get; set; }
 
 		public TrackProps(TrackView view)
 		{
@@ -78,22 +78,22 @@ namespace Visual_Music
 
 		public void resetStyle()
 		{
-			StyleProps.reset(TrackNumber);
+			StyleProps = new StyleProps(TrackNumber);
 		}
 
 		public void resetMaterial()
 		{
-			MaterialProps.reset(TrackNumber, NumTracks);
+			MaterialProps = new MaterialProps(TrackNumber, NumTracks);
 		}
 
 		public void resetLight()
 		{
-			LightProps.reset(TrackNumber);
+			LightProps = new LightProps(TrackNumber);
 		}
 
 		public void resetSpatial()
 		{
-			SpatialProps.reset();
+			SpatialProps = new SpatialProps();
 		}
 
 		public void resetProps()
@@ -348,10 +348,30 @@ namespace Visual_Music
 		public NoteStyleType? Type { get; set; }
 		NoteStyle[] styles = new NoteStyle[Enum.GetNames(typeof(NoteStyleType)).Length];
 
-		public StyleProps()
+		public StyleProps(int trackNumber)
 		{
-
+			int[] styleTypes = (int[])Enum.GetValues(typeof(NoteStyleType));
+			string[] styleNames = (string[])Enum.GetNames(typeof(NoteStyleType));
+			for (int i = 0; i < styles.Length; i++)
+			{
+				if ((NoteStyleType)styleTypes[i] != NoteStyleType.Default)
+				{
+					styles[i] = (NoteStyle)Activator.CreateInstance(System.Type.GetType("Visual_Music.NoteStyle_" + styleNames[i]));
+					styles[i].loadFx();
+				}
+			}
+			if (trackNumber == 0)
+			{
+				Type = NoteStyleType.Bar;
+				//UseGlobalLight = false;
+			}
+			else
+			{
+				Type = NoteStyleType.Default;
+				//UseGlobalLight = true;
+			}
 		}
+
 		public StyleProps(SerializationInfo info, StreamingContext ctxt)
 		{
 			foreach (SerializationEntry entry in info)
@@ -424,31 +444,6 @@ namespace Visual_Music
 			}
 		}
 
-
-		public void reset(int trackNumber)
-		{
-			int[] styleTypes = (int[])Enum.GetValues(typeof(NoteStyleType));
-			string[] styleNames = (string[])Enum.GetNames(typeof(NoteStyleType));
-			for (int i = 0; i < styles.Length; i++)
-			{
-				if ((NoteStyleType)styleTypes[i] != NoteStyleType.Default)
-				{
-					styles[i] = (NoteStyle)Activator.CreateInstance(System.Type.GetType("Visual_Music.NoteStyle_" + styleNames[i]));
-					styles[i].loadFx();
-				}
-			}
-			if (trackNumber == 0)
-			{
-				Type = NoteStyleType.Bar;
-				//UseGlobalLight = false;
-			}
-			else
-			{
-				Type = NoteStyleType.Default;
-				//UseGlobalLight = true;
-			}
-		}
-
 		new public StyleProps clone()
 		{
 			StyleProps dest = base.clone();
@@ -468,11 +463,26 @@ namespace Visual_Music
 		public TrackPropsTex TexProps { get; set; } = new TrackPropsTex();
 		public TrackPropsTex HmapProps { get; set; } = new TrackPropsTex();
 		
-		public MaterialProps()
+		public MaterialProps(int trackNumber, int numTracks)
 		{
-
+			TexProps.unloadTexture();
+			TexProps = new TrackPropsTex();
+			if (trackNumber == 0)
+			{
+				Transp = 1;
+				Hue = 0.1f;
+				Normal = new NoteTypeMaterial(1, 0.27f);
+				Hilited = new NoteTypeMaterial(0.8f, 0.75f);
+			}
+			else
+			{
+				Transp = 0.5f;
+				Hue = (float)(trackNumber - 1) / (numTracks - 1);
+				Normal = new NoteTypeMaterial();
+				Hilited = new NoteTypeMaterial(); ;
+			}
 		}
-
+		
 		public MaterialProps(SerializationInfo info, StreamingContext ctxt)
 		{
 			foreach (SerializationEntry entry in info)
@@ -570,26 +580,6 @@ namespace Visual_Music
 			else
 				return HmapProps;
 		}
-
-		public void reset(int trackNumber, int numTracks)
-		{
-			TexProps.unloadTexture();
-			TexProps = new TrackPropsTex();
-			if (trackNumber == 0)
-			{
-				Transp = 1;
-				Hue = 0.1f;
-				Normal = new NoteTypeMaterial(1, 0.27f);
-				Hilited = new NoteTypeMaterial(0.8f, 0.75f);
-			}
-			else
-			{
-				Transp = 0.5f;
-				Hue = (float)(trackNumber - 1) / (numTracks - 1);
-				Normal = new NoteTypeMaterial();
-				Hilited = new NoteTypeMaterial(); ;
-			}
-		}
 	}
 
 	[Serializable()]
@@ -616,9 +606,25 @@ namespace Visual_Music
 		public float? SpecAmount { get; set; }
 		public float? SpecPower { get; set; }
 
-		public LightProps()
+		public LightProps(int trackNumber)
 		{
-
+			if (trackNumber == 0)
+			{
+				UseGlobalLight = false;
+				AmbientAmount = 0.2f;
+				DiffuseAmount = 2;
+				SpecAmount = 1;
+				SpecPower = 50;
+			}
+			else
+			{
+				UseGlobalLight = true;
+				AmbientAmount = 0;
+				DiffuseAmount = 0;
+				SpecAmount = 0;
+				SpecPower = 0;
+			}
+			Dir = new Vector3(-1, -1, 1);
 		}
 
 		public LightProps(SerializationInfo info, StreamingContext ctxt)
@@ -649,27 +655,6 @@ namespace Visual_Music
 			info.AddValue("specAmount", SpecAmount);
 			info.AddValue("specPower", SpecPower);
 		}
-
-		public void reset(int trackNumber)
-		{
-			if (trackNumber == 0)
-			{
-				UseGlobalLight = false;
-				AmbientAmount = 0.2f;
-				DiffuseAmount = 2;
-				SpecAmount = 1;
-				SpecPower = 50;
-			}
-			else
-			{
-				UseGlobalLight = true;
-				AmbientAmount = 0;
-				DiffuseAmount = 0;
-				SpecAmount = 0;
-				SpecPower = 0;
-			}
-			Dir = new Vector3(-1, -1, 1);
-		}
 	}
 
 	[Serializable()]
@@ -691,7 +676,7 @@ namespace Visual_Music
 
 		public SpatialProps()
 		{
-
+			PosOffset = new Vector3();
 		}
 
 		public SpatialProps(SerializationInfo info, StreamingContext ctxt)
@@ -708,10 +693,6 @@ namespace Visual_Music
 			info.AddValue("posOffset", PosOffset);
 		}
 
-		public void reset()
-		{
-			PosOffset = new Vector3();
-		}
 	}
 
 	abstract public class CloneableProps<T>
