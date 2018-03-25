@@ -598,7 +598,7 @@ namespace Visual_Music
 				Hue = 0.1f;
 				Normal = new NoteTypeMaterial(1, 0.27f);
 				Hilited = new NoteTypeMaterial(0.8f, 0.75f);
-				AmbientAmount = 0;
+				AmbientAmount = 0.2f;
 				DiffuseAmount = 2;
 				SpecAmount = 1;
 				SpecPower = 50;
@@ -609,10 +609,10 @@ namespace Visual_Music
 				Hue = (float)(trackNumber - 1) / (numTracks - 1);
 				Normal = new NoteTypeMaterial();
 				Hilited = new NoteTypeMaterial(); ;
-				AmbientAmount = 1;
-				DiffuseAmount = 1;
-				SpecAmount = 1;
-				SpecPower = 1;
+				AmbientAmount = 0;
+				DiffuseAmount = 0;
+				SpecAmount = 0;
+				SpecPower = 0;
 			}
 		}
 	}

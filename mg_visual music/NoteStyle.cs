@@ -362,10 +362,10 @@ namespace Visual_Music
 			}
 
 			//Material
-			fx.Parameters["AmbientAmount"].SetValue((float)(Project.GlobalTrackProps.MaterialProps.AmbientAmount * trackProps.MaterialProps.AmbientAmount));
-			fx.Parameters["DiffuseAmount"].SetValue((float)(Project.GlobalTrackProps.MaterialProps.DiffuseAmount * trackProps.MaterialProps.DiffuseAmount));
-			fx.Parameters["SpecAmount"].SetValue((float)(Project.GlobalTrackProps.MaterialProps.SpecAmount * trackProps.MaterialProps.SpecAmount));
-			fx.Parameters["SpecPower"].SetValue((float)(Project.GlobalTrackProps.MaterialProps.SpecPower * trackProps.MaterialProps.SpecPower));
+			fx.Parameters["AmbientAmount"].SetValue((float)(Project.GlobalTrackProps.MaterialProps.AmbientAmount + trackProps.MaterialProps.AmbientAmount));
+			fx.Parameters["DiffuseAmount"].SetValue((float)(Project.GlobalTrackProps.MaterialProps.DiffuseAmount + trackProps.MaterialProps.DiffuseAmount));
+			fx.Parameters["SpecAmount"].SetValue((float)(Project.GlobalTrackProps.MaterialProps.SpecAmount + trackProps.MaterialProps.SpecAmount));
+			fx.Parameters["SpecPower"].SetValue((float)(Project.GlobalTrackProps.MaterialProps.SpecPower + trackProps.MaterialProps.SpecPower));
 
 			//Light
 			TrackProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps : trackProps;
