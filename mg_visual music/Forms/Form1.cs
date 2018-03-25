@@ -656,10 +656,10 @@ namespace Visual_Music
 				setNumericUdValue(texVScrollUD, texProps.VScroll);
 
 				//Lighting
-				setNumericUdValue(ambientAmountUd, mergedTrackProps.MaterialProps.AmbientAmount);
-				setNumericUdValue(diffuseAmountUd, mergedTrackProps.MaterialProps.DiffuseAmount);
-				setNumericUdValue(specAmountUd, mergedTrackProps.MaterialProps.SpecAmount);
-				setNumericUdValue(specPowUd, mergedTrackProps.MaterialProps.SpecPower);
+				setNumericUdValue(ambientAmountUd, mergedTrackProps.LightProps.AmbientAmount);
+				setNumericUdValue(diffuseAmountUd, mergedTrackProps.LightProps.DiffuseAmount);
+				setNumericUdValue(specAmountUd, mergedTrackProps.LightProps.SpecAmount);
+				setNumericUdValue(specPowUd, mergedTrackProps.LightProps.SpecPower);
 				//-------------------------------
 
 				//Spatial---------------------------------
@@ -1467,7 +1467,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.AmbientAmount = (float)((NumericUpDown)sender).Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientAmount = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void diffuseAmountUd_ValueChanged(object sender, EventArgs e)
@@ -1475,7 +1475,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.DiffuseAmount = (float)((NumericUpDown)sender).Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.DiffuseAmount = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void specAmountUd_ValueChanged(object sender, EventArgs e)
@@ -1483,7 +1483,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.SpecAmount = (float)specAmountUd.Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecAmount = (float)specAmountUd.Value;
 		}
 
 		private void specPowUd_ValueChanged(object sender, EventArgs e)
@@ -1491,7 +1491,7 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.MaterialProps.SpecPower = (float)specPowUd.Value;
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecPower = (float)specPowUd.Value;
 		}
 
 		private void upDownVpWidth_CommitChanges(object sender, EventArgs e)

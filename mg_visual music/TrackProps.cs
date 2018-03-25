@@ -468,11 +468,6 @@ namespace Visual_Music
 		public TrackPropsTex TexProps { get; set; } = new TrackPropsTex();
 		public TrackPropsTex HmapProps { get; set; } = new TrackPropsTex();
 		
-		public float? AmbientAmount { get; set; }
-		public float? DiffuseAmount { get; set; }
-		public float? SpecAmount { get; set; }
-		public float? SpecPower { get; set; }
-
 		public MaterialProps()
 		{
 
@@ -494,14 +489,6 @@ namespace Visual_Music
 					TexProps = (TrackPropsTex)entry.Value;
 				else if (entry.Name == "hmapProps")
 					HmapProps = (TrackPropsTex)entry.Value;
-				else if (entry.Name == "ambientAmount")
-					AmbientAmount = (float)entry.Value;
-				else if (entry.Name == "diffuseAmount")
-					DiffuseAmount = (float)entry.Value;
-				else if (entry.Name == "specAmount")
-					SpecAmount = (float)entry.Value;
-				else if (entry.Name == "specPower")
-					SpecPower = (float)entry.Value;
 			}
 		}
 
@@ -513,10 +500,6 @@ namespace Visual_Music
 			info.AddValue("hilited", Hilited);
 			info.AddValue("texProps", TexProps);
 			info.AddValue("hmapProps", HmapProps);
-			info.AddValue("ambientAmount", AmbientAmount);
-			info.AddValue("diffuseAmount", DiffuseAmount);
-			info.AddValue("specAmount", SpecAmount);
-			info.AddValue("specPower", SpecPower);
 		}
 
 		internal void loadContent(SongPanel songPanel)
@@ -598,10 +581,6 @@ namespace Visual_Music
 				Hue = 0.1f;
 				Normal = new NoteTypeMaterial(1, 0.27f);
 				Hilited = new NoteTypeMaterial(0.8f, 0.75f);
-				AmbientAmount = 0.2f;
-				DiffuseAmount = 2;
-				SpecAmount = 1;
-				SpecPower = 50;
 			}
 			else
 			{
@@ -609,10 +588,6 @@ namespace Visual_Music
 				Hue = (float)(trackNumber - 1) / (numTracks - 1);
 				Normal = new NoteTypeMaterial();
 				Hilited = new NoteTypeMaterial(); ;
-				AmbientAmount = 0;
-				DiffuseAmount = 0;
-				SpecAmount = 0;
-				SpecPower = 0;
 			}
 		}
 	}
@@ -636,6 +611,11 @@ namespace Visual_Music
 		public float? DirY { get; set; }
 		public float? DirZ { get; set; }
 
+		public float? AmbientAmount { get; set; }
+		public float? DiffuseAmount { get; set; }
+		public float? SpecAmount { get; set; }
+		public float? SpecPower { get; set; }
+
 		public LightProps()
 		{
 
@@ -649,6 +629,14 @@ namespace Visual_Music
 					Dir = (Vector3)entry.Value;
 				else if (entry.Name == "useGlobalLight")
 					UseGlobalLight = (bool)entry.Value;
+				else if (entry.Name == "ambientAmount")
+					AmbientAmount = (float)entry.Value;
+				else if (entry.Name == "diffuseAmount")
+					DiffuseAmount = (float)entry.Value;
+				else if (entry.Name == "specAmount")
+					SpecAmount = (float)entry.Value;
+				else if (entry.Name == "specPower")
+					SpecPower = (float)entry.Value;
 			}
 		}
 
@@ -656,14 +644,30 @@ namespace Visual_Music
 		{
 			info.AddValue("dir", Dir);
 			info.AddValue("useGlobalLight", UseGlobalLight);
+			info.AddValue("ambientAmount", AmbientAmount);
+			info.AddValue("diffuseAmount", DiffuseAmount);
+			info.AddValue("specAmount", SpecAmount);
+			info.AddValue("specPower", SpecPower);
 		}
 
 		public void reset(int trackNumber)
 		{
 			if (trackNumber == 0)
+			{
 				UseGlobalLight = false;
+				AmbientAmount = 0.2f;
+				DiffuseAmount = 2;
+				SpecAmount = 1;
+				SpecPower = 50;
+			}
 			else
+			{
 				UseGlobalLight = true;
+				AmbientAmount = 0;
+				DiffuseAmount = 0;
+				SpecAmount = 0;
+				SpecPower = 0;
+			}
 			Dir = new Vector3(-1, -1, 1);
 		}
 	}

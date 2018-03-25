@@ -55,10 +55,6 @@
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.trackPropsPanel = new System.Windows.Forms.Panel();
-			this.trackList = new Visual_Music.ListViewNF();
-			this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.normalColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.hilitedColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.trackListCM = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.invertSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,21 +62,10 @@
 			this.defaultPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.selectedTrackPropsPanel = new System.Windows.Forms.TabControl();
 			this.style = new System.Windows.Forms.TabPage();
-			this.lineStyleControl = new Visual_Music.LineStyleControl();
-			this.barStyleControl = new Visual_Music.BarStyleControl();
 			this.defaultStyleBtn = new System.Windows.Forms.Button();
 			this.styleList = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.material = new System.Windows.Forms.TabPage();
-			this.lightingGb = new System.Windows.Forms.GroupBox();
-			this.specPowUd = new System.Windows.Forms.NumericUpDown();
-			this.ambientAmountUd = new System.Windows.Forms.NumericUpDown();
-			this.diffuseAmountUd = new System.Windows.Forms.NumericUpDown();
-			this.specAmountUd = new System.Windows.Forms.NumericUpDown();
-			this.label15 = new System.Windows.Forms.Label();
-			this.label14 = new System.Windows.Forms.Label();
-			this.label23 = new System.Windows.Forms.Label();
-			this.label22 = new System.Windows.Forms.Label();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.label37 = new System.Windows.Forms.Label();
 			this.label34 = new System.Windows.Forms.Label();
@@ -134,12 +119,6 @@
 			this.light = new System.Windows.Forms.TabPage();
 			this.defaultLightBtn = new System.Windows.Forms.Button();
 			this.lightPanel = new System.Windows.Forms.Panel();
-			this.label11 = new System.Windows.Forms.Label();
-			this.label12 = new System.Windows.Forms.Label();
-			this.label13 = new System.Windows.Forms.Label();
-			this.lightDirZUd = new System.Windows.Forms.NumericUpDown();
-			this.lightDirYUd = new System.Windows.Forms.NumericUpDown();
-			this.lightDirXUd = new System.Windows.Forms.NumericUpDown();
 			this.label24 = new System.Windows.Forms.Label();
 			this.globalLightCb = new System.Windows.Forms.CheckBox();
 			this.spatial = new System.Windows.Forms.TabPage();
@@ -165,12 +144,32 @@
 			this.maxPitchUd = new System.Windows.Forms.NumericUpDown();
 			this.label8 = new System.Windows.Forms.Label();
 			this.hnotelabel = new System.Windows.Forms.Label();
-			this.upDownVpWidth = new Visual_Music.TbSlider();
 			this.songPropsCb = new System.Windows.Forms.CheckBox();
 			this.propsTogglePanel = new System.Windows.Forms.Panel();
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
 			this.debugLabel = new System.Windows.Forms.Label();
+			this.label11 = new System.Windows.Forms.Label();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label13 = new System.Windows.Forms.Label();
+			this.lightDirZUd = new System.Windows.Forms.NumericUpDown();
+			this.lightDirYUd = new System.Windows.Forms.NumericUpDown();
+			this.lightDirXUd = new System.Windows.Forms.NumericUpDown();
+			this.specPowUd = new System.Windows.Forms.NumericUpDown();
+			this.ambientAmountUd = new System.Windows.Forms.NumericUpDown();
+			this.diffuseAmountUd = new System.Windows.Forms.NumericUpDown();
+			this.specAmountUd = new System.Windows.Forms.NumericUpDown();
+			this.label15 = new System.Windows.Forms.Label();
+			this.label14 = new System.Windows.Forms.Label();
+			this.label23 = new System.Windows.Forms.Label();
+			this.label22 = new System.Windows.Forms.Label();
+			this.upDownVpWidth = new Visual_Music.TbSlider();
+			this.trackList = new Visual_Music.ListViewNF();
+			this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.normalColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.hilitedColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.lineStyleControl = new Visual_Music.LineStyleControl();
+			this.barStyleControl = new Visual_Music.BarStyleControl();
 			this.songPanelBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
@@ -180,11 +179,6 @@
 			this.selectedTrackPropsPanel.SuspendLayout();
 			this.style.SuspendLayout();
 			this.material.SuspendLayout();
-			this.lightingGb.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.ambientAmountUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.diffuseAmountUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).BeginInit();
 			this.groupBox4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.texVScrollUD)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.texUScrollUD)).BeginInit();
@@ -202,9 +196,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.hiliteSatSlider)).BeginInit();
 			this.light.SuspendLayout();
 			this.lightPanel.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).BeginInit();
 			this.spatial.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).BeginInit();
@@ -213,6 +204,13 @@
 			((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).BeginInit();
 			this.propsTogglePanel.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.ambientAmountUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.diffuseAmountUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).BeginInit();
 			this.SuspendLayout();
@@ -348,7 +346,7 @@
             this.playbackToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1415, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1432, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -455,54 +453,12 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(1020, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(1037, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 10052);
 			this.trackPropsPanel.TabIndex = 3;
 			this.trackPropsPanel.Visible = false;
 			this.trackPropsPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.trackPropsPanel_Paint);
-			// 
-			// trackList
-			// 
-			this.trackList.AllowDrop = true;
-			this.trackList.BackColor = System.Drawing.Color.Black;
-			this.trackList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.trackColumn,
-            this.normalColumn,
-            this.hilitedColumn});
-			this.trackList.ContextMenuStrip = this.trackListCM;
-			this.trackList.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackList.ForeColor = System.Drawing.Color.White;
-			this.trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-			this.trackList.HideSelection = false;
-			this.trackList.Location = new System.Drawing.Point(1, 0);
-			this.trackList.Name = "trackList";
-			this.trackList.Size = new System.Drawing.Size(186, 10052);
-			this.trackList.TabIndex = 0;
-			this.trackList.UseCompatibleStateImageBehavior = false;
-			this.trackList.View = System.Windows.Forms.View.Details;
-			this.trackList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.trackList_ItemDrag);
-			this.trackList.SelectedIndexChanged += new System.EventHandler(this.trackList_SelectedIndexChanged);
-			this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
-			this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
-			this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
-			// 
-			// trackColumn
-			// 
-			this.trackColumn.Text = "Track";
-			this.trackColumn.Width = 112;
-			// 
-			// normalColumn
-			// 
-			this.normalColumn.Text = "N";
-			this.normalColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			this.normalColumn.Width = 35;
-			// 
-			// hilitedColumn
-			// 
-			this.hilitedColumn.Text = "H";
-			this.hilitedColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			this.hilitedColumn.Width = 35;
 			// 
 			// trackListCM
 			// 
@@ -571,27 +527,6 @@
 			this.style.TabIndex = 2;
 			this.style.Text = "Style";
 			// 
-			// lineStyleControl
-			// 
-			this.lineStyleControl.AutoSize = true;
-			this.lineStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
-			this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
-			this.lineStyleControl.Name = "lineStyleControl";
-			this.lineStyleControl.Size = new System.Drawing.Size(183, 347);
-			this.lineStyleControl.TabIndex = 2;
-			this.lineStyleControl.Visible = false;
-			// 
-			// barStyleControl
-			// 
-			this.barStyleControl.AutoSize = true;
-			this.barStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.barStyleControl.Location = new System.Drawing.Point(3, 72);
-			this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-			this.barStyleControl.Name = "barStyleControl";
-			this.barStyleControl.Size = new System.Drawing.Size(180, 55);
-			this.barStyleControl.TabIndex = 2;
-			// 
 			// defaultStyleBtn
 			// 
 			this.defaultStyleBtn.Location = new System.Drawing.Point(1, 1);
@@ -627,7 +562,6 @@
 			// 
 			this.material.AutoScroll = true;
 			this.material.BackColor = System.Drawing.Color.Transparent;
-			this.material.Controls.Add(this.lightingGb);
 			this.material.Controls.Add(this.groupBox4);
 			this.material.Controls.Add(this.defaultMtrlBtn);
 			this.material.Controls.Add(this.alphaLbl);
@@ -644,114 +578,6 @@
 			this.material.Size = new System.Drawing.Size(200, 10026);
 			this.material.TabIndex = 0;
 			this.material.Text = "Material";
-			// 
-			// lightingGb
-			// 
-			this.lightingGb.Controls.Add(this.specPowUd);
-			this.lightingGb.Controls.Add(this.ambientAmountUd);
-			this.lightingGb.Controls.Add(this.diffuseAmountUd);
-			this.lightingGb.Controls.Add(this.specAmountUd);
-			this.lightingGb.Controls.Add(this.label15);
-			this.lightingGb.Controls.Add(this.label14);
-			this.lightingGb.Controls.Add(this.label23);
-			this.lightingGb.Controls.Add(this.label22);
-			this.lightingGb.Location = new System.Drawing.Point(0, 892);
-			this.lightingGb.Name = "lightingGb";
-			this.lightingGb.Size = new System.Drawing.Size(181, 133);
-			this.lightingGb.TabIndex = 70;
-			this.lightingGb.TabStop = false;
-			this.lightingGb.Text = "Lighting";
-			// 
-			// specPowUd
-			// 
-			this.specPowUd.Location = new System.Drawing.Point(111, 101);
-			this.specPowUd.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-			this.specPowUd.Name = "specPowUd";
-			this.specPowUd.Size = new System.Drawing.Size(59, 20);
-			this.specPowUd.TabIndex = 40;
-			this.specPowUd.ValueChanged += new System.EventHandler(this.specPowUd_ValueChanged);
-			// 
-			// ambientAmountUd
-			// 
-			this.ambientAmountUd.DecimalPlaces = 2;
-			this.ambientAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-			this.ambientAmountUd.Location = new System.Drawing.Point(111, 23);
-			this.ambientAmountUd.Name = "ambientAmountUd";
-			this.ambientAmountUd.Size = new System.Drawing.Size(59, 20);
-			this.ambientAmountUd.TabIndex = 10;
-			this.ambientAmountUd.ValueChanged += new System.EventHandler(this.ambientAmountUd_ValueChanged);
-			// 
-			// diffuseAmountUd
-			// 
-			this.diffuseAmountUd.DecimalPlaces = 2;
-			this.diffuseAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-			this.diffuseAmountUd.Location = new System.Drawing.Point(111, 49);
-			this.diffuseAmountUd.Name = "diffuseAmountUd";
-			this.diffuseAmountUd.Size = new System.Drawing.Size(59, 20);
-			this.diffuseAmountUd.TabIndex = 20;
-			this.diffuseAmountUd.ValueChanged += new System.EventHandler(this.diffuseAmountUd_ValueChanged);
-			// 
-			// specAmountUd
-			// 
-			this.specAmountUd.DecimalPlaces = 2;
-			this.specAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-			this.specAmountUd.Location = new System.Drawing.Point(111, 75);
-			this.specAmountUd.Name = "specAmountUd";
-			this.specAmountUd.Size = new System.Drawing.Size(59, 20);
-			this.specAmountUd.TabIndex = 30;
-			this.specAmountUd.ValueChanged += new System.EventHandler(this.specAmountUd_ValueChanged);
-			// 
-			// label15
-			// 
-			this.label15.AutoSize = true;
-			this.label15.Location = new System.Drawing.Point(22, 25);
-			this.label15.Name = "label15";
-			this.label15.Size = new System.Drawing.Size(83, 13);
-			this.label15.TabIndex = 4;
-			this.label15.Text = "Ambient amount";
-			// 
-			// label14
-			// 
-			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(23, 51);
-			this.label14.Name = "label14";
-			this.label14.Size = new System.Drawing.Size(78, 13);
-			this.label14.TabIndex = 5;
-			this.label14.Text = "Diffuse amount";
-			// 
-			// label23
-			// 
-			this.label23.AutoSize = true;
-			this.label23.Location = new System.Drawing.Point(18, 77);
-			this.label23.Name = "label23";
-			this.label23.Size = new System.Drawing.Size(87, 13);
-			this.label23.TabIndex = 6;
-			this.label23.Text = "Specular amount";
-			// 
-			// label22
-			// 
-			this.label22.AutoSize = true;
-			this.label22.Location = new System.Drawing.Point(24, 103);
-			this.label22.Name = "label22";
-			this.label22.Size = new System.Drawing.Size(81, 13);
-			this.label22.TabIndex = 7;
-			this.label22.Text = "Specular power";
 			// 
 			// groupBox4
 			// 
@@ -1398,9 +1224,18 @@
 			// 
 			this.light.AutoScroll = true;
 			this.light.BackColor = System.Drawing.SystemColors.Control;
+			this.light.Controls.Add(this.specPowUd);
 			this.light.Controls.Add(this.defaultLightBtn);
+			this.light.Controls.Add(this.ambientAmountUd);
 			this.light.Controls.Add(this.lightPanel);
+			this.light.Controls.Add(this.diffuseAmountUd);
 			this.light.Controls.Add(this.globalLightCb);
+			this.light.Controls.Add(this.specAmountUd);
+			this.light.Controls.Add(this.label24);
+			this.light.Controls.Add(this.label15);
+			this.light.Controls.Add(this.label14);
+			this.light.Controls.Add(this.label22);
+			this.light.Controls.Add(this.label23);
 			this.light.Location = new System.Drawing.Point(4, 22);
 			this.light.Name = "light";
 			this.light.Padding = new System.Windows.Forms.Padding(3);
@@ -1420,104 +1255,23 @@
 			// 
 			// lightPanel
 			// 
+			this.lightPanel.AutoSize = true;
+			this.lightPanel.Controls.Add(this.lightDirXUd);
 			this.lightPanel.Controls.Add(this.label11);
+			this.lightPanel.Controls.Add(this.lightDirYUd);
+			this.lightPanel.Controls.Add(this.lightDirZUd);
 			this.lightPanel.Controls.Add(this.label12);
 			this.lightPanel.Controls.Add(this.label13);
-			this.lightPanel.Controls.Add(this.lightDirZUd);
-			this.lightPanel.Controls.Add(this.lightDirYUd);
-			this.lightPanel.Controls.Add(this.lightDirXUd);
-			this.lightPanel.Controls.Add(this.label24);
 			this.lightPanel.Enabled = false;
-			this.lightPanel.Location = new System.Drawing.Point(1, 60);
+			this.lightPanel.Location = new System.Drawing.Point(2, 51);
 			this.lightPanel.Name = "lightPanel";
-			this.lightPanel.Size = new System.Drawing.Size(179, 76);
+			this.lightPanel.Size = new System.Drawing.Size(179, 46);
 			this.lightPanel.TabIndex = 30;
-			// 
-			// label11
-			// 
-			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(144, 49);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(14, 13);
-			this.label11.TabIndex = 7;
-			this.label11.Text = "Z";
-			// 
-			// label12
-			// 
-			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(85, 49);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(14, 13);
-			this.label12.TabIndex = 8;
-			this.label12.Text = "Y";
-			// 
-			// label13
-			// 
-			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(23, 49);
-			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(14, 13);
-			this.label13.TabIndex = 9;
-			this.label13.Text = "X";
-			// 
-			// lightDirZUd
-			// 
-			this.lightDirZUd.Location = new System.Drawing.Point(121, 25);
-			this.lightDirZUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-			this.lightDirZUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-			this.lightDirZUd.Name = "lightDirZUd";
-			this.lightDirZUd.Size = new System.Drawing.Size(57, 20);
-			this.lightDirZUd.TabIndex = 30;
-			this.lightDirZUd.ValueChanged += new System.EventHandler(this.lightDirZUd_ValueChanged);
-			// 
-			// lightDirYUd
-			// 
-			this.lightDirYUd.Location = new System.Drawing.Point(61, 25);
-			this.lightDirYUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-			this.lightDirYUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-			this.lightDirYUd.Name = "lightDirYUd";
-			this.lightDirYUd.Size = new System.Drawing.Size(57, 20);
-			this.lightDirYUd.TabIndex = 20;
-			this.lightDirYUd.ValueChanged += new System.EventHandler(this.lightDirYUd_ValueChanged);
-			// 
-			// lightDirXUd
-			// 
-			this.lightDirXUd.Location = new System.Drawing.Point(1, 25);
-			this.lightDirXUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-			this.lightDirXUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-			this.lightDirXUd.Name = "lightDirXUd";
-			this.lightDirXUd.Size = new System.Drawing.Size(57, 20);
-			this.lightDirXUd.TabIndex = 10;
-			this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
 			// 
 			// label24
 			// 
 			this.label24.AutoSize = true;
-			this.label24.Location = new System.Drawing.Point(3, 9);
+			this.label24.Location = new System.Drawing.Point(0, 38);
 			this.label24.Name = "label24";
 			this.label24.Size = new System.Drawing.Size(49, 13);
 			this.label24.TabIndex = 2;
@@ -1528,11 +1282,11 @@
 			this.globalLightCb.AutoSize = true;
 			this.globalLightCb.Checked = true;
 			this.globalLightCb.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.globalLightCb.Location = new System.Drawing.Point(1, 37);
+			this.globalLightCb.Location = new System.Drawing.Point(104, 37);
 			this.globalLightCb.Name = "globalLightCb";
-			this.globalLightCb.Size = new System.Drawing.Size(119, 17);
+			this.globalLightCb.Size = new System.Drawing.Size(76, 17);
 			this.globalLightCb.TabIndex = 20;
-			this.globalLightCb.Text = "Use global direction";
+			this.globalLightCb.Text = "Use global";
 			this.globalLightCb.UseVisualStyleBackColor = true;
 			this.globalLightCb.CheckedChanged += new System.EventHandler(this.globalLightCb_CheckedChanged);
 			// 
@@ -1594,7 +1348,7 @@
 			// label20
 			// 
 			this.label20.AutoSize = true;
-			this.label20.Location = new System.Drawing.Point(-3, 41);
+			this.label20.Location = new System.Drawing.Point(-2, 41);
 			this.label20.Name = "label20";
 			this.label20.Size = new System.Drawing.Size(73, 13);
 			this.label20.TabIndex = 1;
@@ -1657,7 +1411,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-3214, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-3282, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1669,7 +1423,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-3326, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-3394, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1679,7 +1433,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-3328, 10040);
+			this.label4.Location = new System.Drawing.Point(-3396, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1821,26 +1575,6 @@
 			this.hnotelabel.TabIndex = 3;
 			this.hnotelabel.Text = "Max pitch";
 			// 
-			// upDownVpWidth
-			// 
-			this.upDownVpWidth.AutoSize = true;
-			this.upDownVpWidth.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.upDownVpWidth.Decimals = 3;
-			this.upDownVpWidth.Decimals2 = 2;
-			this.upDownVpWidth.ExpBase = 2D;
-			this.upDownVpWidth.Location = new System.Drawing.Point(12, 28);
-			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
-			this.upDownVpWidth.Max = 10D;
-			this.upDownVpWidth.Min = 0D;
-			this.upDownVpWidth.Name = "upDownVpWidth";
-			this.upDownVpWidth.Size = new System.Drawing.Size(180, 48);
-			this.upDownVpWidth.TabIndex = 0;
-			this.upDownVpWidth.TbWidth = 50;
-			this.upDownVpWidth.TickFreq = 1D;
-			this.upDownVpWidth.Value = 16D;
-			this.upDownVpWidth.ValueChanged += new System.EventHandler(this.upDownVpWidth_ValueChanged);
-			this.upDownVpWidth.CommitChanges += new System.EventHandler(this.upDownVpWidth_CommitChanges);
-			// 
 			// songPropsCb
 			// 
 			this.songPropsCb.Appearance = System.Windows.Forms.Appearance.Button;
@@ -1877,6 +1611,284 @@
 			this.debugLabel.Text = "label16";
 			this.debugLabel.Visible = false;
 			// 
+			// label11
+			// 
+			this.label11.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(144, 27);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(14, 13);
+			this.label11.TabIndex = 31;
+			this.label11.Text = "Z";
+			// 
+			// label12
+			// 
+			this.label12.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.label12.AutoSize = true;
+			this.label12.Location = new System.Drawing.Point(85, 27);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(14, 13);
+			this.label12.TabIndex = 32;
+			this.label12.Text = "Y";
+			// 
+			// label13
+			// 
+			this.label13.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.label13.AutoSize = true;
+			this.label13.Location = new System.Drawing.Point(23, 27);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(14, 13);
+			this.label13.TabIndex = 33;
+			this.label13.Text = "X";
+			// 
+			// lightDirZUd
+			// 
+			this.lightDirZUd.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.lightDirZUd.Location = new System.Drawing.Point(121, 3);
+			this.lightDirZUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.lightDirZUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.lightDirZUd.Name = "lightDirZUd";
+			this.lightDirZUd.Size = new System.Drawing.Size(57, 20);
+			this.lightDirZUd.TabIndex = 36;
+			// 
+			// lightDirYUd
+			// 
+			this.lightDirYUd.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.lightDirYUd.Location = new System.Drawing.Point(61, 3);
+			this.lightDirYUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.lightDirYUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.lightDirYUd.Name = "lightDirYUd";
+			this.lightDirYUd.Size = new System.Drawing.Size(57, 20);
+			this.lightDirYUd.TabIndex = 35;
+			// 
+			// lightDirXUd
+			// 
+			this.lightDirXUd.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.lightDirXUd.Location = new System.Drawing.Point(1, 3);
+			this.lightDirXUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.lightDirXUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.lightDirXUd.Name = "lightDirXUd";
+			this.lightDirXUd.Size = new System.Drawing.Size(57, 20);
+			this.lightDirXUd.TabIndex = 34;
+			// 
+			// specPowUd
+			// 
+			this.specPowUd.Location = new System.Drawing.Point(101, 178);
+			this.specPowUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.specPowUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+			this.specPowUd.Name = "specPowUd";
+			this.specPowUd.Size = new System.Drawing.Size(59, 20);
+			this.specPowUd.TabIndex = 48;
+			this.specPowUd.ValueChanged += new System.EventHandler(this.specPowUd_ValueChanged);
+			// 
+			// ambientAmountUd
+			// 
+			this.ambientAmountUd.DecimalPlaces = 2;
+			this.ambientAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.ambientAmountUd.Location = new System.Drawing.Point(101, 100);
+			this.ambientAmountUd.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+			this.ambientAmountUd.Name = "ambientAmountUd";
+			this.ambientAmountUd.Size = new System.Drawing.Size(59, 20);
+			this.ambientAmountUd.TabIndex = 45;
+			this.ambientAmountUd.ValueChanged += new System.EventHandler(this.ambientAmountUd_ValueChanged);
+			// 
+			// diffuseAmountUd
+			// 
+			this.diffuseAmountUd.DecimalPlaces = 2;
+			this.diffuseAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.diffuseAmountUd.Location = new System.Drawing.Point(101, 126);
+			this.diffuseAmountUd.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+			this.diffuseAmountUd.Name = "diffuseAmountUd";
+			this.diffuseAmountUd.Size = new System.Drawing.Size(59, 20);
+			this.diffuseAmountUd.TabIndex = 46;
+			this.diffuseAmountUd.ValueChanged += new System.EventHandler(this.diffuseAmountUd_ValueChanged);
+			// 
+			// specAmountUd
+			// 
+			this.specAmountUd.DecimalPlaces = 2;
+			this.specAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.specAmountUd.Location = new System.Drawing.Point(101, 152);
+			this.specAmountUd.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+			this.specAmountUd.Name = "specAmountUd";
+			this.specAmountUd.Size = new System.Drawing.Size(59, 20);
+			this.specAmountUd.TabIndex = 47;
+			this.specAmountUd.ValueChanged += new System.EventHandler(this.specAmountUd_ValueChanged);
+			// 
+			// label15
+			// 
+			this.label15.AutoSize = true;
+			this.label15.Location = new System.Drawing.Point(12, 102);
+			this.label15.Name = "label15";
+			this.label15.Size = new System.Drawing.Size(83, 13);
+			this.label15.TabIndex = 41;
+			this.label15.Text = "Ambient amount";
+			// 
+			// label14
+			// 
+			this.label14.AutoSize = true;
+			this.label14.Location = new System.Drawing.Point(13, 128);
+			this.label14.Name = "label14";
+			this.label14.Size = new System.Drawing.Size(78, 13);
+			this.label14.TabIndex = 42;
+			this.label14.Text = "Diffuse amount";
+			// 
+			// label23
+			// 
+			this.label23.AutoSize = true;
+			this.label23.Location = new System.Drawing.Point(8, 154);
+			this.label23.Name = "label23";
+			this.label23.Size = new System.Drawing.Size(87, 13);
+			this.label23.TabIndex = 43;
+			this.label23.Text = "Specular amount";
+			// 
+			// label22
+			// 
+			this.label22.AutoSize = true;
+			this.label22.Location = new System.Drawing.Point(14, 180);
+			this.label22.Name = "label22";
+			this.label22.Size = new System.Drawing.Size(81, 13);
+			this.label22.TabIndex = 44;
+			this.label22.Text = "Specular power";
+			// 
+			// upDownVpWidth
+			// 
+			this.upDownVpWidth.AutoSize = true;
+			this.upDownVpWidth.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.upDownVpWidth.Decimals = 3;
+			this.upDownVpWidth.Decimals2 = 2;
+			this.upDownVpWidth.ExpBase = 2D;
+			this.upDownVpWidth.Location = new System.Drawing.Point(12, 28);
+			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
+			this.upDownVpWidth.Max = 10D;
+			this.upDownVpWidth.Min = 0D;
+			this.upDownVpWidth.Name = "upDownVpWidth";
+			this.upDownVpWidth.Size = new System.Drawing.Size(180, 48);
+			this.upDownVpWidth.TabIndex = 0;
+			this.upDownVpWidth.TbWidth = 50;
+			this.upDownVpWidth.TickFreq = 1D;
+			this.upDownVpWidth.Value = 16D;
+			this.upDownVpWidth.ValueChanged += new System.EventHandler(this.upDownVpWidth_ValueChanged);
+			this.upDownVpWidth.CommitChanges += new System.EventHandler(this.upDownVpWidth_CommitChanges);
+			// 
+			// trackList
+			// 
+			this.trackList.AllowDrop = true;
+			this.trackList.BackColor = System.Drawing.Color.Black;
+			this.trackList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.trackColumn,
+            this.normalColumn,
+            this.hilitedColumn});
+			this.trackList.ContextMenuStrip = this.trackListCM;
+			this.trackList.Dock = System.Windows.Forms.DockStyle.Right;
+			this.trackList.ForeColor = System.Drawing.Color.White;
+			this.trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.trackList.HideSelection = false;
+			this.trackList.Location = new System.Drawing.Point(1, 0);
+			this.trackList.Name = "trackList";
+			this.trackList.Size = new System.Drawing.Size(186, 10052);
+			this.trackList.TabIndex = 0;
+			this.trackList.UseCompatibleStateImageBehavior = false;
+			this.trackList.View = System.Windows.Forms.View.Details;
+			this.trackList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.trackList_ItemDrag);
+			this.trackList.SelectedIndexChanged += new System.EventHandler(this.trackList_SelectedIndexChanged);
+			this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
+			this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
+			this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
+			// 
+			// trackColumn
+			// 
+			this.trackColumn.Text = "Track";
+			this.trackColumn.Width = 112;
+			// 
+			// normalColumn
+			// 
+			this.normalColumn.Text = "N";
+			this.normalColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			this.normalColumn.Width = 35;
+			// 
+			// hilitedColumn
+			// 
+			this.hilitedColumn.Text = "H";
+			this.hilitedColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			this.hilitedColumn.Width = 35;
+			// 
+			// lineStyleControl
+			// 
+			this.lineStyleControl.AutoSize = true;
+			this.lineStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
+			this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+			this.lineStyleControl.Name = "lineStyleControl";
+			this.lineStyleControl.Size = new System.Drawing.Size(183, 347);
+			this.lineStyleControl.TabIndex = 2;
+			this.lineStyleControl.Visible = false;
+			// 
+			// barStyleControl
+			// 
+			this.barStyleControl.AutoSize = true;
+			this.barStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.barStyleControl.Location = new System.Drawing.Point(3, 72);
+			this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			this.barStyleControl.Name = "barStyleControl";
+			this.barStyleControl.Size = new System.Drawing.Size(180, 55);
+			this.barStyleControl.TabIndex = 2;
+			// 
 			// songPanelBindingSource
 			// 
 			this.songPanelBindingSource.DataSource = typeof(Visual_Music.SongPanel);
@@ -1891,7 +1903,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1432, 407);
+			this.ClientSize = new System.Drawing.Size(1449, 407);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);
@@ -1920,12 +1932,6 @@
 			this.style.PerformLayout();
 			this.material.ResumeLayout(false);
 			this.material.PerformLayout();
-			this.lightingGb.ResumeLayout(false);
-			this.lightingGb.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.ambientAmountUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.diffuseAmountUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).EndInit();
 			this.groupBox4.ResumeLayout(false);
 			this.groupBox4.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.texVScrollUD)).EndInit();
@@ -1951,9 +1957,6 @@
 			this.light.PerformLayout();
 			this.lightPanel.ResumeLayout(false);
 			this.lightPanel.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).EndInit();
 			this.spatial.ResumeLayout(false);
 			this.spatial.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).EndInit();
@@ -1965,6 +1968,13 @@
 			((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).EndInit();
 			this.propsTogglePanel.ResumeLayout(false);
 			this.propsTogglePanel.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.specPowUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.ambientAmountUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.diffuseAmountUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).EndInit();
 			this.ResumeLayout(false);
@@ -2102,22 +2112,21 @@
 		private System.Windows.Forms.ColorDialog colorDialog1;
 		private BarStyleControl barStyleControl;
 		private LineStyleControl lineStyleControl;
-		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.Label label12;
-		private System.Windows.Forms.Label label13;
-		private System.Windows.Forms.NumericUpDown lightDirZUd;
-		private System.Windows.Forms.NumericUpDown lightDirYUd;
-		private System.Windows.Forms.NumericUpDown lightDirXUd;
-		private System.Windows.Forms.GroupBox lightingGb;
+		public System.Windows.Forms.Label debugLabel;
 		private System.Windows.Forms.NumericUpDown specPowUd;
 		private System.Windows.Forms.NumericUpDown ambientAmountUd;
+		private System.Windows.Forms.NumericUpDown lightDirXUd;
+		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.NumericUpDown lightDirYUd;
+		private System.Windows.Forms.NumericUpDown lightDirZUd;
+		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.Label label13;
 		private System.Windows.Forms.NumericUpDown diffuseAmountUd;
 		private System.Windows.Forms.NumericUpDown specAmountUd;
 		private System.Windows.Forms.Label label15;
 		private System.Windows.Forms.Label label14;
-		private System.Windows.Forms.Label label23;
 		private System.Windows.Forms.Label label22;
-		public System.Windows.Forms.Label debugLabel;
+		private System.Windows.Forms.Label label23;
 	}
 }
 
