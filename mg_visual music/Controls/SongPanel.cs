@@ -617,26 +617,6 @@ namespace Visual_Music
 			Project.createOcTrees();
 		}
 
-		protected override void OnMouseWheel(MouseEventArgs e)
-		{
-			base.OnMouseWheel(e);
-			if (Project.Notes == null)
-				return;
-			bool wasPlaying;
-			if (wasPlaying = Project.IsPlaying)
-				Project.togglePlayback();
-
-			double delta = (float)Math.Sign(e.Delta) / Project.Notes.SongLengthT; //Scroll one tick
-			if (ModifierKeys.HasFlag(WinKeys.Shift))
-				delta *= Project.LargeScrollStepT;   //default large-step scroll is one "page"
-			else
-				delta *= Project.SmallScrollStepT;   //default small-step scroll is 1/16 of one "page" //(=one quarter note with default view width of 16 quarter notes)
-			Project.NormSongPos += delta;
-
-			if (wasPlaying)
-				Project.togglePlayback();
-		}
-
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			base.OnMouseDown(e);

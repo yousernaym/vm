@@ -268,7 +268,36 @@ namespace Visual_Music
 				}
 			}			
 		}
-		
+
+		private void songPanel_MouseWheel(object sender, MouseEventArgs e)
+		{
+			if (Project.Notes == null)
+				return;
+			double delta = (double)Math.Sign(e.Delta);
+
+			if (ModifierKeys.HasFlag(Keys.Control)) //Change view width
+			{
+				upDownVpWidth.Value *= (float)Math.Pow(1.1, delta);
+			}
+			else //scroll
+			{
+				bool wasPlaying;
+				if (wasPlaying = Project.IsPlaying)
+					Project.togglePlayback();
+
+				delta /= Project.Notes.SongLengthT; //Scroll one tick
+				if (ModifierKeys.HasFlag(Keys.Shift))
+					delta *= Project.LargeScrollStepT;   //default large-step scroll is one "page"
+				else
+					delta *= Project.SmallScrollStepT;   //default small-step scroll is 1/16 of one "page" //(=one quarter note with default view width of 16 quarter notes)
+
+				Project.NormSongPos += delta;
+
+				if (wasPlaying)
+					Project.togglePlayback();
+			}
+		}
+
 		private void songPanel_MouseMove(object sender, MouseEventArgs e)
 		{
 			//GdiPoint clientP = songPanel.PointToClient(e.Location);
@@ -277,7 +306,6 @@ namespace Visual_Music
 			songPanel.NormMouseX = (float)(clientP.X - middle) * 2 / songPanel.ClientRectangle.Width;
 			songPanel.NormMouseY = (float)(clientP.Y) / songPanel.ClientRectangle.Height;
 		}
-
 
 		private void exportVideoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -369,6 +397,11 @@ namespace Visual_Music
 					TrackProps tprops = project.TrackViews[t].TrackProps;
 					Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
 				}
+			}
+			else if (e.KeyCode == Keys.ControlKey && Project.VertWidthScale != 1)
+			{
+				project.createOcTrees();
+				SongPanel.Invalidate();
 			}
 		}
 
@@ -1027,6 +1060,7 @@ namespace Visual_Music
 			songPanel.Visible = true;
 			Controls.Add(songPanel);
 			songPanel.BringToFront();
+			songPanel.MouseWheel += new MouseEventHandler(songPanel_MouseWheel);
 			songPanel.MouseMove += new MouseEventHandler(songPanel_MouseMove);
 			songPanel.KeyDown += new KeyEventHandler(songPanel_KeyDown);
 			SongPanel.OnSongPosChanged = delegate ()
@@ -1036,7 +1070,6 @@ namespace Visual_Music
 			};
 		}
 
-	
 		private void invalidateSongPanel(object sender, EventArgs e)
 		{
 			songPanel.Invalidate();
