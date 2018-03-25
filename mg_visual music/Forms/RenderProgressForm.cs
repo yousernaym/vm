@@ -38,7 +38,7 @@ namespace Visual_Music
 			{
 				progress = Math.Min(1, progress);
 				progress = Math.Max(0, progress);
-				int value = (int)(progress * songPanel.Project.SongLengthT);
+				int value = (int)(progress * songPanel.Project.Notes.SongLengthT);
 				progressBar1.Value = value;
 				int percent = (int)(100.0 * progress + 0.5);
 				if (percent > 100)

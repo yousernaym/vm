@@ -126,6 +126,8 @@ namespace Visual_Music
 				if (normSongPos != value)
 				{
 					normSongPos = value;
+					normSongPos = Math.Max(0, normSongPos);
+					normSongPos = Math.Min(1, normSongPos);
 					//SongPanel.paint();
 					songPanel.Invalidate();
 					if (SongPanel.OnSongPosChanged != null)
@@ -672,7 +674,10 @@ namespace Visual_Music
 		}
 		public float SongLengthP =>
 			(float)(notes.SongLengthT * Camera.ViewportSize.X) / viewWidthT;
-		
+
+		public int SmallScrollStepT => (int)(ViewWidthT * SongPanel.SmallScrollStep);
+		public int LargeScrollStepT => (int)(ViewWidthT * SongPanel.LargeScrollStep);
+
 		public float getCurveScreenY(float x, Curve curve)
 		{
 			float pitch = curve.Evaluate((float)getTimeT(x));

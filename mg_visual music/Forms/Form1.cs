@@ -375,8 +375,8 @@ namespace Visual_Music
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
 		{
 			Project.ViewWidthQn = (float)((TbSlider)sender).Value;
-            songScrollBar.SmallChange = Project.ViewWidthT / 16;
-            songScrollBar.LargeChange = Project.ViewWidthT / 1;
+			songScrollBar.SmallChange = Project.SmallScrollStepT; 
+			songScrollBar.LargeChange = Project.LargeScrollStepT;
 		}
 
 		private void upDownVpWidth_MouseUp(object sender, MouseEventArgs e)
