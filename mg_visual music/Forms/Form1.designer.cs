@@ -1385,6 +1385,7 @@
 			this.lightDirXUd.Name = "lightDirXUd";
 			this.lightDirXUd.Size = new System.Drawing.Size(57, 20);
 			this.lightDirXUd.TabIndex = 34;
+			this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
 			// 
 			// label11
 			// 
@@ -1413,6 +1414,7 @@
 			this.lightDirYUd.Name = "lightDirYUd";
 			this.lightDirYUd.Size = new System.Drawing.Size(57, 20);
 			this.lightDirYUd.TabIndex = 35;
+			this.lightDirYUd.ValueChanged += new System.EventHandler(this.lightDirYUd_ValueChanged);
 			// 
 			// lightDirZUd
 			// 
@@ -1431,6 +1433,7 @@
 			this.lightDirZUd.Name = "lightDirZUd";
 			this.lightDirZUd.Size = new System.Drawing.Size(57, 20);
 			this.lightDirZUd.TabIndex = 36;
+			this.lightDirZUd.ValueChanged += new System.EventHandler(this.lightDirZUd_ValueChanged);
 			// 
 			// label12
 			// 
@@ -1669,7 +1672,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-3299, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-3316, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1681,7 +1684,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-3411, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-3428, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1691,7 +1694,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-3413, 10040);
+			this.label4.Location = new System.Drawing.Point(-3430, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
