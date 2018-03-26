@@ -231,8 +231,10 @@ namespace Visual_Music
 			sourceSongType = _noteFileType;
 			desiredSongLengthS = songLengthS;
 			Media.closeAudioFile();
+			
 			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, _insTrack, mixdownType == MixdownType.Internal, songLengthS))
 				return false;
+			
 			if (!openAudioFile(audioFile, mixdownType))
 				return false;
 			createTrackViews(notes.Tracks.Count, eraseCurrent);
@@ -393,7 +395,7 @@ namespace Visual_Music
 
 		public void drawSong(Point viewportSize, double normPos)
 		{
-			if (notes == null)
+			if (notes == null || trackViews == null)
 				return;
 
 			for (int t = 1; t < trackViews.Count; t++)

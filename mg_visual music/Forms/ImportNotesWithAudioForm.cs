@@ -161,8 +161,8 @@ namespace Visual_Music
 			if (tpartyProcess != null)
 				tpartyProcess.Dispose();
 			tpartyProcess = new Process();
-            tpartyProcess.StartInfo.FileName = tpartyApp;
-            tpartyProcess.StartInfo.Arguments = tpartyArgs;
+			tpartyProcess.StartInfo.FileName = tpartyApp;
+			tpartyProcess.StartInfo.Arguments = tpartyArgs;
 			return true;
 		}
        
