@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Visual_Music
 {
@@ -26,6 +27,9 @@ namespace Visual_Music
 
 		static string tpartyOutputFile;
 		public static string TpartyOutputFile { get => tpartyOutputFile; }
+
+		CommonOpenFileDialog tpartyAudioDirDlg = new CommonOpenFileDialog();
+
 		public ImportNotesWithAudioForm()
         {
             InitializeComponent();
@@ -42,6 +46,9 @@ namespace Visual_Music
 			
 			watcher.NotifyFilter = NotifyFilters.LastWrite;
 			watcher.Filter = "*.wav";
+
+			tpartyAudioDirDlg.IsFolderPicker = true;
+			tpartyAudioDirDlg.EnsurePathExists = true;
 		}
 
         override public string AudioFilePath
@@ -71,8 +78,9 @@ namespace Visual_Music
 
         private void browseTpartyOutputBtn_Click(object sender, EventArgs e)
         {
-            if (openTpartyAudioDlg.ShowDialog() == DialogResult.OK)
-                tpartyAudioTb.Text = openTpartyAudioDlg.FileName;
+			tpartyAudioDirDlg.InitialDirectory = tpartyAudioTb.Text;
+			if (tpartyAudioDirDlg.ShowDialog() == CommonFileDialogResult.Ok)
+                tpartyAudioTb.Text = tpartyAudioDirDlg.InitialDirectory = tpartyAudioDirDlg.FileName;
         }
 
         protected void importFiles(bool insTrack, bool internalMixdownSupported, bool xmPlayMixdownSupported, double songLengthS, Midi.FileType noteFileType)
@@ -144,11 +152,16 @@ namespace Visual_Music
 		{
 			tpartyApp = appPath;
 			tpartyArgs = arguments;
-			tpartyOutputDir = outputDir;
+			tpartyOutputDir = outputDir.TrimEnd('\\') + "\\";
 			base.importFiles(insTrack, MixdownType.Tparty, "", songLengthS, noteFileType);
 		}
 		static bool createTpartyProcess()
         {
+			if (!Directory.Exists(tpartyOutputDir))
+			{
+				MessageBox.Show("Couldn't find directory: \n" + tpartyOutputDir, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return false;
+			}
 			try { watcher.Path = tpartyOutputDir; }
 			catch (System.ArgumentException e)
 			{

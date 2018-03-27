@@ -109,25 +109,25 @@
 			// 
 			// tpartyAppTb
 			// 
-			this.tpartyAppTb.Location = new System.Drawing.Point(76, 0);
+			this.tpartyAppTb.Location = new System.Drawing.Point(85, 0);
 			this.tpartyAppTb.Name = "tpartyAppTb";
-			this.tpartyAppTb.Size = new System.Drawing.Size(258, 20);
+			this.tpartyAppTb.Size = new System.Drawing.Size(249, 20);
 			this.tpartyAppTb.TabIndex = 6;
 			// 
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(20, 54);
+			this.label3.Location = new System.Drawing.Point(11, 54);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(50, 13);
+			this.label3.Size = new System.Drawing.Size(68, 13);
 			this.label3.TabIndex = 13;
-			this.label3.Text = "Audio file";
+			this.label3.Text = "Output folder";
 			// 
 			// tpartyAudioTb
 			// 
-			this.tpartyAudioTb.Location = new System.Drawing.Point(76, 51);
+			this.tpartyAudioTb.Location = new System.Drawing.Point(85, 51);
 			this.tpartyAudioTb.Name = "tpartyAudioTb";
-			this.tpartyAudioTb.Size = new System.Drawing.Size(258, 20);
+			this.tpartyAudioTb.Size = new System.Drawing.Size(249, 20);
 			this.tpartyAudioTb.TabIndex = 9;
 			// 
 			// label4
@@ -156,15 +156,15 @@
 			// 
 			// tpartyArgsTb
 			// 
-			this.tpartyArgsTb.Location = new System.Drawing.Point(76, 26);
+			this.tpartyArgsTb.Location = new System.Drawing.Point(85, 26);
 			this.tpartyArgsTb.Name = "tpartyArgsTb";
-			this.tpartyArgsTb.Size = new System.Drawing.Size(258, 20);
+			this.tpartyArgsTb.Size = new System.Drawing.Size(249, 20);
 			this.tpartyArgsTb.TabIndex = 8;
 			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(13, 29);
+			this.label5.Location = new System.Drawing.Point(11, 29);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(57, 13);
 			this.label5.TabIndex = 20;
