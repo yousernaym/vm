@@ -14,9 +14,9 @@ namespace Visual_Music
 		public LineStyleControl()
 		{
 			InitializeComponent();
-			Array enumArray = Enum.GetValues(typeof(LineStyleEnum));
-			foreach (LineStyleEnum lse in enumArray)
-				lineStyleList.Items.Add(lse.ToString());
+			Array enumArray = Enum.GetValues(typeof(LineTypeEnum));
+			foreach (LineTypeEnum lse in enumArray)
+				lineTypeList.Items.Add(lse.ToString());
 			enumArray = Enum.GetValues(typeof(LineHlStyleEnum));
 			foreach (LineHlStyleEnum lse in enumArray)
 				lineHlStyleList.Items.Add(lse.ToString());
@@ -27,9 +27,9 @@ namespace Visual_Music
 			base.update(noteStyle);
 			NoteStyle_Line noteStyle_Line = (NoteStyle_Line)noteStyle;
 			if (noteStyle_Line.LineType == null)
-				lineStyleList.SelectedIndex = -1;
+				lineTypeList.SelectedIndex = -1;
 			else
-				lineStyleList.SelectedIndex = (int)noteStyle_Line.LineType;
+				lineTypeList.SelectedIndex = (int)noteStyle_Line.LineType;
 
 			Form1.setNumericUdValue(lineWidthUd, noteStyle_Line.LineWidth);
 			Form1.setNumericUdValue(qnGapFillUd, noteStyle_Line.Qn_gapThreshold);
@@ -47,13 +47,14 @@ namespace Visual_Music
 
 		
 		
-		private void lineStyleList_SelectedIndexChanged(object sender, EventArgs e)
+		private void lineTypeList_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (UpdatingControls)
 				return;
 			//SongPanel.Invalidate();
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().LineType = (LineStyleEnum)lineStyleList.SelectedIndex;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().LineType = (LineTypeEnum)lineTypeList.SelectedIndex;
+			SongPanel.Project.createOcTrees();
 		}
 
 		private void lineWidthUd_ValueChanged(object sender, EventArgs e)

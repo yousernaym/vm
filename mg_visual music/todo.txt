@@ -2,6 +2,7 @@
 - Bump mapping.
 - (Fix alpha blending.) Fix line vertices at turns.
 - Fix fadeout-to-discard. Non-black edges.
+- Increase minimum width och ribbons.
 
 Done:
 - Use static vertex buffers for bar style.

@@ -38,7 +38,7 @@
 			this.label27 = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
 			this.lineWidthUd = new System.Windows.Forms.NumericUpDown();
-			this.lineStyleList = new System.Windows.Forms.ComboBox();
+			this.lineTypeList = new System.Windows.Forms.ComboBox();
 			this.label17 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
 			this.qnGapFillUd = new System.Windows.Forms.NumericUpDown();
@@ -172,15 +172,15 @@
 			// 
 			// lineStyleList
 			// 
-			this.lineStyleList.DisplayMember = "Name";
-			this.lineStyleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.lineStyleList.FormattingEnabled = true;
-			this.lineStyleList.Location = new System.Drawing.Point(64, 6);
-			this.lineStyleList.Name = "lineStyleList";
-			this.lineStyleList.Size = new System.Drawing.Size(102, 21);
-			this.lineStyleList.TabIndex = 10;
-			this.lineStyleList.ValueMember = "Value";
-			this.lineStyleList.SelectedIndexChanged += new System.EventHandler(this.lineStyleList_SelectedIndexChanged);
+			this.lineTypeList.DisplayMember = "Name";
+			this.lineTypeList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.lineTypeList.FormattingEnabled = true;
+			this.lineTypeList.Location = new System.Drawing.Point(64, 6);
+			this.lineTypeList.Name = "lineStyleList";
+			this.lineTypeList.Size = new System.Drawing.Size(102, 21);
+			this.lineTypeList.TabIndex = 10;
+			this.lineTypeList.ValueMember = "Value";
+			this.lineTypeList.SelectedIndexChanged += new System.EventHandler(this.lineTypeList_SelectedIndexChanged);
 			// 
 			// label17
 			// 
@@ -230,7 +230,7 @@
 			this.lineControlsPanel.Controls.Add(this.qnGapFillUd);
 			this.lineControlsPanel.Controls.Add(this.label11);
 			this.lineControlsPanel.Controls.Add(this.lineWidthUd);
-			this.lineControlsPanel.Controls.Add(this.lineStyleList);
+			this.lineControlsPanel.Controls.Add(this.lineTypeList);
 			this.lineControlsPanel.Location = new System.Drawing.Point(0, 0);
 			this.lineControlsPanel.Name = "lineControlsPanel";
 			this.lineControlsPanel.Size = new System.Drawing.Size(180, 273);
@@ -280,7 +280,7 @@
 		private System.Windows.Forms.Label label27;
 		private System.Windows.Forms.Label label14;
 		private System.Windows.Forms.NumericUpDown lineWidthUd;
-		private System.Windows.Forms.ComboBox lineStyleList;
+		private System.Windows.Forms.ComboBox lineTypeList;
 		private System.Windows.Forms.Label label17;
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.NumericUpDown qnGapFillUd;
