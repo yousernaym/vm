@@ -395,7 +395,7 @@ namespace Visual_Music
 
 		public void drawSong(Point viewportSize, double normPos)
 		{
-			if (notes == null || trackViews == null)
+			if (notes == null)
 				return;
 
 			for (int t = 1; t < trackViews.Count; t++)

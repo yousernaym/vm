@@ -30,12 +30,11 @@ namespace WinFormsGraphicsDevice
     /// </summary>
     abstract public class GraphicsDeviceControl : Control
     {
-        #region Fields
+		#region Fields
+		protected readonly object renderLock = new object();
 
-
-        // However many GraphicsDeviceControl instances you have, they all share
-        // the same underlying GraphicsDevice, managed by this helper service.
-		protected object renderLock = new object();
+		// However many GraphicsDeviceControl instances you have, they all share
+		// the same underlying GraphicsDevice, managed by this helper service.
 		GraphicsDeviceService graphicsDeviceService;
 
 
@@ -65,16 +64,15 @@ namespace WinFormsGraphicsDevice
 
         ServiceContainer services = new ServiceContainer();
 
+		#endregion
 
-        #endregion
-
-        #region Initialization
+		#region Initialization
 
 
-        /// <summary>
-        /// Initializes the control.
-        /// </summary>
-        protected override void OnCreateControl()
+		/// <summary>
+		/// Initializes the control.
+		/// </summary>
+		protected override void OnCreateControl()
         {
             // Don't initialize the graphics device if we are running in the designer.
             if (!DesignMode)
@@ -119,9 +117,13 @@ namespace WinFormsGraphicsDevice
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
-            if (!Monitor.TryEnter(renderLock, 0))
-				return;
-			
+			bool locked = false;
+			try
+			{
+				if (!Monitor.TryEnter(renderLock, 0))
+					return;
+
+				locked = true;
 				string beginDrawError = BeginDraw();
 
 				if (string.IsNullOrEmpty(beginDrawError))
@@ -135,9 +137,13 @@ namespace WinFormsGraphicsDevice
 					// If BeginDraw failed, show an error message using System.Drawing.
 					PaintUsingSystemDrawing(e.Graphics, beginDrawError);
 				}
-			
-		
-			Monitor.Exit(renderLock);
+
+			}
+			finally
+			{
+				if (locked)
+					Monitor.Exit(renderLock);
+			}
 			
         }
 

@@ -227,25 +227,33 @@ namespace Visual_Music
             songScrollBar.Value = Project.SongPosT;
             upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
         }
-        
+
 		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType, double songLengthS, Midi.FileType noteFileType)
 		{
 			saveSettings();
-			
-			if (Project.importSong(notePath, audioPath, eraseCurrent, modInsTrack, mixdownType, songLengthS, noteFileType))
-            {
-				if (eraseCurrent)
+
+			try
+			{
+				songPanel.SuspendPaint();
+				if (Project.importSong(notePath, audioPath, eraseCurrent, modInsTrack, mixdownType, songLengthS, noteFileType))
 				{
-					defaultPitchesBtn.PerformClick();
-					project.resetPitchLimits();
-					currentProjPath = "";
-					updateFormTitle("");
-                }
-				songLoaded(notePath);
-				return true;
-            }
-            else
-                return false;
+					if (eraseCurrent)
+					{
+						defaultPitchesBtn.PerformClick();
+						project.resetPitchLimits();
+						currentProjPath = "";
+						updateFormTitle("");
+					}
+					songLoaded(notePath);
+					return true;
+				}
+				else
+					return false;
+			}
+			finally
+			{ 
+				songPanel.ResumePaint();
+			}
 		}
 
 		void saveSettings()
@@ -957,24 +965,29 @@ namespace Visual_Music
 		}
 		void openSongFile(string fileName)
 		{
-			//try
-			//{
+			try
+			{
+				songPanel.SuspendPaint();
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
-                using (FileStream stream = File.Open(fileName, FileMode.Open))
+				using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
-                    project = (Project)dcs.ReadObject(stream);
+					project = (Project)dcs.ReadObject(stream);
 					Project.SongPanel = songPanel;
-                }
+				}
 				updateImportForm();
-				
-                currentProjPath = fileName;
+
+				currentProjPath = fileName;
 				songLoaded(currentProjPath);
 				updateFormTitle(currentProjPath);
-			//}
-			//catch (Exception ex)
-			//{
-			//	MessageBox.Show(ex.Message);
-			//}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+			finally
+			{
+				songPanel.ResumePaint();
+			}
 		}
 		
 		void updateImportForm()
