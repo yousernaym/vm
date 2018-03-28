@@ -94,7 +94,7 @@ namespace Visual_Music
 			BlendState.ColorWriteChannels = ColorWriteChannels.All;
 			BlendState.AlphaBlendFunction = BlendFunction.Add;
 			BlendState.ColorBlendFunction = BlendFunction.Add;
-
+			
 			content = new ContentManager(Services, "Content");
 			NoteStyle.sInitAllStyles(this);
 
@@ -151,6 +151,7 @@ namespace Visual_Music
 				SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
 				SpriteBatch.End();
 			}
+			GraphicsDevice.BlendState = BlendState;
 			Project.drawSong(new Point(2, 1), Project.NormSongPos);
 		}
 
@@ -158,15 +159,16 @@ namespace Visual_Music
 		{
 			if (Parent == null || ((Form1)Parent).trackListItems.Count == 0)
 				return;
+			
 			if (leftMbPressed)
 			{
 				Invalidate();
 				selectingRegion = true;
-
+				
 				Point mousePos = new Point((int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width), (int)(NormMouseY * ClientRectangle.Height));
 				selectedScreenRegion.Width = mousePos.X - selectedScreenRegion.X;
 				selectedScreenRegion.Height = mousePos.Y - selectedScreenRegion.Y;
-				
+
 				int selectedCount = 0;
 
 				//Frustum check----------------
