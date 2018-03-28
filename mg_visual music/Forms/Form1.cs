@@ -285,7 +285,7 @@ namespace Visual_Music
 
 			if (ModifierKeys.HasFlag(Keys.Control)) //Change view width
 			{
-				upDownVpWidth.Value *= (float)Math.Pow(1.1, delta);
+				upDownVpWidth.Value *= (float)Math.Pow(1.1, -delta);
 			}
 			else //scroll
 			{
@@ -299,7 +299,7 @@ namespace Visual_Music
 				else
 					delta *= Project.SmallScrollStepT;   //default small-step scroll is 1/16 of one "page" //(=one quarter note with default view width of 16 quarter notes)
 
-				Project.NormSongPos += delta;
+				Project.NormSongPos -= delta;
 
 				if (wasPlaying)
 					Project.togglePlayback();
