@@ -345,13 +345,21 @@ namespace Visual_Music
 						float hLineEnd = hLineStart;
 						do
 						{
-							hLineEnd++;
-						} while ((int)center.Y == (int)Project.getCurveScreenY((float)hLineEnd + 1, trackProps.TrackView.Curve) && hLineEnd < endDraw);
-						if (hLineEnd > hLineStart + LineWidth / 2)
+							hLineEnd += step;
+						} while ((int)center.Y == (int)Project.getCurveScreenY((float)hLineEnd + step, trackProps.TrackView.Curve) && hLineEnd < endDraw);
+						if (hLineEnd > hLineStart + vpLineWidth / 2)
 						{
 							hLineVerts[hLineVertIndex++] = lineVerts[vertIndex];
 							hLineVerts[hLineVertIndex++] = lineVerts[vertIndex + 1];
 						}
+						//float horizontalFactor = Math.Abs(normal.Y);
+						//float horizontalLimit = 0.98f;
+						//float minThickness = 0.001f;
+						//if (horizontalFactor > horizontalLimit)
+						//{ //todo use vertexoffset for non-ribbon instead of normal
+						//	horizontalFactor = (horizontalFactor - horizontalLimit) / (1 - horizontalLimit);  //[horizontalFactor, 1] -> [0, 1]
+						//	lineVerts[vertIndex].pos.Y -= minThickness * horizontalFactor * Math.Sign(normal.X);
+						//}
 					}
 
 					if (x == startDraw && vertIndex > 3)
