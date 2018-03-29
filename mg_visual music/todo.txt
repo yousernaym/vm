@@ -1,10 +1,10 @@
 ﻿Todo:
 - Bump mapping.
 - (Fix alpha blending.) Fix line vertices at turns.
-- Fix fadeout-to-discard. Non-black edges.
 - Increase minimum width for ribbons.
 
 Done:
+- Fix fadeout-to-discard. Non-black edges.
 - Use static vertex buffers for bar style.
 - Antialiasing through blurring of line edges and mod discarding if FadeOut > 0.
 - Add possibility to select notes with non-default camera settings.

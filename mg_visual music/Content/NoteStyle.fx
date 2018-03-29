@@ -205,12 +205,19 @@ float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 
 			if (Invert[i])
 				interpolant = 1 - interpolant;
 			if (ColorDestEnable[i])
-				result.rgb = lerp(result.rgb, ColorDest[i].rgb, interpolant);
+			{
+				result.rgb = lerp(discardFade ? ColorDest[i].rgb : result.rgb, ColorDest[i].rgb, interpolant);
+			}
 			if (AlphaDestEnable[i])
-				result.a = lerp(result.a, ColorDest[i].a, interpolant);
+			{
+				result.a = lerp(discardFade ? ColorDest[i].a : result.a, ColorDest[i].a, interpolant);
+			}
 			if (AngleDestEnable[i])
 			{
-				float angle = AngleDest[i] * interpolant; //lerp from 0 to AngleDest
+				float angle = AngleDest[i];
+				if (!discardFade)
+					angle *= interpolant; //lerp from 0 to AngleDest
+				
 				float3 perpSourceDest = cross(sourceNormal, destNormalDir);
 				float3 perpSource = normalize(cross(perpSourceDest, sourceNormal));
 				destNormal += cos(angle) * sourceNormal + sin(angle) * perpSource;
