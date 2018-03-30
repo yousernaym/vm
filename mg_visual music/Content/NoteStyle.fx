@@ -43,6 +43,48 @@ float Power[ModEntriesCount];
 bool DiscardAfterStop[ModEntriesCount];
 bool Invert[ModEntriesCount];
 
+struct ModEntry
+{
+	float2 Origin;
+	bool XOriginEnable;
+	bool YOriginEnable;
+	int CombineXY;
+	bool ColorDestEnable;
+	bool AlphaDestEnable;
+	bool AngleDestEnable;
+	float4 ColorDest;
+	float AngleDest;
+	float Start;
+	float Stop;
+	float FadeIn;
+	float FadeOut;
+	float Power;
+	bool DiscardAfterStop;
+	bool Invert;
+};
+
+//Struct arrays cannot yet be passed to shaders in Monogame, so pass arrays of individual ellements and copy them to the struct here
+void fillModEntryStruct(out ModEntry entry, int index)
+{
+	entry.Origin = Origin[index];
+	entry.XOriginEnable = XOriginEnable[index];
+	entry.YOriginEnable = YOriginEnable[index];
+	entry.CombineXY = CombineXY[index];
+	entry.ColorDestEnable = ColorDestEnable[index];
+	entry.AlphaDestEnable = AlphaDestEnable[index];
+	entry.AngleDestEnable = AngleDestEnable[index];
+	entry.ColorDest = ColorDest[index];
+	entry.AngleDest = AngleDest[index];
+	entry.Start = Start[index];
+	entry.Stop = Stop[index];
+	entry.FadeIn = FadeIn[index];
+	entry.FadeOut = FadeOut[index];
+	entry.Power = Power[index];
+	entry.DiscardAfterStop = DiscardAfterStop[index];
+	entry.Invert = Invert[index];
+	
+}
+
 //bool bla[4][3];
 int ActiveModEntries;
 //##define ModSource_TopLeft 0
@@ -85,26 +127,26 @@ float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 	return color;
 }
 
-float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir, out bool discardFade)
+float getInterpolant(ModEntry modEntry, float2 normPos, out float3 destNormalDir, out bool discardFade)
 {
 	discardFade = false;
-	float2 transformedPos = normPos - Origin[modIndex];
+	float2 transformedPos = normPos - modEntry.Origin;
 	if (transformedPos.x < 0)
-		transformedPos.x /= Origin[modIndex].x;
+		transformedPos.x /= modEntry.Origin.x;
 	else
-		transformedPos.x /= 1 - Origin[modIndex].x;
+		transformedPos.x /= 1 - modEntry.Origin.x;
 	if (transformedPos.y < 0)
-		transformedPos.y /= Origin[modIndex].y;
+		transformedPos.y /= modEntry.Origin.y;
 	else
-		transformedPos.y /= 1 - Origin[modIndex].y;
+		transformedPos.y /= 1 - modEntry.Origin.y;
 
 	float2 distFromOrigin = abs(transformedPos);
 	float interpolant = 0;
 	destNormalDir = float3(0, 0, 0);
 
-	if (XOriginEnable[modIndex] && YOriginEnable[modIndex])
+	if (modEntry.XOriginEnable && modEntry.YOriginEnable)
 	{
-		if (CombineXY[modIndex] == CombineXY_Max)
+		if (modEntry.CombineXY == CombineXY_Max)
 		{
 			if (distFromOrigin.x > distFromOrigin.y)
 				destNormalDir.x = transformedPos.x;
@@ -112,7 +154,7 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir, out
 				destNormalDir.y = transformedPos.y;
 			interpolant = max(distFromOrigin.x, distFromOrigin.y);
 		}
-		else if (CombineXY[modIndex] == CombineXY_Min)
+		else if (modEntry.CombineXY == CombineXY_Min)
 		{
 			if (distFromOrigin.x < distFromOrigin.y)
 				destNormalDir.x = transformedPos.x;
@@ -123,18 +165,18 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir, out
 		else //Both x and y is used
 		{
 			destNormalDir = float3(transformedPos, 0);
-			if (CombineXY[modIndex] == CombineXY_Add)
+			if (modEntry.CombineXY == CombineXY_Add)
 				interpolant = distFromOrigin.x + distFromOrigin.y;
-			else if (CombineXY[modIndex] == CombineXY_Length)
+			else if (modEntry.CombineXY == CombineXY_Length)
 				interpolant = pow(distFromOrigin.x, 2) + pow(distFromOrigin.y, 2);
 		}
 	}
-	else if (XOriginEnable[modIndex])
+	else if (modEntry.XOriginEnable)
 	{
 		destNormalDir.x = transformedPos.x;
 		interpolant = distFromOrigin.x;
 	}
-	else if (YOriginEnable[modIndex])
+	else if (modEntry.YOriginEnable)
 	{
 		destNormalDir.y = transformedPos.y;
 		interpolant = distFromOrigin.y;
@@ -145,24 +187,24 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir, out
 	destNormalDir = normalize(destNormalDir);
 		
 	//Outside Start - Stop?
-	bool discardBeforeStart = Invert[modIndex] && DiscardAfterStop[modIndex];
-	//bool discardBeforeStart = DiscardAfterStop[modIndex];
-	bool discardAfterStop = !Invert[modIndex] && DiscardAfterStop[modIndex];
-	if (interpolant < Start[modIndex])
+	bool discardBeforeStart = modEntry.Invert && modEntry.DiscardAfterStop;
+	//bool discardBeforeStart = modEntry.DiscardAfterStop;
+	bool discardAfterStop = !modEntry.Invert && modEntry.DiscardAfterStop;
+	if (interpolant < modEntry.Start)
 		return discardBeforeStart ? -1 : 0;
-	if (interpolant > Stop[modIndex])
+	if (interpolant > modEntry.Stop)
 		return discardAfterStop ? -1 : 0;
 			
-	interpolant -= Start[modIndex];
-	interpolant /= Stop[modIndex] - Start[modIndex];
+	interpolant -= modEntry.Start;
+	interpolant /= modEntry.Stop - modEntry.Start;
 	
-	if (interpolant > FadeIn[modIndex] && 1 - interpolant > FadeOut[modIndex])
+	if (interpolant > modEntry.FadeIn && 1 - interpolant > modEntry.FadeOut)
 		return 1;
 	
 	float fadeInInterpolant;
-	if (FadeIn[modIndex] > 0 && interpolant < FadeIn[modIndex])
+	if (modEntry.FadeIn > 0 && interpolant < modEntry.FadeIn)
 	{
-		fadeInInterpolant = interpolant / FadeIn[modIndex];
+		fadeInInterpolant = interpolant / modEntry.FadeIn;
 		if (discardBeforeStart)
 			discardFade = true;
 	}
@@ -170,17 +212,17 @@ float getInterpolant(float2 normPos, int modIndex, out float3 destNormalDir, out
 		fadeInInterpolant = 1;
 
 	float fadeOutInterpolant;
-	if (FadeOut[modIndex] > 0 && 1 - interpolant < FadeOut[modIndex])
+	if (modEntry.FadeOut > 0 && 1 - interpolant < modEntry.FadeOut)
 	{
-		fadeOutInterpolant = (1 - interpolant) / FadeOut[modIndex];
+		fadeOutInterpolant = (1 - interpolant) / modEntry.FadeOut;
 		if (discardAfterStop)
 			discardFade = true;
 	}
 	else
 		fadeOutInterpolant = 1;
-	interpolant = fadeOutInterpolant * fadeInInterpolant;
+	interpolant = min(fadeOutInterpolant, fadeInInterpolant);
 	
-	interpolant = pow(saturate(interpolant), Power[modIndex]);
+	interpolant = pow(saturate(interpolant), modEntry.Power);
 	return interpolant;
 }
 float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 worldPos)
@@ -188,14 +230,20 @@ float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 
 	float4 result = sourceColor;
 	float3 destNormal = float3(0,0,0);
 	
-	float2 gradLength = ddx(normPos);
+	float gradLength = max(length(ddx(normPos)), length(ddy(normPos)));
 	for (int i = 0; i < ActiveModEntries; i++)
 	{
 		if (ColorDestEnable[i] || AlphaDestEnable[i] || AngleDestEnable[i])
 		{
+			ModEntry modEntry;
+			fillModEntryStruct(modEntry, i);
+			modEntry.FadeOut = max(gradLength*2, modEntry.FadeOut);
+			modEntry.FadeIn = max(gradLength*2, modEntry.FadeIn);
+			modEntry.FadeIn = min(1 - modEntry.FadeOut, modEntry.FadeIn);
+			
 			float3 destNormalDir;
 			bool discardFade;
-			float interpolant = getInterpolant(normPos, i, destNormalDir, discardFade);
+			float interpolant = getInterpolant(modEntry, normPos, destNormalDir, discardFade);
 			if (interpolant < 0) //Discard after stop
 			{
 				result = 0;
@@ -230,7 +278,8 @@ float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 
 	}
 	if (!any(destNormal))
 		destNormal = sourceNormal;
-	result.rgb = calcLighting(result.rgb, destNormal, worldPos);
+	
+	result.rgb = calcLighting(result.rgb, normalize(destNormal), worldPos);
 	return result;
 }
 
