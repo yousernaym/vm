@@ -237,9 +237,12 @@ float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 
 		{
 			ModEntry modEntry;
 			fillModEntryStruct(modEntry, i);
-			modEntry.FadeOut = max(gradLength*2, modEntry.FadeOut);
-			modEntry.FadeIn = max(gradLength*2, modEntry.FadeIn);
-			modEntry.FadeIn = min(1 - modEntry.FadeOut, modEntry.FadeIn);
+			modEntry.FadeOut = max(gradLength * 3, modEntry.FadeOut);
+			if (modEntry.Start > 0)
+			{
+				modEntry.FadeIn = max(gradLength * 3, modEntry.FadeIn);
+				modEntry.FadeIn = min(1 - modEntry.FadeOut, modEntry.FadeIn);
+			}
 			
 			float3 destNormalDir;
 			bool discardFade;
