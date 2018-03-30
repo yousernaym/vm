@@ -13,6 +13,9 @@ using System.Diagnostics;
 
 namespace Visual_Music
 {
+	public enum LineType { Standard, Ribbon };
+	public enum LineHlStyleEnum { Arrow, Circle };
+
 	public struct LineHlVertex : IVertexType
 	{
 		public Vector3 pos;
@@ -48,7 +51,7 @@ namespace Visual_Music
 		public float? LineWidth { get; set; } = 5;
 		public float? Qn_gapThreshold { get; set; } = 3;
 		public bool? Continuous { get; set; } = true;
-		public LineTypeEnum? LineType { get; set; } = LineTypeEnum.Simple;
+		public LineType? LineType { get; set; } = Visual_Music.LineType.Standard;
 		public LineHlStyleEnum? HlType { get; set; } = LineHlStyleEnum.Arrow;
 		float VpHlSize => (float)HlSize * Project.Camera.ViewportSize.X / 1000.0f;
 		public float? HlSize { get; set; } = 20;
@@ -77,7 +80,7 @@ namespace Visual_Music
 				else if (entry.Name == "continuous")
 					Continuous = (bool)entry.Value;
 				else if(entry.Name == "style")
-					LineType = (LineTypeEnum)entry.Value;
+					LineType = (LineType)entry.Value;
 				else if (entry.Name == "hlStyle")
 					HlType = (LineHlStyleEnum)entry.Value;
 				else if (entry.Name == "hlSize")
@@ -129,7 +132,7 @@ namespace Visual_Music
 			normal.Normalize();
 			pos = points[1];
 
-			if (LineType == LineTypeEnum.Ribbon)
+			if (LineType == Visual_Music.LineType.Ribbon)
 				vertexOffset = new Vector3(1, 0, 0);
 			else
 				vertexOffset = normal;
@@ -339,7 +342,7 @@ namespace Visual_Music
 					if (texMaterial.TexProps.Texture != null)
 						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texMaterial.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
-					if (LineType == LineTypeEnum.Ribbon)
+					if (LineType == Visual_Music.LineType.Ribbon)
 					{
 						float hLineStart = center.X;
 						float hLineEnd = hLineStart;

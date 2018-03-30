@@ -170,13 +170,13 @@
             0});
 			this.lineWidthUd.ValueChanged += new System.EventHandler(this.lineWidthUd_ValueChanged);
 			// 
-			// lineStyleList
+			// lineTypeList
 			// 
 			this.lineTypeList.DisplayMember = "Name";
 			this.lineTypeList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.lineTypeList.FormattingEnabled = true;
 			this.lineTypeList.Location = new System.Drawing.Point(64, 6);
-			this.lineTypeList.Name = "lineStyleList";
+			this.lineTypeList.Name = "lineTypeList";
 			this.lineTypeList.Size = new System.Drawing.Size(102, 21);
 			this.lineTypeList.TabIndex = 10;
 			this.lineTypeList.ValueMember = "Value";
@@ -187,9 +187,9 @@
 			this.label17.AutoSize = true;
 			this.label17.Location = new System.Drawing.Point(7, 9);
 			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(51, 13);
+			this.label17.Size = new System.Drawing.Size(50, 13);
 			this.label17.TabIndex = 47;
-			this.label17.Text = "Line style";
+			this.label17.Text = "Line type";
 			// 
 			// label11
 			// 

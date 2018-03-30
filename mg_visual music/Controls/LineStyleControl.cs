@@ -14,8 +14,8 @@ namespace Visual_Music
 		public LineStyleControl()
 		{
 			InitializeComponent();
-			Array enumArray = Enum.GetValues(typeof(LineTypeEnum));
-			foreach (LineTypeEnum lse in enumArray)
+			Array enumArray = Enum.GetValues(typeof(LineType));
+			foreach (LineType lse in enumArray)
 				lineTypeList.Items.Add(lse.ToString());
 			enumArray = Enum.GetValues(typeof(LineHlStyleEnum));
 			foreach (LineHlStyleEnum lse in enumArray)
@@ -53,7 +53,7 @@ namespace Visual_Music
 				return;
 			//SongPanel.Invalidate();
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().LineType = (LineTypeEnum)lineTypeList.SelectedIndex;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().LineType = (LineType)lineTypeList.SelectedIndex;
 			SongPanel.Project.createOcTrees();
 		}
 
