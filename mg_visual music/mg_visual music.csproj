@@ -10,7 +10,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Visual_Music</RootNamespace>
-    <AssemblyName>Visual Music</AssemblyName>
+    <AssemblyName>VM</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>

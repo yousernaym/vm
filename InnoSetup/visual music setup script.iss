@@ -4,7 +4,7 @@
 #define MyAppName "Visual Music"
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Mikesoft"
-#define MyAppExeName "Visual Music.exe"
+#define MyAppExeName "VM.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -26,12 +26,17 @@ VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany={#MyAppPublisher}
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed = x64
+ChangesAssociations=True
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
+Name: "associateVmp"; Description: "Associate with .vmp files";
+;Name: "associateMod"; Description: "Associate with module files";
+;Name: "associateMod\mod"; Description: ".mod";
+;Name: "associateMod\xm"; Description: ".xm";
 
 [Files]
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\Visual Music.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -58,3 +63,9 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [Dirs]
 Name: "{app}\Tparty\xmplay\output"
+
+[Registry]
+Root: HKCR; SubKey: ".vmp"; ValueType: string; ValueData: "VisualMusicProject"; Flags: uninsdeletekey
+Root: HKCR; SubKey: "VisualMusicProject"; ValueType: string; ValueData: "Visual Music project"; Flags: uninsdeletekey
+Root: HKCR; SubKey: "VisualMusicProject\Shell\Open\Command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey
+Root: HKCR; Subkey: "VisualMusicProject\DefaultIcon"; ValueType: string; ValueData: "{app}\{#MyAppExeName},0"; Flags: uninsdeletevalue
