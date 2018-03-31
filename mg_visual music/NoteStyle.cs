@@ -54,6 +54,7 @@ namespace Visual_Music
 		public bool? YOriginEnable { get; set; } = true;
 
 		public int? CombineXY { get; set; } = 0;
+		public bool? SquareAspect { get; set; } = false;
 		public bool? ColorDestEnable { get; set; } = false;
 		public bool? AlphaDestEnable { get; set; } = false;
 		public bool? AngleDestEnable { get; set; } = false;
@@ -98,6 +99,8 @@ namespace Visual_Music
 					YOriginEnable = (bool)entry.Value;
 				else if (entry.Name == "combineXY")
 					CombineXY = (int)entry.Value;
+				else if (entry.Name == "squareAspect")
+					SquareAspect = (bool)entry.Value;
 				else if (entry.Name == "colorDestEnable")
 					ColorDestEnable = (bool)entry.Value;
 				else if (entry.Name == "angleDestEnable")
@@ -130,6 +133,7 @@ namespace Visual_Music
 			info.AddValue("xOriginEnable", XOriginEnable);
 			info.AddValue("yOriginEnable", YOriginEnable);
 			info.AddValue("combineXY", CombineXY);
+			info.AddValue("squareAspect", SquareAspect);
 			info.AddValue("colorDestEnable", ColorDestEnable);
 			info.AddValue("angleDestEnable", AngleDestEnable);
 			info.AddValue("colorDest", ColorDest);
@@ -330,6 +334,7 @@ namespace Visual_Music
 				//fxModEntry["XSource"].SetValue(ModEntries[i].XSource);
 				//fxModEntry["YSource"].SetValue(ModEntries[i].YSource);
 				//fxModEntry["CombineXY"].SetValue(ModEntries[i].CombineXY);
+				//fxModEntry["squareAspect"].SetValue(ModEntries[i].SquareAspect);
 				//fxModEntry["ColorDestEnable"].SetValue(ModEntries[i].ColorDestEnable);
 				//fxModEntry["ColorDest"].SetValue(ModEntries[i].ColorDest);
 				//fxModEntry["AngleDestEnable"].SetValue(ModEntries[i].AngleDestEnable);
@@ -345,6 +350,7 @@ namespace Visual_Music
 				fx.Parameters["XOriginEnable"].Elements[i].SetValue((bool)ModEntries[i].XOriginEnable);
 				fx.Parameters["YOriginEnable"].Elements[i].SetValue((bool)ModEntries[i].YOriginEnable);
 				fx.Parameters["CombineXY"].Elements[i].SetValue((int)ModEntries[i].CombineXY);
+				fx.Parameters["SquareAspect"].Elements[i].SetValue((bool)ModEntries[i].SquareAspect);
 				fx.Parameters["ColorDestEnable"].Elements[i].SetValue((bool)ModEntries[i].ColorDestEnable);
 				fx.Parameters["AngleDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AngleDestEnable);
 				fx.Parameters["AlphaDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AlphaDestEnable);

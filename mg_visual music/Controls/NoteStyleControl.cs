@@ -70,6 +70,7 @@ namespace Visual_Music
 					combineXYCombo.SelectedIndex = -1;
 				else
 					combineXYCombo.SelectedIndex = (int)modEntry.CombineXY;
+				squareAspectCb.CheckState = Form1.toCheckState(modEntry.SquareAspect);
 				colorDestCb.CheckState = Form1.toCheckState(modEntry.ColorDestEnable);
 				angleDestCb.CheckState = Form1.toCheckState(modEntry.AngleDestEnable);
 				colorDestBtn.BackColor = modEntry.SystemColorDest;
@@ -170,6 +171,14 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.CombineXY = combineXYCombo.SelectedIndex;
+		}
+
+		private void squareAspectCb_CheckedChanged(object sender, EventArgs e)
+		{
+			if (UpdatingControls)
+				return;
+			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.SquareAspect = squareAspectCb.Checked;
 		}
 
 		private void colorDestCb_CheckedChanged(object sender, EventArgs e)

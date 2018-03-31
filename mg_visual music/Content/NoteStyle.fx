@@ -30,6 +30,7 @@ float2 Origin[ModEntriesCount];
 bool XOriginEnable[ModEntriesCount];
 bool YOriginEnable[ModEntriesCount];
 int CombineXY[ModEntriesCount];
+bool SquareAspect[ModEntriesCount];
 bool ColorDestEnable[ModEntriesCount];
 bool AlphaDestEnable[ModEntriesCount];
 bool AngleDestEnable[ModEntriesCount];
@@ -49,6 +50,7 @@ struct ModEntry
 	bool XOriginEnable;
 	bool YOriginEnable;
 	int CombineXY;
+	bool SquareAspect;
 	bool ColorDestEnable;
 	bool AlphaDestEnable;
 	bool AngleDestEnable;
@@ -70,6 +72,7 @@ void fillModEntryStruct(out ModEntry entry, int index)
 	entry.XOriginEnable = XOriginEnable[index];
 	entry.YOriginEnable = YOriginEnable[index];
 	entry.CombineXY = CombineXY[index];
+	entry.SquareAspect = SquareAspect[index];
 	entry.ColorDestEnable = ColorDestEnable[index];
 	entry.AlphaDestEnable = AlphaDestEnable[index];
 	entry.AngleDestEnable = AngleDestEnable[index];
@@ -150,16 +153,12 @@ float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out flo
 	distToEdgeFromOrigin = abs(distToEdgeFromOrigin * noteSize);
 	
 	float2 distFromOrigin = normDistFromOrigin * distToEdgeFromOrigin;
-	//float2 distFromEdge = distToEdgeFromOrigin - distFromOrigin;
-	if (distToEdgeFromOrigin.x < distToEdgeFromOrigin.y)
-	{
-
-	}
-	else
+	if (modEntry.SquareAspect && distToEdgeFromOrigin.x > distToEdgeFromOrigin.y)
 	{
 		float ratio = distToEdgeFromOrigin.x / distToEdgeFromOrigin.y;
-		float normDistFromEdgeX = min((1 - normDistFromOrigin.x) * ratio, 1);
+		float normDistFromEdgeX = min((1 - normDistFromOrigin.x) * ratio, 1); //1:1 aspect by increasing x dist from edge to match y dist from edge
 		normDistFromOrigin.x = 1 - normDistFromEdgeX;
+		//normDistFromOrigin.y = normDistFromOrigin.y / ratio; //1:1 aspect by reducing y dist from origin to match x dist from origin
 	}
 	transformedNormPos = normDistFromOrigin * sign(transformedNormPos);
 	float interpolant = 0;
