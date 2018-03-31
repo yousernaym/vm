@@ -146,7 +146,7 @@
 			// label14
 			// 
 			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(129, 61);
+			this.label14.Location = new System.Drawing.Point(126, 61);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(42, 13);
 			this.label14.TabIndex = 51;
@@ -154,7 +154,7 @@
 			// 
 			// lineWidthUd
 			// 
-			this.lineWidthUd.Location = new System.Drawing.Point(64, 33);
+			this.lineWidthUd.Location = new System.Drawing.Point(61, 30);
 			this.lineWidthUd.Maximum = new decimal(new int[] {
             500,
             0,
@@ -175,7 +175,7 @@
 			this.lineTypeList.DisplayMember = "Name";
 			this.lineTypeList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.lineTypeList.FormattingEnabled = true;
-			this.lineTypeList.Location = new System.Drawing.Point(64, 6);
+			this.lineTypeList.Location = new System.Drawing.Point(61, 3);
 			this.lineTypeList.Name = "lineTypeList";
 			this.lineTypeList.Size = new System.Drawing.Size(102, 21);
 			this.lineTypeList.TabIndex = 10;
@@ -185,25 +185,25 @@
 			// label17
 			// 
 			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(7, 9);
+			this.label17.Location = new System.Drawing.Point(24, 6);
 			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(50, 13);
+			this.label17.Size = new System.Drawing.Size(31, 13);
 			this.label17.TabIndex = 47;
-			this.label17.Text = "Line type";
+			this.label17.Text = "Type";
 			// 
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(3, 35);
+			this.label11.Location = new System.Drawing.Point(20, 32);
 			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(55, 13);
+			this.label11.Size = new System.Drawing.Size(35, 13);
 			this.label11.TabIndex = 49;
-			this.label11.Text = "Line width";
+			this.label11.Text = "Width";
 			// 
 			// qnGapFillUd
 			// 
 			this.qnGapFillUd.DecimalPlaces = 1;
-			this.qnGapFillUd.Location = new System.Drawing.Point(64, 59);
+			this.qnGapFillUd.Location = new System.Drawing.Point(61, 56);
 			this.qnGapFillUd.Name = "qnGapFillUd";
 			this.qnGapFillUd.Size = new System.Drawing.Size(59, 20);
 			this.qnGapFillUd.TabIndex = 30;
@@ -214,9 +214,9 @@
 			this.label12.AutoSize = true;
 			this.label12.Location = new System.Drawing.Point(1, 61);
 			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(57, 13);
+			this.label12.Size = new System.Drawing.Size(54, 13);
 			this.label12.TabIndex = 50;
-			this.label12.Text = "Fill gaps < ";
+			this.label12.Text = "Fill gaps <";
 			// 
 			// lineControlsPanel
 			// 
