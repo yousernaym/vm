@@ -13,6 +13,7 @@ struct VSOutput
     float4 pos : POSITION0;
 	float2 normPos : POSITION1;
 	float4 worldPos : POSITION2;
+	float2 worldSize : POSITION3;
 	float2 texCoords : TEXCOORD0;
 	float4 color : COLOR0;
 };
@@ -37,6 +38,7 @@ VSOutput VS(VSInput IN)
 	else
 		OUT.color = Color;
 	OUT.normPos = IN.normPos;// *2 - 1;
+	OUT.worldSize = IN.rect.zw;
     return OUT;
 }
 
@@ -44,7 +46,7 @@ float4 PS(VSOutput IN) : COLOR0
 {
 	float4 color = IN.color;
 	color.rgb *= tex2D(TextureSampler, IN.texCoords);
-	color = modulate(IN.normPos, color, float3(0,0,1), IN.worldPos);
+	color = modulate(IN.normPos, IN.worldSize, color, float3(0,0,1), IN.worldPos);
 	
 	return color;
 	//return float4(1, 1, 1, color.r*10);

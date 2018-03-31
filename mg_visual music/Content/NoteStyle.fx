@@ -127,20 +127,41 @@ float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 	return color;
 }
 
-float getInterpolant(ModEntry modEntry, float2 normPos, out float3 destNormalDir, out bool discardFade)
+float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out float3 destNormalDir, out bool discardFade)
 {
 	discardFade = false;
-	float2 transformedPos = normPos - modEntry.Origin;
-	if (transformedPos.x < 0)
-		transformedPos.x /= modEntry.Origin.x;
+	float2 transformedNormPos = normPos - modEntry.Origin;
+	float2 distToEdgeFromOrigin = modEntry.Origin;
+	if (transformedNormPos.x < 0)
+		transformedNormPos.x /= modEntry.Origin.x;
 	else
-		transformedPos.x /= 1 - modEntry.Origin.x;
-	if (transformedPos.y < 0)
-		transformedPos.y /= modEntry.Origin.y;
+	{
+		transformedNormPos.x /= 1 - modEntry.Origin.x;
+		distToEdgeFromOrigin = 1 - modEntry.Origin.x;
+	}
+	if (transformedNormPos.y < 0)
+		transformedNormPos.y /= modEntry.Origin.y;
 	else
-		transformedPos.y /= 1 - modEntry.Origin.y;
+	{
+		transformedNormPos.y /= 1 - modEntry.Origin.y;
+		distToEdgeFromOrigin = 1 - modEntry.Origin.y;
+	}
+	float2 normDistFromOrigin = abs(transformedNormPos);
+	distToEdgeFromOrigin = abs(distToEdgeFromOrigin * noteSize);
+	
+	float2 distFromOrigin = normDistFromOrigin * distToEdgeFromOrigin;
+	//float2 distFromEdge = distToEdgeFromOrigin - distFromOrigin;
+	if (distToEdgeFromOrigin.x < distToEdgeFromOrigin.y)
+	{
 
-	float2 distFromOrigin = abs(transformedPos);
+	}
+	else
+	{
+		float ratio = distToEdgeFromOrigin.x / distToEdgeFromOrigin.y;
+		float normDistFromEdgeX = min((1 - normDistFromOrigin.x) * ratio, 1);
+		normDistFromOrigin.x = 1 - normDistFromEdgeX;
+	}
+	transformedNormPos = normDistFromOrigin * sign(transformedNormPos);
 	float interpolant = 0;
 	destNormalDir = float3(0, 0, 0);
 
@@ -148,38 +169,38 @@ float getInterpolant(ModEntry modEntry, float2 normPos, out float3 destNormalDir
 	{
 		if (modEntry.CombineXY == CombineXY_Max)
 		{
-			if (distFromOrigin.x > distFromOrigin.y)
-				destNormalDir.x = transformedPos.x;
+			if (normDistFromOrigin.x > normDistFromOrigin.y)
+				destNormalDir.x = transformedNormPos.x;
 			else
-				destNormalDir.y = transformedPos.y;
-			interpolant = max(distFromOrigin.x, distFromOrigin.y);
+				destNormalDir.y = transformedNormPos.y;
+			interpolant = max(normDistFromOrigin.x, normDistFromOrigin.y);
 		}
 		else if (modEntry.CombineXY == CombineXY_Min)
 		{
-			if (distFromOrigin.x < distFromOrigin.y)
-				destNormalDir.x = transformedPos.x;
+			if (normDistFromOrigin.x < normDistFromOrigin.y)
+				destNormalDir.x = transformedNormPos.x;
 			else
-				destNormalDir.y = transformedPos.y;
-			interpolant = min(distFromOrigin.x, distFromOrigin.y);
+				destNormalDir.y = transformedNormPos.y;
+			interpolant = min(normDistFromOrigin.x, normDistFromOrigin.y);
 		}
 		else //Both x and y is used
 		{
-			destNormalDir = float3(transformedPos, 0);
+			destNormalDir = float3(transformedNormPos, 0);
 			if (modEntry.CombineXY == CombineXY_Add)
-				interpolant = distFromOrigin.x + distFromOrigin.y;
+				interpolant = normDistFromOrigin.x + normDistFromOrigin.y;
 			else if (modEntry.CombineXY == CombineXY_Length)
-				interpolant = pow(distFromOrigin.x, 2) + pow(distFromOrigin.y, 2);
+				interpolant = pow(normDistFromOrigin.x, 2) + pow(normDistFromOrigin.y, 2);
 		}
 	}
 	else if (modEntry.XOriginEnable)
 	{
-		destNormalDir.x = transformedPos.x;
-		interpolant = distFromOrigin.x;
+		destNormalDir.x = transformedNormPos.x;
+		interpolant = normDistFromOrigin.x;
 	}
 	else if (modEntry.YOriginEnable)
 	{
-		destNormalDir.y = transformedPos.y;
-		interpolant = distFromOrigin.y;
+		destNormalDir.y = transformedNormPos.y;
+		interpolant = normDistFromOrigin.y;
 	}
 	else
 		return 0;
@@ -225,7 +246,7 @@ float getInterpolant(ModEntry modEntry, float2 normPos, out float3 destNormalDir
 	interpolant = pow(saturate(interpolant), modEntry.Power);
 	return interpolant;
 }
-float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 worldPos)
+float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sourceNormal, float3 worldPos)
 {
 	float4 result = sourceColor;
 	float3 destNormal = float3(0,0,0);
@@ -246,7 +267,7 @@ float4 modulate(float2 normPos, float4 sourceColor, float3 sourceNormal, float3 
 			
 			float3 destNormalDir;
 			bool discardFade;
-			float interpolant = getInterpolant(modEntry, normPos, destNormalDir, discardFade);
+			float interpolant = getInterpolant(modEntry, normPos, noteSize, destNormalDir, discardFade);
 			if (interpolant < 0) //Discard after stop
 			{
 				result = 0;

@@ -25,6 +25,7 @@ struct VSOutput
 	float3 center : POSITION1;
 	float3 rawPos : POSITION2;
 	float2 normPos : POSITION3;
+	float2 worldSize : POSITION4;
 	float2 texCoords : TEXCOORD0;
 };
 
@@ -34,6 +35,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.center = IN.center;
 	OUT.rawPos = IN.pos.xyz;
 	OUT.normPos = IN.normPos;
+	//OUT.worldSize = IN.WorldSize;
 	
 	//IN.texCoords.x *= TexWidthScale;
 	OUT.texCoords = IN.texCoords - TexScrollOffset;
@@ -72,7 +74,7 @@ void PS(out float4 color : COLOR0, in VSOutput IN)
 	//normPos.y = normPos.y * 0.5f + 0.5f;
 	//normPos.y = normDistFromEdge;
 	IN.rawPos.x -= SongPos;
-	color = modulate(normPos, color, lightingNormal, IN.rawPos);
+	color = modulate(normPos, IN.worldSize, color, lightingNormal, IN.rawPos);
 	color = blurEdges(color, normPos.y);
 	//color.a = 0;
 }
