@@ -65,6 +65,7 @@
 			this.combineXYCombo = new System.Windows.Forms.ComboBox();
 			this.label9 = new System.Windows.Forms.Label();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+			this.squareAspectCb = new System.Windows.Forms.CheckBox();
 			this.modEntryCm.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.modEntryBs)).BeginInit();
 			this.modGbox.SuspendLayout();
@@ -137,7 +138,7 @@
 			this.modGbox.Controls.Add(this.modEntryCombo);
 			this.modGbox.Location = new System.Drawing.Point(0, 0);
 			this.modGbox.Name = "modGbox";
-			this.modGbox.Size = new System.Drawing.Size(177, 472);
+			this.modGbox.Size = new System.Drawing.Size(177, 498);
 			this.modGbox.TabIndex = 43;
 			this.modGbox.TabStop = false;
 			this.modGbox.Text = "Modulation";
@@ -150,7 +151,7 @@
 			this.modEntryPanel.Controls.Add(this.pixelPosGb);
 			this.modEntryPanel.Location = new System.Drawing.Point(3, 46);
 			this.modEntryPanel.Name = "modEntryPanel";
-			this.modEntryPanel.Size = new System.Drawing.Size(168, 407);
+			this.modEntryPanel.Size = new System.Drawing.Size(168, 433);
 			this.modEntryPanel.TabIndex = 42;
 			this.modEntryPanel.Visible = false;
 			// 
@@ -168,7 +169,7 @@
 			this.interpolationGb.Controls.Add(this.label42);
 			this.interpolationGb.Controls.Add(this.stopUd);
 			this.interpolationGb.Controls.Add(this.fadeInUd);
-			this.interpolationGb.Location = new System.Drawing.Point(3, 192);
+			this.interpolationGb.Location = new System.Drawing.Point(3, 218);
 			this.interpolationGb.Name = "interpolationGb";
 			this.interpolationGb.Size = new System.Drawing.Size(158, 212);
 			this.interpolationGb.TabIndex = 40;
@@ -320,7 +321,7 @@
 			this.destinationsGb.Controls.Add(this.colorDestCb);
 			this.destinationsGb.Controls.Add(this.colorDestBtn);
 			this.destinationsGb.Controls.Add(this.angleDestUd);
-			this.destinationsGb.Location = new System.Drawing.Point(3, 106);
+			this.destinationsGb.Location = new System.Drawing.Point(3, 132);
 			this.destinationsGb.Name = "destinationsGb";
 			this.destinationsGb.Size = new System.Drawing.Size(158, 80);
 			this.destinationsGb.TabIndex = 30;
@@ -388,6 +389,7 @@
 			// 
 			// pixelPosGb
 			// 
+			this.pixelPosGb.Controls.Add(this.squareAspectCb);
 			this.pixelPosGb.Controls.Add(this.yOriginCb);
 			this.pixelPosGb.Controls.Add(this.xOriginCb);
 			this.pixelPosGb.Controls.Add(this.label8);
@@ -397,7 +399,7 @@
 			this.pixelPosGb.Controls.Add(this.label9);
 			this.pixelPosGb.Location = new System.Drawing.Point(3, 3);
 			this.pixelPosGb.Name = "pixelPosGb";
-			this.pixelPosGb.Size = new System.Drawing.Size(158, 97);
+			this.pixelPosGb.Size = new System.Drawing.Size(158, 123);
 			this.pixelPosGb.TabIndex = 20;
 			this.pixelPosGb.TabStop = false;
 			this.pixelPosGb.Text = "Pixel position";
@@ -427,7 +429,7 @@
 			// label8
 			// 
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(5, 24);
+			this.label8.Location = new System.Drawing.Point(18, 23);
 			this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(34, 13);
@@ -512,11 +514,22 @@
 			// label9
 			// 
 			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(2, 71);
+			this.label9.Location = new System.Drawing.Point(4, 71);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(48, 13);
 			this.label9.TabIndex = 38;
 			this.label9.Text = "Combine";
+			// 
+			// squareAspectCb
+			// 
+			this.squareAspectCb.AutoSize = true;
+			this.squareAspectCb.Location = new System.Drawing.Point(6, 100);
+			this.squareAspectCb.Name = "squareAspectCb";
+			this.squareAspectCb.Size = new System.Drawing.Size(95, 17);
+			this.squareAspectCb.TabIndex = 60;
+			this.squareAspectCb.Text = "Square aspect";
+			this.squareAspectCb.UseVisualStyleBackColor = true;
+			this.squareAspectCb.CheckedChanged += new System.EventHandler(this.squareAspectCb_CheckedChanged);
 			// 
 			// NoteStyleControl
 			// 
@@ -526,7 +539,7 @@
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.Controls.Add(this.modGbox);
 			this.Name = "NoteStyleControl";
-			this.Size = new System.Drawing.Size(180, 475);
+			this.Size = new System.Drawing.Size(180, 501);
 			this.modEntryCm.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.modEntryBs)).EndInit();
 			this.modGbox.ResumeLayout(false);
@@ -588,5 +601,6 @@
 		private System.Windows.Forms.CheckBox invertCb;
 		private System.Windows.Forms.GroupBox interpolationGb;
 		private System.Windows.Forms.ComboBox modEntryCombo;
+		private System.Windows.Forms.CheckBox squareAspectCb;
 	}
 }
