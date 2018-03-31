@@ -3,7 +3,7 @@
 // Input parameters
 
 float Radius;
-int Style;
+int LineType;
 float3 WorldPos;
 float HlSize;
 float InnerHlSize;
@@ -50,7 +50,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 void PS(out float4 color : COLOR0, in VSOutput IN)
 {
 	float3 lightingNormal;
-	if (Style == 1) //Ribbon
+	if (LineType == 1) //Ribbon
 	{
 		if (IN.normal.x > 0)
 			IN.normal *= -1;

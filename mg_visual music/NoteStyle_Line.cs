@@ -14,7 +14,7 @@ using System.Diagnostics;
 namespace Visual_Music
 {
 	public enum LineType { Standard, Ribbon };
-	public enum LineHlStyleEnum { Arrow, Circle };
+	public enum LineHlType { Arrow, Circle };
 
 	public struct LineHlVertex : IVertexType
 	{
@@ -52,7 +52,7 @@ namespace Visual_Music
 		public float? Qn_gapThreshold { get; set; } = 3;
 		public bool? Continuous { get; set; } = true;
 		public LineType? LineType { get; set; } = Visual_Music.LineType.Standard;
-		public LineHlStyleEnum? HlType { get; set; } = LineHlStyleEnum.Arrow;
+		public LineHlType? HlType { get; set; } = LineHlType.Arrow;
 		float VpHlSize => (float)HlSize * Project.Camera.ViewportSize.X / 1000.0f;
 		public float? HlSize { get; set; } = 20;
 		public bool? MovingHl { get; set; } = false;
@@ -79,10 +79,10 @@ namespace Visual_Music
 					Qn_gapThreshold = (float)entry.Value;
 				else if (entry.Name == "continuous")
 					Continuous = (bool)entry.Value;
-				else if(entry.Name == "style")
+				else if(entry.Name == "lineType")
 					LineType = (LineType)entry.Value;
-				else if (entry.Name == "hlStyle")
-					HlType = (LineHlStyleEnum)entry.Value;
+				else if (entry.Name == "hlType")
+					HlType = (LineHlType)entry.Value;
 				else if (entry.Name == "hlSize")
 					HlSize = (float)entry.Value;
 				else if (entry.Name == "movingHl")
@@ -99,8 +99,8 @@ namespace Visual_Music
 			info.AddValue("lineWidth", LineWidth);
 			info.AddValue("qn_gapThreshold", Qn_gapThreshold);
 			info.AddValue("continuous", Continuous);
-			info.AddValue("style", LineType);
-			info.AddValue("hlStyle", HlType);
+			info.AddValue("LineType", LineType);
+			info.AddValue("hlType", HlType);
 			info.AddValue("hlSize", HlSize);
 			info.AddValue("movingHl", MovingHl);
 			info.AddValue("shrinkingHl", ShrinkingHl);
@@ -476,7 +476,7 @@ namespace Visual_Music
 
 			//this.trackProps = trackProps;
 
-			fx.Parameters["Style"].SetValue((int)LineType);
+			fx.Parameters["LineType"].SetValue((int)LineType);
 			fx.Parameters["HlSize"].SetValue(VpHlSize / 2.0f);
 			songPanel.GraphicsDevice.BlendState = songPanel.BlendState;
 			float radius = (float)VpLineWidth / 2.0f;
@@ -534,7 +534,7 @@ namespace Visual_Music
 			}
 
 			Vector3 noteStartVec = new Vector3(noteStart.X, noteStart.Y, 0);
-			if (HlType == LineHlStyleEnum.Arrow)
+			if (HlType == LineHlType.Arrow)
 			{
 				float arrowLength;
 				Vector3 arrowDir;
@@ -588,7 +588,7 @@ namespace Visual_Music
 				side2Normal.Normalize();
 				fx.Parameters["Side2Normal"].SetValue(side2Normal);
 			}
-			else if (HlType == LineHlStyleEnum.Circle && !(bool)MovingHl)
+			else if (HlType == LineHlType.Circle && !(bool)MovingHl)
 			{
 				setHlCirclePos(noteStartVec);
 			}
@@ -612,7 +612,7 @@ namespace Visual_Music
 			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
 			
 			fx.Parameters["Border"].SetValue((bool)HlBorder);
-			if (HlType == LineHlStyleEnum.Arrow)
+			if (HlType == LineHlType.Arrow)
 			{
 				//Calc shortest dist to incenter from border, ie. the inscribed circle's radius
 				float a = (lineHlVerts[0].pos - lineHlVerts[1].pos).Length();
@@ -627,7 +627,7 @@ namespace Visual_Music
 				fx.CurrentTechnique.Passes[0].Apply();
 				songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
 			}
-			else if (HlType == LineHlStyleEnum.Circle)
+			else if (HlType == LineHlType.Circle)
 			{
 				if ((bool)MovingHl)
 				{

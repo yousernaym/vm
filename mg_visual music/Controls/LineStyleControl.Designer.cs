@@ -31,7 +31,7 @@
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.hlBorderCb = new System.Windows.Forms.CheckBox();
 			this.shrinkingHlCb = new System.Windows.Forms.CheckBox();
-			this.lineHlStyleList = new System.Windows.Forms.ComboBox();
+			this.lineHlTypeList = new System.Windows.Forms.ComboBox();
 			this.movingHlCb = new System.Windows.Forms.CheckBox();
 			this.label29 = new System.Windows.Forms.Label();
 			this.hlSizeUpDown = new System.Windows.Forms.NumericUpDown();
@@ -60,7 +60,7 @@
 			// 
 			this.groupBox3.Controls.Add(this.hlBorderCb);
 			this.groupBox3.Controls.Add(this.shrinkingHlCb);
-			this.groupBox3.Controls.Add(this.lineHlStyleList);
+			this.groupBox3.Controls.Add(this.lineHlTypeList);
 			this.groupBox3.Controls.Add(this.movingHlCb);
 			this.groupBox3.Controls.Add(this.label29);
 			this.groupBox3.Controls.Add(this.hlSizeUpDown);
@@ -94,17 +94,17 @@
 			this.shrinkingHlCb.UseVisualStyleBackColor = true;
 			this.shrinkingHlCb.CheckedChanged += new System.EventHandler(this.shrinkingHlCb_CheckedChanged);
 			// 
-			// lineHlStyleList
+			// lineHlTypeList
 			// 
-			this.lineHlStyleList.DisplayMember = "Name";
-			this.lineHlStyleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.lineHlStyleList.FormattingEnabled = true;
-			this.lineHlStyleList.Location = new System.Drawing.Point(43, 19);
-			this.lineHlStyleList.Name = "lineHlStyleList";
-			this.lineHlStyleList.Size = new System.Drawing.Size(109, 21);
-			this.lineHlStyleList.TabIndex = 10;
-			this.lineHlStyleList.ValueMember = "Value";
-			this.lineHlStyleList.SelectedIndexChanged += new System.EventHandler(this.lineHlStyleList_SelectedIndexChanged);
+			this.lineHlTypeList.DisplayMember = "Name";
+			this.lineHlTypeList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.lineHlTypeList.FormattingEnabled = true;
+			this.lineHlTypeList.Location = new System.Drawing.Point(43, 19);
+			this.lineHlTypeList.Name = "lineHlTypeList";
+			this.lineHlTypeList.Size = new System.Drawing.Size(109, 21);
+			this.lineHlTypeList.TabIndex = 10;
+			this.lineHlTypeList.ValueMember = "Value";
+			this.lineHlTypeList.SelectedIndexChanged += new System.EventHandler(this.lineHlTypeList_SelectedIndexChanged);
 			// 
 			// movingHlCb
 			// 
@@ -139,9 +139,9 @@
 			this.label27.AutoSize = true;
 			this.label27.Location = new System.Drawing.Point(6, 22);
 			this.label27.Name = "label27";
-			this.label27.Size = new System.Drawing.Size(30, 13);
+			this.label27.Size = new System.Drawing.Size(31, 13);
 			this.label27.TabIndex = 9;
-			this.label27.Text = "Style";
+			this.label27.Text = "Type";
 			// 
 			// label14
 			// 
@@ -273,7 +273,7 @@
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.CheckBox hlBorderCb;
 		private System.Windows.Forms.CheckBox shrinkingHlCb;
-		private System.Windows.Forms.ComboBox lineHlStyleList;
+		private System.Windows.Forms.ComboBox lineHlTypeList;
 		private System.Windows.Forms.CheckBox movingHlCb;
 		private System.Windows.Forms.Label label29;
 		private System.Windows.Forms.NumericUpDown hlSizeUpDown;

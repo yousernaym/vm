@@ -17,9 +17,9 @@ namespace Visual_Music
 			Array enumArray = Enum.GetValues(typeof(LineType));
 			foreach (LineType lse in enumArray)
 				lineTypeList.Items.Add(lse.ToString());
-			enumArray = Enum.GetValues(typeof(LineHlStyleEnum));
-			foreach (LineHlStyleEnum lse in enumArray)
-				lineHlStyleList.Items.Add(lse.ToString());
+			enumArray = Enum.GetValues(typeof(LineHlType));
+			foreach (LineHlType lse in enumArray)
+				lineHlTypeList.Items.Add(lse.ToString());
 		}
 
 		public override void update(NoteStyle noteStyle)
@@ -35,9 +35,9 @@ namespace Visual_Music
 			Form1.setNumericUdValue(qnGapFillUd, noteStyle_Line.Qn_gapThreshold);
 			continuousCb.CheckState = Form1.toCheckState(noteStyle_Line.Continuous);
 			if (noteStyle_Line.HlType == null)
-				lineHlStyleList.SelectedIndex = -1;
+				lineHlTypeList.SelectedIndex = -1;
 			else
-				lineHlStyleList.SelectedIndex = (int)noteStyle_Line.HlType;
+				lineHlTypeList.SelectedIndex = (int)noteStyle_Line.HlType;
 
 			Form1.setNumericUdValue(hlSizeUpDown, noteStyle_Line.HlSize);
 			movingHlCb.CheckState = Form1.toCheckState(noteStyle_Line.MovingHl);
@@ -75,13 +75,13 @@ namespace Visual_Music
 			SongPanel.Project.createOcTrees();
 		}
 
-		private void lineHlStyleList_SelectedIndexChanged(object sender, EventArgs e)
+		private void lineHlTypeList_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (UpdatingControls)
 				return;
 			//SongPanel.Invalidate();
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().HlType= (LineHlStyleEnum)lineHlStyleList.SelectedIndex;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().HlType= (LineHlType)lineHlTypeList.SelectedIndex;
 		}
 
 		private void hlSizeUpDown_ValueChanged(object sender, EventArgs e)
