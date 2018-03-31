@@ -124,28 +124,37 @@ namespace Visual_Music
 			bool bSongFile = false;
 			bool bMidiFile = false;
             bool bModFile = false;
-            bool bImportFiles = false;
-            //string noteFile = null;
+			bool bSidFile = false;
+			bool bImportFiles = false;
             string audioFile = null;
+			//startupArgs = new string[] { @"cmd\sid.wav", @"cmd\sid.mp3", @"cmd\sid.sid", @"cmd\mod.mod" };
 			foreach (string arg in startupArgs)
 			{
-				string ext = Path.GetExtension(arg);
-				if (ext == ".mid")
+				//MessageBox.Show(arg);
+				string ext = Path.GetExtension(arg).ToLower();
+				if (!bImportFiles)
 				{
-					importMidiForm.NoteFilePath = arg;
-                    bMidiFile = bImportFiles = true;
+					if (ext == ".mid")
+					{
+						importMidiForm.NoteFilePath = arg;
+						bMidiFile = bImportFiles = true;
+					}
+					else if (ext == ".mod" || ext == ".xm" || ext == ".s3m" || ext == ".it" || ext == ".stm")
+					{
+						importModForm.NoteFilePath = arg;
+						bModFile = bImportFiles = true;
+					}
+					else if (ext == ".sid" || ext == ".dat")
+					{
+						importSidForm.NoteFilePath = arg;
+						bSidFile = bImportFiles = true;
+					}
 				}
-                else if (ext == ".mod" || ext == ".xm" || ext == ".s3m" || ext == ".it" || ext == ".stm")
-                {
-                    importModForm.NoteFilePath = arg;
-                    bModFile = bImportFiles = true;
-                }
-                else if (ext == ".wav" || ext == ".mp3")
+				if (audioFile == null && (ext == ".wav" || ext == ".mp3"))
 				{
 					audioFile = arg;
-					bImportFiles = true;
 				}
-				else if (ext == ".vms")
+				else if (ext == ".vms" && !bImportFiles)
 				{
 					openSongFile(arg);
 					bSongFile = true;
@@ -154,16 +163,21 @@ namespace Visual_Music
 			}
 			if (!bSongFile && bImportFiles)
 			{
-                if (bModFile)
+				if (bMidiFile)
+				{
+					importMidiForm.AudioFilePath = audioFile;
+					importMidiToolStripMenuItem.PerformClick();
+				}
+				if (bModFile)
                 {
-                    importModForm.AudioFilePath = audioFile;
+					importModForm.AudioFilePath = audioFile;
                     importModuleToolStripMenuItem.PerformClick();
                 }
-                else
-                {
-                    importMidiForm.AudioFilePath = audioFile;
-                    importMidiToolStripMenuItem.PerformClick();
-                }
+                else if (bSidFile)
+				{
+					importSidForm.AudioFilePath = audioFile;
+					importSidSongToolStripMenuItem.PerformClick();
+				}
                 
 			}
 		}

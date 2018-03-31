@@ -2,6 +2,7 @@
 - Bump mapping.
 - (Fix alpha blending.) Fix line vertices at turns.
 - Increase minimum width for ribbons.
+- Make a Point/Dot note style, like Bar but centered on note start. 
 
 Done:
 - Fix fadeout-to-discard. Non-black edges.

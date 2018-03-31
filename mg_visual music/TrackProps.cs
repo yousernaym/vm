@@ -281,6 +281,7 @@ namespace Visual_Music
 		}
 	}
 
+	//Highlighted or normal note material (currently same for both)
 	[Serializable()]
 	public class NoteTypeMaterial : ISerializable
 	{
