@@ -13,7 +13,7 @@
 AppId={{3F797ABA-DFBA-4CB6-8F1F-DFBA6986E064}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
+AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
@@ -27,6 +27,7 @@ VersionInfoCompany={#MyAppPublisher}
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed = x64
 ChangesAssociations=True
+UninstallDisplayName={#MyAppName}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -39,6 +40,7 @@ Name: "associateVmp"; Description: "Associate with .vmp files";
 ;Name: "associateMod\xm"; Description: ".xm";
 
 [Files]
+; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: "..\mg_visual music\bin\x64\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\libmikmod.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -51,7 +53,6 @@ Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Releas
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\mg_visual music\bin\x64\Release\SharpDX.DXGI.dll"; DestDir: "{app}"
 Source: "..\mg_visual music\Distribute\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: "..\mg_visual music\bin\x64\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
 
 [Icons]
@@ -71,3 +72,6 @@ Root: HKCR; SubKey: ".vmp"; ValueType: string; ValueData: "VisualMusicProject"; 
 Root: HKCR; SubKey: "VisualMusicProject"; ValueType: string; ValueData: "Visual Music project"; Flags: uninsdeletekey
 Root: HKCR; SubKey: "VisualMusicProject\Shell\Open\Command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey
 Root: HKCR; Subkey: "VisualMusicProject\DefaultIcon"; ValueType: string; ValueData: "{app}\{#MyAppExeName},0"; Flags: uninsdeletevalue
+
+[UninstallDelete]
+Type: files; Name: "{app}\settings.xml";
