@@ -10,7 +10,7 @@ namespace Visual_Music
 	class Settings : ISerializable
 	{
 		enum Keys { MidiNoteFolder, ModNoteFolder, SidNoteFolder, MidiAudioFolder, ModAudioFolder, SidAudioFolder, VideoFolder, TextureFolder, ProjectFolder, ModTpartyApp, ModTpartyArgs, ModTpartyOutput, SidTpartyApp, SidTpartyArgs, SidTpartyOutput, HvscDir, TpartyModuleMixdown, TpartySidMixdown, HvscSongLengths }
-		public const string Filename = "settings";
+		public const string Filename = "settings.xml";
 		public static Type[] Types = { typeof(string) };
 		string getKeyName(Keys key)
 		{

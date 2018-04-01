@@ -113,13 +113,13 @@ namespace Visual_Music
 			try
 			{
 				loadSettings();
-			
-				}
-				catch
-				{
-				}
-				//upDownVpWidth.Focus();
-				//upDownVpWidth.Value = songPanel.Qn_viewWidth;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, "Error in " + Settings.Filename, MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+			//upDownVpWidth.Focus();
+			//upDownVpWidth.Value = songPanel.Qn_viewWidth;
 
 			bool bSongFile = false;
 			bool bMidiFile = false;

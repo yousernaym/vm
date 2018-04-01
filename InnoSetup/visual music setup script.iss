@@ -52,6 +52,7 @@ Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Releas
 Source: "..\mg_visual music\bin\x64\Release\SharpDX.DXGI.dll"; DestDir: "{app}"
 Source: "..\mg_visual music\Distribute\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+Source: "..\mg_visual music\bin\x64\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -63,6 +64,7 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [Dirs]
 Name: "{app}\Tparty\xmplay\output"
+Name: "{app}\Content"
 
 [Registry]
 Root: HKCR; SubKey: ".vmp"; ValueType: string; ValueData: "VisualMusicProject"; Flags: uninsdeletekey
