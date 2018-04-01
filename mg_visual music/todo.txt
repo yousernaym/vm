@@ -3,6 +3,8 @@
 - (Fix alpha blending.) Fix line vertices at turns.
 - Increase minimum width for ribbons.
 - Make a Point/Dot note style, like Bar but centered on note start. 
+  Alternatively make it an option to add points in line style.
+- Fix sid parsing.
 
 Done:
 - Fix fadeout-to-discard. Non-black edges.

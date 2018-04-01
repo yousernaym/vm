@@ -39,7 +39,7 @@ Name: "associateVmp"; Description: "Associate with .vmp files";
 ;Name: "associateMod\xm"; Description: ".xm";
 
 [Files]
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\Visual Music.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\x64\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\libmikmod.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
