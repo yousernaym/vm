@@ -19,6 +19,7 @@ namespace Visual_Music
 		static readonly string tempDirRoot = Path.Combine(Path.GetTempPath(), "Visual Music");
 		static public readonly string TempDir = Path.Combine(tempDirRoot, Path.GetRandomFileName()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
 		static public readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
+		static FileStream dirLock = null;
 
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
@@ -33,7 +34,8 @@ namespace Visual_Music
 					Form1.showErrorMsgBox(null, "Couldn't initialize Media Foundation.");
 					return;
 				}
-				
+				Directory.CreateDirectory(TempDir);
+				dirLock = File.Create(Path.Combine(TempDir, "dontdeletefolder"));
 				Midi.Song.initLib(TempDir, Path.GetFileName(MixdownPath));
 				Application.EnableVisualStyles();
 				Application.SetCompatibleTextRenderingDefault(false);
@@ -44,9 +46,11 @@ namespace Visual_Music
 			{
 				Media.closeMF();
 				Midi.Song.exitLib();
+				dirLock.Close();
+				dirLock = null;
 				try
 				{
-					if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1) //no other instances running?
+					//if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1) //no other instances running?
 						Directory.Delete(tempDirRoot, true);
 				}
 				catch
