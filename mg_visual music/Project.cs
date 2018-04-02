@@ -147,6 +147,7 @@ namespace Visual_Music
 					AudioHasStarted = false;
 			}
 		}
+		bool tempPausing;
 		public bool AudioHasStarted { get; set; }
 		
 		public Project(SongPanel spanel)
@@ -695,6 +696,24 @@ namespace Visual_Music
 		{
 			float pitch = curve.Evaluate((float)getTimeT(x));
 			return getScreenPosY(pitch);
+		}
+
+		public void tempPausePlayback()
+		{
+			if (IsPlaying)
+			{
+				tempPausing = true;
+				togglePlayback();
+			}
+		}
+
+		public void resumeTempPausedPlayback()
+		{
+			if (!IsPlaying && tempPausing)
+			{
+				tempPausing = false;
+				togglePlayback();
+			}
 		}
 	}
 

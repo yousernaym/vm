@@ -89,7 +89,7 @@ namespace Visual_Music
 
             songScrollBar.Dock = DockStyle.Bottom;
 			songScrollBar.ValueChanged += songScrollBar_ValueChanged;
-			songScrollBar.Scroll += delegate { updatePlaybackPosWhilePlaying(); };
+			songScrollBar.Scroll += songScrollBar_Scroll;
 			Controls.Add(songScrollBar);
             songScrollBar.BringToFront();
 
@@ -1439,14 +1439,23 @@ namespace Visual_Music
 			songScrollBar.Value = Math.Min(songScrollBar.Maximum, songScrollBar.Value + songScrollBar.LargeChange);
 			updatePlaybackPosWhilePlaying();
 		}
+		
 		void updatePlaybackPosWhilePlaying()
 		{
-			if (Project.IsPlaying)
+			if (project.IsPlaying)
 			{
-				Project.togglePlayback();
-				Project.togglePlayback();
+				project.togglePlayback();
+				project.togglePlayback();
 			}
 		}
+		void songScrollBar_Scroll(object sender, ScrollEventArgs e)
+		{
+			if (e.Type != ScrollEventType.EndScroll)
+				Project.tempPausePlayback();
+			else
+				Project.resumeTempPausedPlayback();
+		}
+
 		private void songScrollBar_ValueChanged(object sender, EventArgs e)
 		{
 			Project.NormSongPos = (double)songScrollBar.Value / songScrollBar.Maximum;
