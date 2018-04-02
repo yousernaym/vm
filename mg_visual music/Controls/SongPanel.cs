@@ -330,7 +330,7 @@ namespace Visual_Music
 					if (options.VrMetadata)
 					{
 						Process injector = new Process();
-						injector.StartInfo.FileName = @"Tparty\Metadata Injector\__main__.exe";
+						injector.StartInfo.FileName = "minjector.exe";
 						string stereo = options.Stereo ? "--stereo top-bottom" : "";
 						injector.StartInfo.Arguments = " -i " + stereo + " \"" + videoFilePath + "\" \"" + videoFilePath + "_\"";
 						injector.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;

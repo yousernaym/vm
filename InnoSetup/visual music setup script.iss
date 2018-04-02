@@ -55,7 +55,7 @@ Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Releas
 Source: "..\mg_visual music\bin\x64\Release\SharpDX.DXGI.dll"; DestDir: "{app}"
 Source: "..\mg_visual music\bin\x64\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\mg_visual music\Distribute\Tparty\*"; DestDir: "{#MyAppDataDir}\tparty"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\mg_visual music\Distribute\Metadata Injector\*"; DestDir: "{app}\Metadata Injector"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\mg_visual music\Distribute\minjector.exe"; DestDir: "{app}"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
