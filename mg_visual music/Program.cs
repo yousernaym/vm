@@ -13,10 +13,11 @@ namespace Visual_Music
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
-		static string dir = Path.GetDirectoryName(Application.ExecutablePath);
-		static public string Dir { get => dir; }
+		static public readonly string Dir = Path.GetDirectoryName(Application.ExecutablePath);
+		static public readonly string AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Visual Music");
 		static public Form1 form1;
-		static string tempDir = Path.Combine(Dir, "temp");
+		static readonly string tempDirRoot = Path.Combine(Path.GetTempPath(), "Visual Music");
+		static public readonly string TempDir = Path.Combine(tempDirRoot, Path.GetRandomFileName()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
 		
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
@@ -24,30 +25,27 @@ namespace Visual_Music
 		{
 			//AppDomain currentDomain = AppDomain.CurrentDomain;
 			//currentDomain.UnhandledException += new UnhandledExceptionEventHandler(exceptionHandler);
-
-			if (!Media.initMF())
+			try
 			{
-				MessageBox.Show("Couldn't initialize Media Foundation.");
-				return;
+				if (!Media.initMF())
+				{
+					Form1.showErrorMsgBox(null, "Couldn't initialize Media Foundation.");
+					return;
+				}
+				
+				Midi.Song.initLib(TempDir);
+				Application.EnableVisualStyles();
+				Application.SetCompatibleTextRenderingDefault(false);
+				form1 = new Form1(args);
+				Application.Run(form1);
 			}
-			Midi.Song.initLib(Path.Combine(tempDir, Path.GetRandomFileName()));
-			
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-			form1 = new Form1(args);
-			Application.Run(form1);
-
-			if (!Media.closeMF())
-				MessageBox.Show("Couldn't close Media Foundation.");
-
-			//Midi.Song.deleteMixdownDir(); //Optional because last instance deletes the whole temp folder
-			//Delete temp folder in case of earlier instances of the app crashed and couldn't delete its mixdowns
-			if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1) //no other instances running?
-				Directory.Delete(tempDir, true);
-								
-			Midi.Song.exitLib();
-			DirectoryInfo xmPlayOutputDir = new DirectoryInfo(TpartyIntegrationForm.XmPlayOutputDir);
-			xmPlayOutputDir.clean();
+			finally
+			{
+				if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1) //no other instances running?
+					Directory.Delete(tempDirRoot, true);
+				Media.closeMF();
+				Midi.Song.exitLib();
+			}
 		}
 		static void exceptionHandler(object sender, UnhandledExceptionEventArgs args)
 		{
@@ -60,10 +58,6 @@ namespace Visual_Music
 		{
 			foreach (FileInfo file in directory.GetFiles()) file.Delete();
 			foreach (DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
-		}
-		static public float getSecondsF(this TimeSpan ts)
-		{
-			return (float)((double)ts.Ticks / (double)Stopwatch.Frequency);
 		}
 	}
 }

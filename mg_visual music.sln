@@ -17,6 +17,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Media", "..\..\c++\MyLibs\Media\Media\Media.vcxproj", "{883D1FB6-BB56-4D7D-9AD3-785BB2076ED9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36B4ABDD-6238-44FB-8EF4-119823880343}"
+	ProjectSection(SolutionItems) = preProject
+		InnoSetup\visual music setup script.iss = InnoSetup\visual music setup script.iss
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NoteExtractor", "..\..\c++\MyLibs\NoteExtractor\NoteExtractor.vcxproj", "{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}"
 EndProject
@@ -25,6 +28,19 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Content.Pipeline.Windows", "..\..\..\Github\MonoGame\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.Windows.csproj", "{B950DE10-AC5D-4BD9-B817-51247C4A732D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Build.Tasks.Windows", "..\..\..\Github\MonoGame\Tools\MonoGame.Build.Tasks\MonoGame.Build.Tasks.Windows.csproj", "{E2D9E2AE-B875-D3D6-92B1-ECDC6C642E54}"
+EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "VM", "C:\Program Files\_test\VM.exe", "{0D3A8FD4-D811-4101-A729-4E5170B0EA58}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = C:\Program Files\_test\VM.exe
+		RemoteMachine = DESKTOP-SNGKJT5
+		StartingDirectory = C:\Program Files\_test
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		UseLegacyDebugEngines = No
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +142,12 @@ Global
 		{E2D9E2AE-B875-D3D6-92B1-ECDC6C642E54}.Release|x64.Build.0 = Release|Any CPU
 		{E2D9E2AE-B875-D3D6-92B1-ECDC6C642E54}.Release|x86.ActiveCfg = Release|Any CPU
 		{E2D9E2AE-B875-D3D6-92B1-ECDC6C642E54}.Release|x86.Build.0 = Release|Any CPU
+		{0D3A8FD4-D811-4101-A729-4E5170B0EA58}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{0D3A8FD4-D811-4101-A729-4E5170B0EA58}.Debug|x64.ActiveCfg = Release|Any CPU
+		{0D3A8FD4-D811-4101-A729-4E5170B0EA58}.Debug|x86.ActiveCfg = Release|Any CPU
+		{0D3A8FD4-D811-4101-A729-4E5170B0EA58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D3A8FD4-D811-4101-A729-4E5170B0EA58}.Release|x64.ActiveCfg = Release|Any CPU
+		{0D3A8FD4-D811-4101-A729-4E5170B0EA58}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -116,7 +116,7 @@ namespace Visual_Music
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message, "Error in " + Settings.Filename, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(ex.Message, "Error in " + Settings.FilePath, MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 			//upDownVpWidth.Focus();
 			//upDownVpWidth.Value = songPanel.Qn_viewWidth;
@@ -245,7 +245,6 @@ namespace Visual_Music
 		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType, double songLengthS, Midi.FileType noteFileType)
 		{
 			saveSettings();
-
 			try
 			{
 				songPanel.SuspendPaint();
@@ -273,7 +272,7 @@ namespace Visual_Music
 		void saveSettings()
 		{
 			DataContractSerializer dcs = new DataContractSerializer(typeof(Settings), Settings.Types);
-			using (FileStream stream = File.Open(Settings.Filename, FileMode.Create))
+			using (FileStream stream = File.Open(Settings.FilePath, FileMode.Create))
 			{ 
 				dcs.WriteObject(stream, settings);
 			}
@@ -282,9 +281,9 @@ namespace Visual_Music
 		void loadSettings()
 		{
 			DataContractSerializer dcs = new DataContractSerializer(typeof(Settings), Settings.Types);
-			if (File.Exists(Settings.Filename))
+			if (File.Exists(Settings.FilePath))
 			{
-				using (FileStream stream = File.Open(Settings.Filename, FileMode.Open))
+				using (FileStream stream = File.Open(Settings.FilePath, FileMode.Open))
 				{
 					settings = (Settings)dcs.ReadObject(stream);
 				}

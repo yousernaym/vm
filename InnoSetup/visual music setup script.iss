@@ -5,6 +5,7 @@
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Mikesoft"
 #define MyAppExeName "VM.exe"
+#define MyAppDataDir "{userappdata}\" + MyAppName
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -52,8 +53,9 @@ Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Releas
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\SharpDX.Direct3D11.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\mg_visual music\bin\x64\Release\SharpDX.DXGI.dll"; DestDir: "{app}"
-Source: "..\mg_visual music\Distribute\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\mg_visual music\bin\x64\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\mg_visual music\Distribute\Tparty\*"; DestDir: "{#MyAppDataDir}\tparty"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\mg_visual music\Distribute\Metadata Injector\*"; DestDir: "{app}\Metadata Injector"; Flags: ignoreversion createallsubdirs recursesubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -64,8 +66,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Dirs]
-Name: "{app}\Tparty\xmplay\output"
-Name: "{app}\Content"
+Name: "{#MyAppDataDir}"; Flags: uninsalwaysuninstall
 
 [Registry]
 Root: HKCR; SubKey: ".vmp"; ValueType: string; ValueData: "VisualMusicProject"; Flags: uninsdeletekey

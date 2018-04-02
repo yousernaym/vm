@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
+using System.IO;
+
 namespace Visual_Music
 {
 	[Serializable]
 	class Settings : ISerializable
 	{
 		enum Keys { MidiNoteFolder, ModNoteFolder, SidNoteFolder, MidiAudioFolder, ModAudioFolder, SidAudioFolder, VideoFolder, TextureFolder, ProjectFolder, ModTpartyApp, ModTpartyArgs, ModTpartyOutput, SidTpartyApp, SidTpartyArgs, SidTpartyOutput, HvscDir, TpartyModuleMixdown, TpartySidMixdown, HvscSongLengths }
-		public const string Filename = "settings.xml";
+		public static readonly string FilePath = Path.Combine(Program.AppDataDir, "settings.xml");
 		public static Type[] Types = { typeof(string) };
 		string getKeyName(Keys key)
 		{

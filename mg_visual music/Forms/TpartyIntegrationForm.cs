@@ -19,10 +19,10 @@ namespace Visual_Music
 	{
 		const string SongLengthsFileName = "songlengths.txt";
 		const string XmPlaySidPluginFileName = "xmp-sid.dll";
-		static public string TpartyDir = Program.Dir + @"\tparty";
-		public static string XmPlayDir = TpartyDir + @"\xmplay";
-		public static string XmPlayPath = XmPlayDir + @"\xmplay.exe";
-		public static string XmPlayOutputDir = XmPlayDir + @"\output";
+		static public string TpartyDir = Path.Combine(Program.AppDataDir, "tparty");
+		public static string XmPlayDir = Path.Combine(TpartyDir, "xmplay");
+		public static string XmPlayPath = Path.Combine(XmPlayDir, "xmplay.exe");
+		public static string XmPlayOutputDir = Program.TempDir;
 		public static string XmPlayFileName = Path.GetFileName(XmPlayPath);
 
 		CommonOpenFileDialog hvscDirDialog = new CommonOpenFileDialog();
@@ -45,8 +45,8 @@ namespace Visual_Music
 			hvscDirDialog.EnsurePathExists = true;
 			//hvscDirDialog.FileOk += new System.ComponentModel.CancelEventHandler(hvscDirDialog_FileOk);
 			hvscDirDialog.Title = "Browse to <HVSC path>\\DOCUMENTS";
-			
-			setXmPlayIni_outputPath();
+			Directory.CreateDirectory(XmPlayOutputDir);
+			setXmPlayIni_outputDir();
 		}
 
 		private void xmPlayLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -106,7 +106,7 @@ namespace Visual_Music
 		{
 			if (openXmPlayDialog.ShowDialog() == DialogResult.OK)
 			{
-				setXmPlayIni_outputPath();
+				setXmPlayIni_outputDir();
 				setXmPlayIni_hvscPath();
 				Directory.CreateDirectory(XmPlayOutputDir);
 			}
@@ -217,7 +217,7 @@ namespace Visual_Music
 		{
 			setXmPlayIniValue("SID_.*", "documents", HvscDir);
 		}
-		void setXmPlayIni_outputPath()
+		void setXmPlayIni_outputDir()
 		{
 			setXmPlayIniValue("", "WritePath", XmPlayOutputDir + "\\");
 		}
