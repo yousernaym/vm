@@ -26,8 +26,7 @@ namespace Visual_Music
 		static public string TpartyOutputDir { get => tpartyOutputDir; set => tpartyOutputDir = value; }
 
 		static string tpartyOutputFile;
-		public static string TpartyOutputFile { get => tpartyOutputFile; }
-
+		
 		CommonOpenFileDialog tpartyAudioDirDlg = new CommonOpenFileDialog();
 
 		public ImportNotesWithAudioForm()
@@ -127,26 +126,34 @@ namespace Visual_Music
 		{
 			if (!createTpartyProcess())
 				return null;
+			string processName = "";
 			try
 			{
 				tpartyOutputFile = null;
 				tpartyProcess.Start();
+				processName = tpartyProcess.ProcessName;
 				tpartyProcess.WaitForExit();
 				watcher.EnableRaisingEvents = false;
 				Program.form1.Activate();
 				if (tpartyOutputFile == null)
 					Form1.showWarningMsgBox(null, "Couldn't find audio mixdown at " + tpartyOutputDir);
+				else
+				{
+					File.Delete(Program.MixdownPath);
+					File.Move(tpartyOutputFile, Program.MixdownPath);
+					tpartyOutputFile = Program.MixdownPath;
+				}
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				MessageBox.Show("Couldn't load application " + tpartyProcess.ProcessName);
+				Form1.showErrorMsgBox(null, e.Message, "Couldn't create audio file" + processName);
 				return null;
 			}
 			finally
 			{
 				//tpartyProcess.Dispose();
 			}
-			return TpartyOutputFile;
+			return tpartyOutputFile;
 		}
 		void importUsingTpartyMixdown(bool insTrack, string appPath, string arguments, string outputDir, double songLengthS, Midi.FileType noteFileType)
 		{

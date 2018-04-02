@@ -18,7 +18,8 @@ namespace Visual_Music
 		static public Form1 form1;
 		static readonly string tempDirRoot = Path.Combine(Path.GetTempPath(), "Visual Music");
 		static public readonly string TempDir = Path.Combine(tempDirRoot, Path.GetRandomFileName()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
-		
+		static public readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
+
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
 		static void Main(string[] args)
@@ -33,7 +34,7 @@ namespace Visual_Music
 					return;
 				}
 				
-				Midi.Song.initLib(TempDir);
+				Midi.Song.initLib(TempDir, Path.GetFileName(MixdownPath));
 				Application.EnableVisualStyles();
 				Application.SetCompatibleTextRenderingDefault(false);
 				form1 = new Form1(args);
@@ -41,10 +42,17 @@ namespace Visual_Music
 			}
 			finally
 			{
-				if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1) //no other instances running?
-					Directory.Delete(tempDirRoot, true);
 				Media.closeMF();
 				Midi.Song.exitLib();
+				try
+				{
+					if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1) //no other instances running?
+						Directory.Delete(tempDirRoot, true);
+				}
+				catch
+				{
+					//If a file can't be deleted for any reason just leave it. All will be deleted next time.
+				}
 			}
 		}
 		static void exceptionHandler(object sender, UnhandledExceptionEventArgs args)

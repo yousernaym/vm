@@ -231,13 +231,19 @@ namespace Visual_Music
 			sourceSongType = _noteFileType;
 			desiredSongLengthS = songLengthS;
 			Media.closeAudioFile();
-			
+
 			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, _insTrack, mixdownType == MixdownType.Internal, songLengthS))
 				return false;
-			
-			if (!openAudioFile(audioFile, mixdownType))
-				return false;
-			createTrackViews(notes.Tracks.Count, eraseCurrent);
+
+			try
+			{
+				if (!openAudioFile(audioFile, mixdownType))
+					return false;
+			}
+			finally
+			{
+				createTrackViews(notes.Tracks.Count, eraseCurrent);
+			}
 			return true;
 		}
 		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _insTrack, bool mixdown, double songLengthS)
