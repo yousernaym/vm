@@ -5,6 +5,8 @@
 - Make a Point/Dot note style, like Bar but centered on note start. 
   Alternatively make it an option to add points in line style.
 - Fix sid parsing.
+- Loading of songs directly from HVSC and Modarchive.
+- Loading of songlengths.txt directly from HVSC.
 
 Done:
 - Fix fadeout-to-discard. Non-black edges.

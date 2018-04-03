@@ -26,17 +26,24 @@ namespace Visual_Music
 		public static string XmPlayFileName = Path.GetFileName(XmPlayPath);
 
 		CommonOpenFileDialog hvscDirDialog = new CommonOpenFileDialog();
-		string hvscDir;
-		public string HvscDir { get => hvscDir; set { hvscDir = hvscDirDialog.InitialDirectory = hvscDirTb.Text = value; songLengthCb.Enabled = HvscInstalled; } }
-		public string SongLengthsPath { get => HvscDir + "\\" + SongLengthsFileName; }
+		string hvscDir = "";
+		public string HvscDir
+		{
+			get => hvscDir;
+			set
+			{
+				hvscDir = hvscDirDialog.InitialDirectory = hvscDirTb.Text = value; songLengthCb.Enabled = HvscInstalled;
+				setXmPlayIni_hvscDir();
+			}
+		}
+		public string SongLengthsPath { get => Path.Combine(HvscDir, SongLengthsFileName); }
 		bool XmPlayInstalled { get => File.Exists(XmPlayPath); }
 		bool XmPlaySidPluginInstalled { get => XmPlayInstalled && File.Exists(XmPlayDir + "\\" + XmPlaySidPluginFileName); }
-		bool HvscInstalled { get => File.Exists(SongLengthsPath); }
+		bool HvscInstalled { get => hvscInstalledAt(hvscDir); }
 		public bool ModuleMixdown{ get => modulesCb.Checked && XmPlayInstalled; set => modulesCb.Checked = XmPlayInstalled ? value : false; }
 		public bool SidMixdown{ get => sidsCb.Checked && XmPlaySidPluginInstalled; set => sidsCb.Checked = XmPlaySidPluginInstalled ? value : false; }
 		public bool HvscSongLengths { get => songLengthCb.Checked && HvscInstalled  ; set => songLengthCb.Checked = HvscInstalled ? value : false; }
 		
-
 		public TpartyIntegrationForm()
 		{
 			InitializeComponent();
@@ -44,7 +51,7 @@ namespace Visual_Music
 			hvscDirDialog.IsFolderPicker = true;
 			hvscDirDialog.EnsurePathExists = true;
 			//hvscDirDialog.FileOk += new System.ComponentModel.CancelEventHandler(hvscDirDialog_FileOk);
-			hvscDirDialog.Title = "Browse to <HVSC path>\\DOCUMENTS";
+			hvscDirDialog.Title = @"Browse to C64Music\DOCUMENTS";
 			Directory.CreateDirectory(XmPlayOutputDir);
 			setXmPlayIni_outputDir();
 		}
@@ -107,7 +114,7 @@ namespace Visual_Music
 			if (openXmPlayDialog.ShowDialog() == DialogResult.OK)
 			{
 				setXmPlayIni_outputDir();
-				setXmPlayIni_hvscPath();
+				setXmPlayIni_hvscDir();
 				Directory.CreateDirectory(XmPlayOutputDir);
 			}
 		}
@@ -115,7 +122,7 @@ namespace Visual_Music
 		private void importSidBtn_Click(object sender, EventArgs e)
 		{
 			openXmPlaySidPluginDialog.ShowDialog();
-			setXmPlayIni_hvscPath();
+			setXmPlayIni_hvscDir();
 		}
 
 		protected override bool ProcessDialogKey(Keys keyData)
@@ -143,10 +150,7 @@ namespace Visual_Music
 						close = false;
 					}
 					else
-					{
 						HvscDir = newDir;
-						setXmPlayIni_hvscPath();
-					}
 				}
 				else
 					close = true;
@@ -213,7 +217,7 @@ namespace Visual_Music
 			return File.Exists(Path.Combine(dir,SongLengthsFileName));
 		}
 		
-		void setXmPlayIni_hvscPath()
+		void setXmPlayIni_hvscDir()
 		{
 			setXmPlayIniValue("SID_.*", "documents", HvscDir);
 		}

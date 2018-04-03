@@ -62,7 +62,12 @@ namespace Visual_Music
 					form.importSidForm.tpartyAudioTb.Text = (string)entry.Value;
 
 				else if (entry.Name == getKeyName(Keys.HvscDir))
-					form.tpartyIntegrationForm.HvscDir = (string)entry.Value;
+				{
+					string value = (string)entry.Value;
+					if (string.IsNullOrWhiteSpace(value)) //set default dir
+						value = Path.Combine(Program.AppDataDir, @"tparty\HVSC");
+					form.tpartyIntegrationForm.HvscDir = value;
+				}
 				else if (entry.Name == getKeyName(Keys.TpartyModuleMixdown))
 					form.tpartyIntegrationForm.ModuleMixdown = (bool)entry.Value;
 				else if (entry.Name == getKeyName(Keys.TpartySidMixdown))
