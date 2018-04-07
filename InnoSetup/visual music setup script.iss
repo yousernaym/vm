@@ -29,16 +29,21 @@ ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed = x64
 ChangesAssociations=True
 UninstallDisplayName={#MyAppName}
+ShowTasksTreeLines=False
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
+[Components]
+Name: "associateSidFiles"; Description: "SID files"
+Name: "associateSidfiles\Sid"; Description: ".sid"; Types: full
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
-Name: "associateVmp"; Description: "Associate with .vmp files";
-;Name: "associateMod"; Description: "Associate with module files";
-;Name: "associateMod\mod"; Description: ".mod";
-;Name: "associateMod\xm"; Description: ".xm";
+Name: "associateVms"; Description: "Associate with .vms files";
+Name: "associateMod"; Description: "Associate with module files";
+Name: "associateMod\mod"; Description: ".mod";
+Name: "associateMod\xm"; Description: ".xm";
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
@@ -71,10 +76,8 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 Name: "{#MyAppDataDir}"; Flags: uninsalwaysuninstall
 
 [Registry]
-Root: HKCR; SubKey: ".vmp"; ValueType: string; ValueData: "VisualMusicProject"; Flags: uninsdeletekey
+Root: HKCR; SubKey: ".vms"; ValueType: string; ValueData: "VisualMusicProject"; Flags: uninsdeletekey
 Root: HKCR; SubKey: "VisualMusicProject"; ValueType: string; ValueData: "Visual Music project"; Flags: uninsdeletekey
 Root: HKCR; SubKey: "VisualMusicProject\Shell\Open\Command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey
 Root: HKCR; Subkey: "VisualMusicProject\DefaultIcon"; ValueType: string; ValueData: "{app}\{#MyAppExeName},0"; Flags: uninsdeletevalue
 
-[UninstallDelete]
-Type: files; Name: "{app}\settings.xml";

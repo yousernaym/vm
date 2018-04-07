@@ -7,6 +7,8 @@
 - Fix sid parsing.
 - Loading of songs directly from HVSC and Modarchive.
 - Loading of songlengths.txt directly from HVSC.
+- Only associate with .vms if checkbox is checked.
+- Change icon.
 
 Done:
 - Fix fadeout-to-discard. Non-black edges.
