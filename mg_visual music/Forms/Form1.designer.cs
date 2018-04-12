@@ -52,6 +52,10 @@
 			this.nudgeForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.jumpBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.jumpForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewSongTSMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewModBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewSidBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
@@ -171,6 +175,8 @@
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
 			this.debugLabel = new System.Windows.Forms.Label();
+			this.sidWebBrowser = new Visual_Music.Controls.SongWebBrowser();
+			this.modWebBrowser = new Visual_Music.Controls.SongWebBrowser();
 			this.songPanelBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
@@ -344,10 +350,11 @@
 			this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.playbackToolStripMenuItem});
+            this.playbackToolStripMenuItem,
+            this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1483, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1534, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -424,6 +431,40 @@
 			this.jumpForwardToolStripMenuItem.Text = "Jump forward";
 			this.jumpForwardToolStripMenuItem.Click += new System.EventHandler(this.jumpForwardToolStripMenuItem_Click);
 			// 
+			// viewToolStripMenuItem
+			// 
+			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.viewSongTSMI,
+            this.viewModBrowserTSMI,
+            this.viewSidBrowserTSMI});
+			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+			this.viewToolStripMenuItem.Text = "View";
+			// 
+			// viewSongTSMI
+			// 
+			this.viewSongTSMI.Name = "viewSongTSMI";
+			this.viewSongTSMI.ShortcutKeys = System.Windows.Forms.Keys.F1;
+			this.viewSongTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewSongTSMI.Text = "Song";
+			this.viewSongTSMI.Click += new System.EventHandler(this.viewSongTSMI_Click);
+			// 
+			// viewModBrowserTSMI
+			// 
+			this.viewModBrowserTSMI.Name = "viewModBrowserTSMI";
+			this.viewModBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F2;
+			this.viewModBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewModBrowserTSMI.Text = "Mod browser";
+			this.viewModBrowserTSMI.Click += new System.EventHandler(this.viewModBrowserTSMI_Click);
+			// 
+			// viewSidBrowserTSMI
+			// 
+			this.viewSidBrowserTSMI.Name = "viewSidBrowserTSMI";
+			this.viewSidBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F3;
+			this.viewSidBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewSidBrowserTSMI.Text = "Sid browser";
+			this.viewSidBrowserTSMI.Click += new System.EventHandler(this.viewSidBrowserTSMI_Click);
+			// 
 			// label7
 			// 
 			this.label7.AutoSize = true;
@@ -456,7 +497,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(1088, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(1139, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 10052);
 			this.trackPropsPanel.TabIndex = 3;
@@ -1675,7 +1716,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-3486, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-3622, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1687,7 +1728,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-3598, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-3734, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1697,7 +1738,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-3600, 10040);
+			this.label4.Location = new System.Drawing.Point(-3736, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1895,6 +1936,22 @@
 			this.debugLabel.Text = "label16";
 			this.debugLabel.Visible = false;
 			// 
+			// sidWebBrowser
+			// 
+			this.sidWebBrowser.Location = new System.Drawing.Point(576, 101);
+			this.sidWebBrowser.Name = "sidWebBrowser";
+			this.sidWebBrowser.Size = new System.Drawing.Size(254, 147);
+			this.sidWebBrowser.TabIndex = 21;
+			this.sidWebBrowser.Url = "https://www.hvsc.c64.org/";
+			// 
+			// modWebBrowser
+			// 
+			this.modWebBrowser.Location = new System.Drawing.Point(238, 101);
+			this.modWebBrowser.Name = "modWebBrowser";
+			this.modWebBrowser.Size = new System.Drawing.Size(282, 147);
+			this.modWebBrowser.TabIndex = 21;
+			this.modWebBrowser.Url = "https://modarchive.org/";
+			// 
 			// songPanelBindingSource
 			// 
 			this.songPanelBindingSource.DataSource = typeof(Visual_Music.SongPanel);
@@ -1909,7 +1966,9 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1500, 407);
+			this.ClientSize = new System.Drawing.Size(1551, 407);
+			this.Controls.Add(this.sidWebBrowser);
+			this.Controls.Add(this.modWebBrowser);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);
@@ -2134,6 +2193,12 @@
 		private System.Windows.Forms.Label label14;
 		private System.Windows.Forms.Label label22;
 		private System.Windows.Forms.Label label23;
+		private Controls.SongWebBrowser modWebBrowser;
+		private Controls.SongWebBrowser sidWebBrowser;
+		private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem viewSongTSMI;
+		private System.Windows.Forms.ToolStripMenuItem viewModBrowserTSMI;
+		private System.Windows.Forms.ToolStripMenuItem viewSidBrowserTSMI;
 	}
 }
 

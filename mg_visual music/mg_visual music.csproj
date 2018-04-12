@@ -105,6 +105,12 @@
     <Compile Include="Controls\NoteStyleControl.Designer.cs">
       <DependentUpon>NoteStyleControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SongWebBrowser.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SongWebBrowser.Designer.cs">
+      <DependentUpon>SongWebBrowser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -249,6 +255,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\NoteStyleControl.resx">
       <DependentUpon>NoteStyleControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SongWebBrowser.resx">
+      <DependentUpon>SongWebBrowser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\TbSlider.resx">
       <DependentUpon>TbSlider.cs</DependentUpon>

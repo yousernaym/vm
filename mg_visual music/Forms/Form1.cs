@@ -93,8 +93,12 @@ namespace Visual_Music
 			Controls.Add(songScrollBar);
             songScrollBar.BringToFront();
 
-            initSongPanel(songPanel);
-            Array enumArray = Enum.GetValues(typeof(NoteStyleType));
+            modWebBrowser.Dock = DockStyle.Fill;
+			sidWebBrowser.Dock = DockStyle.Fill;
+			initSongPanel(songPanel);
+
+			//Controls.Add(modWebBrowser);
+			Array enumArray = Enum.GetValues(typeof(NoteStyleType));
             foreach (NoteStyleType nse in enumArray)
                 styleList.Items.Add(nse.ToString());
 
@@ -1567,6 +1571,21 @@ namespace Visual_Music
 			if (project.VertWidthScale != 1)
 				project.createOcTrees();
 			songPanel.Invalidate();
+		}
+
+		private void viewSongTSMI_Click(object sender, EventArgs e)
+		{
+			songPanel.BringToFront();
+		}
+
+		private void viewModBrowserTSMI_Click(object sender, EventArgs e)
+		{
+			modWebBrowser.BringToFront();
+		}
+
+		private void viewSidBrowserTSMI_Click(object sender, EventArgs e)
+		{
+			sidWebBrowser.BringToFront();
 		}
 	}
 }

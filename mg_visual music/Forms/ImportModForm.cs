@@ -15,7 +15,7 @@ namespace Visual_Music
 		public ImportModForm()
         {
             InitializeComponent();
-            //customInit();
+			//customInit();
         }
         public ImportModForm(Form1 _parent) : base(_parent)
         {
