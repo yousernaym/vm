@@ -1,7 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\CefSharp.WinForms.63.0.3\build\CefSharp.WinForms.props" Condition="Exists('..\packages\CefSharp.WinForms.63.0.3\build\CefSharp.WinForms.props')" />
+  <Import Project="..\packages\CefSharp.Common.63.0.3\build\CefSharp.Common.props" Condition="Exists('..\packages\CefSharp.Common.63.0.3\build\CefSharp.Common.props')" />
+  <Import Project="..\packages\cef.redist.x86.3.3239.1723\build\cef.redist.x86.props" Condition="Exists('..\packages\cef.redist.x86.3.3239.1723\build\cef.redist.x86.props')" />
+  <Import Project="..\packages\cef.redist.x64.3.3239.1723\build\cef.redist.x64.props" Condition="Exists('..\packages\cef.redist.x64.3.3239.1723\build\cef.redist.x64.props')" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
   <PropertyGroup>
+    <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
@@ -15,6 +20,8 @@
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -197,6 +204,24 @@
     <Compile Include="ScreenQuad.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SuspendPaint.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\BaseRequestEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\CanGetCookiesEventArg.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\CanSetCookieEventArg.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\GetAuthCredentialsEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\GetResourceResponseFilterEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnBeforeBrowseEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnBeforeResourceLoadEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnCertificateErrorEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnOpenUrlFromTabEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnPluginCrashedEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnProtocolExecutionEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnQuotaRequestEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnRenderProcessTerminatedEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnRenderViewReadyEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnResourceLoadCompleteEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnResourceRedirectEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnResourceResponseEventArgs.cs" />
+    <Compile Include="tparty\CefSharp\RequestEventHandler\RequestEventHandler.cs" />
     <Compile Include="tparty\Timer.cs" />
     <Compile Include="tparty\TimerQueueTimer.cs" />
     <Compile Include="TrackProps.cs" />
@@ -313,6 +338,19 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\cef.redist.x64.3.3239.1723\build\cef.redist.x64.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x64.3.3239.1723\build\cef.redist.x64.props'))" />
+    <Error Condition="!Exists('..\packages\cef.redist.x86.3.3239.1723\build\cef.redist.x86.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x86.3.3239.1723\build\cef.redist.x86.props'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.Common.63.0.3\build\CefSharp.Common.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Common.63.0.3\build\CefSharp.Common.props'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.Common.63.0.3\build\CefSharp.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Common.63.0.3\build\CefSharp.Common.targets'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.WinForms.63.0.3\build\CefSharp.WinForms.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.WinForms.63.0.3\build\CefSharp.WinForms.props'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.WinForms.63.0.3\build\CefSharp.WinForms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.WinForms.63.0.3\build\CefSharp.WinForms.targets'))" />
+  </Target>
+  <Import Project="..\packages\CefSharp.Common.63.0.3\build\CefSharp.Common.targets" Condition="Exists('..\packages\CefSharp.Common.63.0.3\build\CefSharp.Common.targets')" />
+  <Import Project="..\packages\CefSharp.WinForms.63.0.3\build\CefSharp.WinForms.targets" Condition="Exists('..\packages\CefSharp.WinForms.63.0.3\build\CefSharp.WinForms.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

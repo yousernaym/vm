@@ -5,6 +5,9 @@ using System.Windows.Forms;
 using System.Security.Permissions;
 using System.IO;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using CefSharp;
+using System.Reflection;
 
 namespace Visual_Music
 {
@@ -27,6 +30,40 @@ namespace Visual_Music
 		{
 			//AppDomain currentDomain = AppDomain.CurrentDomain;
 			//currentDomain.UnhandledException += new UnhandledExceptionEventHandler(exceptionHandler);
+			AppDomain.CurrentDomain.AssemblyResolve += Resolver;
+			LoadApp(args);
+		}
+
+		static void exceptionHandler(object sender, UnhandledExceptionEventArgs args)
+		{
+			Exception e = (Exception)args.ExceptionObject;
+			MessageBox.Show(e.Message);
+			//Console.WriteLine("MyHandler caught : " + e.Message);
+			//Console.WriteLine("Runtime terminating: {0}", args.IsTerminating);
+		}
+		public static void clean(this DirectoryInfo directory)
+		{
+			foreach (FileInfo file in directory.GetFiles()) file.Delete();
+			foreach (DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
+		}
+
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		private static void LoadApp(string[] args)
+		{
+			var settings = new CefSettings();
+
+			// Set BrowserSubProcessPath based on app bitness at runtime
+			settings.BrowserSubprocessPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
+												   Environment.Is64BitProcess ? "x64" : "x86",
+												   "CefSharp.BrowserSubprocess.exe");
+					
+
+			// Make sure you set performDependencyCheck false
+			Cef.Initialize(settings, performDependencyCheck: false, browserProcessHandler: null);
+
+			//var browser = new BrowserForm();
+			//Application.Run(browser);
+
 			try
 			{
 				if (!Media.initMF())
@@ -51,7 +88,7 @@ namespace Visual_Music
 				try
 				{
 					//if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1) //no other instances running?
-						Directory.Delete(tempDirRoot, true);
+					Directory.Delete(tempDirRoot, true);
 				}
 				catch
 				{
@@ -59,17 +96,23 @@ namespace Visual_Music
 				}
 			}
 		}
-		static void exceptionHandler(object sender, UnhandledExceptionEventArgs args)
+
+		// Will attempt to load missing assembly from either x86 or x64 subdir
+		private static Assembly Resolver(object sender, ResolveEventArgs args)
 		{
-			Exception e = (Exception)args.ExceptionObject;
-			MessageBox.Show(e.Message);
-			//Console.WriteLine("MyHandler caught : " + e.Message);
-			//Console.WriteLine("Runtime terminating: {0}", args.IsTerminating);
-		}
-		public static void clean(this DirectoryInfo directory)
-		{
-			foreach (FileInfo file in directory.GetFiles()) file.Delete();
-			foreach (DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
+			if (args.Name.StartsWith("CefSharp"))
+			{
+				string assemblyName = args.Name.Split(new[] { ',' }, 2)[0] + ".dll";
+				string archSpecificPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
+													   Environment.Is64BitProcess ? "x64" : "x86",
+													   assemblyName);
+
+				return File.Exists(archSpecificPath)
+						   ? Assembly.LoadFile(archSpecificPath)
+						   : null;
+			}
+
+			return null;
 		}
 	}
 }

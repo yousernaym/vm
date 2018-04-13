@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.Serialization;
 using System.IO.Compression;
+using CefSharp.WinForms;
 
 namespace Visual_Music
 {
@@ -60,6 +61,7 @@ namespace Visual_Music
 		public SongPanel SongPanel => songPanel;
 		Project project;
 		public Project Project => project;
+		ChromiumWebBrowser cefBrowser = new ChromiumWebBrowser("https://modarchive.org/");
 		//float PosOffsetScale => Project.Camera.ViewportSize.X / 100.0f; //Pos offset is in percent of screen width
 		Settings settings = new Settings();
 		ScrollBar songScrollBar = new HScrollBar();
@@ -68,6 +70,7 @@ namespace Visual_Music
 		public Form1(string[] args)
 		{
 			InitializeComponent();
+
 			//Application.Idle += delegate { songPanel.update(); };
 
 			project = new Project(SongPanel);
@@ -96,6 +99,10 @@ namespace Visual_Music
             modWebBrowser.Dock = DockStyle.Fill;
 			sidWebBrowser.Dock = DockStyle.Fill;
 			initSongPanel(songPanel);
+			Controls.Add(cefBrowser);
+			cefBrowser.Dock = DockStyle.Fill;
+			cefBrowser.BringToFront();
+
 
 			//Controls.Add(modWebBrowser);
 			Array enumArray = Enum.GetValues(typeof(NoteStyleType));
