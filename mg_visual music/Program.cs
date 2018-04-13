@@ -50,6 +50,7 @@ namespace Visual_Music
 		[MethodImpl(MethodImplOptions.NoInlining)]
 		private static void LoadApp(string[] args)
 		{
+			Cef.EnableHighDPISupport();
 			var settings = new CefSettings();
 
 			// Set BrowserSubProcessPath based on app bitness at runtime

@@ -13,7 +13,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.Serialization;
 using System.IO.Compression;
-using CefSharp.WinForms;
 
 namespace Visual_Music
 {
@@ -59,9 +58,10 @@ namespace Visual_Music
 		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType) };
         SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
+		SongWebBrowser modWebBrowser = new SongWebBrowser();
+		SongWebBrowser sidWebBrowser = new SongWebBrowser();
 		Project project;
 		public Project Project => project;
-		ChromiumWebBrowser cefBrowser = new ChromiumWebBrowser("https://modarchive.org/");
 		//float PosOffsetScale => Project.Camera.ViewportSize.X / 100.0f; //Pos offset is in percent of screen width
 		Settings settings = new Settings();
 		ScrollBar songScrollBar = new HScrollBar();
@@ -99,12 +99,9 @@ namespace Visual_Music
             modWebBrowser.Dock = DockStyle.Fill;
 			sidWebBrowser.Dock = DockStyle.Fill;
 			initSongPanel(songPanel);
-			Controls.Add(cefBrowser);
-			cefBrowser.Dock = DockStyle.Fill;
-			cefBrowser.BringToFront();
-
-
-			//Controls.Add(modWebBrowser);
+			
+			Controls.Add(modWebBrowser);
+			Controls.Add(sidWebBrowser);
 			Array enumArray = Enum.GetValues(typeof(NoteStyleType));
             foreach (NoteStyleType nse in enumArray)
                 styleList.Items.Add(nse.ToString());

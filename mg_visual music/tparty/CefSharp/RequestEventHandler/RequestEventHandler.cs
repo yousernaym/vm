@@ -25,8 +25,6 @@ namespace CefSharp.Example.RequestEventHandler
         public event EventHandler<OnBeforeResourceLoadEventArgs> OnBeforeResourceLoadEvent;
         public event EventHandler<GetAuthCredentialsEventArgs> GetAuthCredentialsEvent;
         public event EventHandler<OnRenderProcessTerminatedEventArgs> OnRenderProcessTerminatedEvent;
-        public event EventHandler<CanGetCookiesEventArg> CanGetCookiesEvent;
-        public event EventHandler<CanSetCookieEventArg> CanSetCookieEvent;
         public event EventHandler<OnQuotaRequestEventArgs> OnQuotaRequestEvent;
         public event EventHandler<OnResourceRedirectEventArgs> OnResourceRedirectEvent;
 
@@ -100,24 +98,6 @@ namespace CefSharp.Example.RequestEventHandler
             var args = new OnRenderProcessTerminatedEventArgs(browserControl, browser, status);
 
             OnRenderProcessTerminatedEvent?.Invoke(this, args);
-        }
-
-        bool IRequestHandler.CanGetCookies(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request)
-        {
-            var args = new CanGetCookiesEventArg(browserControl, browser, frame, request);
-
-            CanGetCookiesEvent?.Invoke(this, args);
-
-            return args.GetCookies;
-        }
-
-        bool IRequestHandler.CanSetCookie(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, Cookie cookie)
-        {
-            var args = new CanSetCookieEventArg(browserControl, browser, frame, request, cookie);
-
-            CanSetCookieEvent?.Invoke(this, args);
-
-            return args.SetCookie;
         }
 
         bool IRequestHandler.OnQuotaRequest(IWebBrowser browserControl, IBrowser browser, string originUrl, long newSize, IRequestCallback callback)
