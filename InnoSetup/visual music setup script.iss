@@ -47,7 +47,7 @@ Name: "associateMod\xm"; Description: ".xm";
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-Source: "..\mg_visual music\bin\x64\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\libmikmod.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -57,12 +57,83 @@ Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Releas
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\NoteExtractor.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\SharpDX.Direct3D11.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\x64\Release\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\x64\Release\SharpDX.DXGI.dll"; DestDir: "{app}"
+Source: "..\mg_visual music\bin\x64\Release\SharpDX.DXGI.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\mg_visual music\bin\x64\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\mg_visual music\Distribute\Tparty\*"; DestDir: "{#MyAppDataDir}\tparty"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\mg_visual music\Distribute\minjector.exe"; DestDir: "{app}"
-Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.txt"; DestDir: "{#MyAppDataDir}\tparty\HVSC"
-Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.md5"; DestDir: "{#MyAppDataDir}\tparty\HVSC"
+Source: "..\mg_visual music\Distribute\minjector.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.txt"; DestDir: "{#MyAppDataDir}\tparty\HVSC"; Flags: ignoreversion
+Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.md5"; DestDir: "{#MyAppDataDir}\tparty\HVSC"; Flags: ignoreversion
+Source: "..\mg_visual music\Distribute\vc2017 dlls\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\mg_visual music\bin\Release\x64\cef.pak"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\CefSharp.BrowserSubprocess.Core.dll"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\CefSharp.BrowserSubprocess.exe"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\CefSharp.Core.dll"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\CefSharp.dll"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\CefSharp.WinForms.dll"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\cef_100_percent.pak"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\cef_200_percent.pak"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\cef_extensions.pak"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\chrome_elf.dll"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\d3dcompiler_47.dll"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\icudtl.dat"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\libcef.dll"; DestDir: "{app}\x64"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\natives_blob.bin"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\snapshot_blob.bin"; DestDir: "{app}\x64\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\am.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\ar.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\bg.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\bn.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\ca.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\cs.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\da.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\de.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\el.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\en-GB.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\en-US.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\es-419.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\es.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\et.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\fa.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\fi.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\fil.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\fr.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\gu.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\he.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\hi.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\hr.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\hu.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\id.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\it.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\ja.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\kn.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\ko.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\lt.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\lv.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\ml.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\mr.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\ms.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\nb.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\nl.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\pl.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\pt-BR.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\pt-PT.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\ro.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\ru.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\sk.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\sl.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\sr.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\sv.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\sw.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\ta.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\te.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\th.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\tr.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\uk.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\vi.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\zh-CN.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\locales\zh-TW.pak"; DestDir: "{app}\x64\locales\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\swiftshader\libEGL.dll"; DestDir: "{app}\x64\swiftshader\"; Flags: ignoreversion
+Source: "..\mg_visual music\bin\Release\x64\swiftshader\libGLESv2.dll"; DestDir: "{app}\x64\swiftshader\"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -74,6 +145,9 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [Dirs]
 Name: "{#MyAppDataDir}"; Flags: uninsalwaysuninstall
+Name: "{app}\x64\x64"
+Name: "{app}\x64\locales\locales"
+Name: "{app}\x64\swiftshader\swiftshader"
 
 [Registry]
 Root: HKCR; SubKey: ".vms"; ValueType: string; ValueData: "VisualMusicProject"; Flags: uninsdeletekey

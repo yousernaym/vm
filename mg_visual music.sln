@@ -32,7 +32,7 @@ EndProject
 Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "VM", "C:\Program Files\_test\VM.exe", "{0D3A8FD4-D811-4101-A729-4E5170B0EA58}"
 	ProjectSection(DebuggerProjectSystem) = preProject
 		PortSupplier = 00000000-0000-0000-0000-000000000000
-		Executable = C:\Program Files\_test\VM.exe
+		Executable = C:\Program Files\Visual Music\VM.exe
 		RemoteMachine = DESKTOP-SNGKJT5
 		StartingDirectory = C:\Program Files\_test
 		Environment = Default
