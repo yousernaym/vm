@@ -291,6 +291,9 @@
     <EmbeddedResource Include="Controls\NoteStyleControl.resx">
       <DependentUpon>NoteStyleControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SongWebBrowser.resx">
+      <DependentUpon>SongWebBrowser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\TbSlider.resx">
       <DependentUpon>TbSlider.cs</DependentUpon>
     </EmbeddedResource>
