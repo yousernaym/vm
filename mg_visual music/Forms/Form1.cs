@@ -1082,7 +1082,7 @@ namespace Visual_Music
 		{
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
 				return;
-			saveMixdownDialog.FileName = Path.GetFileName(saveProjDialog.FileName);
+			saveMixdownDialog.FileName = Path.GetFileName(saveProjDialog.FileName) + ".wav";
 			if (Project.MixdownType != MixdownType.None && saveMixdownDialog.ShowDialog() == DialogResult.OK)
 			{
 				File.Copy(Media.getAudioFilePath(), saveMixdownDialog.FileName, true);

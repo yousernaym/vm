@@ -99,8 +99,9 @@
 			this.MaximizeBox = false;
 			this.Name = "ProgressForm";
 			this.ShowInTaskbar = false;
-			this.Text = "Render progress";
+			this.Text = "Progress";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ProgressForm_FormClosed);
+			this.VisibleChanged += new System.EventHandler(this.ProgressForm_VisibleChanged);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

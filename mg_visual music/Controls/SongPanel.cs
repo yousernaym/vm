@@ -318,7 +318,7 @@ namespace Visual_Music
 						}
 						frameStart += frameDuration;
 						Project.setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0 / videoFormat.fps, false);
-						progressForm.updateProgress((int)(Project.NormSongPos * Project.SongLengthT));
+						progressForm.updateProgress(Project.NormSongPos);
 						frames++;
 					}
 					Project.NormSongPos = normSongPosBackup;

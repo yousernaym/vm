@@ -20,14 +20,20 @@ namespace Visual_Music
 		ProgressAtTime[] progressBuf = new ProgressAtTime[100];
 		int frame = 0;
 						
-		public void updateProgress(int progress)
+		public ProgressForm()
 		{
-			double normProgress = (double)progress / progressBar1.Maximum;
+			InitializeComponent();
+			progressBar1.Maximum = 1000;
+			stopWatch.Start();
+		}
+
+		public void updateProgress(double normProgress)
+		{
 			if (frame % 1 == 0)
 			{
 				normProgress = Math.Min(1, normProgress);
 				normProgress = Math.Max(0, normProgress);
-				progressBar1.Value = progress;
+				progressBar1.Value = (int)(normProgress * progressBar1.Maximum);
 				int percent = (int)(100.0 * normProgress + 0.5);
 				if (percent > 100)
 					percent = 100;
@@ -37,7 +43,7 @@ namespace Visual_Music
 				pat.time = stopWatch.Elapsed.TotalSeconds;
 				pat.normProgress = normProgress;
 				progressBuf[progressBufIndex1] = pat;
-				
+
 				//Task bar
 				taskBarProgress.SetProgressValue(progressBar1.Value, progressBar1.Maximum);
 
@@ -57,18 +63,6 @@ namespace Visual_Music
 			frame++;
 		}
 
-		public ProgressForm()
-		{
-			InitializeComponent();
-		}
-		public ProgressForm(int maximumProgress)
-		{
-			InitializeComponent();
-			progressBar1.Maximum = maximumProgress;
-			taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.Normal);
-			stopWatch.Start();
-		}
-
 		private void button1_Click(object sender, EventArgs e)
 		{
 			DialogResult = DialogResult.Cancel;
@@ -78,6 +72,11 @@ namespace Visual_Music
 		private void ProgressForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
+		}
+
+		private void ProgressForm_VisibleChanged(object sender, EventArgs e)
+		{
+			taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.Normal);
 		}
 	}
 	public struct ProgressAtTime

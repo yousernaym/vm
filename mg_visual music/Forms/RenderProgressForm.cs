@@ -11,7 +11,7 @@ namespace Visual_Music
 	public partial class RenderProgressForm : ProgressForm
 	{
 		delegate void Delegate_renderVideo(string file, RenderProgressForm progressForm, VideoExportForm options);
-		delegate void Delegate_updateProgress(int progress);
+		delegate void Delegate_updateProgress(double progress);
 		delegate void Delegate_void_noparams();
 		delegate void Delegate_void_string(string str);
 
@@ -23,7 +23,7 @@ namespace Visual_Music
 		StopRenderingMb cancelMb = new StopRenderingMb();
 		ProgressAtTime[] progressBuf = new ProgressAtTime[100];
 
-		public new void updateProgress(int progress)
+		public new void updateProgress(double progress)
 		{
 			Invoke(new Delegate_updateProgress(base.updateProgress), progress);
 		}
@@ -32,7 +32,7 @@ namespace Visual_Music
 		{
 			InitializeComponent();
 		}
-		public RenderProgressForm(SongPanel _songPanel, string file, VideoExportForm options) : base(_songPanel.Project.SongLengthT)
+		public RenderProgressForm(SongPanel _songPanel, string file, VideoExportForm options)
 		{
 			InitializeComponent();
 			songPanel = _songPanel;

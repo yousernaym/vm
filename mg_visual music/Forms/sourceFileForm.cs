@@ -14,11 +14,35 @@ namespace Visual_Music
 	public partial class SourceFileForm : Form
 	{
 		WebClient client = new WebClient();
-		string downloadedFilePath => Path.Combine(Program.TempDir, NoteFilePath);
+		public string DownloadedFilePath { get; private set; }
+		ProgressForm progressForm = new ProgressForm();
+
 		public string NoteFilePath
 		{
-			get { return noteFilePath.Text; }
-			set { noteFilePath.Text = value; }
+			get
+			{
+				if (!string.IsNullOrWhiteSpace(DownloadedFilePath))
+					return DownloadedFilePath;
+				else if (Uri.IsWellFormedUriString(noteFilePath.Text, UriKind.Absolute))
+				{
+					string fileName = "downloadedsong." + Path.GetFileName(noteFilePath.Text.Split('.').Last());
+					Uri url = new Uri(noteFilePath.Text);
+					DownloadedFilePath = Path.Combine(Program.TempDir, fileName);
+					client.DownloadFileAsync(url, DownloadedFilePath);
+					if (progressForm.ShowDialog() != DialogResult.OK)
+						DownloadedFilePath = null;
+					return DownloadedFilePath;
+				}
+				else
+					return noteFilePath.Text;
+			}
+			set
+			{
+				if (noteFilePath.Text.Equals(value))
+					return;
+				noteFilePath.Text = value;
+				DownloadedFilePath = null;
+			}
 		}
         virtual public string AudioFilePath
 		{
@@ -51,16 +75,19 @@ namespace Visual_Music
 			InitializeComponent();
 			client.DownloadFileCompleted += OnDownloadCompleted;
 			client.DownloadProgressChanged += OnDownloadProgressChanged;
+			
 		}
 
 		private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
 		{
-			throw new NotImplementedException();
+			progressForm.updateProgress(e.ProgressPercentage / 100.0f);
 		}
 
 		private void OnDownloadCompleted(object sender, AsyncCompletedEventArgs e)
 		{
-			throw new NotImplementedException();
+			//NoteFilePath = downloadedFilePath;
+			progressForm.DialogResult = DialogResult.OK;
+			progressForm.Hide();
 		}
 
 		private void browseNoteBtn_Click(object sender, EventArgs e)
@@ -104,14 +131,7 @@ namespace Visual_Music
 				MessageBox.Show("Note file path required.");
 				return false;
 			}
-			if (Uri.IsWellFormedUriString(NoteFilePath, UriKind.Absolute))
-			{
-				
-				//client.DownloadFileAsync(new Uri(NoteFilePath));
-					
-				//}
-			}
-			if (!File.Exists(NoteFilePath))
+			else if (!File.Exists(NoteFilePath))
 			{
 				MessageBox.Show("Note file not found.");
 				return false;

@@ -81,9 +81,10 @@ namespace Visual_Music
 			if (e.Request.Url.EndsWith(".xm"))
 			{
 				e.CancelNavigation = true;
+				string url = string.Copy(e.Request.Url);
 				this.InvokeOnUiThreadIfRequired(delegate
 				{
-					mainForm.importModForm.NoteFilePath = e.Request.Url;
+					mainForm.importModForm.NoteFilePath = url;
 					mainForm.importModForm.ShowDialog();//(filePath, Form1.Settings.ModInsTrack, mainForm.tpartyIntegrationForm.ModuleMixdown ? MixdownType.Tparty);
 				});
 			}
