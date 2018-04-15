@@ -23,7 +23,7 @@ namespace Visual_Music
 		static string tpartyOutputDir;
 		static public string TpartyApp { get => tpartyApp; set => tpartyApp = value; }
 		static public string TpartyArgs { get => tpartyArgs; set => tpartyArgs = value; }
-		static public string TpartyOutputDir { get => tpartyOutputDir; set => tpartyOutputDir = value; }
+		static public string TpartyOutputDir { get => tpartyOutputDir; set => tpartyOutputDir = value.ToLower(); }
 
 		static string tpartyOutputFile;
 		

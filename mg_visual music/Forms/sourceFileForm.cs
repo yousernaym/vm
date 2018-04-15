@@ -107,11 +107,11 @@ namespace Visual_Music
 			if (Uri.IsWellFormedUriString(NoteFilePath, UriKind.Absolute))
 			{
 				
-				client.DownloadFileAsync(new Uri(NoteFilePath));
+				//client.DownloadFileAsync(new Uri(NoteFilePath));
 					
-				}
+				//}
 			}
-				if (!File.Exists(NoteFilePath))
+			if (!File.Exists(NoteFilePath))
 			{
 				MessageBox.Show("Note file not found.");
 				return false;

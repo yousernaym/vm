@@ -19,8 +19,8 @@ namespace Visual_Music
 		static public readonly string Dir = Path.GetDirectoryName(Application.ExecutablePath);
 		static public readonly string AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Visual Music");
 		static public Form1 form1;
-		static readonly string tempDirRoot = Path.Combine(Path.GetTempPath(), "Visual Music");
-		static public readonly string TempDir = Path.Combine(tempDirRoot, Path.GetRandomFileName()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
+		static public readonly string TempDirRoot = Path.Combine(Path.GetTempPath(), "visual music").ToLower();
+		static public readonly string TempDir = Path.Combine(TempDirRoot, Path.GetRandomFileName().ToLower()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
 		static public readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
 		static FileStream dirLock = null;
 
@@ -94,7 +94,7 @@ namespace Visual_Music
 				try
 				{
 					//if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1) //no other instances running?
-					Directory.Delete(tempDirRoot, true);
+					Directory.Delete(TempDirRoot, true);
 				}
 				catch
 				{

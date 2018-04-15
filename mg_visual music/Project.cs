@@ -197,7 +197,12 @@ namespace Visual_Music
 				else if (entry.Name == "tpartyArgs")
 					ImportNotesWithAudioForm.TpartyArgs = (string)entry.Value;
 				else if (entry.Name == "tpartyOutputDir")
-					ImportNotesWithAudioForm.TpartyOutputDir = (string)entry.Value;
+				{
+					string dir = ((string)entry.Value).ToLower();
+					if (dir.Contains(Program.TempDirRoot))
+						dir = Program.TempDir;
+					ImportNotesWithAudioForm.TpartyOutputDir = dir;
+				}
 				else if (entry.Name == "desiredSongLengthS")
 					desiredSongLengthS = (double)entry.Value;
 				else if (entry.Name == "camera")
@@ -243,6 +248,7 @@ namespace Visual_Music
 			}
 			finally
 			{
+				MixdownType = mixdownType;
 				createTrackViews(notes.Tracks.Count, eraseCurrent);
 			}
 			return true;
