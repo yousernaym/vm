@@ -72,6 +72,7 @@ namespace Visual_Music
 		private void ProgressForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
+			stopWatch.Reset();
 		}
 
 		private void ProgressForm_VisibleChanged(object sender, EventArgs e)

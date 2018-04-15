@@ -13,26 +13,20 @@ namespace Visual_Music
 {
 	public partial class SourceFileForm : Form
 	{
-		WebClient client = new WebClient();
 		public string DownloadedFilePath { get; private set; }
-		ProgressForm progressForm = new ProgressForm();
-
+		
+		public string RawNoteFilePath => noteFilePath.Text;
 		public string NoteFilePath
 		{
 			get
 			{
+				//If a file has been previously downloaded to temp dir, return path to that file.
 				if (!string.IsNullOrWhiteSpace(DownloadedFilePath))
 					return DownloadedFilePath;
-				else if (Uri.IsWellFormedUriString(noteFilePath.Text, UriKind.Absolute))
-				{
-					string fileName = "downloadedsong." + Path.GetFileName(noteFilePath.Text.Split('.').Last());
-					Uri url = new Uri(noteFilePath.Text);
-					DownloadedFilePath = Path.Combine(Program.TempDir, fileName);
-					client.DownloadFileAsync(url, DownloadedFilePath);
-					if (progressForm.ShowDialog() != DialogResult.OK)
-						DownloadedFilePath = null;
-					return DownloadedFilePath;
-				}
+				//If noteFilePath textbox is a URL, download file to temp dir and return path to that file, otherwise return
+				else if (noteFilePath.Text.IsUrl())
+					return DownloadedFilePath = noteFilePath.Text.downloadFile();
+				//Return path as written in textbox
 				else
 					return noteFilePath.Text;
 			}
@@ -73,22 +67,8 @@ namespace Visual_Music
 		{
 			parent = _parent;
 			InitializeComponent();
-			client.DownloadFileCompleted += OnDownloadCompleted;
-			client.DownloadProgressChanged += OnDownloadProgressChanged;
-			
 		}
-
-		private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-		{
-			progressForm.updateProgress(e.ProgressPercentage / 100.0f);
-		}
-
-		private void OnDownloadCompleted(object sender, AsyncCompletedEventArgs e)
-		{
-			//NoteFilePath = downloadedFilePath;
-			progressForm.DialogResult = DialogResult.OK;
-			progressForm.Hide();
-		}
+				
 
 		private void browseNoteBtn_Click(object sender, EventArgs e)
 		{

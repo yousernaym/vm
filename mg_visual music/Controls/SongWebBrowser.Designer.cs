@@ -36,15 +36,10 @@
 			this.forwardButton = new System.Windows.Forms.ToolStripButton();
 			this.urlTextBox = new System.Windows.Forms.ToolStripTextBox();
 			this.goButton = new System.Windows.Forms.ToolStripButton();
-			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.showDevToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripContainer.ContentPanel.SuspendLayout();
 			this.toolStripContainer.TopToolStripPanel.SuspendLayout();
 			this.toolStripContainer.SuspendLayout();
 			this.toolStrip1.SuspendLayout();
-			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// toolStripContainer
@@ -54,13 +49,13 @@
 			// 
 			this.toolStripContainer.ContentPanel.Controls.Add(this.statusLabel);
 			this.toolStripContainer.ContentPanel.Controls.Add(this.outputLabel);
-			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(730, 441);
+			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(730, 465);
 			this.toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.toolStripContainer.LeftToolStripPanelVisible = false;
-			this.toolStripContainer.Location = new System.Drawing.Point(0, 24);
+			this.toolStripContainer.Location = new System.Drawing.Point(0, 0);
 			this.toolStripContainer.Name = "toolStripContainer";
 			this.toolStripContainer.RightToolStripPanelVisible = false;
-			this.toolStripContainer.Size = new System.Drawing.Size(730, 466);
+			this.toolStripContainer.Size = new System.Drawing.Size(730, 490);
 			this.toolStripContainer.TabIndex = 0;
 			this.toolStripContainer.Text = "toolStripContainer1";
 			// 
@@ -72,7 +67,7 @@
 			// 
 			this.statusLabel.AutoSize = true;
 			this.statusLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.statusLabel.Location = new System.Drawing.Point(0, 415);
+			this.statusLabel.Location = new System.Drawing.Point(0, 439);
 			this.statusLabel.Name = "statusLabel";
 			this.statusLabel.Size = new System.Drawing.Size(0, 13);
 			this.statusLabel.TabIndex = 1;
@@ -81,7 +76,7 @@
 			// 
 			this.outputLabel.AutoSize = true;
 			this.outputLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.outputLabel.Location = new System.Drawing.Point(0, 428);
+			this.outputLabel.Location = new System.Drawing.Point(0, 452);
 			this.outputLabel.Name = "outputLabel";
 			this.outputLabel.Size = new System.Drawing.Size(0, 13);
 			this.outputLabel.TabIndex = 0;
@@ -139,43 +134,11 @@
 			this.goButton.Text = "Go";
 			this.goButton.Click += new System.EventHandler(this.GoButtonClick);
 			// 
-			// menuStrip1
-			// 
-			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
-			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(730, 24);
-			this.menuStrip1.TabIndex = 1;
-			this.menuStrip1.Text = "menuStrip1";
-			// 
-			// fileToolStripMenuItem
-			// 
-			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showDevToolsToolStripMenuItem,
-            this.exitToolStripMenuItem});
-			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-			this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-			this.fileToolStripMenuItem.Text = "File";
-			// 
-			// showDevToolsToolStripMenuItem
-			// 
-			this.showDevToolsToolStripMenuItem.Name = "showDevToolsToolStripMenuItem";
-			this.showDevToolsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
-			this.showDevToolsToolStripMenuItem.Text = "Show DevTools";
-			// 
-			// exitToolStripMenuItem
-			// 
-			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-			this.exitToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
-			this.exitToolStripMenuItem.Text = "Exit";
-			// 
 			// SongWebBrowser
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Controls.Add(this.toolStripContainer);
-			this.Controls.Add(this.menuStrip1);
 			this.Name = "SongWebBrowser";
 			this.Size = new System.Drawing.Size(730, 490);
 			this.toolStripContainer.ContentPanel.ResumeLayout(false);
@@ -186,10 +149,7 @@
 			this.toolStripContainer.PerformLayout();
 			this.toolStrip1.ResumeLayout(false);
 			this.toolStrip1.PerformLayout();
-			this.menuStrip1.ResumeLayout(false);
-			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
         }
 
@@ -201,12 +161,8 @@
         private System.Windows.Forms.ToolStripButton forwardButton;
         private System.Windows.Forms.ToolStripTextBox urlTextBox;
         private System.Windows.Forms.ToolStripButton goButton;
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.Label outputLabel;
         private System.Windows.Forms.Label statusLabel;
-		private System.Windows.Forms.ToolStripMenuItem showDevToolsToolStripMenuItem;
 
     }
 }

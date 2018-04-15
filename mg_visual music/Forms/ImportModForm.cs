@@ -37,7 +37,7 @@ namespace Visual_Music
         private void Ok_Click(object sender, EventArgs e)
         {
 			bool xmPlayMixdownSupported = false;
-			string ext = Path.GetExtension(noteFilePath.Text);
+			string ext = Path.GetExtension(NoteFilePath);
 			if (ext.Length > 1) //'.' and more
 			{
 				ext = ext.Substring(1); //Remove '.'

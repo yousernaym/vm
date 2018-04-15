@@ -43,6 +43,8 @@ namespace Visual_Music
 		double pbStartSongTimeS;
 
 		//Serialization----------------------------------
+
+		//Save note and audio file pathsfor importing when loading project
 		string noteFilePath = "";
 		public string NoteFilePath
 		{
@@ -159,7 +161,10 @@ namespace Visual_Music
 		{
 			if (!string.IsNullOrWhiteSpace(noteFilePath))
 			{
-				importSong(noteFilePath, audioFilePath, false, insTrack, mixdownType, desiredSongLengthS, sourceSongType);
+				string importNoteFilePath = noteFilePath.downloadFile();
+				if (importNoteFilePath == null)
+					return;
+				importSong(importNoteFilePath, audioFilePath, false, insTrack, mixdownType, desiredSongLengthS, sourceSongType);
 				if (trackViews != null)
 				{
 					for (int i = 0; i < trackViews.Count; i++)
@@ -258,7 +263,6 @@ namespace Visual_Music
 			SongPanel.Invalidate();
 			stopPlayback();
 
-			noteFilePath = file;
 			insTrack = _insTrack;
 			int minPitch = 0, maxPitch = 0;
 			if (eraseCurrent)
@@ -277,7 +281,7 @@ namespace Visual_Music
 			Midi.Song newNotes = new Midi.Song();
 			try
 			{
-				newNotes.openFile(noteFilePath, ref audioFile, _insTrack, mixdown, songLengthS, sourceSongType);
+				newNotes.openFile(file, ref audioFile, _insTrack, mixdown, songLengthS, sourceSongType);
 				if (newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
 				{
 					MessageBox.Show("Couldn't load note file. No notes found.",  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -302,7 +306,6 @@ namespace Visual_Music
 			notes.createNoteBsp();
 
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
-			
 			return true;
 		}
 		public bool openAudioFile(string file, MixdownType _mixdownType)

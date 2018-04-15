@@ -85,7 +85,8 @@ namespace Visual_Music
 				this.InvokeOnUiThreadIfRequired(delegate
 				{
 					mainForm.importModForm.NoteFilePath = url;
-					mainForm.importModForm.ShowDialog();//(filePath, Form1.Settings.ModInsTrack, mainForm.tpartyIntegrationForm.ModuleMixdown ? MixdownType.Tparty);
+					mainForm.importModForm.AudioFilePath = "";
+					mainForm.importModForm.ShowDialog();
 				});
 			}
 		}

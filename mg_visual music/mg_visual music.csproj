@@ -178,6 +178,7 @@
     <Compile Include="Forms\VideoExportForm.Designer.cs">
       <DependentUpon>VideoExportForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Download.cs" />
     <Compile Include="NoteStyle_Bar.cs" />
     <Compile Include="NoteStyle_Line.cs" />
     <Compile Include="Media.cs" />

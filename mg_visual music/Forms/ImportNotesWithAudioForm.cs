@@ -58,7 +58,7 @@ namespace Visual_Music
                 //{
 
                 //}
-                return existingAudioRbtn.Checked ? audioFilePath.Text : tpartyAudioTb.Text.Replace("%notefilename", Path.GetFileName(noteFilePath.Text));
+                return existingAudioRbtn.Checked ? audioFilePath.Text : tpartyAudioTb.Text.Replace("%notefilename", Path.GetFileName(NoteFilePath));
             }
 
             set { audioFilePath.Text = value; }
@@ -96,7 +96,7 @@ namespace Visual_Music
                     {   //Mixdown with xmplay
 						//string folder = Application.StartupPath + "\\plugins\\xmplay";
 						importUsingTpartyMixdown(insTrack, TpartyIntegrationForm.XmPlayPath,
-								   "\"" + noteFilePath.Text + "\" -boost",
+								   "\"" + NoteFilePath + "\" -boost",
 								   TpartyIntegrationForm.XmPlayOutputDir,
 								   songLengthS,
 								   noteFileType);
@@ -115,7 +115,7 @@ namespace Visual_Music
             else 
             { //User-specified command line
 				importUsingTpartyMixdown(insTrack, tpartyAppTb.Text,
-					   tpartyArgsTb.Text.Replace("%notefilepath", "\"" + noteFilePath.Text + "\""),
+					   tpartyArgsTb.Text.Replace("%notefilepath", "\"" + NoteFilePath + "\""),
 					   tpartyAudioTb.Text,
 					   songLengthS,
 					   noteFileType);

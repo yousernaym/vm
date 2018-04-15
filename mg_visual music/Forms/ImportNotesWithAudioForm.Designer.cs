@@ -208,7 +208,7 @@
 			this.Controls.Add(this.tPartyMixdownPnl);
 			this.Controls.Add(this.panel1);
 			this.Name = "ImportNotesWithAudioForm";
-			this.Controls.SetChildIndex(this.noteFilePath, 0);
+			//this.Controls.SetChildIndex(this.noteFilePath, 0);
 			this.Controls.SetChildIndex(this.panel1, 0);
 			this.Controls.SetChildIndex(this.tPartyMixdownPnl, 0);
 			this.Controls.SetChildIndex(this.BrowseAudioBtn, 0);

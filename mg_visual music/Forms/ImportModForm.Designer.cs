@@ -102,7 +102,7 @@
 			this.Controls.Add(this.modChTrackBtn);
 			this.Name = "ImportModForm";
 			this.Load += new System.EventHandler(this.ImportModForm_Load);
-			this.Controls.SetChildIndex(this.noteFilePath, 0);
+			//this.Controls.SetChildIndex(this.noteFilePath, 0);
 			this.Controls.SetChildIndex(this.BrowseAudioBtn, 0);
 			this.Controls.SetChildIndex(this.audioFilePath, 0);
 			this.Controls.SetChildIndex(this.label1, 0);

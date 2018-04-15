@@ -99,7 +99,7 @@ namespace Visual_Music
 
 			modWebBrowser = new SongWebBrowser(this);
 			modWebBrowser.Dock = DockStyle.Fill;
-			modWebBrowser.Url = "modarchive.org";
+			modWebBrowser.Url = "https://modarchive.org/index.php?request=view_searchbox";
 			modWebBrowser.SongFormats = ImportModForm.Formats;
 			//modWebBrowser.OnBeforeBrowseEvent += OnBeforeBrowse;
 			sidWebBrowser = new SongWebBrowser(this);
@@ -281,6 +281,7 @@ namespace Visual_Music
 						updateFormTitle("");
 					}
 					songLoaded(notePath);
+					updateProjectNoteFilePath();
 					return true;
 				}
 				else
@@ -1025,7 +1026,23 @@ namespace Visual_Music
 				songPanel.ResumePaint();
 			}
 		}
-		
+
+		void updateProjectNoteFilePath()
+		{
+			if (Project.SourceSongType == Midi.FileType.Midi)
+			{
+				Project.NoteFilePath = importMidiForm.RawNoteFilePath;
+			}
+			else if (Project.SourceSongType == Midi.FileType.Mod)
+			{
+				Project.NoteFilePath = importModForm.RawNoteFilePath;
+			}
+			else if (Project.SourceSongType == Midi.FileType.Sid)
+			{
+				Project.NoteFilePath = importSidForm.RawNoteFilePath;
+			}
+		}
+
 		void updateImportForm()
 		{
 			if (Project.SourceSongType == Midi.FileType.Midi)
@@ -1090,6 +1107,7 @@ namespace Visual_Music
 				Project.AudioFilePath = saveMixdownDialog.FileName;
 				updateImportForm(); //To update audio file path
 			}
+			
 
 			currentProjPath = saveProjDialog.FileName;
 			ProjectFolder = Path.GetDirectoryName(currentProjPath);
