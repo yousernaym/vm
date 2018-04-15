@@ -9,11 +9,14 @@ using System.IO;
 namespace Visual_Music
 {
 	[Serializable]
-	class Settings : ISerializable
+	public class Settings : ISerializable
 	{
 		enum Keys { MidiNoteFolder, ModNoteFolder, SidNoteFolder, MidiAudioFolder, ModAudioFolder, SidAudioFolder, VideoFolder, TextureFolder, ProjectFolder, ModTpartyApp, ModTpartyArgs, ModTpartyOutput, SidTpartyApp, SidTpartyArgs, SidTpartyOutput, HvscDir, TpartyModuleMixdown, TpartySidMixdown, HvscSongLengths }
 		public static readonly string FilePath = Path.Combine(Program.AppDataDir, "settings.xml");
-		public static Type[] Types = { typeof(string) };
+		public static Type[] Types = { typeof(string), typeof(bool) };
+
+		public string ModInsTrack { get; set; }
+
 		string getKeyName(Keys key)
 		{
 			return Enum.GetName(typeof(Keys), key);

@@ -12,6 +12,7 @@ namespace Visual_Music
     public partial class ImportModForm : ImportNotesWithAudioForm
     {
 		static string[] XmPlayFormats = { "IT", "XM", "S3M", "MTM", "MOD", "UMX", "MO3" };
+		static public readonly string[] Formats = Properties.Resources.ModFormats.ToLower().Split(null);
 		public ImportModForm()
         {
             InitializeComponent();

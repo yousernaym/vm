@@ -6,12 +6,18 @@ using System;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
+using CefSharp.Example.RequestEventHandler;
+using System.Net;
+using System.IO;
 
 namespace Visual_Music
 {
     public partial class SongWebBrowser : UserControl
     {
-        private readonly ChromiumWebBrowser browser;
+		readonly ChromiumWebBrowser browser;
+		readonly Form1 mainForm;
+
+		public string[] SongFormats { get; set; }
 		public string Url
 		{
 			get => urlTextBox.Text;
@@ -34,15 +40,29 @@ namespace Visual_Music
 				}
 			}
 		}
+
+		//public event EventHandler<OnBeforeBrowseEventArgs> OnBeforeBrowseEvent
+		//{
+		//	//add => ((RequestEventHandler)browser.RequestHandler).OnBeforeBrowseEvent += value;
+		//	add =>
+		//		this.InvokeOnUiThreadIfRequired(() => ((RequestEventHandler)browser.RequestHandler).OnBeforeBrowseEvent += value);
+		//	remove =>
+		//		this.InvokeOnUiThreadIfRequired(() => ((RequestEventHandler)browser.RequestHandler).OnBeforeBrowseEvent -= value);
+		//}
 		
-		public SongWebBrowser()
+		public SongWebBrowser(Form1 form1)
         {
             InitializeComponent();
 
-            browser = new ChromiumWebBrowser("www.google.com")
+			mainForm = form1;
+			browser = new ChromiumWebBrowser("")
             {
                 Dock = DockStyle.Fill,
             };
+
+			RequestEventHandler requestEventHandler = new RequestEventHandler();
+			requestEventHandler.OnBeforeBrowseEvent += OnBeforeBrowse;
+			browser.RequestHandler = requestEventHandler;
             toolStripContainer.ContentPanel.Controls.Add(browser);
 
             browser.LoadingStateChanged += OnLoadingStateChanged;
@@ -56,7 +76,20 @@ namespace Visual_Music
             DisplayOutput(version);
         }
 
-        private void OnBrowserConsoleMessage(object sender, ConsoleMessageEventArgs args)
+		private void OnBeforeBrowse(object sender, OnBeforeBrowseEventArgs e)
+		{
+			if (e.Request.Url.EndsWith(".xm"))
+			{
+				e.CancelNavigation = true;
+				this.InvokeOnUiThreadIfRequired(delegate
+				{
+					mainForm.importModForm.NoteFilePath = e.Request.Url;
+					mainForm.importModForm.ShowDialog();//(filePath, Form1.Settings.ModInsTrack, mainForm.tpartyIntegrationForm.ModuleMixdown ? MixdownType.Tparty);
+				});
+			}
+		}
+
+		private void OnBrowserConsoleMessage(object sender, ConsoleMessageEventArgs args)
         {
             DisplayOutput(string.Format("Line: {0}, Source: {1}, Message: {2}", args.Line, args.Source, args.Message));
         }

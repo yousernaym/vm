@@ -61,6 +61,32 @@ namespace Visual_Music.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 669
+        ///AMF
+        ///APUN
+        ///DSM
+        ///FAR
+        ///GDM
+        ///IT
+        ///IMF
+        ///MOD
+        ///MED
+        ///MTM
+        ///OKT
+        ///S3M
+        ///STM
+        ///STX
+        ///ULT
+        ///UNI
+        ///XM.
+        /// </summary>
+        internal static string ModFormats {
+            get {
+                return ResourceManager.GetString("ModFormats", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap nav_left_green {

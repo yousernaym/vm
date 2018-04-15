@@ -7,11 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Net;
 
 namespace Visual_Music
 {
 	public partial class SourceFileForm : Form
 	{
+		WebClient client = new WebClient();
+		string downloadedFilePath => Path.Combine(Program.TempDir, NoteFilePath);
 		public string NoteFilePath
 		{
 			get { return noteFilePath.Text; }
@@ -38,7 +41,7 @@ namespace Visual_Music
 		{
 			get { return eraseCurrent.Checked; }
 		}
-        public SourceFileForm()
+        public SourceFileForm() //For designer view
         {
             InitializeComponent();
         }
@@ -46,6 +49,18 @@ namespace Visual_Music
 		{
 			parent = _parent;
 			InitializeComponent();
+			client.DownloadFileCompleted += OnDownloadCompleted;
+			client.DownloadProgressChanged += OnDownloadProgressChanged;
+		}
+
+		private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void OnDownloadCompleted(object sender, AsyncCompletedEventArgs e)
+		{
+			throw new NotImplementedException();
 		}
 
 		private void browseNoteBtn_Click(object sender, EventArgs e)
@@ -89,7 +104,14 @@ namespace Visual_Music
 				MessageBox.Show("Note file path required.");
 				return false;
 			}
-			if (!File.Exists(NoteFilePath))
+			if (Uri.IsWellFormedUriString(NoteFilePath, UriKind.Absolute))
+			{
+				
+				client.DownloadFileAsync(new Uri(NoteFilePath));
+					
+				}
+			}
+				if (!File.Exists(NoteFilePath))
 			{
 				MessageBox.Show("Note file not found.");
 				return false;

@@ -47,6 +47,11 @@ namespace Visual_Music
 			foreach (DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
 		}
 
+		public static string joinFormatList(this string[] formatList)
+		{
+			return string.Join("; ", formatList) + ";";
+		}
+
 		[MethodImpl(MethodImplOptions.NoInlining)]
 		private static void LoadApp(string[] args)
 		{

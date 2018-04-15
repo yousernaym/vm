@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.Serialization;
 using System.IO.Compression;
+using CefSharp.Example.RequestEventHandler;
 
 namespace Visual_Music
 {
@@ -56,21 +57,21 @@ namespace Visual_Music
 		VideoExportForm vidExpForm;
 
 		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType) };
-        SongPanel songPanel = new SongPanel();
+		SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
-		SongWebBrowser modWebBrowser = new SongWebBrowser();
-		SongWebBrowser sidWebBrowser = new SongWebBrowser();
+		SongWebBrowser modWebBrowser;
+		SongWebBrowser sidWebBrowser;
 		Project project;
 		public Project Project => project;
 		//float PosOffsetScale => Project.Camera.ViewportSize.X / 100.0f; //Pos offset is in percent of screen width
-		Settings settings = new Settings();
+		static Settings settings = new Settings();
+		public static Settings Settings { get => settings; }
 		ScrollBar songScrollBar = new HScrollBar();
 		NoteStyleControl currentNoteStyleControl;
 
 		public Form1(string[] args)
 		{
 			InitializeComponent();
-
 			//Application.Idle += delegate { songPanel.update(); };
 
 			project = new Project(SongPanel);
@@ -84,20 +85,26 @@ namespace Visual_Music
 			ControlStyles.AllPaintingInWmPaint, true);
 
 			importMidiForm = new ImportMidiForm(this);
-            importModForm = new ImportModForm(this);
-            importSidForm = new ImportSidForm(this);
+			importModForm = new ImportModForm(this);
+			importSidForm = new ImportSidForm(this);
 			tpartyIntegrationForm = new TpartyIntegrationForm();
 			vidExpForm = new VideoExportForm();
 			ResizeRedraw = true;
 
-            songScrollBar.Dock = DockStyle.Bottom;
+			songScrollBar.Dock = DockStyle.Bottom;
 			songScrollBar.ValueChanged += songScrollBar_ValueChanged;
 			songScrollBar.Scroll += songScrollBar_Scroll;
 			Controls.Add(songScrollBar);
-            songScrollBar.BringToFront();
+			songScrollBar.BringToFront();
 
-            modWebBrowser.Dock = DockStyle.Fill;
+			modWebBrowser = new SongWebBrowser(this);
+			modWebBrowser.Dock = DockStyle.Fill;
+			modWebBrowser.Url = "modarchive.org";
+			modWebBrowser.SongFormats = ImportModForm.Formats;
+			//modWebBrowser.OnBeforeBrowseEvent += OnBeforeBrowse;
+			sidWebBrowser = new SongWebBrowser(this);
 			sidWebBrowser.Dock = DockStyle.Fill;
+			sidWebBrowser.Url = "hvsc.c64.org";
 			initSongPanel(songPanel);
 			
 			Controls.Add(modWebBrowser);
@@ -116,6 +123,14 @@ namespace Visual_Music
 			//lineStyleControl.init(this);
 		}
 
+		void OnBeforeBrowse(object sender, OnBeforeBrowseEventArgs e)
+		{
+			if (e.Request.Url.EndsWith(".xm"))
+			{
+				e.CancelNavigation = true;
+				this.InvokeOnUiThreadIfRequired(() => importModuleToolStripMenuItem.PerformClick());
+			}
+		}
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			try

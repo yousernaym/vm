@@ -268,11 +268,11 @@
     <Content Include="Content\CubeToPlane.fx" />
     <Content Include="Content\Line.fx" />
     <Content Include="Icon.ico" />
-    <None Include="Resources\chromium-256.png" />
     <None Include="Resources\nav_left_green.png" />
     <None Include="Resources\nav_plain_green.png" />
     <None Include="Resources\nav_plain_red.png" />
     <None Include="Resources\nav_right_green.png" />
+    <None Include="Resources\ModFormats.txt" />
     <Content Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
