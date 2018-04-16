@@ -11,6 +11,7 @@ using System.Net;
 using System.IO;
 using System.Linq;
 using CefSharp.WinForms.Example.Handlers;
+using System.Threading;
 
 namespace Visual_Music
 {
@@ -73,8 +74,8 @@ namespace Visual_Music
             browser.StatusMessage += OnBrowserStatusMessage;
             browser.TitleChanged += OnBrowserTitleChanged;
             browser.AddressChanged += OnBrowserAddressChanged;
-
-            var bitness = Environment.Is64BitProcess ? "x64" : "x86";
+			
+			var bitness = Environment.Is64BitProcess ? "x64" : "x86";
             var version = String.Format("Chromium: {0}, CEF: {1}, CefSharp: {2}, Environment: {3}", Cef.ChromiumVersion, Cef.CefVersion, Cef.CefSharpVersion, bitness);
             DisplayOutput(version);
         }
@@ -118,9 +119,9 @@ namespace Visual_Music
         {
             SetCanGoBack(args.CanGoBack);
             SetCanGoForward(args.CanGoForward);
-
-            this.InvokeOnUiThreadIfRequired(() => SetIsLoading(!args.CanReload));
-        }
+			this.InvokeOnUiThreadIfRequired(() => SetIsLoading(!args.CanReload));
+			this.InvokeOnUiThreadIfRequired(() => browser.Focus()); 
+		}
 
         private void OnBrowserTitleChanged(object sender, TitleChangedEventArgs args)
         {
@@ -209,7 +210,13 @@ namespace Visual_Music
                 browser.Load(url);
             }
         }
-    }
+
+		private void SongWebBrowser_Load(object sender, EventArgs e)
+		{
+			//Visible = Enabled = false;
+			//Thread..Focus();
+		}
+	}
 
 	static class ControlExtensions
 	{

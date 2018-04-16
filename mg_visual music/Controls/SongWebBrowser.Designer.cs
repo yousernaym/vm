@@ -141,6 +141,7 @@
 			this.Controls.Add(this.toolStripContainer);
 			this.Name = "SongWebBrowser";
 			this.Size = new System.Drawing.Size(730, 490);
+			this.Load += new System.EventHandler(this.SongWebBrowser_Load);
 			this.toolStripContainer.ContentPanel.ResumeLayout(false);
 			this.toolStripContainer.ContentPanel.PerformLayout();
 			this.toolStripContainer.TopToolStripPanel.ResumeLayout(false);

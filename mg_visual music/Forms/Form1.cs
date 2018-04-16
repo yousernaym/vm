@@ -61,6 +61,7 @@ namespace Visual_Music
 		public SongPanel SongPanel => songPanel;
 		SongWebBrowser modWebBrowser;
 		SongWebBrowser sidWebBrowser;
+		List<Control> screens = new List<Control>();
 		Project project;
 		public Project Project => project;
 		//float PosOffsetScale => Project.Camera.ViewportSize.X / 100.0f; //Pos offset is in percent of screen width
@@ -100,15 +101,24 @@ namespace Visual_Music
 			modWebBrowser = new SongWebBrowser(this);
 			modWebBrowser.Dock = DockStyle.Fill;
 			modWebBrowser.Url = "https://modarchive.org/index.php?request=view_searchbox";
-			modWebBrowser.SongFormats = ImportModForm.Formats;
 			//modWebBrowser.OnBeforeBrowseEvent += OnBeforeBrowse;
+
 			sidWebBrowser = new SongWebBrowser(this);
 			sidWebBrowser.Dock = DockStyle.Fill;
 			sidWebBrowser.Url = "https://www.exotica.org.uk/wiki/Special:HVSC";
-			initSongPanel(songPanel);
 			
 			Controls.Add(modWebBrowser);
 			Controls.Add(sidWebBrowser);
+			modWebBrowser.BringToFront();
+			sidWebBrowser.BringToFront();
+			initSongPanel();
+			
+			screens.Add(songPanel);
+			screens.Add(modWebBrowser);
+			screens.Add(sidWebBrowser);
+
+			viewSongTSMI.PerformClick();
+
 			Array enumArray = Enum.GetValues(typeof(NoteStyleType));
             foreach (NoteStyleType nse in enumArray)
                 styleList.Items.Add(nse.ToString());
@@ -1123,7 +1133,7 @@ namespace Visual_Music
 		{
 			saveSongAs();
 		}
-		void initSongPanel(SongPanel panel)
+		void initSongPanel()
 		{
 			songPanel.Dock = DockStyle.Fill;
 			songPanel.TabStop = false;
@@ -1621,17 +1631,24 @@ namespace Visual_Music
 
 		private void viewSongTSMI_Click(object sender, EventArgs e)
 		{
-			songPanel.BringToFront();
+			changeToScreen(songPanel);
 		}
 
 		private void viewModBrowserTSMI_Click(object sender, EventArgs e)
 		{
-			modWebBrowser.BringToFront();
+			changeToScreen(modWebBrowser);
 		}
 
 		private void viewSidBrowserTSMI_Click(object sender, EventArgs e)
 		{
-			sidWebBrowser.BringToFront();
+			changeToScreen(sidWebBrowser);
+		}
+
+		void changeToScreen(Control newScreen)
+		{
+			foreach (var screen in screens)
+				screen.Visible = screen.Enabled = false;
+			newScreen.Visible = newScreen.Enabled = true; 
 		}
 	}
 }
