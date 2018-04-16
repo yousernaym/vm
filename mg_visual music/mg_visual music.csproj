@@ -289,6 +289,8 @@
     <None Include="Resources\nav_plain_red.png" />
     <None Include="Resources\nav_right_green.png" />
     <None Include="Resources\ModFormats.txt" />
+    <None Include="Resources\MidiFormats.txt" />
+    <None Include="Resources\SidFormats.txt" />
     <Content Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -315,6 +317,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportMidiForm.resx">
+      <DependentUpon>ImportMidiForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportModForm.resx">
       <DependentUpon>ImportModForm.cs</DependentUpon>

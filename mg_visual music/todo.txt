@@ -5,12 +5,15 @@
 - Make a Point/Dot note style, like Bar but centered on note start. 
   Alternatively make it an option to add points in line style.
 - Fix sid parsing.
-- Loading of songs directly from HVSC and Modarchive.
 - Loading of songlengths.txt directly from HVSC.
 - Only associate with .vms if checkbox is checked.
-- Change icon.
+- Automatic import from web browser and command line without import dialog.
 
 Done:
+- Fix source file import filters.
+- Fix reset of max/min-pitch in project class.
+- Loading of songs directly from HVSC and Modarchive.
+- Change icon.
 - Fix fadeout-to-discard. Non-black edges.
 - Use static vertex buffers for bar style.
 - Antialiasing through blurring of line edges and mod discarding if FadeOut > 0.

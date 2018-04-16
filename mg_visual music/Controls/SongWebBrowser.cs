@@ -9,6 +9,7 @@ using CefSharp.WinForms;
 using CefSharp.Example.RequestEventHandler;
 using System.Net;
 using System.IO;
+using System.Linq;
 
 namespace Visual_Music
 {
@@ -78,15 +79,24 @@ namespace Visual_Music
 
 		private void OnBeforeBrowse(object sender, OnBeforeBrowseEventArgs e)
 		{
-			if (e.Request.Url.EndsWith(".xm"))
-			{
+			string fileExt = e.Request.Url.Split('.').Last();
+			SourceFileForm importForm = null;
+
+			if (ImportMidiForm.Formats.Contains(fileExt))
+				importForm = mainForm.importMidiForm;
+			else if (ImportModForm.Formats.Contains(fileExt))
+				importForm = mainForm.importModForm;
+			else if (ImportModForm.Formats.Contains(fileExt))
+				importForm = mainForm.importSidForm;
+			if (importForm != null)
+			{ 
 				e.CancelNavigation = true;
 				string url = string.Copy(e.Request.Url);
 				this.InvokeOnUiThreadIfRequired(delegate
 				{
 					mainForm.importModForm.NoteFilePath = url;
 					mainForm.importModForm.AudioFilePath = "";
-					mainForm.importModForm.ShowDialog();
+					importForm.ShowDialog();
 				});
 			}
 		}

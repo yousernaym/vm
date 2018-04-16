@@ -264,7 +264,6 @@ namespace Visual_Music
 			stopPlayback();
 
 			insTrack = _insTrack;
-			int minPitch = 0, maxPitch = 0;
 			if (eraseCurrent)
 			{
 				ViewWidthQn = DefaultViewWidthQn;
@@ -297,12 +296,6 @@ namespace Visual_Music
 			}
 			
 			notes = newNotes;
-			if (eraseCurrent)
-			{
-				minPitch = notes.MinPitch;
-				maxPitch = notes.MaxPitch;
-			}
-
 			notes.createNoteBsp();
 
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);

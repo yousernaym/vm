@@ -12,7 +12,8 @@ namespace Visual_Music
 {
     public partial class ImportSidForm : ImportNotesWithAudioForm
     {
-        public ImportSidForm()
+		static public readonly string[] Formats = Properties.Resources.SidFormats.ToLower().Split(null);
+		public ImportSidForm()
         {
             InitializeComponent();
         }
@@ -77,6 +78,11 @@ namespace Visual_Music
 			//	}
 				
 			//}
+		}
+
+		private void ImportSidForm_Load(object sender, EventArgs e)
+		{
+			createFormatFilter("Sid files", Formats);
 		}
 	}
 }

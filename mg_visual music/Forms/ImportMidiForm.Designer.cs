@@ -28,29 +28,30 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.SuspendLayout();
-            // 
-            // label2
-            // 
-            this.label2.Size = new System.Drawing.Size(42, 13);
-            this.label2.Text = "Midi file";
-            // 
-            // Ok
-            // 
-            this.Ok.Click += new System.EventHandler(this.Ok_Click);
-            // 
-            // openNoteFileDlg
-            // 
-            this.openNoteFileDlg.Filter = "Midi files (*.mid)|*.mid|All files (*.*)|*.*";
-            this.openNoteFileDlg.Title = "Open midi file";
-            // 
-            // ImportMidiForm
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(400, 167);
-            this.Name = "ImportMidiForm";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+			this.SuspendLayout();
+			// 
+			// label2
+			// 
+			this.label2.Size = new System.Drawing.Size(42, 13);
+			this.label2.Text = "Midi file";
+			// 
+			// openNoteFileDlg
+			// 
+			this.openNoteFileDlg.Filter = "Midi files (*.mid)|*.mid|All files (*.*)|*.*";
+			this.openNoteFileDlg.Title = "Open midi file";
+			// 
+			// Ok
+			// 
+			this.Ok.Click += new System.EventHandler(this.Ok_Click);
+			// 
+			// ImportMidiForm
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.ClientSize = new System.Drawing.Size(400, 167);
+			this.Name = "ImportMidiForm";
+			this.Load += new System.EventHandler(this.ImportMidiForm_Load);
+			this.ResumeLayout(false);
+			this.PerformLayout();
 
         }
 

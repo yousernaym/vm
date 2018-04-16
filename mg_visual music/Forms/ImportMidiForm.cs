@@ -10,7 +10,8 @@ namespace Visual_Music
 {
     public partial class ImportMidiForm : SourceFileForm
     {
-        public ImportMidiForm()
+		static public readonly string[] Formats = Properties.Resources.MidiFormats.ToLower().Split(null);
+		public ImportMidiForm()
         {
             InitializeComponent();
         }
@@ -23,5 +24,10 @@ namespace Visual_Music
         {
 			importFiles(false, MixdownType.None, AudioFilePath, 0, Midi.FileType.Midi);
         }
-    }
+
+		private void ImportMidiForm_Load(object sender, EventArgs e)
+		{
+			createFormatFilter("Midi files", Formats);
+		}
+	}
 }

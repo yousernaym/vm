@@ -61,6 +61,15 @@ namespace Visual_Music.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string MidiFormats {
+            get {
+                return ResourceManager.GetString("MidiFormats", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 669
         ///AMF
         ///APUN
@@ -123,6 +132,15 @@ namespace Visual_Music.Properties {
             get {
                 object obj = ResourceManager.GetObject("nav_right_green", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string SidFormats {
+            get {
+                return ResourceManager.GetString("SidFormats", resourceCulture);
             }
         }
     }

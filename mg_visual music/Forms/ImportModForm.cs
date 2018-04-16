@@ -50,8 +50,7 @@ namespace Visual_Music
 
 		private void ImportModForm_Load(object sender, EventArgs e)
 		{
-			string supportedFiles = "*.669; *.AMF; *.APUN; *.DSM; *.FAR; *.GDM; *.IT; *.IMF; *.MOD; *.MED; *.MTM; *.OKT; *.S3M; *.STM; *.STX; *.ULT; *.UNI; *.XM;";
-			openNoteFileDlg.Filter = "Module files (" + supportedFiles + ") | " + supportedFiles + " | All files(*.*) | *.*";
+			createFormatFilter("Mod files", Formats);
 		}
 	}
 }

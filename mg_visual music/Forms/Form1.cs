@@ -104,7 +104,7 @@ namespace Visual_Music
 			//modWebBrowser.OnBeforeBrowseEvent += OnBeforeBrowse;
 			sidWebBrowser = new SongWebBrowser(this);
 			sidWebBrowser.Dock = DockStyle.Fill;
-			sidWebBrowser.Url = "hvsc.c64.org";
+			sidWebBrowser.Url = "https://www.exotica.org.uk/wiki/Special:HVSC";
 			initSongPanel(songPanel);
 			
 			Controls.Add(modWebBrowser);
@@ -275,8 +275,7 @@ namespace Visual_Music
 				{
 					if (eraseCurrent)
 					{
-						defaultPitchesBtn.PerformClick();
-						project.resetPitchLimits();
+						setDefaultPitches();
 						currentProjPath = "";
 						updateFormTitle("");
 					}
@@ -1265,12 +1264,17 @@ namespace Visual_Music
 			project.createOcTrees();
 		}
 
-		private void defaultPitchesBtn_Click(object sender, EventArgs e)
+		void setDefaultPitches()
 		{
 			project.resetPitchLimits();
 			maxPitchUd.Value = (decimal)Project.MaxPitch;
 			minPitchUd.Value = (decimal)Project.MinPitch;
-        }
+		}
+
+		private void defaultPitchesBtn_Click(object sender, EventArgs e)
+		{
+			setDefaultPitches();
+		}
 
 		private void pointSmpCb_CheckedChanged(object sender, EventArgs e)
 		{

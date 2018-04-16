@@ -18,7 +18,7 @@ namespace Visual_Music
 		{
 			if (path.IsUrl())
 			{
-				string fileName = "downloadedsong." + Path.GetFileName(path.Split('.').Last());
+				string fileName = path.Split('/').Last().Split('#').Last();
 				Uri url = new Uri(path);
 				string downloadedFilePath = Path.Combine(Program.TempDir, fileName);
 				client.DownloadFileAsync(url, downloadedFilePath);

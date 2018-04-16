@@ -58,6 +58,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.ClientSize = new System.Drawing.Size(411, 263);
 			this.Name = "ImportSidForm";
+			this.Load += new System.EventHandler(this.ImportSidForm_Load);
 			this.Shown += new System.EventHandler(this.ImportSidForm_Shown);
 			this.ResumeLayout(false);
 			this.PerformLayout();
