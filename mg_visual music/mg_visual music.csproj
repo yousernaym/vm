@@ -216,6 +216,7 @@
     <Compile Include="ScreenQuad.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SuspendPaint.cs" />
+    <Compile Include="tparty\CefSharp\KeyboardHandler.cs" />
     <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\BaseRequestEventArgs.cs" />
     <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\CanGetCookiesEventArg.cs" />
     <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\CanSetCookieEventArg.cs" />

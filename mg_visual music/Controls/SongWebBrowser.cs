@@ -10,6 +10,7 @@ using CefSharp.Example.RequestEventHandler;
 using System.Net;
 using System.IO;
 using System.Linq;
+using CefSharp.WinForms.Example.Handlers;
 
 namespace Visual_Music
 {
@@ -64,7 +65,8 @@ namespace Visual_Music
 			RequestEventHandler requestEventHandler = new RequestEventHandler();
 			requestEventHandler.OnBeforeBrowseEvent += OnBeforeBrowse;
 			browser.RequestHandler = requestEventHandler;
-            toolStripContainer.ContentPanel.Controls.Add(browser);
+			browser.KeyboardHandler = new KeyboardHandler();
+			toolStripContainer.ContentPanel.Controls.Add(browser);
 
             browser.LoadingStateChanged += OnLoadingStateChanged;
             browser.ConsoleMessage += OnBrowserConsoleMessage;
@@ -86,7 +88,7 @@ namespace Visual_Music
 				importForm = mainForm.importMidiForm;
 			else if (ImportModForm.Formats.Contains(fileExt))
 				importForm = mainForm.importModForm;
-			else if (ImportModForm.Formats.Contains(fileExt))
+			else if (ImportSidForm.Formats.Contains(fileExt))
 				importForm = mainForm.importSidForm;
 			if (importForm != null)
 			{ 
@@ -94,8 +96,8 @@ namespace Visual_Music
 				string url = string.Copy(e.Request.Url);
 				this.InvokeOnUiThreadIfRequired(delegate
 				{
-					mainForm.importModForm.NoteFilePath = url;
-					mainForm.importModForm.AudioFilePath = "";
+					importForm.NoteFilePath = url;
+					importForm.AudioFilePath = "";
 					//importForm.ShowDialog();
 					importForm.importFiles();
 				});
