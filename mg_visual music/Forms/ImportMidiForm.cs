@@ -22,8 +22,13 @@ namespace Visual_Music
 
         private void Ok_Click(object sender, EventArgs e)
         {
-			importFiles(false, MixdownType.None, AudioFilePath, 0, Midi.FileType.Midi);
+			importFiles();
         }
+
+		public override void importFiles()
+		{
+			importFiles(false, MixdownType.None, AudioFilePath, 0, Midi.FileType.Midi);
+		}
 
 		private void ImportMidiForm_Load(object sender, EventArgs e)
 		{

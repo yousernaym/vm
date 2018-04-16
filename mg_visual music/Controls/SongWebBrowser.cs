@@ -96,7 +96,8 @@ namespace Visual_Music
 				{
 					mainForm.importModForm.NoteFilePath = url;
 					mainForm.importModForm.AudioFilePath = "";
-					importForm.ShowDialog();
+					//importForm.ShowDialog();
+					importForm.importFiles();
 				});
 			}
 		}

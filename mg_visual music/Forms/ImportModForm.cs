@@ -34,19 +34,24 @@ namespace Visual_Music
             set { if (value) modInsTrackBtn.Checked = true; else modChTrackBtn.Checked = true; }
         }
 
-        private void Ok_Click(object sender, EventArgs e)
+		private void Ok_Click(object sender, EventArgs e)
         {
+			importFiles();
+        }
+
+		public override void importFiles()
+		{
 			bool xmPlayMixdownSupported = false;
 			string ext = Path.GetExtension(NoteFilePath);
 			if (ext.Length > 1) //'.' and more
 			{
-				ext = ext.Substring(1); //Remove '.'
+				ext = ext.Substring(1).ToUpper(); //Remove '.'
 				foreach (string f in XmPlayFormats)
-					if (ext.ToLower() == f.ToLower())
+					if (ext == f)
 						xmPlayMixdownSupported = true;
 			}
 			importFiles(InsTrack, true, xmPlayMixdownSupported && parent.tpartyIntegrationForm.ModuleMixdown, 0, Midi.FileType.Mod);
-        }
+		}
 
 		private void ImportModForm_Load(object sender, EventArgs e)
 		{

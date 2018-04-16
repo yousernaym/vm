@@ -50,10 +50,17 @@ namespace Visual_Music
 				double deltaTime = progressBuf[progressBufIndex1].time - progressBuf[progressBufIndex0].time;
 				double deltaProgress = progressBuf[progressBufIndex1].normProgress - progressBuf[progressBufIndex0].normProgress;
 				double progressLeft = 1.0 - progressBuf[progressBufIndex1].normProgress;
-				TimeSpan timeLeft = TimeSpan.FromSeconds(deltaTime * progressLeft / deltaProgress);
-
-				estimatedTimeLabel.Text = string.Format("Estimated time remaining: {0:d2}:{1:d2}:{2:d2}", new object[] { timeLeft.Hours, timeLeft.Minutes, timeLeft.Seconds });
-				elapsedTimeLabel.Text = string.Format("Elapsed time: {0:d2}:{1:d2}:{2:d2}", new object[] { stopWatch.Elapsed.Hours, stopWatch.Elapsed.Minutes, stopWatch.Elapsed.Seconds });
+				if (deltaProgress > 0)
+				{
+					TimeSpan timeLeft = TimeSpan.FromSeconds(deltaTime * progressLeft / deltaProgress);
+					estimatedTimeLabel.Text = string.Format("Estimated time remaining: {0:d2}:{1:d2}:{2:d2}", new object[] { timeLeft.Hours, timeLeft.Minutes, timeLeft.Seconds });
+					elapsedTimeLabel.Text = string.Format("Elapsed time: {0:d2}:{1:d2}:{2:d2}", new object[] { stopWatch.Elapsed.Hours, stopWatch.Elapsed.Minutes, stopWatch.Elapsed.Seconds });
+				}
+				else
+				{
+					estimatedTimeLabel.Text = "";
+					elapsedTimeLabel.Text = "";
+				}
 
 				if (++progressBufIndex0 >= progressBuf.Length)
 					progressBufIndex0 = 0;

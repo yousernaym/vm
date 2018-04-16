@@ -24,13 +24,18 @@ namespace Visual_Music
         
         private void Ok_Click(object sender, EventArgs e)
         {
+			importFiles();
+        }
+
+		public override void importFiles()
+		{
 			if (!checkNoteFile())
 				return;
 			double songLengthS = 0; //song length in seconds. //0 = NoteExtractor default
 			//if (parent.tpartyIntegrationForm.HvscSongLengths)
 				//songLengthS = getSongLength();
 			importFiles(false, false, parent.tpartyIntegrationForm.SidMixdown, songLengthS, Midi.FileType.Sid);
-        }
+		}
 
 		private void ImportSidForm_Shown(object sender, EventArgs e)
 		{

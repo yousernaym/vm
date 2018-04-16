@@ -155,19 +155,21 @@ namespace Visual_Music
 			{
 				//MessageBox.Show(arg);
 				string ext = Path.GetExtension(arg).ToLower();
+				
+				//If no previous note file has been encountered, check if this extension is a note file
 				if (!bImportFiles)
 				{
-					if (ext == ".mid")
+					if (ImportMidiForm.Formats.Contains(ext))
 					{
 						importMidiForm.NoteFilePath = arg;
 						bMidiFile = bImportFiles = true;
 					}
-					else if (ext == ".mod" || ext == ".xm" || ext == ".s3m" || ext == ".it" || ext == ".stm")
+					else if (ImportModForm.Formats.Contains(ext))
 					{
 						importModForm.NoteFilePath = arg;
 						bModFile = bImportFiles = true;
 					}
-					else if (ext == ".sid" || ext == ".dat")
+					else if (ImportModForm.Formats.Contains(ext))
 					{
 						importSidForm.NoteFilePath = arg;
 						bSidFile = bImportFiles = true;
@@ -189,17 +191,20 @@ namespace Visual_Music
 				if (bMidiFile)
 				{
 					importMidiForm.AudioFilePath = audioFile;
-					importMidiToolStripMenuItem.PerformClick();
+					//importMidiToolStripMenuItem.PerformClick();
+					importMidiForm.importFiles();
 				}
 				if (bModFile)
                 {
 					importModForm.AudioFilePath = audioFile;
-                    importModuleToolStripMenuItem.PerformClick();
-                }
+					//importModuleToolStripMenuItem.PerformClick();
+					importModForm.importFiles();
+				}
                 else if (bSidFile)
 				{
 					importSidForm.AudioFilePath = audioFile;
-					importSidSongToolStripMenuItem.PerformClick();
+					//importSidSongToolStripMenuItem.PerformClick();
+					importSidForm.importFiles();
 				}
                 
 			}

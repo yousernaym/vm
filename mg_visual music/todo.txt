@@ -7,9 +7,10 @@
 - Fix sid parsing.
 - Loading of songlengths.txt directly from HVSC.
 - Only associate with .vms if checkbox is checked.
-- Automatic import from web browser and command line without import dialog.
 
 Done:
+- Automatic import from web browser and command line without import dialog.
+- Import of all formats from command line.
 - Fix source file import filters.
 - Fix reset of max/min-pitch in project class.
 - Loading of songs directly from HVSC and Modarchive.
