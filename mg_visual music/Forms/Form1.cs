@@ -1647,8 +1647,8 @@ namespace Visual_Music
 		void changeToScreen(Control newScreen)
 		{
 			foreach (var screen in screens)
-				screen.Visible = screen.Enabled = false;
-			newScreen.Visible = newScreen.Enabled = true; 
+				screen.Visible = false;
+			newScreen.Visible = true; 
 		}
 	}
 }

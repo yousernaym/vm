@@ -50,6 +50,7 @@
 			this.toolStripContainer.ContentPanel.Controls.Add(this.statusLabel);
 			this.toolStripContainer.ContentPanel.Controls.Add(this.outputLabel);
 			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(730, 465);
+			this.toolStripContainer.ContentPanel.Enter += new System.EventHandler(this.toolStripContainer_ContentPanel_Enter);
 			this.toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.toolStripContainer.LeftToolStripPanelVisible = false;
 			this.toolStripContainer.Location = new System.Drawing.Point(0, 0);
@@ -141,7 +142,6 @@
 			this.Controls.Add(this.toolStripContainer);
 			this.Name = "SongWebBrowser";
 			this.Size = new System.Drawing.Size(730, 490);
-			this.Load += new System.EventHandler(this.SongWebBrowser_Load);
 			this.toolStripContainer.ContentPanel.ResumeLayout(false);
 			this.toolStripContainer.ContentPanel.PerformLayout();
 			this.toolStripContainer.TopToolStripPanel.ResumeLayout(false);

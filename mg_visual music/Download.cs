@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CefSharp;
+using CefSharp.WinForms;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -7,24 +9,23 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CefSharp.Example;
 
 namespace Visual_Music
 {
 	public static class Download
 	{
 		static Client client = new Client();
-		
+
 		public static string downloadFile(this string path)
 		{
 			if (path.IsUrl())
 			{
-				string fileName = path.Split('/').Last().Split('#').Last();
-				Uri url = new Uri(path);
-				string downloadedFilePath = Path.Combine(Program.TempDir, fileName);
-				client.DownloadFileAsync(url, downloadedFilePath);
-				if (client.ProgressForm.ShowDialog() != DialogResult.OK)
-					downloadedFilePath = null;
-				return downloadedFilePath;
+				client.Load(path);
+				string savePath = null;
+				if (client.ProgressForm.ShowDialog() == DialogResult.OK)
+					savePath = Client.SavePath;
+				return savePath;
 			}
 			else
 				return path;
@@ -36,25 +37,34 @@ namespace Visual_Music
 		}
 	}
 
-	class Client : WebClient
+	class Client : ChromiumWebBrowser
 	{
+		public static string SavePath { get; private set; }
 		public readonly ProgressForm ProgressForm = new ProgressForm();
-		public Client()
+		public Client() : base("")
 		{
-			DownloadFileCompleted += OnDownloadCompleted;
-			DownloadProgressChanged += OnDownloadProgressChanged;
+			DownloadHandler downloadHandler = new DownloadHandler();
+			downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
+			downloadHandler.OnDownloadUpdatedFired += OnDownloadUpdated;
+			downloadHandler.ShowDialog = false;
+			this.DownloadHandler = downloadHandler;
+			
 		}
 
-		private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+		private void OnBeforeDownload(object sender, DownloadItem e)
 		{
-			ProgressForm.updateProgress(e.ProgressPercentage / 100.0f);
+			SavePath = e.SuggestedFileName = Path.Combine(Visual_Music.Program.TempDir, e.SuggestedFileName);
 		}
 
-		private void OnDownloadCompleted(object sender, AsyncCompletedEventArgs e)
+		private void OnDownloadUpdated(object sender, DownloadItem e)
 		{
-			//NoteFilePath = downloadedFilePath;
-			ProgressForm.DialogResult = DialogResult.OK;
-			ProgressForm.Hide();
+			ProgressForm.updateProgress(e.PercentComplete / 100.0f);
+			if (e.IsComplete)
+			{
+				ProgressForm.DialogResult = DialogResult.OK;
+				ProgressForm.Hide();
+			}
 		}
 	}
 }
+

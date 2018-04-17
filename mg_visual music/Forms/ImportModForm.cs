@@ -41,6 +41,8 @@ namespace Visual_Music
 
 		public override void importFiles()
 		{
+			if (!checkNoteFile())
+				return;
 			bool xmPlayMixdownSupported = false;
 			string ext = Path.GetExtension(NoteFilePath);
 			if (ext.Length > 1) //'.' and more

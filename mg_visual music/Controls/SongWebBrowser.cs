@@ -11,7 +11,7 @@ using System.Net;
 using System.IO;
 using System.Linq;
 using CefSharp.WinForms.Example.Handlers;
-using System.Threading;
+using CefSharp.Example;
 
 namespace Visual_Music
 {
@@ -67,6 +67,7 @@ namespace Visual_Music
 			requestEventHandler.OnBeforeBrowseEvent += OnBeforeBrowse;
 			browser.RequestHandler = requestEventHandler;
 			browser.KeyboardHandler = new KeyboardHandler();
+			browser.DownloadHandler = new CefSharp.Example.DownloadHandler();
 			toolStripContainer.ContentPanel.Controls.Add(browser);
 
             browser.LoadingStateChanged += OnLoadingStateChanged;
@@ -186,7 +187,9 @@ namespace Visual_Music
         private void BackButtonClick(object sender, EventArgs e)
         {
             browser.Back();
-        }
+			//browser.Load("http://www.prg.dtu.dk/HVSC/HVSC_68-all-of-them.zip");
+
+		}
 
         private void ForwardButtonClick(object sender, EventArgs e)
         {
@@ -211,10 +214,9 @@ namespace Visual_Music
             }
         }
 
-		private void SongWebBrowser_Load(object sender, EventArgs e)
+		private void toolStripContainer_ContentPanel_Enter(object sender, EventArgs e)
 		{
-			//Visible = Enabled = false;
-			//Thread..Focus();
+			urlTextBox.Focus();
 		}
 	}
 
