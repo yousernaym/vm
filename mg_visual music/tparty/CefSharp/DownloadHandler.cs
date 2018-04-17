@@ -16,7 +16,7 @@ namespace CefSharp.Example
 
         public void OnBeforeDownload(IBrowser browser, DownloadItem downloadItem, IBeforeDownloadCallback callback)
         {
-            var handler = OnBeforeDownloadFired;
+			var handler = OnBeforeDownloadFired;
             if (handler != null)
             {
                 handler(this, downloadItem);

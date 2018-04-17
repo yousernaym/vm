@@ -143,6 +143,7 @@ namespace Visual_Music
 		}
 		private void Form1_Load(object sender, EventArgs e)
 		{
+			Download.init(this);
 			try
 			{
 				loadSettings();

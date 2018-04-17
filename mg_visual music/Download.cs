@@ -17,6 +17,10 @@ namespace Visual_Music
 	{
 		static Client client = new Client();
 
+		public static void init(Form form)
+		{
+			form.Controls.Add(client);
+		}
 		public static string downloadFile(this string path)
 		{
 			if (path.IsUrl())
@@ -40,9 +44,11 @@ namespace Visual_Music
 	class Client : ChromiumWebBrowser
 	{
 		public static string SavePath { get; private set; }
-		public readonly ProgressForm ProgressForm = new ProgressForm();
+		public ProgressForm ProgressForm;
 		public Client() : base("")
 		{
+			Width = Height = 0;
+			this.InvokeOnUiThreadIfRequired(() =>  ProgressForm = new ProgressForm());
 			DownloadHandler downloadHandler = new DownloadHandler();
 			downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
 			downloadHandler.OnDownloadUpdatedFired += OnDownloadUpdated;
@@ -58,11 +64,14 @@ namespace Visual_Music
 
 		private void OnDownloadUpdated(object sender, DownloadItem e)
 		{
-			ProgressForm.updateProgress(e.PercentComplete / 100.0f);
+			ProgressForm.InvokeOnUiThreadIfRequired(()=>ProgressForm.updateProgress(e.PercentComplete / 100.0f));
 			if (e.IsComplete)
 			{
-				ProgressForm.DialogResult = DialogResult.OK;
-				ProgressForm.Hide();
+				ProgressForm.InvokeOnUiThreadIfRequired(delegate ()
+				{
+					ProgressForm.DialogResult = DialogResult.OK;
+					ProgressForm.Hide();
+				});
 			}
 		}
 	}
