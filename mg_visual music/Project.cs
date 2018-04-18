@@ -694,6 +694,9 @@ namespace Visual_Music
 		public int SmallScrollStepT => (int)(ViewWidthT * SongPanel.SmallScrollStep);
 		public int LargeScrollStepT => (int)(ViewWidthT * SongPanel.LargeScrollStep);
 
+		public string DefaultFileName { get; set; }
+		public const string DefaultFileExt = ".vms";
+
 		public float getCurveScreenY(float x, Curve curve)
 		{
 			float pitch = curve.Evaluate((float)getTimeT(x));

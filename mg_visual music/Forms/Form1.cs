@@ -282,6 +282,7 @@ namespace Visual_Music
 			changeToScreen(songPanel);
         }
 
+		//Called only when iomporting note and audio files.
 		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType, double songLengthS, Midi.FileType noteFileType)
 		{
 			saveSettings();
@@ -297,7 +298,7 @@ namespace Visual_Music
 						updateFormTitle("");
 					}
 					songLoaded(notePath);
-					updateProjectNoteFilePath();
+					updateProjectFromImportForm();
 					return true;
 				}
 				else
@@ -1010,6 +1011,7 @@ namespace Visual_Music
 
 		private void openSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			openProjDialog.FileName = "";
 			if (openProjDialog.ShowDialog() != DialogResult.OK)
 				return;
 			ProjectFolder = Path.GetDirectoryName(openProjDialog.FileName);
@@ -1027,11 +1029,12 @@ namespace Visual_Music
 					project = (Project)dcs.ReadObject(stream);
 					Project.SongPanel = songPanel;
 				}
-				updateImportForm();
+				updateImportFormFromProject();
 
 				currentProjPath = fileName;
 				songLoaded(currentProjPath);
 				updateFormTitle(currentProjPath);
+				Project.DefaultFileName = Path.GetFileName(currentProjPath);
 			}
 			catch (Exception ex)
 			{
@@ -1043,23 +1046,21 @@ namespace Visual_Music
 			}
 		}
 
-		void updateProjectNoteFilePath()
+		void updateProjectFromImportForm()
 		{
+			SourceFileForm importForm = null;
 			if (Project.SourceSongType == Midi.FileType.Midi)
-			{
-				Project.NoteFilePath = importMidiForm.RawNoteFilePath;
-			}
+				importForm = importMidiForm;
 			else if (Project.SourceSongType == Midi.FileType.Mod)
-			{
-				Project.NoteFilePath = importModForm.RawNoteFilePath;
-			}
+				importForm = importModForm;
 			else if (Project.SourceSongType == Midi.FileType.Sid)
-			{
-				Project.NoteFilePath = importSidForm.RawNoteFilePath;
-			}
+				importForm = importSidForm;
+
+			Project.NoteFilePath = importForm.RawNoteFilePath;
+			Project.DefaultFileName = Path.GetFileName(importForm.NoteFilePath) + Visual_Music.Project.DefaultFileExt;
 		}
 
-		void updateImportForm()
+		void updateImportFormFromProject()
 		{
 			if (Project.SourceSongType == Midi.FileType.Midi)
             {
@@ -1113,6 +1114,7 @@ namespace Visual_Music
 		}
 		void saveSongAs()
 		{
+			saveProjDialog.FileName = project.DefaultFileName;
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
 				return;
 			saveMixdownDialog.FileName = Path.GetFileName(saveProjDialog.FileName) + ".wav";
@@ -1121,7 +1123,7 @@ namespace Visual_Music
 				File.Copy(Media.getAudioFilePath(), saveMixdownDialog.FileName, true);
 				Project.MixdownType = MixdownType.None;
 				Project.AudioFilePath = saveMixdownDialog.FileName;
-				updateImportForm(); //To update audio file path
+				updateImportFormFromProject(); //To update audio file path
 			}
 			
 
