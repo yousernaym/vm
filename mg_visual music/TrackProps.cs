@@ -560,8 +560,8 @@ namespace Visual_Music
 				globalTp2 = globalMaterial.Normal;
 			}
 			h = (double)(Hue + globalMaterial.Hue);
-			if (h > 1) h -= 1;
-			if (h < 0) h += 1;
+			if (h >= 1) h -= 1;
+			else if (h < 0) h += 1;
 			s = (double)(tp2.Sat * globalTp2.Sat);
 			l = (double)(tp2.Lum * globalTp2.Lum);
 			if (s > 1)
