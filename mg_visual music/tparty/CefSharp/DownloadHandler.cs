@@ -16,13 +16,9 @@ namespace CefSharp.Example
 
         public void OnBeforeDownload(IBrowser browser, DownloadItem downloadItem, IBeforeDownloadCallback callback)
         {
-			var handler = OnBeforeDownloadFired;
-            if (handler != null)
-            {
-                handler(this, downloadItem);
-            }
+			OnBeforeDownloadFired?.Invoke(this, downloadItem);
 
-            if (!callback.IsDisposed)
+			if (!callback.IsDisposed)
             {
                 using (callback)
                 {
@@ -33,11 +29,7 @@ namespace CefSharp.Example
 
         public void OnDownloadUpdated(IBrowser browser, DownloadItem downloadItem, IDownloadItemCallback callback)
         {
-			var handler = OnDownloadUpdatedFired;
-            if (handler != null)
-            {
-                handler(this, downloadItem);
-            }
-        }
+			OnDownloadUpdatedFired?.Invoke(this, downloadItem);
+		}
     }
 }

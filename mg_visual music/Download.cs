@@ -26,6 +26,7 @@ namespace Visual_Music
 			if (path.IsUrl())
 			{
 				client.Load(path);
+				client.Visible = true;
 				string savePath = null;
 				if (client.ProgressForm.ShowDialog() == DialogResult.OK)
 					savePath = Client.SavePath;
@@ -54,23 +55,26 @@ namespace Visual_Music
 			downloadHandler.OnDownloadUpdatedFired += OnDownloadUpdated;
 			downloadHandler.ShowDialog = false;
 			this.DownloadHandler = downloadHandler;
-			
+			this.Hide();
 		}
 
 		private void OnBeforeDownload(object sender, DownloadItem e)
 		{
 			SavePath = e.SuggestedFileName = Path.Combine(Visual_Music.Program.TempDir, e.SuggestedFileName);
+			this.InvokeOnUiThreadIfRequired(()=> this.Show());
 		}
 
 		private void OnDownloadUpdated(object sender, DownloadItem e)
 		{
 			ProgressForm.InvokeOnUiThreadIfRequired(()=>ProgressForm.updateProgress(e.PercentComplete / 100.0f));
+			e.IsCancelled = true;
 			if (e.IsComplete)
 			{
 				ProgressForm.InvokeOnUiThreadIfRequired(delegate ()
 				{
 					ProgressForm.DialogResult = DialogResult.OK;
 					ProgressForm.Hide();
+					this.Hide();
 				});
 			}
 		}

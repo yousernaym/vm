@@ -117,7 +117,7 @@ namespace Visual_Music
 			screens.Add(modWebBrowser);
 			screens.Add(sidWebBrowser);
 
-			viewSongTSMI.PerformClick();
+			changeToScreen(songPanel);
 
 			Array enumArray = Enum.GetValues(typeof(NoteStyleType));
             foreach (NoteStyleType nse in enumArray)
@@ -279,6 +279,7 @@ namespace Visual_Music
             songScrollBar.Maximum = Project.SongLengthT;
             songScrollBar.Value = Project.SongPosT;
             upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
+			changeToScreen(songPanel);
         }
 
 		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType, double songLengthS, Midi.FileType noteFileType)
@@ -1138,7 +1139,6 @@ namespace Visual_Music
 		{
 			songPanel.Dock = DockStyle.Fill;
 			songPanel.TabStop = false;
-
 			songPanel.Visible = true;
 			Controls.Add(songPanel);
 			songPanel.BringToFront();

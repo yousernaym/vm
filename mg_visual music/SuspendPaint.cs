@@ -24,7 +24,9 @@ namespace Visual_Music
 		public static void ResumePaint(this Control control)
 		{
 			SendMessage(control.Handle, WM_SETREDRAW, true, 0);
-			control.Refresh();
+			control.Invalidate();
+			if (!control.Visible)
+				control.Visible = false; //Otherwise the control will be redrawn even if it's supposed to be invisible.
 		}
 	}	
 }
