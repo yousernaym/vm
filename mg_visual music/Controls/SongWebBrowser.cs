@@ -89,7 +89,10 @@ namespace Visual_Music
 			if (ImportMidiForm.Formats.Contains(fileExt))
 				importForm = mainForm.importMidiForm;
 			else if (ImportModForm.Formats.Contains(fileExt))
+			{
 				importForm = mainForm.importModForm;
+				//mainForm.importModForm.InsTrack = Form1.Settings.DefaultInsTrack;
+			}
 			else if (ImportSidForm.Formats.Contains(fileExt))
 				importForm = mainForm.importSidForm;
 			if (importForm != null)

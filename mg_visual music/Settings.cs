@@ -11,11 +11,11 @@ namespace Visual_Music
 	[Serializable]
 	public class Settings : ISerializable
 	{
-		enum Keys { MidiNoteFolder, ModNoteFolder, SidNoteFolder, MidiAudioFolder, ModAudioFolder, SidAudioFolder, VideoFolder, TextureFolder, ProjectFolder, ModTpartyApp, ModTpartyArgs, ModTpartyOutput, SidTpartyApp, SidTpartyArgs, SidTpartyOutput, HvscDir, TpartyModuleMixdown, TpartySidMixdown, HvscSongLengths }
+		enum Keys { MidiNoteFolder, ModNoteFolder, SidNoteFolder, MidiAudioFolder, ModAudioFolder, SidAudioFolder, VideoFolder, TextureFolder, ProjectFolder, ModTpartyApp, ModTpartyArgs, ModTpartyOutput, SidTpartyApp, SidTpartyArgs, SidTpartyOutput, HvscDir, TpartyModuleMixdown, TpartySidMixdown, HvscSongLengths, DefaultInsTrack}
 		public static readonly string FilePath = Path.Combine(Program.AppDataDir, "settings.xml");
 		public static Type[] Types = { typeof(string), typeof(bool) };
 
-		public string ModInsTrack { get; set; }
+		//public bool DefaultInsTrack { get; set; } = true; //preserve latest import form setting instead
 
 		string getKeyName(Keys key)
 		{
@@ -29,7 +29,9 @@ namespace Visual_Music
 			Form1 form = Program.form1;
 			foreach (SerializationEntry entry in info)
 			{
-				if (entry.Name == getKeyName(Keys.MidiNoteFolder))
+				if (entry.Name == getKeyName(Keys.DefaultInsTrack))
+					form.importModForm.InsTrack = (bool)entry.Value;
+				else if (entry.Name == getKeyName(Keys.MidiNoteFolder))
 					form.importMidiForm.NoteFolder = (string)entry.Value;
 				else if (entry.Name == getKeyName(Keys.ModNoteFolder))
 					form.importModForm.NoteFolder = (string)entry.Value;
@@ -83,6 +85,7 @@ namespace Visual_Music
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			Form1 form = Program.form1;
+			info.AddValue(getKeyName(Keys.DefaultInsTrack), form.importModForm.InsTrack);
 			info.AddValue(getKeyName(Keys.MidiNoteFolder), form.importMidiForm.NoteFolder);
 			info.AddValue(getKeyName(Keys.ModNoteFolder), form.importModForm.NoteFolder);
 			info.AddValue(getKeyName(Keys.SidNoteFolder), form.importSidForm.NoteFolder);
