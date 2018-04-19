@@ -25,11 +25,7 @@ namespace Visual_Music
 
 		public static string downloadFile(this string path)
 		{
-			client.Load(path);
-			string savePath = null;
-			if (client.ProgressForm.ShowDialog() == DialogResult.OK)
-				savePath = Client.SavePath;
-			return savePath;
+			return client.Load(path);
 		}
 
 		public static bool IsUrl(this string path)
@@ -63,7 +59,7 @@ namespace Visual_Music
 
 	class Client : ChromiumWebBrowser
 	{
-		public static string SavePath { get; private set; }
+		string savePath { get; set; }
 		public ProgressForm ProgressForm;
 		bool bCheckFileName = false;
 		string fileName;
@@ -95,14 +91,14 @@ namespace Visual_Music
 				return;
 			}
 			
-			SavePath = e.SuggestedFileName = Path.Combine(Visual_Music.Program.TempDir, e.SuggestedFileName);
+			savePath = e.SuggestedFileName = Path.Combine(Visual_Music.Program.TempDir, e.SuggestedFileName);
 			//this.InvokeOnUiThreadIfRequired(()=> Show());
 		}
 
 		private void OnDownloadUpdated(object sender, DownloadItem e)
 		{
 			ProgressForm.InvokeOnUiThreadIfRequired(()=>ProgressForm.updateProgress(e.PercentComplete / 100.0f));
-			if (e.IsComplete)
+			if (e.IsComplete || e.IsCancelled)
 			{
 				ProgressForm.InvokeOnUiThreadIfRequired(delegate ()
 				{
@@ -113,10 +109,15 @@ namespace Visual_Music
 			}
 		}
 
-		public new void Load(string url)
+		public new string Load(string url)
 		{
 			Active = true;
 			base.Load(url);
+			if (ProgressForm.ShowDialog() != DialogResult.OK)
+				savePath = null;
+			Active = false;
+			return savePath;
+
 		}
 		async public Task<string> getFileName(string url)
 		{
