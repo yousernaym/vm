@@ -22,7 +22,12 @@ namespace Visual_Music
 			{
 				//If a file has been previously downloaded to temp dir, return path to that file.
 				if (!string.IsNullOrWhiteSpace(DownloadedFilePath))
+				{
+					if (!File.Exists(DownloadedFilePath))
+						DownloadedFilePath = null;
 					return DownloadedFilePath;
+				}
+					
 				//If noteFilePath textbox is a URL, download file to temp dir and return path to that file, otherwise return
 				else if (noteFilePath.Text.IsUrl())
 					return DownloadedFilePath = noteFilePath.Text.downloadFile();
@@ -96,7 +101,7 @@ namespace Visual_Music
 
 		private void noteFilePath_TextChanged(object sender, EventArgs e)
 		{
-			//NoteFilePath = noteFilePath.Text;
+			DownloadedFilePath = null;
 		}
 
 		private void audioFilePath_TextChanged(object sender, EventArgs e)

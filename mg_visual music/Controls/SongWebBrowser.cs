@@ -67,7 +67,10 @@ namespace Visual_Music
 			requestEventHandler.OnBeforeBrowseEvent += OnBeforeBrowse;
 			browser.RequestHandler = requestEventHandler;
 			browser.KeyboardHandler = new KeyboardHandler();
-			browser.DownloadHandler = new CefSharp.Example.DownloadHandler();
+			DownloadHandler downloadHandler = new DownloadHandler();
+			downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
+			downloadHandler.ShowDialog = false;
+			browser.DownloadHandler = downloadHandler;
 			toolStripContainer.ContentPanel.Controls.Add(browser);
 
             browser.LoadingStateChanged += OnLoadingStateChanged;
@@ -81,24 +84,15 @@ namespace Visual_Music
             DisplayOutput(version);
         }
 
-		private void OnBeforeBrowse(object sender, OnBeforeBrowseEventArgs e)
+		private void OnBeforeDownload(object sender, DownloadItem e)
 		{
-			string fileExt = e.Request.Url.Split('.').Last();
-			SourceFileForm importForm = null;
+			e.IsCancelled = true;
+			string fileName = e.SuggestedFileName;// await e.Url.getFileNameFromUrl();
 
-			if (ImportMidiForm.Formats.Contains(fileExt))
-				importForm = mainForm.importMidiForm;
-			else if (ImportModForm.Formats.Contains(fileExt))
-			{
-				importForm = mainForm.importModForm;
-				//mainForm.importModForm.InsTrack = Form1.Settings.DefaultInsTrack;
-			}
-			else if (ImportSidForm.Formats.Contains(fileExt))
-				importForm = mainForm.importSidForm;
+			SourceFileForm importForm = mainForm.getImportFormFromFileType(fileName);
 			if (importForm != null)
-			{ 
-				e.CancelNavigation = true;
-				string url = string.Copy(e.Request.Url);
+			{
+				string url = string.Copy(e.Url);
 				this.InvokeOnUiThreadIfRequired(delegate
 				{
 					importForm.NoteFilePath = url;
@@ -107,6 +101,24 @@ namespace Visual_Music
 					importForm.importFiles();
 				});
 			}
+		}
+		async private void OnBeforeBrowse(object sender, OnBeforeBrowseEventArgs e)
+		{
+			//e.CancelNavigation = true;
+			//string fileName = await e.Request.Url.getFileNameFromUrl();
+			
+			//	SourceFileForm importForm = mainForm.getImportFormFromFileType(fileName);
+			//	if (importForm != null)
+			//	{
+			//		string url = string.Copy(e.Request.Url);
+			//		this.InvokeOnUiThreadIfRequired(delegate
+			//		{
+			//			importForm.NoteFilePath = url;
+			//			importForm.AudioFilePath = "";
+			//			//importForm.ShowDialog();
+			//			importForm.importFiles();
+			//		});
+			//	}
 		}
 
 		private void OnBrowserConsoleMessage(object sender, ConsoleMessageEventArgs args)

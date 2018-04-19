@@ -161,9 +161,13 @@ namespace Visual_Music
 		{
 			if (!string.IsNullOrWhiteSpace(noteFilePath))
 			{
-				string importNoteFilePath = noteFilePath.downloadFile();
-				if (importNoteFilePath == null)
-					return;
+				string importNoteFilePath = noteFilePath;
+				if (importNoteFilePath.IsUrl())
+				{
+					importNoteFilePath = importNoteFilePath.downloadFile();
+					if (importNoteFilePath == null)
+						return;
+				}
 				importSong(importNoteFilePath, audioFilePath, false, insTrack, mixdownType, desiredSongLengthS, sourceSongType);
 				if (trackViews != null)
 				{

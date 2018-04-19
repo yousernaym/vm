@@ -22,7 +22,8 @@ namespace CefSharp.Example
             {
                 using (callback)
                 {
-                    callback.Continue(downloadItem.SuggestedFileName, showDialog: ShowDialog);
+                    if (!downloadItem.IsCancelled)
+						callback.Continue(downloadItem.SuggestedFileName, showDialog: ShowDialog);
                 }
             }
         }
@@ -30,6 +31,8 @@ namespace CefSharp.Example
         public void OnDownloadUpdated(IBrowser browser, DownloadItem downloadItem, IDownloadItemCallback callback)
         {
 			OnDownloadUpdatedFired?.Invoke(this, downloadItem);
+			if (downloadItem.IsCancelled)
+				callback.Cancel();
 		}
     }
 }
