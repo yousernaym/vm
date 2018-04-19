@@ -287,11 +287,11 @@ namespace Visual_Music
 					return false;
 				}
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 				//notes = null;
 				//MessageBox.Show(Parent, e.Message, "Note file error");
-				MessageBox.Show("Couldn't load note file.",  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show("Couldn't load note file.\n"+e.Message,  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
 			}
 			
