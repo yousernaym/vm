@@ -63,6 +63,8 @@ namespace Visual_Music
 		public ProgressForm ProgressForm;
 		bool bCheckFileName = false;
 		string fileName;
+		DownloadHandler downloadHandler;
+
 		public bool Active { set => this.InvokeOnUiThreadIfRequired(() => Visible = value); }
 
 	AutoResetEvent checkFileNameEvent = new AutoResetEvent(false);
@@ -71,7 +73,7 @@ namespace Visual_Music
 		{
 			Width = Height = 0;
 			this.InvokeOnUiThreadIfRequired(() =>  ProgressForm = new ProgressForm());
-			DownloadHandler downloadHandler = new DownloadHandler();
+			downloadHandler = new DownloadHandler();
 			downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
 			downloadHandler.OnDownloadUpdatedFired += OnDownloadUpdated;
 			downloadHandler.ShowDialog = false;
@@ -98,7 +100,7 @@ namespace Visual_Music
 		private void OnDownloadUpdated(object sender, DownloadItem e)
 		{
 			ProgressForm.InvokeOnUiThreadIfRequired(()=>ProgressForm.updateProgress(e.PercentComplete / 100.0f));
-			if (e.IsComplete || e.IsCancelled)
+			if (e.IsComplete)
 			{
 				ProgressForm.InvokeOnUiThreadIfRequired(delegate ()
 				{
@@ -114,7 +116,10 @@ namespace Visual_Music
 			Active = true;
 			base.Load(url);
 			if (ProgressForm.ShowDialog() != DialogResult.OK)
+			{
 				savePath = null;
+				downloadHandler.UpdateCallback.Cancel();
+			}
 			Active = false;
 			return savePath;
 

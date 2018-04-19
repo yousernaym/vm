@@ -11,6 +11,8 @@ namespace CefSharp.Example
 	{
 		public event EventHandler<DownloadItem> OnBeforeDownloadFired;
 		public event EventHandler<DownloadItem> OnDownloadUpdatedFired;
+		IDownloadItemCallback updateCallback;
+		public IDownloadItemCallback UpdateCallback => updateCallback;
 
 		public bool ShowDialog { get; set; } = true;
 
@@ -30,6 +32,7 @@ namespace CefSharp.Example
 
         public void OnDownloadUpdated(IBrowser browser, DownloadItem downloadItem, IDownloadItemCallback callback)
         {
+			updateCallback = callback;
 			OnDownloadUpdatedFired?.Invoke(this, downloadItem);
 			if (downloadItem.IsCancelled)
 				callback.Cancel();
