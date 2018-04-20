@@ -19,6 +19,7 @@ namespace Visual_Music
 		int progressBufIndex1 = 0;
 		ProgressAtTime[] progressBuf = new ProgressAtTime[100];
 		int frame = 0;
+		public string ProgressText { get; set; } = "Progress";
 						
 		public ProgressForm()
 		{
@@ -37,7 +38,7 @@ namespace Visual_Music
 				int percent = (int)(100.0 * normProgress + 0.5);
 				if (percent > 100)
 					percent = 100;
-				Text = "Progress: " + percent.ToString() + "%";
+				Text =  $"{ProgressText}: {percent.ToString()}%";
 
 				ProgressAtTime pat = new ProgressAtTime();
 				pat.time = stopWatch.Elapsed.TotalSeconds;

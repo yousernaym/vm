@@ -38,6 +38,7 @@ namespace Visual_Music
 			Cancel = false;
 			Delegate_renderVideo delegate_renderVideo = new Delegate_renderVideo(songPanel.renderVideo);
 			IAsyncResult result = delegate_renderVideo.BeginInvoke(file, this, options, renderingFinished, delegate_renderVideo);
+			ProgressText = "Render progress";
 		}
 
 		void renderingFinished(IAsyncResult result)

@@ -60,7 +60,7 @@ namespace Visual_Music
 	class Client : ChromiumWebBrowser
 	{
 		string savePath { get; set; }
-		public ProgressForm ProgressForm;
+		ProgressForm progressForm = new ProgressForm();
 		bool bCheckFileName = false;
 		string fileName;
 		DownloadHandler downloadHandler;
@@ -72,12 +72,12 @@ namespace Visual_Music
 		public Client() : base("")
 		{
 			Width = Height = 0;
-			this.InvokeOnUiThreadIfRequired(() =>  ProgressForm = new ProgressForm());
 			downloadHandler = new DownloadHandler();
 			downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
 			downloadHandler.OnDownloadUpdatedFired += OnDownloadUpdated;
 			downloadHandler.ShowDialog = false;
 			this.DownloadHandler = downloadHandler;
+			progressForm.ProgressText = "Download progress";
 			Active = false;
 		}
 
@@ -99,13 +99,13 @@ namespace Visual_Music
 
 		private void OnDownloadUpdated(object sender, DownloadItem e)
 		{
-			ProgressForm.InvokeOnUiThreadIfRequired(()=>ProgressForm.updateProgress(e.PercentComplete / 100.0f));
+			progressForm.InvokeOnUiThreadIfRequired(()=>progressForm.updateProgress(e.PercentComplete / 100.0f));
 			if (e.IsComplete)
 			{
-				ProgressForm.InvokeOnUiThreadIfRequired(delegate ()
+				progressForm.InvokeOnUiThreadIfRequired(delegate ()
 				{
-					ProgressForm.DialogResult = DialogResult.OK;
-					ProgressForm.Close();
+					progressForm.DialogResult = DialogResult.OK;
+					progressForm.Close();
 				});
 				Active = false;
 			}
@@ -115,7 +115,7 @@ namespace Visual_Music
 		{
 			Active = true;
 			base.Load(url);
-			if (ProgressForm.ShowDialog() != DialogResult.OK)
+			if (progressForm.ShowDialog() != DialogResult.OK)
 			{
 				savePath = null;
 				if (downloadHandler.UpdateCallback != null && !downloadHandler.UpdateCallback.IsDisposed)
