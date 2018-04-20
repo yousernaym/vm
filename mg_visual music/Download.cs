@@ -71,9 +71,15 @@ namespace Visual_Music
 			downloadHandler.OnDownloadUpdatedFired += OnDownloadUpdated;
 			downloadHandler.ShowDialog = false;
 			this.DownloadHandler = downloadHandler;
-			
+			LoadError += OnLoadError;
 			progressForm.ProgressText = "Download progress";
 			Active = false;
+		}
+
+		private void OnLoadError(object sender, LoadErrorEventArgs e)
+		{
+			if (e.ErrorCode != CefErrorCode.Aborted) //aborted means download started instead of a page loading
+				progressForm.DialogResult = DialogResult.Cancel;
 		}
 
 		private void OnBeforeDownload(object sender, DownloadItem e)

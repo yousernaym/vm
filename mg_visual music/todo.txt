@@ -7,14 +7,12 @@
 - Fix sid parsing.
 - Loading of songlengths.txt directly from HVSC.
 - Only associate with .vms if checkbox is checked.
-- Fix midi and sid downloading.
 - Use context menus for download links to download songs instead of import, or open import form instead of directly importing.
   Maybe also add default behaviour setting.
-- If the cancel button of the download progress form is clicked, the download that is in progress should be cancelled and not be left hanging.
-- If entering a valid url in import form the download progress dialog should not be opened.
-
 
 Done:
+- Fix midi and sid downloading.
+- If the cancel button of the download progress form is clicked, the download that is in progress should be cancelled and not be left hanging.
 - Automatic import from web browser and command line without import dialog.
 - Import of all formats from command line.
 - Fix source file import filters.
