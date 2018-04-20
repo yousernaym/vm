@@ -20,7 +20,6 @@ namespace Visual_Music
 		bool finished = false;
 		SongPanel songPanel;
 
-		StopRenderingMb cancelMb = new StopRenderingMb();
 		ProgressAtTime[] progressBuf = new ProgressAtTime[100];
 
 		public new void updateProgress(double progress)
@@ -58,7 +57,6 @@ namespace Visual_Music
 				DialogResult = DialogResult.OK;
 				MessageBox.Show(this, "Done!");
 			}
-			cancelMb.Close();
 			Close();
 		}
 
@@ -69,10 +67,13 @@ namespace Visual_Music
 				e.Cancel = true;
 				//if (DialogResult.Yes == MessageBox.Show(this, "Are you sure you want to stop rendering?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2))
 				//new Thread(delegate(){
-				if (DialogResult.Yes == cancelMb.ShowDialog(this))
+				using (StopRenderingMb cancelMb = new StopRenderingMb())
 				{
-					lock (cancelLock)
-						Cancel = true; //Will cause rendering loop in songPanel to finish so that renderingFinished gets called by delegate_renderVideo.BeginInvoke. renderingFinished will call closeForm which will call Close which will take us back here again, but this time finished will be true.
+					if (DialogResult.Yes == cancelMb.ShowDialog(this))
+					{
+						lock (cancelLock)
+							Cancel = true; //Will cause rendering loop in songPanel to finish so that renderingFinished gets called by delegate_renderVideo.BeginInvoke. renderingFinished will call closeForm which will call Close which will take us back here again, but this time finished will be true.
+					}
 				}
 			}
 		}
@@ -84,6 +85,12 @@ namespace Visual_Music
 		void _showMessage(string message)
 		{
 			MessageBox.Show(this, message);
+		}
+
+		private void RenderProgressForm_VisibleChanged(object sender, EventArgs e)
+		{
+				
+		
 		}
 	}
 }

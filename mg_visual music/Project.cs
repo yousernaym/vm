@@ -207,10 +207,14 @@ namespace Visual_Music
 					ImportNotesWithAudioForm.TpartyArgs = (string)entry.Value;
 				else if (entry.Name == "tpartyOutputDir")
 				{
-					string dir = ((string)entry.Value).ToLower();
-					if (dir.Contains(Program.TempDirRoot))
-						dir = Program.TempDir;
-					ImportNotesWithAudioForm.TpartyOutputDir = dir;
+					string dir = ((string)entry.Value);
+					if (!string.IsNullOrWhiteSpace(dir))
+					{
+						dir = dir.ToLower();
+						if (dir.Contains(Program.TempDirRoot))
+							dir = Program.TempDir;
+						ImportNotesWithAudioForm.TpartyOutputDir = dir;
+					}
 				}
 				else if (entry.Name == "desiredSongLengthS")
 					desiredSongLengthS = (double)entry.Value;

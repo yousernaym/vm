@@ -105,7 +105,7 @@ namespace Visual_Music
 				ProgressForm.InvokeOnUiThreadIfRequired(delegate ()
 				{
 					ProgressForm.DialogResult = DialogResult.OK;
-					ProgressForm.Hide();
+					ProgressForm.Close();
 				});
 				Active = false;
 			}
@@ -118,7 +118,8 @@ namespace Visual_Music
 			if (ProgressForm.ShowDialog() != DialogResult.OK)
 			{
 				savePath = null;
-				downloadHandler.UpdateCallback.Cancel();
+				if (downloadHandler.UpdateCallback != null && !downloadHandler.UpdateCallback.IsDisposed)
+					downloadHandler.UpdateCallback.Cancel();
 			}
 			Active = false;
 			return savePath;

@@ -378,8 +378,9 @@ namespace Visual_Music
 
 			if (vidExpForm.ShowDialog() != DialogResult.OK)
 				return;
-			RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, vidExpForm);
-			renderProgressForm.ShowDialog();
+			using (RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, vidExpForm))
+				renderProgressForm.ShowDialog();
+			
 	}
 		
 		private void songPanel_KeyDown(object sender, KeyEventArgs e)

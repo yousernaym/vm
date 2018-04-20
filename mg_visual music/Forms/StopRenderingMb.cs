@@ -24,13 +24,11 @@ namespace Visual_Music
 		private void yesBtn_Click(object sender, EventArgs e)
 		{
 			DialogResult = DialogResult.Yes;
-			Close();
 		}
 
 		private void noBtn_Click(object sender, EventArgs e)
 		{
 			DialogResult = DialogResult.No;
-			Close();
 		}
 	}
 }

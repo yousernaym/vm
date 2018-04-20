@@ -36,6 +36,7 @@
 			this.ClientSize = new System.Drawing.Size(393, 97);
 			this.Name = "RenderProgressForm";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.RenderProgressForm_FormClosing);
+			this.VisibleChanged += new System.EventHandler(this.RenderProgressForm_VisibleChanged);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

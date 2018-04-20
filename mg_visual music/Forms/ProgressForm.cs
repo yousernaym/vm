@@ -78,13 +78,20 @@ namespace Visual_Music
 
 		private void ProgressForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
-			stopWatch.Reset();
 		}
 
 		private void ProgressForm_VisibleChanged(object sender, EventArgs e)
 		{
-			taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.Normal);
+			if (Visible)
+			{
+				taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.Normal);
+				stopWatch.Reset();
+			}
+			else
+			{
+				taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
+				updateProgress(0);
+			}
 		}
 	}
 	public struct ProgressAtTime
