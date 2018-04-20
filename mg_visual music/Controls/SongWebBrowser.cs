@@ -6,7 +6,6 @@ using System;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
-using CefSharp.Example.RequestEventHandler;
 using System.Net;
 using System.IO;
 using System.Linq;
@@ -44,15 +43,6 @@ namespace Visual_Music
 			}
 		}
 
-		//public event EventHandler<OnBeforeBrowseEventArgs> OnBeforeBrowseEvent
-		//{
-		//	//add => ((RequestEventHandler)browser.RequestHandler).OnBeforeBrowseEvent += value;
-		//	add =>
-		//		this.InvokeOnUiThreadIfRequired(() => ((RequestEventHandler)browser.RequestHandler).OnBeforeBrowseEvent += value);
-		//	remove =>
-		//		this.InvokeOnUiThreadIfRequired(() => ((RequestEventHandler)browser.RequestHandler).OnBeforeBrowseEvent -= value);
-		//}
-		
 		public SongWebBrowser(Form1 form1)
         {
             InitializeComponent();
@@ -63,9 +53,6 @@ namespace Visual_Music
                 Dock = DockStyle.Fill,
             };
 
-			RequestEventHandler requestEventHandler = new RequestEventHandler();
-			requestEventHandler.OnBeforeBrowseEvent += OnBeforeBrowse;
-			browser.RequestHandler = requestEventHandler;
 			browser.KeyboardHandler = new KeyboardHandler();
 			DownloadHandler downloadHandler = new DownloadHandler();
 			downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
@@ -73,7 +60,7 @@ namespace Visual_Music
 			browser.DownloadHandler = downloadHandler;
 			toolStripContainer.ContentPanel.Controls.Add(browser);
 
-            browser.LoadingStateChanged += OnLoadingStateChanged;
+			browser.LoadingStateChanged += OnLoadingStateChanged;
             browser.ConsoleMessage += OnBrowserConsoleMessage;
             browser.StatusMessage += OnBrowserStatusMessage;
             browser.TitleChanged += OnBrowserTitleChanged;
@@ -87,7 +74,7 @@ namespace Visual_Music
 		private void OnBeforeDownload(object sender, DownloadItem e)
 		{
 			e.IsCancelled = true;
-			string fileName = e.SuggestedFileName;// await e.Url.getFileNameFromUrl();
+			string fileName = e.SuggestedFileName;
 
 			SourceFileForm importForm = mainForm.getImportFormFromFileType(fileName);
 			if (importForm != null)
@@ -102,25 +89,7 @@ namespace Visual_Music
 				});
 			}
 		}
-		async private void OnBeforeBrowse(object sender, OnBeforeBrowseEventArgs e)
-		{
-			//e.CancelNavigation = true;
-			//string fileName = await e.Request.Url.getFileNameFromUrl();
-			
-			//	SourceFileForm importForm = mainForm.getImportFormFromFileType(fileName);
-			//	if (importForm != null)
-			//	{
-			//		string url = string.Copy(e.Request.Url);
-			//		this.InvokeOnUiThreadIfRequired(delegate
-			//		{
-			//			importForm.NoteFilePath = url;
-			//			importForm.AudioFilePath = "";
-			//			//importForm.ShowDialog();
-			//			importForm.importFiles();
-			//		});
-			//	}
-		}
-
+		
 		private void OnBrowserConsoleMessage(object sender, ConsoleMessageEventArgs args)
         {
             DisplayOutput(string.Format("Line: {0}, Source: {1}, Message: {2}", args.Line, args.Source, args.Message));

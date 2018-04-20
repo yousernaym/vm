@@ -33,10 +33,6 @@ namespace Visual_Music
 			return Uri.IsWellFormedUriString(path, UriKind.Absolute);
 		}
 
-		async public static Task<string> getFileNameFromUrl(this string url)
-		{
-			return await client.getFileName(url);
-		}
 		public static SourceFileForm getImportFormFromFileType(this Form1 mainForm, string fileName)
 		{
 			string ext = fileName.Split('.').Last().ToLower();
@@ -61,8 +57,6 @@ namespace Visual_Music
 	{
 		string savePath { get; set; }
 		ProgressForm progressForm = new ProgressForm();
-		bool bCheckFileName = false;
-		string fileName;
 		DownloadHandler downloadHandler;
 
 		public bool Active { set => this.InvokeOnUiThreadIfRequired(() => Visible = value); }
@@ -77,24 +71,14 @@ namespace Visual_Music
 			downloadHandler.OnDownloadUpdatedFired += OnDownloadUpdated;
 			downloadHandler.ShowDialog = false;
 			this.DownloadHandler = downloadHandler;
+			
 			progressForm.ProgressText = "Download progress";
 			Active = false;
 		}
 
 		private void OnBeforeDownload(object sender, DownloadItem e)
 		{
-			if (bCheckFileName)
-			{
-				bCheckFileName = false;
-				fileName = e.SuggestedFileName;
-				e.IsCancelled = true;
-				checkFileNameEvent.Set();
-				Active = false;
-				return;
-			}
-			
 			savePath = e.SuggestedFileName = Path.Combine(Visual_Music.Program.TempDir, e.SuggestedFileName);
-			//this.InvokeOnUiThreadIfRequired(()=> Show());
 		}
 
 		private void OnDownloadUpdated(object sender, DownloadItem e)
@@ -124,15 +108,6 @@ namespace Visual_Music
 			Active = false;
 			return savePath;
 
-		}
-		async public Task<string> getFileName(string url)
-		{
-			bCheckFileName = true;
-			Load(url);
-			bool fileFound = await Task<bool>.Run(()=>checkFileNameEvent.WaitOne());
-			if (!fileFound)
-				fileName = null;
-			return fileName;
 		}
 	}
 }
