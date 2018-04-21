@@ -72,8 +72,14 @@ namespace Visual_Music
 			downloadHandler.ShowDialog = false;
 			this.DownloadHandler = downloadHandler;
 			LoadError += OnLoadError;
+			AddressChanged += OnAddressChanged;
 			progressForm.ProgressText = "Download progress";
 			Active = false;
+		}
+
+		private void OnAddressChanged(object sender, AddressChangedEventArgs e)
+		{
+			progressForm.DialogResult = DialogResult.Cancel;
 		}
 
 		private void OnLoadError(object sender, LoadErrorEventArgs e)

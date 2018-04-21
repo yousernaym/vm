@@ -27,7 +27,6 @@ namespace Visual_Music
 						DownloadedFilePath = null;
 					return DownloadedFilePath;
 				}
-					
 				//If noteFilePath textbox is a URL, download file to temp dir and return path to that file, otherwise return
 				else if (noteFilePath.Text.IsUrl())
 					return DownloadedFilePath = noteFilePath.Text.downloadFile();
