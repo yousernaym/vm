@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Visual_Music
 {
@@ -17,7 +18,8 @@ namespace Visual_Music
         {
             InitializeComponent();
 			//customInit();
-        }
+		}
+
         public ImportModForm(Form1 _parent) : base(_parent)
         {
             InitializeComponent();

@@ -13,7 +13,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 namespace Visual_Music
 {
 	public enum MixdownType { None, Tparty, Internal }
-	public abstract partial class ImportNotesWithAudioForm : SourceFileForm
+	public partial class ImportNotesWithAudioForm : SourceFileForm
     {
 		//AutoResetEvent tpartyDoneEvent = new AutoResetEvent(false);
 		static Process tpartyProcess;

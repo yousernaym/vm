@@ -11,7 +11,7 @@ using System.Net;
 
 namespace Visual_Music
 {
-	public abstract partial class SourceFileForm : Form
+	public partial class SourceFileForm : Form
 	{
 		public string DownloadedFilePath { get; private set; }
 		
@@ -123,7 +123,10 @@ namespace Visual_Music
 			return true;
 		}
 
-		public abstract void importFiles();
+		public virtual void importFiles() //Can't be abstract because designer won't be able to show derived forms
+		{
+			throw new NotImplementedException();
+		}
 
 		protected void importFiles(bool modInsTrack, MixdownType mixdownType, string audioPath, double songLengthS, Midi.FileType noteFileType)
         {
