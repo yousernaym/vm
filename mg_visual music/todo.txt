@@ -6,7 +6,6 @@
   Alternatively make it an option to add points in line style.
 - Fix sid parsing.
 - Loading of songlengths.txt directly from HVSC.
-- Only associate with .vms if checkbox is checked.
 - Use context menus for download links to download songs instead of import, or open import form instead of directly importing.
   Maybe also add default behaviour setting.
 

@@ -6,6 +6,7 @@
 #define MyAppPublisher "Mikesoft"
 #define MyAppExeName "VM.exe"
 #define MyAppDataDir "{userappdata}\" + MyAppName
+#define SongFileType "VisualMusicSong"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -35,15 +36,15 @@ ShowTasksTreeLines=False
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Components]
-Name: "associateSidFiles"; Description: "SID files"
-Name: "associateSidfiles\Sid"; Description: ".sid"; Types: full
+;Name: "associateSidFiles"; Description: "SID files"
+;Name: "associateSidfiles\Sid"; Description: ".sid"; Types: full
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
-Name: "associateVms"; Description: "Associate with .vms files";
-Name: "associateMod"; Description: "Associate with module files";
-Name: "associateMod\mod"; Description: ".mod";
-Name: "associateMod\xm"; Description: ".xm";
+;Name: "associateVms"; Description: "Associate with .vms files";
+;Name: "associateMod"; Description: "Associate with module files";
+;Name: "associateMod\mod"; Description: ".mod";
+;Name: "associateMod\xm"; Description: ".xm";
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
@@ -150,8 +151,8 @@ Name: "{app}\x64\locales\locales"
 Name: "{app}\x64\swiftshader\swiftshader"
 
 [Registry]
-Root: HKCR; SubKey: ".vms"; ValueType: string; ValueData: "VisualMusicProject"; Flags: uninsdeletekey
-Root: HKCR; SubKey: "VisualMusicProject"; ValueType: string; ValueData: "Visual Music project"; Flags: uninsdeletekey
-Root: HKCR; SubKey: "VisualMusicProject\Shell\Open\Command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey
-Root: HKCR; Subkey: "VisualMusicProject\DefaultIcon"; ValueType: string; ValueData: "{app}\{#MyAppExeName},0"; Flags: uninsdeletevalue
-
+Root: HKCR; SubKey: ".vms"; ValueType: string; ValueName: ""; ValueData: "VisualMusicSong"
+Root: HKCR; SubKey: "{#SongFileType}"; ValueType: string; ValueName: ""; ValueData: "Visual Music song"; Flags: uninsdeletekey
+Root: HKCR; Subkey: "{#SongFileType}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKCR; SubKey: "{#SongFileType}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+;Root: HKCU;  Subkey: "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.vms\UserChoice"; ValueData: "{#SongFileType}";  ValueType: string;  ValueName: "Progid"; Tasks: associateVms
