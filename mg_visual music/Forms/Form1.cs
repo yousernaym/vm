@@ -162,10 +162,11 @@ namespace Visual_Music
 			bool bImportFiles = false;
             string audioFile = null;
 			//startupArgs = new string[] { @"cmd\sid.wav", @"cmd\sid.mp3", @"cmd\sid.sid", @"cmd\mod.mod" };
+
 			foreach (string arg in startupArgs)
 			{
 				//MessageBox.Show(arg);
-				string ext = Path.GetExtension(arg).ToLower();
+				string ext = arg.Split('.').Last().ToLower();
 				
 				//If no previous note file has been encountered, check if this extension is a note file
 				if (!bImportFiles)
