@@ -622,6 +622,7 @@ namespace Visual_Music
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			base.OnMouseDown(e);
+			Focus();
 			if (Project.Notes == null)
 				return;
 			
@@ -659,6 +660,49 @@ namespace Visual_Music
 				{
 					Project.togglePlayback();
 					isPausingWhileScrolling = false;
+				}
+			}
+		}
+
+		protected override void OnKeyDown(KeyEventArgs e)
+		{
+			base.OnKeyDown(e);
+			if(ModifierKeys == WinKeys.Control)
+			{
+				//Reset camera
+				if (e.KeyCode == WinKeys.R)
+					Project.Camera = new Camera(this);
+			}
+
+			//-----------------------------------
+
+			if (ModifierKeys != 0)
+				return;
+
+			//Control camera
+			if (Project.Camera.control(e.KeyCode, true))
+				e.SuppressKeyPress = true;
+
+			//Start/stop playback
+			if (e.KeyCode == WinKeys.Space)
+			{
+				Project.togglePlayback();
+				e.SuppressKeyPress = true;
+			}
+			//Toggle force default note style
+			if (e.KeyCode == WinKeys.Z)
+			{
+				ForceDefaultNoteStyle = true;
+				for (int t = 1; t < Project.TrackViews.Count; t++)
+				{
+					TrackProps tprops = Project.TrackViews[t].TrackProps;
+					NoteStyleType currentNoteStyle = (NoteStyleType)tprops.StyleProps.Type;
+					if (tprops.ActiveNoteStyle.GetType() != typeof(NoteStyle_Bar))
+					{
+						tprops.StyleProps.Type = NoteStyleType.Bar;
+						Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
+						tprops.StyleProps.Type = currentNoteStyle;
+					}
 				}
 			}
 		}

@@ -164,9 +164,6 @@ namespace Visual_Music
 	abstract public class NoteStyle : ISerializable
 	{
 		public float TexTileScale => Project.Camera.ViewportSize.X / 1920;
-		public static bool bCull = true;
-		public static bool bSkipClose = false;
-		public static bool bSkipPoints = true;
 		protected const int NumDynamicVerts = 30000;
 		public class Textures
 		{

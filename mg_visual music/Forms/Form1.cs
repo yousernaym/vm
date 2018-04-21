@@ -391,63 +391,7 @@ namespace Visual_Music
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
 		{
-			if (ModifierKeys == Keys.Control)
-			{
-				//Reset camera
-				if (e.KeyCode == Keys.R)
-					Project.Camera = new Camera(songPanel);
-			}
-
-			//Debug rendering options---------------------
-			//Skip notes that lies very close in screen space
-			if (e.KeyCode == Keys.D1)
-			{
-				NoteStyle.bSkipClose = e.Control ? true : false;
-				songPanel.Invalidate();
-			}
-			//Cull notes outside of view
-			if (e.KeyCode == Keys.D2)
-			{
-				NoteStyle.bCull = e.Control ? true : false;
-				songPanel.Invalidate();
-			}
-			//Skip line points that lie very close in screen space
-			if (e.KeyCode == Keys.D3)
-			{
-				NoteStyle.bSkipPoints = e.Control ? true : false;
-				songPanel.Invalidate();
-			}
-			//-----------------------------------
-
-			if (ModifierKeys != 0)
-				return;
-
-			//Control camera
-			if (Project.Camera.control(e.KeyCode, true))
-				e.SuppressKeyPress = true;
-
-			//Start/stop playback
-			if (e.KeyCode == Keys.Space)
-			{
-				startStopToolStripMenuItem_Click(null, null);
-				e.SuppressKeyPress = true;
-			}
-			//Toggle force default note style
-			if (e.KeyCode == Keys.Z)
-			{
-				songPanel.ForceDefaultNoteStyle = true;
-				for (int t = 1; t < project.TrackViews.Count; t++)
-				{
-					TrackProps tprops = project.TrackViews[t].TrackProps;
-					NoteStyleType currentNoteStyle = (NoteStyleType)tprops.StyleProps.Type;
-					if (tprops.ActiveNoteStyle.GetType() != typeof(NoteStyle_Bar))
-					{
-						tprops.StyleProps.Type = NoteStyleType.Bar;
-						Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
-						tprops.StyleProps.Type = currentNoteStyle;
-					}
-				}
-			}
+			
 		}
 
 		private void Form1_KeyUp(object sender, KeyEventArgs e)
@@ -1653,7 +1597,20 @@ namespace Visual_Music
 		{
 			foreach (var screen in screens)
 				screen.Visible = false;
-			newScreen.Visible = true; 
+			newScreen.Visible = true;
+			newScreen.Focus();
+		}
+
+		private void trackPropsPanel_VisibleChanged(object sender, EventArgs e)
+		{
+			if (!trackPropsPanel.Visible)
+				SongPanel.Focus();
+		}
+
+		private void songPropsPanel_VisibleChanged(object sender, EventArgs e)
+		{
+			if (!songPropsPanel.Visible)
+				SongPanel.Focus();
 		}
 	}
 }
