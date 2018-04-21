@@ -289,9 +289,9 @@ namespace Visual_Music
 			try
 			{
 				newNotes.openFile(file, ref audioFile, _insTrack, mixdown, songLengthS, sourceSongType);
-				if (newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
+				if (newNotes.Tracks == null || newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
 				{
-					MessageBox.Show("Couldn't load note file. No notes found.",  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					MessageBox.Show($"Couldn't load note file: {file}\nNo notes found.",  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
 				}
 			}
@@ -299,7 +299,7 @@ namespace Visual_Music
 			{
 				//notes = null;
 				//MessageBox.Show(Parent, e.Message, "Note file error");
-				MessageBox.Show("Couldn't load note file.\n"+e.Message,  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show($"Couldn't load note file: {file}\n"+e.Message,  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
 			}
 			
