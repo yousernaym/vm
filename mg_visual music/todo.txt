@@ -3,7 +3,7 @@
 - (Fix alpha blending.) Fix line vertices at turns.
 - Increase minimum width for ribbons.
 - Make a Point/Dot note style, like Bar but centered on note start. 
-  Alternatively make it an option to add points in line style.
+  Alternatively make it an option to add points in line style (and optionally make line invisible).
 - Fix sid parsing.
 - Loading of songlengths.txt directly from HVSC.
 - Use context menus for download links to download songs instead of import, or open import form instead of directly importing.

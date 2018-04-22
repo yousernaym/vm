@@ -383,6 +383,10 @@
     <Error Condition="!Exists('..\packages\CefSharp.WinForms.65.0.0-CI2571\build\CefSharp.WinForms.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.WinForms.65.0.0-CI2571\build\CefSharp.WinForms.props'))" />
   </Target>
   <Import Project="..\packages\CefSharp.Common.65.0.0-CI2571\build\CefSharp.Common.targets" Condition="Exists('..\packages\CefSharp.Common.65.0.0-CI2571\build\CefSharp.Common.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(SolutionDir)x64\$(ConfigurationName)\*.dll" "$(TargetDir)" /D /Y
+xcopy "$(SolutionDir)x64\$(ConfigurationName)\*.pdb" "$(TargetDir)" /D /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
