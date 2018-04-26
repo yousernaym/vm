@@ -101,12 +101,14 @@ namespace Visual_Music
 			modWebBrowser = new SongWebBrowser(this);
 			modWebBrowser.Dock = DockStyle.Fill;
 			modWebBrowser.Url = "https://modarchive.org/index.php?request=view_searchbox";
+			modWebBrowser.Visible = false;
 			//modWebBrowser.OnBeforeBrowseEvent += OnBeforeBrowse;
 
 			sidWebBrowser = new SongWebBrowser(this);
 			sidWebBrowser.Dock = DockStyle.Fill;
 			sidWebBrowser.Url = "https://www.exotica.org.uk/wiki/Special:HVSC";
-			
+			sidWebBrowser.Visible = false;
+
 			Controls.Add(modWebBrowser);
 			Controls.Add(sidWebBrowser);
 			modWebBrowser.BringToFront();
@@ -116,8 +118,6 @@ namespace Visual_Music
 			screens.Add(songPanel);
 			screens.Add(modWebBrowser);
 			screens.Add(sidWebBrowser);
-
-			changeToScreen(songPanel);
 
 			Array enumArray = Enum.GetValues(typeof(NoteStyleType));
             foreach (NoteStyleType nse in enumArray)
@@ -161,7 +161,7 @@ namespace Visual_Music
 			bool bSidFile = false;
 			bool bImportFiles = false;
             string audioFile = null;
-			//startupArgs = new string[] { @"cmd\sid.wav", @"cmd\sid.mp3", @"cmd\sid.sid", @"cmd\mod.mod" };
+			//startupArgs = new string[] { @"cmd\" };
 
 			foreach (string arg in startupArgs)
 			{
@@ -181,7 +181,7 @@ namespace Visual_Music
 						importModForm.NoteFilePath = arg;
 						bModFile = bImportFiles = true;
 					}
-					else if (ImportModForm.Formats.Contains(ext))
+					else if (ImportSidForm.Formats.Contains(ext))
 					{
 						importSidForm.NoteFilePath = arg;
 						bSidFile = bImportFiles = true;
@@ -209,7 +209,6 @@ namespace Visual_Music
 				if (bModFile)
                 {
 					importModForm.AudioFilePath = audioFile;
-					//importModuleToolStripMenuItem.PerformClick();
 					importModForm.importFiles();
 				}
                 else if (bSidFile)
@@ -218,9 +217,9 @@ namespace Visual_Music
 					//importSidSongToolStripMenuItem.PerformClick();
 					importSidForm.importFiles();
 				}
-                
 			}
 		}
+
 		void addInvalidateEH(Control.ControlCollection controls)
 		{
 			foreach (Control control in controls)
@@ -245,11 +244,13 @@ namespace Visual_Music
 
 		private void importMidiSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			importMidiForm.ShowDialog(this);
+			if (importMidiForm.ShowDialog(this) == DialogResult.OK)
+				songPanel.Focus();
 		}
         private void importModuleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			importModForm.ShowDialog(this);
+			if (importModForm.ShowDialog(this) == DialogResult.OK)
+				SongPanel.Focus(); 
         }
                 
         void songLoaded(string path)
@@ -281,7 +282,7 @@ namespace Visual_Music
             songScrollBar.Value = Project.SongPosT;
             upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(songPanel);
-        }
+		}
 
 		//Called only when iomporting note and audio files.
 		public bool openSourceFiles(string notePath, string audioPath, bool eraseCurrent, bool modInsTrack, MixdownType mixdownType, double songLengthS, Midi.FileType noteFileType)
@@ -1098,6 +1099,7 @@ namespace Visual_Music
 				if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)
 					songScrollBar.Value = Project.SongPosT;
 			};
+			changeToScreen(songPanel);
 		}
 
 		private void invalidateSongPanel(object sender, EventArgs e)
@@ -1403,7 +1405,8 @@ namespace Visual_Music
 
         private void importSidSongToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			importSidForm.ShowDialog(this);
+			if (importSidForm.ShowDialog(this) == DialogResult.OK)
+				songPanel.Focus();
         }
 
 		private void tpartyToolStripMenuItem_Click(object sender, EventArgs e)

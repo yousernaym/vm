@@ -141,9 +141,7 @@ namespace Visual_Music
 
 		private void SourceFileForm_VisibleChanged(object sender, EventArgs e)
 		{
-			if (Visible)
-			{
-			}
+			
 		}
 
 		private void SourceFileForm_Load(object sender, EventArgs e)
