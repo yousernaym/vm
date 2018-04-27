@@ -61,7 +61,7 @@ namespace Visual_Music.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to mid.
         /// </summary>
         internal static string MidiFormats {
             get {
@@ -70,24 +70,7 @@ namespace Visual_Music.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 669
-        ///AMF
-        ///APUN
-        ///DSM
-        ///FAR
-        ///GDM
-        ///IT
-        ///IMF
-        ///MOD
-        ///MED
-        ///MTM
-        ///OKT
-        ///S3M
-        ///STM
-        ///STX
-        ///ULT
-        ///UNI
-        ///XM.
+        ///   Looks up a localized string similar to 669 AMF APUN DSM FAR GDM IT IMF MOD MED MTM OKT S3M STM STX ULT UNI XM.
         /// </summary>
         internal static string ModFormats {
             get {
@@ -136,11 +119,21 @@ namespace Visual_Music.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to sid psid dat rsid mus.
         /// </summary>
         internal static string SidFormats {
             get {
                 return ResourceManager.GetString("SidFormats", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Songlengths {
+            get {
+                object obj = ResourceManager.GetObject("Songlengths", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

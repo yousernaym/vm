@@ -62,7 +62,7 @@ Source: "..\mg_visual music\bin\x64\Release\SharpDX.DXGI.dll"; DestDir: "{app}";
 Source: "..\mg_visual music\bin\x64\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\mg_visual music\Distribute\Tparty\*"; DestDir: "{#MyAppDataDir}\tparty"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\mg_visual music\Distribute\minjector.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.txt"; DestDir: "{#MyAppDataDir}\tparty\HVSC"; Flags: ignoreversion
+;Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.txt"; DestDir: "{#MyAppDataDir}\tparty\HVSC"; Flags: ignoreversion
 Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.md5"; DestDir: "{#MyAppDataDir}\tparty\HVSC"; Flags: ignoreversion
 Source: "..\mg_visual music\Distribute\vc2017 dlls\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\mg_visual music\bin\Release\x64\cef.pak"; DestDir: "{app}\x64\"; Flags: ignoreversion
