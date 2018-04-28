@@ -44,30 +44,8 @@ namespace Visual_Music
 
 		//Serialization----------------------------------
 
-		//Save note and audio file pathsfor importing when loading project
-		string noteFilePath = "";
-		public string NoteFilePath
-		{
-			get { return noteFilePath; }
-			set { noteFilePath = value; }
-		}
-		string audioFilePath = "";
-		public string AudioFilePath
-		{
-			get { return mixdownType == MixdownType.None ? audioFilePath : ""; }
-			set { audioFilePath = value; }
-			//get { return ((Form1)Parent).sourceFileForm.AudioFilePath; }
-			//set { ((Form1)Parent).sourceFileForm.AudioFilePath = value; }
-		}
-
-		bool insTrack;
-		public bool InsTrack
-		{
-			get { return insTrack; }
-		}
-
-		MixdownType mixdownType;
-		public MixdownType MixdownType { get => mixdownType; set => mixdownType = value; }
+		public ImportOptions ImportOptions { get; set; }
+				
 		List<TrackView> trackViews;
 		public List<TrackView> TrackViews
 		{
@@ -98,12 +76,9 @@ namespace Visual_Music
 		public int MinPitch { get; set; }
 		public int MaxPitch { get; set; }
 		int NumPitches { get { return MaxPitch - MinPitch + 1; } }
-		Midi.FileType sourceSongType;
-		public Midi.FileType SourceSongType => sourceSongType;
-		double desiredSongLengthS = 0; //Desired song length in seconds when importing note file. 0 = not specified. Currently not used.
+		
 		public Camera Camera { get; set; } = new Camera();
 		public Camera DefaultCamera { get; } = new Camera();
-		//Midi.FileType noteFileType;
 		//----------------------------------------------------
 
 		public TrackProps GlobalTrackProps
@@ -159,21 +134,15 @@ namespace Visual_Music
 
 		public void loadContent()
 		{
-			if (!string.IsNullOrWhiteSpace(noteFilePath))
+			if (ImportOptions == null || string.IsNullOrWhiteSpace(ImportOptions.NotePath))
+				return;
+
+			ImportOptions.EraseCurrent = false;
+			importSong(ImportOptions);
+			if (trackViews != null)
 			{
-				string importNoteFilePath = noteFilePath;
-				if (importNoteFilePath.IsUrl())
-				{
-					importNoteFilePath = importNoteFilePath.downloadFile();
-					if (importNoteFilePath == null)
-						return;
-				}
-				importSong(importNoteFilePath, audioFilePath, false, insTrack, mixdownType, desiredSongLengthS, sourceSongType);
-				if (trackViews != null)
-				{
-					for (int i = 0; i < trackViews.Count; i++)
-						trackViews[i].TrackProps.loadContent(songPanel);
-				}
+				for (int i = 0; i < trackViews.Count; i++)
+					trackViews[i].TrackProps.loadContent(songPanel);
 			}
 		}
 
@@ -183,12 +152,8 @@ namespace Visual_Music
 			{
 				if (entry.Name == "version")
 					SongFormat.readVersion = (int)entry.Value;
-				else if (entry.Name == "noteFilePath")
-					noteFilePath = (string)entry.Value;
-				else if (entry.Name == "audioFilePath")
-					audioFilePath = (string)entry.Value;
-				else if (entry.Name == "mixdownType")
-					mixdownType = (MixdownType)entry.Value;
+				else if (entry.Name == "importOptions")
+					ImportOptions = (ImportOptions)entry.Value;
 				else if (entry.Name == "trackViews")
 					trackViews = (List<TrackView>)entry.Value;
 				else if (entry.Name == "qn_viewWidth")
@@ -199,8 +164,6 @@ namespace Visual_Music
 					MaxPitch = (int)entry.Value;
 				else if (entry.Name == "minPitch")
 					MinPitch = (int)entry.Value;
-				else if (entry.Name == "sourceSongType")
-					sourceSongType = (Midi.FileType)entry.Value;
 				else if (entry.Name == "tpartyApp")
 					ImportNotesWithAudioForm.TpartyApp = (string)entry.Value;
 				else if (entry.Name == "tpartyArgs")
@@ -216,8 +179,6 @@ namespace Visual_Music
 						ImportNotesWithAudioForm.TpartyOutputDir = dir;
 					}
 				}
-				else if (entry.Name == "desiredSongLengthS")
-					desiredSongLengthS = (double)entry.Value;
 				else if (entry.Name == "camera")
 					Camera = (Camera)entry.Value;
 			}
@@ -227,52 +188,47 @@ namespace Visual_Music
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
 			info.AddValue("version", SongFormat.writeVersion);
-			info.AddValue("noteFilePath", noteFilePath);
-			info.AddValue("audioFilePath", audioFilePath);
-			info.AddValue("insTrack", insTrack);
-			info.AddValue("mixdownType", mixdownType);
+			info.AddValue("importOptions", ImportOptions);
 			info.AddValue("trackViews", trackViews);
 			info.AddValue("qn_viewWidth", ViewWidthQn);
 			info.AddValue("audioOffset", AudioOffset);
 			info.AddValue("maxPitch", MaxPitch);
 			info.AddValue("minPitch", MinPitch);
-			info.AddValue("sourceSongType", sourceSongType);
 			info.AddValue("tpartyApp", ImportNotesWithAudioForm.TpartyApp);
 			info.AddValue("tpartyArgs", ImportNotesWithAudioForm.TpartyArgs);
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
-			info.AddValue("desiredSongLengthS", desiredSongLengthS);
 			info.AddValue("camera", Camera);
-			//info.AddValue("noteFileType", noteFileType);
 		}
 
-		public bool importSong(string songFile, string audioFile, bool eraseCurrent, bool _insTrack, MixdownType mixdownType, double songLengthS, Midi.FileType _noteFileType)
+		public bool importSong(ImportOptions options)
 		{
-			sourceSongType = _noteFileType;
-			desiredSongLengthS = songLengthS;
+			string mixdownPath;
 			Media.closeAudioFile();
 
-			if (!openNoteFile(songFile, ref audioFile, eraseCurrent, _insTrack, mixdownType == MixdownType.Internal, songLengthS))
+			if (!openNoteFile(options, out mixdownPath))
 				return false;
 
 			try
 			{
-				if (!openAudioFile(audioFile, mixdownType))
+				if (!openAudioFile(string.IsNullOrWhiteSpace(mixdownPath) ? options.AudioPath : mixdownPath, options.MixdownType))
 					return false;
 			}
 			finally
 			{
-				MixdownType = mixdownType;
-				createTrackViews(notes.Tracks.Count, eraseCurrent);
+				ImportOptions = options;
+				createTrackViews(notes.Tracks.Count, options.EraseCurrent);
 			}
 			return true;
 		}
-		public bool openNoteFile(string file, ref string audioFile, bool eraseCurrent, bool _insTrack, bool mixdown, double songLengthS)
+
+		public bool openNoteFile(ImportOptions options, out string mixdownPath)
 		{
 			SongPanel.Invalidate();
 			stopPlayback();
+			mixdownPath = null;
 
-			insTrack = _insTrack;
-			if (eraseCurrent)
+			//insTrack = _insTrack;
+			if (options.EraseCurrent)
 			{
 				ViewWidthQn = DefaultViewWidthQn;
 				AudioOffset = 0;
@@ -288,10 +244,10 @@ namespace Visual_Music
 			Midi.Song newNotes = new Midi.Song();
 			try
 			{
-				newNotes.openFile(file, ref audioFile, _insTrack, mixdown, songLengthS, sourceSongType);
+				newNotes.openFile(options, out mixdownPath);
 				if (newNotes.Tracks == null || newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
 				{
-					MessageBox.Show($"Couldn't load note file: {file}\nNo notes found.",  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					MessageBox.Show($"Couldn't load note file: {options.NotePath}\nNo notes found.",  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
 				}
 			}
@@ -299,7 +255,7 @@ namespace Visual_Music
 			{
 				//notes = null;
 				//MessageBox.Show(Parent, e.Message, "Note file error");
-				MessageBox.Show($"Couldn't load note file: {file}\n"+e.Message,  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show($"Couldn't load note file: {options.NotePath}\n"+e.Message,  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
 			}
 			
@@ -309,25 +265,21 @@ namespace Visual_Music
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
 			return true;
 		}
-		public bool openAudioFile(string file, MixdownType _mixdownType)
+		public bool openAudioFile(string file, Midi.MixdownType mixdownType)
 		{
 			//internalMixdown = false;// mixdownType == MixdownType.Internal;
-			if (_mixdownType == MixdownType.Tparty)
-			{
+			if (mixdownType == Midi.MixdownType.Tparty)
 				file = ImportNotesWithAudioForm.runTpartyProcess();
-			}
-			audioFilePath = file;
-
+					
 			if (string.IsNullOrWhiteSpace(file))
-			{
 				return true;
-			}
+			
 			if (!Media.openAudioFile(file))
 			{
 				MessageBox.Show("Couldn't load audio file " + file, "Audio file error");
 				return false;
 			}
-			mixdownType = _mixdownType;
+			
 			if (notes != null)
 				notes.SongLengthT = (int)secondsToTicks(Media.getAudioLength());
 			return true;
@@ -728,6 +680,14 @@ namespace Visual_Music
 				togglePlayback();
 			}
 		}
+
+		public void updateFromImportForm()
+		{
+			ImportOptions.NotePath = ImportOptions.ImportForm.RawNoteFilePath;
+			DefaultFileName = Path.GetFileName(ImportOptions.ImportForm.NoteFilePath) + DefaultFileExt;
+		}
+
+
 	}
 
 

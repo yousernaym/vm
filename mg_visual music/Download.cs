@@ -39,11 +39,11 @@ namespace Visual_Music
 			SourceFileForm importForm = null;
 
 			if (ImportMidiForm.Formats.Contains(ext))
-				importForm = mainForm.importMidiForm;
+				importForm = Form1.ImportMidiForm;
 			else if (ImportModForm.Formats.Contains(ext))
-				importForm = mainForm.importModForm;
+				importForm = Form1.ImportModForm;
 			else if (ImportSidForm.Formats.Contains(ext))
-				importForm = mainForm.importSidForm;
+				importForm = Form1.ImportSidForm;
 			return importForm;
 		}
 

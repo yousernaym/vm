@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Security.Cryptography;
 using System.IO;
+using System.Runtime.Serialization;
 
 namespace Visual_Music
 {
@@ -34,19 +35,18 @@ namespace Visual_Music
 		{
 			if (!checkNoteFile())
 				return;
-			double songLengthS = getSongLength(); //song length in seconds. //0 = NoteExtractor default
-			//Form1.setSidImport(subSong, numSubSongs, songLengthS);
-			importFiles(false, false, parent.tpartyIntegrationForm.SidMixdown, songLengthS, Midi.FileType.Sid);
+			float songLengthS = getSongLength(); //song length in seconds. //0 = NoteExtractor default
+			importFiles(new SidImportOptions(subSong, numSubSongs, songLengthS));
 		}
 
 		private void ImportSidForm_Shown(object sender, EventArgs e)
 		{
-			if (!parent.tpartyIntegrationForm.SidMixdown)
+			if (!Form1.TpartyIntegrationForm.SidMixdown)
 				existingAudioRbtn.Text = "Audio file";
 			else
 				existingAudioRbtn.Text = "Audio file (leave empty for SID file audio)";
 		}
-		double getSongLength()
+		float getSongLength()
 		{
 			//return 300;
 			using (var stream = File.OpenRead(NoteFilePath))
@@ -78,7 +78,7 @@ namespace Visual_Music
 										string[] minsec = subSongTimeString.Split(':');
 										int seconds = int.Parse(minsec[0]) * 60 + int.Parse(minsec[1]);
 										//MessageBox.Show("Match found");
-										return seconds;
+										return (float)seconds;
 									}
 								}
 
@@ -87,12 +87,27 @@ namespace Visual_Music
 					}
 				}
 			}
-			return 0;
+			return 0.0f;
 		}
 
 		private void ImportSidForm_Load(object sender, EventArgs e)
 		{
 			createFormatFilter("Sid files", Formats);
+		}
+	}
+	[Serializable()]
+	class SidImportOptions : ImportOptions
+	{
+		public SidImportOptions(int subSong, int numSubSongs, float songLengthS) : base(Midi.FileType.Sid)
+		{
+			MixdownType = Form1.TpartyIntegrationForm.SidMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
+			SubSong = subSong;
+			NumSubSongs = numSubSongs;
+			SongLengthS = songLengthS;
+		}
+		public SidImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
+		{
+
 		}
 	}
 }

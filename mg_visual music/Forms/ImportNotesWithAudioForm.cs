@@ -12,7 +12,6 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Visual_Music
 {
-	public enum MixdownType { None, Tparty, Internal }
 	public partial class ImportNotesWithAudioForm : SourceFileForm
     {
 		//AutoResetEvent tpartyDoneEvent = new AutoResetEvent(false);
@@ -82,43 +81,36 @@ namespace Visual_Music
                 tpartyAudioTb.Text = tpartyAudioDirDlg.InitialDirectory = tpartyAudioDirDlg.FileName;
         }
 
-        protected void importFiles(bool insTrack, bool internalMixdownSupported, bool xmPlayMixdownSupported, double songLengthS, Midi.FileType noteFileType)
+        new protected void importFiles(ImportOptions options)
         {
 			if (!checkNoteFile())
 				return;
-			//insTrack = _insTrack;
-            //internalMixdownSupported = _internalMixdownSupported;
-            if (existingAudioRbtn.Checked)
+			if (existingAudioRbtn.Checked)
             {   //No user-specified command line
-                if (string.IsNullOrWhiteSpace(audioFilePath.Text))
+                if (options.MixdownType != Midi.MixdownType.None)
                 {   //No existing audio file, do mixdown
-                    if (xmPlayMixdownSupported)
+                    if (options.MixdownType == Midi.MixdownType.Tparty)
                     {   //Mixdown with xmplay
 						//string folder = Application.StartupPath + "\\plugins\\xmplay";
-						importUsingTpartyMixdown(insTrack, TpartyIntegrationForm.XmPlayPath,
+						importUsingTpartyMixdown(options, TpartyIntegrationForm.XmPlayPath,
 								   "\"" + NoteFilePath + "\" -boost",
-								   TpartyIntegrationForm.XmPlayOutputDir,
-								   songLengthS,
-								   noteFileType);
-						
+								   TpartyIntegrationForm.XmPlayOutputDir);
                     }
                     else
-                    {   //Mixdown internally if possible, otherwise there will be no audio
-                        base.importFiles(insTrack, internalMixdownSupported ? MixdownType.Internal : MixdownType.None, "", songLengthS, noteFileType);
+                    {   //Mixdown internally
+                        base.importFiles(options);
                     }
                 }
                 else
-                {   //Existing audio file specified
-                    base.importFiles(insTrack, MixdownType.None, AudioFilePath, songLengthS, noteFileType);
+                {   //No mixdown
+                    base.importFiles(options);
                 }
             }
             else 
             { //User-specified command line
-				importUsingTpartyMixdown(insTrack, tpartyAppTb.Text,
+				importUsingTpartyMixdown(options, tpartyAppTb.Text,
 					   tpartyArgsTb.Text.Replace("%notefilepath", "\"" + NoteFilePath + "\""),
-					   tpartyAudioTb.Text,
-					   songLengthS,
-					   noteFileType);
+					   tpartyAudioTb.Text);
             }
         }
 
@@ -155,12 +147,12 @@ namespace Visual_Music
 			}
 			return tpartyOutputFile;
 		}
-		void importUsingTpartyMixdown(bool insTrack, string appPath, string arguments, string outputDir, double songLengthS, Midi.FileType noteFileType)
+		void importUsingTpartyMixdown(ImportOptions options, string appPath, string arguments, string outputDir)
 		{
 			tpartyApp = appPath;
 			tpartyArgs = arguments;
 			tpartyOutputDir = outputDir.TrimEnd('\\') + "\\";
-			base.importFiles(insTrack, MixdownType.Tparty, "", songLengthS, noteFileType);
+			base.importFiles(options);
 		}
 		static bool createTpartyProcess()
         {

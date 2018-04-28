@@ -25,8 +25,8 @@ namespace CefSharp.Example.RequestEventHandler
         public event EventHandler<OnBeforeResourceLoadEventArgs> OnBeforeResourceLoadEvent;
         public event EventHandler<GetAuthCredentialsEventArgs> GetAuthCredentialsEvent;
         public event EventHandler<OnRenderProcessTerminatedEventArgs> OnRenderProcessTerminatedEvent;
-        public event EventHandler<CanGetCookiesEventArg> CanGetCookiesEvent;
-        public event EventHandler<CanSetCookieEventArg> CanSetCookieEvent;
+        //public event EventHandler<CanGetCookiesEventArg> CanGetCookiesEvent;
+        //public event EventHandler<CanSetCookieEventArg> CanSetCookieEvent;
         public event EventHandler<OnQuotaRequestEventArgs> OnQuotaRequestEvent;
         public event EventHandler<OnResourceRedirectEventArgs> OnResourceRedirectEvent;
 

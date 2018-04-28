@@ -7,12 +7,13 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Visual_Music
 {
     public partial class ImportModForm : ImportNotesWithAudioForm
     {
-		static string[] XmPlayFormats = { "IT", "XM", "S3M", "MTM", "MOD", "UMX", "MO3" };
 		static public readonly string[] Formats = Properties.Resources.ModFormats.ToLower().Split(null);
 		public ImportModForm()
         {
@@ -41,25 +42,38 @@ namespace Visual_Music
 			importFiles();
         }
 
+
 		public override void importFiles()
 		{
 			if (!checkNoteFile())
 				return;
-			bool xmPlayMixdownSupported = false;
-			string ext = Path.GetExtension(NoteFilePath);
-			if (ext.Length > 1) //'.' and more
-			{
-				ext = ext.Substring(1).ToUpper(); //Remove '.'
-				foreach (string f in XmPlayFormats)
-					if (ext == f)
-						xmPlayMixdownSupported = true;
-			}
-			importFiles(InsTrack, true, xmPlayMixdownSupported && parent.tpartyIntegrationForm.ModuleMixdown, 0, Midi.FileType.Mod);
+			
+			importFiles(new ModImportOptions());
 		}
 
 		private void ImportModForm_Load(object sender, EventArgs e)
 		{
 			createFormatFilter("Mod files", Formats);
+		}
+	}
+
+	[Serializable()]
+	class ModImportOptions : ImportOptions
+	{
+		static string[] XmPlayFormats = { "IT", "XM", "S3M", "MTM", "MOD", "UMX", "MO3" };
+		new ImportModForm ImportForm;
+		public ModImportOptions() : base(Midi.FileType.Mod)
+		{
+			ImportForm = (ImportModForm)base.ImportForm;
+			string ext = NotePath.Split('.').Last().ToLower();
+			bool xmPlayMixdownSupported = XmPlayFormats.Contains(ext);
+			MixdownType = xmPlayMixdownSupported && Form1.TpartyIntegrationForm.ModuleMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
+			InsTrack = ImportForm.InsTrack;
+		}
+
+		public ModImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
+		{
+
 		}
 	}
 }
