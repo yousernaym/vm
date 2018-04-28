@@ -983,9 +983,10 @@ namespace Visual_Music
 				updateFormTitle(currentProjPath);
 				Project.DefaultFileName = Path.GetFileName(currentProjPath);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				MessageBox.Show(ex.Message);
+				showErrorMsgBox(this, "Couldn't load song");
+				project = null;
 			}
 			finally
 			{

@@ -53,9 +53,14 @@ namespace Visual_Music
 			Cef.EnableHighDPISupport();
 			var settings = new CefSettings();
 
-			// Set BrowserSubProcessPath based on app bitness at runtime
+			// For AnyCPU, Set BrowserSubProcessPath based on app bitness at runtime
+			string platformString = Environment.Is64BitProcess ? "x64" : "x86";
+			// For x86, use root app folder
+			#if X86
+				platformString = "";
+			#endif
 			settings.BrowserSubprocessPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-												   Environment.Is64BitProcess ? "x64" : "x86",
+												   platformString,
 												   "CefSharp.BrowserSubprocess.exe");
 					
 
