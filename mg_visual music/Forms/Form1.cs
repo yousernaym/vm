@@ -288,7 +288,7 @@ namespace Visual_Music
 		}
 
 		//Called only when iomporting note and audio files.
-		public bool openSourceFiles(ImportOptions options)
+		public void openSourceFiles(ImportOptions options)
 		{
 			saveSettings();
 			try
@@ -296,20 +296,14 @@ namespace Visual_Music
 				songPanel.SuspendPaint();
 				if (project.TrackViews == null)
 					options.EraseCurrent = true; //In order for setDefaultPitches below to be called
-				if (Project.importSong(options))
+				Project.importSong(options);
+				if (options.EraseCurrent)
 				{
-					if (options.EraseCurrent)
-					{
-						setDefaultPitches();
-						currentProjPath = "";
-						updateFormTitle("");
-					}
-					songLoaded(options.NotePath);
-					//project.updateFromImportForm();
-					return true;
+					setDefaultPitches();
+					currentProjPath = "";
+					updateFormTitle("");
 				}
-				else
-					return false;
+				songLoaded(options.NotePath);
 			}
 			finally
 			{
@@ -992,10 +986,15 @@ namespace Visual_Music
 				updateFormTitle(currentProjPath);
 				project.DefaultFileName = Path.GetFileName(currentProjPath);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				showErrorMsgBox(this, "Couldn't load song");
-				project = currentProject;
+				if (ex is FileFormatException || ex is SerializationException || ex is FileNotFoundException)
+				{
+					showErrorMsgBox("Couldn't load song.\n" + ex.Message);
+					project = currentProject;
+				}
+				else
+					throw;
 			}
 			finally
 			{
@@ -1391,13 +1390,13 @@ namespace Visual_Music
 			TpartyIntegrationForm.ShowDialog();
 			saveSettings();
 		}
-		public static void showErrorMsgBox(IWin32Window owner, string message, string caption = "")
+		public static void showErrorMsgBox(string message, string caption = "")
 		{
-			MessageBox.Show(owner, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+			MessageBox.Show(null, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
-		public static void showWarningMsgBox(IWin32Window owner, string message, string caption = "")
+		public static void showWarningMsgBox(string message, string caption = "")
 		{
-			MessageBox.Show(owner, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			MessageBox.Show(null, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 
 		private void resetCamBtn_Click(object sender, EventArgs e)

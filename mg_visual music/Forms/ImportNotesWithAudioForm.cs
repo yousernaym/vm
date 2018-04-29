@@ -85,6 +85,7 @@ namespace Visual_Music
         {
 			if (!options.checkNoteFile())
 				return;
+				
 			if (existingAudioRbtn.Checked)
             {   //No user-specified command line
                 if (options.MixdownType != Midi.MixdownType.None)
@@ -138,7 +139,7 @@ namespace Visual_Music
 			}
 			catch (Exception e)
 			{
-				Form1.showErrorMsgBox(null, e.Message, "Couldn't create audio file" + processName);
+				Form1.showErrorMsgBox(e.Message, "Couldn't create audio file" + processName);
 				return null;
 			}
 			finally

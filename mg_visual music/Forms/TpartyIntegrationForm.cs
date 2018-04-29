@@ -104,7 +104,7 @@ namespace Visual_Music
 			}
 			catch (Exception ex)
 			{
-				Form1.showErrorMsgBox(this, ex.Message);
+				Form1.showErrorMsgBox(ex.Message);
 				e.Cancel = true;
 			}
 			enableCheckboxes();
@@ -146,7 +146,7 @@ namespace Visual_Music
 					string newDir = hvscDirDialog.InitialDirectory = hvscDirDialog.FileName;
 					if (!hvscInstalledAt(newDir))
 					{
-						Form1.showErrorMsgBox(this, SongLengthsFileName + " not found in specified folder.");
+						Form1.showErrorMsgBox(SongLengthsFileName + " not found in specified folder.");
 						close = false;
 					}
 					else
@@ -175,7 +175,7 @@ namespace Visual_Music
 			HvscDir = hvscDirDialog.FileName;
 			if (!HvscInstalled)
 			{
-				Form1.showErrorMsgBox(this, "songlengths.txt not found in specified folder.");
+				Form1.showErrorMsgBox("songlengths.txt not found in specified folder.");
 				HvscDir = oldDir;
 				e.Cancel = true;
 			}

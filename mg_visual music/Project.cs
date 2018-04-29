@@ -134,8 +134,12 @@ namespace Visual_Music
 
 		public void loadContent()
 		{
-			if (ImportOptions == null || string.IsNullOrWhiteSpace(ImportOptions.NotePath))
+			if (ImportOptions == null)
 				return;
+			if (string.IsNullOrWhiteSpace(ImportOptions.NotePath))
+				throw new FileFormatException("Note file path missing from song file.");
+			if (!File.Exists(ImportOptions.NotePath))
+				throw new FileNotFoundException("Note file missing: " + ImportOptions.NotePath);
 
 			ImportOptions.EraseCurrent = false;
 			importSong(ImportOptions);
@@ -200,27 +204,18 @@ namespace Visual_Music
 			info.AddValue("camera", Camera);
 		}
 
-		public bool importSong(ImportOptions options)
+		public void importSong(ImportOptions options)
 		{
 			string mixdownPath;
 			Media.closeAudioFile();
 
-			if (!openNoteFile(options, out mixdownPath))
-				return false;
-
-			try
-			{
-				if (!openAudioFile(string.IsNullOrWhiteSpace(mixdownPath) ? options.AudioPath : mixdownPath, options.MixdownType))
-					return false;
-			}
-			finally
-			{
-				ImportOptions = options;
-				if (options.EraseCurrent)
-					DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + DefaultFileExt;
-				createTrackViews(notes.Tracks.Count, options.EraseCurrent);
-			}
-			return true;
+			openNoteFile(options, out mixdownPath);
+			openAudioFile(string.IsNullOrWhiteSpace(mixdownPath) ? options.AudioPath : mixdownPath, options.MixdownType);
+					
+			ImportOptions = options;
+			if (options.EraseCurrent)
+				DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + DefaultFileExt;
+			createTrackViews(notes.Tracks.Count, options.EraseCurrent);
 		}
 
 		public bool openNoteFile(ImportOptions options, out string mixdownPath)
@@ -229,62 +224,35 @@ namespace Visual_Music
 			stopPlayback();
 			mixdownPath = null;
 
-			//insTrack = _insTrack;
 			if (options.EraseCurrent)
 			{
 				ViewWidthQn = DefaultViewWidthQn;
 				AudioOffset = 0;
 			}
 
-			//if (string.IsNullOrWhiteSpace(noteFilePath))
-			//{
-			//	notes = null;
-			//	trackProps = null;
-			//	return true;
-			//}
-
 			Midi.Song newNotes = new Midi.Song();
-			try
-			{
-				newNotes.openFile(options, out mixdownPath);
-				if (newNotes.Tracks == null || newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
-				{
-					MessageBox.Show($"Couldn't load note file: {options.NotePath}\nNo notes found.",  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return false;
-				}
-			}
-			catch (Exception e)
-			{
-				//notes = null;
-				//MessageBox.Show(Parent, e.Message, "Note file error");
-				MessageBox.Show($"Couldn't load note file: {options.NotePath}\n"+e.Message,  "Note file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return false;
-			}
-			
+			newNotes.openFile(options, out mixdownPath);
+			if (newNotes.Tracks == null || newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
+				throw new FileFormatException(new Uri(options.RawNotePath), "No notes found.");
+									
 			notes = newNotes;
 			notes.createNoteBsp();
 
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
 			return true;
 		}
-		public bool openAudioFile(string file, Midi.MixdownType mixdownType)
+		public void openAudioFile(string file, Midi.MixdownType mixdownType)
 		{
-			//internalMixdown = false;// mixdownType == MixdownType.Internal;
 			if (mixdownType == Midi.MixdownType.Tparty)
 				file = ImportNotesWithAudioForm.runTpartyProcess();
+			else if (string.IsNullOrWhiteSpace(file))
+				return;
 					
-			if (string.IsNullOrWhiteSpace(file))
-				return true;
-			
 			if (!Media.openAudioFile(file))
-			{
-				MessageBox.Show("Couldn't load audio file " + file, "Audio file error");
-				return false;
-			}
-			
+				throw new FileFormatException(new Uri(file));
+						
 			if (notes != null)
 				notes.SongLengthT = (int)secondsToTicks(Media.getAudioLength());
-			return true;
 		}
 
 		public void resetPitchLimits()
@@ -355,7 +323,7 @@ namespace Visual_Music
 
 		public void createOcTrees()
 		{
-			if (trackViews == null || viewWidthQn == 0)
+			if (trackViews == null || viewWidthQn == 0 || Notes == null)
 				return;
 			vertViewWidthQn = viewWidthQn;
 			//for (int i = TrackViews.Count - 1; i > 0; i--)

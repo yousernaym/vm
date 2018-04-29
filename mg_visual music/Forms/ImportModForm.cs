@@ -42,7 +42,6 @@ namespace Visual_Music
 			importFiles();
         }
 
-
 		public override void importFiles()
 		{
 			importFiles(new ModImportOptions());
@@ -62,7 +61,7 @@ namespace Visual_Music
 		public ModImportOptions() : base(Midi.FileType.Mod)
 		{
 			ImportForm = (ImportModForm)base.ImportForm;
-			string ext = NotePath.Split('.').Last().ToLower();
+			string ext = NotePath?.Split('.').Last().ToUpper();
 			bool xmPlayMixdownSupported = XmPlayFormats.Contains(ext);
 			MixdownType = xmPlayMixdownSupported && Form1.TpartyIntegrationForm.ModuleMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
 			InsTrack = ImportForm.InsTrack;

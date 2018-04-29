@@ -123,12 +123,17 @@ namespace Visual_Music
         {
 			if (!options.checkNoteFile())
 				return;
-            if (parent.openSourceFiles(options))
-            {
-                DialogResult = DialogResult.OK;
-                Hide();
-            }
-        }
+			try
+			{
+				parent.openSourceFiles(options);
+				DialogResult = DialogResult.OK;
+				Hide();
+			}
+			catch (FileFormatException ex)
+			{
+				Form1.showErrorMsgBox(ex.Message);
+			}
+		}
 
 		private void SourceFileForm_VisibleChanged(object sender, EventArgs e)
 		{
