@@ -119,7 +119,6 @@ namespace Visual_Music
 			}
 			Active = false;
 			return savePath;
-
 		}
 	}
 }

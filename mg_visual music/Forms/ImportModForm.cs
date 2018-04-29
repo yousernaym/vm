@@ -45,9 +45,6 @@ namespace Visual_Music
 
 		public override void importFiles()
 		{
-			if (!checkNoteFile())
-				return;
-			
 			importFiles(new ModImportOptions());
 		}
 

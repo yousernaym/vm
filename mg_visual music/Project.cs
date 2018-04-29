@@ -216,6 +216,8 @@ namespace Visual_Music
 			finally
 			{
 				ImportOptions = options;
+				if (options.EraseCurrent)
+					DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + DefaultFileExt;
 				createTrackViews(notes.Tracks.Count, options.EraseCurrent);
 			}
 			return true;
@@ -683,8 +685,8 @@ namespace Visual_Music
 
 		public void updateFromImportForm()
 		{
-			ImportOptions.NotePath = ImportOptions.ImportForm.RawNoteFilePath;
-			DefaultFileName = Path.GetFileName(ImportOptions.ImportForm.NoteFilePath) + DefaultFileExt;
+			//ImportOptions.NotePath = ImportOptions.ImportForm.RawNoteFilePath;
+			//DefaultFileName = Path.GetFileName(ImportOptions.ImportForm.NoteFilePath) + DefaultFileExt;
 		}
 
 

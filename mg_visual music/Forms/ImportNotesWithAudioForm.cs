@@ -83,7 +83,7 @@ namespace Visual_Music
 
         new protected void importFiles(ImportOptions options)
         {
-			if (!checkNoteFile())
+			if (!options.checkNoteFile())
 				return;
 			if (existingAudioRbtn.Checked)
             {   //No user-specified command line

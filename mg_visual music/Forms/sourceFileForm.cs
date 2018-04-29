@@ -14,35 +14,38 @@ namespace Visual_Music
 {
 	public partial class SourceFileForm : Form
 	{
-		public string DownloadedFilePath { get; private set; }
+		//public string DownloadedFilePath { get; private set; }
 		
-		public string RawNoteFilePath => noteFilePath.Text;
+		//public string RawNoteFilePath => noteFilePath.Text;
 		public string NoteFilePath
 		{
-			get
-			{
-				//If a file has been previously downloaded to temp dir, return path to that file.
-				if (!string.IsNullOrWhiteSpace(DownloadedFilePath))
-				{
-					if (!File.Exists(DownloadedFilePath))
-						DownloadedFilePath = null;
-					return DownloadedFilePath;
-				}
-				//If noteFilePath textbox is a URL, download file to temp dir and return path to that file, otherwise return
-				else if (noteFilePath.Text.IsUrl())
-					return DownloadedFilePath = noteFilePath.Text.downloadFile();
-				//Return path as written in textbox
-				else
-					return noteFilePath.Text;
-			}
-			set
-			{
-				if (noteFilePath.Text.Equals(value))
-					return;
-				noteFilePath.Text = value;
-				DownloadedFilePath = null;
-			}
+			get => noteFilePath.Text;
+			set => noteFilePath.Text = value;
 		}
+			//get
+			//{
+			//	//If a file has been previously downloaded to temp dir, return path to that file.
+			//	if (!string.IsNullOrWhiteSpace(DownloadedFilePath))
+			//	{
+			//		if (!File.Exists(DownloadedFilePath))
+			//			DownloadedFilePath = null;
+			//		return DownloadedFilePath;
+			//	}
+			//	//If noteFilePath textbox is a URL, download file to temp dir and return path to that file, otherwise return
+			//	else if (noteFilePath.Text.IsUrl())
+			//		return DownloadedFilePath = noteFilePath.Text.downloadFile();
+			//	//Return path as written in textbox
+			//	else
+			//		return noteFilePath.Text;
+			//}
+			//set
+			//{
+			//	if (noteFilePath.Text.Equals(value))
+			//		return;
+			//	noteFilePath.Text = value;
+			//	DownloadedFilePath = null;
+			//}
+		//}
         virtual public string AudioFilePath
 		{
 			get { return audioFilePath.Text; }
@@ -103,27 +106,12 @@ namespace Visual_Music
 
 		private void noteFilePath_TextChanged(object sender, EventArgs e)
 		{
-			DownloadedFilePath = null;
+			//DownloadedFilePath = null;
 		}
 
 		private void audioFilePath_TextChanged(object sender, EventArgs e)
 		{
 			//AudioFilePath = audioFilePath.Text;
-		}
-
-		protected bool checkNoteFile()
-		{
-			if (string.IsNullOrWhiteSpace(NoteFilePath))
-			{
-				MessageBox.Show("Note file path required.");
-				return false;
-			}
-			else if (!File.Exists(NoteFilePath))
-			{
-				MessageBox.Show("Note file not found.");
-				return false;
-			}
-			return true;
 		}
 
 		public virtual void importFiles() //Can't be abstract because designer won't be able to show derived forms
@@ -133,7 +121,7 @@ namespace Visual_Music
 
 		protected void importFiles(ImportOptions options)
         {
-			if (!checkNoteFile())
+			if (!options.checkNoteFile())
 				return;
             if (parent.openSourceFiles(options))
             {
@@ -182,12 +170,32 @@ namespace Visual_Music
 					_importForm = Form1.ImportSidForm;
 			}
 		}
+
+		string rawNotePath;
+		public string RawNotePath
+		{
+			get => rawNotePath; //Note path as entered at import, either local file or url.
+			set
+			{
+				rawNotePath = value;
+				if (value.IsUrl())
+					base.NotePath = value.downloadFile();
+				else
+					base.NotePath = value;
+			}
+		}
+
+		new public string NotePath
+		{
+			get => base.NotePath;
+		}
+
 		public bool EraseCurrent;
 
 		public ImportOptions(Midi.FileType noteFileType)
 		{
 			NoteFileType = noteFileType;
-			NotePath = ImportForm.NoteFilePath;
+			RawNotePath = ImportForm.NoteFilePath;
 			AudioPath = ImportForm.AudioFilePath;
 			EraseCurrent = ImportForm.EraseCurrent;
 		}
@@ -196,8 +204,8 @@ namespace Visual_Music
 		{
 			foreach (var entry in info)
 			{
-				if (entry.Name == "notePath")
-					NotePath = (string) entry.Value;
+				if (entry.Name == "rawNotePath")
+					RawNotePath = (string) entry.Value;
 				else if (entry.Name == "audioPath")
 					AudioPath = (string) entry.Value;
 				else if (entry.Name == "mixdownType")
@@ -217,7 +225,7 @@ namespace Visual_Music
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("notePath", NotePath);
+			info.AddValue("rawNotePath", RawNotePath);
 			info.AddValue("audioPath", AudioPath);
 			info.AddValue("mixdownType", MixdownType);
 			info.AddValue("insTrack", InsTrack);
@@ -229,10 +237,25 @@ namespace Visual_Music
 
 		public void updateImportForm()
 		{
-			ImportForm.NoteFilePath = NotePath;
+			ImportForm.NoteFilePath = RawNotePath;
 			ImportForm.AudioFilePath = AudioPath;
 			if (ImportForm.GetType() == typeof(ImportModForm))
 				((ImportModForm)ImportForm).InsTrack = InsTrack;
+		}
+
+		public bool checkNoteFile()
+		{
+			if (string.IsNullOrWhiteSpace(NotePath))
+			{
+				MessageBox.Show("Note file path required.");
+				return false;
+			}
+			else if (!File.Exists(NotePath))
+			{
+				MessageBox.Show("Note file not found.");
+				return false;
+			}
+			return true;
 		}
 	}
 }

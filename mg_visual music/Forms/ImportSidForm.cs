@@ -14,9 +14,7 @@ namespace Visual_Music
     public partial class ImportSidForm : ImportNotesWithAudioForm
     {
 		static public readonly string[] Formats = Properties.Resources.SidFormats.ToLower().Split(null);
-		int subSong = 1;
-		int numSubSongs = 1;
-
+		
 		public ImportSidForm()
         {
             InitializeComponent();
@@ -28,15 +26,18 @@ namespace Visual_Music
         
         private void Ok_Click(object sender, EventArgs e)
         {
-			importFiles();
+			//if (subSongForm.ShowDialog() == DialogResult.Ok)
+				importFiles(/*subSongForm.SelectedSong*/);
         }
-
+		//getSongLength(subSong); //song length in seconds. 0 = NoteExtractor default
 		public override void importFiles()
 		{
-			if (!checkNoteFile())
-				return;
-			float songLengthS = getSongLength(); //song length in seconds. //0 = NoteExtractor default
-			importFiles(new SidImportOptions(subSong, numSubSongs, songLengthS));
+			importFiles(0);
+		}
+
+		public void importFiles(int subSong, int songLengthS = 0)
+		{
+			importFiles(new SidImportOptions(subSong, songLengthS));
 		}
 
 		private void ImportSidForm_Shown(object sender, EventArgs e)
@@ -46,10 +47,31 @@ namespace Visual_Music
 			else
 				existingAudioRbtn.Text = "Audio file (leave empty for SID file audio)";
 		}
-		float getSongLength()
+		
+
+		private void ImportSidForm_Load(object sender, EventArgs e)
 		{
-			//return 300;
-			using (var stream = File.OpenRead(NoteFilePath))
+			createFormatFilter("Sid files", Formats);
+		}
+	}
+
+	[Serializable()]
+	class SidImportOptions : ImportOptions
+	{
+		public SidImportOptions(int subSong, float songLengthS) : base(Midi.FileType.Sid)
+		{
+			MixdownType = Form1.TpartyIntegrationForm.SidMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
+			SubSong = subSong;
+			SongLengthS = songLengthS; 
+		}
+		public SidImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
+		{
+
+		}
+
+		float getSongLength(string filePath, int subSong)
+		{
+			using (var stream = File.OpenRead(filePath))
 			{
 				using (var md5 = MD5.Create())
 				{
@@ -88,26 +110,6 @@ namespace Visual_Music
 				}
 			}
 			return 0.0f;
-		}
-
-		private void ImportSidForm_Load(object sender, EventArgs e)
-		{
-			createFormatFilter("Sid files", Formats);
-		}
-	}
-	[Serializable()]
-	class SidImportOptions : ImportOptions
-	{
-		public SidImportOptions(int subSong, int numSubSongs, float songLengthS) : base(Midi.FileType.Sid)
-		{
-			MixdownType = Form1.TpartyIntegrationForm.SidMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
-			SubSong = subSong;
-			NumSubSongs = numSubSongs;
-			SongLengthS = songLengthS;
-		}
-		public SidImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
-		{
-
 		}
 	}
 }

@@ -294,6 +294,8 @@ namespace Visual_Music
 			try
 			{
 				songPanel.SuspendPaint();
+				if (project.TrackViews == null)
+					options.EraseCurrent = true; //In order for setDefaultPitches below to be called
 				if (Project.importSong(options))
 				{
 					if (options.EraseCurrent)
@@ -303,7 +305,7 @@ namespace Visual_Music
 						updateFormTitle("");
 					}
 					songLoaded(options.NotePath);
-					project.updateFromImportForm();
+					//project.updateFromImportForm();
 					return true;
 				}
 				else
@@ -973,6 +975,7 @@ namespace Visual_Music
 		}
 		void openSongFile(string fileName)
 		{
+			Project currentProject = project;
 			try
 			{
 				songPanel.SuspendPaint();
@@ -987,12 +990,12 @@ namespace Visual_Music
 				currentProjPath = fileName;
 				songLoaded(currentProjPath);
 				updateFormTitle(currentProjPath);
-				Project.DefaultFileName = Path.GetFileName(currentProjPath);
+				project.DefaultFileName = Path.GetFileName(currentProjPath);
 			}
 			catch (Exception)
 			{
 				showErrorMsgBox(this, "Couldn't load song");
-				project = null;
+				project = currentProject;
 			}
 			finally
 			{
