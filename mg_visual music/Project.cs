@@ -140,7 +140,9 @@ namespace Visual_Music
 				throw new FileFormatException("Note file path missing from song file.");
 			if (!File.Exists(ImportOptions.NotePath))
 				throw new FileNotFoundException("Note file missing: " + ImportOptions.NotePath);
-
+			if (!string.IsNullOrWhiteSpace(ImportOptions.AudioPath) && !File.Exists(ImportOptions.AudioPath))
+				Form1.showWarningMsgBox("Audio file missing: " + ImportOptions.AudioPath);
+			
 			ImportOptions.EraseCurrent = false;
 			importSong(ImportOptions);
 			if (trackViews != null)
@@ -245,9 +247,12 @@ namespace Visual_Music
 		{
 			if (mixdownType == Midi.MixdownType.Tparty)
 				file = ImportNotesWithAudioForm.runTpartyProcess();
-			else if (string.IsNullOrWhiteSpace(file))
+
+			//if (string.IsNullOrWhiteSpace(file))
+				//return;
+			if (!File.Exists(file))  //If loading project file and audio file is no longer where it should be, or tparty process failed, keep loading/importing but skip audio. (If importing, import won't even start if trying to import with non-empty incorrect audio path.)
 				return;
-					
+						
 			if (!Media.openAudioFile(file))
 				throw new FileFormatException(new Uri(file));
 						

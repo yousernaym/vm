@@ -88,7 +88,9 @@ namespace Visual_Music
 				
 			if (existingAudioRbtn.Checked)
             {   //No user-specified command line
-                if (options.MixdownType != Midi.MixdownType.None)
+				if (!String.IsNullOrWhiteSpace(options.AudioPath))
+					options.MixdownType = Midi.MixdownType.None;
+				if (options.MixdownType != Midi.MixdownType.None)
                 {   //No existing audio file, do mixdown
                     if (options.MixdownType == Midi.MixdownType.Tparty)
                     {   //Mixdown with xmplay

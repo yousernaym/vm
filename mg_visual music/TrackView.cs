@@ -113,7 +113,7 @@ namespace Visual_Music
 
 		public void drawTrack(TrackProps globalTrackProps, bool defaultStyle)
 		{
-			if (midiTrack.Notes.Count == 0)
+			if (midiTrack?.Notes?.Count == 0)
 				return;
 			MaterialProps texMaterial = TrackProps.MaterialProps.getTexture(false, null) != null ? TrackProps.MaterialProps : globalTrackProps.MaterialProps;
 			if (defaultStyle)

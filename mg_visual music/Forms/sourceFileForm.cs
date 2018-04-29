@@ -123,6 +123,11 @@ namespace Visual_Music
         {
 			if (!options.checkNoteFile())
 				return;
+			if (options.MixdownType == Midi.MixdownType.None && !string.IsNullOrWhiteSpace(options.AudioPath) && !File.Exists(options.AudioPath))
+			{
+				Form1.showErrorMsgBox("Couldn't find audio file.");
+				return;
+			}
 			try
 			{
 				parent.openSourceFiles(options);
