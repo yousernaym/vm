@@ -84,6 +84,7 @@ namespace Visual_Music
 				{
 					importForm.NoteFilePath = url;
 					importForm.AudioFilePath = "";
+					importForm.EraseCurrent = true;
 					//importForm.ShowDialog();
 					importForm.importFiles();
 				});

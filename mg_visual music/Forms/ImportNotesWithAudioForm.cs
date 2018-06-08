@@ -96,7 +96,7 @@ namespace Visual_Music
                     {   //Mixdown with xmplay
 						//string folder = Application.StartupPath + "\\plugins\\xmplay";
 						importUsingTpartyMixdown(options, TpartyIntegrationForm.XmPlayPath,
-								   "\"" + NoteFilePath + "\" -boost",
+								   "\"" + options.NotePath + "\" -boost",
 								   TpartyIntegrationForm.XmPlayOutputDir);
                     }
                     else
@@ -131,7 +131,7 @@ namespace Visual_Music
 				watcher.EnableRaisingEvents = false;
 				Program.form1.Activate();
 				if (tpartyOutputFile == null)
-					Form1.showWarningMsgBox(null, "Couldn't find audio mixdown at " + tpartyOutputDir);
+					Form1.showWarningMsgBox("Couldn't find audio mixdown at " + tpartyOutputDir);
 				else
 				{
 					File.Delete(Program.MixdownPath);

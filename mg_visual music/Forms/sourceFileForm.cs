@@ -66,7 +66,7 @@ namespace Visual_Music
 		public bool EraseCurrent
 		{
 			get => eraseCurrent.Checked;
-			private set => eraseCurrent.Checked = value;
+			set => eraseCurrent.Checked = value;
 		}
 		
         public SourceFileForm() //For designer view

@@ -7,13 +7,12 @@
 - Loading of songlengths.txt directly from HVSC.
 - Use context menus for download links to download songs instead of import, or open import form instead of directly importing.
   Maybe also add default behaviour setting.
-
 - Option to choose sub song (use sidplayfp insterad of xmplay)
+
+Done:
 - Make sure EraseCurrent = true when importing from command line and browsers
 - Can't open projects with url to note file.
 - Fix song import with "new project" unchecked and no song currently loaded.
-
-Done:
 - Fix sid parsing (better sync).
 - Fix midi and sid downloading.
 - If the cancel button of the download progress form is clicked, the download that is in progress should be cancelled and not be left hanging.

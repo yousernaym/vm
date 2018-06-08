@@ -19,11 +19,11 @@ namespace Visual_Music
 	{
 		const string SongLengthsFileName = "songlengths.txt";
 		const string XmPlaySidPluginFileName = "xmp-sid.dll";
-		static public string TpartyDir = Path.Combine(Program.AppDataDir, "tparty");
-		public static string XmPlayDir = Path.Combine(TpartyDir, "xmplay");
-		public static string XmPlayPath = Path.Combine(XmPlayDir, "xmplay.exe");
-		public static string XmPlayOutputDir = Program.TempDir;
-		public static string XmPlayFileName = Path.GetFileName(XmPlayPath);
+		static readonly public string TpartyDir = Path.Combine(Program.AppDataDir, "tparty");
+		public readonly static string XmPlayDir = Path.Combine(TpartyDir, "xmplay");
+		public readonly static string XmPlayPath = Path.Combine(XmPlayDir, "xmplay.exe");
+		public readonly static string XmPlayOutputDir = Program.TempDir;
+		public readonly static string XmPlayFileName = Path.GetFileName(XmPlayPath);
 
 		CommonOpenFileDialog hvscDirDialog = new CommonOpenFileDialog();
 		string hvscDir = "";
