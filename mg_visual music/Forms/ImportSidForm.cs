@@ -14,6 +14,7 @@ namespace Visual_Music
     public partial class ImportSidForm : ImportNotesWithAudioForm
     {
 		static public readonly string[] Formats = Properties.Resources.SidFormats.ToLower().Split(null);
+		Forms.SubSongForm subSongForm = new Forms.SubSongForm();
 		
 		public ImportSidForm()
         {
@@ -26,18 +27,20 @@ namespace Visual_Music
         
         private void Ok_Click(object sender, EventArgs e)
         {
-			//if (subSongForm.ShowDialog() == DialogResult.Ok)
-				importFiles(/*subSongForm.SelectedSong*/);
+			importFiles();
+
         }
 		//getSongLength(subSong); //song length in seconds. 0 = NoteExtractor default
 		public override void importFiles()
 		{
-			importFiles(0);
-		}
-
-		public void importFiles(int subSong, int songLengthS = 0)
-		{
-			importFiles(new SidImportOptions(subSong, songLengthS));
+			var options = new SidImportOptions();
+			subSongForm.init(options.NotePath);
+			if (subSongForm.ShowDialog() == DialogResult.OK)
+			{
+				options.SubSong = subSongForm.SelectedSong;
+				options.SongLengthS = subSongForm.SongLengthS;
+				importFiles(options);
+			}
 		}
 
 		private void ImportSidForm_Shown(object sender, EventArgs e)
@@ -58,58 +61,16 @@ namespace Visual_Music
 	[Serializable()]
 	class SidImportOptions : ImportOptions
 	{
-		public SidImportOptions(int subSong, float songLengthS) : base(Midi.FileType.Sid)
+		public SidImportOptions() : base(Midi.FileType.Sid)
 		{
 			MixdownType = Form1.TpartyIntegrationForm.SidMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
-			SubSong = subSong;
-			SongLengthS = songLengthS; 
 		}
+
 		public SidImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
 
 		}
 
-		float getSongLength(string filePath, int subSong)
-		{
-			using (var stream = File.OpenRead(filePath))
-			{
-				using (var md5 = MD5.Create())
-				{
-					byte[] bytes = md5.ComputeHash(stream);
-					string hash1 = "";
-					foreach (byte b in bytes)
-					{
-						hash1 += b.ToString("X2");
-					}
-					hash1 = hash1.ToLower();
-					using (StreamReader reader = new StreamReader(new MemoryStream(Properties.Resources.Songlengths)))
-					{
-						while (!reader.EndOfStream)
-						{
-							string line = reader.ReadLine().Trim();
-							if (!string.IsNullOrEmpty(line) && line[0] != ';')
-							{
-								int equalSignIndex = line.IndexOf('=');
-								if (equalSignIndex > 0)
-								{
-									string hash2 = line.Substring(0, equalSignIndex).ToLower();
-									if (hash1 == hash2)
-									{
-										string timeString = line.Substring(equalSignIndex + 1, line.Length - equalSignIndex - 1);
-										string subSongTimeString = timeString.Split(' ')[subSong - 1];
-										string[] minsec = subSongTimeString.Split(':');
-										int seconds = int.Parse(minsec[0]) * 60 + int.Parse(minsec[1]);
-										//MessageBox.Show("Match found");
-										return (float)seconds;
-									}
-								}
-
-							}
-						}
-					}
-				}
-			}
-			return 0.0f;
-		}
+		
 	}
 }
