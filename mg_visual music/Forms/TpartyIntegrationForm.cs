@@ -18,13 +18,15 @@ namespace Visual_Music
 	public partial class TpartyIntegrationForm : Form
 	{
 		const string SongLengthsFileName = "songlengths.txt";
-		const string XmPlaySidPluginFileName = "xmp-sid.dll";
 		static readonly public string TpartyDir = Path.Combine(Program.AppDataDir, "tparty");
 		public readonly static string XmPlayDir = Path.Combine(TpartyDir, "xmplay");
-		public readonly static string XmPlayPath = Path.Combine(XmPlayDir, "xmplay.exe");
-		public readonly static string XmPlayOutputDir = Program.TempDir;
-		public readonly static string XmPlayFileName = Path.GetFileName(XmPlayPath);
-
+		public readonly static string SidPlayDir = Path.Combine(TpartyDir, "sidplayfp");
+		public const string XmPlayFileName = "xmplay.exe";
+		public const string SidPlayFileName = "sidplayfp.exe";
+		public readonly static string XmPlayPath = Path.Combine(XmPlayDir, XmPlayFileName);
+		public readonly static string SidPlayPath = Path.Combine(SidPlayDir, SidPlayFileName);
+		public readonly static string MixdownOutputDir = Program.TempDir;
+		
 		CommonOpenFileDialog hvscDirDialog = new CommonOpenFileDialog();
 		string hvscDir = "";
 		public string HvscDir
@@ -38,10 +40,10 @@ namespace Visual_Music
 		}
 		public string SongLengthsPath { get => Path.Combine(HvscDir, SongLengthsFileName); }
 		bool XmPlayInstalled { get => File.Exists(XmPlayPath); }
-		bool XmPlaySidPluginInstalled { get => XmPlayInstalled && File.Exists(XmPlayDir + "\\" + XmPlaySidPluginFileName); }
+		bool SidPlayInstalled { get => File.Exists(SidPlayDir + "\\" + SidPlayFileName); }
 		bool HvscInstalled { get => hvscInstalledAt(hvscDir); }
 		public bool ModuleMixdown{ get => modulesCb.Checked && XmPlayInstalled; set => modulesCb.Checked = XmPlayInstalled ? value : false; }
-		public bool SidMixdown{ get => sidsCb.Checked && XmPlaySidPluginInstalled; set => sidsCb.Checked = XmPlaySidPluginInstalled ? value : false; }
+		public bool SidMixdown{ get => sidsCb.Checked && SidPlayInstalled; set => sidsCb.Checked = SidPlayInstalled ? value : false; }
 		public bool HvscSongLengths { get => songLengthCb.Checked && HvscInstalled  ; set => songLengthCb.Checked = HvscInstalled ? value : false; }
 		
 		public TpartyIntegrationForm()
@@ -52,7 +54,7 @@ namespace Visual_Music
 			hvscDirDialog.EnsurePathExists = true;
 			//hvscDirDialog.FileOk += new System.ComponentModel.CancelEventHandler(hvscDirDialog_FileOk);
 			hvscDirDialog.Title = @"Browse to C64Music\DOCUMENTS";
-			Directory.CreateDirectory(XmPlayOutputDir);
+			Directory.CreateDirectory(MixdownOutputDir);
 			setXmPlayIni_outputDir();
 		}
 
@@ -63,7 +65,7 @@ namespace Visual_Music
 
 		private void sidLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("http://support.xmplay.com/files_view.php?file_id=504");
+			Process.Start("https://sourceforge.net/projects/sidplay-residfp/files/sidplayfp/1.4/");
 		}
 
 		private void hvscLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -71,7 +73,7 @@ namespace Visual_Music
 			Process.Start("http://www.hvsc.c64.org/#download");
 		}
 
-		void importZip(string zipPath, string checkForEntry, string extractionDir, CancelEventArgs e)
+		void importZip(string zipPath, string checkForEntry, string extractionDir, CancelEventArgs e, bool keepDirStructure = false)
 		{
 			try
 			{
@@ -79,26 +81,42 @@ namespace Visual_Music
 				{
 					using (ZipArchive zipArchive = new ZipArchive(stream))
 					{
-						if (zipArchive.GetEntry(checkForEntry) != null)
+						//if (zipArchive.GetEntry(checkForEntry) != null)
+						//{
+						bool entryFound = false;
+						foreach (ZipArchiveEntry entry in zipArchive.Entries)
 						{
-							foreach (ZipArchiveEntry entry in zipArchive.Entries)
+							if (entry.Name == checkForEntry)
 							{
-								string completeFileName = Path.Combine(extractionDir, entry.FullName);
-								string directory = Path.GetDirectoryName(completeFileName);
-
-								if (!Directory.Exists(directory))
-									Directory.CreateDirectory(directory);
-
-								if (entry.Name != "")
-									entry.ExtractToFile(completeFileName, true);
+								entryFound = true;
+								break;
 							}
-							//zipArchive.ExtractToDirectory(extractionDir);
 						}
-						else
+						if (!entryFound)
 						{
 							MessageBox.Show(this, checkForEntry + " could not be found.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 							e.Cancel = true;
 						}
+						foreach (ZipArchiveEntry entry in zipArchive.Entries)
+						{
+							string entryPath;
+							entryPath = keepDirStructure ? entry.FullName : entry.Name;
+							entryPath = Path.Combine(extractionDir, entryPath);
+							string directory = Path.GetDirectoryName(entryPath);
+
+							if (!Directory.Exists(directory))
+								Directory.CreateDirectory(directory);
+
+							if (entry.Name != "")
+								entry.ExtractToFile(entryPath, true);
+						}
+						//zipArchive.ExtractToDirectory(extractionDir);
+						//}
+						//else
+						//{
+						//	MessageBox.Show(this, checkForEntry + " could not be found.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						//	e.Cancel = true;
+						//}
 					}
 				}
 			}
@@ -115,14 +133,14 @@ namespace Visual_Music
 			{
 				setXmPlayIni_outputDir();
 				setXmPlayIni_hvscDir();
-				Directory.CreateDirectory(XmPlayOutputDir);
+				Directory.CreateDirectory(MixdownOutputDir);
 			}
 		}
 		
 		private void importSidBtn_Click(object sender, EventArgs e)
 		{
-			openXmPlaySidPluginDialog.ShowDialog();
-			setXmPlayIni_hvscDir();
+			openSidPlayDialog.ShowDialog();
+			//setXmPlayIni_hvscDir();
 		}
 
 		protected override bool ProcessDialogKey(Keys keyData)
@@ -166,7 +184,7 @@ namespace Visual_Music
 
 		private void openXmPlaySidPluginDialog_FileOk(object sender, CancelEventArgs e)
 		{
-			importZip(openXmPlaySidPluginDialog.FileName, XmPlaySidPluginFileName, XmPlayDir, e);
+			importZip(openSidPlayDialog.FileName, SidPlayFileName, SidPlayDir, e);
 		}
 
 		private void hvscDirDialog_FileOk(object sender, CancelEventArgs e)
@@ -185,7 +203,7 @@ namespace Visual_Music
 		void enableCheckboxes()
 		{
 			modulesCb.Enabled = XmPlayInstalled;
-			sidsCb.Enabled = XmPlaySidPluginInstalled;
+			sidsCb.Enabled = SidPlayInstalled;
 			songLengthCb.Enabled = HvscInstalled;
 		}
 
@@ -223,7 +241,7 @@ namespace Visual_Music
 		}
 		void setXmPlayIni_outputDir()
 		{
-			setXmPlayIniValue("", "WritePath", XmPlayOutputDir + "\\");
+			setXmPlayIniValue("", "WritePath", MixdownOutputDir + "\\");
 		}
 		static void setXmPlayIniValue(string section, string key, string value)
 		{

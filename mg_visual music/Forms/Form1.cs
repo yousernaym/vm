@@ -247,11 +247,13 @@ namespace Visual_Music
 
 		private void importMidiSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			ImportMidiForm.Hide();
 			if (ImportMidiForm.ShowDialog(this) == DialogResult.OK)
 				songPanel.Focus();
 		}
 		private void importModuleToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			ImportModForm.Hide();
 			if (ImportModForm.ShowDialog(this) == DialogResult.OK)
 				SongPanel.Focus();
 		}
@@ -1381,6 +1383,7 @@ namespace Visual_Music
 
 		private void importSidSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			ImportSidForm.Hide();
 			if (ImportSidForm.ShowDialog(this) == DialogResult.OK)
 				songPanel.Focus();
 		}

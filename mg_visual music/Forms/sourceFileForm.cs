@@ -201,6 +201,8 @@ namespace Visual_Music
 		}
 
 		public bool EraseCurrent;
+		public string MixdownAppPath;
+		public string MixdownAppArgs;
 
 		public ImportOptions(Midi.FileType noteFileType)
 		{
@@ -230,6 +232,10 @@ namespace Visual_Music
 					NumSubSongs = (int)entry.Value;
 				else if (entry.Name == "songLengthS")
 					SongLengthS = (float)entry.Value;
+				else if (entry.Name == "mixdownAppPath")
+					MixdownAppPath = (string)entry.Value;
+				else if (entry.Name == "mixdownAppArgs")
+					MixdownAppArgs = (string)entry.Value;
 			}
 		}
 
@@ -243,6 +249,8 @@ namespace Visual_Music
 			info.AddValue("subSong", SubSong);
 			info.AddValue("numSubSong", NumSubSongs);
 			info.AddValue("songLengthS", SongLengthS);
+			info.AddValue("mixdownAppPath", MixdownAppPath);
+			info.AddValue("mixdownAppArgs", MixdownAppArgs);
 		}
 
 		public void updateImportForm()

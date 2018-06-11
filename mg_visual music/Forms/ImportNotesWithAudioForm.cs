@@ -93,11 +93,9 @@ namespace Visual_Music
 				if (options.MixdownType != Midi.MixdownType.None)
                 {   //No existing audio file, do mixdown
                     if (options.MixdownType == Midi.MixdownType.Tparty)
-                    {   //Mixdown with xmplay
+                    {   //Mixdown with xmplay or sidplayfp
 						//string folder = Application.StartupPath + "\\plugins\\xmplay";
-						importUsingTpartyMixdown(options, TpartyIntegrationForm.XmPlayPath,
-								   "\"" + options.NotePath + "\" -boost",
-								   TpartyIntegrationForm.XmPlayOutputDir);
+						importUsingTpartyMixdown(options, TpartyIntegrationForm.MixdownOutputDir);
                     }
                     else
                     {   //Mixdown internally
@@ -111,9 +109,9 @@ namespace Visual_Music
             }
             else 
             { //User-specified command line
-				importUsingTpartyMixdown(options, tpartyAppTb.Text,
-					   tpartyArgsTb.Text.Replace("%notefilepath", "\"" + NoteFilePath + "\""),
-					   tpartyAudioTb.Text);
+				options.MixdownAppPath = tpartyAppTb.Text;
+				options.MixdownAppArgs = tpartyArgsTb.Text.Replace("%notefilepath", "\"" + NoteFilePath + "\"");
+				importUsingTpartyMixdown(options, tpartyAudioTb.Text);
             }
         }
 
@@ -150,10 +148,10 @@ namespace Visual_Music
 			}
 			return tpartyOutputFile;
 		}
-		void importUsingTpartyMixdown(ImportOptions options, string appPath, string arguments, string outputDir)
+		void importUsingTpartyMixdown(ImportOptions options, string outputDir)
 		{
-			tpartyApp = appPath;
-			tpartyArgs = arguments;
+			tpartyApp = options.MixdownAppPath;
+			tpartyArgs = options.MixdownAppArgs;
 			tpartyOutputDir = outputDir.TrimEnd('\\') + "\\";
 			base.importFiles(options);
 		}
@@ -202,9 +200,9 @@ namespace Visual_Music
                     if (stream != null)
                         stream.Close();
                 }
-				if (tpartyProcess.HasExited)
+				if (tpartyProcess.HasExited && stream == null)
 					return;
-            }
+			}
 			tpartyOutputFile = e.FullPath;
 			//tpartyDoneEvent.Set();
 			//Process[] components = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tpartyProcess.StartInfo.FileName)));

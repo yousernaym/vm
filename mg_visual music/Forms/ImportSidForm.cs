@@ -34,11 +34,17 @@ namespace Visual_Music
 		public override void importFiles()
 		{
 			var options = new SidImportOptions();
+			if (!options.checkNoteFile())
+				return;
 			subSongForm.init(options.NotePath);
 			if (subSongForm.ShowDialog() == DialogResult.OK)
 			{
 				options.SubSong = subSongForm.SelectedSong;
 				options.SongLengthS = subSongForm.SongLengthS;
+				string mixdownPath = Path.Combine(TpartyIntegrationForm.MixdownOutputDir, Path.GetFileName(options.NotePath)) + ".wav";
+				options.MixdownAppArgs = $"\"{options.NotePath}\" -w\"{mixdownPath}\" -o{options.SubSong} -s -t{options.SongLengthS} -rr";
+				//options.MixdownAppPath = TpartyIntegrationForm.XmPlayPath;
+				//options.MixdownAppArgs = "\"" + options.NotePath + "\" -boost";
 				importFiles(options);
 			}
 		}
@@ -63,7 +69,8 @@ namespace Visual_Music
 	{
 		public SidImportOptions() : base(Midi.FileType.Sid)
 		{
-			MixdownType = Form1.TpartyIntegrationForm.SidMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
+			MixdownType = Form1.TpartyIntegrationForm.SidMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.None;
+			MixdownAppPath = TpartyIntegrationForm.SidPlayPath;
 		}
 
 		public SidImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
