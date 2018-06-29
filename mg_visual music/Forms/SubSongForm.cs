@@ -14,29 +14,43 @@ namespace Visual_Music.Forms
 	{
 		int _defaultSong;
 		List<int> songLengthList;
-		public int SelectedSong { get; private set; }
+		int _selectedSong;
+		public int SelectedSong
+		{
+			get => _selectedSong;
+			set
+			{
+				_selectedSong = Math.Max(value, 1);
+				_selectedSong = Math.Min(_selectedSong, NumSongs);
+				subSongsLB.SelectedIndex = _selectedSong - 1;
+				if (_selectedSong - 1 < songLengthList.Count)
+					SongLengthS = songLengthList[_selectedSong - 1];
+				else
+					SongLengthS = 0;
+			}
+		}
 		public float SongLengthS { get; private set; }
+		public int NumSongs { get; private set; }
 		
 		public void init(string songPath)
 		{
 			if (string.IsNullOrWhiteSpace(songPath))
 				return;
-			int numSongs;
 			using (var file = File.Open(songPath, FileMode.Open, FileAccess.Read))
 			{
 				file.Seek(0xe, SeekOrigin.Begin); //Seek to number of songs
-				numSongs = (file.ReadByte() << 8) | file.ReadByte();
-				if (numSongs < 1)
-					numSongs = 1;
+				NumSongs = (file.ReadByte() << 8) | file.ReadByte();
+				if (NumSongs < 1)
+					NumSongs = 1;
 				_defaultSong = (file.ReadByte() << 8) | file.ReadByte();
-				if (_defaultSong < 0 || _defaultSong > numSongs)
+				if (_defaultSong < 0 || _defaultSong > NumSongs)
 					_defaultSong = 1;
 			}
 
 			subSongsLB.Items.Clear();
 			string[] songLengthStrings = getSongLengths(songPath);
 			songLengthList = new List<int>();
-			for (int i = 0; i < numSongs; i++)
+			for (int i = 0; i < NumSongs; i++)
 			{
 				string defaultSuffix = i == _defaultSong - 1 ? " (default song)" : "";
 				if (songLengthStrings != null && songLengthStrings.Length > i)
@@ -48,7 +62,7 @@ namespace Visual_Music.Forms
 				else
 					subSongsLB.Items.Add(i + " - unknown length" + defaultSuffix);
 			}
-			subSongsLB.SelectedIndex = _defaultSong - 1;
+			SelectedSong = _defaultSong;
 		}
 		
 		public SubSongForm()
@@ -98,15 +112,7 @@ namespace Visual_Music.Forms
 
 		private void okBtn_Click(object sender, EventArgs e)
 		{
-			if (subSongsLB.SelectedIndices.Count == 0)
-				SelectedSong = _defaultSong;
-			else
-				SelectedSong = subSongsLB.SelectedIndices[0] + 1;
-
-			if (SelectedSong - 1 < songLengthList.Count)
-				SongLengthS = songLengthList[SelectedSong - 1];
-			else
-				SongLengthS = 0;
+			SelectedSong = subSongsLB.SelectedIndex + 1;
 		}
 
 		private void subSongsLB_Resize(object sender, EventArgs e)

@@ -37,7 +37,7 @@ namespace Visual_Music
 			if (!options.checkNoteFile())
 				return;
 			subSongForm.init(options.NotePath);
-			if (subSongForm.ShowDialog() == DialogResult.OK)
+			if (subSongForm.NumSongs == 1 || subSongForm.NumSongs > 1 && subSongForm.ShowDialog() == DialogResult.OK)
 			{
 				options.SubSong = subSongForm.SelectedSong;
 				options.SongLengthS = subSongForm.SongLengthS;
