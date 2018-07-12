@@ -117,8 +117,8 @@ namespace Visual_Music.Forms
 
 		private void subSongsLB_Resize(object sender, EventArgs e)
 		{
-			int buttonMargin = Height - okBtn.Bottom;
-			Height = subSongsLB.Bottom + okBtn.Height + buttonMargin + 10;
+			int buttonMargin = (Height - okBtn.Bottom);
+			Height = subSongsLB.Bottom + okBtn.Height + 10 * DeviceDpi / 96 + buttonMargin;
 		}
 	}
 }

@@ -33,23 +33,23 @@
 			// 
 			// okBtn
 			// 
-			this.okBtn.Location = new System.Drawing.Point(41, 28);
-			this.okBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.okBtn.Location = new System.Drawing.Point(98, 68);
+			this.okBtn.Margin = new System.Windows.Forms.Padding(4);
 			this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
 			// 
 			// cancelBtn
 			// 
-			this.cancelBtn.Location = new System.Drawing.Point(120, 28);
-			this.cancelBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.cancelBtn.Location = new System.Drawing.Point(181, 68);
+			this.cancelBtn.Margin = new System.Windows.Forms.Padding(4);
 			// 
 			// subSongsLB
 			// 
 			this.subSongsLB.Dock = System.Windows.Forms.DockStyle.Top;
 			this.subSongsLB.FormattingEnabled = true;
 			this.subSongsLB.Location = new System.Drawing.Point(0, 0);
-			this.subSongsLB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.subSongsLB.Margin = new System.Windows.Forms.Padding(4);
 			this.subSongsLB.Name = "subSongsLB";
-			this.subSongsLB.Size = new System.Drawing.Size(206, 17);
+			this.subSongsLB.Size = new System.Drawing.Size(269, 17);
 			this.subSongsLB.TabIndex = 3;
 			this.subSongsLB.Resize += new System.EventHandler(this.subSongsLB_Resize);
 			// 
@@ -57,9 +57,9 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(206, 62);
+			this.ClientSize = new System.Drawing.Size(269, 104);
 			this.Controls.Add(this.subSongsLB);
-			this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.Margin = new System.Windows.Forms.Padding(4);
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "SubSongForm";

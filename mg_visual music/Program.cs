@@ -30,6 +30,8 @@ namespace Visual_Music
 		{
 			//AppDomain currentDomain = AppDomain.CurrentDomain;
 			//currentDomain.UnhandledException += new UnhandledExceptionEventHandler(exceptionHandler);
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
 			AppDomain.CurrentDomain.AssemblyResolve += Resolver;
 			LoadApp(args);
 		}
@@ -80,8 +82,6 @@ namespace Visual_Music
 				Directory.CreateDirectory(TempDir);
 				dirLock = File.Create(Path.Combine(TempDir, "dontdeletefolder"));
 				Midi.Song.initLib(TempDir, Path.GetFileName(MixdownPath));
-				Application.EnableVisualStyles();
-				Application.SetCompatibleTextRenderingDefault(false);
 				form1 = new Form1(args);
 				Application.Run(form1);
 			}
