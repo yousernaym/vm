@@ -151,7 +151,7 @@ namespace Visual_Music
 				SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
 				SpriteBatch.End();
 			}
-			GraphicsDevice.BlendState = BlendState;
+			//GraphicsDevice.BlendState = BlendState;
 			Project.drawSong(new Point(2, 1), Project.NormSongPos);
 		}
 
