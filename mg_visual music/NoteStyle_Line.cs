@@ -47,13 +47,13 @@ namespace Visual_Music
 		static LineVertex[] hLineVerts = new LineVertex[MaxHLineVerts];
 		protected static LineHlVertex[] lineHlVerts = new LineHlVertex[4];
 
-		float VpLineWidth => (float)LineWidth * Project.Camera.ViewportSize.X / 1000.0f;
+		float VpLineWidth => Project.normalizeVpScalar((float)LineWidth);
 		public float? LineWidth { get; set; } = 5;
 		public float? Qn_gapThreshold { get; set; } = 3;
 		public bool? Continuous { get; set; } = true;
 		public LineType? LineType { get; set; } = Visual_Music.LineType.Standard;
 		public LineHlType? HlType { get; set; } = LineHlType.Arrow;
-		float VpHlSize => (float)HlSize * Project.Camera.ViewportSize.X / 1000.0f;
+		float VpHlSize => Project.normalizeVpScalar((float)HlSize);
 		public float? HlSize { get; set; } = 20;
 		public bool? MovingHl { get; set; } = false;
 		public bool? ShrinkingHl { get; set; } = false;

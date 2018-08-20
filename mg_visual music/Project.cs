@@ -668,10 +668,17 @@ namespace Visual_Music
 
 		public Vector3 getSpatialNormPosOffset(int trackNumber)
 		{
-			return (GlobalTrackProps.SpatialProps.PosOffset + trackViews[trackNumber].TrackProps.SpatialProps.PosOffset) * Camera.ViewportSize.X * 2.0f / UserViewWidth;
+			return normalizeVpVector(GlobalTrackProps.SpatialProps.PosOffset + trackViews[trackNumber].TrackProps.SpatialProps.PosOffset);
 		}
-		
 
+		public float normalizeVpScalar(float value)
+		{
+			return value * Camera.ViewportSize.X / UserViewWidth;
+		}
+		public Vector3 normalizeVpVector(Vector3 value)
+		{
+			return value * Camera.ViewportSize.X / UserViewWidth;
+		}
 	}
 
 
