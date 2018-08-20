@@ -8,8 +8,10 @@
 - Use context menus for download links to download songs instead of import, or open import form instead of directly importing.
   Maybe also add default behaviour setting.
 - Handle variable CIA speed for sid songs.
+- Selecting notes with non-zero spatial offset stopped working.
 
 Done:
+- Elapsed/remaining time stopped working (fixed).
 - Option to choose sub song (use sidplayfp insterad of xmplay)
 - Make sure EraseCurrent = true when importing from command line and browsers
 - Can't open projects with url to note file.

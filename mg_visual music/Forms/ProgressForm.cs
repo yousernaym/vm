@@ -13,7 +13,7 @@ namespace Visual_Music
 {
 	public partial class ProgressForm : Form
 	{
-		Stopwatch stopWatch = new Stopwatch();
+		Stopwatch stopwatch = new Stopwatch();
 		Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager taskBarProgress = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
 		int progressBufIndex0 = 1;
 		int progressBufIndex1 = 0;
@@ -25,7 +25,7 @@ namespace Visual_Music
 		{
 			InitializeComponent();
 			progressBar1.Maximum = 1000;
-			stopWatch.Start();
+			stopwatch.Start();
 		}
 
 		public void updateProgress(double normProgress)
@@ -41,7 +41,7 @@ namespace Visual_Music
 				Text =  $"{ProgressText}: {percent.ToString()}%";
 
 				ProgressAtTime pat = new ProgressAtTime();
-				pat.time = stopWatch.Elapsed.TotalSeconds;
+				pat.time = stopwatch.Elapsed.TotalSeconds;
 				pat.normProgress = normProgress;
 				progressBuf[progressBufIndex1] = pat;
 
@@ -55,7 +55,7 @@ namespace Visual_Music
 				{
 					TimeSpan timeLeft = TimeSpan.FromSeconds(deltaTime * progressLeft / deltaProgress);
 					estimatedTimeLabel.Text = string.Format("Estimated time remaining: {0:d2}:{1:d2}:{2:d2}", new object[] { timeLeft.Hours, timeLeft.Minutes, timeLeft.Seconds });
-					elapsedTimeLabel.Text = string.Format("Elapsed time: {0:d2}:{1:d2}:{2:d2}", new object[] { stopWatch.Elapsed.Hours, stopWatch.Elapsed.Minutes, stopWatch.Elapsed.Seconds });
+					elapsedTimeLabel.Text = string.Format("Elapsed time: {0:d2}:{1:d2}:{2:d2}", new object[] { stopwatch.Elapsed.Hours, stopwatch.Elapsed.Minutes, stopwatch.Elapsed.Seconds });
 				}
 				else
 				{
@@ -86,7 +86,8 @@ namespace Visual_Music
 			if (Visible)
 			{
 				taskBarProgress.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.Normal);
-				stopWatch.Reset();
+				stopwatch.Reset();
+				stopwatch.Start();
 			}
 			else
 			{
