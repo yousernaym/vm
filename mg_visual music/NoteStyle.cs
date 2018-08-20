@@ -312,7 +312,7 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-			fx.Parameters["BlurredEdge"].SetValue(Project.Camera.ViewportSize.X * 2.0f / 1000);
+			fx.Parameters["BlurredEdge"].SetValue(Project.Camera.ViewportSize.X * 2.0f / TrackProps.ScreenWidth); 
 			songPosP = Project.SongPosP;
 			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Camera.ViewportSize.X, Project.Camera.ViewportSize.Y));
@@ -375,7 +375,7 @@ namespace Visual_Music
 			fx.Parameters["LightDir"].SetValue(normLightDir);
 
 			//Spatial props
-			fx.Parameters["PosOffset"].SetValue((Project.GlobalTrackProps.SpatialProps.PosOffset + trackProps.SpatialProps.PosOffset) * Project.Camera.ViewportSize.X / 1000.0f);
+			fx.Parameters["PosOffset"].SetValue(Project.getSpatialNormPosOffset(trackProps.TrackView.TrackNumber)); ;
 
 			fx.Parameters["CamPos"].SetValue(Project.Camera.Pos);
 		}

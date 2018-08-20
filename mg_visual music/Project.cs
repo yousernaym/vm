@@ -662,6 +662,11 @@ namespace Visual_Music
 			//DefaultFileName = Path.GetFileName(ImportOptions.ImportForm.NoteFilePath) + DefaultFileExt;
 		}
 
+		public Vector3 getSpatialNormPosOffset(int trackNumber)
+		{
+			return GlobalTrackProps.SpatialProps.getNormPosOffset(Camera.ViewportSize) + trackViews[trackNumber].TrackProps.SpatialProps.getNormPosOffset(Camera.ViewportSize);
+		}
+		
 
 	}
 

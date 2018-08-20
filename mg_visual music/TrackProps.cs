@@ -17,6 +17,7 @@ namespace Visual_Music
 	[Serializable()]
 	public class TrackProps : CloneableProps<TrackProps>, ISerializable
 	{
+		public const float ScreenWidth = 1000f;
 		internal TrackView TrackView { get; set; }
 		static int NumTracks { get => TrackView.NumTracks; }
 		int TrackNumber { get => TrackView.TrackNumber; }
@@ -671,10 +672,11 @@ namespace Visual_Music
 				ZOffset = value.Z;
 			}
 		}
+		
 		public float? XOffset { get; set; }
 		public float? YOffset { get; set; }
 		public float? ZOffset { get; set; }
-
+		
 		public SpatialProps()
 		{
 			PosOffset = new Vector3();
@@ -694,6 +696,10 @@ namespace Visual_Music
 			info.AddValue("posOffset", PosOffset);
 		}
 
+		public Vector3 getNormPosOffset(Vector2 viewportSize)
+		{
+			return PosOffset * viewportSize.X * 2.0f / TrackProps.ScreenWidth;
+		}
 	}
 
 	abstract public class CloneableProps<T>
