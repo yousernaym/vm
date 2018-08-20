@@ -312,7 +312,7 @@ namespace Visual_Music
 			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
 			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-			fx.Parameters["BlurredEdge"].SetValue(Project.Camera.ViewportSize.X * 2.0f / TrackProps.ScreenWidth); 
+			fx.Parameters["BlurredEdge"].SetValue(Project.Camera.ViewportSize.X * 2.0f / Project.UserViewWidth); 
 			songPosP = Project.SongPosP;
 			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Camera.ViewportSize.X, Project.Camera.ViewportSize.Y));

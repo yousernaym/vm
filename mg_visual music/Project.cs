@@ -20,6 +20,7 @@ namespace Visual_Music
 	[Serializable()]
 	public class Project : ISerializable
 	{
+		public float UserViewWidth = 1000f;
 		const float NormPitchMargin = 1 / 100.0f;
 		float PitchMargin => NormPitchMargin * Camera.ViewportSize.Y;
 		public float NoteHeight => (Camera.ViewportSize.Y - PitchMargin * 2) / NumPitches;
@@ -187,6 +188,8 @@ namespace Visual_Music
 				}
 				else if (entry.Name == "camera")
 					Camera = (Camera)entry.Value;
+				else if (entry.Name == "userViewWidth")
+					UserViewWidth = (float)entry.Value;
 			}
 			//noteFileType = (Midi.FileType)info.GetValue("noteFileType", typeof(Midi.FileType));
 		}
@@ -204,6 +207,7 @@ namespace Visual_Music
 			info.AddValue("tpartyArgs", ImportNotesWithAudioForm.TpartyArgs);
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
 			info.AddValue("camera", Camera);
+			info.AddValue("userViewWidth", UserViewWidth);
 		}
 
 		public void importSong(ImportOptions options)
@@ -664,7 +668,7 @@ namespace Visual_Music
 
 		public Vector3 getSpatialNormPosOffset(int trackNumber)
 		{
-			return GlobalTrackProps.SpatialProps.getNormPosOffset(Camera.ViewportSize) + trackViews[trackNumber].TrackProps.SpatialProps.getNormPosOffset(Camera.ViewportSize);
+			return (GlobalTrackProps.SpatialProps.PosOffset + trackViews[trackNumber].TrackProps.SpatialProps.PosOffset) * Camera.ViewportSize.X * 2.0f / UserViewWidth;
 		}
 		
 
