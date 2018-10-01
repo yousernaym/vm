@@ -19,7 +19,8 @@ namespace Visual_Music
 		int trackNumber;
 		public int TrackNumber
 		{
-			get { return trackNumber; }
+			get => trackNumber;
+			set => trackNumber = value;
 		}
 
 		static int numTracks;
