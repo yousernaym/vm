@@ -9,6 +9,8 @@
   Maybe also add default behaviour setting.
 - Handle variable CIA speed for sid songs.
 - Let user specify view width in song properties.
+= Increase line sampling when line width increases and maybe when curvature increases.
+- Non-linear line-highlight movement.
 
 Done:
 - Selecting notes with non-zero spatial offset stopped working (fixed).

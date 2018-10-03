@@ -534,13 +534,18 @@ namespace Visual_Music
 			}
 
 			Vector3 noteStartVec = new Vector3(noteStart.X, noteStart.Y, 0);
+			float hlPosX = (bool)MovingHl ?
+				(noteStart.X + nextNoteStart.X) / 2 :
+				noteStart.X;
+			Vector3 hlPos = new Vector3(hlPosX, Project.getScreenPosY(trackProps.TrackView.Curve.Evaluate(Project.SongPosT)), 0f);
+			
 			if (HlType == LineHlType.Arrow)
 			{
 				float arrowLength;
 				Vector3 arrowDir;
 				Vector3 arrowNormal;
 				Vector3 arrowStart;
-				if (!(bool)MovingHl)
+				if (!(bool)MovingHl)  //Non-moving arrow
 				{
 					Vector3 nextNoteStartVec = new Vector3(nextNoteStart.X, nextNoteStart.Y, 0);
 					Vector3 nextNoteOffset = nextNoteStartVec - noteStartVec;
@@ -552,7 +557,7 @@ namespace Visual_Music
 					arrowDir = nextNoteOffset / nextNoteOffsetLength;
 					arrowStart = noteStartVec;
 				}
-				else
+				else //Moving arrow
 				{
 					float x1 = songPosP;
 					float pitch1 = trackProps.TrackView.Curve.Evaluate(Project.SongPosT);
@@ -589,7 +594,7 @@ namespace Visual_Music
 				fx.Parameters["Side2Normal"].SetValue(side2Normal);
 			}
 			else if (HlType == LineHlType.Circle && !(bool)MovingHl)
-			{
+			{ //Non-moving circle
 				setHlCirclePos(noteStartVec);
 			}
 			//For shrinking highlights
@@ -629,7 +634,7 @@ namespace Visual_Music
 			}
 			else if (HlType == LineHlType.Circle)
 			{
-				if ((bool)MovingHl)
+				if ((bool)MovingHl) //Moving circle
 				{
 					float x = songPosP;// songDrawProps.viewportSize.X / 2.0f;
 					Vector3 circlePos = new Vector3(x, Project.getCurveScreenY(x, trackProps.TrackView.Curve), 0);
