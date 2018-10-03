@@ -519,10 +519,10 @@ namespace Visual_Music
 			else
 				nextNote = note;
 
-			Vector2 noteStart = Project.getScreenPos(note.start, note.pitch);
+			Vector3 noteStart = new Vector3(Project.getScreenPos(note.start, note.pitch), 0);
 			float noteEnd = Project.getScreenPos(note.stop, note.pitch).X;
 
-			Vector2 nextNoteStart = Project.getScreenPos(nextNote.start, nextNote.pitch);
+			Vector3 nextNoteStart = new Vector3(Project.getScreenPos(nextNote.start, nextNote.pitch), 0);
 			if (noteEnd > nextNoteStart.X && hlNoteIndex < noteList.Count - 1)
 				noteEnd = nextNoteStart.X;
 			
@@ -533,70 +533,18 @@ namespace Visual_Music
 				nextNoteStart.X = noteEnd;
 			}
 
-			Vector3 noteStartVec = new Vector3(noteStart.X, noteStart.Y, 0);
-			float hlPosX = (bool)MovingHl ?
-				(noteStart.X + nextNoteStart.X) / 2 :
-				noteStart.X;
-			Vector3 hlPos = new Vector3(hlPosX, Project.getScreenPosY(trackProps.TrackView.Curve.Evaluate(Project.SongPosT)), 0f);
-			
-			if (HlType == LineHlType.Arrow)
+			Vector3 hlPos = noteStart;
+			if ((bool)MovingHl)
 			{
-				float arrowLength;
-				Vector3 arrowDir;
-				Vector3 arrowNormal;
-				Vector3 arrowStart;
-				if (!(bool)MovingHl)  //Non-moving arrow
-				{
-					Vector3 nextNoteStartVec = new Vector3(nextNoteStart.X, nextNoteStart.Y, 0);
-					Vector3 nextNoteOffset = nextNoteStartVec - noteStartVec;
-					float nextNoteOffsetLength = nextNoteOffset.Length();
-					arrowLength = nextNoteOffsetLength;
-
-					arrowNormal = new Vector3(-nextNoteOffset.Y, nextNoteOffset.X, 0);
-					arrowNormal /= nextNoteOffsetLength;
-					arrowDir = nextNoteOffset / nextNoteOffsetLength;
-					arrowStart = noteStartVec;
-				}
-				else //Moving arrow
-				{
-					float x1 = songPosP;
-					float pitch1 = trackProps.TrackView.Curve.Evaluate(Project.SongPosT);
-					float y1 = Project.getScreenPosY(pitch1);
-					float x2 = x1 + 0.001f;
-					float pitch2 = trackProps.TrackView.Curve.Evaluate(Project.getTimeT(x2));
-					float y2 = Project.getScreenPosY(pitch2);
-
-					arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
-					arrowDir.Normalize();
-					arrowNormal = new Vector3(-arrowDir.Y, arrowDir.X, 0);
-					arrowNormal.Normalize();
-					arrowLength = VpHlSize * 1.25f;  //Make arrow 25% longer than wide
-					arrowStart = new Vector3(x1, y1, 0);
-				}
-
-				float halfArrowWidth = VpHlSize * 0.5f;
-
-				lineHlVerts[0].pos = arrowStart + arrowNormal * halfArrowWidth;
-				lineHlVerts[1].pos = arrowStart - arrowNormal * halfArrowWidth;
-				lineHlVerts[2].pos = arrowStart + arrowDir * arrowLength;
-
-				fx.Parameters["ArrowDir"].SetValue(arrowDir);
-				//lineFx.Parameters["ArrowLength"].SetValue(nextNoteOffsetLength);
-				fx.Parameters["ArrowStart"].SetValue(arrowStart);
-				fx.Parameters["ArrowEnd"].SetValue(lineHlVerts[2].pos); //Is used to calc distance from the two "sides" of the triangle (not the bottom) since they share this point
-				Vector3 side1Tangent = lineHlVerts[2].pos - lineHlVerts[0].pos;
-				Vector3 side1Normal = new Vector3(-side1Tangent.Y, side1Tangent.X, 0);
-				side1Normal.Normalize();
-				fx.Parameters["Side1Normal"].SetValue(side1Normal);
-				Vector3 side2Tangent = lineHlVerts[2].pos - lineHlVerts[1].pos;
-				Vector3 side2Normal = new Vector3(-side2Tangent.Y, side2Tangent.X, 0);
-				side2Normal.Normalize();
-				fx.Parameters["Side2Normal"].SetValue(side2Normal);
+				float distBetweenNotes = (nextNoteStart.X - noteStart.X);
+				float normPos = (songPosP - noteStart.X) / distBetweenNotes;
+				normPos = (float)Math.Pow(normPos, 2);
+				hlPos.X = noteStart.X + normPos * distBetweenNotes;
+				hlPos.Y = Project.getScreenPosY(trackProps.TrackView.Curve.Evaluate(Project.getTimeT(hlPos.X)));
 			}
-			else if (HlType == LineHlType.Circle && !(bool)MovingHl)
-			{ //Non-moving circle
-				setHlCirclePos(noteStartVec);
-			}
+
+			//Set common fx params---------------------
+			
 			//For shrinking highlights
 			float leftLength = -(noteStart.X - songPosP) - 0.0011f;
 			float shrinkPercent = leftLength / (noteEnd - noteStart.X);
@@ -606,7 +554,6 @@ namespace Visual_Music
 				if ((bool)HlBorder)
 					shrinkPercent = 1;
 			}
-
 			fx.Parameters["ClipPercent"].SetValue(shrinkPercent);
 			float innerHlSize = VpHlSize * 0.5f * (1 - shrinkPercent);
 			fx.Parameters["InnerHlSize"].SetValue(innerHlSize);
@@ -615,10 +562,53 @@ namespace Visual_Music
 			Texture2D hlTexture;
 			getMaterial(trackProps, true, out hlColor, out hlTexture);
 			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
-			
 			fx.Parameters["Border"].SetValue((bool)HlBorder);
+			//-----------------------------------------------
+
 			if (HlType == LineHlType.Arrow)
 			{
+				float arrowLength;
+				Vector3 arrowDir;
+				Vector3 arrowNormal;
+				if (!(bool)MovingHl)  //Non-moving arrow
+				{
+					Vector3 nextNoteOffset = nextNoteStart - noteStart;
+					arrowLength = nextNoteOffset.Length();
+					arrowDir = nextNoteOffset;;
+				}
+				else //Moving arrow
+				{
+					float x1 = hlPos.X;
+					float y1 = hlPos.Y;
+					float x2 = x1 + 0.001f;
+					float pitch2 = trackProps.TrackView.Curve.Evaluate(Project.getTimeT(x2));
+					float y2 = Project.getScreenPosY(pitch2);
+					arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
+					arrowLength = VpHlSize * 1.25f;  //Make arrow 25% longer than wide
+				}
+				arrowDir.Normalize();
+				arrowNormal = new Vector3(-arrowDir.Y, arrowDir.X, 0);
+				arrowNormal.Normalize();
+
+				float halfArrowWidth = VpHlSize * 0.5f;
+
+				lineHlVerts[0].pos = hlPos + arrowNormal * halfArrowWidth;
+				lineHlVerts[1].pos = hlPos - arrowNormal * halfArrowWidth;
+				lineHlVerts[2].pos = hlPos + arrowDir * arrowLength;
+
+				fx.Parameters["ArrowDir"].SetValue(arrowDir);
+				//lineFx.Parameters["ArrowLength"].SetValue(nextNoteOffsetLength);
+				fx.Parameters["ArrowStart"].SetValue(hlPos);
+				fx.Parameters["ArrowEnd"].SetValue(lineHlVerts[2].pos); //Is used to calc distance from the two "sides" of the triangle (not the bottom) since they share this point
+				Vector3 side1Tangent = lineHlVerts[2].pos - lineHlVerts[0].pos;
+				Vector3 side1Normal = new Vector3(-side1Tangent.Y, side1Tangent.X, 0);
+				side1Normal.Normalize();
+				fx.Parameters["Side1Normal"].SetValue(side1Normal);
+				Vector3 side2Tangent = lineHlVerts[2].pos - lineHlVerts[1].pos;
+				Vector3 side2Normal = new Vector3(-side2Tangent.Y, side2Tangent.X, 0);
+				side2Normal.Normalize();
+				fx.Parameters["Side2Normal"].SetValue(side2Normal);
+
 				//Calc shortest dist to incenter from border, ie. the inscribed circle's radius
 				float a = (lineHlVerts[0].pos - lineHlVerts[1].pos).Length();
 				float b = (lineHlVerts[0].pos - lineHlVerts[2].pos).Length();
@@ -627,19 +617,14 @@ namespace Visual_Music
 				float icRadius = (float)Math.Sqrt(k * (k - a) * (k - b) * (k - c)) / k;
 				fx.Parameters["DistToCenter"].SetValue(icRadius);
 
-				songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
 				fx.CurrentTechnique = fx.Techniques["Arrow"];
 				fx.CurrentTechnique.Passes[0].Apply();
 				songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
 			}
 			else if (HlType == LineHlType.Circle)
-			{
-				if ((bool)MovingHl) //Moving circle
-				{
-					float x = songPosP;// songDrawProps.viewportSize.X / 2.0f;
-					Vector3 circlePos = new Vector3(x, Project.getCurveScreenY(x, trackProps.TrackView.Curve), 0);
-					setHlCirclePos(circlePos);
-				}
+			{ 
+				setHlCirclePos(hlPos);
+			
 				songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
 				fx.CurrentTechnique = fx.Techniques["Circle"];
 				fx.CurrentTechnique.Passes[0].Apply();
