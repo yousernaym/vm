@@ -85,16 +85,15 @@ namespace Visual_Music
 			SpriteBatch = new SpriteBatch(GraphicsDevice);
 			BlendState = new BlendState();
 
-			BlendState.AlphaDestinationBlend = Blend.DestinationAlpha;
-			//blendState.AlphaDestinationBlend = Blend.One;
-			BlendState.AlphaSourceBlend = Blend.InverseDestinationAlpha;
-			BlendState.ColorDestinationBlend = Blend.DestinationAlpha;
-			//blendState.ColorDestinationBlend = Blend.One;
-			BlendState.ColorSourceBlend = Blend.InverseDestinationAlpha;
-			BlendState.ColorWriteChannels = ColorWriteChannels.All;
-			BlendState.AlphaBlendFunction = BlendFunction.Add;
-			BlendState.ColorBlendFunction = BlendFunction.Add;
-			
+			//BlendState.AlphaDestinationBlend = Blend.DestinationAlpha;
+			//BlendState.AlphaSourceBlend = Blend.InverseDestinationAlpha;
+			//BlendState.ColorDestinationBlend = Blend.DestinationAlpha;
+			//BlendState.ColorSourceBlend = Blend.InverseDestinationAlpha;
+			//BlendState.ColorWriteChannels = ColorWriteChannels.All;
+			//BlendState.AlphaBlendFunction = BlendFunction.Add;
+			//BlendState.ColorBlendFunction = BlendFunction.Add;
+
+			BlendState = BlendState.AlphaBlend;
 			content = new ContentManager(Services, "Content");
 			NoteStyle.sInitAllStyles(this);
 
@@ -151,7 +150,7 @@ namespace Visual_Music
 				SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
 				SpriteBatch.End();
 			}
-			//GraphicsDevice.BlendState = BlendState;
+			GraphicsDevice.BlendState = BlendState;
 			Project.drawSong(new Point(2, 1), Project.NormSongPos);
 		}
 
