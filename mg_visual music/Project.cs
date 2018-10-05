@@ -638,6 +638,8 @@ namespace Visual_Music
 
 		public float getCurveScreenY(float x, Curve curve)
 		{
+			//float pitch = curve.EvaluateCurvature((float)getTimeT(x));
+			//return pitch / 100;
 			float pitch = curve.Evaluate((float)getTimeT(x));
 			return getScreenPosY(pitch);
 		}

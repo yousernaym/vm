@@ -39,7 +39,7 @@ namespace Visual_Music
 	[Serializable()]
 	public class NoteStyle_Line : NoteStyle
 	{
-		const float EvalStep = 0.001f;
+		const float EvalStep = 0.01f;//0.001f;
 		const int MaxLineVerts = 100000;
 		const int MaxHLineVerts = 30000; 
 		static VertexDeclaration lineVertDecl;
@@ -116,6 +116,7 @@ namespace Visual_Music
 			Vector3[] points = new Vector3[3];
 			Vector3[] tangents = new Vector3[2];
 			step *= 0.1f;
+
 			for (int i = 0; i < points.Length; i++)
 			{
 				points[i] = new Vector3();
@@ -317,20 +318,36 @@ namespace Visual_Music
 				float startDraw = noteStart.X;
 				float endDraw = nextNoteStart.X;
 
-				float stepScale = Math.Max(Project.ViewWidthQn, Project.DefaultViewWidthQn);
-				//stepScale = Math.Min(stepScale, Project.DefaultViewWidthQn * 8);
-				stepScale /= Project.ViewWidthQn;
-				float step = EvalStep * stepScale;
-								
+				Curve curve = trackProps.TrackView.Curve;
+				float startCurvature = Math.Max(curve.EvaluateCurvature(note.start + 1), curve.EvaluateCurvature(note.start - 1));
+				float endCurvature = Math.Max(curve.EvaluateCurvature(nextNote.start - 1), curve.EvaluateCurvature(nextNote.start + 1));
+				float curvature = Math.Max(startCurvature, endCurvature);
+				curvature = (float)Math.Pow(curvature, 1) * 10;
+				
+				float step;
+				if (curvature == 0)
+					step = endDraw; //Only one point for thes note
+				else
+				{
+					float stepScale = Math.Max(Project.ViewWidthQn, Project.DefaultViewWidthQn);
+					//stepScale = Math.Min(stepScale, Project.DefaultViewWidthQn * 8);
+					stepScale /= Project.ViewWidthQn * curvature * (float)LineWidth / 50f;
+					step = EvalStep * stepScale;
+				}
+
 				for (float x = startDraw; x < endDraw; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
+					
 					getCurvePoint(out center, out normal, out vertexOffset, step, x, trackProps, vpLineWidth);
+					//curvature = Math.Max(1, curvature);
+					//normal.X = curvature/10f;
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
 
 					//Create vertices
 					//adjustCurvePoint(center, vertexOffset, -1, trackProps, lineVerts, vertIndex, step, vpLineWidth);
 					//adjustCurvePoint(center, vertexOffset, 1, trackProps, lineVerts, vertIndex + 1, step, vpLineWidth);
+					//center.Y = curvature / 1000;
 					lineVerts[vertIndex].pos = center - vertexOffset;
 					lineVerts[vertIndex + 1].pos = center + vertexOffset;
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
@@ -338,7 +355,7 @@ namespace Visual_Music
 					//lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = normStepFromNoteStart;
 					lineVerts[vertIndex].normPos = new Vector2(normStepFromNoteStart, 0);
 					lineVerts[vertIndex + 1].normPos = new Vector2(normStepFromNoteStart, 1);
-
+					
 					if (texMaterial.TexProps.Texture != null)
 						calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texMaterial.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
 
@@ -365,11 +382,11 @@ namespace Visual_Music
 						//}
 					}
 
-					if (x == startDraw && vertIndex > 3)
-					{
-						lineVerts[vertIndex].pos = lineVerts[vertIndex - 2].pos;
-						lineVerts[vertIndex + 1].pos = lineVerts[vertIndex - 1].pos;
-					}
+					//if (x == startDraw && vertIndex > 3)
+					//{
+					//	lineVerts[vertIndex].pos = lineVerts[vertIndex - 2].pos;
+					//	lineVerts[vertIndex + 1].pos = lineVerts[vertIndex - 1].pos;
+					//}
 
 					//Create bounding box
 					Vector3 bboxCorner1 = lineVerts[vertIndex].pos;
@@ -378,18 +395,19 @@ namespace Visual_Music
 					geo.bboxes.Add(BoundingBox.CreateFromPoints(new Vector3[2] { bboxCorner1, bboxCorner2 }));
 					
 					vertIndex += 2;
+
 					if (vertIndex >= MaxLineVerts - 2 || hLineVertIndex >= MaxHLineVerts - 2)
 					{
 						createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
 						x -= step;
 					}
+					//break;
 				}
 
 				if (!(bool)Continuous)
 					endOfSegment = true; //One draw call per note. Can be used to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
 				if (endOfSegment)
 					createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
-
 				completeNoteListIndex++;
 			}
 			createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
@@ -399,6 +417,7 @@ namespace Visual_Music
 		{
 			Vector3 curPos = center + vertexOffset * side;
 			Vector3 dummyCenter, dummyNormal, newVerteexOffset;
+			float dummyCurvature;
 			getCurvePoint(out dummyCenter, out dummyNormal, out newVerteexOffset, step, curPos.X, trackProps, lineWidth);
 			float newPosX = curPos.X + newVerteexOffset.X * side;
 

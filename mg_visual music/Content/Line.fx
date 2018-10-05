@@ -76,6 +76,7 @@ void PS(out float4 color : COLOR0, in VSOutput IN)
 	IN.rawPos.x -= SongPos;
 	color = modulate(normPos, IN.worldSize, color, lightingNormal, IN.rawPos);
 	color = blurEdges(color, normPos.y);
+	//color.r = IN.normal.x / 5.0f;
 	//color.a = 0;
 }
 
