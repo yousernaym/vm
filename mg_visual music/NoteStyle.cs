@@ -375,7 +375,7 @@ namespace Visual_Music
 			fx.Parameters["LightDir"].SetValue(normLightDir);
 
 			//Spatial props
-			fx.Parameters["PosOffset"].SetValue(Project.getSpatialNormPosOffset(trackProps.TrackView.TrackNumber)); ;
+			fx.Parameters["PosOffset"].SetValue(Project.getSpatialNormPosOffset(trackProps)); ;
 
 			fx.Parameters["CamPos"].SetValue(Project.Camera.Pos);
 		}

@@ -787,10 +787,8 @@ namespace Visual_Music
 					}
 					for (int i = 0; i < selectedItems.Length; i++)
 						newItems[i].Selected = true;    //After removal of old items it's now safe to select new items
-					for (int i = 0; i < Project.TrackViews.Count; i++)
-						Project.TrackViews[i].TrackNumber = i;
-
-
+					//for (int i = 0; i < Project.TrackViews.Count; i++)
+						//Project.TrackViews[i].TrackNumber = i;
 				}
 				else //CTRL pressed
 				{

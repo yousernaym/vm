@@ -194,7 +194,7 @@ namespace Visual_Music
 				for (int i = 1; i < Project.TrackViews.Count; i++)
 				{
 					if (Project.TrackViews[i].MidiTrack.Notes.Count > 0 &&
-						Project.TrackViews[i].ocTree.areObjectsInFrustum(selectionFrustum, songPos, Project, i))
+						Project.TrackViews[i].ocTree.areObjectsInFrustum(selectionFrustum, songPos, Project, Project.TrackViews[i].TrackProps))
 					{
 						((Form1)Parent).trackListItems[i].Selected = true;
 						selectedCount++; ;

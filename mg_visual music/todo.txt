@@ -9,10 +9,10 @@
   Maybe also add default behaviour setting.
 - Handle variable CIA speed for sid songs.
 - Let user specify view width in song properties.
-= Increase line sampling when line width increases and maybe when curvature increases.
-- Non-linear line-highlight movement.
 
 Done:
+= Increase line sampling when curvature increases.
+- Non-linear line-highlight movement.
 - Selecting notes with non-zero spatial offset stopped working (fixed).
 - Elapsed/remaining time stopped working (fixed).
 - Option to choose sub song (use sidplayfp insterad of xmplay)

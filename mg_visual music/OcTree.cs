@@ -125,12 +125,12 @@ namespace Visual_Music
 			}
 		}
 
-		public bool areObjectsInFrustum(BoundingFrustum frustum, float songPos, Project project, int trackNumber)
+		public bool areObjectsInFrustum(BoundingFrustum frustum, float songPos, Project project, TrackProps trackProps)
 		{
 			foreach (var bbox in _geo.bboxes)
 			{
 				BoundingBox bb = bbox;
-				Vector3 posOffset = project.getSpatialNormPosOffset(trackNumber);
+				Vector3 posOffset = project.getSpatialNormPosOffset(trackProps);
 				bb.Min += posOffset;
 				bb.Max += posOffset;
 				bb.Min.X -= songPos;
