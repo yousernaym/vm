@@ -319,11 +319,56 @@ namespace Visual_Music
 				float endDraw = nextNoteStart.X;
 
 				Curve curve = trackProps.TrackView.Curve;
-				float startCurvature = Math.Max(curve.EvaluateCurvature(note.start + 1), curve.EvaluateCurvature(note.start - 1));
-				float endCurvature = Math.Max(curve.EvaluateCurvature(nextNote.start - 1), curve.EvaluateCurvature(nextNote.start + 1));
-				float curvature = Math.Max(startCurvature, endCurvature);
-				curvature = (float)Math.Pow(curvature, 1) * 10;
-				
+				//float startCurvature = Math.Max(curve.EvaluateCurvature(note.start + 1), curve.EvaluateCurvature(note.start - 1));
+				//float endCurvature = Math.Max(curve.EvaluateCurvature(nextNote.start - 1), curve.EvaluateCurvature(nextNote.start + 1));
+				//float curvature = Math.Max(startCurvature, endCurvature);
+
+				//float curvature = trackProps.TrackView.Curve.ComputeMaxCurvature(n);
+				//curvature = (float)Math.Pow(curvature, 1) * 10;
+
+				//float curvature = trackProps.TrackView.Curve.Keys[n].Angle;
+				//CurveKey currentKey = curve.Keys[n];
+				//Vector2 prevVec;
+				//if (n > 0)
+				//{
+				//	CurveKey prevKey = curve.Keys[n - 1];
+				//	prevVec = new Vector2(currentKey.Position - prevKey.Position, currentKey.Value - prevKey.Value);
+				//}
+				//else
+				//{
+				//	prevVec = new Vector2(1, 0);
+				//}
+				//Vector2 nextVec;
+				//if (n <= noteList.Count - 2)
+				//{
+				//	CurveKey nextKey = curve.Keys[n + 1];
+				//	nextVec = new Vector2(nextKey.Position - currentKey.Position, nextKey.Value - currentKey.Value);
+				//}
+				//else
+				//{
+				//	nextVec = new Vector2(1, 0);
+				//}
+				Vector2 prevVec;
+				if (n > 0)
+					prevVec = curve.Keys[n - 1].NextVector;
+				else
+					prevVec = new Vector2(1, 0);
+				prevVec.X = Project.getScreenPosX((int)prevVec.X);
+				prevVec.Y = prevVec.Y * Project.NoteHeight;
+				Vector2 nextVec = curve.Keys[n].NextVector;
+				nextVec.X = Project.getScreenPosX((int)nextVec.X);
+				nextVec.Y = nextVec.Y * Project.NoteHeight;
+				nextVec.Normalize();
+				prevVec.Normalize();
+				float angle = Vector2.Dot(nextVec, prevVec);
+				//Handle rounding errors
+				if (angle > 1)
+					angle = 0;
+				else if (angle < -1)
+					angle = (float)Math.PI;
+				else
+					angle = (float)Math.Acos(angle);
+				float curvature = angle;
 				float step;
 				if (curvature == 0)
 					step = endDraw; //Only one point for thes note
@@ -335,7 +380,7 @@ namespace Visual_Music
 					step = EvalStep * stepScale;
 				}
 
-				for (float x = startDraw; x < endDraw; x += step)
+				for (float x = startDraw; x < endDraw; x += EvalStep / 10)
 				{
 					Vector3 center, normal, vertexOffset;
 					
@@ -347,7 +392,9 @@ namespace Visual_Music
 					//Create vertices
 					//adjustCurvePoint(center, vertexOffset, -1, trackProps, lineVerts, vertIndex, step, vpLineWidth);
 					//adjustCurvePoint(center, vertexOffset, 1, trackProps, lineVerts, vertIndex + 1, step, vpLineWidth);
-					//center.Y = curvature / 1000;
+					
+					//curvature = trackProps.TrackView.Curve.EvaluateCurvature(Project.getTimeT(x));
+					center.Y = curvature / 10;
 					lineVerts[vertIndex].pos = center - vertexOffset;
 					lineVerts[vertIndex + 1].pos = center + vertexOffset;
 					lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;

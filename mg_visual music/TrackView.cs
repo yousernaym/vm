@@ -87,8 +87,11 @@ namespace Visual_Music
 				float value = note.pitch;
 				curve.Keys.Add(new CurveKey(pos, value));
 			}
-			setCurveTangents();
+			curve.ComputeTangents(CurveTangent.Smooth);
+			curve.ComputeNextVectors();
+			//setCurveTangents();
 		}
+
 		public void setCurveTangents()
 		{
 			for (int i = 0; i < curve.Keys.Count; i++)
