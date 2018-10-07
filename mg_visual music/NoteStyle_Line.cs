@@ -553,7 +553,10 @@ namespace Visual_Music
 			fx.CurrentTechnique.Passes[0].Apply();
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
 
+			DepthStencilState oldDss = songPanel.GraphicsDevice.DepthStencilState;
+			songPanel.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 			drawHighLights(midiTrack, trackProps, songPosP);
+			songPanel.GraphicsDevice.DepthStencilState = oldDss;
 		}
 
 		void drawHighLights(Midi.Track midiTrack, TrackProps trackProps, float songPosP)

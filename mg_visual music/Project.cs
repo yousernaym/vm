@@ -11,6 +11,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Visual_Music
 {
@@ -346,8 +347,19 @@ namespace Visual_Music
 			if (notes == null)
 				return;
 
+			DepthStencilState oldDss = songPanel.GraphicsDevice.DepthStencilState;
+			DepthStencilState dss = new DepthStencilState();
+			dss.StencilEnable = true;
+			dss.StencilFunction = CompareFunction.Greater;
+			dss.StencilPass = StencilOperation.Replace;
+			dss.ReferenceStencil = 1;
+			songPanel.GraphicsDevice.DepthStencilState = dss;
 			for (int t = 1; t < trackViews.Count; t++)
+			{
+				songPanel.GraphicsDevice.Clear(ClearOptions.Stencil | ClearOptions.DepthBuffer, Color.AliceBlue, 1, 0);
 				trackViews[t].drawTrack(GlobalTrackProps, SongPanel.ForceDefaultNoteStyle);
+			}
+			songPanel.GraphicsDevice.DepthStencilState = oldDss;
 		}
 
 		public int screenPosToSongPos(float normScreenPos)
