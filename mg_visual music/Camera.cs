@@ -50,7 +50,9 @@ namespace Visual_Music
 		const float rotSpeed = 0.5f;
 		const float moveSpeed = 0.5f;
 
-		Matrix NonCubeRotMat => Matrix.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
+		Quaternion CamOrientation { get; set; } = Quaternion.Identity;
+		Matrix NonCubeRotMat => Matrix.CreateFromQuaternion(CamOrientation);
+
 		Matrix RotMat
 		{
 			get
@@ -167,7 +169,12 @@ namespace Visual_Music
 				else if (entry.Name == "pos")
 					pos = (Vector3)entry.Value;
 				else if (entry.Name == "angles")
+				{
 					angles = (Vector3)entry.Value;
+					CamOrientation = Quaternion.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
+				}
+				else if (entry.Name == "camOrientation")
+					CamOrientation = (Quaternion)entry.Value;
 				else if (entry.Name == "viewportSize")
 					ViewportSize = (Vector2)entry.Value;
 			}
@@ -176,20 +183,16 @@ namespace Visual_Music
 		{
 			info.AddValue("fov", Fov);
 			info.AddValue("pos", pos);
-			info.AddValue("angles", angles);
+			//info.AddValue("angles", angles);
+			info.AddValue("camOrientation", CamOrientation);
 			info.AddValue("viewportSize", ViewportSize);
 		}
 
 		public void update(float deltaTime)
 		{
 			Pos += Vector3.Transform(moveVel, RotMat) * deltaTime;
-			Vector3 oldAngles = Angles;
-			Angles += rotVel * deltaTime;
-			float Pi2 = (float)Math.PI * 2;
-			if (oldAngles.Y < Pi2 && angles.Y >= Pi2)
-				angles.Y -= Pi2;
-			else if (oldAngles.Y > 0 && angles.Y <= 0)
-				angles.Y += Pi2;
+			Vector3 scaledRotVel = rotVel * deltaTime;
+			CamOrientation = CamOrientation * Quaternion.CreateFromYawPitchRoll(scaledRotVel.Y, scaledRotVel.X, scaledRotVel.Z);
 		}
 
 		public bool control(Keys key, bool isKeyDown)
