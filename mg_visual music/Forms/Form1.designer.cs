@@ -163,6 +163,8 @@
 			this.openTextureDlg = new System.Windows.Forms.OpenFileDialog();
 			this.trackPropsCb = new System.Windows.Forms.CheckBox();
 			this.songPropsPanel = new System.Windows.Forms.Panel();
+			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.camTb = new System.Windows.Forms.TextBox();
 			this.resetCamBtn = new System.Windows.Forms.Button();
 			this.defaultPitchesBtn = new System.Windows.Forms.Button();
 			this.minPitchUd = new System.Windows.Forms.NumericUpDown();
@@ -213,6 +215,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).BeginInit();
 			this.songPropsPanel.SuspendLayout();
+			this.groupBox3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).BeginInit();
 			this.propsTogglePanel.SuspendLayout();
@@ -352,7 +355,7 @@
             this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1670, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1891, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -495,7 +498,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(1275, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(1496, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 10052);
 			this.trackPropsPanel.TabIndex = 3;
@@ -1785,7 +1788,7 @@
 			// 
 			// songPropsPanel
 			// 
-			this.songPropsPanel.Controls.Add(this.resetCamBtn);
+			this.songPropsPanel.Controls.Add(this.groupBox3);
 			this.songPropsPanel.Controls.Add(this.defaultPitchesBtn);
 			this.songPropsPanel.Controls.Add(this.minPitchUd);
 			this.songPropsPanel.Controls.Add(this.maxPitchUd);
@@ -1804,9 +1807,29 @@
 			this.songPropsPanel.Visible = false;
 			this.songPropsPanel.VisibleChanged += new System.EventHandler(this.songPropsPanel_VisibleChanged);
 			// 
+			// groupBox3
+			// 
+			this.groupBox3.Controls.Add(this.camTb);
+			this.groupBox3.Controls.Add(this.resetCamBtn);
+			this.groupBox3.Location = new System.Drawing.Point(3, 201);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Size = new System.Drawing.Size(189, 144);
+			this.groupBox3.TabIndex = 6;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "Camera";
+			// 
+			// camTb
+			// 
+			this.camTb.Location = new System.Drawing.Point(9, 19);
+			this.camTb.Multiline = true;
+			this.camTb.Name = "camTb";
+			this.camTb.Size = new System.Drawing.Size(121, 81);
+			this.camTb.TabIndex = 6;
+			this.camTb.TextChanged += new System.EventHandler(this.camTb_TextChanged);
+			// 
 			// resetCamBtn
 			// 
-			this.resetCamBtn.Location = new System.Drawing.Point(12, 201);
+			this.resetCamBtn.Location = new System.Drawing.Point(9, 106);
 			this.resetCamBtn.Name = "resetCamBtn";
 			this.resetCamBtn.Size = new System.Drawing.Size(111, 23);
 			this.resetCamBtn.TabIndex = 5;
@@ -1949,7 +1972,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1687, 407);
+			this.ClientSize = new System.Drawing.Size(1908, 407);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);
@@ -2018,6 +2041,8 @@
 			((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).EndInit();
 			this.songPropsPanel.ResumeLayout(false);
 			this.songPropsPanel.PerformLayout();
+			this.groupBox3.ResumeLayout(false);
+			this.groupBox3.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).EndInit();
 			this.propsTogglePanel.ResumeLayout(false);
@@ -2178,6 +2203,8 @@
 		private System.Windows.Forms.ToolStripMenuItem viewSongTSMI;
 		private System.Windows.Forms.ToolStripMenuItem viewModBrowserTSMI;
 		private System.Windows.Forms.ToolStripMenuItem viewSidBrowserTSMI;
+		private System.Windows.Forms.GroupBox groupBox3;
+		private System.Windows.Forms.TextBox camTb;
 	}
 }
 

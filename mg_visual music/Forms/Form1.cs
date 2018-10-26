@@ -18,7 +18,7 @@ using CefSharp.Example.RequestEventHandler;
 namespace Visual_Music
 {
 	using GdiPoint = System.Drawing.Point;
-	//using XnaPoint = Microsoft.Xna.Framework.Point;
+	using GdiColor = System.Drawing.Color;
 
 	public partial class Form1 : Form
 	{
@@ -283,11 +283,25 @@ namespace Visual_Music
 			audioOffsetS.Value = (decimal)Project.AudioOffset;
 			maxPitchUd.Value = Project.MaxPitch;
 			minPitchUd.Value = Project.MinPitch;
+			updateCamControls();
 
 			songScrollBar.Maximum = Project.SongLengthT;
 			songScrollBar.Value = Project.SongPosT;
 			upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(songPanel);
+		}
+
+		private void updateCamControls()
+		{
+			updatingControls = true;
+
+			camTb.Lines = new string[2];
+			Vector3 pos = project.Camera.Pos;
+			Quaternion orient = project.Camera.Orientation;
+			camTb.Text = $"{pos.X} {pos.Y} {pos.Z}\r\n{orient.X} {orient.Y} {orient.Z} {orient.W}";
+
+			updatingControls = false;
+
 		}
 
 		//Called only when iomporting note and audio files.
@@ -1612,6 +1626,54 @@ namespace Visual_Music
 			if (!songPropsPanel.Visible)
 				SongPanel.Focus();
 		}
+
+		private void camTb_TextChanged(object sender, EventArgs e)
+		{
+			camTb.ForeColor = GdiColor.Black;
+			if (updatingControls)
+				return;
+			string row = "pos";
+			foreach (string line in camTb.Lines)
+			{
+				string[] entries = line.Split(" ".ToCharArray(), System.StringSplitOptions.RemoveEmptyEntries);
+				if (entries.Length > 0)
+				{
+					try
+					{
+						if (row == "pos")
+						{
+							if (entries.Length >= 3)
+							{
+								Vector3 pos = new Vector3();
+								pos.X = float.Parse(entries[0]);
+								pos.Y = float.Parse(entries[1]);
+								pos.Z = float.Parse(entries[2]);
+								project.Camera.Pos = pos;
+							}
+							row = "orient";
+						}
+						else
+						{
+							if (entries.Length >= 4)
+							{
+								Quaternion orient = new Quaternion();
+								orient.X = float.Parse(entries[0]);
+								orient.Y = float.Parse(entries[1]);
+								orient.Z = float.Parse(entries[2]);
+								orient.W = float.Parse(entries[3]);
+								project.Camera.Orientation = orient;
+							}
+						}
+					}
+
+					catch (FormatException)
+					{
+						camTb.ForeColor = GdiColor.Red;
+					}
+				}
+			}
+		}
+		
 	}
 
 	

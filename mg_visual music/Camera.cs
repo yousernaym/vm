@@ -42,8 +42,20 @@ namespace Visual_Music
 		const float rotSpeed = 0.5f;
 		const float moveSpeed = 0.5f;
 
-		Quaternion CamOrientation { get; set; } = Quaternion.Identity;
-		Matrix NonCubeRotMat => Matrix.CreateFromQuaternion(CamOrientation);
+		Quaternion orientation = Quaternion.Identity;
+		public Quaternion Orientation
+		{
+			get => orientation;
+			set
+			{
+				if (!orientation.Equals(value))
+				{
+					SongPanel.Invalidate();
+					orientation = value;
+				}
+			}
+		}
+		Matrix NonCubeRotMat => Matrix.CreateFromQuaternion(Orientation);
 
 		Matrix RotMat
 		{
@@ -165,10 +177,10 @@ namespace Visual_Music
 				else if (entry.Name == "angles")
 				{
 					Vector3 angles = (Vector3)entry.Value;
-					CamOrientation = Quaternion.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
+					orientation = Quaternion.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
 				}
 				else if (entry.Name == "camOrientation")
-					CamOrientation = (Quaternion)entry.Value;
+					orientation = (Quaternion)entry.Value;
 				else if (entry.Name == "viewportSize")
 					ViewportSize = (Vector2)entry.Value;
 			}
@@ -177,7 +189,7 @@ namespace Visual_Music
 		{
 			info.AddValue("fov", Fov);
 			info.AddValue("pos", pos);
-			info.AddValue("camOrientation", CamOrientation);
+			info.AddValue("camOrientation", orientation);
 			info.AddValue("viewportSize", ViewportSize);
 		}
 
@@ -193,9 +205,7 @@ namespace Visual_Music
 			}
 			Pos += Vector3.Transform(moveVel, RotMat) * (float)deltaTime;
 			Vector3 scaledRotVel = (rotVel + mouseRotVel) * (float)deltaTime;
-			if (scaledRotVel != Vector3.Zero)
-				SongPanel.Invalidate();
-			CamOrientation = CamOrientation * Quaternion.CreateFromYawPitchRoll(scaledRotVel.Y, scaledRotVel.X, scaledRotVel.Z);
+			Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(scaledRotVel.Y, scaledRotVel.X, scaledRotVel.Z);
 		}
 
 		public bool control(WinKeys key, bool isKeyDown)
@@ -275,7 +285,7 @@ namespace Visual_Music
 
 		internal void ApplyMouseRot(float x, float y)
 		{
-			CamOrientation = CamOrientation * Quaternion.CreateFromYawPitchRoll(-x, -y, 0);
+			Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(-x, -y, 0);
 		}
 
 		//public void reset()
