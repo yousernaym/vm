@@ -536,6 +536,7 @@ namespace Visual_Music
 
 		public void update(double deltaTimeS)
 		{
+			Camera.update(deltaTimeS);
 			//Scroll song depending on user input or playback position.
 			if (IsPlaying)
 			{
@@ -564,7 +565,6 @@ namespace Visual_Music
 					togglePlayback();
 			}
 			//else
-			SongPanel.scrollSong();
 
 			if (NormSongPos < 0)
 				NormSongPos = 0;

@@ -56,8 +56,8 @@ namespace Visual_Music
 		public TimeSpan TotalTimeElapsed => stopwatch.Elapsed;
 		double deltaTimeS;
 		//double renderInterval = 0.0001;
-		bool leftMbPressed = false;
-		public bool rightMbPressed = false;
+		public bool LeftMbPressed { get; private set; } = false;
+		public bool RightMbPressed { get; private set; } = false;
 		double scrollCenter = 0;
 		bool selectingRegion = false;
 		public bool SelectingRegion => selectingRegion;
@@ -76,6 +76,7 @@ namespace Visual_Music
 		public SpriteBatch SpriteBatch { get; private set; }
 
 		public BlendState BlendState { get; private set; }
+
 		Point videoSize = new Point(1920, 1080);
 		public readonly float SmallScrollStep = 1.0f / 16;
 		public readonly float LargeScrollStep = 1.0f;
@@ -127,11 +128,11 @@ namespace Visual_Music
 			//if (deltaTimeS < renderInterval)
 			//return;
 
-			Project.Camera.update(leftMbPressed, rightMbPressed, (float)deltaTimeS);
 			oldTime = newTime;
 			selectRegion();
 			Project.update(deltaTimeS);
-
+			scrollSong();
+			
 			if (Control.IsKeyLocked(WinKeys.CapsLock))
 			{
 				const int KEYEVENTF_EXTENDEDKEY = 0x1;
@@ -173,7 +174,7 @@ namespace Visual_Music
 			if (Parent == null || ((Form1)Parent).trackListItems.Count == 0)
 				return;
 			
-			if (leftMbPressed)
+			if (LeftMbPressed)
 			{
 				Invalidate();
 				selectingRegion = true;
@@ -641,7 +642,7 @@ namespace Visual_Music
 			
 			if (e.Button == MouseButtons.Left)
 			{
-				leftMbPressed = true;
+				LeftMbPressed = true;
 				if (ModifierKeys.HasFlag(WinKeys.Shift))
 					mergeRegionSelection = true;
 				selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width);
@@ -649,7 +650,7 @@ namespace Visual_Music
 			}
 			if (e.Button == MouseButtons.Right)
 			{
-				rightMbPressed = true;
+				RightMbPressed = true;
 				mousePosScrollSong = true;
 				if (Project.IsPlaying)
 				{
@@ -664,12 +665,12 @@ namespace Visual_Music
 			base.OnMouseUp(e);
 			if (e.Button == MouseButtons.Left)
 			{
-				leftMbPressed = false;
+				LeftMbPressed = false;
 				mergeRegionSelection = false;
 			}
 			if (e.Button == MouseButtons.Right)
 			{
-				rightMbPressed = false;
+				RightMbPressed = false;
 				mousePosScrollSong = false;
 				if (isPausingWhileScrolling && !Project.IsPlaying)
 				{

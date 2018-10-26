@@ -181,18 +181,18 @@ namespace Visual_Music
 			info.AddValue("viewportSize", ViewportSize);
 		}
 
-		public void update(bool leftMb, bool rightMb, float deltaTime)
+		public void update(double deltaTime)
 		{
 			Vector3 mouseRotVel = new Vector3();
 			if (MouseRot)
 			{
-				if (leftMb)
+				if (SongPanel.LeftMbPressed)
 					mouseRotVel.Z = rotSpeed;
-				if (rightMb)
+				if (SongPanel.RightMbPressed)
 					mouseRotVel.Z = -rotSpeed;
 			}
-			Pos += Vector3.Transform(moveVel, RotMat) * deltaTime;
-			Vector3 scaledRotVel = (rotVel + mouseRotVel) * deltaTime;
+			Pos += Vector3.Transform(moveVel, RotMat) * (float)deltaTime;
+			Vector3 scaledRotVel = (rotVel + mouseRotVel) * (float)deltaTime;
 			if (scaledRotVel != Vector3.Zero)
 				SongPanel.Invalidate();
 			CamOrientation = CamOrientation * Quaternion.CreateFromYawPitchRoll(scaledRotVel.Y, scaledRotVel.X, scaledRotVel.Z);
