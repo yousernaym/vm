@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using System.Windows.Forms;
 using System.Runtime.Serialization;
+//using Microsoft.Xna.Framework.Input;
+
+using WinKeys = System.Windows.Forms.Keys;
+using GdiPoint = System.Drawing.Point;
 
 namespace Visual_Music
 {
@@ -32,18 +36,6 @@ namespace Visual_Music
 		}
 		public Vector3 ViewportPos => getViewportPos(pos);
 
-		Vector3 angles = new Vector3();
-		public Vector3 Angles { get => angles;
-			set
-			{
-				if (!angles.Equals(value))
-				{
-					SongPanel.Invalidate();
-					angles = value;
-				}
-			}
-		}
-		
 		Vector3 moveVel = new Vector3();
 		Vector3 rotVel = new Vector3();
 		
@@ -150,6 +142,8 @@ namespace Visual_Music
 		public Matrix VpMat => ViewMat * ProjMat;
 		public SongPanel SongPanel { get; set; }
 
+		public bool MouseRot { get; set; } = false;
+
 		//Methods/////////////////////////////////
 		public Camera(SongPanel spanel = null)
 		{
@@ -170,7 +164,7 @@ namespace Visual_Music
 					pos = (Vector3)entry.Value;
 				else if (entry.Name == "angles")
 				{
-					angles = (Vector3)entry.Value;
+					Vector3 angles = (Vector3)entry.Value;
 					CamOrientation = Quaternion.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
 				}
 				else if (entry.Name == "camOrientation")
@@ -183,79 +177,105 @@ namespace Visual_Music
 		{
 			info.AddValue("fov", Fov);
 			info.AddValue("pos", pos);
-			//info.AddValue("angles", angles);
 			info.AddValue("camOrientation", CamOrientation);
 			info.AddValue("viewportSize", ViewportSize);
 		}
 
-		public void update(float deltaTime)
+		public void update(bool leftMb, bool rightMb, float deltaTime)
 		{
+			Vector3 mouseRotVel = new Vector3();
+			if (MouseRot)
+			{
+				if (leftMb)
+					mouseRotVel.Z = rotSpeed;
+				if (rightMb)
+					mouseRotVel.Z = -rotSpeed;
+			}
 			Pos += Vector3.Transform(moveVel, RotMat) * deltaTime;
-			Vector3 scaledRotVel = rotVel * deltaTime;
+			Vector3 scaledRotVel = (rotVel + mouseRotVel) * deltaTime;
+			if (scaledRotVel != Vector3.Zero)
+				SongPanel.Invalidate();
 			CamOrientation = CamOrientation * Quaternion.CreateFromYawPitchRoll(scaledRotVel.Y, scaledRotVel.X, scaledRotVel.Z);
 		}
 
-		public bool control(Keys key, bool isKeyDown)
+		public bool control(WinKeys key, bool isKeyDown)
 		{
 			float startOrStop = isKeyDown ? 1 : 0;
 			bool keyMatch = false;
-			if (key == Keys.Q)
+			if (key == WinKeys.Q)
 			{
 				rotVel.Y = rotSpeed * startOrStop;
 				keyMatch = true;
 			}
-			if (key == Keys.E)
+			if (key == WinKeys.E)
 			{
 				rotVel.Y = -rotSpeed * startOrStop;
 				keyMatch = true;
 			}
-			if (key == Keys.W)
+			if (key == WinKeys.W)
 			{
 				moveVel = Vector3.Forward * moveSpeed * startOrStop;
 				keyMatch = true;
 			}
-			if (key == Keys.S)
+			if (key == WinKeys.S)
 			{
 				moveVel = -Vector3.Forward * moveSpeed * startOrStop;
 				keyMatch = true;
 			}
-			if (key == Keys.A)
+			if (key == WinKeys.A)
 			{
 				moveVel = Vector3.Left * moveSpeed * startOrStop;
 				keyMatch = true;
 			}
-			if (key == Keys.D)
+			if (key == WinKeys.D)
 			{
 				moveVel = -Vector3.Left * moveSpeed * startOrStop;
 				keyMatch = true;
 			}
-			if (key == Keys.R)
+			if (key == WinKeys.R)
 			{
 				moveVel = Vector3.Up * moveSpeed * startOrStop;
 				keyMatch = true;
 			}
-			if (key == Keys.F)
+			if (key == WinKeys.F)
 			{
 				moveVel = -Vector3.Up * moveSpeed * startOrStop;
 				keyMatch = true;
 			}
 
-			if (key == Keys.X)
+			if (key == WinKeys.X)
 			{
 				rotVel.Z = rotSpeed * startOrStop;
 				keyMatch = true;
 			}
-			if (key == Keys.C)
+			if (key == WinKeys.C)
 			{
 				rotVel.Z = -rotSpeed * startOrStop;
 				keyMatch = true;
 			}
+
+			/*if (key == WinKeys.ShiftKey)
+				shiftPressed = isKeyDown;
+			if (key == WinKeys.ControlKey)
+				ctrlPressed = isKeyDown;*/
+			if (key == WinKeys.CapsLock && isKeyDown)
+			{
+				MouseRot = !MouseRot;
+				SongPanel.NormMouseX = SongPanel.NormMouseY = 0;
+				Cursor.Position = SongPanel.PointToScreen(new GdiPoint(SongPanel.ClientRectangle.Width / 2, SongPanel.ClientRectangle.Height / 2));
+			}
+
 			return keyMatch;
 		}
 
 		public Vector3 getViewportPos(Vector3 _pos)
 		{
 			return _pos * ViewportSize.X;
+		}
+
+		internal void ApplyMouseRot(float x, float y)
+		{
+			CamOrientation = CamOrientation * Quaternion.CreateFromYawPitchRoll(-x, -y, 0);
 		}
 
 		//public void reset()

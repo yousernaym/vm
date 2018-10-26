@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 //using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Input;
+//using Microsoft.Xna.Framework.Input;
 using WinFormsGraphicsDevice;
 using System;
 using System.Windows.Forms;
@@ -12,6 +12,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
+
 
 #endregion
 
@@ -23,6 +25,9 @@ namespace Visual_Music
 	
 	public class SongPanel : GraphicsDeviceControl
 	{
+		[DllImport("user32.dll")]
+		static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
 		//Jdlc.Timers.TimerQueueTimer timer = new Jdlc.Timers.TimerQueueTimer();
 		System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
 		public delegate void Delegate_songPosChanged();
@@ -52,7 +57,7 @@ namespace Visual_Music
 		double deltaTimeS;
 		//double renderInterval = 0.0001;
 		bool leftMbPressed = false;
-		//public bool RightMbPressed { get; set; }
+		public bool rightMbPressed = false;
 		double scrollCenter = 0;
 		bool selectingRegion = false;
 		public bool SelectingRegion => selectingRegion;
@@ -122,12 +127,21 @@ namespace Visual_Music
 			//if (deltaTimeS < renderInterval)
 			//return;
 
-			Project.Camera.update((float)deltaTimeS);
+			Project.Camera.update(leftMbPressed, rightMbPressed, (float)deltaTimeS);
 			oldTime = newTime;
 			selectRegion();
 			Project.update(deltaTimeS);
 
+			if (Control.IsKeyLocked(WinKeys.CapsLock))
+			{
+				const int KEYEVENTF_EXTENDEDKEY = 0x1;
+				const int KEYEVENTF_KEYUP = 0x2;
+				keybd_event(0x14, 0x45, KEYEVENTF_EXTENDEDKEY, (UIntPtr)0);
+				keybd_event(0x14, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, (UIntPtr)0);
+			}
+
 			timer.Start();
+
 		}
 
 		protected override void Dispose(bool disposing)
@@ -635,6 +649,7 @@ namespace Visual_Music
 			}
 			if (e.Button == MouseButtons.Right)
 			{
+				rightMbPressed = true;
 				mousePosScrollSong = true;
 				if (Project.IsPlaying)
 				{
@@ -654,6 +669,7 @@ namespace Visual_Music
 			}
 			if (e.Button == MouseButtons.Right)
 			{
+				rightMbPressed = false;
 				mousePosScrollSong = false;
 				if (isPausingWhileScrolling && !Project.IsPlaying)
 				{
@@ -674,6 +690,8 @@ namespace Visual_Music
 			}
 
 			//-----------------------------------
+
+			//Project.Camera.toggleMouseControl(e.KeyCode, true))
 
 			if (ModifierKeys != 0)
 				return;
