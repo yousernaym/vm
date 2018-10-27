@@ -14,7 +14,6 @@ using System.Threading;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-
 #endregion
 
 namespace Visual_Music
@@ -22,9 +21,12 @@ namespace Visual_Music
 	//using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
 	using WinKeys = System.Windows.Forms.Keys;
 	using RectangleF = System.Drawing.RectangleF;
-	
+	using GdiPoint = System.Drawing.Point;
+
 	public class SongPanel : GraphicsDeviceControl
 	{
+		GdiPoint previousMousePos = MousePosition;
+
 		[DllImport("user32.dll")]
 		static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
 
@@ -647,6 +649,7 @@ namespace Visual_Music
 					mergeRegionSelection = true;
 				selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * ClientRectangle.Width);
 				selectedScreenRegion.Y = (int)(NormMouseY * ClientRectangle.Height);
+				
 			}
 			if (e.Button == MouseButtons.Right)
 			{
@@ -677,6 +680,29 @@ namespace Visual_Music
 					Project.togglePlayback();
 					isPausingWhileScrolling = false;
 				}
+			}
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			base.OnMouseMove(e);
+			GdiPoint curPos = MousePosition;
+			if (previousMousePos == MousePosition)
+				return;
+			previousMousePos = curPos;
+			GdiPoint clientP = e.Location;
+			int middleX = ClientRectangle.Width / 2;
+			int middleY = ClientRectangle.Height / 2;
+
+			NormMouseX = (float)(clientP.X - middleX) * 2 / ClientRectangle.Width;
+			NormMouseY = (float)(clientP.Y) / ClientRectangle.Height;
+			if (Project.Camera.MouseRot)
+			{
+				Invalidate();
+				NormMouseY = (float)(clientP.Y - middleY) * 2 / ClientRectangle.Width;
+				Cursor.Position = PointToScreen(new GdiPoint(middleX, middleY));
+				Project.Camera.ApplyMouseRot(NormMouseX, NormMouseY);
+
 			}
 		}
 

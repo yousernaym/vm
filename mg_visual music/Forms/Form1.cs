@@ -72,7 +72,6 @@ namespace Visual_Music
 		public static Settings Settings { get => settings; }
 		ScrollBar songScrollBar = new HScrollBar();
 		NoteStyleControl currentNoteStyleControl;
-		private GdiPoint previousMousePos = MousePosition;
 
 		public Form1(string[] args)
 		{
@@ -375,29 +374,6 @@ namespace Visual_Music
 
 				if (wasPlaying)
 					Project.togglePlayback();
-			}
-		}
-
-		private void songPanel_MouseMove(object sender, MouseEventArgs e)
-		{
-			//GdiPoint clientP = songPanel.PointToClient(e.Location);
-			GdiPoint curPos = MousePosition;
-			if (previousMousePos == MousePosition)
-				return;
-			previousMousePos = curPos;
-			GdiPoint clientP = e.Location;
-			int middleX = songPanel.ClientRectangle.Width / 2;
-			int middleY = songPanel.ClientRectangle.Height / 2;
-
-			songPanel.NormMouseX = (float)(clientP.X - middleX) * 2 / songPanel.ClientRectangle.Width;
-			songPanel.NormMouseY = (float)(clientP.Y) / songPanel.ClientRectangle.Height;
-			if (project.Camera.MouseRot)
-			{
-				songPanel.Invalidate();
-				songPanel.NormMouseY = (float)(clientP.Y - middleY) * 2 / songPanel.ClientRectangle.Width;
-				Cursor.Position = songPanel.PointToScreen(new GdiPoint(middleX, middleY));
-				project.Camera.ApplyMouseRot(songPanel.NormMouseX, songPanel.NormMouseY);
-
 			}
 		}
 
@@ -1102,7 +1078,7 @@ namespace Visual_Music
 			Controls.Add(songPanel);
 			songPanel.BringToFront();
 			songPanel.MouseWheel += new MouseEventHandler(songPanel_MouseWheel);
-			songPanel.MouseMove += new MouseEventHandler(songPanel_MouseMove);
+			//songPanel.MouseMove += new MouseEventHandler(songPanel_MouseMove);
 			songPanel.KeyDown += new KeyEventHandler(songPanel_KeyDown);
 			SongPanel.OnSongPosChanged = delegate ()
 			{
