@@ -299,7 +299,7 @@ namespace Visual_Music
 			updatingControls = true;
 			Vector3 pos = project.Camera.Pos;
 			Quaternion orient = project.Camera.Orientation;
-			camTb.Text = $"{pos.X} {pos.Y} {pos.Z}\r\n{orient.X} {orient.Y} {orient.Z} {orient.W}";
+			camTb.Text = $"{pos.X}\r\n{pos.Y}\r\n{pos.Z}\r\n\r\n{orient.X}\r\n{orient.Y}\r\n{orient.Z}\r\n{orient.W}";
 			updatingControls = false;
 
 		}
@@ -1633,49 +1633,54 @@ namespace Visual_Music
 			camTb.ForeColor = GdiColor.Black;
 			if (updatingControls)
 				return;
-			string row = "pos";
+			int elementIndex = 0;
+			Vector3 pos = new Vector3();
+			Quaternion orient = new Quaternion();
+			
 			foreach (string line in camTb.Lines)
 			{
-				string[] entries = line.Split(" ".ToCharArray(), System.StringSplitOptions.RemoveEmptyEntries);
-				if (entries.Length > 0)
+				if (string.IsNullOrWhiteSpace(line))
+					continue;
+				float element;
+				try
 				{
-					try
-					{
-						if (row == "pos")
-						{
-							if (entries.Length >= 3)
-							{
-								Vector3 pos = new Vector3();
-								pos.X = float.Parse(entries[0]);
-								pos.Y = float.Parse(entries[1]);
-								pos.Z = float.Parse(entries[2]);
-								project.Camera.Pos = pos;
-							}
-							row = "orient";
-						}
-						else
-						{
-							if (entries.Length >= 4)
-							{
-								Quaternion orient = new Quaternion();
-								orient.X = float.Parse(entries[0]);
-								orient.Y = float.Parse(entries[1]);
-								orient.Z = float.Parse(entries[2]);
-								orient.W = float.Parse(entries[3]);
-								project.Camera.Orientation = orient;
-							}
-						}
-					}
-
-					catch (FormatException)
-					{
-						camTb.ForeColor = GdiColor.Red;
-					}
+					element = float.Parse(line);
 				}
+				catch (FormatException)
+				{
+					camTb.ForeColor = GdiColor.Red;
+					return;
+				}
+
+				switch (elementIndex)
+				{
+					case 0:
+						pos.X = element;
+						break;
+					case 1:
+						pos.Y = element;
+						break;
+					case 2:
+						pos.Z = element;
+						project.Camera.Pos = pos;
+						break;
+					case 3:
+						orient.X = element;
+						break;
+					case 4:
+						orient.Y = element;
+						break;
+					case 5:
+						orient.Z = element;
+						break;
+					case 6:
+						orient.W = element;
+						project.Camera.Orientation = orient;
+						break;
+				}
+				elementIndex++;
 			}
 		}
 		
 	}
-
-	
 }
