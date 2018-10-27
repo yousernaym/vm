@@ -10,6 +10,8 @@ using System.Runtime.Serialization;
 
 using WinKeys = System.Windows.Forms.Keys;
 using GdiPoint = System.Drawing.Point;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Visual_Music
 {
@@ -24,24 +26,20 @@ namespace Visual_Music
 		public int CubeMapFace { get; set; } = -1; //-1 = normal rendering
 		public float Fov { get; set; } = (float)Math.PI / 4.0f;
 		Vector3 pos = new Vector3();
-		public Vector3 Pos { get => pos;
+		public Vector3 Pos
+		{
+			get => pos;
 			set
 			{
 				if (!pos.Equals(value))
 				{
-					SongPanel.Invalidate();
+					if (SongPanel != null)
+						SongPanel.Invalidate();
 					pos = value;
+					SpatialChanged?.Invoke();
 				}
 			}
 		}
-		public Vector3 ViewportPos => getViewportPos(pos);
-
-		Vector3 moveVel = new Vector3();
-		Vector3 rotVel = new Vector3();
-		
-		const float rotSpeed = 0.5f;
-		const float moveSpeed = 0.5f;
-
 		Quaternion orientation = Quaternion.Identity;
 		public Quaternion Orientation
 		{
@@ -50,13 +48,35 @@ namespace Visual_Music
 			{
 				if (!orientation.Equals(value))
 				{
-					SongPanel.Invalidate();
+					if(SongPanel != null)
+						SongPanel.Invalidate();
 					orientation = value;
+					SpatialChanged?.Invoke();
 				}
 			}
 		}
 		Matrix NonCubeRotMat => Matrix.CreateFromQuaternion(Orientation);
 
+		public Action spatialChanged;
+		public Action SpatialChanged
+		{
+			get => spatialChanged;
+			set
+			{
+				value();
+				spatialChanged = value;
+			}
+		}
+
+		public Vector3 ViewportPos => getViewportPos(pos);
+
+		Vector3 moveVel = new Vector3();
+		Vector3 rotVel = new Vector3();
+		
+		const float rotSpeed = 0.5f;
+		const float moveSpeed = 0.5f;
+
+		
 		Matrix RotMat
 		{
 			get
@@ -161,7 +181,9 @@ namespace Visual_Music
 		{
 			SongPanel = spanel;
 			XYRatio = 16.0f / 9;
-			pos.Z = Math.Abs(ProjMat.M11) / 2;
+			Vector3 newPos = pos;
+			newPos.Z = Math.Abs(ProjMat.M11) / 2;
+			Pos = newPos;
 			if (SongPanel != null)
 				SongPanel.Invalidate();
 		}
@@ -173,14 +195,14 @@ namespace Visual_Music
 				if (entry.Name == "fov")
 					Fov = (float)entry.Value;
 				else if (entry.Name == "pos")
-					pos = (Vector3)entry.Value;
+					Pos = (Vector3)entry.Value;
 				else if (entry.Name == "angles")
 				{
 					Vector3 angles = (Vector3)entry.Value;
-					orientation = Quaternion.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
+					Orientation = Quaternion.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
 				}
 				else if (entry.Name == "camOrientation")
-					orientation = (Quaternion)entry.Value;
+					Orientation = (Quaternion)entry.Value;
 				else if (entry.Name == "viewportSize")
 					ViewportSize = (Vector2)entry.Value;
 			}
@@ -189,7 +211,7 @@ namespace Visual_Music
 		{
 			info.AddValue("fov", Fov);
 			info.AddValue("pos", pos);
-			info.AddValue("camOrientation", orientation);
+			info.AddValue("orientation", orientation);
 			info.AddValue("viewportSize", ViewportSize);
 		}
 

@@ -128,6 +128,8 @@ namespace Visual_Music
 				styleList.Items.Add(nse.ToString());
 
 			addInvalidateEH(this.Controls);
+			//camTb.DataBindings.Add("Text", project.Camera, "SpatialString", false, DataSourceUpdateMode.Never);
+			//camTb.DataBindings.Add("Text", Project.Camera, "SpatialString");
 
 			//barStyleControl = new BarStyleControl(this, songPanel);
 			//lineStyleControl = new LineStyleControl(this, songPanel);
@@ -283,23 +285,21 @@ namespace Visual_Music
 			audioOffsetS.Value = (decimal)Project.AudioOffset;
 			maxPitchUd.Value = Project.MaxPitch;
 			minPitchUd.Value = Project.MinPitch;
-			updateCamControls();
+			project.Camera.SpatialChanged = updateCamControls;
 
 			songScrollBar.Maximum = Project.SongLengthT;
 			songScrollBar.Value = Project.SongPosT;
 			upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(songPanel);
+
 		}
 
 		private void updateCamControls()
 		{
 			updatingControls = true;
-
-			camTb.Lines = new string[2];
 			Vector3 pos = project.Camera.Pos;
 			Quaternion orient = project.Camera.Orientation;
 			camTb.Text = $"{pos.X} {pos.Y} {pos.Z}\r\n{orient.X} {orient.Y} {orient.Z} {orient.W}";
-
 			updatingControls = false;
 
 		}
@@ -1437,6 +1437,7 @@ namespace Visual_Music
 		private void resetCamBtn_Click(object sender, EventArgs e)
 		{
 			Project.Camera = new Camera(songPanel);
+			Project.Camera.spatialChanged = updateCamControls;
 		}
 
 		private void nudgeBackwardsToolStripMenuItem_Click(object sender, EventArgs e)
