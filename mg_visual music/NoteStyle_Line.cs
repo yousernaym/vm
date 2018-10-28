@@ -597,11 +597,10 @@ namespace Visual_Music
 			Vector3 hlPos = noteStart;
 			float noteLength = (noteEnd - noteStart.X);
 			float normPos = (songPosP - noteStart.X) / noteLength;
-			//HlMovementPow = 4;
-			normPos = (float)Math.Pow(normPos, (double)HlMovementPow);
 			if ((bool)MovingHl)
 			{
-				hlPos.X = noteStart.X + normPos * noteLength;
+				float poweredNormPos = (float)Math.Pow(normPos, (double)HlMovementPow);
+				hlPos.X = noteStart.X + poweredNormPos * noteLength;
 				hlPos.Y = Project.getScreenPosY(trackProps.TrackView.Curve.Evaluate(Project.getTimeT(hlPos.X)));
 			}
 
