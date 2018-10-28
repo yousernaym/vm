@@ -620,10 +620,10 @@ namespace Visual_Music
 			else
 			{
 				UseGlobalLight = true;
-				AmbientAmount = 0;
-				DiffuseAmount = 0;
-				SpecAmount = 0;
-				SpecPower = 0;
+				AmbientAmount = 1;
+				DiffuseAmount = 1;
+				SpecAmount = 1;
+				SpecPower = 1;
 			}
 			Dir = new Vector3(-1, -1, 1);
 		}
