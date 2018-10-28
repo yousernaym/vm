@@ -595,20 +595,20 @@ namespace Visual_Music
 			}
 
 			Vector3 hlPos = noteStart;
+			float noteLength = (noteEnd - noteStart.X);
+			float normPos = (songPosP - noteStart.X) / noteLength;
+			//HlMovementPow = 4;
+			normPos = (float)Math.Pow(normPos, (double)HlMovementPow);
 			if ((bool)MovingHl)
 			{
-				float distBetweenNotes = (nextNoteStart.X - noteStart.X);
-				float normPos = (songPosP - noteStart.X) / distBetweenNotes;
-				normPos = (float)Math.Pow(normPos, HlMovementPow);
-				hlPos.X = noteStart.X + normPos * distBetweenNotes;
+				hlPos.X = noteStart.X + normPos * noteLength;
 				hlPos.Y = Project.getScreenPosY(trackProps.TrackView.Curve.Evaluate(Project.getTimeT(hlPos.X)));
 			}
 
 			//Set common fx params---------------------
 			
 			//For shrinking highlights
-			float leftLength = -(noteStart.X - songPosP) - 0.0011f;
-			float shrinkPercent = leftLength / (noteEnd - noteStart.X);
+			float shrinkPercent = normPos * 1.0001f;
 			if (!(bool)ShrinkingHl)
 			{
 				shrinkPercent = 0;
