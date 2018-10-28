@@ -1657,6 +1657,5 @@ namespace Visual_Music
 				elementIndex++;
 			}
 		}
-		
 	}
 }

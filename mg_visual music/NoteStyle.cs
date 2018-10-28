@@ -363,12 +363,12 @@ namespace Visual_Music
 			}
 
 			//Light
-			fx.Parameters["AmbientAmount"].SetValue((float)(Project.GlobalTrackProps.LightProps.AmbientAmount * trackProps.LightProps.AmbientAmount));
-			fx.Parameters["DiffuseAmount"].SetValue((float)(Project.GlobalTrackProps.LightProps.DiffuseAmount * trackProps.LightProps.DiffuseAmount));
-			fx.Parameters["SpecAmount"].SetValue((float)(Project.GlobalTrackProps.LightProps.SpecAmount * trackProps.LightProps.SpecAmount));
-			fx.Parameters["SpecPower"].SetValue((float)(Project.GlobalTrackProps.LightProps.SpecPower + trackProps.LightProps.SpecPower));
-			TrackProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps : trackProps;
-			Vector3 normLightDir = lightProps.LightProps.Dir;
+			LightProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps.LightProps : trackProps.LightProps;
+			fx.Parameters["AmbientAmount"].SetValue((float)(lightProps.AmbientAmount));
+			fx.Parameters["DiffuseAmount"].SetValue((float)(lightProps.DiffuseAmount));
+			fx.Parameters["SpecAmount"].SetValue((float)(lightProps.SpecAmount));
+			fx.Parameters["SpecPower"].SetValue((float)(lightProps.SpecPower));
+			Vector3 normLightDir = lightProps.Dir;
 			normLightDir.Normalize();
 			fx.Parameters["LightDir"].SetValue(normLightDir);
 

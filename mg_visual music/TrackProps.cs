@@ -609,22 +609,22 @@ namespace Visual_Music
 
 		public LightProps(int trackNumber)
 		{
-			if (trackNumber == 0)
+			if (trackNumber == 0 || true)
 			{
-				UseGlobalLight = false;
+				UseGlobalLight = true;
 				AmbientAmount = 0.2f;
 				DiffuseAmount = 2;
 				SpecAmount = 1;
 				SpecPower = 50;
 			}
-			else
-			{
-				UseGlobalLight = true;
-				AmbientAmount = 1;
-				DiffuseAmount = 1;
-				SpecAmount = 1;
-				SpecPower = 1;
-			}
+			//else
+			//{
+			//	UseGlobalLight = true;
+			//	AmbientAmount = 1;
+			//	DiffuseAmount = 1;
+			//	SpecAmount = 1;
+			//	SpecPower = 1;
+			//}
 			Dir = new Vector3(-1, -1, 1);
 		}
 
