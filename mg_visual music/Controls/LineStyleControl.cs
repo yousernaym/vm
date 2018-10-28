@@ -40,13 +40,12 @@ namespace Visual_Music
 				lineHlTypeList.SelectedIndex = (int)noteStyle_Line.HlType;
 
 			Form1.setNumericUdValue(hlSizeUpDown, noteStyle_Line.HlSize);
+			Form1.setNumericUdValue(hlMovementPowUd, noteStyle_Line.HlMovementPow);
 			movingHlCb.CheckState = Form1.toCheckState(noteStyle_Line.MovingHl);
 			shrinkingHlCb.CheckState = Form1.toCheckState(noteStyle_Line.ShrinkingHl);
 			hlBorderCb.CheckState = Form1.toCheckState(noteStyle_Line.HlBorder);
 		}
-
-		
-		
+				
 		private void lineTypeList_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (UpdatingControls)
@@ -90,6 +89,14 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().HlSize = (float)hlSizeUpDown.Value;
+		}
+
+		private void hlMovementPowUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (UpdatingControls)
+				return;
+			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().HlMovementPow = (float)hlMovementPowUd.Value;
 		}
 
 		private void movingHlCb_CheckedChanged(object sender, EventArgs e)

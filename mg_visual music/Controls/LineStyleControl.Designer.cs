@@ -45,16 +45,19 @@
 			this.label12 = new System.Windows.Forms.Label();
 			this.lineControlsPanel = new System.Windows.Forms.Panel();
 			this.continuousCb = new System.Windows.Forms.CheckBox();
+			this.hlMovementPowUd = new System.Windows.Forms.NumericUpDown();
+			this.label3 = new System.Windows.Forms.Label();
 			this.groupBox3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.hlSizeUpDown)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lineWidthUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.qnGapFillUd)).BeginInit();
 			this.lineControlsPanel.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.hlMovementPowUd)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// modGbox
 			// 
-			this.modGbox.Location = new System.Drawing.Point(0, 292);
+			this.modGbox.Location = new System.Drawing.Point(4, 323);
 			// 
 			// groupBox3
 			// 
@@ -62,12 +65,14 @@
 			this.groupBox3.Controls.Add(this.shrinkingHlCb);
 			this.groupBox3.Controls.Add(this.lineHlTypeList);
 			this.groupBox3.Controls.Add(this.movingHlCb);
+			this.groupBox3.Controls.Add(this.label3);
 			this.groupBox3.Controls.Add(this.label29);
+			this.groupBox3.Controls.Add(this.hlMovementPowUd);
 			this.groupBox3.Controls.Add(this.hlSizeUpDown);
 			this.groupBox3.Controls.Add(this.label27);
 			this.groupBox3.Location = new System.Drawing.Point(0, 131);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(177, 139);
+			this.groupBox3.Size = new System.Drawing.Size(177, 175);
 			this.groupBox3.TabIndex = 50;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Highlights properties";
@@ -75,7 +80,7 @@
 			// hlBorderCb
 			// 
 			this.hlBorderCb.AutoSize = true;
-			this.hlBorderCb.Location = new System.Drawing.Point(6, 117);
+			this.hlBorderCb.Location = new System.Drawing.Point(6, 152);
 			this.hlBorderCb.Name = "hlBorderCb";
 			this.hlBorderCb.Size = new System.Drawing.Size(57, 17);
 			this.hlBorderCb.TabIndex = 50;
@@ -86,7 +91,7 @@
 			// shrinkingHlCb
 			// 
 			this.shrinkingHlCb.AutoSize = true;
-			this.shrinkingHlCb.Location = new System.Drawing.Point(6, 94);
+			this.shrinkingHlCb.Location = new System.Drawing.Point(6, 129);
 			this.shrinkingHlCb.Name = "shrinkingHlCb";
 			this.shrinkingHlCb.Size = new System.Drawing.Size(70, 17);
 			this.shrinkingHlCb.TabIndex = 40;
@@ -109,7 +114,7 @@
 			// movingHlCb
 			// 
 			this.movingHlCb.AutoSize = true;
-			this.movingHlCb.Location = new System.Drawing.Point(6, 71);
+			this.movingHlCb.Location = new System.Drawing.Point(6, 106);
 			this.movingHlCb.Name = "movingHlCb";
 			this.movingHlCb.Size = new System.Drawing.Size(61, 17);
 			this.movingHlCb.TabIndex = 30;
@@ -120,7 +125,7 @@
 			// label29
 			// 
 			this.label29.AutoSize = true;
-			this.label29.Location = new System.Drawing.Point(6, 47);
+			this.label29.Location = new System.Drawing.Point(68, 48);
 			this.label29.Name = "label29";
 			this.label29.Size = new System.Drawing.Size(27, 13);
 			this.label29.TabIndex = 14;
@@ -128,7 +133,7 @@
 			// 
 			// hlSizeUpDown
 			// 
-			this.hlSizeUpDown.Location = new System.Drawing.Point(43, 45);
+			this.hlSizeUpDown.Location = new System.Drawing.Point(101, 46);
 			this.hlSizeUpDown.Name = "hlSizeUpDown";
 			this.hlSizeUpDown.Size = new System.Drawing.Size(61, 20);
 			this.hlSizeUpDown.TabIndex = 20;
@@ -233,7 +238,7 @@
 			this.lineControlsPanel.Controls.Add(this.lineTypeList);
 			this.lineControlsPanel.Location = new System.Drawing.Point(0, 0);
 			this.lineControlsPanel.Name = "lineControlsPanel";
-			this.lineControlsPanel.Size = new System.Drawing.Size(180, 273);
+			this.lineControlsPanel.Size = new System.Drawing.Size(180, 309);
 			this.lineControlsPanel.TabIndex = 10;
 			// 
 			// continuousCb
@@ -247,13 +252,41 @@
 			this.continuousCb.UseVisualStyleBackColor = true;
 			this.continuousCb.CheckedChanged += new System.EventHandler(this.continuousCb_CheckedChanged);
 			// 
+			// hlMovementPowUd
+			// 
+			this.hlMovementPowUd.DecimalPlaces = 1;
+			this.hlMovementPowUd.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+			this.hlMovementPowUd.Location = new System.Drawing.Point(101, 76);
+			this.hlMovementPowUd.Name = "hlMovementPowUd";
+			this.hlMovementPowUd.Size = new System.Drawing.Size(61, 20);
+			this.hlMovementPowUd.TabIndex = 20;
+			this.hlMovementPowUd.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.hlMovementPowUd.ValueChanged += new System.EventHandler(this.hlMovementPowUd_ValueChanged);
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(6, 78);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(89, 13);
+			this.label3.TabIndex = 14;
+			this.label3.Text = "Movement power";
+			// 
 			// LineStyleControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.Controls.Add(this.lineControlsPanel);
 			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "LineStyleControl";
-			this.Size = new System.Drawing.Size(183, 347);
+			this.Size = new System.Drawing.Size(184, 378);
 			this.Controls.SetChildIndex(this.modGbox, 0);
 			this.Controls.SetChildIndex(this.lineControlsPanel, 0);
 			this.groupBox3.ResumeLayout(false);
@@ -263,6 +296,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.qnGapFillUd)).EndInit();
 			this.lineControlsPanel.ResumeLayout(false);
 			this.lineControlsPanel.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.hlMovementPowUd)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -287,5 +321,7 @@
 		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.Panel lineControlsPanel;
 		private System.Windows.Forms.CheckBox continuousCb;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.NumericUpDown hlMovementPowUd;
 	}
 }
