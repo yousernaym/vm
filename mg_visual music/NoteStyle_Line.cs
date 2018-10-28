@@ -560,7 +560,7 @@ namespace Visual_Music
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
 
 			DepthStencilState oldDss = songPanel.GraphicsDevice.DepthStencilState;
-			songPanel.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+			songPanel.GraphicsDevice.DepthStencilState = DepthStencilState.None;
 			drawHighLights(midiTrack, trackProps, songPosP);
 			songPanel.GraphicsDevice.DepthStencilState = oldDss;
 		}
