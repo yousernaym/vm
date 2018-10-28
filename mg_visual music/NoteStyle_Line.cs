@@ -274,6 +274,8 @@ namespace Visual_Music
 		{
 			LineGeo lineGeo = new LineGeo();
 			geo = lineGeo;
+			if (LineWidth == 0)
+				return;
 			List<Midi.Note> noteList = midiTrack.Notes;
 			//List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
 			if (noteList.Count == 0)
