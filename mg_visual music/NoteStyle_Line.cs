@@ -57,6 +57,7 @@ namespace Visual_Music
 		public bool? MovingHl { get; set; } = false;
 		public bool? ShrinkingHl { get; set; } = false;
 		public bool? HlBorder { get; set; } = false;
+		public float? HlMovementPow { get; set; } = 1;
 
 		public NoteStyle_Line()
 		{
@@ -90,6 +91,8 @@ namespace Visual_Music
 					ShrinkingHl = (bool)entry.Value;
 				else if (entry.Name == "hlBorder")
 					HlBorder = (bool)entry.Value;
+				else if (entry.Name == "hlMovementPow")
+					HlMovementPow = (float)entry.Value;
 			}
 		}
 		override public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -104,6 +107,7 @@ namespace Visual_Music
 			info.AddValue("movingHl", MovingHl);
 			info.AddValue("shrinkingHl", ShrinkingHl);
 			info.AddValue("hlBorder", HlBorder);
+			info.AddValue("hlMovementPow", HlMovementPow);
 		}
 		override public void loadFx()
 		{
@@ -595,7 +599,7 @@ namespace Visual_Music
 			{
 				float distBetweenNotes = (nextNoteStart.X - noteStart.X);
 				float normPos = (songPosP - noteStart.X) / distBetweenNotes;
-				normPos = (float)Math.Pow(normPos, 2);
+				normPos = (float)Math.Pow(normPos, HlMovementPow);
 				hlPos.X = noteStart.X + normPos * distBetweenNotes;
 				hlPos.Y = Project.getScreenPosY(trackProps.TrackView.Curve.Evaluate(Project.getTimeT(hlPos.X)));
 			}
