@@ -57,7 +57,7 @@ namespace Visual_Music
 		}
 		Matrix NonCubeRotMat => Matrix.CreateFromQuaternion(Orientation);
 
-		public Action spatialChanged;
+		Action spatialChanged;
 		public Action SpatialChanged
 		{
 			get => spatialChanged;
@@ -201,7 +201,7 @@ namespace Visual_Music
 					Vector3 angles = (Vector3)entry.Value;
 					Orientation = Quaternion.CreateFromYawPitchRoll(angles.Y, angles.X, angles.Z);
 				}
-				else if (entry.Name == "camOrientation")
+				else if (entry.Name == "camOrientation" || entry.Name == "orientation")
 					Orientation = (Quaternion)entry.Value;
 				else if (entry.Name == "viewportSize")
 					ViewportSize = (Vector2)entry.Value;

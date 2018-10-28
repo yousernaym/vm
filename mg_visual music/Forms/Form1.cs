@@ -1413,7 +1413,7 @@ namespace Visual_Music
 		private void resetCamBtn_Click(object sender, EventArgs e)
 		{
 			Project.Camera = new Camera(songPanel);
-			Project.Camera.spatialChanged = updateCamControls;
+			Project.Camera.SpatialChanged = updateCamControls;
 		}
 
 		private void nudgeBackwardsToolStripMenuItem_Click(object sender, EventArgs e)
