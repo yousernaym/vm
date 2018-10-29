@@ -548,12 +548,15 @@ namespace Visual_Music
 			//fx.Parameters["Texture"].SetValue(texture);
 
 			//Texture scrolling including adjustment for screen anchoring
-			Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
-			TrackPropsTex texProps = texMaterial.TexProps;
-			Vector2 texScrollOffset = Project.SongPosB * texProps.Scroll;
-			if (texProps.UAnchor == TexAnchorEnum.Screen)
-				texScrollOffset.X += (songPosP + Project.Camera.ViewportSize.X / 2) / ((bool)texProps.UTile ? texSize.X : Project.Camera.ViewportSize.X);
-			fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
+			if (texture != null)
+			{
+				Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
+				TrackPropsTex texProps = texMaterial.TexProps;
+				Vector2 texScrollOffset = Project.SongPosB * texProps.Scroll;
+				if (texProps.UAnchor == TexAnchorEnum.Screen)
+					texScrollOffset.X += (songPosP + Project.Camera.ViewportSize.X / 2) / ((bool)texProps.UTile ? texSize.X : Project.Camera.ViewportSize.X);
+				fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
+			}
 
 			fx.CurrentTechnique = fx.Techniques["Line"];
 			fx.CurrentTechnique.Passes[0].Apply();

@@ -47,7 +47,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.pos = mul(OUT.pos, VpMat);
 }
 
-void PS(out float4 color : COLOR0, in VSOutput IN)
+float4 PS(in VSOutput IN) : COLOR0
 {
 	float3 lightingNormal;
 	if (LineType == 1) //Ribbon
@@ -62,22 +62,16 @@ void PS(out float4 color : COLOR0, in VSOutput IN)
 		lightingNormal = float3(0, 0, 1);
 				
 	lightingNormal = normalize(lightingNormal);
-	//color = float4(Color.rgb, 1);
-	color = Color;
-	color.rgb *= tex2D(TextureSampler, IN.texCoords);
-	//color.a *= (Color.r + Color.g + Color.b) / 3;
+    float4 color = getPixelColor(Color, IN.texCoords);
 		
 	float3 normal = normalize(IN.normal);
 	float3 tPos = IN.rawPos - IN.center;
 	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f;
 	float2 normPos = IN.normPos;
-	//normPos.y = normPos.y * 0.5f + 0.5f;
-	//normPos.y = normDistFromEdge;
 	IN.rawPos.x -= SongPos;
 	color = modulate(normPos, IN.worldSize, color, lightingNormal, IN.rawPos);
 	color = blurEdges(color, normPos.y);
-	//color.r = IN.normal.x / 5.0f;
-	//color.a = 0;
+    return color;
 }
 
 
@@ -186,12 +180,12 @@ void CirclePS(out float4 color : COLOR0, in HlVSOutput IN)
 
 technique Arrow
 {
-	pass
-	{
-		CullMode = None;
-		VertexShader = compile vs_5_0 HlVS();
-		PixelShader  = compile ps_5_0 ArrowPS();
-	}
+    pass
+    {
+        CullMode = None;
+        VertexShader = compile vs_5_0 HlVS();
+        PixelShader  = compile ps_5_0 ArrowPS();
+    }
 }
 
 technique Circle

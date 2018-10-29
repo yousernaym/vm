@@ -399,3 +399,16 @@ float4 RgbaToHsla(float4 rgba)
     return float4(h, s, l, rgba.a);
 }
 
+float4 getPixelColor(float4 color, float2 texCoords)
+{
+    float4 texColor = float4(0, 1, 0.5f, 1); //"Identity" HSL color, equivalent to modulating with RGBA = 1,1,1,1
+    if (UseTexture)
+    {
+        texColor = tex2D(TextureSampler, texCoords);
+        texColor = RgbaToHsla(texColor);
+    }
+    color.x += texColor.x;
+    color.y *= texColor.y;
+    color.z *= texColor.z;
+    return HslaToRgba(color);
+}
