@@ -545,10 +545,11 @@ namespace Visual_Music
 		}
 		public System.Drawing.Color getSysColor(bool bhilited, MaterialProps globalMaterial)
 		{
-			Color c = getColor(bhilited, globalMaterial, false);
-			return System.Drawing.Color.FromArgb(c.R, c.G, c.B);
+			Vector4 c = getColor(bhilited, globalMaterial);
+			c *= 255;
+			return System.Drawing.Color.FromArgb((int)c.X, (int)c.Y, (int)c.Z);
 		}
-		public Color getColor(bool bhilited, MaterialProps globalMaterial, bool alpha)
+		public Vector4 getColor(bool bhilited, MaterialProps globalMaterial)
 		{
 			float h, s, l;
 			NoteTypeMaterial tp2;
@@ -574,11 +575,8 @@ namespace Visual_Music
 				s = 1;
 			if (l > 1)
 				l = 1;
-			Color c = new Color(h, s, l);
-			//Color c = SongPanel.HSLA2RGBA(h, s, l, alpha ? (float)(Transp * globalMaterial.Transp) : 1);
-			//c *= (transp * globalProps.transp * 255);
-			Vector4 v = c.ToVector4();
-			return c;
+			
+			return new Vector4(h, s, l, (float)(Transp * globalMaterial.Transp));
 		}
 
 		public TrackPropsTex getTexProps(int selector)
@@ -588,7 +586,7 @@ namespace Visual_Music
 			else
 				return HmapProps;
 		}
-		new public MaterialProps clone(SongPanel songPanel)
+		public MaterialProps clone(SongPanel songPanel)
 		{
 			MaterialProps dest = base.clone();
 			dest.loadContent(songPanel);

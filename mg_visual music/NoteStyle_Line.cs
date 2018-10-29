@@ -285,9 +285,9 @@ namespace Visual_Music
 			if (noteList.Count == 0)
 				return;
 
-			Color color;
+			Vector4 dummyColor;
 			Texture2D texture;
-			getMaterial(trackProps, false, out color, out texture);
+			getMaterial(trackProps, false, out dummyColor, out texture);
 			
 			Vector2 texSize = new Vector2(texture.Width, texture.Height);
 			
@@ -541,11 +541,11 @@ namespace Visual_Music
 			fx.Parameters["Radius"].SetValue(radius);
 			fx.Parameters["InnerHlSize"].SetValue(0.0f);
 
-			Color color;
+			Vector4 dummyColor;
 			Texture2D texture;
-			getMaterial(trackProps, false, out color, out texture);
-			fx.Parameters["Color"].SetValue(color.ToVector4());
-			fx.Parameters["Texture"].SetValue(texture);
+			getMaterial(trackProps, false, out dummyColor, out texture);
+			//fx.Parameters["Color"].SetValue(color.ToVector4());
+			//fx.Parameters["Texture"].SetValue(texture);
 
 			//Texture scrolling including adjustment for screen anchoring
 			Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
@@ -618,11 +618,11 @@ namespace Visual_Music
 			float innerHlSize = VpHlSize * 0.5f * (1 - shrinkPercent);
 			fx.Parameters["InnerHlSize"].SetValue(innerHlSize);
 
-			Color hlColor;
-			Texture2D hlTexture;
-			getMaterial(trackProps, true, out hlColor, out hlTexture);
-			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
-			fx.Parameters["Border"].SetValue((bool)HlBorder);
+			//Vector4 hlColor;
+			//Texture2D hlTexture;
+			//getMaterial(trackProps, true, out hlColor, out hlTexture);
+			//fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
+			//fx.Parameters["Border"].SetValue((bool)HlBorder);
 			//-----------------------------------------------
 
 			if (HlType == LineHlType.Arrow)

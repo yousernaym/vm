@@ -279,16 +279,16 @@ namespace Visual_Music
 		public abstract void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
 		public abstract void drawGeoChunk(Geo geo);
 
-		protected void getMaterial(TrackProps trackProps, float x1, float x2, out Color color, out Texture2D texture)
+		protected void getMaterial(TrackProps trackProps, float x1, float x2, out Vector4 color, out Texture2D texture)
 		{
 			bool bHilited = false;
 			if (x1 < 0 && x2 > 0)
 				bHilited = true;
 			getMaterial(trackProps, bHilited, out color, out texture);
 		}
-		protected void getMaterial(TrackProps trackProps, bool bHilited, out Color color, out Texture2D texture)
+		protected void getMaterial(TrackProps trackProps, bool bHilited, out Vector4 color, out Texture2D texture)
 		{
-			color = trackProps.MaterialProps.getColor(bHilited, Project.GlobalTrackProps.MaterialProps, true);
+			color = trackProps.MaterialProps.getColor(bHilited, Project.GlobalTrackProps.MaterialProps);
 			texture = trackProps.MaterialProps.getTexture(bHilited, Project.GlobalTrackProps.MaterialProps);
 			if (texture == null)
 			{
@@ -362,13 +362,14 @@ namespace Visual_Music
 				fx.Parameters["Invert"].Elements[i].SetValue((bool)ModEntries[i].Invert);
 			}
 
+			//Material
 			Texture2D texture;
 			Vector4 color;
 			getMaterial(trackProps, false, out color, out texture);
 			fx.Parameters["Texture"].SetValue(texture);
 			fx.Parameters["Color"].SetValue(color);
 			Vector4 hlColor = trackProps.MaterialProps.getColor(true, Project.GlobalTrackProps.MaterialProps);
-			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());			
+			fx.Parameters["HlColor"].SetValue(hlColor);			
 
 			//Light
 			LightProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps.LightProps : trackProps.LightProps;
