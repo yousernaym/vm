@@ -71,12 +71,6 @@ namespace Visual_Music
 			info.AddValue("trackProps", TrackProps);
 		}
 
-		public void cloneTrackProps(TrackView dest)
-		{
-			dest.TrackProps = TrackProps.clone();
-			dest.TrackProps.TrackView = dest;
-		}
-
 		public void createCurve(/*Midi.Song song*/)
 		{
 			curve = new Curve();

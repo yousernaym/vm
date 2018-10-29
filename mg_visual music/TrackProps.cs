@@ -67,15 +67,6 @@ namespace Visual_Music
 			MaterialProps.loadContent(songPanel);
 		}
 
-		new public TrackProps clone()
-		{
-			TrackView tv = TrackView;
-			TrackProps dest = base.clone();
-			dest.StyleProps.loadFx();
-			dest.TrackView = tv;
-			return dest;
-		}
-
 		public void resetStyle()
 		{
 			StyleProps = new StyleProps(TrackNumber);
@@ -102,6 +93,19 @@ namespace Visual_Music
 			resetStyle();
 			resetLight();
 			resetSpatial();
+		}
+
+		internal void cloneFrom(TrackProps source, TrackPropsType type)
+		{
+			int iType = (int)type;
+			if ((iType & (int)TrackPropsType.TPT_Style) > 0)
+				StyleProps = source.StyleProps.clone();
+			if ((iType & (int)TrackPropsType.TPT_Material) > 0)
+				MaterialProps = source.MaterialProps.clone();
+			if ((iType & (int)TrackPropsType.TPT_Light) > 0)
+				LightProps = source.LightProps.clone();
+			if ((iType & (int)TrackPropsType.TPT_Spatial) > 0)
+				SpatialProps = source.SpatialProps.clone();
 		}
 	}
 
@@ -580,6 +584,12 @@ namespace Visual_Music
 				return TexProps;
 			else
 				return HmapProps;
+		}
+		new public MaterialProps clone(SongPanel songPanel)
+		{
+			MaterialProps dest = base.clone();
+			dest.loadContent(songPanel);
+			return dest;
 		}
 	}
 

@@ -19,6 +19,7 @@ namespace Visual_Music
 {
 	using GdiPoint = System.Drawing.Point;
 	using GdiColor = System.Drawing.Color;
+	enum TrackPropsType { TPT_Style = 1, TPT_Material = 2, TPT_Light = 4, TPT_Spatial = 8, TPT_All = 255 }
 
 	public partial class Form1 : Form
 	{
@@ -127,15 +128,10 @@ namespace Visual_Music
 				styleList.Items.Add(nse.ToString());
 
 			addInvalidateEH(this.Controls);
-			//camTb.DataBindings.Add("Text", project.Camera, "SpatialString", false, DataSourceUpdateMode.Never);
-			//camTb.DataBindings.Add("Text", Project.Camera, "SpatialString");
 
-			//barStyleControl = new BarStyleControl(this, songPanel);
-			//lineStyleControl = new LineStyleControl(this, songPanel);
-			//styleTab.Controls.Add(barStyleControl);
-			//styleTab.Controls.Add(lineStyleControl);
-			//barStyleControl.init(this);
-			//lineStyleControl.init(this);
+			string[] tptList = Enum.GetNames(typeof(TrackPropsType));
+			for (int i = 0; i < selectedTrackPropsPanel.TabPages.Count; i++)
+				selectedTrackPropsPanel.TabPages[i].Name = tptList[i];
 		}
 
 		void OnBeforeBrowse(object sender, OnBeforeBrowseEventArgs e)
@@ -803,25 +799,14 @@ namespace Visual_Music
 					TrackProps sourceTrackProps = sourceTrackView.TrackProps;
 					for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 					{
-						TrackView destTrackView = Project.TrackViews[trackList.SelectedIndices[i]];
+						TrackProps destTrackProps = Project.TrackViews[trackList.SelectedIndices[i]].TrackProps;
+						TrackPropsType tpt = TrackPropsType.TPT_All;
 						if (onlyCopyCurrentTab)
 						{
 							string tabName = selectedTrackPropsPanel.SelectedTab.Name;
-							TrackProps destTrackProps = destTrackView.TrackProps;
-							if (tabName == "style")
-							{
-								destTrackProps.StyleProps = sourceTrackProps.StyleProps.clone();
-								project.createOcTrees();
-							}
-							else if (tabName == "material")
-								destTrackProps.MaterialProps = sourceTrackProps.MaterialProps.clone();
-							else if (tabName == "light")
-								destTrackProps.LightProps = sourceTrackProps.LightProps.clone();
-							else if (tabName == "spatial")
-								destTrackProps.SpatialProps = sourceTrackProps.SpatialProps.clone();
+							Enum.TryParse(tabName, out tpt);
 						}
-						else
-							sourceTrackView.cloneTrackProps(destTrackView);
+						destTrackProps.cloneFrom(sourceTrackProps, tpt);
 					}
 					updateTrackControls();
 					updateTrackListColors();
