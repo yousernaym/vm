@@ -306,11 +306,11 @@ namespace Visual_Music
 					int minPitchBackup = Project.MinPitch;
 					if (options.Sphere)
 					{
-						Project.ViewWidthQn /= 3;
-						int pitchChange = (int)((Project.MaxPitch - Project.MinPitch) / 5.0f);
-						Project.MaxPitch -= (int)(pitchChange / 1.3f);
-						Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
-						Project.createOcTrees();
+						//Project.ViewWidthQn /= 3;
+						//int pitchChange = (int)((Project.MaxPitch - Project.MinPitch) / 5.0f);
+						//Project.MaxPitch -= (int)(pitchChange / 1.3f);
+						//Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
+						//Project.createOcTrees();
 					}
 					const int frameSamples = 1;
 					cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);

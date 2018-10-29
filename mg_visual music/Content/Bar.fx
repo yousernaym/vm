@@ -45,8 +45,14 @@ VSOutput VS(VSInput IN)
 float4 PS(VSOutput IN) : COLOR0
 {
 	float4 color = IN.color;
-	color.rgb *= tex2D(TextureSampler, IN.texCoords);
-	color = modulate(IN.normPos, IN.worldSize, color, float3(0,0,1), IN.worldPos);
+	float4 texColor = tex2D(TextureSampler, IN.texCoords);
+    
+    texColor = RgbaToHsla(texColor);
+    color.x += texColor.x;
+    color.y *= texColor.y;
+    color.z *= texColor.z;
+    color = HslaToRgba(color);
+    color = modulate(IN.normPos, IN.worldSize, color, float3(0,0,1), IN.worldPos);
 	
 	return color;
 	//return float4(1, 1, 1, color.r*10);

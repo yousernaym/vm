@@ -550,7 +550,7 @@ namespace Visual_Music
 		}
 		public Color getColor(bool bhilited, MaterialProps globalMaterial, bool alpha)
 		{
-			double h, s, l;
+			float h, s, l;
 			NoteTypeMaterial tp2;
 			NoteTypeMaterial globalTp2;
 			if (bhilited)
@@ -563,18 +563,21 @@ namespace Visual_Music
 				tp2 = Normal;
 				globalTp2 = globalMaterial.Normal;
 			}
-			h = (double)(Hue + globalMaterial.Hue);
-			if (h >= 1) h -= 1;
-			else if (h < 0) h += 1;
-			s = (double)(tp2.Sat * globalTp2.Sat);
-			l = (double)(tp2.Lum * globalTp2.Lum);
+			h = (float)(Hue + globalMaterial.Hue);
+			if (h >= 1)
+				h -= 1;
+			else if
+				(h < 0) h += 1;
+			s = (float)(tp2.Sat * globalTp2.Sat);
+			l = (float)(tp2.Lum * globalTp2.Lum);
 			if (s > 1)
 				s = 1;
 			if (l > 1)
 				l = 1;
-			Color c = SongPanel.HSLA2RGBA(h, s, l, alpha ? (float)(Transp * globalMaterial.Transp) : 1);
-
+			Color c = new Color(h, s, l);
+			//Color c = SongPanel.HSLA2RGBA(h, s, l, alpha ? (float)(Transp * globalMaterial.Transp) : 1);
 			//c *= (transp * globalProps.transp * 255);
+			Vector4 v = c.ToVector4();
 			return c;
 		}
 

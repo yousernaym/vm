@@ -362,6 +362,14 @@ namespace Visual_Music
 				fx.Parameters["Invert"].Elements[i].SetValue((bool)ModEntries[i].Invert);
 			}
 
+			Texture2D texture;
+			Vector4 color;
+			getMaterial(trackProps, false, out color, out texture);
+			fx.Parameters["Texture"].SetValue(texture);
+			fx.Parameters["Color"].SetValue(color);
+			Vector4 hlColor = trackProps.MaterialProps.getColor(true, Project.GlobalTrackProps.MaterialProps);
+			fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());			
+
 			//Light
 			LightProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps.LightProps : trackProps.LightProps;
 			fx.Parameters["AmbientAmount"].SetValue((float)(lightProps.AmbientAmount));

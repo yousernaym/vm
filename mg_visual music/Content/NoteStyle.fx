@@ -306,3 +306,96 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 	return result;
 }
 
+float4 HslaToRgba(float4 hsla)
+{
+    float v;
+    float h = hsla.x;
+    float s = hsla.y;
+    float l = hsla.z;
+    double r, g, b;
+    r = g = b = l; // default to gray
+    v = (l <= 0.5) ? (l * (1.0 + s)) : (l + s - l * s);
+    if (v > 0)
+    {
+        float m;
+        float sv;
+        int sextant;
+        float fract, vsf, mid1, mid2;
+        m = l + l - v;
+        sv = (v - m) / v;
+        h *= 6.0;
+        sextant = (int) h;
+        fract = h - sextant;
+        vsf = v * sv * fract;
+        mid1 = m + vsf;
+        mid2 = v - vsf;
+        switch (sextant)
+        {
+            case 0:
+                r = v;
+                g = mid1;
+                b = m;
+                break;
+            case 1:
+                r = mid2;
+                g = v;
+                b = m;
+                break;
+            case 2:
+                r = m;
+                g = v;
+                b = mid1;
+                break;
+            case 3:
+                r = m;
+                g = mid2;
+                b = v;
+                break;
+            case 4:
+                r = mid1;
+                g = m;
+                b = v;
+                break;
+            case 5:
+                r = v;
+                g = m;
+                b = mid2;
+                break;
+        }
+    }
+    return float4(r, g, b, hsla.a);;
+}
+
+
+float4 RgbaToHsla(float4 rgba)
+{
+    float r = rgba.x;
+    float g = rgba.y;
+    float b = rgba.z;
+    //r /= 255, g /= 255, b /= 255;
+    float maxValue = max(r, g);
+    maxValue = max(maxValue, b);
+    float minValue = min(r, g);
+    minValue = min(minValue, b);
+    float h, s, l = (maxValue + minValue) / 2;
+
+    if (maxValue == minValue)
+    {
+        h = s = 0; // achromatic
+    }
+    else
+    {
+        float d = maxValue - minValue;
+        s = l > 0.5 ? d / (2 - maxValue - minValue) : d / (maxValue + minValue);
+        if (maxValue == r)
+            h = (g - b) / d + (g < b ? 6 : 0);
+        else if (maxValue == g)
+            h = (b - r) / d + 2;
+        else if (maxValue == b)
+            h = (r - g) / d + 4;
+        h /= 6;
+    }
+
+    return float4(h, s, l, rgba.a);
+}
+
