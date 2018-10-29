@@ -616,21 +616,36 @@ namespace Visual_Music
 		}
 		void loadMtrlTexInPb()
 		{
+			trackTexPb.Width = MaxTrackTexPbWidth;
+			trackTexPb.Height = TrackTexPbHeight;
 			TrackPropsTex texProps = getActiveTexProps(mergedTrackProps);
 			if (!string.IsNullOrEmpty(texProps.Path))
 			{
-				using (FileStream stream = File.Open(texProps.Path, FileMode.Open))
+				try
 				{
-					Image srcImage = new Bitmap(Image.FromStream(stream));
-					trackTexPb.Image = new Bitmap(trackTexPb.Width, trackTexPb.Height);
-					using (Graphics g = Graphics.FromImage(trackTexPb.Image))
+					using (FileStream stream = File.Open(texProps.Path, FileMode.Open))
 					{
-						if (getActiveTexProps(mergedTrackProps).PointSmp ?? false)
-							g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-						g.DrawImage(srcImage, new System.Drawing.Rectangle(0, 0, trackTexPb.Width, trackTexPb.Height));
+						using (Image srcImage = new Bitmap(Image.FromStream(stream)))
+						{
+							trackTexPb.Image = new Bitmap(trackTexPb.Width, trackTexPb.Height);
+							using (Graphics g = Graphics.FromImage(trackTexPb.Image))
+							{
+								if (getActiveTexProps(mergedTrackProps).PointSmp ?? false)
+									g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+								g.DrawImage(srcImage, new System.Drawing.Rectangle(0, 0, trackTexPb.Width, trackTexPb.Height));
+							}
+						}
 					}
-					srcImage.Dispose();
 				}
+				catch (FileNotFoundException e)
+				{
+					trackTexPb.Image = trackTexPb.ErrorImage;
+					trackTexPb.Width = trackTexPb.ErrorImage.Width;
+					trackTexPb.Height = trackTexPb.ErrorImage.Height;
+					return;
+				}
+
+
 				float whRatio = (float)trackTexPb.Image.Width / trackTexPb.Image.Height;
 				trackTexPb.Height = TrackTexPbHeight;
 				trackTexPb.Width = (int)(trackTexPb.Height * whRatio);
