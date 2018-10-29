@@ -550,23 +550,24 @@ namespace Visual_Music
 			return cmFaces[face][v * faceSide + u];
 		}
 
-		public static Color HSLA2RGBA(double h, double s, double l, float a, bool bgr = false)
+		public static Color HSLA2RGBA(Vector4 hsla)
 		{
-			double v;
-			double r, g, b;
+			float v;
+			float r, g, b;
+			float h = hsla.X, s = hsla.Y, l = hsla.Z;
 			r = l;   // default to gray
 			g = l;
 			b = l;
-			v = (l <= 0.5) ? (l * (1.0 + s)) : (l + s - l * s);
+			v = (l <= 0.5f) ? (l * (1.0f + s)) : (l + s - l * s);
 			if (v > 0)
 			{
-				double m;
-				double sv;
+				float m;
+				float sv;
 				int sextant;
-				double fract, vsf, mid1, mid2;
+				float fract, vsf, mid1, mid2;
 				m = l + l - v;
 				sv = (v - m) / v;
-				h *= 6.0;
+				h *= 6.0f;
 				sextant = (int)h;
 				fract = h - sextant;
 				vsf = v * sv * fract;
@@ -606,15 +607,7 @@ namespace Visual_Music
 						break;
 				}
 			}
-			Color rgb;
-			if (bgr)
-				rgb = new Color((float)b, (float)g, (float)r, 1);
-			else
-				rgb = new Color((float)r, (float)g, (float)b, (float)1);
-			//rgb *= a;
-			rgb.A = (byte)(a * 255);
-
-			return rgb;
+			return new Color(r, g, b, hsla.W);
 		}
 		//NoteDrawingProps getNoteDrawingProps(int track, bool hilited)
 		//{
