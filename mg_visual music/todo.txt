@@ -1,6 +1,5 @@
 ﻿Todo:
 - Bump mapping.
-- (Fix alpha blending.) Fix line vertices at turns.
 - Increase minimum width for ribbons.
 - Make a Point/Dot note style, like Bar but centered on note start. 
   Alternatively make it an option to add points in line style (and optionally make line invisible).
@@ -11,6 +10,7 @@
 - Let user specify view width in song properties.
 
 Done:
+- Fix alpha blending and line vertices at turns.
 = Increase line sampling when curvature increases.
 - Non-linear line-highlight movement.
 - Selecting notes with non-zero spatial offset stopped working (fixed).
