@@ -170,7 +170,6 @@ namespace Visual_Music
 			public Texture2D hilited;
 			public Texture2D normal;
 		}
-		protected static Textures[] defaultTextures = new Textures[Enum.GetValues(typeof(NoteStyleType)).GetLength(0)];
 
 		protected Effect fx;
 		
@@ -240,10 +239,6 @@ namespace Visual_Music
 			songPanel = _songPanel;
 			NoteStyle_Bar.sInit();
 			NoteStyle_Line.sInit();
-			defaultTextures[(int)NoteStyleType.Bar] = new Textures();
-			defaultTextures[(int)NoteStyleType.Bar].normal = new Texture2D(songPanel.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-			defaultTextures[(int)NoteStyleType.Bar].normal.SetData(new[] { Color.White });
-			defaultTextures[(int)NoteStyleType.Bar].hilited = defaultTextures[(int)NoteStyleType.Bar].normal;
 
 			int radius = 20;
 			Color[] texData = new Color[radius * 2 * radius * 2];
@@ -264,15 +259,9 @@ namespace Visual_Music
 							alpha = 0;
 						c = Color.White * alpha;
 					}
-					//c = Color.White;
 					texData[i + j * radius * 2] = c;
 				}
 			}
-			defaultTextures[(int)NoteStyleType.Line] = new Textures();
-			//textures[(int)NoteStyleEnum.Line].hilited = new Texture2D(songPanel.GraphicsDevice, radius * 2, radius * 2, false, SurfaceFormat.Color);
-			//textures[(int)NoteStyleEnum.Line].hilited.SetData(texData);
-			defaultTextures[(int)NoteStyleType.Line].hilited = defaultTextures[(int)NoteStyleType.Bar].normal;
-			defaultTextures[(int)NoteStyleType.Line].normal = defaultTextures[(int)NoteStyleType.Bar].normal;
 		}
 		public abstract void loadFx();
 		//abstract public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, Material texMaterial);
@@ -290,13 +279,13 @@ namespace Visual_Music
 		{
 			color = trackProps.MaterialProps.getColor(bHilited, Project.GlobalTrackProps.MaterialProps);
 			texture = trackProps.MaterialProps.getTexture(bHilited, Project.GlobalTrackProps.MaterialProps);
-			if (texture == null)
-			{
-				if (bHilited)
-					texture = defaultTextures[(int)styleType].hilited;
-				else
-					texture = defaultTextures[(int)styleType].normal;
-			}
+			//if (texture == null)
+			//{
+			//	if (bHilited)
+			//		texture = defaultTextures[(int)styleType].hilited;
+			//	else
+			//		texture = defaultTextures[(int)styleType].normal;
+			//}
 		}
 		protected List<Midi.Note> getNotes(int leftMargin, Midi.Track track)
 		{   //Get currently visible notes in specified track
@@ -366,7 +355,9 @@ namespace Visual_Music
 			Texture2D texture;
 			Vector4 color;
 			getMaterial(trackProps, false, out color, out texture);
-			fx.Parameters["Texture"].SetValue(texture);
+			if (texture != null)
+				fx.Parameters["Texture"].SetValue(texture);
+			fx.Parameters["UseTexture"].SetValue(texture != null);
 			fx.Parameters["Color"].SetValue(color);
 			Vector4 hlColor = trackProps.MaterialProps.getColor(true, Project.GlobalTrackProps.MaterialProps);
 			fx.Parameters["HlColor"].SetValue(hlColor);			

@@ -1,6 +1,7 @@
 ﻿float4x4 VpMat;
 float2 ViewportSize;
 texture Texture;
+bool UseTexture;
 float2 ProjScale;
 float SongPos;
 float2 TexScrollOffset;
@@ -372,7 +373,6 @@ float4 RgbaToHsla(float4 rgba)
     float r = rgba.x;
     float g = rgba.y;
     float b = rgba.z;
-    //r /= 255, g /= 255, b /= 255;
     float maxValue = max(r, g);
     maxValue = max(maxValue, b);
     float minValue = min(r, g);

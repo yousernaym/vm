@@ -144,14 +144,6 @@ namespace Visual_Music
 		{
 			float songPosP;
 			base.drawTrack(midiTrack, trackProps, texMaterial, out songPosP);
-			//Color color;
-			//Texture2D texture;
-			//getMaterial(trackProps, false, out color, out texture);
-			//fx.Parameters["Texture"].SetValue(texture);
-			//fx.Parameters["Color"].SetValue(color.ToVector4());
-			//Color hlColor = trackProps.MaterialProps.getColor(true, Project.GlobalTrackProps.MaterialProps, true);
-			//fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
-
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
 		}
 				
