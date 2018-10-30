@@ -483,8 +483,8 @@ namespace Visual_Music
 			{
 				Transp = 1;
 				Hue = 0.1f;
-				Normal = new NoteTypeMaterial(1, 0.27f);
-				Hilited = new NoteTypeMaterial(0.8f, 0.75f);
+				Normal = new NoteTypeMaterial(1, 0.6f);
+				Hilited = new NoteTypeMaterial(1, 1.5f);
 			}
 			else
 			{
