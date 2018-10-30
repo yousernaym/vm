@@ -541,23 +541,6 @@ namespace Visual_Music
 			fx.Parameters["Radius"].SetValue(radius);
 			fx.Parameters["InnerHlSize"].SetValue(0.0f);
 
-			Vector4 dummyColor;
-			Texture2D texture;
-			getMaterial(trackProps, false, out dummyColor, out texture);
-			//fx.Parameters["Color"].SetValue(color.ToVector4());
-			//fx.Parameters["Texture"].SetValue(texture);
-
-			//Texture scrolling including adjustment for screen anchoring
-			if (texture != null)
-			{
-				Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
-				TrackPropsTex texProps = texMaterial.TexProps;
-				Vector2 texScrollOffset = Project.SongPosB * texProps.Scroll;
-				if (texProps.UAnchor == TexAnchorEnum.Screen)
-					texScrollOffset.X += (songPosP + Project.Camera.ViewportSize.X / 2) / ((bool)texProps.UTile ? texSize.X : Project.Camera.ViewportSize.X);
-				fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
-			}
-
 			fx.CurrentTechnique = fx.Techniques["Line"];
 			fx.CurrentTechnique.Passes[0].Apply();
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);

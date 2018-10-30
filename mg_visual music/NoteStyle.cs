@@ -376,6 +376,19 @@ namespace Visual_Music
 			fx.Parameters["PosOffset"].SetValue(Project.getSpatialNormPosOffset(trackProps)); ;
 
 			fx.Parameters["CamPos"].SetValue(Project.Camera.Pos);
+
+			//Texture scrolling including adjustment for screen anchoring
+			if (texture != null)
+			{
+				TrackPropsTex texProps = texMaterial.TexProps;
+				Vector2 texScrollOffset = Project.SongPosB * texProps.Scroll;
+				if (texProps.UAnchor == TexAnchorEnum.Screen)
+				{
+					Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
+					texScrollOffset.X += (songPosP + Project.Camera.ViewportSize.X / 2) / ((bool)texProps.UTile ? texSize.X : Project.Camera.ViewportSize.X);
+				}
+				fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
+			}
 		}
 
 		//public abstract void createGeoChunk(BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, Material texMaterial);
@@ -432,27 +445,29 @@ namespace Visual_Music
 					size_tex.Y = size_tex.Y * uvRatio;
 				}
 			}
-			topLeft_tex -= Project.SongPosB * texMaterial.TexProps.Scroll;
+			//topLeft_tex -= Project.SongPosB * texMaterial.TexProps.Scroll;
 		}
 
 		protected Vector2 calcTexCoords(Vector2 texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, MaterialProps texMaterial)
 		{
 			Vector2 coords = new Vector2();
 			float songPosP = Project.getScreenPosX(Project.SongPosT);
-			coords.X = calcTexCoordComponent(texSize.X, Project.Camera.ViewportSize.X, notePos.X - songPosP, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor);
-			coords.Y = calcTexCoordComponent(texSize.Y, Project.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texMaterial.TexProps.VTile, (TexAnchorEnum)texMaterial.TexProps.VAnchor);
+			coords.X = calcTexCoordComponent(texSize.X, Project.Camera.ViewportSize.X, notePos.X - songPosP, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor, true);
+			coords.Y = calcTexCoordComponent(texSize.Y, Project.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texMaterial.TexProps.VTile, (TexAnchorEnum)texMaterial.TexProps.VAnchor, false);
 			coords.Y *= -1;
 			return coords;
 		}
 
-		float calcTexCoordComponent(float texSize, float vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor)
+		float calcTexCoordComponent(float texSize, float vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor, bool u)
 		{
 			if (tile)
 				texSize *= TexTileScale;
 
 			if (anchor == TexAnchorEnum.Screen)
 			{
-				float screenPos = notePos + posOffset + vpSize / 2;
+				float screenPos = notePos + posOffset;
+				if (!u)
+					screenPos += vpSize / 2;
 				if (!tile)
 					return screenPos / vpSize;
 				else
@@ -465,7 +480,7 @@ namespace Visual_Music
 				else
 					return posOffset / texSize;
 			}
-			else //anchor at song start	
+			else //Anchor at song start. Can only be true for U
 			{
 				//float songPos = Project.getSongPosP((float)notePos + posOffset);
 				float x = Project.getScreenPosX(Project.SongPosT) + notePos + posOffset;

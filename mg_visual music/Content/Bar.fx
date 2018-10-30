@@ -32,7 +32,7 @@ VSOutput VS(VSInput IN)
 	OUT.pos = mul(OUT.worldPos, VpMat);
 	//OUT.pos.z = 0;
 	//OUT.pos.w = 1;
-	OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw;
+    OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw - TexScrollOffset;
 	if (IN.rect.x  < SongPos && IN.rect.x + IN.rect.z > SongPos)
 		OUT.color = HlColor;
 	else
