@@ -639,7 +639,7 @@ namespace Visual_Music
 				}
 				catch (FileNotFoundException e)
 				{
-					trackTexPb.Image = trackTexPb.ErrorImage;
+					trackTexPb.Image = (Image)trackTexPb.ErrorImage.Clone();
 					trackTexPb.Width = trackTexPb.ErrorImage.Width;
 					trackTexPb.Height = trackTexPb.ErrorImage.Height;
 					return;
@@ -821,7 +821,8 @@ namespace Visual_Music
 							string tabName = selectedTrackPropsPanel.SelectedTab.Name;
 							Enum.TryParse(tabName, out tpt);
 						}
-						destTrackProps.cloneFrom(sourceTrackProps, tpt);
+						destTrackProps.cloneFrom(sourceTrackProps, tpt, SongPanel);
+						project.TrackViews[i].createOcTree(project, project.GlobalTrackProps);
 					}
 					updateTrackControls();
 					updateTrackListColors();
@@ -980,8 +981,8 @@ namespace Visual_Music
 		void openSongFile(string fileName)
 		{
 			Project currentProject = project;
-			try
-			{
+			//try
+			//{
 				songPanel.SuspendPaint();
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
 				using (FileStream stream = File.Open(fileName, FileMode.Open))
@@ -995,21 +996,21 @@ namespace Visual_Music
 				songLoaded(currentProjPath);
 				updateFormTitle(currentProjPath);
 				project.DefaultFileName = Path.GetFileName(currentProjPath);
-			}
-			catch (Exception ex)
-			{
-				if (ex is FileFormatException || ex is SerializationException || ex is FileNotFoundException)
-				{
-					showErrorMsgBox("Couldn't load song.\n" + ex.Message);
-					project = currentProject;
-				}
-				else
-					throw;
-			}
-			finally
-			{
-				songPanel.ResumePaint();
-			}
+			//}
+			//catch (Exception ex)
+			//{
+			//	if (ex is FileFormatException || ex is SerializationException || ex is FileNotFoundException)
+			//	{
+			//		showErrorMsgBox("Couldn't load song.\n" + ex.Message);
+			//		project = currentProject;
+			//	}
+			//	else
+			//		throw;
+			//}
+			//finally
+			//{
+			//	songPanel.ResumePaint();
+			//}
 		}
 
 		void updateFormTitle(string path)

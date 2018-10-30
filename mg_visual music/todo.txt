@@ -8,6 +8,8 @@
   Maybe also add default behaviour setting.
 - Handle variable CIA speed for sid songs.
 - Let user specify view width in song properties.
+- Specify colors for the different light types.
+- Playback start offset and fade in/out of brightness.
 
 Done:
 - Fix alpha blending and line vertices at turns.

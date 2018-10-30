@@ -1,5 +1,4 @@
 #include "notestyle.fx"
-float4 HlColor;
 
 struct VSInput
 {

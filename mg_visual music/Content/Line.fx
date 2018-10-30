@@ -96,6 +96,8 @@ struct HlVSOutput
 {
 	float4 pos : POSITION0;
 	float3 rawPos : POSITION1;
+    float4 color : COLOR0;
+    float4 hlColor : COLOR1;
 };
 
 void HlVS(in HlVSInput IN, out HlVSOutput OUT)
@@ -105,6 +107,8 @@ void HlVS(in HlVSInput IN, out HlVSOutput OUT)
 	OUT.pos.xyz += PosOffset;
 	OUT.pos.x -= SongPos;
 	OUT.pos = mul(OUT.pos, VpMat);
+    OUT.color = HslaToRgba(Color);
+    OUT.hlColor = HslaToRgba(HlColor);
 }
 
 float ClipPercent;
@@ -114,7 +118,6 @@ float3 Side2Normal;
 float3 ArrowDir;
 float3 ArrowStart;
 float3 ArrowEnd;
-float4 HlColor;
 float DistToCenter;
 
 void ArrowPS(out float4 color : COLOR0, in HlVSOutput IN)
@@ -135,14 +138,14 @@ void ArrowPS(out float4 color : COLOR0, in HlVSOutput IN)
 		float lum2 = saturate(1 - abs((dist - BlurredEdge) / BlurredEdge));
 		lum = max(lum, lum2);
 
-		color = HlColor * lum;
+		color = IN.hlColor * lum;
 	}
 	else
 	{
 		if (normDistFromBorder > ClipPercent)
-			color = HlColor;
+			color = IN.hlColor;
 		else
-			color = Color;
+			color = IN.color;
 		lum = saturate(dist / BlurredEdge);
 		color *= lum;
 	}
@@ -163,14 +166,14 @@ void CirclePS(out float4 color : COLOR0, in HlVSOutput IN)
 		float distFromInnerEdge = max(distFromCenter - (InnerHlSize - BlurredEdge), 0);
 		float lum2 = saturate(1 - distFromInnerEdge / BlurredEdge);
 		lum = max(lum, lum2);
-		color = HlColor * lum;
+		color = IN.hlColor * lum;
 	}
 	else
 	{
 		if (distFromCenter < InnerHlSize)
-			color = HlColor;
+			color = IN.hlColor;
 		else
-			color = Color;
+			color = IN.color;
 		lum = 1 - saturate(sgnDistFromEdge / BlurredEdge);
 		color *= lum;
 	}

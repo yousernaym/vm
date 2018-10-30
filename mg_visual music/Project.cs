@@ -386,7 +386,7 @@ namespace Visual_Music
 			TrackProps outProps = TrackViews[listIndices[0]].TrackProps;
 			if (listIndices.Count == 1)
 				return outProps;
-			outProps = outProps.clone();
+			outProps = outProps.clone(SongPanel);
 			for (int i = 1; i < listIndices.Count; i++)
 				outProps = (TrackProps)mergeObjects(outProps, TrackViews[listIndices[i]].TrackProps);
 			return outProps;

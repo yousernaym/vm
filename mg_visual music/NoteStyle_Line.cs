@@ -285,12 +285,6 @@ namespace Visual_Music
 			if (noteList.Count == 0)
 				return;
 
-			Vector4 dummyColor;
-			Texture2D texture;
-			getMaterial(trackProps, false, out dummyColor, out texture);
-			
-			Vector2 texSize = new Vector2(texture.Width, texture.Height);
-			
 			int vertIndex = 3;
 			int hLineVertIndex = 0;
 			int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
@@ -607,8 +601,9 @@ namespace Visual_Music
 			//Vector4 hlColor;
 			//Texture2D hlTexture;
 			//getMaterial(trackProps, true, out hlColor, out hlTexture);
-			//fx.Parameters["HlColor"].SetValue(hlColor.ToVector4());
-			//fx.Parameters["Border"].SetValue((bool)HlBorder);
+			//Vector4 hlColor = fx.Parameters["HlColor"].GetValueVector4();
+			//fx.Parameters["HlColor"].SetValue(SongPanel.HSLA2RGBA(hlColor).ToVector4());
+			fx.Parameters["Border"].SetValue((bool)HlBorder);
 			//-----------------------------------------------
 
 			if (HlType == LineHlType.Arrow)

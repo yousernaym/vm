@@ -81,10 +81,7 @@ namespace Visual_Music
 			float halfNoteHeight = Project.NoteHeight / 2;
 			int instanceIndex = 0;
 			float songPosP = Project.SongPosP;
-			Vector4 dummyColor;
-			Texture2D texture;
-			getMaterial(trackProps, false, out dummyColor, out texture);
-
+			
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				Midi.Note note = noteList[n];
@@ -104,7 +101,8 @@ namespace Visual_Music
 				Vector2 topLeft_tex = topLeft_world;
 				Vector2 size_tex = size_world;
 
-				if (texture != null) //Unnecessary because texture is never null. Can revert to default 1x1 white pixel.
+				Texture2D texture = texMaterial.TexProps.Texture;
+				if (texture != null)
 				{
 					Vector2 texSize = new Vector2(texture.Width, texture.Height);
 					calcRectTexCoords(out topLeft_tex, out size_tex, texSize, topLeft_world, size_world, texMaterial);

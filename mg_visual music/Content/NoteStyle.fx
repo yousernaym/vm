@@ -7,7 +7,7 @@ float SongPos;
 float2 TexScrollOffset;
 float VertWidthScale;
 float TexWidthScale;
-
+float4 HlColor;
 
 sampler  TextureSampler = sampler_state
 {

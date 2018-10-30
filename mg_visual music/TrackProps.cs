@@ -15,7 +15,7 @@ namespace Visual_Music
 	public enum TexAnchorEnum { Note = 0, Screen, Song };
 
 	[Serializable()]
-	public class TrackProps : CloneableProps<TrackProps>, ISerializable
+	public class TrackProps : ISerializable
 	{
 		internal TrackView TrackView { get; set; }
 		static int NumTracks { get => TrackView.NumTracks; }
@@ -95,13 +95,20 @@ namespace Visual_Music
 			resetSpatial();
 		}
 
-		internal void cloneFrom(TrackProps source, TrackPropsType type)
+		public TrackProps clone(SongPanel songPanel)
+		{
+			TrackProps newProps = new TrackProps(TrackView);
+			newProps.cloneFrom(this, TrackPropsType.TPT_All, songPanel);
+			return newProps;
+		}
+
+		internal void cloneFrom(TrackProps source, TrackPropsType type, SongPanel songPanel)
 		{
 			int iType = (int)type;
 			if ((iType & (int)TrackPropsType.TPT_Style) > 0)
 				StyleProps = source.StyleProps.clone();
 			if ((iType & (int)TrackPropsType.TPT_Material) > 0)
-				MaterialProps = source.MaterialProps.clone();
+				MaterialProps = source.MaterialProps.clone(songPanel);
 			if ((iType & (int)TrackPropsType.TPT_Light) > 0)
 				LightProps = source.LightProps.clone();
 			if ((iType & (int)TrackPropsType.TPT_Spatial) > 0)
@@ -552,6 +559,8 @@ namespace Visual_Music
 		}
 		public Vector4 getColor(bool bhilited, MaterialProps globalMaterial)
 		{
+			if (Hue == null)
+				return new Vector4(0, 0, 0, 0);
 			float h, s, l;
 			NoteTypeMaterial tp2;
 			NoteTypeMaterial globalTp2;
@@ -565,6 +574,8 @@ namespace Visual_Music
 				tp2 = Normal;
 				globalTp2 = globalMaterial.Normal;
 			}
+			if (tp2.Lum == null || tp2.Sat == null)
+				return new Vector4(0, 0, 0, 0);
 			h = (float)(Hue + globalMaterial.Hue);
 			if (h >= 1)
 				h -= 1;

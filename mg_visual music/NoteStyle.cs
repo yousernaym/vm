@@ -360,8 +360,8 @@ namespace Visual_Music
 			fx.Parameters["UseTexture"].SetValue(texture != null);
 			fx.Parameters["Color"].SetValue(color);
 			Vector4 hlColor = trackProps.MaterialProps.getColor(true, Project.GlobalTrackProps.MaterialProps);
-			fx.Parameters["HlColor"].SetValue(hlColor);			
-
+			fx.Parameters["HlColor"].SetValue(hlColor);
+			
 			//Light
 			LightProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps.LightProps : trackProps.LightProps;
 			fx.Parameters["AmbientAmount"].SetValue((float)(lightProps.AmbientAmount));
