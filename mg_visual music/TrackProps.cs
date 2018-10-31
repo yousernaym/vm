@@ -119,7 +119,7 @@ namespace Visual_Music
 	[Serializable()]
 	public class TrackPropsTex : ISerializable
 	{
-		public Texture2D Texture { get; set; } = null;
+		internal Texture2D Texture { get; set; } = null;
 		public string Path { get; set; } = "";
 		
 		SamplerState samplerState = new SamplerState();

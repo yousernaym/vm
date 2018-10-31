@@ -410,7 +410,10 @@ float4 getPixelColor(float4 color, float2 texCoords)
         texColor = RgbaToHsla(texColor);
     }
     color.x += texColor.x;
+    if (color.x >= 1)
+        color.x -= (int) color.x;
     color.y *= texColor.y;
     color.z *= texColor.z;
+    color = saturate(color);
     return HslaToRgba(color);
 }
