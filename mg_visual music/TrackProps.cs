@@ -629,6 +629,21 @@ namespace Visual_Music
 		public float? DiffuseAmount { get; set; }
 		public float? SpecAmount { get; set; }
 		public float? SpecPower { get; set; }
+		public Color? Color { get; set; }
+		public System.Drawing.Color SystemColor
+		{
+			get
+			{
+				if (Color == null)
+					return System.Drawing.Color.Empty;
+				else
+				{
+					Color c = (Color)Color;
+					return System.Drawing.Color.FromArgb(c.A, c.R, c.G, c.B);
+				}
+			}
+			set => Color = new Color(value.R, value.G, value.B);
+		}
 
 		public LightProps(int trackNumber)
 		{
@@ -649,9 +664,10 @@ namespace Visual_Music
 			//	SpecPower = 1;
 			//}
 			Dir = new Vector3(-1, -1, 1);
+			Color = new Color(0xffffffff);
 		}
 
-		public LightProps(SerializationInfo info, StreamingContext ctxt)
+		public LightProps(SerializationInfo info, StreamingContext ctxt) : this(0)
 		{
 			foreach (SerializationEntry entry in info)
 			{
@@ -667,6 +683,10 @@ namespace Visual_Music
 					SpecAmount = (float)entry.Value;
 				else if (entry.Name == "specPower")
 					SpecPower = (float)entry.Value;
+				else if (entry.Name == "color")
+					Color = (Color)entry.Value;
+				else if (entry.Name == "color")
+					Color = (Color)entry.Value;
 			}
 		}
 
@@ -678,6 +698,8 @@ namespace Visual_Music
 			info.AddValue("diffuseAmount", DiffuseAmount);
 			info.AddValue("specAmount", SpecAmount);
 			info.AddValue("specPower", SpecPower);
+			info.AddValue("color", Color);
+
 		}
 	}
 

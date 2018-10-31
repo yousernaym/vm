@@ -191,9 +191,8 @@ namespace Visual_Music
 
 		private void colorDestBtn_Click(object sender, EventArgs e)
 		{
-			if (UpdatingControls)
+			if (colorDialog1.ShowDialog() != DialogResult.OK)
 				return;
-			colorDialog1.ShowDialog();
 			colorDestBtn.BackColor = colorDialog1.Color;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.SystemColorDest = colorDestBtn.BackColor;

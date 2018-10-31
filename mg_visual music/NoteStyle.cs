@@ -364,13 +364,14 @@ namespace Visual_Music
 			
 			//Light
 			LightProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps.LightProps : trackProps.LightProps;
+			Vector3 normLightDir = lightProps.Dir;
+			normLightDir.Normalize();
+			fx.Parameters["LightDir"].SetValue(normLightDir);
 			fx.Parameters["AmbientAmount"].SetValue((float)(lightProps.AmbientAmount));
 			fx.Parameters["DiffuseAmount"].SetValue((float)(lightProps.DiffuseAmount));
 			fx.Parameters["SpecAmount"].SetValue((float)(lightProps.SpecAmount));
 			fx.Parameters["SpecPower"].SetValue((float)(lightProps.SpecPower));
-			Vector3 normLightDir = lightProps.Dir;
-			normLightDir.Normalize();
-			fx.Parameters["LightDir"].SetValue(normLightDir);
+			fx.Parameters["LightColor"].SetValue(((Color)lightProps.Color).ToVector4());
 
 			//Spatial props
 			fx.Parameters["PosOffset"].SetValue(Project.getSpatialNormPosOffset(trackProps)); ;

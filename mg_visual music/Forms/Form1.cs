@@ -19,6 +19,8 @@ namespace Visual_Music
 {
 	using GdiPoint = System.Drawing.Point;
 	using GdiColor = System.Drawing.Color;
+	using XnaColor = Microsoft.Xna.Framework.Color;
+
 	enum TrackPropsType { TPT_Style = 1, TPT_Material = 2, TPT_Light = 4, TPT_Spatial = 8, TPT_All = 255 }
 
 	public partial class Form1 : Form
@@ -60,7 +62,7 @@ namespace Visual_Music
 		static public TpartyIntegrationForm TpartyIntegrationForm => tpartyIntegrationForm;
 		VideoExportForm vidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion) };
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor) };
 		SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
 		SongWebBrowser modWebBrowser;
@@ -728,6 +730,7 @@ namespace Visual_Music
 				setNumericUdValue(diffuseAmountUd, mergedTrackProps.LightProps.DiffuseAmount);
 				setNumericUdValue(specAmountUd, mergedTrackProps.LightProps.SpecAmount);
 				setNumericUdValue(specPowUd, mergedTrackProps.LightProps.SpecPower);
+				lightColorBtn.BackColor = mergedTrackProps.LightProps.SystemColor;
 				//-------------------------------
 
 				//Spatial---------------------------------
@@ -1657,6 +1660,16 @@ namespace Visual_Music
 				}
 				elementIndex++;
 			}
+		}
+
+		private void lightColorBtn_Click(object sender, EventArgs e)
+		{
+			colorDialog1.Color = lightColorBtn.BackColor;
+			if (colorDialog1.ShowDialog() != DialogResult.OK)
+				return;
+			lightColorBtn.BackColor = colorDialog1.Color;
+			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
+				Project.TrackViews[TrackList.SelectedIndices[i]].TrackProps.LightProps.SystemColor = lightColorBtn.BackColor;
 		}
 	}
 }

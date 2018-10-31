@@ -22,6 +22,7 @@ float DiffuseAmount;
 float SpecAmount;
 float SpecPower;
 float SpecFov;
+float4 LightColor;
 float3 CamPos;
 float3 PosOffset;
 
@@ -124,6 +125,7 @@ float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 {
 	//float lum = clamp(dot(LightDir, normal), AmbientLum, 1);
 	color *= saturate(dot(LightDir, normal)) * DiffuseAmount + AmbientAmount;
+    color *= LightColor;
 	float3 lightReflection = -reflect(LightDir, normal);
 	float3 viewVec = normalize(CamPos - worldPos);
 	if (any(color))
