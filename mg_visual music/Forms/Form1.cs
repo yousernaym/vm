@@ -984,8 +984,8 @@ namespace Visual_Music
 		void openSongFile(string fileName)
 		{
 			Project currentProject = project;
-			//try
-			//{
+			try
+			{
 				songPanel.SuspendPaint();
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
 				using (FileStream stream = File.Open(fileName, FileMode.Open))
@@ -999,21 +999,21 @@ namespace Visual_Music
 				songLoaded(currentProjPath);
 				updateFormTitle(currentProjPath);
 				project.DefaultFileName = Path.GetFileName(currentProjPath);
-			//}
-			//catch (Exception ex)
-			//{
-			//	if (ex is FileFormatException || ex is SerializationException || ex is FileNotFoundException)
-			//	{
-			//		showErrorMsgBox("Couldn't load song.\n" + ex.Message);
-			//		project = currentProject;
-			//	}
-			//	else
-			//		throw;
-			//}
-			//finally
-			//{
-			//	songPanel.ResumePaint();
-			//}
+			}
+			catch (Exception ex)
+			{
+				if (ex is FileFormatException || ex is SerializationException || ex is FileNotFoundException)
+				{
+					showErrorMsgBox("Couldn't load song.\n" + ex.Message);
+					project = currentProject;
+				}
+				else
+					throw;
+			}
+			finally
+			{
+				songPanel.ResumePaint();
+			}
 		}
 
 		void updateFormTitle(string path)
@@ -1037,11 +1037,12 @@ namespace Visual_Music
 			{
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
 
-				using (FileStream stream = File.Open(currentProjPath, FileMode.Create))
+				string tempPath = Path.Combine(Program.TempDir, "tempprojectfile");
+				using (FileStream stream = File.Open(tempPath, FileMode.Create))
 				{
-
 					dcs.WriteObject(stream, project);
 				}
+				File.Copy(tempPath, currentProjPath, true);
 				updateFormTitle(currentProjPath);
 			}
 			catch (Exception ex)
