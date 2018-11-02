@@ -476,7 +476,7 @@ namespace Visual_Music
 			}
 			else
 			{
-				transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = trackList.SelectedIndices[0] != 0;// || trackList.SelectedIndices.Count == 1);
+				//transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = trackList.SelectedIndices[0] != 0;// || trackList.SelectedIndices.Count == 1);
 				selectedTrackPropsPanel.Enabled = true;
 				defaultPropertiesToolStripMenuItem.Enabled = true;
 				globalLightCb.Enabled = trackList.SelectedIndices[0] != 0; // || trackList.SelectedIndices.Count == 1

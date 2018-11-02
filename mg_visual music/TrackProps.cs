@@ -500,14 +500,14 @@ namespace Visual_Music
 			TexProps = new TrackPropsTex();
 			if (trackNumber == 0)
 			{
-				Transp = 1;
+				Transp = 0.5f;
 				Hue = 0.1f;
 				Normal = new NoteTypeMaterial(1, 0.6f);
 				Hilited = new NoteTypeMaterial(1, 1.5f);
 			}
 			else
 			{
-				Transp = 0.5f;
+				Transp = 1;
 				Hue = (float)(trackNumber - 1) / (numTracks - 1);
 				Normal = new NoteTypeMaterial();
 				Hilited = new NoteTypeMaterial(); ;
