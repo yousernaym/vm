@@ -130,6 +130,7 @@
 			this.light = new System.Windows.Forms.TabPage();
 			this.defaultLightBtn = new System.Windows.Forms.Button();
 			this.lightPanel = new System.Windows.Forms.Panel();
+			this.lightColorBtn = new System.Windows.Forms.Button();
 			this.specPowUd = new System.Windows.Forms.NumericUpDown();
 			this.ambientAmountUd = new System.Windows.Forms.NumericUpDown();
 			this.diffuseAmountUd = new System.Windows.Forms.NumericUpDown();
@@ -137,6 +138,7 @@
 			this.specAmountUd = new System.Windows.Forms.NumericUpDown();
 			this.label15 = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
+			this.label16 = new System.Windows.Forms.Label();
 			this.label22 = new System.Windows.Forms.Label();
 			this.label23 = new System.Windows.Forms.Label();
 			this.lightDirXUd = new System.Windows.Forms.NumericUpDown();
@@ -180,8 +182,7 @@
 			this.songPanelBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.songPanelBindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-			this.label16 = new System.Windows.Forms.Label();
-			this.lightColorBtn = new System.Windows.Forms.Button();
+			this.disableTextureCh = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -706,6 +707,7 @@
 			this.groupBox4.Controls.Add(this.tileTexCb);
 			this.groupBox4.Controls.Add(this.loadTexBtn);
 			this.groupBox4.Controls.Add(this.unloadTexBtn);
+			this.groupBox4.Controls.Add(this.disableTextureCh);
 			this.groupBox4.Controls.Add(this.pointSmpCb);
 			this.groupBox4.Controls.Add(this.trackTexPb);
 			this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -713,7 +715,7 @@
 			this.groupBox4.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Padding = new System.Windows.Forms.Padding(2);
-			this.groupBox4.Size = new System.Drawing.Size(182, 397);
+			this.groupBox4.Size = new System.Drawing.Size(182, 422);
 			this.groupBox4.TabIndex = 60;
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "Texture";
@@ -722,7 +724,7 @@
 			// 
 			this.label37.AutoSize = true;
 			this.label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label37.Location = new System.Drawing.Point(117, 359);
+			this.label37.Location = new System.Drawing.Point(115, 379);
 			this.label37.Name = "label37";
 			this.label37.Size = new System.Drawing.Size(52, 13);
 			this.label37.TabIndex = 19;
@@ -732,7 +734,7 @@
 			// 
 			this.label34.AutoSize = true;
 			this.label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label34.Location = new System.Drawing.Point(117, 339);
+			this.label34.Location = new System.Drawing.Point(115, 359);
 			this.label34.Name = "label34";
 			this.label34.Size = new System.Drawing.Size(52, 13);
 			this.label34.TabIndex = 19;
@@ -742,7 +744,7 @@
 			// 
 			this.label35.AutoSize = true;
 			this.label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label35.Location = new System.Drawing.Point(7, 359);
+			this.label35.Location = new System.Drawing.Point(5, 379);
 			this.label35.Name = "label35";
 			this.label35.Size = new System.Drawing.Size(43, 13);
 			this.label35.TabIndex = 19;
@@ -757,7 +759,7 @@
             0,
             0,
             131072});
-			this.texVScrollUD.Location = new System.Drawing.Point(56, 357);
+			this.texVScrollUD.Location = new System.Drawing.Point(54, 377);
 			this.texVScrollUD.Maximum = new decimal(new int[] {
             10,
             0,
@@ -777,7 +779,7 @@
 			// 
 			this.label33.AutoSize = true;
 			this.label33.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label33.Location = new System.Drawing.Point(6, 339);
+			this.label33.Location = new System.Drawing.Point(4, 359);
 			this.label33.Name = "label33";
 			this.label33.Size = new System.Drawing.Size(44, 13);
 			this.label33.TabIndex = 19;
@@ -792,7 +794,7 @@
             0,
             0,
             131072});
-			this.texUScrollUD.Location = new System.Drawing.Point(56, 337);
+			this.texUScrollUD.Location = new System.Drawing.Point(54, 357);
 			this.texUScrollUD.Maximum = new decimal(new int[] {
             10,
             0,
@@ -823,7 +825,7 @@
 			this.tableLayoutPanel1.Controls.Add(this.panel2, 1, 1);
 			this.tableLayoutPanel1.Controls.Add(this.screenAnchorLabel, 0, 2);
 			this.tableLayoutPanel1.Controls.Add(this.panel1, 2, 1);
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(4, 238);
+			this.tableLayoutPanel1.Location = new System.Drawing.Point(2, 258);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.RowCount = 4;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
@@ -1001,7 +1003,7 @@
 			// 
 			this.texVTileCb.AutoSize = true;
 			this.texVTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.texVTileCb.Location = new System.Drawing.Point(95, 195);
+			this.texVTileCb.Location = new System.Drawing.Point(93, 215);
 			this.texVTileCb.Name = "texVTileCb";
 			this.texVTileCb.Size = new System.Drawing.Size(33, 17);
 			this.texVTileCb.TabIndex = 32;
@@ -1013,7 +1015,7 @@
 			// 
 			this.texUTileCb.AutoSize = true;
 			this.texUTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.texUTileCb.Location = new System.Drawing.Point(56, 195);
+			this.texUTileCb.Location = new System.Drawing.Point(54, 215);
 			this.texUTileCb.Name = "texUTileCb";
 			this.texUTileCb.Size = new System.Drawing.Size(34, 17);
 			this.texUTileCb.TabIndex = 31;
@@ -1025,7 +1027,7 @@
 			// 
 			this.texKeepAspectCb.AutoSize = true;
 			this.texKeepAspectCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.texKeepAspectCb.Location = new System.Drawing.Point(7, 216);
+			this.texKeepAspectCb.Location = new System.Drawing.Point(5, 236);
 			this.texKeepAspectCb.Margin = new System.Windows.Forms.Padding(2);
 			this.texKeepAspectCb.Name = "texKeepAspectCb";
 			this.texKeepAspectCb.Size = new System.Drawing.Size(109, 17);
@@ -1038,7 +1040,7 @@
 			// 
 			this.tileTexCb.AutoSize = true;
 			this.tileTexCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.tileTexCb.Location = new System.Drawing.Point(8, 195);
+			this.tileTexCb.Location = new System.Drawing.Point(6, 215);
 			this.tileTexCb.Margin = new System.Windows.Forms.Padding(2);
 			this.tileTexCb.Name = "tileTexCb";
 			this.tileTexCb.Size = new System.Drawing.Size(43, 17);
@@ -1073,7 +1075,7 @@
 			// 
 			this.pointSmpCb.AutoSize = true;
 			this.pointSmpCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.pointSmpCb.Location = new System.Drawing.Point(8, 174);
+			this.pointSmpCb.Location = new System.Drawing.Point(6, 194);
 			this.pointSmpCb.Margin = new System.Windows.Forms.Padding(2);
 			this.pointSmpCb.Name = "pointSmpCb";
 			this.pointSmpCb.Size = new System.Drawing.Size(94, 17);
@@ -1382,6 +1384,16 @@
 			this.lightPanel.Size = new System.Drawing.Size(179, 223);
 			this.lightPanel.TabIndex = 30;
 			// 
+			// lightColorBtn
+			// 
+			this.lightColorBtn.BackColor = System.Drawing.Color.White;
+			this.lightColorBtn.Location = new System.Drawing.Point(104, 182);
+			this.lightColorBtn.Name = "lightColorBtn";
+			this.lightColorBtn.Size = new System.Drawing.Size(59, 23);
+			this.lightColorBtn.TabIndex = 57;
+			this.lightColorBtn.UseVisualStyleBackColor = false;
+			this.lightColorBtn.Click += new System.EventHandler(this.lightColorBtn_Click);
+			// 
 			// specPowUd
 			// 
 			this.specPowUd.Location = new System.Drawing.Point(104, 156);
@@ -1483,6 +1495,15 @@
 			this.label14.Size = new System.Drawing.Size(78, 13);
 			this.label14.TabIndex = 50;
 			this.label14.Text = "Diffuse amount";
+			// 
+			// label16
+			// 
+			this.label16.AutoSize = true;
+			this.label16.Location = new System.Drawing.Point(67, 187);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(31, 13);
+			this.label16.TabIndex = 52;
+			this.label16.Text = "Color";
 			// 
 			// label22
 			// 
@@ -1723,7 +1744,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-4864, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-4881, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1735,7 +1756,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-4976, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-4993, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1745,7 +1766,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-4978, 10040);
+			this.label4.Location = new System.Drawing.Point(-4995, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1976,24 +1997,18 @@
 			// 
 			this.songPanelBindingSource1.DataSource = typeof(Visual_Music.SongPanel);
 			// 
-			// label16
+			// disableTextureCh
 			// 
-			this.label16.AutoSize = true;
-			this.label16.Location = new System.Drawing.Point(67, 187);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(31, 13);
-			this.label16.TabIndex = 52;
-			this.label16.Text = "Color";
-			// 
-			// lightColorBtn
-			// 
-			this.lightColorBtn.BackColor = System.Drawing.Color.White;
-			this.lightColorBtn.Location = new System.Drawing.Point(104, 182);
-			this.lightColorBtn.Name = "lightColorBtn";
-			this.lightColorBtn.Size = new System.Drawing.Size(59, 23);
-			this.lightColorBtn.TabIndex = 57;
-			this.lightColorBtn.UseVisualStyleBackColor = false;
-			this.lightColorBtn.Click += new System.EventHandler(this.lightColorBtn_Click);
+			this.disableTextureCh.AutoSize = true;
+			this.disableTextureCh.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.disableTextureCh.Location = new System.Drawing.Point(6, 173);
+			this.disableTextureCh.Margin = new System.Windows.Forms.Padding(2);
+			this.disableTextureCh.Name = "disableTextureCh";
+			this.disableTextureCh.Size = new System.Drawing.Size(96, 17);
+			this.disableTextureCh.TabIndex = 20;
+			this.disableTextureCh.Text = "Disable texture";
+			this.disableTextureCh.UseVisualStyleBackColor = true;
+			this.disableTextureCh.CheckedChanged += new System.EventHandler(this.disableTextureCb_CheckedChanged);
 			// 
 			// Form1
 			// 
@@ -2238,6 +2253,7 @@
 		private System.Windows.Forms.Label label23;
 		private System.Windows.Forms.Button lightColorBtn;
 		private System.Windows.Forms.Label label16;
+		private System.Windows.Forms.CheckBox disableTextureCh;
 	}
 }
 

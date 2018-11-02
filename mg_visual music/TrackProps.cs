@@ -149,6 +149,7 @@ namespace Visual_Music
 			}
 			//set { samplerState = value; }
 		}
+		public bool DisableTexture { get; set; } = false;
 		bool? pointSmp = false;
 		public bool? PointSmp
 		{
@@ -212,17 +213,30 @@ namespace Visual_Music
 		}
 		public TrackPropsTex(SerializationInfo info, StreamingContext ctxt)
 		{
-			Path = (string)info.GetValue("path", typeof(string));
-			PointSmp = (bool)info.GetValue("PointSmp", typeof(bool));
-			keepAspect = (bool)info.GetValue("keepAspect", typeof(bool));
-			uTile = (bool)info.GetValue("uTile", typeof(bool));
-			vTile = (bool)info.GetValue("vTile", typeof(bool));
-			Anchor = (Point)info.GetValue("anchor", typeof(Point));
-			Scroll = (Vector2)info.GetValue("scroll", typeof(Vector2));
+			foreach (var entry in info)
+			{
+				if (entry.Name == "path")
+					Path = (string)entry.Value;
+				else if (entry.Name == "disableTexture")
+					DisableTexture = (bool)entry.Value;
+				else if (entry.Name == "pointSmp")
+					PointSmp = (bool)entry.Value;
+				else if (entry.Name == "keepAspect")
+					keepAspect = (bool)entry.Value;
+				else if (entry.Name == "uTile")
+					uTile = (bool)entry.Value;
+				else if (entry.Name == "vTile")
+					vTile = (bool)entry.Value;
+				else if (entry.Name == "anchor")
+					Anchor = (Point)entry.Value;
+				else if (entry.Name == "scroll")
+					Scroll = (Vector2)entry.Value;
+			}
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 		{
 			info.AddValue("path", Path);
+			info.AddValue("disableTexture", DisableTexture);
 			info.AddValue("PointSmp", PointSmp);
 			info.AddValue("keepAspect", keepAspect);
 			info.AddValue("uTile", uTile);

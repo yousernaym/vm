@@ -355,13 +355,14 @@ namespace Visual_Music
 			Texture2D texture;
 			Vector4 color;
 			getMaterial(trackProps, false, out color, out texture);
-			if (texture != null)
+			bool useTexture = texture != null && !trackProps.MaterialProps.getTexProps(0).DisableTexture && !Project.GlobalTrackProps.MaterialProps.getTexProps(0).DisableTexture;
+			if (useTexture) 
 				fx.Parameters["Texture"].SetValue(texture);
-			fx.Parameters["UseTexture"].SetValue(texture != null);
+			fx.Parameters["UseTexture"].SetValue(useTexture);
 			fx.Parameters["Color"].SetValue(color);
 			Vector4 hlColor = trackProps.MaterialProps.getColor(true, Project.GlobalTrackProps.MaterialProps);
 			fx.Parameters["HlColor"].SetValue(hlColor);
-			
+						
 			//Light
 			LightProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps.LightProps : trackProps.LightProps;
 			Vector3 normLightDir = lightProps.Dir;

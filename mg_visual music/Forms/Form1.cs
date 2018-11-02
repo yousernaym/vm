@@ -696,8 +696,8 @@ namespace Visual_Music
 				TrackPropsTex texProps = getActiveTexProps(mergedTrackProps);
 				texPathTb.Text = texProps.Path;
 				loadMtrlTexInPb();
+				disableTextureCh.CheckState = toCheckState(texProps.DisableTexture);
 				pointSmpCb.CheckState = toCheckState(texProps.PointSmp);
-
 				texUTileCb.CheckState = toCheckState(texProps.UTile);
 				texVTileCb.CheckState = toCheckState(texProps.VTile);
 				updateTexUVCb(tileTexCb, texUTileCb, texVTileCb);
@@ -1233,13 +1233,20 @@ namespace Visual_Music
 			setDefaultPitches();
 		}
 
+		private void disableTextureCb_CheckedChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				getActiveTexProps(i).DisableTexture = ((CheckBox)sender).Checked;
+		}
+
 		private void pointSmpCb_CheckedChanged(object sender, EventArgs e)
 		{
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).PointSmp = ((CheckBox)sender).Checked;
-			//loadMtrlTexInPb();
 			updateTrackControls();
 		}
 
