@@ -1688,6 +1688,5 @@ namespace Visual_Music
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				Project.TrackViews[TrackList.SelectedIndices[i]].TrackProps.LightProps.SystemColor = lightColorBtn.BackColor;
 		}
-
 	}
 }
