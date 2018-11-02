@@ -355,7 +355,7 @@ namespace Visual_Music
 			Texture2D texture;
 			Vector4 color;
 			getMaterial(trackProps, false, out color, out texture);
-			bool useTexture = texture != null && !trackProps.MaterialProps.getTexProps(0).DisableTexture && !Project.GlobalTrackProps.MaterialProps.getTexProps(0).DisableTexture;
+			bool useTexture = texture != null && !(bool)trackProps.MaterialProps.getTexProps(0).DisableTexture && !(bool)Project.GlobalTrackProps.MaterialProps.getTexProps(0).DisableTexture;
 			if (useTexture) 
 				fx.Parameters["Texture"].SetValue(texture);
 			fx.Parameters["UseTexture"].SetValue(useTexture);

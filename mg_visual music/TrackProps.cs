@@ -149,7 +149,7 @@ namespace Visual_Music
 			}
 			//set { samplerState = value; }
 		}
-		public bool DisableTexture { get; set; } = false;
+		public bool? DisableTexture { get; set; } = false;
 		bool? pointSmp = false;
 		public bool? PointSmp
 		{
@@ -237,7 +237,7 @@ namespace Visual_Music
 		{
 			info.AddValue("path", Path);
 			info.AddValue("disableTexture", DisableTexture);
-			info.AddValue("PointSmp", PointSmp);
+			info.AddValue("pointSmp", PointSmp);
 			info.AddValue("keepAspect", keepAspect);
 			info.AddValue("uTile", uTile);
 			info.AddValue("vTile", vTile);
@@ -661,15 +661,16 @@ namespace Visual_Music
 
 		public LightProps(int trackNumber)
 		{
-			if (trackNumber == 0 || true)
+			if (trackNumber == 0)
 			{
-				UseGlobalLight = true;
+				UseGlobalLight = false;
 				AmbientAmount = 0.2f;
 				DiffuseAmount = 2;
 				SpecAmount = 1;
 				SpecPower = 50;
 			}
-			//else
+			else
+				UseGlobalLight = true;
 			//{
 			//	UseGlobalLight = true;
 			//	AmbientAmount = 1;
@@ -681,8 +682,9 @@ namespace Visual_Music
 			Color = new Color(0xffffffff);
 		}
 
-		public LightProps(SerializationInfo info, StreamingContext ctxt) : this(0)
+		public LightProps(SerializationInfo info, StreamingContext ctxt)
 		{
+			Color = new Color(0xffffffff); //Compatible with older saves without color information
 			foreach (SerializationEntry entry in info)
 			{
 				if (entry.Name == "dir")

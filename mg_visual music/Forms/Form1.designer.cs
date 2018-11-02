@@ -104,6 +104,7 @@
 			this.tileTexCb = new System.Windows.Forms.CheckBox();
 			this.loadTexBtn = new System.Windows.Forms.Button();
 			this.unloadTexBtn = new System.Windows.Forms.Button();
+			this.disableTextureCh = new System.Windows.Forms.CheckBox();
 			this.pointSmpCb = new System.Windows.Forms.CheckBox();
 			this.trackTexPb = new System.Windows.Forms.PictureBox();
 			this.defaultMtrlBtn = new System.Windows.Forms.Button();
@@ -182,7 +183,6 @@
 			this.songPanelBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.songPanelBindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-			this.disableTextureCh = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -1071,6 +1071,19 @@
 			this.unloadTexBtn.UseVisualStyleBackColor = true;
 			this.unloadTexBtn.Click += new System.EventHandler(this.unloadTexBtn_Click);
 			// 
+			// disableTextureCh
+			// 
+			this.disableTextureCh.AutoSize = true;
+			this.disableTextureCh.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.disableTextureCh.Location = new System.Drawing.Point(6, 173);
+			this.disableTextureCh.Margin = new System.Windows.Forms.Padding(2);
+			this.disableTextureCh.Name = "disableTextureCh";
+			this.disableTextureCh.Size = new System.Drawing.Size(96, 17);
+			this.disableTextureCh.TabIndex = 20;
+			this.disableTextureCh.Text = "Disable texture";
+			this.disableTextureCh.UseVisualStyleBackColor = true;
+			this.disableTextureCh.CheckedChanged += new System.EventHandler(this.disableTextureCb_CheckedChanged);
+			// 
 			// pointSmpCb
 			// 
 			this.pointSmpCb.AutoSize = true;
@@ -1744,7 +1757,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-4881, 10055);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-4898, 10055);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1756,7 +1769,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-4993, 10056);
+			this.texPathTb.Location = new System.Drawing.Point(-5010, 10056);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1766,7 +1779,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-4995, 10040);
+			this.label4.Location = new System.Drawing.Point(-5012, 10040);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1996,19 +2009,6 @@
 			// songPanelBindingSource1
 			// 
 			this.songPanelBindingSource1.DataSource = typeof(Visual_Music.SongPanel);
-			// 
-			// disableTextureCh
-			// 
-			this.disableTextureCh.AutoSize = true;
-			this.disableTextureCh.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.disableTextureCh.Location = new System.Drawing.Point(6, 173);
-			this.disableTextureCh.Margin = new System.Windows.Forms.Padding(2);
-			this.disableTextureCh.Name = "disableTextureCh";
-			this.disableTextureCh.Size = new System.Drawing.Size(96, 17);
-			this.disableTextureCh.TabIndex = 20;
-			this.disableTextureCh.Text = "Disable texture";
-			this.disableTextureCh.UseVisualStyleBackColor = true;
-			this.disableTextureCh.CheckedChanged += new System.EventHandler(this.disableTextureCb_CheckedChanged);
 			// 
 			// Form1
 			// 
