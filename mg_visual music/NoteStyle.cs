@@ -296,11 +296,6 @@ namespace Visual_Music
 
 		protected void drawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial, out float songPosP)
 		{
-			songPanel.GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
-			songPanel.GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
-			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
-			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-
 			fx.Parameters["BlurredEdge"].SetValue(0.002f * Project.Camera.ViewportSize.X);
 			songPosP = Project.SongPosP;
 			fx.Parameters["SongPos"].SetValue(songPosP);
@@ -352,6 +347,10 @@ namespace Visual_Music
 			}
 
 			//Material
+			songPanel.GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
+			songPanel.GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
+			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
+			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 			Texture2D texture;
 			Vector4 color;
 			getMaterial(trackProps, false, out color, out texture);
@@ -362,7 +361,8 @@ namespace Visual_Music
 			fx.Parameters["Color"].SetValue(color);
 			Vector4 hlColor = trackProps.MaterialProps.getColor(true, Project.GlobalTrackProps.MaterialProps);
 			fx.Parameters["HlColor"].SetValue(hlColor);
-						
+			fx.Parameters["TexColBlend"].SetValue((bool)texMaterial.TexProps.TexColBlend);
+			
 			//Light
 			LightProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps.LightProps : trackProps.LightProps;
 			Vector3 normLightDir = lightProps.Dir;

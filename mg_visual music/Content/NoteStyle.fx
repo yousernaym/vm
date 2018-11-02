@@ -2,6 +2,7 @@
 float2 ViewportSize;
 texture Texture;
 bool UseTexture;
+bool TexColBlend;
 float2 ProjScale;
 float SongPos;
 float2 TexScrollOffset;
@@ -403,17 +404,27 @@ float4 RgbaToHsla(float4 rgba)
 
 float4 getPixelColor(float4 color, float2 texCoords)
 {
-    float4 texColor = float4(0, 1, 0.5f, 1); //"Identity" HSL color, equivalent to modulating with RGBA = 1,1,1,1
+    float4 texColor = !TexColBlend ? float4(0, 1, 0.5f, 1) : float4(0.5f, 0.5f, 0.5f, 1); //"Identity" HSL color, equivalent to modulating with RGBA = 1,1,1,1
     if (UseTexture)
     {
         texColor = tex2D(TextureSampler, texCoords);
-        texColor = RgbaToHsla(texColor);
+        if (!TexColBlend)
+            texColor = RgbaToHsla(texColor);
     }
-    color.x += texColor.x;
-    if (color.x >= 1)
-        color.x -= (int) color.x;
-    color.y *= texColor.y;
-    color.z *= texColor.z;
-    color = saturate(color);
-    return HslaToRgba(color);
+    if (TexColBlend)
+    {
+        color = HslaToRgba(color) * texColor;
+        color = saturate(color);
+        return color;
+    }
+    else
+    {
+        color.x += texColor.x;
+        if (color.x >= 1)
+            color.x -= (int) color.x;
+        color.y *= texColor.y;
+        color.z *= texColor.z;
+        color = saturate(color);
+        return HslaToRgba(color);
+    }
 }

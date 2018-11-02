@@ -162,6 +162,8 @@ namespace Visual_Music
 			}
 		}
 
+		public bool? TexColBlend { get; set; } = false;
+
 		bool? uTile = false;
 		public bool? UTile
 		{
@@ -221,6 +223,8 @@ namespace Visual_Music
 					DisableTexture = (bool)entry.Value;
 				else if (entry.Name == "pointSmp")
 					PointSmp = (bool)entry.Value;
+				else if (entry.Name == "texColBlend")
+					TexColBlend = (bool)entry.Value;
 				else if (entry.Name == "keepAspect")
 					keepAspect = (bool)entry.Value;
 				else if (entry.Name == "uTile")
@@ -238,6 +242,7 @@ namespace Visual_Music
 			info.AddValue("path", Path);
 			info.AddValue("disableTexture", DisableTexture);
 			info.AddValue("pointSmp", PointSmp);
+			info.AddValue("texColBlend", TexColBlend);
 			info.AddValue("keepAspect", keepAspect);
 			info.AddValue("uTile", uTile);
 			info.AddValue("vTile", vTile);
@@ -662,23 +667,14 @@ namespace Visual_Music
 		public LightProps(int trackNumber)
 		{
 			if (trackNumber == 0)
-			{
 				UseGlobalLight = false;
-				AmbientAmount = 0.2f;
-				DiffuseAmount = 2;
-				SpecAmount = 1;
-				SpecPower = 50;
-			}
 			else
 				UseGlobalLight = true;
-			//{
-			//	UseGlobalLight = true;
-			//	AmbientAmount = 1;
-			//	DiffuseAmount = 1;
-			//	SpecAmount = 1;
-			//	SpecPower = 1;
-			//}
 			Dir = new Vector3(-1, -1, 1);
+			AmbientAmount = 0.2f;
+			DiffuseAmount = 2;
+			SpecAmount = 1;
+			SpecPower = 50;
 			Color = new Color(0xffffffff);
 		}
 
@@ -699,8 +695,6 @@ namespace Visual_Music
 					SpecAmount = (float)entry.Value;
 				else if (entry.Name == "specPower")
 					SpecPower = (float)entry.Value;
-				else if (entry.Name == "color")
-					Color = (Color)entry.Value;
 				else if (entry.Name == "color")
 					Color = (Color)entry.Value;
 			}

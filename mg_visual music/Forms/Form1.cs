@@ -698,6 +698,7 @@ namespace Visual_Music
 				loadMtrlTexInPb();
 				disableTextureCh.CheckState = toCheckState(texProps.DisableTexture);
 				pointSmpCb.CheckState = toCheckState(texProps.PointSmp);
+				texColBlendCb.CheckState = toCheckState(texProps.TexColBlend);
 				texUTileCb.CheckState = toCheckState(texProps.UTile);
 				texVTileCb.CheckState = toCheckState(texProps.VTile);
 				updateTexUVCb(tileTexCb, texUTileCb, texVTileCb);
@@ -1250,6 +1251,14 @@ namespace Visual_Music
 			updateTrackControls();
 		}
 
+		private void texColBlendCb_CheckedChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				getActiveTexProps(i).TexColBlend = ((CheckBox)sender).Checked;
+		}
+
 		private void tileTexCb_CheckedChanged(object sender, EventArgs e)
 		{
 			if (updatingControls)
@@ -1679,5 +1688,6 @@ namespace Visual_Music
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				Project.TrackViews[TrackList.SelectedIndices[i]].TrackProps.LightProps.SystemColor = lightColorBtn.BackColor;
 		}
+
 	}
 }
