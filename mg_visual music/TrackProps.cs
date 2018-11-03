@@ -645,23 +645,26 @@ namespace Visual_Music
 		public float? DirZ { get; set; }
 
 		public float? AmbientAmount { get; set; }
+		public Color? AmbientColor { get; set; }
 		public float? DiffuseAmount { get; set; }
+		public Color? DiffuseColor { get; set; }
 		public float? SpecAmount { get; set; }
+		public Color? SpecColor { get; set; }
 		public float? SpecPower { get; set; }
-		public Color? Color { get; set; }
+		public Color? Filter { get; set; }
 		public System.Drawing.Color SystemColor
 		{
 			get
 			{
-				if (Color == null)
+				if (Filter == null)
 					return System.Drawing.Color.Empty;
 				else
 				{
-					Color c = (Color)Color;
+					Color c = (Color)Filter;
 					return System.Drawing.Color.FromArgb(c.A, c.R, c.G, c.B);
 				}
 			}
-			set => Color = new Color(value.R, value.G, value.B);
+			set => Filter = new Color(value.R, value.G, value.B);
 		}
 
 		public LightProps(int trackNumber)
@@ -674,13 +677,13 @@ namespace Visual_Music
 			AmbientAmount = 0.2f;
 			DiffuseAmount = 2;
 			SpecAmount = 1;
+			AmbientColor = DiffuseColor = SpecColor = Filter = Color.White;
 			SpecPower = 50;
-			Color = new Color(0xffffffff);
 		}
 
 		public LightProps(SerializationInfo info, StreamingContext ctxt)
 		{
-			Color = new Color(0xffffffff); //Compatible with older saves without color information
+			AmbientColor = DiffuseColor = SpecColor = Filter = Color.White; //Compatible with older saves without color information
 			foreach (SerializationEntry entry in info)
 			{
 				if (entry.Name == "dir")
@@ -693,10 +696,16 @@ namespace Visual_Music
 					DiffuseAmount = (float)entry.Value;
 				else if (entry.Name == "specAmount")
 					SpecAmount = (float)entry.Value;
+				else if (entry.Name == "ambientColor")
+					AmbientColor = (Color)entry.Value;
+				else if (entry.Name == "diffuseColor")
+					DiffuseColor = (Color)entry.Value;
+				else if (entry.Name == "specColor")
+					SpecColor = (Color)entry.Value;
 				else if (entry.Name == "specPower")
 					SpecPower = (float)entry.Value;
 				else if (entry.Name == "color")
-					Color = (Color)entry.Value;
+					Filter = (Color)entry.Value;
 			}
 		}
 
@@ -707,8 +716,11 @@ namespace Visual_Music
 			info.AddValue("ambientAmount", AmbientAmount);
 			info.AddValue("diffuseAmount", DiffuseAmount);
 			info.AddValue("specAmount", SpecAmount);
+			info.AddValue("ambientColor", AmbientColor);
+			info.AddValue("diffuseColor", DiffuseColor);
+			info.AddValue("specColor", SpecColor);
 			info.AddValue("specPower", SpecPower);
-			info.AddValue("color", Color);
+			info.AddValue("color", Filter);
 
 		}
 	}

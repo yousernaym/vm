@@ -18,12 +18,11 @@ float4 Color;
 float BlurredEdgePixels = 2;
 float BlurredEdge;
 float3 LightDir = normalize(float3(1, 1, 1));
-float AmbientAmount;
-float DiffuseAmount;
-float SpecAmount;
+float4 AmbientColor;
+float4 DiffuseColor;
+float4 SpecColor;
 float SpecPower;
-float SpecFov;
-float4 LightColor;
+float4 LightFilter;
 float3 CamPos;
 float3 PosOffset;
 
@@ -125,13 +124,13 @@ float4 blurEdges(float4 color, float normPosY)
 float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 {
 	//float lum = clamp(dot(LightDir, normal), AmbientLum, 1);
-	color *= saturate(dot(LightDir, normal)) * DiffuseAmount + AmbientAmount;
-    color *= LightColor;
+	color *= saturate(dot(LightDir, normal)) * DiffuseColor + AmbientColor;
 	float3 lightReflection = -reflect(LightDir, normal);
 	float3 viewVec = normalize(CamPos - worldPos);
 	if (any(color))
-		color += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecAmount;
-	return color;
+		color += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecColor;
+    color *= LightFilter;
+    return color;
 }
 
 float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out float3 destNormalDir, out bool discardFade)
@@ -305,8 +304,7 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 	}
 	if (!any(destNormal))
 		destNormal = sourceNormal;
-	
-	result.rgb = calcLighting(result.rgb, normalize(destNormal), worldPos);
+    result.rgb = calcLighting(result.rgb, normalize(destNormal), worldPos);
 	return result;
 }
 

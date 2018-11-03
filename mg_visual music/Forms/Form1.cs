@@ -14,6 +14,8 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.Serialization;
 using System.IO.Compression;
 using CefSharp.Example.RequestEventHandler;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Visual_Music
 {
@@ -730,8 +732,12 @@ namespace Visual_Music
 				setNumericUdValue(ambientAmountUd, mergedTrackProps.LightProps.AmbientAmount);
 				setNumericUdValue(diffuseAmountUd, mergedTrackProps.LightProps.DiffuseAmount);
 				setNumericUdValue(specAmountUd, mergedTrackProps.LightProps.SpecAmount);
+				ambientColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.AmbientColor);
+				diffuseColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.DiffuseColor);
+				specColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.SpecColor);
+
 				setNumericUdValue(specPowUd, mergedTrackProps.LightProps.SpecPower);
-				lightColorBtn.BackColor = mergedTrackProps.LightProps.SystemColor;
+				lightFilterBtn.BackColor = mergedTrackProps.LightProps.SystemColor;
 				//-------------------------------
 
 				//Spatial---------------------------------
@@ -808,8 +814,8 @@ namespace Visual_Music
 					}
 					for (int i = 0; i < selectedItems.Length; i++)
 						newItems[i].Selected = true;    //After removal of old items it's now safe to select new items
-					//for (int i = 0; i < Project.TrackViews.Count; i++)
-						//Project.TrackViews[i].TrackNumber = i;
+														//for (int i = 0; i < Project.TrackViews.Count; i++)
+														//Project.TrackViews[i].TrackNumber = i;
 				}
 				else //CTRL pressed
 				{
@@ -1575,6 +1581,55 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecAmount = (float)specAmountUd.Value;
 		}
 
+		private void ambientColorBtn_Click(object sender, EventArgs e)
+		{
+			Thread thread = new Thread(new ThreadStart(delegate { colorDialog1.ShowDialog(); }));
+			while (thread.IsAlive)
+				debugLabel.Text = colorDialog1.Color.GetHue().ToString();
+			//if (!colorDialogButtonClick((Button)sender))
+			//	return;
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientColor = gdiToXnaCol(ambientColorBtn.BackColor);
+		}
+
+		private void diffuseColorBtn_Click(object sender, EventArgs e)
+		{
+			if (!colorDialogButtonClick((Button)sender))
+				return;
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.DiffuseColor = gdiToXnaCol(diffuseColorBtn.BackColor);
+		}
+
+		private void specColorBtn_Click(object sender, EventArgs e)
+		{
+			if (!colorDialogButtonClick((Button)sender))
+				return;
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecColor = gdiToXnaCol(specColorBtn.BackColor);
+		}
+
+		public static XnaColor gdiToXnaCol(GdiColor gdiCol)
+		{
+			return new XnaColor(gdiCol.R, gdiCol.G, gdiCol.B);
+		}
+
+		public static GdiColor xnaToGdiCol(XnaColor? xnaCol)
+		{
+			if (xnaCol == null)
+				return GdiColor.Empty;
+			else
+			{
+				XnaColor c = (XnaColor)xnaCol;
+				return GdiColor.FromArgb(c.A, c.R, c.G, c.B);
+			}
+		}
+
 		private void specPowUd_ValueChanged(object sender, EventArgs e)
 		{
 			if (updatingControls)
@@ -1633,7 +1688,7 @@ namespace Visual_Music
 			int elementIndex = 0;
 			Vector3 pos = new Vector3();
 			Quaternion orient = new Quaternion();
-			
+
 			foreach (string line in camTb.Lines)
 			{
 				if (string.IsNullOrWhiteSpace(line))
@@ -1679,14 +1734,27 @@ namespace Visual_Music
 			}
 		}
 
-		private void lightColorBtn_Click(object sender, EventArgs e)
+		private void lightFilterBtn_Click(object sender, EventArgs e)
 		{
-			colorDialog1.Color = lightColorBtn.BackColor;
-			if (colorDialog1.ShowDialog() != DialogResult.OK)
+			if (!colorDialogButtonClick((Button)sender))
 				return;
-			lightColorBtn.BackColor = colorDialog1.Color;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				Project.TrackViews[TrackList.SelectedIndices[i]].TrackProps.LightProps.SystemColor = lightColorBtn.BackColor;
+				Project.TrackViews[TrackList.SelectedIndices[i]].TrackProps.LightProps.SystemColor = lightFilterBtn.BackColor;
 		}
+
+		private bool colorDialogButtonClick(Button button)
+		{
+			colorDialog1.Color = button.BackColor;
+			if (colorDialog1.ShowDialog() != DialogResult.OK)
+				return false;
+			button.BackColor = colorDialog1.Color;
+			return true;
+		}
+	}
+
+	
+	public class ColorDialogRT : ColorDialog
+	{
+		
 	}
 }
