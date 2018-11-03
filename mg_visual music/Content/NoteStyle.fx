@@ -262,6 +262,8 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 			ModEntry modEntry;
 			fillModEntryStruct(modEntry, i);
 			modEntry.FadeOut = max(gradLength * 3, modEntry.FadeOut);
+            modEntry.FadeOut = max(0.05f, modEntry.FadeOut);
+
 			if (modEntry.Start > 0)
 				modEntry.FadeIn = max(gradLength * 3, modEntry.FadeIn);
 			modEntry.FadeIn = min(1 - modEntry.FadeOut, modEntry.FadeIn);
