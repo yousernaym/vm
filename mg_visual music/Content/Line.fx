@@ -80,9 +80,10 @@ technique Line
 	pass
 	{
 		CullMode = None;
-		VertexShader = compile vs_5_0 VS();
+     	VertexShader = compile vs_5_0 VS();
 		PixelShader  = compile ps_5_0 PS();
-	}
+	}   
+
 }
 
 //Highlights------------------------------

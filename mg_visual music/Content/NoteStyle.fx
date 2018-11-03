@@ -25,6 +25,7 @@ float SpecPower;
 float4 LightFilter;
 float3 CamPos;
 float3 PosOffset;
+bool DiscardAtOnce;
 
 #define ModEntriesCount 5
 
@@ -270,13 +271,16 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 			float3 destNormalDir;
 			bool discardFade;
 			float interpolant = getInterpolant(modEntry, normPos, noteSize, destNormalDir, discardFade);
+			
+            if (DiscardAtOnce && (discardFade || interpolant < 0))
+                discard;
 			if (interpolant < 0) //Discard after stop
 			{
 				result = 0;
 				//result = blurEdges(result, -interpolant);
 				continue;
 			}
-			if (Invert[i])
+           	if (Invert[i])
 				interpolant = 1 - interpolant;
 			if (ColorDestEnable[i])
 			{
@@ -304,8 +308,10 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 	}
 	if (!any(destNormal))
 		destNormal = sourceNormal;
-    result.rgb = calcLighting(result.rgb, normalize(destNormal), worldPos);
-	return result;
+	//if (!any(result))
+      //  discard;
+	result.rgb = calcLighting(result.rgb, normalize(destNormal), worldPos);
+    return result;
 }
 
 float4 HslaToRgba(float4 hsla)
