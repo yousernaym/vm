@@ -263,11 +263,9 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 			fillModEntryStruct(modEntry, i);
 			modEntry.FadeOut = max(gradLength * 3, modEntry.FadeOut);
 			if (modEntry.Start > 0)
-			{
 				modEntry.FadeIn = max(gradLength * 3, modEntry.FadeIn);
-				modEntry.FadeIn = min(1 - modEntry.FadeOut, modEntry.FadeIn);
-			}
-			
+			modEntry.FadeIn = min(1 - modEntry.FadeOut, modEntry.FadeIn);
+					
 			float3 destNormalDir;
 			bool discardFade;
 			float interpolant = getInterpolant(modEntry, normPos, noteSize, destNormalDir, discardFade);

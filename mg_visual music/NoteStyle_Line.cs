@@ -539,21 +539,13 @@ namespace Visual_Music
 			fx.Parameters["DiscardAtOnce"].SetValue(true);
 			fx.CurrentTechnique.Passes[0].Apply();
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
-
-			DepthStencilState oldDss = songPanel.GraphicsDevice.DepthStencilState;
-			DepthStencilState dss = new DepthStencilState();
-			dss.StencilEnable = true;
-			dss.StencilFunction = CompareFunction.Greater;
-			dss.StencilPass = StencilOperation.Keep;
-			dss.ReferenceStencil = 1;
-			songPanel.GraphicsDevice.DepthStencilState = dss;
 			fx.Parameters["DiscardAtOnce"].SetValue(false);
 			fx.CurrentTechnique.Passes[0].Apply();
 			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
 
+			DepthStencilState oldDss = songPanel.GraphicsDevice.DepthStencilState;
 			songPanel.GraphicsDevice.DepthStencilState = DepthStencilState.None;
 			drawHighLights(midiTrack, trackProps, songPosP);
-
 			songPanel.GraphicsDevice.DepthStencilState = oldDss;
 		}
 
