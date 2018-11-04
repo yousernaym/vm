@@ -1,14 +1,16 @@
 ﻿using ColorSpaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Visual_Music.Controls
+namespace Visual_Music
 {
+	[DefaultEvent("ColorChanged")]
 	class HueSatButton : Button
 	{
 		public event EventHandler ColorChanged;
@@ -23,23 +25,22 @@ namespace Visual_Music.Controls
 			set => form.Saturation = value;
 		}
 
-		HueSatForm form = new HueSatForm();
+		public HueSatForm form = new HueSatForm();
 		public HueSatButton()
 		{
 			form.SelectionChanged += form_SelectionChanged;
 			Click += OnClick;
+			Text = "";
 		}
 
 		private void OnClick(object sender, EventArgs e)
 		{
-			float hue = Hue;
-			float sat = Saturation;
+			float hue = Hue, sat = Saturation;
 			if (form.ShowDialog() != DialogResult.OK)
 			{
 				Hue = hue;
 				Saturation = sat;
-			}
-			
+			}			
 		}
 
 		private void form_SelectionChanged(object sender, EventArgs e)

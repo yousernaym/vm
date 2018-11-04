@@ -27,7 +27,6 @@ namespace Visual_Music
 
 	public partial class Form1 : Form
 	{
-		HueSatForm hueSatForm = new HueSatForm();
 		string[] startupArgs;
 		int TrackTexPbHeight;
 		int MaxTrackTexPbWidth;
@@ -229,20 +228,20 @@ namespace Visual_Music
 		{
 			foreach (Control control in controls)
 			{
-				if (control is TextBox)
+				if (control.GetType() == typeof(TextBox))
 					((TextBox)control).TextChanged += invalidateSongPanel;
-				else if (control is NumericUpDown)
+				else if (control.GetType() == typeof(NumericUpDown))
 					((NumericUpDown)control).ValueChanged += invalidateSongPanel;
-				else if (control is CheckBox)
+				else if (control.GetType() == typeof(CheckBox))
 					((CheckBox)control).CheckedChanged += invalidateSongPanel;
-				else if (control is Button)
+				else if (control.GetType() == typeof(Button))
 					((Button)control).Click += invalidateSongPanel;
-				else if (control is RadioButton)
+				else if (control.GetType() == typeof(RadioButton))
 					((RadioButton)control).CheckedChanged += invalidateSongPanel;
-				else if (control is ComboBox)
+				else if (control.GetType() == typeof(ComboBox))
 					((ComboBox)control).SelectedValueChanged += invalidateSongPanel;
-				else if (control is TwoD)
-					((TwoD)control).SelectionChanged += invalidateSongPanel;
+				else if (control.GetType() == typeof(HueSatButton))
+					((HueSatButton)control).ColorChanged += invalidateSongPanel;
 				if (control.Controls.Count > 0)
 					addInvalidateEH(control.Controls);
 			}
@@ -733,7 +732,7 @@ namespace Visual_Music
 				setNumericUdValue(ambientAmountUd, mergedTrackProps.LightProps.AmbientAmount);
 				setNumericUdValue(diffuseAmountUd, mergedTrackProps.LightProps.DiffuseAmount);
 				setNumericUdValue(specAmountUd, mergedTrackProps.LightProps.SpecAmount);
-				ambientColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.AmbientColor);
+				//ambientColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.AmbientColor);
 				diffuseColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.DiffuseColor);
 				specColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.SpecColor);
 
@@ -1582,14 +1581,23 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecAmount = (float)specAmountUd.Value;
 		}
 
+		private void ambientHsBtn_ColorChanged(object sender, EventArgs e)
+		{
+			//if (!colorDialogButtonClick((Button)sender))
+				//return;
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientColor = gdiToXnaCol(ambientHsBtn.BackColor);
+		}
 		private void ambientColorBtn_Click(object sender, EventArgs e)
 		{
 			if (!colorDialogButtonClick((Button)sender))
 				return;
 			if (updatingControls)
 				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientColor = gdiToXnaCol(ambientColorBtn.BackColor);
+			//for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				//Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientColor = gdiToXnaCol(ambientColorBtn.BackColor);
 		}
 
 		private void diffuseColorBtn_Click(object sender, EventArgs e)
@@ -1747,11 +1755,6 @@ namespace Visual_Music
 				return false;
 			button.BackColor = colorDialog1.Color;
 			return true;
-		}
-
-		private void twoDHueSat1_SelectionChanged(object sender, EventArgs e)
-		{
-
 		}
 	}
 }

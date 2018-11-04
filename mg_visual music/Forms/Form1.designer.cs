@@ -128,7 +128,6 @@
 			this.lightPanel = new System.Windows.Forms.Panel();
 			this.specColorBtn = new System.Windows.Forms.Button();
 			this.diffuseColorBtn = new System.Windows.Forms.Button();
-			this.ambientColorBtn = new System.Windows.Forms.Button();
 			this.lightFilterBtn = new System.Windows.Forms.Button();
 			this.specPowUd = new System.Windows.Forms.NumericUpDown();
 			this.ambientAmountUd = new System.Windows.Forms.NumericUpDown();
@@ -184,7 +183,7 @@
 			this.hilitedColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.lineStyleControl = new Visual_Music.LineStyleControl();
 			this.barStyleControl = new Visual_Music.BarStyleControl();
-			this.twoDHueSat1 = new Visual_Music.TwoDHueSat();
+			this.ambientHsBtn = new Visual_Music.HueSatButton();
 			this.songPanelBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.songPanelBindingSource1 = new System.Windows.Forms.BindingSource(this.components);
@@ -365,7 +364,7 @@
             this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1673, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1043, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -508,7 +507,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(1278, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(648, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 15642);
 			this.trackPropsPanel.TabIndex = 3;
@@ -1307,7 +1306,6 @@
 			// 
 			this.light.AutoScroll = true;
 			this.light.BackColor = System.Drawing.SystemColors.Control;
-			this.light.Controls.Add(this.twoDHueSat1);
 			this.light.Controls.Add(this.defaultLightBtn);
 			this.light.Controls.Add(this.lightPanel);
 			this.light.Controls.Add(this.globalLightCb);
@@ -1331,9 +1329,9 @@
 			// lightPanel
 			// 
 			this.lightPanel.AutoSize = true;
+			this.lightPanel.Controls.Add(this.ambientHsBtn);
 			this.lightPanel.Controls.Add(this.specColorBtn);
 			this.lightPanel.Controls.Add(this.diffuseColorBtn);
-			this.lightPanel.Controls.Add(this.ambientColorBtn);
 			this.lightPanel.Controls.Add(this.lightFilterBtn);
 			this.lightPanel.Controls.Add(this.specPowUd);
 			this.lightPanel.Controls.Add(this.ambientAmountUd);
@@ -1374,15 +1372,6 @@
 			this.diffuseColorBtn.TabIndex = 58;
 			this.diffuseColorBtn.UseVisualStyleBackColor = true;
 			this.diffuseColorBtn.Click += new System.EventHandler(this.diffuseColorBtn_Click);
-			// 
-			// ambientColorBtn
-			// 
-			this.ambientColorBtn.Location = new System.Drawing.Point(116, 78);
-			this.ambientColorBtn.Name = "ambientColorBtn";
-			this.ambientColorBtn.Size = new System.Drawing.Size(53, 20);
-			this.ambientColorBtn.TabIndex = 58;
-			this.ambientColorBtn.UseVisualStyleBackColor = true;
-			this.ambientColorBtn.Click += new System.EventHandler(this.ambientColorBtn_Click);
 			// 
 			// lightFilterBtn
 			// 
@@ -1744,7 +1733,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-5438, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-6221, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1756,7 +1745,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-5550, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-6333, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1766,7 +1755,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-5552, 15630);
+			this.label4.Location = new System.Drawing.Point(-6335, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2054,19 +2043,16 @@
 			this.barStyleControl.Size = new System.Drawing.Size(180, 55);
 			this.barStyleControl.TabIndex = 2;
 			// 
-			// twoDHueSat1
+			// ambientHsBtn
 			// 
-			this.twoDHueSat1.BackColor = System.Drawing.SystemColors.Control;
-			this.twoDHueSat1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-			this.twoDHueSat1.Hue = 0F;
-			this.twoDHueSat1.Location = new System.Drawing.Point(22, 280);
-			this.twoDHueSat1.Name = "twoDHueSat1";
-			this.twoDHueSat1.Saturation = 0F;
-			this.twoDHueSat1.SelectionSize = 20;
-			this.twoDHueSat1.SetSelectionColor = System.Drawing.Color.Black;
-			this.twoDHueSat1.Size = new System.Drawing.Size(146, 146);
-			this.twoDHueSat1.TabIndex = 31;
-			this.twoDHueSat1.SelectionChanged += new System.EventHandler(this.twoDHueSat1_SelectionChanged);
+			this.ambientHsBtn.Hue = 0F;
+			this.ambientHsBtn.Location = new System.Drawing.Point(116, 78);
+			this.ambientHsBtn.Name = "ambientHsBtn";
+			this.ambientHsBtn.Saturation = 0F;
+			this.ambientHsBtn.Size = new System.Drawing.Size(53, 20);
+			this.ambientHsBtn.TabIndex = 59;
+			this.ambientHsBtn.UseVisualStyleBackColor = true;
+			this.ambientHsBtn.ColorChanged += new System.EventHandler(this.ambientHsBtn_ColorChanged);
 			// 
 			// songPanelBindingSource
 			// 
@@ -2087,7 +2073,7 @@
 			this.AutoScroll = true;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(1690, 505);
+			this.ClientSize = new System.Drawing.Size(1060, 505);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);
@@ -2328,8 +2314,7 @@
 		private System.Windows.Forms.CheckBox trackPropsCb;
 		private System.Windows.Forms.Button specColorBtn;
 		private System.Windows.Forms.Button diffuseColorBtn;
-		private System.Windows.Forms.Button ambientColorBtn;
-		private TwoDHueSat twoDHueSat1;
+		private HueSatButton ambientHsBtn;
 	}
 }
 

@@ -17,7 +17,6 @@ namespace Visual_Music
 		public BaseDialog()
 		{
 			InitializeComponent();
-			TopLevel = false;
 		}
 
 		private void okBtn_Click(object sender, EventArgs e)

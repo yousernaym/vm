@@ -18,7 +18,6 @@ namespace Visual_Music
 		public event EventHandler SelectionChanged;
 		
 		bool mouseDown = false;
-		PointF selectionPoint = new PointF();
 		float _x;
 		protected float X
 		{
@@ -60,7 +59,7 @@ namespace Visual_Music
 		{
 			get
 			{
-				Point p = new Point((int)(selectionPoint.X * Width), (int)(selectionPoint.Y * Height));
+				Point p = new Point((int)(SelectionPoint.X * Width), (int)(SelectionPoint.Y * Height));
 				if (p.X < 1) p.X = 1;
 				if (p.Y < 1) p.Y = 1;
 				if (p.X > Width - 5) p.X = Width - 5;
@@ -69,8 +68,8 @@ namespace Visual_Music
 			}
 			set
 			{
-				_x = (float)value.X / Width;
-				_y = (float)value.Y / Height;
+				X = (float)value.X / Width;
+				Y = (float)value.Y / Height;
 				SelectionChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
@@ -128,8 +127,8 @@ namespace Visual_Music
 		}
 		public float Saturation
 		{
-			get => Y;
-			set => Y = value;
+			get => 1 - Y;
+			set => Y = 1 - value;
 		}
 
 		public TwoDHueSat() : base()
