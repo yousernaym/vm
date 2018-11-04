@@ -136,6 +136,12 @@
     <Compile Include="Controls\ListViewNF.designer.cs">
       <DependentUpon>ListViewNF.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\HueSatForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\HueSatForm.Designer.cs">
+      <DependentUpon>HueSatForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ImportMidiForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -331,6 +337,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\HueSatForm.resx">
+      <DependentUpon>HueSatForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportMidiForm.resx">
       <DependentUpon>ImportMidiForm.cs</DependentUpon>

@@ -87,7 +87,6 @@ namespace Visual_Music
 		public TwoD()
 		{
 			InitializeComponent();
-
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
