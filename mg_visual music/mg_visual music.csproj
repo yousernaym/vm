@@ -118,6 +118,12 @@
     <Compile Include="Controls\SongWebBrowser.Designer.cs">
       <DependentUpon>SongWebBrowser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TwoD.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TwoD.Designer.cs">
+      <DependentUpon>TwoD.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -318,6 +324,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\TbSlider.resx">
       <DependentUpon>TbSlider.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TwoD.resx">
+      <DependentUpon>TwoD.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
