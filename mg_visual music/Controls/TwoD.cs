@@ -141,7 +141,7 @@ namespace Visual_Music
 				Rectangle r = new Rectangle(x, 0, 1, Height);
 				double hue = (double)x / Width;
 				Color c1 = new HslColor(hue, 1, 0.5);
-				Color c2 = new HslColor(hue, 0, 0.5);
+				Color c2 = new HslColor(hue, 0, 1);
 				using (LinearGradientBrush brush = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Vertical))
 				{
 					e.Graphics.FillRectangle(brush, r);

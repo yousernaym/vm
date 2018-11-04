@@ -65,7 +65,7 @@ namespace Visual_Music
 
 		void updateColor()
 		{
-			BackColor = new HslColor(Hue, Saturation, 0.5); ;
+			BackColor = new HslColor(Hue, Saturation, 0.5 + (1 - Saturation) / 2); ;
 		}
 	}
 }
