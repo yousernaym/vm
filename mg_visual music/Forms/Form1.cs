@@ -27,6 +27,7 @@ namespace Visual_Music
 
 	public partial class Form1 : Form
 	{
+		HueSatForm hueSatForm = new HueSatForm();
 		string[] startupArgs;
 		int TrackTexPbHeight;
 		int MaxTrackTexPbWidth;
@@ -82,7 +83,6 @@ namespace Visual_Music
 		{
 			InitializeComponent();
 			//Application.Idle += delegate { songPanel.update(); };
-
 			project = new Project(SongPanel);
 			startupArgs = args;
 			TrackTexPbHeight = trackTexPb.Height;
@@ -1753,11 +1753,5 @@ namespace Visual_Music
 		{
 
 		}
-	}
-
-
-	public class ColorDialogRT : ColorDialog
-	{
-		
 	}
 }
