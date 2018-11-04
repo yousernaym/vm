@@ -1583,11 +1583,8 @@ namespace Visual_Music
 
 		private void ambientColorBtn_Click(object sender, EventArgs e)
 		{
-			Thread thread = new Thread(new ThreadStart(delegate { colorDialog1.ShowDialog(); }));
-			while (thread.IsAlive)
-				debugLabel.Text = colorDialog1.Color.GetHue().ToString();
-			//if (!colorDialogButtonClick((Button)sender))
-			//	return;
+			if (!colorDialogButtonClick((Button)sender))
+				return;
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
