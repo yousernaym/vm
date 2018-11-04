@@ -10,19 +10,49 @@ using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using ColorSpaces;
 
-namespace Visual_Music.Controls
+namespace Visual_Music
 {
+	[DefaultEvent("SelectionChanged")]
 	public abstract partial class TwoD : UserControl
 	{
+		public event EventHandler SelectionChanged;
+		
 		bool mouseDown = false;
 		PointF selectionPoint = new PointF();
-		PointF SelectionPoint
+		float _x;
+		protected float X
 		{
-			get => selectionPoint;
+			get => _x;
 			set
 			{
-				selectionPoint = value;
-				Invalidate();
+				if (_x != value)
+				{
+					_x = value;
+					Invalidate();
+				}
+			}
+		}
+
+		float _y;
+		protected float Y
+		{
+			get => _y;
+			set
+			{
+				if (_y != value)
+				{
+					_y = value;
+					Invalidate();
+				}
+			}
+		}
+		protected PointF SelectionPoint
+		{
+			get => new PointF(_x, _y);
+			set
+			{
+				_x = value.X;
+				_y = value.Y;
 			}
 		}
 
@@ -37,7 +67,12 @@ namespace Visual_Music.Controls
 				if (p.Y > Height - 5) p.Y = Height - 5;
 				return p;
 			}
-			set => SelectionPoint = new PointF((float)value.X / Width, (float)value.Y / Height);
+			set
+			{
+				_x = (float)value.X / Width;
+				_y = (float)value.Y / Height;
+				SelectionChanged?.Invoke(this, EventArgs.Empty);
+			}
 		}
 		protected PointF origin = new PointF(0, 0);
 		protected Pen SelectionPen = new Pen(Color.Black, 2);
@@ -83,9 +118,21 @@ namespace Visual_Music.Controls
 		}
 	}
 
+
+	//TwoDHueSat-------------------------------
 	public class TwoDHueSat : TwoD
 	{
-		//LinearGradientBrush brush = new LinearGradientBrush(;
+		public float Hue
+		{
+			get => X;
+			set => X = value;
+		}
+		public float Saturation
+		{
+			get => Y;
+			set => Y = value;
+		}
+
 		public TwoDHueSat() : base()
 		{
 		}

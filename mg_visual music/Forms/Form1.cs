@@ -241,7 +241,8 @@ namespace Visual_Music
 					((RadioButton)control).CheckedChanged += invalidateSongPanel;
 				else if (control is ComboBox)
 					((ComboBox)control).SelectedValueChanged += invalidateSongPanel;
-
+				else if (control is TwoD)
+					((TwoD)control).SelectionChanged += invalidateSongPanel;
 				if (control.Controls.Count > 0)
 					addInvalidateEH(control.Controls);
 			}
@@ -1747,9 +1748,14 @@ namespace Visual_Music
 			button.BackColor = colorDialog1.Color;
 			return true;
 		}
+
+		private void twoDHueSat1_SelectionChanged(object sender, EventArgs e)
+		{
+
+		}
 	}
 
-	
+
 	public class ColorDialogRT : ColorDialog
 	{
 		
