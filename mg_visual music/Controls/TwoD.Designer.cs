@@ -36,6 +36,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.DoubleBuffered = true;
 			this.Name = "TwoD";
 			this.Size = new System.Drawing.Size(146, 146);
 			this.ResumeLayout(false);

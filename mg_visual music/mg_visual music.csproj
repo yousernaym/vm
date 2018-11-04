@@ -248,6 +248,7 @@
     <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnResourceRedirectEventArgs.cs" />
     <Compile Include="tparty\CefSharp\RequestEventHandler\EventArgs\OnResourceResponseEventArgs.cs" />
     <Compile Include="tparty\CefSharp\RequestEventHandler\RequestEventHandler.cs" />
+    <Compile Include="tparty\HslColor.cs" />
     <Compile Include="tparty\Timer.cs" />
     <Compile Include="tparty\TimerQueueTimer.cs" />
     <Compile Include="TrackProps.cs" />

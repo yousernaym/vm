@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing.Drawing2D;
+using ColorSpaces;
 
 namespace Visual_Music.Controls
 {
@@ -38,11 +40,11 @@ namespace Visual_Music.Controls
 			set => SelectionPoint = new PointF((float)value.X / Width, (float)value.Y / Height);
 		}
 		protected PointF origin = new PointF(0, 0);
-		protected Pen pen = new Pen(Color.Black, 2);
+		protected Pen SelectionPen = new Pen(Color.Black, 2);
 		public Color SetSelectionColor
 		{
-			get => pen.Color;
-			set => pen.Color = value;
+			get => SelectionPen.Color;
+			set => SelectionPen.Color = value;
 		}
 		public int SelectionSize { get; set; } = 20;
 
@@ -56,9 +58,8 @@ namespace Visual_Music.Controls
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-
-			e.Graphics.DrawLine(pen, new Point(SelectionPointCoords.X - SelectionSize / 2, SelectionPointCoords.Y), new Point(SelectionPointCoords.X + SelectionSize / 2, SelectionPointCoords.Y));
-			e.Graphics.DrawLine(pen, new Point(SelectionPointCoords.X, SelectionPointCoords.Y - SelectionSize / 2), new Point(SelectionPointCoords.X, SelectionPointCoords.Y + SelectionSize / 2));
+			e.Graphics.DrawLine(SelectionPen, new Point(SelectionPointCoords.X - SelectionSize / 2, SelectionPointCoords.Y), new Point(SelectionPointCoords.X + SelectionSize / 2, SelectionPointCoords.Y));
+			e.Graphics.DrawLine(SelectionPen, new Point(SelectionPointCoords.X, SelectionPointCoords.Y - SelectionSize / 2), new Point(SelectionPointCoords.X, SelectionPointCoords.Y + SelectionSize / 2));
 		}
 
 		protected override void OnMouseDown(MouseEventArgs e)
@@ -84,8 +85,25 @@ namespace Visual_Music.Controls
 
 	public class TwoDHueSat : TwoD
 	{
+		//LinearGradientBrush brush = new LinearGradientBrush(;
 		public TwoDHueSat() : base()
 		{
+		}
+		protected override void OnPaint(PaintEventArgs e)
+		{
+			for (int x = 0; x < Width; x++)
+			{
+				Rectangle r = new Rectangle(x, 0, 1, Height);
+				double hue = (double)x / Width;
+				Color c1 = new HslColor(hue, 1, 0.5);
+				Color c2 = new HslColor(hue, 0, 0.5);
+				using (LinearGradientBrush brush = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Vertical))
+				{
+					e.Graphics.FillRectangle(brush, r);
+				}
+			}
+			base.OnPaint(e);
+
 		}
 	}
 }
