@@ -732,12 +732,12 @@ namespace Visual_Music
 				setNumericUdValue(ambientAmountUd, mergedTrackProps.LightProps.AmbientAmount);
 				setNumericUdValue(diffuseAmountUd, mergedTrackProps.LightProps.DiffuseAmount);
 				setNumericUdValue(specAmountUd, mergedTrackProps.LightProps.SpecAmount);
-				//ambientColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.AmbientColor);
-				diffuseColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.DiffuseColor);
-				specColorBtn.BackColor = xnaToGdiCol(mergedTrackProps.LightProps.SpecColor);
-
+				ambientHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.AmbientColor);
+				//diffuseHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.DiffuseColor);
+				//specularHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.SpecularColor);
+				
 				setNumericUdValue(specPowUd, mergedTrackProps.LightProps.SpecPower);
-				lightFilterBtn.BackColor = mergedTrackProps.LightProps.SystemColor;
+				//lightFilterHsBtn.SelectedColor = mergedTrackProps.LightProps.SystemColor;
 				//-------------------------------
 
 				//Spatial---------------------------------
@@ -1583,12 +1583,10 @@ namespace Visual_Music
 
 		private void ambientHsBtn_ColorChanged(object sender, EventArgs e)
 		{
-			//if (!colorDialogButtonClick((Button)sender))
-				//return;
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientColor = gdiToXnaCol(ambientHsBtn.BackColor);
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientColor = gdiToXnaCol(ambientHsBtn.SelectedColor);
 		}
 		private void ambientColorBtn_Click(object sender, EventArgs e)
 		{

@@ -24,8 +24,20 @@ namespace Visual_Music
 			get => form.Saturation;
 			set => form.Saturation = value;
 		}
+		public Color SelectedColor
+		{
+			get => new HslColor(Hue, Saturation, 0.5);
+			set
+			{
+				HslColor c = value;
+				Hue = (float)c.Hue;
+				Saturation = (float)c.Saturation;
+				updateColor();
+			}
+		}
 
 		public HueSatForm form = new HueSatForm();
+
 		public HueSatButton()
 		{
 			form.SelectionChanged += form_SelectionChanged;
@@ -40,13 +52,20 @@ namespace Visual_Music
 			{
 				Hue = hue;
 				Saturation = sat;
+				updateColor();
+				ColorChanged(sender, e);
 			}			
 		}
 
 		private void form_SelectionChanged(object sender, EventArgs e)
 		{
-			BackColor = new HslColor(Hue, Saturation, 0.5); ;
+			updateColor();
 			ColorChanged?.Invoke(sender, e);
+		}
+
+		void updateColor()
+		{
+			BackColor = new HslColor(Hue, Saturation, 0.5); ;
 		}
 	}
 }
