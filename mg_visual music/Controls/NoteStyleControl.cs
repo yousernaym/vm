@@ -73,7 +73,7 @@ namespace Visual_Music
 				squareAspectCb.CheckState = Form1.toCheckState(modEntry.SquareAspect);
 				colorDestCb.CheckState = Form1.toCheckState(modEntry.ColorDestEnable);
 				angleDestCb.CheckState = Form1.toCheckState(modEntry.AngleDestEnable);
-				colorDestBtn.BackColor = modEntry.SystemColorDest;
+				colorDestBtn.BackColor = Form1.xnaToGdiCol(modEntry.ColorDest);
 				Form1.setNumericUdValue(angleDestUd, modEntry.AngleDest);
 				Form1.setNumericUdValue(startUd, modEntry.Start);
 				Form1.setNumericUdValue(stopUd, modEntry.Stop);
@@ -195,7 +195,7 @@ namespace Visual_Music
 				return;
 			colorDestBtn.BackColor = colorDialog1.Color;
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.SystemColorDest = colorDestBtn.BackColor;
+				TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.ColorDest = Form1.gdiToXnaCol(colorDestBtn.BackColor);
 		}
 
 		private void angleDestCb_CheckedChanged(object sender, EventArgs e)

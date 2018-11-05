@@ -58,18 +58,7 @@ namespace Visual_Music
 		public bool? ColorDestEnable { get; set; } = false;
 		public bool? AlphaDestEnable { get; set; } = false;
 		public bool? AngleDestEnable { get; set; } = false;
-		public Vector4 ColorDest { get; set; } = new Vector4(1,1,1,1);
-		public System.Drawing.Color SystemColorDest
-		{
-			get
-			{
-				if (ColorDest == null)
-					return System.Drawing.Color.Empty;
-				else
-					return System.Drawing.Color.FromArgb((int)(ColorDest.W * 255), (int)(ColorDest.X * 255), (int)(ColorDest.Y * 255), (int)(ColorDest.Z * 255));
-			}
-			set => ColorDest = new Vector4((float)value.R / 255, (float)value.G / 255, (float)value.B / 255, (float)value.A / 255);
-		}
+		public Color? ColorDest { get; set; } = Color.White;
 		public int? AngleDest { get; set; } = 45;
 		public float RadAngleDest => (float)AngleDest * (float)Math.PI / 180;
 		public float? Start { get; set; } = 0;
@@ -106,7 +95,10 @@ namespace Visual_Music
 				else if (entry.Name == "angleDestEnable")
 					AngleDestEnable = (bool)entry.Value;
 				else if (entry.Name == "colorDest")
-					ColorDest = (Vector4)entry.Value;
+				{
+					if (entry.Value is Color) //Compatibility with older save files
+						ColorDest = (Color)entry.Value;
+				}
 				else if (entry.Name == "angleDest")
 					AngleDest = (int)entry.Value;
 				else if (entry.Name == "start")
@@ -335,7 +327,7 @@ namespace Visual_Music
 				fx.Parameters["ColorDestEnable"].Elements[i].SetValue((bool)ModEntries[i].ColorDestEnable);
 				fx.Parameters["AngleDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AngleDestEnable);
 				fx.Parameters["AlphaDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AlphaDestEnable);
-				fx.Parameters["ColorDest"].Elements[i].SetValue(ModEntries[i].ColorDest);
+				fx.Parameters["ColorDest"].Elements[i].SetValue(((Color)ModEntries[i].ColorDest).ToVector4());
 				fx.Parameters["AngleDest"].Elements[i].SetValue(ModEntries[i].RadAngleDest);
 				fx.Parameters["Start"].Elements[i].SetValue((float)ModEntries[i].Start);
 				fx.Parameters["Stop"].Elements[i].SetValue((float)ModEntries[i].Stop);

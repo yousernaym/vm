@@ -1621,7 +1621,7 @@ namespace Visual_Music
 		public static GdiColor xnaToGdiCol(XnaColor? xnaCol)
 		{
 			if (xnaCol == null)
-				return GdiColor.Empty;
+				return GdiColor.Black;
 			else
 			{
 				XnaColor c = (XnaColor)xnaCol;
