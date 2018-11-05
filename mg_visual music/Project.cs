@@ -398,7 +398,7 @@ namespace Visual_Music
 				return null;
 			PropertyInfo[] props = first.GetType().GetProperties();
 			bool hasSuitableProp = false;
-			if (props.Length > 0)
+			if (props.Length > 0 && !(first is Color))
 			{
 				foreach (PropertyInfo propertyInfo in props)
 				{

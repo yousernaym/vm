@@ -733,11 +733,10 @@ namespace Visual_Music
 				setNumericUdValue(diffuseAmountUd, mergedTrackProps.LightProps.DiffuseAmount);
 				setNumericUdValue(specAmountUd, mergedTrackProps.LightProps.SpecAmount);
 				ambientHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.AmbientColor);
-				//diffuseHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.DiffuseColor);
-				//specularHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.SpecularColor);
-				
+				diffuseHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.DiffuseColor);
+				specHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.SpecColor);
+				lightFilterHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.Filter);
 				setNumericUdValue(specPowUd, mergedTrackProps.LightProps.SpecPower);
-				//lightFilterHsBtn.SelectedColor = mergedTrackProps.LightProps.SystemColor;
 				//-------------------------------
 
 				//Spatial---------------------------------
@@ -1588,35 +1587,31 @@ namespace Visual_Music
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientColor = gdiToXnaCol(ambientHsBtn.SelectedColor);
 		}
-		private void ambientColorBtn_Click(object sender, EventArgs e)
-		{
-			if (!colorDialogButtonClick((Button)sender))
-				return;
-			if (updatingControls)
-				return;
-			//for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				//Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientColor = gdiToXnaCol(ambientColorBtn.BackColor);
-		}
 
-		private void diffuseColorBtn_Click(object sender, EventArgs e)
+		private void diffuseHsBtn_ColorChanged(object sender, EventArgs e)
 		{
-			if (!colorDialogButtonClick((Button)sender))
-				return;
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.DiffuseColor = gdiToXnaCol(diffuseColorBtn.BackColor);
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.DiffuseColor = gdiToXnaCol(diffuseHsBtn.SelectedColor);
 		}
 
-		private void specColorBtn_Click(object sender, EventArgs e)
+		private void specHsBtn_ColorChanged(object sender, EventArgs e)
 		{
-			if (!colorDialogButtonClick((Button)sender))
-				return;
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecColor = gdiToXnaCol(specColorBtn.BackColor);
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecColor = gdiToXnaCol(specHsBtn.SelectedColor);
 		}
+
+		private void lightFilterHsBtn_ColorChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.Filter = gdiToXnaCol(lightFilterHsBtn.SelectedColor);
+		}
+		
 
 		public static XnaColor gdiToXnaCol(GdiColor gdiCol)
 		{
@@ -1738,14 +1733,6 @@ namespace Visual_Music
 			}
 		}
 
-		private void lightFilterBtn_Click(object sender, EventArgs e)
-		{
-			if (!colorDialogButtonClick((Button)sender))
-				return;
-			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-				Project.TrackViews[TrackList.SelectedIndices[i]].TrackProps.LightProps.SystemColor = lightFilterBtn.BackColor;
-		}
-
 		private bool colorDialogButtonClick(Button button)
 		{
 			colorDialog1.Color = button.BackColor;
@@ -1754,5 +1741,7 @@ namespace Visual_Music
 			button.BackColor = colorDialog1.Color;
 			return true;
 		}
+
+		
 	}
 }

@@ -32,7 +32,10 @@ namespace Visual_Music
 				HslColor c = value;
 				Hue = (float)c.Hue;
 				Saturation = (float)c.Saturation;
-				updateColor();
+				if (value == Color.Empty) //signaling that two or more selected tracks had different color. Set to black since HueSatButton colors can never be black normally.
+					BackColor = Color.Black;
+				else
+					updateColor();
 			}
 		}
 

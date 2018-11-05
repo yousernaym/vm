@@ -652,21 +652,7 @@ namespace Visual_Music
 		public Color? SpecColor { get; set; }
 		public float? SpecPower { get; set; }
 		public Color? Filter { get; set; }
-		public System.Drawing.Color SystemColor
-		{
-			get
-			{
-				if (Filter == null)
-					return System.Drawing.Color.Empty;
-				else
-				{
-					Color c = (Color)Filter;
-					return System.Drawing.Color.FromArgb(c.A, c.R, c.G, c.B);
-				}
-			}
-			set => Filter = new Color(value.R, value.G, value.B);
-		}
-
+		
 		public LightProps(int trackNumber)
 		{
 			if (trackNumber == 0)

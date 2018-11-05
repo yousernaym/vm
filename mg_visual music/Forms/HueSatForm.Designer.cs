@@ -33,11 +33,11 @@
 			// 
 			// okBtn
 			// 
-			this.okBtn.Location = new System.Drawing.Point(164, 298);
+			this.okBtn.Location = new System.Drawing.Point(112, 247);
 			// 
 			// cancelBtn
 			// 
-			this.cancelBtn.Location = new System.Drawing.Point(245, 298);
+			this.cancelBtn.Location = new System.Drawing.Point(193, 247);
 			// 
 			// twoDHueSat1
 			// 
@@ -50,7 +50,7 @@
 			this.twoDHueSat1.Saturation = 0F;
 			this.twoDHueSat1.SelectionSize = 20;
 			this.twoDHueSat1.SetSelectionColor = System.Drawing.Color.Black;
-			this.twoDHueSat1.Size = new System.Drawing.Size(332, 288);
+			this.twoDHueSat1.Size = new System.Drawing.Size(280, 239);
 			this.twoDHueSat1.TabIndex = 3;
 			this.twoDHueSat1.SelectionChanged += new System.EventHandler(this.twoDHueSat1_SelectionChanged);
 			// 
@@ -58,7 +58,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(332, 333);
+			this.ClientSize = new System.Drawing.Size(280, 282);
 			this.Controls.Add(this.twoDHueSat1);
 			this.Name = "HueSatForm";
 			this.Text = "Hue/Saturation picker";
