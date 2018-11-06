@@ -282,6 +282,7 @@ namespace Visual_Music
 
 			upDownVpWidth.Value = Project.ViewWidthQn;
 			audioOffsetS.Value = (decimal)Project.AudioOffset;
+			playbackOffsetUd.Value = (decimal)project.PlaybackOffsetS;
 			maxPitchUd.Value = Project.MaxPitch;
 			minPitchUd.Value = Project.MinPitch;
 			project.Camera.SpatialChanged = updateCamControls;
@@ -439,6 +440,12 @@ namespace Visual_Music
 		private void audioOffsetS_ValueChanged(object sender, EventArgs e)
 		{
 			Project.AudioOffset = (float)audioOffsetS.Value;
+		}
+
+		private void playbackOffsetUd_ValueChanged(object sender, EventArgs e)
+		{
+			project.PlaybackOffsetS = (float)playbackOffsetUd.Value;
+			songScrollBar.Maximum = Project.SongLengthT;
 		}
 
 		private void trackPropsBtn_Click(object sender, EventArgs e)
@@ -1741,7 +1748,5 @@ namespace Visual_Music
 			button.BackColor = colorDialog1.Color;
 			return true;
 		}
-
-		
 	}
 }
