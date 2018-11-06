@@ -318,13 +318,13 @@ namespace Visual_Music
 
 					Project.setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
 
-					while ((int)songPosInTicks < Project.Notes.SongLengthT && !progressForm.Cancel)
+					while ((int)songPosInTicks < Project.SongLengthT && !progressForm.Cancel)
 					{
 						drawVideoFrame(currentTempoEvent, songPosInSeconds, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d, renderTarget2d8bit, songPosInTicks, cubeToPlaneFx);
 						GraphicsDevice.SetRenderTarget(null);
 						renderTarget2d8bit.GetData<uint>(frameData);
 												
-						bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, Project.AudioOffset);
+						bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, Project.AudioOffset + Project.PlaybackOffsetS);
 						if (!b)
 						{
 							lock (progressForm.cancelLock)
@@ -402,12 +402,12 @@ namespace Visual_Music
 					GraphicsDevice.Viewport = new Viewport(0, 0, viewport.Width / 2, viewport.Height);
 
 				}
-				Project.drawSong(options.Resolution, (float)songPosInTicks / Project.Notes.SongLengthT);
+				Project.drawSong(options.Resolution, (float)songPosInTicks / Project.SongLengthT);
 				if (options.Stereo)
 				{
 					Project.Camera.Eye = 1;
 					GraphicsDevice.Viewport = new Viewport(viewport.Width / 2, 0, viewport.Width / 2, viewport.Height);
-					Project.drawSong(options.Resolution, (float)songPosInTicks / Project.Notes.SongLengthT);
+					Project.drawSong(options.Resolution, (float)songPosInTicks / Project.SongLengthT);
 				}
 			}
 		}
