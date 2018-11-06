@@ -289,7 +289,7 @@ namespace Visual_Music
 		protected void drawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial, out float songPosP)
 		{
 			fx.Parameters["BlurredEdge"].SetValue(0.002f * Project.Camera.ViewportSize.X);
-			songPosP = Project.SongPosP;
+			songPosP = Project.SongPosP - Project.PlaybackOffsetP;
 			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Camera.ViewportSize.X, Project.Camera.ViewportSize.Y));
 			fx.Parameters["VpMat"].SetValue(Project.Camera.VpMat);

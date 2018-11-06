@@ -552,7 +552,7 @@ namespace Visual_Music
 		void drawHighLights(Midi.Track midiTrack, TrackProps trackProps, float songPosP)
 		{
 			List<Midi.Note> noteList = midiTrack.Notes;
-			int hlNoteIndex = midiTrack.getLastNoteIndexAtTime(Project.SongPosT);
+			int hlNoteIndex = midiTrack.getLastNoteIndexAtTime(Project.SongPosT - Project.PlaybackOffsetT);
 			if (hlNoteIndex < 0)
 				return;
 			Midi.Note note = noteList[hlNoteIndex], nextNote;

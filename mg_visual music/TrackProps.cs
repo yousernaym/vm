@@ -645,14 +645,14 @@ namespace Visual_Music
 		public float? DirZ { get; set; }
 
 		public float? AmbientAmount { get; set; }
-		public Color? AmbientColor { get; set; }
+		public Color? AmbientColor { get; set; } = Color.White;
 		public float? DiffuseAmount { get; set; }
-		public Color? DiffuseColor { get; set; }
+		public Color? DiffuseColor { get; set; } = Color.White;
 		public float? SpecAmount { get; set; }
-		public Color? SpecColor { get; set; }
+		public Color? SpecColor { get; set; } = Color.White;
 		public float? SpecPower { get; set; }
-		public Color? Filter { get; set; }
-		
+		public Color? Filter { get; set; } = Color.White;
+
 		public LightProps(int trackNumber)
 		{
 			if (trackNumber == 0)
@@ -669,7 +669,6 @@ namespace Visual_Music
 
 		public LightProps(SerializationInfo info, StreamingContext ctxt)
 		{
-			AmbientColor = DiffuseColor = SpecColor = Filter = Color.White; //Compatible with older saves without color information
 			foreach (SerializationEntry entry in info)
 			{
 				if (entry.Name == "dir")
