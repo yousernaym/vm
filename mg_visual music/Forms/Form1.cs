@@ -287,8 +287,8 @@ namespace Visual_Music
 			minPitchUd.Value = Project.MinPitch;
 			project.Camera.SpatialChanged = updateCamControls;
 
-			songScrollBar.Maximum = Project.SongLengthT;
-			songScrollBar.Value = Project.SongPosT;
+			songScrollBar.Maximum = (int)Project.SongLengthT;
+			songScrollBar.Value = (int)Project.SongPosT;
 			upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(songPanel);
 
@@ -445,7 +445,8 @@ namespace Visual_Music
 		private void playbackOffsetUd_ValueChanged(object sender, EventArgs e)
 		{
 			project.PlaybackOffsetS = (float)playbackOffsetUd.Value;
-			songScrollBar.Maximum = Project.SongLengthT;
+			songScrollBar.Maximum = (int)Project.SongLengthT;
+			songScrollBar.Value = (int)Project.SongPosT;
 		}
 
 		private void trackPropsBtn_Click(object sender, EventArgs e)
@@ -1101,7 +1102,7 @@ namespace Visual_Music
 			SongPanel.OnSongPosChanged = delegate ()
 			{
 				if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)
-					songScrollBar.Value = Project.SongPosT;
+					songScrollBar.Value = (int)Project.SongPosT;
 			};
 			changeToScreen(songPanel);
 		}
@@ -1491,7 +1492,7 @@ namespace Visual_Music
 
 		private void songScrollBar_ValueChanged(object sender, EventArgs e)
 		{
-			Project.NormSongPos = (double)songScrollBar.Value / songScrollBar.Maximum;
+			Project.NormSongPos = songScrollBar.Value / Project.SongLengthT;
 		}
 
 		private void xoffsetUd_ValueChanged(object sender, EventArgs e)

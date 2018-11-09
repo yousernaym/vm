@@ -65,18 +65,28 @@ namespace Visual_Music
 			{
 				viewWidthQn = value;
 				if (notes != null)
-					viewWidthT = (int)(viewWidthQn * notes.TicksPerBeat);
+					viewWidthT = viewWidthQn * notes.TicksPerBeat;
 			}
 		}
 		float vertViewWidthQn;
 		public float VertWidthScale => vertViewWidthQn / viewWidthQn;
 
-		int viewWidthT; ////Number of ticks that fits on screen
-		public int ViewWidthT { get => viewWidthT; }
+		float viewWidthT; ////Number of ticks that fits on screen
+		public float ViewWidthT { get => viewWidthT; }
 
 		public double AudioOffset { get; set; }
 		public double PlaybackOffsetS { get; set; } = 0;
-		public int PlaybackOffsetT => (int)(PlaybackOffsetS * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat);
+		public double PlaybackOffsetT
+		{
+			get
+			{
+				if (PlaybackOffsetS >= 0)
+					return PlaybackOffsetS * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat;
+				else
+					return -secondsToTicks(-PlaybackOffsetS);
+			}
+		}
+		double TempoEventsOffset => PlaybackOffsetS > 0 ? PlaybackOffsetT : 0;
 		public float PlaybackOffsetP => getScreenPosX(PlaybackOffsetT);
 
 		public int MinPitch { get; set; }
@@ -96,9 +106,9 @@ namespace Visual_Music
 		Midi.Song notes;
 		public Midi.Song Notes { get { return notes; } }
 
-		public int SongLengthT => (notes != null ? notes.SongLengthT : 0) + PlaybackOffsetT; //Song length in ticks
-		public int SongPosT => (int)(normSongPos * SongLengthT); //Current song position in ticks
-		public float SongPosB => (float)SongPosT / Notes.TicksPerBeat; //Current song position in beats
+		public double SongLengthT => (notes != null ? notes.SongLengthT : 0) + PlaybackOffsetT; //Song length in ticks
+		public double SongPosT => (int)(normSongPos * SongLengthT); //Current song position in ticks
+		public double SongPosB => (float)SongPosT / Notes.TicksPerBeat; //Current song position in beats
 		public float SongPosP => getScreenPosX(SongPosT); //Current song position in pixels
 		double normSongPos; //Song position normalized to [0,1]
 		public double NormSongPos
@@ -239,7 +249,7 @@ namespace Visual_Music
 			{
 				ViewWidthQn = DefaultViewWidthQn;
 				AudioOffset = 0;
-				//PlaybackOffsetS = 0;
+				PlaybackOffsetS = 0;
 				Camera = new Camera(songPanel);
 			}
 
@@ -268,7 +278,7 @@ namespace Visual_Music
 				throw new FileFormatException(new Uri(file));
 						
 			if (notes != null)
-				notes.SongLengthT = (int)secondsToTicks(Media.getAudioLength() + AudioOffset);
+				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + AudioOffset));
 		}
 
 		public void resetPitchLimits()
@@ -374,8 +384,8 @@ namespace Visual_Music
 		}
 		Point getVisibleSongPortionT(double normPos)
 		{
-			int posT = (int)(normPos * SongLengthT);
-			return new Point(posT - ViewWidthT, posT + ViewWidthT);
+			double posT = normPos * SongLengthT;
+			return new Point((int)(posT - ViewWidthT), (int)(posT + ViewWidthT));
 		}
 		public int getPitch(float normPosY)
 		{
@@ -451,10 +461,31 @@ namespace Visual_Music
 			int currentTempoEvent = 0;
 			double currentTimeT = 0;
 			double currentTimeS = 0;
-			double normSongPosTemp = normSongPos;
-			setSongPosInSeconds(ref currentTempoEvent, ref currentTimeT, ref currentTimeS, seconds, false);
-			//Todo: create function that returns these values without modifying Mormsongpos
-			normSongPos = normSongPosTemp;
+			int nextTempoEvent = currentTempoEvent;
+			bool bLastTempoEvent = false;
+			while ((float)currentTimeS < (float)seconds)
+			{
+				double nextTimeStepS;
+				double currentBps = notes.TempoEvents[currentTempoEvent].Tempo / 60; //beats per seconds
+				if (bLastTempoEvent)
+					nextTimeStepS = seconds;
+				else
+				{
+					if (currentTempoEvent + 1 < notes.TempoEvents.Count)
+						nextTempoEvent++;
+					else
+						bLastTempoEvent = true;
+
+					double nextTempoTimeS = (notes.TempoEvents[nextTempoEvent].Time + TempoEventsOffset - currentTimeT) / (notes.TicksPerBeat * currentBps) + currentTimeS;
+					nextTimeStepS = nextTempoTimeS;
+					if (nextTimeStepS > seconds || nextTimeStepS < currentTimeS || nextTimeStepS == currentTimeS && bLastTempoEvent)
+						nextTimeStepS = seconds; //always causes loop to exit
+					else
+						currentTempoEvent = nextTempoEvent;
+				}
+				currentTimeT += (nextTimeStepS - currentTimeS) * currentBps * notes.TicksPerBeat;
+				currentTimeS = nextTimeStepS;
+			}
 			return currentTimeT;
 		}
 
@@ -468,31 +499,13 @@ namespace Visual_Music
 
 		public void setSongPosInSeconds(ref int currentTempoEvent, ref double currentTimeT, ref double currentTimeS, double newTimeS, bool updateScreen)
 		{
-			int nextTempoEvent = currentTempoEvent;
-			bool bLastTempoEvent = false;
-			while ((float)currentTimeS < (float)newTimeS)
+			double offsetS = 0, offsetT = 0;
+			if (PlaybackOffsetS < 0)
 			{
-				double nextTimeStepS;
-				double currentBps = notes.TempoEvents[currentTempoEvent].Tempo / 60; //beats per seconds
-				if (bLastTempoEvent)
-					nextTimeStepS = newTimeS;
-				else
-				{
-					if (currentTempoEvent + 1 < notes.TempoEvents.Count)
-						nextTempoEvent++;
-					else
-						bLastTempoEvent = true;
-
-					double nextTempoTimeS = ((double)notes.TempoEvents[nextTempoEvent].Time + PlaybackOffsetT - currentTimeT) / (notes.TicksPerBeat * currentBps) + (double)currentTimeS;
-					nextTimeStepS = nextTempoTimeS;
-					if (nextTimeStepS > newTimeS || nextTimeStepS < currentTimeS || nextTimeStepS == currentTimeS && bLastTempoEvent)
-						nextTimeStepS = newTimeS; //always causes loop to exit
-					else
-						currentTempoEvent = nextTempoEvent;
-				}
-				currentTimeT += (nextTimeStepS - currentTimeS) * currentBps * notes.TicksPerBeat;
-				currentTimeS = nextTimeStepS;
+				offsetS = -PlaybackOffsetS;
+				offsetT = -PlaybackOffsetT;
 			}
+			currentTimeT = secondsToTicks(newTimeS + offsetS) - offsetT;
 			double newSongPos = currentTimeT / (double)SongLengthT;
 			if (updateScreen)
 				NormSongPos = newSongPos;
@@ -508,16 +521,23 @@ namespace Visual_Music
 		{
 			if (notes == null)
 				return 0;
-			int songPosT = (int)(_normSongPos * SongLengthT);
+			double offsetS = 0, offsetT = 0;
+			if (PlaybackOffsetS < 0)
+			{
+				offsetS = -PlaybackOffsetS;
+				offsetT = -PlaybackOffsetT;
+			}
+
+			double songPosT = _normSongPos * SongLengthT + offsetT;
 			int nextTempoEvent = 0;
 			int currentTempoEvent = 0;
 			bool bLastTempoEvent = false;
-			int currentTimeT = 0;
+			double currentTimeT = 0;
 			double currentTimeS = 0;
-
+			
 			while (currentTimeT < songPosT)
 			{
-				int nextTimeStepT;
+				double nextTimeStepT;
 				double currentBps = notes.TempoEvents[currentTempoEvent].Tempo / 60; //beats per seconds
 				if (bLastTempoEvent)
 					nextTimeStepT = songPosT;
@@ -528,7 +548,7 @@ namespace Visual_Music
 					else
 						bLastTempoEvent = true;
 
-					nextTimeStepT = notes.TempoEvents[nextTempoEvent].Time + PlaybackOffsetT;
+					nextTimeStepT = notes.TempoEvents[nextTempoEvent].Time + TempoEventsOffset;
 					if (nextTimeStepT > songPosT || nextTimeStepT < currentTimeT || nextTimeStepT == currentTimeT && bLastTempoEvent)
 						nextTimeStepT = songPosT; //always causes loop to exit
 					else
@@ -537,7 +557,7 @@ namespace Visual_Music
 				currentTimeS += (nextTimeStepT - currentTimeT) / (notes.TicksPerBeat * currentBps);
 				currentTimeT = nextTimeStepT;
 			}
-			return currentTimeS;
+			return currentTimeS - offsetS;
 		}
 
 		public void update(double deltaTimeS)
@@ -628,20 +648,20 @@ namespace Visual_Music
 			p.Y = getScreenPosY((float)pitch);
 			return p;
 		}
-		public float getScreenPosX(int timeT)
+		public float getScreenPosX(double timeT)
 		{
-			return (float)(((double)timeT / viewWidthT) * (Camera.ViewportSize.X));
+			return (float)((timeT / viewWidthT) * (Camera.ViewportSize.X));
 		}
 	
 		public float getScreenPosY(float pitch)
 		{
 			return (pitch - MinPitch) * NoteHeight + NoteHeight / 2.0f + PitchMargin - Camera.ViewportSize.Y / 2;
 		}
-		public float getTimeT(float screenX)
+		public double getTimeT(double screenX)
 		{ //Returns time in ticks
-			return (float)screenX / Camera.ViewportSize.X * (float)viewWidthT; //Far right -> screenX = viewPortSize / 2
+			return screenX / Camera.ViewportSize.X * viewWidthT; //Far right -> screenX = viewPortSize / 2
 		}
-		public float getSongPosP(float screenXOffset)
+		public double getSongPosP(double screenXOffset)
 		{ //Returns song pos in pixels 
 			return (getTimeT(screenXOffset) + SongPosT) * Camera.ViewportSize.X / viewWidthT;
 		}

@@ -281,7 +281,7 @@ namespace Visual_Music
 		}
 		protected List<Midi.Note> getNotes(int leftMargin, Midi.Track track)
 		{   //Get currently visible notes in specified track
-			return track.getNotes(Project.SongPosT - Project.ViewWidthT / 2 - leftMargin, Project.SongPosT + Project.ViewWidthT / 2 + leftMargin);
+			return track.getNotes((int)(Project.SongPosT - Project.ViewWidthT / 2 - leftMargin), (int)(Project.SongPosT + Project.ViewWidthT / 2 + leftMargin));
 		}
 
 		abstract public void drawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
@@ -375,7 +375,7 @@ namespace Visual_Music
 			if (texture != null)
 			{
 				TrackPropsTex texProps = texMaterial.TexProps;
-				Vector2 texScrollOffset = Project.SongPosB * texProps.Scroll;
+				Vector2 texScrollOffset = (float)Project.SongPosB * texProps.Scroll;
 				if (texProps.UAnchor == TexAnchorEnum.Screen)
 				{
 					Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
