@@ -110,6 +110,7 @@ namespace Visual_Music
 		public double SongPosT => (int)(normSongPos * SongLengthT); //Current song position in ticks
 		public double SongPosB => (float)SongPosT / Notes.TicksPerBeat; //Current song position in beats
 		public float SongPosP => getScreenPosX(SongPosT); //Current song position in pixels
+		public double SongPosS => normSongPosToSeconds(normSongPos); //Current song position in seconds
 		double normSongPos; //Song position normalized to [0,1]
 		public double NormSongPos
 		{
@@ -456,6 +457,38 @@ namespace Visual_Music
 			createOcTrees();
 		}
 
+		double ticksToSeconds(double ticks)
+		{
+			int nextTempoEvent = 0;
+			int currentTempoEvent = 0;
+			bool bLastTempoEvent = false;
+			double currentTimeT = 0;
+			double currentTimeS = 0;
+
+			while (currentTimeT < ticks)
+			{
+				double nextTimeStepT;
+				double currentBps = notes.TempoEvents[currentTempoEvent].Tempo / 60; //beats per seconds
+				if (bLastTempoEvent)
+					nextTimeStepT = ticks;
+				else
+				{
+					if (currentTempoEvent + 1 < notes.TempoEvents.Count)
+						nextTempoEvent++;
+					else
+						bLastTempoEvent = true;
+
+					nextTimeStepT = notes.TempoEvents[nextTempoEvent].Time + TempoEventsOffset;
+					if (nextTimeStepT > ticks || nextTimeStepT < currentTimeT || nextTimeStepT == currentTimeT && bLastTempoEvent)
+						nextTimeStepT = ticks; //always causes loop to exit
+					else
+						currentTempoEvent = nextTempoEvent;
+				}
+				currentTimeS += (nextTimeStepT - currentTimeT) / (notes.TicksPerBeat * currentBps);
+				currentTimeT = nextTimeStepT;
+			}
+			return currentTimeS;
+		}
 		double secondsToTicks(double seconds)
 		{
 			int currentTempoEvent = 0;
@@ -513,51 +546,21 @@ namespace Visual_Music
 				normSongPos = newSongPos;
 		}
 
-		double getSongPosInSeconds()
-		{
-			return getSongPosInSeconds(normSongPos);
-		}
-		public double getSongPosInSeconds(double _normSongPos)
+		//Converts normalized song pos to seconds
+		//0 as input returns 0 seconds, 1 returns song length in seconds
+		public double normSongPosToSeconds(double norm)
 		{
 			if (notes == null)
 				return 0;
+
 			double offsetS = 0, offsetT = 0;
 			if (PlaybackOffsetS < 0)
 			{
 				offsetS = -PlaybackOffsetS;
 				offsetT = -PlaybackOffsetT;
 			}
-
-			double songPosT = _normSongPos * SongLengthT + offsetT;
-			int nextTempoEvent = 0;
-			int currentTempoEvent = 0;
-			bool bLastTempoEvent = false;
-			double currentTimeT = 0;
-			double currentTimeS = 0;
-			
-			while (currentTimeT < songPosT)
-			{
-				double nextTimeStepT;
-				double currentBps = notes.TempoEvents[currentTempoEvent].Tempo / 60; //beats per seconds
-				if (bLastTempoEvent)
-					nextTimeStepT = songPosT;
-				else
-				{
-					if (currentTempoEvent + 1 < notes.TempoEvents.Count)
-						nextTempoEvent++;
-					else
-						bLastTempoEvent = true;
-
-					nextTimeStepT = notes.TempoEvents[nextTempoEvent].Time + TempoEventsOffset;
-					if (nextTimeStepT > songPosT || nextTimeStepT < currentTimeT || nextTimeStepT == currentTimeT && bLastTempoEvent)
-						nextTimeStepT = songPosT; //always causes loop to exit
-					else
-						currentTempoEvent = nextTempoEvent;
-				}
-				currentTimeS += (nextTimeStepT - currentTimeT) / (notes.TicksPerBeat * currentBps);
-				currentTimeT = nextTimeStepT;
-			}
-			return currentTimeS - offsetS;
+			double songPosT = norm * SongLengthT;
+			return ticksToSeconds(songPosT + offsetT) - offsetS;
 		}
 
 		public void update(double deltaTimeS)
@@ -581,7 +584,7 @@ namespace Visual_Music
 					if (!Media.playbackIsRunning())
 					{
 						IsPlaying = false;
-						timeS = getSongPosInSeconds();
+						timeS = SongPosS;
 					}
 					else
 						timeS = Media.getPlaybackPos() + AudioOffset + PlaybackOffsetS;
@@ -610,7 +613,7 @@ namespace Visual_Music
 			}
 			else
 			{
-				double startTime = getSongPosInSeconds() - AudioOffset - PlaybackOffsetS;
+				double startTime = SongPosS - AudioOffset - PlaybackOffsetS;
 				if (startTime >= 0)
 				{
 					if (!Media.startPlaybackAtTime(startTime))
@@ -626,7 +629,7 @@ namespace Visual_Music
 				else
 				{
 					pbStartSysTime = SongPanel.TotalTimeElapsed;
-					pbStartSongTimeS = getSongPosInSeconds();
+					pbStartSongTimeS = SongPosS;
 					AudioHasStarted = false;
 				}
 			}
