@@ -585,7 +585,7 @@ namespace Visual_Music
 			{
 				float poweredNormPos = (float)Math.Pow(normPos, (double)HlMovementPow);
 				hlPos.X = noteStart.X + poweredNormPos * noteLength;
-				hlPos.Y = Project.getScreenPosY(trackProps.TrackView.Curve.Evaluate((float)Project.getTimeT(hlPos.X)));
+				hlPos.Y = Project.getScreenPosY(trackProps.TrackView.Curve.Evaluate((float)Project.pixelsToTicks(hlPos.X)));
 			}
 
 			//Set common fx params---------------------
@@ -626,7 +626,7 @@ namespace Visual_Music
 					float x1 = hlPos.X;
 					float y1 = hlPos.Y;
 					float x2 = x1 + 0.001f;
-					float pitch2 = trackProps.TrackView.Curve.Evaluate((float)Project.getTimeT(x2));
+					float pitch2 = trackProps.TrackView.Curve.Evaluate((float)Project.pixelsToTicks(x2));
 					float y2 = Project.getScreenPosY(pitch2);
 					arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
 					arrowLength = VpHlSize * 1.25f;  //Make arrow 25% longer than wide

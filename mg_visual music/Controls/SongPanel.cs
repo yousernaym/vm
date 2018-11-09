@@ -316,7 +316,7 @@ namespace Visual_Music
 					cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
 					Project.Camera.InvertY = !options.Sphere;
 
-					Project.setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
+					Project.setSongPosS(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, startSongPosS, false);
 
 					while ((int)songPosInTicks < Project.SongLengthT && !progressForm.Cancel)
 					{
@@ -333,7 +333,7 @@ namespace Visual_Music
 							break;
 						}
 						frameStart += frameDuration;
-						Project.setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0 / videoFormat.fps, false);
+						Project.setSongPosS(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0 / videoFormat.fps, false);
 						progressForm.updateProgress(Project.NormSongPos);
 						frames++;
 					}
@@ -373,7 +373,7 @@ namespace Visual_Music
 				if (i == frameSamples - 1)
 					rt = renderTarget2d8bit; //Last pass should draw to normal rendertarget iwth 8 bits per channel
 				drawVideoFrameSample(options, renderTargetCube, rt, tex, songPosInTicks, cubeToPlaneFx);
-				Project.setSongPosInSeconds(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0 / frameSamples / fps, false);
+				Project.setSongPosS(ref currentTempoEvent, ref songPosInTicks, ref songPosInSeconds, songPosInSeconds + 1.0 / frameSamples / fps, false);
 			}
 		}
 
