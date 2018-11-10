@@ -89,6 +89,11 @@ namespace Visual_Music
 		double TempoEventsOffset => PlaybackOffsetS > 0 ? PlaybackOffsetT : 0;
 		public float PlaybackOffsetP => getScreenPosX(PlaybackOffsetT);
 
+		//Current playback position to seek from
+		int pbTempoEvent = 0;
+		double pbTimeT = 0;
+		double pbTimeS = 0;
+
 		public int MinPitch { get; set; }
 		public int MaxPitch { get; set; }
 		int NumPitches { get { return MaxPitch - MinPitch + 1; } }
@@ -106,7 +111,7 @@ namespace Visual_Music
 		Midi.Song notes;
 		public Midi.Song Notes { get { return notes; } }
 
-		public double SongLengthT => (notes != null ? notes.SongLengthT : 0) + PlaybackOffsetT; //Song length in ticks
+		public double SongLengthT => (notes != null ? notes.SongLengthT : 0) + AudioOffset + PlaybackOffsetT; //Song length in ticks
 		public double SongPosT => (int)(normSongPos * SongLengthT); //Current song position in ticks
 		public double SongPosB => (float)SongPosT / Notes.TicksPerBeat; //Current song position in beats
 		public float SongPosP => getScreenPosX(SongPosT); //Current song position in pixels
@@ -279,7 +284,7 @@ namespace Visual_Music
 				throw new FileFormatException(new Uri(file));
 						
 			if (notes != null)
-				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + AudioOffset));
+				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength()));
 		}
 
 		public void resetPitchLimits()
@@ -359,7 +364,7 @@ namespace Visual_Music
 				TrackViews[i].createOcTree(this, GlobalTrackProps);
 		}
 
-		public void drawSong(Point viewportSize, double normPos)
+		public void drawSong(Point viewportSize)
 		{
 			if (notes == null)
 				return;
@@ -460,77 +465,66 @@ namespace Visual_Music
 		double ticksToSeconds(double ticks)
 		{
 			int nextTempoEvent = 0;
-			int currentTempoEvent = 0;
 			bool bLastTempoEvent = false;
-			double currentTimeT = 0;
-			double currentTimeS = 0;
-
-			while (currentTimeT < ticks)
+			pbTimeT = pbTimeS = pbTempoEvent = 0;
+			while (pbTimeT < ticks)
 			{
 				double nextTimeStepT;
-				double currentBps = notes.TempoEvents[currentTempoEvent].Tempo / 60; //beats per seconds
+				double currentBps = notes.TempoEvents[pbTempoEvent].Tempo / 60; //beats per seconds
 				if (bLastTempoEvent)
 					nextTimeStepT = ticks;
 				else
 				{
-					if (currentTempoEvent + 1 < notes.TempoEvents.Count)
+					if (pbTempoEvent + 1 < notes.TempoEvents.Count)
 						nextTempoEvent++;
 					else
 						bLastTempoEvent = true;
 
 					nextTimeStepT = notes.TempoEvents[nextTempoEvent].Time + TempoEventsOffset;
-					if (nextTimeStepT > ticks || nextTimeStepT < currentTimeT || nextTimeStepT == currentTimeT && bLastTempoEvent)
+					if (nextTimeStepT > ticks || nextTimeStepT < pbTimeT || nextTimeStepT == pbTimeT && bLastTempoEvent)
 						nextTimeStepT = ticks; //always causes loop to exit
 					else
-						currentTempoEvent = nextTempoEvent;
+						pbTempoEvent = nextTempoEvent;
 				}
-				currentTimeS += (nextTimeStepT - currentTimeT) / (notes.TicksPerBeat * currentBps);
-				currentTimeT = nextTimeStepT;
+				pbTimeS += (nextTimeStepT - pbTimeT) / (notes.TicksPerBeat * currentBps);
+				pbTimeT = nextTimeStepT;
 			}
-			return currentTimeS;
+			return pbTimeS;
 		}
 		double secondsToTicks(double seconds)
 		{
-			int currentTempoEvent = 0;
-			double currentTimeT = 0;
-			double currentTimeS = 0;
-			int nextTempoEvent = currentTempoEvent;
+			if (pbTimeS > seconds) //Reset seek position
+				pbTimeS = pbTimeT = pbTempoEvent = 0;
+			
+			int nextTempoEvent = pbTempoEvent;
 			bool bLastTempoEvent = false;
-			while ((float)currentTimeS < (float)seconds)
+			while ((float)pbTimeS < (float)seconds)
 			{
 				double nextTimeStepS;
-				double currentBps = notes.TempoEvents[currentTempoEvent].Tempo / 60; //beats per seconds
+				double currentBps = notes.TempoEvents[pbTempoEvent].Tempo / 60; //beats per seconds
 				if (bLastTempoEvent)
 					nextTimeStepS = seconds;
 				else
 				{
-					if (currentTempoEvent + 1 < notes.TempoEvents.Count)
+					if (pbTempoEvent + 1 < notes.TempoEvents.Count)
 						nextTempoEvent++;
 					else
 						bLastTempoEvent = true;
 
-					double nextTempoTimeS = (notes.TempoEvents[nextTempoEvent].Time + TempoEventsOffset - currentTimeT) / (notes.TicksPerBeat * currentBps) + currentTimeS;
+					double nextTempoTimeS = (notes.TempoEvents[nextTempoEvent].Time + TempoEventsOffset - pbTimeT) / (notes.TicksPerBeat * currentBps) + pbTimeS;
 					nextTimeStepS = nextTempoTimeS;
-					if (nextTimeStepS > seconds || nextTimeStepS < currentTimeS || nextTimeStepS == currentTimeS && bLastTempoEvent)
+					if (nextTimeStepS > seconds || nextTimeStepS < pbTimeS || nextTimeStepS == pbTimeS && bLastTempoEvent)
 						nextTimeStepS = seconds; //always causes loop to exit
 					else
-						currentTempoEvent = nextTempoEvent;
+						pbTempoEvent = nextTempoEvent;
 				}
-				currentTimeT += (nextTimeStepS - currentTimeS) * currentBps * notes.TicksPerBeat;
-				currentTimeS = nextTimeStepS;
+				pbTimeT += (nextTimeStepS - pbTimeS) * currentBps * notes.TicksPerBeat;
+				pbTimeS = nextTimeStepS;
 			}
-			return currentTimeT;
+			return pbTimeT;
 		}
 
 		public void setSongPosS(double newTimeS, bool updateScreen)
-		{
-			int currentTempoEvent = 0;
-			double currentTimeT = 0;
-			double currentTimeS = 0;
-			setSongPosS(ref currentTempoEvent, ref currentTimeT, ref currentTimeS, newTimeS, updateScreen);
-		}
-
-		public void setSongPosS(ref int currentTempoEvent, ref double currentTimeT, ref double currentTimeS, double newTimeS, bool updateScreen)
 		{
 			double offsetS = 0, offsetT = 0;
 			if (PlaybackOffsetS < 0)
@@ -538,12 +532,17 @@ namespace Visual_Music
 				offsetS = -PlaybackOffsetS;
 				offsetT = -PlaybackOffsetT;
 			}
-			currentTimeT = secondsToTicks(newTimeS + offsetS) - offsetT;
-			double newSongPos = currentTimeT / (double)SongLengthT;
+			pbTimeT = secondsToTicks(newTimeS + offsetS) - offsetT;
+			double newSongPos = pbTimeT / (double)SongLengthT;
 			if (updateScreen)
 				NormSongPos = newSongPos;
 			else
 				normSongPos = newSongPos;
+		}
+
+		public void incrementPlaybackPosS(double stepS)
+		{
+
 		}
 
 		//Converts normalized song pos to seconds
@@ -572,16 +571,16 @@ namespace Visual_Music
 				double timeS;
 				if (!AudioHasStarted)
 				{
-					timeS = (SongPanel.TotalTimeElapsed - pbStartSysTime).TotalMilliseconds / 1000.0 + pbStartSongTimeS;
+					timeS = (SongPanel.TotalTimeElapsed - pbStartSysTime).TotalSeconds + pbStartSongTimeS;
 					if (timeS > AudioOffset + PlaybackOffsetS)
 					{
 						AudioHasStarted = true;
 						Media.startPlaybackAtTime(0);
 					}
 				}
-				else
+				else 
 				{
-					if (!Media.playbackIsRunning())
+					if (!Media.playbackIsRunning()) //playback reached end of song
 					{
 						IsPlaying = false;
 						timeS = SongPosS;
@@ -589,6 +588,7 @@ namespace Visual_Music
 					else
 						timeS = Media.getPlaybackPos() + AudioOffset + PlaybackOffsetS;
 				}
+				
 				setSongPosS(timeS, true);
 				if (NormSongPos > 1)
 					togglePlayback();
@@ -613,23 +613,21 @@ namespace Visual_Music
 			}
 			else
 			{
-				double startTime = SongPosS - AudioOffset - PlaybackOffsetS;
+				double songPosS = SongPosS;
+				double startTime = songPosS - AudioOffset - PlaybackOffsetS;
 				if (startTime >= 0)
 				{
 					if (!Media.startPlaybackAtTime(startTime))
 						MessageBox.Show("An error occured while starting playback.");
 					if (!Media.playbackIsRunning()) //Assuming this is because we tried to start playback after end of audio
-					{
 						IsPlaying = false;
-						//bAudioPlayback = false;
-					}
 					else
 						AudioHasStarted = true;
 				}
 				else
 				{
 					pbStartSysTime = SongPanel.TotalTimeElapsed;
-					pbStartSongTimeS = SongPosS;
+					pbStartSongTimeS = songPosS;
 					AudioHasStarted = false;
 				}
 			}
@@ -644,16 +642,16 @@ namespace Visual_Music
 			NormSongPos = 0;
 		}
 
-		public Vector2 getScreenPos(int ticks, int pitch)
+		public Vector2 getScreenPos(int timeS, int pitch)
 		{
 			Vector2 p = new Vector2();
-			p.X = getScreenPosX(ticks);
+			p.X = getScreenPosX(timeS);
 			p.Y = getScreenPosY((float)pitch);
 			return p;
 		}
-		public float getScreenPosX(double ticks)
+		public float getScreenPosX(double timeS)
 		{
-			return (float)((ticks / viewWidthT) * (Camera.ViewportSize.X));
+			return (float)((timeS / viewWidthT) * (Camera.ViewportSize.X));
 		}
 	
 		public float getScreenPosY(float pitch)
@@ -665,8 +663,7 @@ namespace Visual_Music
 			return screenX / Camera.ViewportSize.X * viewWidthT; //Far right -> screenX = viewPortSize / 2
 		}
 		
-		public float SongLengthP =>
-			(float)(SongLengthT * Camera.ViewportSize.X) / viewWidthT;
+		public float SongLengthP => (float)(SongLengthT * Camera.ViewportSize.X) / viewWidthT;
 
 		public int SmallScrollStepT => (int)(ViewWidthT * SongPanel.SmallScrollStep);
 		public int LargeScrollStepT => (int)(ViewWidthT * SongPanel.LargeScrollStep);
