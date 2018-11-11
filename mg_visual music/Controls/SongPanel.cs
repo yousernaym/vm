@@ -294,7 +294,6 @@ namespace Visual_Music
 
 					UInt64 frameDuration = 0;
 					UInt64 frameStart = 0;
-					int currentTempoEvent = 0;
 					int frames = 0;
 					double songPosS = 0;
 					double normSongPosBackup = Project.NormSongPos;

@@ -75,8 +75,8 @@ namespace Visual_Music
 		public float ViewWidthT { get => viewWidthT; }
 
 		public double AudioOffset { get; set; }
-		double playbackOffsetS = 0;
-		public double PlaybackOffsetS
+		float playbackOffsetS = 0;
+		public float PlaybackOffsetS
 		{
 			get => playbackOffsetS;
 			set
@@ -88,9 +88,9 @@ namespace Visual_Music
 				
 				//Set playbackOffsetT
 				if (value >= 0)
-					playbackOffsetT = value * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat;
+					playbackOffsetT = (float)(value * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat);
 				else
-					playbackOffsetT = -secondsToTicks(-value);
+					playbackOffsetT = (float)-secondsToTicks((double)-value);
 
 				//Set firstTempoEvent (if playback offset is negative, playback may start after second event in which firstTempoEvent shouldn't be zero)
 				if (value < 0)
@@ -109,10 +109,9 @@ namespace Visual_Music
 				pbTempoEvent = firstTempoEvent;
 			}
 		}
-		double playbackOffsetT = 0;
-		public double PlaybackOffsetT => playbackOffsetT;
+		float playbackOffsetT = 0;
+		public float PlaybackOffsetT => playbackOffsetT;
 	
-		double tempoEventsOffset => PlaybackOffsetS > 0 ? playbackOffsetT : 0;
 		int firstTempoEvent = 0;
 		public float PlaybackOffsetP => getScreenPosX(playbackOffsetT);
 
@@ -121,6 +120,9 @@ namespace Visual_Music
 		double pbTimeT = 0;
 		double pbTimeS = 0;
 
+		public float FadeIn = 0;
+		public float FadeOut = 0;
+		
 		public int MinPitch { get; set; }
 		public int MaxPitch { get; set; }
 		int NumPitches { get { return MaxPitch - MinPitch + 1; } }
@@ -215,6 +217,12 @@ namespace Visual_Music
 					ViewWidthQn = (float)entry.Value;
 				else if (entry.Name == "audioOffset")
 					AudioOffset = (double)entry.Value;
+				else if (entry.Name == "playbackOffsetS")
+					playbackOffsetS = (float)entry.Value;
+				else if (entry.Name == "fadeIn")
+					FadeIn = (float)entry.Value;
+				else if (entry.Name == "fadeOut")
+					FadeOut = (float)entry.Value;
 				else if (entry.Name == "maxPitch")
 					MaxPitch = (int)entry.Value;
 				else if (entry.Name == "minPitch")
@@ -249,6 +257,9 @@ namespace Visual_Music
 			info.AddValue("trackViews", trackViews);
 			info.AddValue("qn_viewWidth", ViewWidthQn);
 			info.AddValue("audioOffset", AudioOffset);
+			info.AddValue("playbackOffsetS", playbackOffsetS);
+			info.AddValue("fadeIn", FadeIn);
+			info.AddValue("fadeOut", FadeOut);
 			info.AddValue("maxPitch", MaxPitch);
 			info.AddValue("minPitch", MinPitch);
 			info.AddValue("tpartyApp", ImportNotesWithAudioForm.TpartyApp);

@@ -283,6 +283,8 @@ namespace Visual_Music
 			upDownVpWidth.Value = Project.ViewWidthQn;
 			audioOffsetS.Value = (decimal)Project.AudioOffset;
 			playbackOffsetUd.Value = (decimal)project.PlaybackOffsetS;
+			fadeInUd.Value = (decimal)project.FadeIn;
+			fadeOutUd.Value = (decimal)project.FadeOut;
 			maxPitchUd.Value = Project.MaxPitch;
 			minPitchUd.Value = Project.MinPitch;
 			project.Camera.SpatialChanged = updateCamControls;
@@ -448,9 +450,19 @@ namespace Visual_Music
 			if (-playbackOffsetUd.Value > songLengthWithoutPbOffset)
 				playbackOffsetUd.Value = -songLengthWithoutPbOffset;
 
-			project.PlaybackOffsetS = (double)playbackOffsetUd.Value;
+			project.PlaybackOffsetS = (float)playbackOffsetUd.Value;
 			songScrollBar.Maximum = (int)Project.SongLengthT;
 			songScrollBar.Value = (int)Project.SongPosT;
+		}
+
+		private void fadeInUd_ValueChanged(object sender, EventArgs e)
+		{
+			project.FadeIn = (float)((NumericUpDown)sender).Value;
+		}
+
+		private void fadeOutUd_ValueChanged(object sender, EventArgs e)
+		{
+			project.FadeOut = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void trackPropsBtn_Click(object sender, EventArgs e)
