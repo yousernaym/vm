@@ -278,14 +278,6 @@ namespace Visual_Music
 			stopPlayback();
 			mixdownPath = null;
 
-			if (options.EraseCurrent)
-			{
-				ViewWidthQn = DefaultViewWidthQn;
-				AudioOffset = 0;
-				PlaybackOffsetS = 0;
-				Camera = new Camera(songPanel);
-			}
-
 			Midi.Song newNotes = new Midi.Song();
 			newNotes.openFile(options, out mixdownPath);
 			if (newNotes.Tracks == null || newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
@@ -294,6 +286,13 @@ namespace Visual_Music
 			notes = newNotes;
 			notes.createNoteBsp();
 
+			if (options.EraseCurrent)
+			{
+				ViewWidthQn = DefaultViewWidthQn;
+				AudioOffset = 0;
+				PlaybackOffsetS = 0;
+				Camera = new Camera(songPanel);
+			}
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
 			return true;
 		}
