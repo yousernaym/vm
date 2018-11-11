@@ -75,19 +75,46 @@ namespace Visual_Music
 		public float ViewWidthT { get => viewWidthT; }
 
 		public double AudioOffset { get; set; }
-		public double PlaybackOffsetS { get; set; } = 0;
-		public double PlaybackOffsetT
+		double playbackOffsetS = 0;
+		public double PlaybackOffsetS
 		{
-			get
+			get => playbackOffsetS;
+			set
 			{
-				if (PlaybackOffsetS >= 0)
-					return PlaybackOffsetS * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat;
+				playbackOffsetS = value;
+
+				firstTempoEvent = pbTempoEvent = 0;
+				pbTimeS = pbTimeT = playbackOffsetT = 0;
+				
+				//Set playbackOffsetT
+				if (value >= 0)
+					playbackOffsetT = value * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat;
 				else
-					return -secondsToTicks(-PlaybackOffsetS);
+					playbackOffsetT = -secondsToTicks(-value);
+
+				//Set firstTempoEvent (if playback offset is negative, playback may start after second event in which firstTempoEvent shouldn't be zero)
+				if (value < 0)
+				{
+					double offsetT = -playbackOffsetT;
+					for (int i = 0; i < notes.TempoEvents.Count; i++)
+					{
+						if (notes.TempoEvents[i].Time <= offsetT)
+							firstTempoEvent = i;
+						else
+							break;
+					}
+				}
+
+				pbTimeS = pbTimeT = 0;
+				pbTempoEvent = firstTempoEvent;
 			}
 		}
-		double TempoEventsOffset => PlaybackOffsetS > 0 ? PlaybackOffsetT : 0;
-		public float PlaybackOffsetP => getScreenPosX(PlaybackOffsetT);
+		double playbackOffsetT = 0;
+		public double PlaybackOffsetT => playbackOffsetT;
+	
+		double tempoEventsOffset => PlaybackOffsetS > 0 ? playbackOffsetT : 0;
+		int firstTempoEvent = 0;
+		public float PlaybackOffsetP => getScreenPosX(playbackOffsetT);
 
 		//Current playback position to seek from
 		int pbTempoEvent = 0;
@@ -111,7 +138,7 @@ namespace Visual_Music
 		Midi.Song notes;
 		public Midi.Song Notes { get { return notes; } }
 
-		public double SongLengthT => (notes != null ? notes.SongLengthT : 0) + AudioOffset + PlaybackOffsetT; //Song length in ticks
+		public double SongLengthT => (notes != null ? notes.SongLengthT : 0) + playbackOffsetT; //Song length in ticks
 		public double SongPosT => (int)(normSongPos * SongLengthT); //Current song position in ticks
 		public double SongPosB => (float)SongPosT / Notes.TicksPerBeat; //Current song position in beats
 		public float SongPosP => getScreenPosX(SongPosT); //Current song position in pixels
@@ -284,7 +311,7 @@ namespace Visual_Music
 				throw new FileFormatException(new Uri(file));
 						
 			if (notes != null)
-				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength()));
+				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + AudioOffset));
 		}
 
 		public void resetPitchLimits()
@@ -462,26 +489,27 @@ namespace Visual_Music
 			createOcTrees();
 		}
 
-		double ticksToSeconds(double ticks)
+		public double ticksToSeconds(double ticks)
 		{
-			int nextTempoEvent = 0;
-			bool bLastTempoEvent = false;
-			pbTimeT = pbTimeS = pbTempoEvent = 0;
+			if (pbTimeT > ticks)
+			{
+				pbTimeT = pbTimeS = 0;
+				pbTempoEvent = firstTempoEvent;
+			}
+			int nextTempoEvent = pbTempoEvent;
 			while (pbTimeT < ticks)
 			{
 				double nextTimeStepT;
 				double currentBps = notes.TempoEvents[pbTempoEvent].Tempo / 60; //beats per seconds
-				if (bLastTempoEvent)
+				if (pbTempoEvent + 1 >= notes.TempoEvents.Count)
 					nextTimeStepT = ticks;
 				else
 				{
-					if (pbTempoEvent + 1 < notes.TempoEvents.Count)
-						nextTempoEvent++;
-					else
-						bLastTempoEvent = true;
-
-					nextTimeStepT = notes.TempoEvents[nextTempoEvent].Time + TempoEventsOffset;
-					if (nextTimeStepT > ticks || nextTimeStepT < pbTimeT || nextTimeStepT == pbTimeT && bLastTempoEvent)
+					nextTempoEvent++;
+					nextTimeStepT = notes.TempoEvents[nextTempoEvent].Time + playbackOffsetT;
+					//if (nextTimeStepT < pbTimeT || nextTimeStepT == pbTimeT && bLastTempoEvent)
+					//	throw new Exception("nextTimeStepT < pbTimeT || nextTimeStepT == pbTimeT && bLastTempoEvent");
+					if (nextTimeStepT > ticks)
 						nextTimeStepT = ticks; //always causes loop to exit
 					else
 						pbTempoEvent = nextTempoEvent;
@@ -494,26 +522,24 @@ namespace Visual_Music
 		double secondsToTicks(double seconds)
 		{
 			if (pbTimeS > seconds) //Reset seek position
-				pbTimeS = pbTimeT = pbTempoEvent = 0;
-			
+			{
+				pbTimeS = pbTimeT = 0;
+				pbTempoEvent = firstTempoEvent;
+			}
+		
 			int nextTempoEvent = pbTempoEvent;
-			bool bLastTempoEvent = false;
-			while ((float)pbTimeS < (float)seconds)
+			while (pbTimeS < seconds)
 			{
 				double nextTimeStepS;
 				double currentBps = notes.TempoEvents[pbTempoEvent].Tempo / 60; //beats per seconds
-				if (bLastTempoEvent)
+				if (pbTempoEvent + 1 >= notes.TempoEvents.Count)
 					nextTimeStepS = seconds;
 				else
 				{
-					if (pbTempoEvent + 1 < notes.TempoEvents.Count)
-						nextTempoEvent++;
-					else
-						bLastTempoEvent = true;
-
-					double nextTempoTimeS = (notes.TempoEvents[nextTempoEvent].Time + TempoEventsOffset - pbTimeT) / (notes.TicksPerBeat * currentBps) + pbTimeS;
+					nextTempoEvent++;
+					double nextTempoTimeS = (notes.TempoEvents[nextTempoEvent].Time + playbackOffsetT - pbTimeT) / (notes.TicksPerBeat * currentBps) + pbTimeS;
 					nextTimeStepS = nextTempoTimeS;
-					if (nextTimeStepS > seconds || nextTimeStepS < pbTimeS || nextTimeStepS == pbTimeS && bLastTempoEvent)
+					if (nextTimeStepS > seconds) 
 						nextTimeStepS = seconds; //always causes loop to exit
 					else
 						pbTempoEvent = nextTempoEvent;
@@ -530,19 +556,14 @@ namespace Visual_Music
 			if (PlaybackOffsetS < 0)
 			{
 				offsetS = -PlaybackOffsetS;
-				offsetT = -PlaybackOffsetT;
+				offsetT = -playbackOffsetT;
 			}
-			pbTimeT = secondsToTicks(newTimeS + offsetS) - offsetT;
+			pbTimeT = secondsToTicks(newTimeS);
 			double newSongPos = pbTimeT / (double)SongLengthT;
 			if (updateScreen)
 				NormSongPos = newSongPos;
 			else
 				normSongPos = newSongPos;
-		}
-
-		public void incrementPlaybackPosS(double stepS)
-		{
-
 		}
 
 		//Converts normalized song pos to seconds
@@ -552,14 +573,7 @@ namespace Visual_Music
 			if (notes == null)
 				return 0;
 
-			double offsetS = 0, offsetT = 0;
-			if (PlaybackOffsetS < 0)
-			{
-				offsetS = -PlaybackOffsetS;
-				offsetT = -PlaybackOffsetT;
-			}
-			double songPosT = norm * SongLengthT;
-			return ticksToSeconds(songPosT + offsetT) - offsetS;
+			return ticksToSeconds(norm * SongLengthT);
 		}
 
 		public void update(double deltaTimeS)

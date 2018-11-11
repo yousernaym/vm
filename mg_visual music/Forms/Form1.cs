@@ -444,7 +444,11 @@ namespace Visual_Music
 
 		private void playbackOffsetUd_ValueChanged(object sender, EventArgs e)
 		{
-			project.PlaybackOffsetS = (float)playbackOffsetUd.Value;
+			decimal songLengthWithoutPbOffset = (decimal)project.ticksToSeconds(project.Notes.SongLengthT);
+			if (-playbackOffsetUd.Value > songLengthWithoutPbOffset)
+				playbackOffsetUd.Value = -songLengthWithoutPbOffset;
+
+			project.PlaybackOffsetS = (double)playbackOffsetUd.Value;
 			songScrollBar.Maximum = (int)Project.SongLengthT;
 			songScrollBar.Value = (int)Project.SongPosT;
 		}
