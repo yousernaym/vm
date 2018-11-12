@@ -1,4 +1,5 @@
-﻿float4x4 VpMat;
+﻿float SongFade;
+float4x4 VpMat;
 float2 ViewportSize;
 texture Texture;
 bool UseTexture;
@@ -131,7 +132,7 @@ float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 	if (any(color))
 		color += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecColor;
     color *= LightFilter;
-    return color;
+    return color * SongFade;
 }
 
 float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out float3 destNormalDir, out bool discardFade)
@@ -419,8 +420,7 @@ float4 getPixelColor(float4 color, float2 texCoords)
     {
         color = HslaToRgba(color) * texColor;
         color = saturate(color);
-        return color;
-    }
+	}
     else
     {
         color.x += texColor.x;
@@ -429,6 +429,7 @@ float4 getPixelColor(float4 color, float2 texCoords)
         color.y *= texColor.y;
         color.z *= texColor.z;
         color = saturate(color);
-        return HslaToRgba(color);
+        color = HslaToRgba(color);
     }
+    return color;
 }

@@ -288,6 +288,15 @@ namespace Visual_Music
 
 		protected void drawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial, out float songPosP)
 		{
+			float songFade = 1;
+			float songPosS = (float)Project.SongPosS;
+			float songLength = (float)Project.SongLengthS;
+			if (songPosS < Project.FadeIn)
+				songFade = songPosS / Project.FadeIn;
+			else if (songLength - songPosS < Project.FadeOut)
+				songFade = (songLength - songPosS) / Project.FadeOut;
+
+			fx.Parameters["SongFade"].SetValue(songFade);
 			fx.Parameters["BlurredEdge"].SetValue(0.002f * Project.Camera.ViewportSize.X);
 			songPosP = Project.SongPosP - Project.PlaybackOffsetP;
 			fx.Parameters["SongPos"].SetValue(songPosP);

@@ -47,7 +47,7 @@ namespace Visual_Music
 		//Serialization----------------------------------
 
 		public ImportOptions ImportOptions { get; set; }
-				
+
 		List<TrackView> trackViews;
 		public List<TrackView> TrackViews
 		{
@@ -85,7 +85,7 @@ namespace Visual_Music
 
 				firstTempoEvent = pbTempoEvent = 0;
 				pbTimeS = pbTimeT = playbackOffsetT = 0;
-				
+
 				//Set playbackOffsetT
 				if (value >= 0)
 					playbackOffsetT = (float)(value * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat);
@@ -107,11 +107,12 @@ namespace Visual_Music
 
 				pbTimeS = pbTimeT = 0;
 				pbTempoEvent = firstTempoEvent;
+				SongLengthS = normSongPosToSeconds(1);
 			}
 		}
 		float playbackOffsetT = 0;
 		public float PlaybackOffsetT => playbackOffsetT;
-	
+
 		int firstTempoEvent = 0;
 		public float PlaybackOffsetP => getScreenPosX(playbackOffsetT);
 
@@ -120,13 +121,13 @@ namespace Visual_Music
 		double pbTimeT = 0;
 		double pbTimeS = 0;
 
-		public float FadeIn = 0;
-		public float FadeOut = 0;
-		
+		public float FadeIn { get; set; } = 0;
+		public float FadeOut { get; set; } = 0;
+
 		public int MinPitch { get; set; }
 		public int MaxPitch { get; set; }
 		int NumPitches { get { return MaxPitch - MinPitch + 1; } }
-		
+
 		public Camera Camera { get; set; } = new Camera();
 		public Camera DefaultCamera { get; } = new Camera();
 		//----------------------------------------------------
@@ -141,6 +142,7 @@ namespace Visual_Music
 		public Midi.Song Notes { get { return notes; } }
 
 		public double SongLengthT => (notes != null ? notes.SongLengthT : 0) + playbackOffsetT; //Song length in ticks
+		public double SongLengthS { get; private set; }
 		public double SongPosT => (int)(normSongPos * SongLengthT); //Current song position in ticks
 		public double SongPosB => (float)SongPosT / Notes.TicksPerBeat; //Current song position in beats
 		public float SongPosP => getScreenPosX(SongPosT); //Current song position in pixels
@@ -506,6 +508,9 @@ namespace Visual_Music
 				pbTimeT = pbTimeS = 0;
 				pbTempoEvent = firstTempoEvent;
 			}
+			else if (pbTimeT == ticks)
+				return pbTimeS;
+
 			int nextTempoEvent = pbTempoEvent;
 			while (pbTimeT < ticks)
 			{

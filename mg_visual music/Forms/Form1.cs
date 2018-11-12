@@ -282,6 +282,7 @@ namespace Visual_Music
 
 			upDownVpWidth.Value = Project.ViewWidthQn;
 			audioOffsetS.Value = (decimal)Project.AudioOffset;
+			project.PlaybackOffsetS = project.PlaybackOffsetS;
 			playbackOffsetUd.Value = (decimal)project.PlaybackOffsetS;
 			fadeInUd.Value = (decimal)project.FadeIn;
 			fadeOutUd.Value = (decimal)project.FadeOut;

@@ -151,6 +151,7 @@ void ArrowPS(out float4 color : COLOR0, in HlVSOutput IN)
 		color *= lum;
 	}
 	color.a = 0;
+    color *= SongFade;
 }
 
 void CirclePS(out float4 color : COLOR0, in HlVSOutput IN)
@@ -180,6 +181,7 @@ void CirclePS(out float4 color : COLOR0, in HlVSOutput IN)
 	}
 
 	color.a = 0;
+    color *= SongFade;
 }
 
 technique Arrow
