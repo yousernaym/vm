@@ -203,6 +203,7 @@ namespace Visual_Music
 				for (int i = 0; i < trackViews.Count; i++)
 					trackViews[i].TrackProps.loadContent(songPanel);
 			}
+			createOcTrees();
 		}
 
 		public Project(SerializationInfo info, StreamingContext ctxt) : base()
@@ -389,7 +390,6 @@ namespace Visual_Music
 			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
 				trackViews.RemoveRange(numTracks, startTrack - numTracks);
 			TrackProps.GlobalProps = trackViews[0].TrackProps;
-			createOcTrees();
 		}
 
 		public void createOcTrees()

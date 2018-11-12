@@ -279,19 +279,20 @@ namespace Visual_Music
 			createTrackList();
 			updateTrackControls();
 			//}
-
+			updatingControls = true;
 			upDownVpWidth.Value = Project.ViewWidthQn;
 			audioOffsetS.Value = (decimal)Project.AudioOffset;
 			project.PlaybackOffsetS = project.PlaybackOffsetS;
 			playbackOffsetUd.Value = (decimal)project.PlaybackOffsetS;
+			songScrollBar.Maximum = (int)Project.SongLengthT;
+			songScrollBar.Value = (int)Project.SongPosT;
 			fadeInUd.Value = (decimal)project.FadeIn;
 			fadeOutUd.Value = (decimal)project.FadeOut;
 			maxPitchUd.Value = Project.MaxPitch;
 			minPitchUd.Value = Project.MinPitch;
-			project.Camera.SpatialChanged = updateCamControls;
+			updatingControls = false;
 
-			songScrollBar.Maximum = (int)Project.SongLengthT;
-			songScrollBar.Value = (int)Project.SongPosT;
+			project.Camera.SpatialChanged = updateCamControls;
 			upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(songPanel);
 
@@ -447,6 +448,8 @@ namespace Visual_Music
 
 		private void playbackOffsetUd_ValueChanged(object sender, EventArgs e)
 		{
+			if (updatingControls)
+				return;
 			decimal songLengthWithoutPbOffset = (decimal)project.ticksToSeconds(project.Notes.SongLengthT);
 			if (-playbackOffsetUd.Value > songLengthWithoutPbOffset)
 				playbackOffsetUd.Value = -songLengthWithoutPbOffset;
@@ -1238,6 +1241,8 @@ namespace Visual_Music
 
 		private void maxPitchUd_ValueChanged(object sender, EventArgs e)
 		{
+			if (updatingControls)
+				return;
 			if ((int)maxPitchUd.Value < Project.Notes.MinPitch)
 				maxPitchUd.Value = Project.Notes.MinPitch;
 			Project.MaxPitch = (int)maxPitchUd.Value;
@@ -1246,6 +1251,8 @@ namespace Visual_Music
 
 		private void minPitchUd_ValueChanged(object sender, EventArgs e)
 		{
+			if (updatingControls)
+				return;
 			if ((int)minPitchUd.Value > Project.Notes.MaxPitch)
 				minPitchUd.Value = Project.Notes.MaxPitch;
 			Project.MinPitch = (int)minPitchUd.Value;
