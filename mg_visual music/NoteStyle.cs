@@ -454,8 +454,7 @@ namespace Visual_Music
 		protected Vector2 calcTexCoords(Vector2 texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, MaterialProps texMaterial)
 		{
 			Vector2 coords = new Vector2();
-			float songPosP = Project.getScreenPosX(Project.SongPosT);
-			coords.X = calcTexCoordComponent(texSize.X, Project.Camera.ViewportSize.X, notePos.X - songPosP, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor, true);
+			coords.X = calcTexCoordComponent(texSize.X, Project.Camera.ViewportSize.X, notePos.X, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor, true);
 			coords.Y = calcTexCoordComponent(texSize.Y, Project.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texMaterial.TexProps.VTile, (TexAnchorEnum)texMaterial.TexProps.VAnchor, false);
 			coords.Y *= -1;
 			return coords;
