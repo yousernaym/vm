@@ -703,13 +703,7 @@ namespace Visual_Music
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
 			base.OnKeyDown(e);
-			if(ModifierKeys == WinKeys.Control)
-			{
-				//Reset camera
-				if (e.KeyCode == WinKeys.R)
-					Project.Camera = new Camera(this);
-			}
-
+		
 			//-----------------------------------
 
 			//Project.Camera.toggleMouseControl(e.KeyCode, true))

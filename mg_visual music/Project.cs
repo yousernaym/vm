@@ -195,15 +195,13 @@ namespace Visual_Music
 				throw new FileNotFoundException("Note file missing: " + ImportOptions.NotePath);
 			if (!string.IsNullOrWhiteSpace(ImportOptions.AudioPath) && !File.Exists(ImportOptions.AudioPath))
 				Form1.showWarningMsgBox("Audio file missing: " + ImportOptions.AudioPath);
-			
-			ImportOptions.EraseCurrent = false;
-			importSong(ImportOptions);
 			if (trackViews != null)
 			{
 				for (int i = 0; i < trackViews.Count; i++)
 					trackViews[i].TrackProps.loadContent(songPanel);
 			}
-			createOcTrees();
+			ImportOptions.EraseCurrent = false;
+			importSong(ImportOptions);
 		}
 
 		public Project(SerializationInfo info, StreamingContext ctxt) : base()
@@ -303,9 +301,8 @@ namespace Visual_Music
 			if (options.EraseCurrent)
 			{
 				ViewWidthQn = DefaultViewWidthQn;
-				AudioOffset = 0;
-				PlaybackOffsetS = 0;
-				Camera = new Camera(songPanel);
+				AudioOffset = playbackOffsetS = FadeIn = FadeOut = 0;
+				NormSongPos = 0;
 			}
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
 			return true;
@@ -390,6 +387,7 @@ namespace Visual_Music
 			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
 				trackViews.RemoveRange(numTracks, startTrack - numTracks);
 			TrackProps.GlobalProps = trackViews[0].TrackProps;
+			createOcTrees();
 		}
 
 		public void createOcTrees()

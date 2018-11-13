@@ -323,6 +323,7 @@ namespace Visual_Music
 					setDefaultPitches();
 					currentProjPath = "";
 					updateFormTitle("");
+					resetCamBtn.PerformClick();
 				}
 				songLoaded(options.NotePath);
 			}
@@ -398,10 +399,15 @@ namespace Visual_Music
 
 		private void songPanel_KeyDown(object sender, KeyEventArgs e)
 		{
-
+			if(ModifierKeys == Keys.Control)
+			{
+				//Reset camera
+				if (e.KeyCode == Keys.R)
+					resetCamBtn.PerformClick();
+			}
 		}
 
-		private void Form1_KeyDown(object sender, KeyEventArgs e)
+			private void Form1_KeyDown(object sender, KeyEventArgs e)
 		{
 
 		}
