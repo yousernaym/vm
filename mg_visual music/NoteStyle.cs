@@ -388,7 +388,17 @@ namespace Visual_Music
 				if (texProps.UAnchor == TexAnchorEnum.Screen)
 				{
 					Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
-					texScrollOffset.X += (songPosP + Project.Camera.ViewportSize.X / 2) / ((bool)texProps.UTile ? texSize.X : Project.Camera.ViewportSize.X);
+					float xOffset = songPosP + Project.Camera.ViewportSize.X / 2;
+					if ((bool)texProps.UTile)
+					{
+						if ((bool)texProps.KeepAspect)
+							texSize.X /= texSize.Y * Project.Camera.XYRatio;
+						xOffset /= texSize.X;;
+					}
+					else
+						xOffset /= Project.Camera.ViewportSize.X;
+
+					texScrollOffset.X += xOffset;
 				}
 				fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
 			}
