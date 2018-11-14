@@ -129,7 +129,7 @@ float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 	color *= saturate(dot(LightDir, normal)) * DiffuseColor + AmbientColor;
 	float3 lightReflection = -reflect(LightDir, normal);
 	float3 viewVec = normalize(CamPos - worldPos);
-	if (any(color))
+	//if (any(color))
 		color += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecColor;
     color *= LightFilter;
     return color * SongFade;
@@ -252,7 +252,7 @@ float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out flo
 }
 float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sourceNormal, float3 worldPos)
 {
-	float4 result = sourceColor;
+    float4 result = float4(1, 1, 1, 1);
 	float3 destNormal = float3(0,0,0);
 	
 	float gradLength = max(length(ddx(normPos)), length(ddy(normPos)));
@@ -309,10 +309,11 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 	}
 	if (!any(destNormal))
 		destNormal = sourceNormal;
-	//if (!any(result))
-      //  discard;
-	result.rgb = calcLighting(result.rgb, normalize(destNormal), worldPos);
-    return result;
+	
+    float4 finalCol = result * sourceColor;
+	if (any(result))
+		finalCol.rgb = calcLighting(finalCol.rgb, normalize(destNormal), worldPos);
+    return finalCol;
 }
 
 float4 HslaToRgba(float4 hsla)

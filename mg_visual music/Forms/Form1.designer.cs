@@ -175,10 +175,16 @@
 			this.defaultPitchesBtn = new System.Windows.Forms.Button();
 			this.minPitchUd = new System.Windows.Forms.NumericUpDown();
 			this.maxPitchUd = new System.Windows.Forms.NumericUpDown();
+			this.label26 = new System.Windows.Forms.Label();
+			this.label21 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
 			this.hnotelabel = new System.Windows.Forms.Label();
+			this.label25 = new System.Windows.Forms.Label();
+			this.label19 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
+			this.fadeOutUd = new System.Windows.Forms.NumericUpDown();
+			this.fadeInUd = new System.Windows.Forms.NumericUpDown();
 			this.playbackOffsetUd = new System.Windows.Forms.NumericUpDown();
 			this.upDownVpWidth = new Visual_Music.TbSlider();
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
@@ -190,12 +196,6 @@
 			this.songPanelBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.songPanelBindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-			this.fadeInUd = new System.Windows.Forms.NumericUpDown();
-			this.label19 = new System.Windows.Forms.Label();
-			this.label21 = new System.Windows.Forms.Label();
-			this.fadeOutUd = new System.Windows.Forms.NumericUpDown();
-			this.label25 = new System.Windows.Forms.Label();
-			this.label26 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -235,13 +235,13 @@
 			this.groupBox3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).BeginInit();
 			this.propsTogglePanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource1)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// openProjDialog
@@ -743,9 +743,9 @@
 			this.label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.label37.Location = new System.Drawing.Point(113, 400);
 			this.label37.Name = "label37";
-			this.label37.Size = new System.Drawing.Size(52, 13);
+			this.label37.Size = new System.Drawing.Size(68, 13);
 			this.label37.TabIndex = 19;
-			this.label37.Text = "repeats/s";
+			this.label37.Text = "repeats/beat";
 			// 
 			// label34
 			// 
@@ -753,9 +753,9 @@
 			this.label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.label34.Location = new System.Drawing.Point(113, 380);
 			this.label34.Name = "label34";
-			this.label34.Size = new System.Drawing.Size(52, 13);
+			this.label34.Size = new System.Drawing.Size(68, 13);
 			this.label34.TabIndex = 19;
-			this.label34.Text = "repeats/s";
+			this.label34.Text = "repeats/beat";
 			// 
 			// label35
 			// 
@@ -772,7 +772,7 @@
 			this.texVScrollUD.DecimalPlaces = 3;
 			this.texVScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.texVScrollUD.Increment = new decimal(new int[] {
-            5,
+            1,
             0,
             0,
             131072});
@@ -807,7 +807,7 @@
 			this.texUScrollUD.DecimalPlaces = 3;
 			this.texUScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.texUScrollUD.Increment = new decimal(new int[] {
-            5,
+            1,
             0,
             0,
             131072});
@@ -1832,7 +1832,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-6289, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-6306, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1844,7 +1844,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-6401, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-6418, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1854,7 +1854,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-6403, 15630);
+			this.label4.Location = new System.Drawing.Point(-6420, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1994,6 +1994,24 @@
 			this.maxPitchUd.TabIndex = 2;
 			this.maxPitchUd.ValueChanged += new System.EventHandler(this.maxPitchUd_ValueChanged);
 			// 
+			// label26
+			// 
+			this.label26.AutoSize = true;
+			this.label26.Location = new System.Drawing.Point(156, 153);
+			this.label26.Name = "label26";
+			this.label26.Size = new System.Drawing.Size(12, 13);
+			this.label26.TabIndex = 3;
+			this.label26.Text = "s";
+			// 
+			// label21
+			// 
+			this.label21.AutoSize = true;
+			this.label21.Location = new System.Drawing.Point(156, 127);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(12, 13);
+			this.label21.TabIndex = 3;
+			this.label21.Text = "s";
+			// 
 			// label18
 			// 
 			this.label18.AutoSize = true;
@@ -2022,6 +2040,24 @@
 			this.hnotelabel.TabIndex = 3;
 			this.hnotelabel.Text = "Max pitch";
 			// 
+			// label25
+			// 
+			this.label25.AutoSize = true;
+			this.label25.Location = new System.Drawing.Point(12, 153);
+			this.label25.Name = "label25";
+			this.label25.Size = new System.Drawing.Size(49, 13);
+			this.label25.TabIndex = 3;
+			this.label25.Text = "Fade out";
+			// 
+			// label19
+			// 
+			this.label19.AutoSize = true;
+			this.label19.Location = new System.Drawing.Point(12, 127);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(42, 13);
+			this.label19.TabIndex = 3;
+			this.label19.Text = "Fade in";
+			// 
 			// label17
 			// 
 			this.label17.AutoSize = true;
@@ -2030,6 +2066,54 @@
 			this.label17.Size = new System.Drawing.Size(80, 13);
 			this.label17.TabIndex = 3;
 			this.label17.Text = "Playback offset";
+			// 
+			// fadeOutUd
+			// 
+			this.fadeOutUd.DecimalPlaces = 2;
+			this.fadeOutUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.fadeOutUd.Location = new System.Drawing.Point(98, 151);
+			this.fadeOutUd.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
+			this.fadeOutUd.Minimum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            -2147483648});
+			this.fadeOutUd.Name = "fadeOutUd";
+			this.fadeOutUd.Size = new System.Drawing.Size(52, 20);
+			this.fadeOutUd.TabIndex = 1;
+			this.fadeOutUd.ValueChanged += new System.EventHandler(this.fadeOutUd_ValueChanged);
+			// 
+			// fadeInUd
+			// 
+			this.fadeInUd.DecimalPlaces = 2;
+			this.fadeInUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.fadeInUd.Location = new System.Drawing.Point(98, 125);
+			this.fadeInUd.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
+			this.fadeInUd.Minimum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            -2147483648});
+			this.fadeInUd.Name = "fadeInUd";
+			this.fadeInUd.Size = new System.Drawing.Size(52, 20);
+			this.fadeInUd.TabIndex = 1;
+			this.fadeInUd.ValueChanged += new System.EventHandler(this.fadeInUd_ValueChanged);
 			// 
 			// playbackOffsetUd
 			// 
@@ -2142,90 +2226,6 @@
 			// 
 			this.songPanelBindingSource1.DataSource = typeof(Visual_Music.SongPanel);
 			// 
-			// fadeInUd
-			// 
-			this.fadeInUd.DecimalPlaces = 2;
-			this.fadeInUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-			this.fadeInUd.Location = new System.Drawing.Point(98, 125);
-			this.fadeInUd.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-			this.fadeInUd.Minimum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            -2147483648});
-			this.fadeInUd.Name = "fadeInUd";
-			this.fadeInUd.Size = new System.Drawing.Size(52, 20);
-			this.fadeInUd.TabIndex = 1;
-			this.fadeInUd.ValueChanged += new System.EventHandler(this.fadeInUd_ValueChanged);
-			// 
-			// label19
-			// 
-			this.label19.AutoSize = true;
-			this.label19.Location = new System.Drawing.Point(12, 127);
-			this.label19.Name = "label19";
-			this.label19.Size = new System.Drawing.Size(42, 13);
-			this.label19.TabIndex = 3;
-			this.label19.Text = "Fade in";
-			// 
-			// label21
-			// 
-			this.label21.AutoSize = true;
-			this.label21.Location = new System.Drawing.Point(156, 127);
-			this.label21.Name = "label21";
-			this.label21.Size = new System.Drawing.Size(12, 13);
-			this.label21.TabIndex = 3;
-			this.label21.Text = "s";
-			// 
-			// fadeOutUd
-			// 
-			this.fadeOutUd.DecimalPlaces = 2;
-			this.fadeOutUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-			this.fadeOutUd.Location = new System.Drawing.Point(98, 151);
-			this.fadeOutUd.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-			this.fadeOutUd.Minimum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            -2147483648});
-			this.fadeOutUd.Name = "fadeOutUd";
-			this.fadeOutUd.Size = new System.Drawing.Size(52, 20);
-			this.fadeOutUd.TabIndex = 1;
-			this.fadeOutUd.ValueChanged += new System.EventHandler(this.fadeOutUd_ValueChanged);
-			// 
-			// label25
-			// 
-			this.label25.AutoSize = true;
-			this.label25.Location = new System.Drawing.Point(12, 153);
-			this.label25.Name = "label25";
-			this.label25.Size = new System.Drawing.Size(49, 13);
-			this.label25.TabIndex = 3;
-			this.label25.Text = "Fade out";
-			// 
-			// label26
-			// 
-			this.label26.AutoSize = true;
-			this.label26.Location = new System.Drawing.Point(156, 153);
-			this.label26.Name = "label26";
-			this.label26.Size = new System.Drawing.Size(12, 13);
-			this.label26.TabIndex = 3;
-			this.label26.Text = "s";
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -2306,14 +2306,14 @@
 			this.groupBox3.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).EndInit();
 			this.propsTogglePanel.ResumeLayout(false);
 			this.propsTogglePanel.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource1)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
