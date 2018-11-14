@@ -148,11 +148,21 @@ namespace Visual_Music
 			vertexOffset *= lineWidth / 2.0f;
 		}
 
-		void calcTexCoords(out Vector2 vert1TC, out Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
+		void calcTexCoords(out Vector2 vert1Tc, out Vector2 vert2Tc, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
 		{
-			Vector2 vpSize = Project.Camera.ViewportSize;
-						
-			Vector2 texSize = new Vector2(texProps.Texture.Width, texProps.Texture.Height) * TexTileScale;
+			double x1, y1, x2, y2;
+			calcTexCoords(out x1, out y1, out x2, out y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, adjustingAspect);
+			vert1Tc = new Vector2((float)x1, (float)y1);
+			vert2Tc = new Vector2((float)x2, (float)y2);
+		}
+
+		void calcTexCoords(out double x1, out double y1, out double x2, out double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect)
+		{
+			double vpSizeX = Project.Camera.ViewportSize.X;
+			double vpSizeY = Project.Camera.ViewportSize.Y;
+			
+			double texSizeX = (double)texProps.Texture.Width * TexTileScale;
+			double texSizeY = (double)texProps.Texture.Height * TexTileScale;
 			TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;
 			TexAnchorEnum texVAnchor = (TexAnchorEnum)texProps.VAnchor;
 			bool uTile = true, vTile = true;
@@ -166,34 +176,34 @@ namespace Visual_Music
 			if (texUAnchor == TexAnchorEnum.Note)
 			{
 				if (!uTile)
-					vert1TC.X = vert2TC.X = normStepFromNoteStart;
+					x1 = x2 = normStepFromNoteStart;
 				else
-					vert1TC.X = vert2TC.X = stepFromNoteStart / texSize.X;
+					x1 = x2 = stepFromNoteStart / texSizeX;
 			}
 			else if (texUAnchor == TexAnchorEnum.Screen)
 			{
 				if (!uTile)
 				{
-					vert1TC.X = worldPos1.X / vpSize.X;
-					vert2TC.X = worldPos2.X / vpSize.X;
+					x1 = worldPos1.X / vpSizeX;
+					x2 = worldPos2.X / vpSizeX;
 				}
 				else
 				{
-					vert1TC.X = worldPos1.X / texSize.X;
-					vert2TC.X = worldPos2.X / texSize.X;
+					x1 = worldPos1.X / texSizeX;
+					x2 = worldPos2.X / texSizeX;
 				}
 			}
 			else if (texUAnchor == TexAnchorEnum.Song)
 			{
 				if (!uTile)
 				{
-					vert1TC.X = worldPos1.X / Project.SongLengthP;
-					vert2TC.X = worldPos2.X / Project.SongLengthP;
+					x1 = (double)worldPos1.X / Project.SongLengthP;
+					x2 = (double)worldPos2.X / Project.SongLengthP;
 				}
 				else
 				{
-					vert1TC.X = worldPos1.X / texSize.X;
-					vert2TC.X = worldPos2.X / texSize.X;
+					x1 = worldPos1.X / texSizeX;
+					x2 = worldPos2.X / texSizeX;
 				}
 			}
 			else
@@ -202,59 +212,59 @@ namespace Visual_Music
 			//VAnchor
 			if (texVAnchor == TexAnchorEnum.Note)
 			{
-				vert1TC.Y = 0;
+				y1 = 0;
 				if (!vTile)
-					vert2TC.Y = 1;
+					y2 = 1;
 				else
-					vert2TC.Y = lineWidth / texSize.Y;
+					y2 = lineWidth / texSizeY;
 			}
 			else if (texVAnchor == TexAnchorEnum.Screen)
 			{
-				worldPos1.Y += Project.Camera.ViewportSize.Y / 2;
-				worldPos2.Y += Project.Camera.ViewportSize.Y / 2;
+				worldPos1.Y += (float)(vpSizeY / 2);
+				worldPos2.Y += (float)(vpSizeY / 2);
 				if (!vTile)
 				{
-					vert1TC.Y = worldPos1.Y / Project.Camera.ViewportSize.Y;
-					vert2TC.Y = worldPos2.Y / Project.Camera.ViewportSize.Y;
+					y1 = worldPos1.Y / vpSizeY;
+					y2 = worldPos2.Y / vpSizeY;
 				}
 				else
 				{
-					vert1TC.Y = worldPos1.Y / texSize.Y;
-					vert2TC.Y = worldPos2.Y / texSize.Y;
+					y1 = worldPos1.Y / texSizeY;
+					y2 = worldPos2.Y / texSizeY;
 				}
 			}
 			else
 				throw new NotImplementedException();
 			if (!adjustingAspect)
-				adjustAspect(ref vert1TC, ref vert2TC, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2);
-			vert1TC.Y *= -1;
-			vert2TC.Y *= -1;
+				adjustAspect(ref x1, ref y1, ref x2, ref y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2);
+			y1 *= -1;
+			y2 *= -1;
 		}
 
-		void adjustAspect(ref Vector2 vert1TC, ref Vector2 vert2TC, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2)
+		void adjustAspect(ref double x1, ref double y1, ref double x2, ref double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2)
 		{
 			if ((bool)texProps.KeepAspect)
 			{
-				Vector2 tiledTc1 = new Vector2(), tiledTc2 = new Vector2();
-				calcTexCoords(out tiledTc1, out tiledTc2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true);
-				Vector2 tcDiff = vert1TC - vert2TC;
-				Vector2 tiledTcDiff = tiledTc1 - tiledTc2;
+				double tiledX1, tiledY1, tiledX2, tiledY2;
+				calcTexCoords(out tiledX1, out tiledY1, out tiledX2, out tiledY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true);
+				double xDiff = x1 - x2, yDiff = y1 - y2;
+				double tiledXDiff = tiledX1 - tiledX2, tiledYDiff = tiledY1 - tiledY2;
 
 				if ((bool)texProps.UTile && !(bool)texProps.VTile)
 				{
-					float ratio = -tcDiff.Y / tiledTcDiff.Y;
-					vert1TC.X *= ratio;
-					vert2TC.X *= ratio;
+					double ratio = -yDiff / tiledYDiff;
+					x1 *= ratio;
+					x2 *= ratio;
 				}
 				else if (!(bool)texProps.UTile && (bool)texProps.VTile)
 				{
-					float ratio;
-					if (tiledTcDiff.X == 0)
-						ratio = vert1TC.X / tiledTc1.X;
+					double ratio;
+					if (tiledXDiff == 0)
+						ratio = x1 / tiledX1;
 					else
-						ratio = tcDiff.X / tiledTcDiff.X;
-					vert1TC.Y *= ratio;
-					vert2TC.Y *= ratio;
+						ratio = xDiff / tiledXDiff;
+					y1 *= ratio;
+					y2 *= ratio;
 				}
 			}
 		}
@@ -336,7 +346,7 @@ namespace Visual_Music
 				curvature = (float)Math.Pow(curvature, 2.25) * 1000;
 				float step;
 				if (curvature == 0)
-					step = (endDraw - startDraw) * 0.999f; //Only one point for thes note
+					step = (endDraw - startDraw) * 0.999f; //Only one point for the note
 				else
 					step = 1 / curvature;
 				
