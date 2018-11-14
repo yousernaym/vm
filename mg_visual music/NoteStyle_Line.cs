@@ -151,12 +151,12 @@ namespace Visual_Music
 		void calcTexCoords(out Vector2 vert1Tc, out Vector2 vert2Tc, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
 		{
 			double x1, y1, x2, y2;
-			calcTexCoords(out x1, out y1, out x2, out y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, adjustingAspect);
+			calcTexCoords(out x1, out y1, out x2, out y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, false, false);
 			vert1Tc = new Vector2((float)x1, (float)y1);
 			vert2Tc = new Vector2((float)x2, (float)y2);
 		}
 
-		void calcTexCoords(out double x1, out double y1, out double x2, out double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect)
+		void calcTexCoords(out double x1, out double y1, out double x2, out double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect, bool forceTiling)
 		{
 			double vpSizeX = Project.Camera.ViewportSize.X;
 			double vpSizeY = Project.Camera.ViewportSize.Y;
@@ -166,7 +166,7 @@ namespace Visual_Music
 			TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;
 			TexAnchorEnum texVAnchor = (TexAnchorEnum)texProps.VAnchor;
 			bool uTile = true, vTile = true;
-			if (!adjustingAspect)
+			if (!forceTiling)
 			{
 				uTile = (bool)texProps.UTile;
 				vTile = (bool)texProps.VTile;
@@ -220,17 +220,17 @@ namespace Visual_Music
 			}
 			else if (texVAnchor == TexAnchorEnum.Screen)
 			{
-				worldPos1.Y += (float)(vpSizeY / 2);
-				worldPos2.Y += (float)(vpSizeY / 2);
+				double worldPos1Y = worldPos1.Y + vpSizeY / 2;
+				double worldPos2Y = worldPos2.Y + vpSizeY / 2;
 				if (!vTile)
 				{
-					y1 = worldPos1.Y / vpSizeY;
-					y2 = worldPos2.Y / vpSizeY;
+					y1 = worldPos1Y / vpSizeY;
+					y2 = worldPos2Y / vpSizeY;
 				}
 				else
 				{
-					y1 = worldPos1.Y / texSizeY;
-					y2 = worldPos2.Y / texSizeY;
+					y1 = worldPos1Y / texSizeY;
+					y2 = worldPos2Y / texSizeY;
 				}
 			}
 			else
@@ -246,13 +246,18 @@ namespace Visual_Music
 			if ((bool)texProps.KeepAspect)
 			{
 				double tiledX1, tiledY1, tiledX2, tiledY2;
-				calcTexCoords(out tiledX1, out tiledY1, out tiledX2, out tiledY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true);
-				double xDiff = x1 - x2, yDiff = y1 - y2;
+				double regularX1 = x1, regularY1 = y1, regularX2 = x2, regularY2 = y2;
+				float intWorldPosX = (int)worldPos1.X;
+				worldPos1.X -= intWorldPosX;
+				worldPos2.X -= intWorldPosX;
+				calcTexCoords(out regularX1, out regularY1, out regularX2, out regularY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, false);
+				calcTexCoords(out tiledX1, out tiledY1, out tiledX2, out tiledY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, true);
+				double xDiff = regularX1 - regularX2, yDiff = regularY1 - regularY2;
 				double tiledXDiff = tiledX1 - tiledX2, tiledYDiff = tiledY1 - tiledY2;
 
 				if ((bool)texProps.UTile && !(bool)texProps.VTile)
 				{
-					double ratio = -yDiff / tiledYDiff;
+					double ratio = yDiff / tiledYDiff;
 					x1 *= ratio;
 					x2 *= ratio;
 				}
