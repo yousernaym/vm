@@ -148,7 +148,7 @@ float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out flo
 		distToEdgeFromOrigin = 1 - modEntry.Origin.x;
 	}
 	if (transformedNormPos.y < 0)
-		transformedNormPos.y /= modEntry.Origin.y;
+        transformedNormPos.y /= modEntry.Origin.y;
 	else
 	{
 		transformedNormPos.y /= 1 - modEntry.Origin.y;
@@ -160,11 +160,16 @@ float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out flo
 	float2 distFromOrigin = normDistFromOrigin * distToEdgeFromOrigin;
 	if (modEntry.SquareAspect && distToEdgeFromOrigin.x > distToEdgeFromOrigin.y)
 	{
-		float ratio = distToEdgeFromOrigin.x / distToEdgeFromOrigin.y;
-		float normDistFromEdgeX = min((1 - normDistFromOrigin.x) * ratio, 1); //1:1 aspect by increasing x dist from edge to match y dist from edge
-		normDistFromOrigin.x = 1 - normDistFromEdgeX;
-		//normDistFromOrigin.y = normDistFromOrigin.y / ratio; //1:1 aspect by reducing y dist from origin to match x dist from origin
-	}
+        if (distToEdgeFromOrigin.y == 0)
+            normDistFromOrigin.x = 0;
+		else
+        {
+            float ratio = distToEdgeFromOrigin.x / distToEdgeFromOrigin.y;
+            float normDistFromEdgeX = min((1 - normDistFromOrigin.x) * ratio, 1); //1:1 aspect by increasing x dist from edge to match y dist from edge
+            normDistFromOrigin.x = 1 - normDistFromEdgeX;
+			//normDistFromOrigin.y = normDistFromOrigin.y / ratio; //1:1 aspect by reducing y dist from origin to match x dist from origin
+        }
+    }
 	transformedNormPos = normDistFromOrigin * sign(transformedNormPos);
 	float interpolant = 0;
 	destNormalDir = float3(0, 0, 0);
@@ -209,6 +214,8 @@ float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out flo
 	else
 		return 0;
 
+    if (!any(destNormalDir))
+       destNormalDir.x = 1; //Pick a random direction with z = 0
 	destNormalDir = normalize(destNormalDir);
 		
 	//Outside Start - Stop?
@@ -309,7 +316,6 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 	}
 	if (!any(destNormal))
 		destNormal = sourceNormal;
-	
     float4 finalCol = result * sourceColor;
 	if (any(result))
 		finalCol.rgb = calcLighting(finalCol.rgb, normalize(destNormal), worldPos);
