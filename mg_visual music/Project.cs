@@ -366,26 +366,37 @@ namespace Visual_Music
 				trackViews = new List<TrackView>(numTracks);
 			}
 			else
-				startTrack = trackViews.Count; //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props at current song's track count and up.
-
-			for (int i = 0; i < numTracks; i++)
 			{
-				if (i < startTrack) //If updating source files without creating new projects, or loading project file.
-				{  //No need to update visual props
-				   // Update notes
-					trackViews[i].MidiTrack = notes.Tracks[trackViews[i].TrackNumber];
-					trackViews[i].createCurve();
-					//If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
-					trackViews[i].TrackProps.StyleProps.loadFx();
-				}
-				else //New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
-				{
-					TrackView view = new TrackView(i, numTracks, notes);
-					trackViews.Add(view);
-				}
+				startTrack = trackViews.Count; //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props at current song's track count and up.
 			}
-			if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
-				trackViews.RemoveRange(numTracks, startTrack - numTracks);
+
+			for (int i = 0; i < trackViews.Count; i++)
+			{
+				//No need to update visual props
+				// Update notes
+				if (trackViews[i].TrackNumber >= notes.Tracks.Count) //The new note file has fewer tracks than the currently loaded
+					continue;
+
+				trackViews[i].MidiTrack = notes.Tracks[trackViews[i].TrackNumber];
+				trackViews[i].createCurve();
+				//If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
+				trackViews[i].TrackProps.StyleProps.loadFx();
+			}
+			for (int i = startTrack; i < numTracks; i++)
+			{
+				//New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
+				TrackView view = new TrackView(i, numTracks, notes);
+				trackViews.Add(view);
+			}
+			//if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
+			//trackViews.RemoveRange(numTracks, startTrack - numTracks);
+			List<TrackView> tvCopy = new List<TrackView>();
+			for (int i = 0; i < trackViews.Count; i++)
+			{
+				if (trackViews[i].TrackNumber < numTracks)
+					tvCopy.Add(trackViews[i]);
+			}
+			trackViews = tvCopy;
 			TrackProps.GlobalProps = trackViews[0].TrackProps;
 			createOcTrees();
 		}
