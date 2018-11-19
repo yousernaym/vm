@@ -354,13 +354,14 @@ namespace Visual_Music
 					step = (endDraw - startDraw) * 0.999f; //Only one point for the note
 				else
 					step = 1 / curvature;
-				
+
 				if (step >= endDraw - startDraw)
-					step = (endDraw - startDraw) * 0.999f;
-				for (float x = startDraw; x < endDraw; x += step)
+					step = (endDraw - startDraw);// * 0.999f;
+				int iterations = (int)((endDraw - startDraw) / step);
+				step = (endDraw - startDraw) / (iterations + 1);
+				for (float x = startDraw; x <= endDraw+0.00001f; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
-					
 					getCurvePoint(out center, out normal, out vertexOffset, step, x, trackProps, vpLineWidth);
 					//normal.X = curvature/10f;
 					lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
