@@ -675,7 +675,7 @@ namespace Visual_Music
 						}
 					}
 				}
-				catch (FileNotFoundException e)
+				catch (FileNotFoundException)
 				{
 					trackTexPb.Image = (Image)trackTexPb.ErrorImage.Clone();
 					trackTexPb.Width = trackTexPb.ErrorImage.Width;
