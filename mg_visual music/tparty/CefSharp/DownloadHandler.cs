@@ -16,26 +16,26 @@ namespace CefSharp.Example
 
 		public bool ShowDialog { get; set; } = true;
 
-        public void OnBeforeDownload(IBrowser browser, DownloadItem downloadItem, IBeforeDownloadCallback callback)
-        {
+      	public void OnBeforeDownload(IWebBrowser chromiumWebBrowser, IBrowser browser, DownloadItem downloadItem, IBeforeDownloadCallback callback)
+		{
 			OnBeforeDownloadFired?.Invoke(this, downloadItem);
 
 			if (!callback.IsDisposed)
-            {
-                using (callback)
-                {
-                    if (!downloadItem.IsCancelled)
+			{
+				using (callback)
+				{
+					if (!downloadItem.IsCancelled)
 						callback.Continue(downloadItem.SuggestedFileName, showDialog: ShowDialog);
-                }
-            }
-        }
+				}
+			}
+		}
 
-        public void OnDownloadUpdated(IBrowser browser, DownloadItem downloadItem, IDownloadItemCallback callback)
-        {
+		public void OnDownloadUpdated(IWebBrowser chromiumWebBrowser, IBrowser browser, DownloadItem downloadItem, IDownloadItemCallback callback)
+		{
 			updateCallback = callback;
 			OnDownloadUpdatedFired?.Invoke(this, downloadItem);
 			if (downloadItem.IsCancelled)
 				callback.Cancel();
 		}
-    }
+	}
 }
