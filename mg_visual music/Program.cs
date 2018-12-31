@@ -24,6 +24,7 @@ namespace Visual_Music
 		static public readonly string TempDir = Path.Combine(TempDirRoot, Path.GetRandomFileName().ToLower()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
 		static public readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
 		static FileStream dirLock = null;
+		static string cefSharpFolder = "cefSharp";
 
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
@@ -63,7 +64,7 @@ namespace Visual_Music
 				platformString = "";
 			#endif
 			settings.BrowserSubprocessPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-												   platformString,
+												   cefSharpFolder, platformString,
 												   "CefSharp.BrowserSubprocess.exe");
 					
 
@@ -110,8 +111,8 @@ namespace Visual_Music
 			if (args.Name.StartsWith("CefSharp"))
 			{
 				string assemblyName = args.Name.Split(new[] { ',' }, 2)[0] + ".dll";
-				string archSpecificPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, 
-													   Environment.Is64BitProcess ? "x64" : "x86",
+				string archSpecificPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
+													   cefSharpFolder, Environment.Is64BitProcess ? "x64" : "x86",
 													   assemblyName);
 
 				return File.Exists(archSpecificPath)
