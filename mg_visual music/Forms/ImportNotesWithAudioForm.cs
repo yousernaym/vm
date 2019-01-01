@@ -109,6 +109,7 @@ namespace Visual_Music
             }
             else 
             { //User-specified command line
+				options.MixdownType = Midi.MixdownType.Tparty;
 				options.MixdownAppPath = tpartyAppTb.Text;
 				options.MixdownAppArgs = tpartyArgsTb.Text.Replace("%notefilepath", "\"" + NoteFilePath + "\"");
 				importUsingTpartyMixdown(options, tpartyAudioTb.Text);

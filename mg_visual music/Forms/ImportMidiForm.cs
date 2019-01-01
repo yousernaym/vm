@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Visual_Music
 {
-	public partial class ImportMidiForm : SourceFileForm
+	public partial class ImportMidiForm : ImportNotesWithAudioForm
 	{
 		static public readonly string[] Formats = Properties.Resources.MidiFormats.ToLower().Split(null);
 		public ImportMidiForm()
