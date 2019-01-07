@@ -69,7 +69,8 @@ namespace Visual_Music
 	{
 		public SidImportOptions() : base(Midi.FileType.Sid)
 		{
-			MixdownType = Form1.TpartyIntegrationForm.SidMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.None;
+			//MixdownType = Form1.TpartyIntegrationForm.SidMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.None;
+			MixdownType = Midi.MixdownType.Internal;
 			MixdownAppPath = TpartyIntegrationForm.SidPlayPath;
 		}
 
