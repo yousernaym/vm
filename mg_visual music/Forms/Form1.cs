@@ -1042,7 +1042,7 @@ namespace Visual_Music
 			}
 			catch (Exception ex)
 			{
-				if (ex is FileFormatException || ex is SerializationException || ex is FileNotFoundException)
+				if (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
 				{
 					showErrorMsgBox("Couldn't load song.\n" + ex.Message);
 					project = currentProject;
@@ -1095,6 +1095,7 @@ namespace Visual_Music
 			saveProjDialog.FileName = project.DefaultFileName;
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
 				return;
+
 			saveMixdownDialog.FileName = Path.GetFileNameWithoutExtension(saveProjDialog.FileName) + ".wav";
 			if (Project.ImportOptions.MixdownType != Midi.MixdownType.None && saveMixdownDialog.ShowDialog() == DialogResult.OK)
 			{
@@ -1103,8 +1104,7 @@ namespace Visual_Music
 				Project.ImportOptions.AudioPath = saveMixdownDialog.FileName;
 				Project.ImportOptions.updateImportForm(); //To update audio file path
 			}
-
-
+			
 			currentProjPath = saveProjDialog.FileName;
 			ProjectFolder = Path.GetDirectoryName(currentProjPath);
 			saveSettings();

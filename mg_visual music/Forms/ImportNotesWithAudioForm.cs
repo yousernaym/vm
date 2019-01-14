@@ -85,7 +85,7 @@ namespace Visual_Music
         {
 			if (!options.checkNoteFile())
 				return;
-				
+
 			if (existingAudioRbtn.Checked)
             {   //No user-specified command line
 				if (!String.IsNullOrWhiteSpace(options.AudioPath))

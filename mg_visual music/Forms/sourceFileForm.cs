@@ -199,10 +199,11 @@ namespace Visual_Music
 		{
 			get => base.NotePath;
 		}
+		public string MidiOutputPath { get; set; }
 
-		public bool EraseCurrent;
-		public string MixdownAppPath;
-		public string MixdownAppArgs;
+		public bool EraseCurrent { get; set; }
+		public string MixdownAppPath { get; set; }
+		public string MixdownAppArgs { get; set; }
 
 		public ImportOptions(Midi.FileType noteFileType)
 		{

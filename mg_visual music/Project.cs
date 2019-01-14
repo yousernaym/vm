@@ -271,9 +271,31 @@ namespace Visual_Music
 		}
 
 		public void importSong(ImportOptions options)
-		{
+		{ //<Open project> and <import files> meet here
 			string mixdownPath;
 			Media.closeAudioFile();
+
+			//Convert mod/sid files to mid/wav
+			if (options.NoteFileType != Midi.FileType.Midi)
+			{
+				string noteFile = Path.GetFileName(options.NotePath);
+				string midiPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "mid"));
+				string midiArg = $"-m \"{midiPath}\"";
+				string audioPath = null, audioArg = null;
+				if (options.MixdownType == Midi.MixdownType.Internal)
+				{
+					audioPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "wav"));
+					audioArg = $"-a \"{audioPath}\"";
+				}
+				else if (options.MixdownType == Midi.MixdownType.None)
+					audioPath = ImportOptions.AudioPath;
+				string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg}";
+				var process = Process.Start("remuxer\\remuxer.exe", cmdLine);
+				process.WaitForExit();
+				options.MidiOutputPath = midiPath;
+				//options.AudioOutputPath = audioPath;
+				options.AudioPath = audioPath;
+			}
 
 			openNoteFile(options, out mixdownPath);
 			openAudioFile(string.IsNullOrWhiteSpace(mixdownPath) ? options.AudioPath : mixdownPath, options.MixdownType);
@@ -291,7 +313,10 @@ namespace Visual_Music
 			mixdownPath = null;
 
 			Midi.Song newNotes = new Midi.Song();
-			newNotes.openFile(options, out mixdownPath);
+			string path = options.MidiOutputPath;
+			if (path == null)
+				path = options.NotePath;
+			newNotes.openFile(path);
 			if (newNotes.Tracks == null || newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
 				throw new FileFormatException(new Uri(options.RawNotePath), "No notes found.");
 									

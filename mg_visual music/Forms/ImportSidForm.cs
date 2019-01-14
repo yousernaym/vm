@@ -51,9 +51,9 @@ namespace Visual_Music
 
 		private void ImportSidForm_Shown(object sender, EventArgs e)
 		{
-			if (!Form1.TpartyIntegrationForm.SidMixdown)
-				existingAudioRbtn.Text = "Audio file";
-			else
+			//if (!Form1.TpartyIntegrationForm.SidMixdown)
+			//	existingAudioRbtn.Text = "Audio file";
+			//else
 				existingAudioRbtn.Text = "Audio file (leave empty for SID file audio)";
 		}
 		

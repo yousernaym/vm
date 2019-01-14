@@ -193,8 +193,6 @@
 			this.propsTogglePanel = new System.Windows.Forms.Panel();
 			this.songPropsCb = new System.Windows.Forms.CheckBox();
 			this.trackPropsCb = new System.Windows.Forms.CheckBox();
-			this.songPanelBindingSource = new System.Windows.Forms.BindingSource(this.components);
-			this.serviceContainerBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.songPanelBindingSource1 = new System.Windows.Forms.BindingSource(this.components);
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
@@ -239,8 +237,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).BeginInit();
 			this.propsTogglePanel.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource1)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -376,7 +372,7 @@
             this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1128, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1145, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -519,7 +515,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(733, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(750, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 15642);
 			this.trackPropsPanel.TabIndex = 3;
@@ -2214,14 +2210,6 @@
 			this.trackPropsCb.UseVisualStyleBackColor = true;
 			this.trackPropsCb.CheckedChanged += new System.EventHandler(this.trackPropsCb_CheckedChanged);
 			// 
-			// songPanelBindingSource
-			// 
-			this.songPanelBindingSource.DataSource = typeof(Visual_Music.SongPanel);
-			// 
-			// serviceContainerBindingSource
-			// 
-			this.serviceContainerBindingSource.DataSource = typeof(WinFormsGraphicsDevice.ServiceContainer);
-			// 
 			// songPanelBindingSource1
 			// 
 			this.songPanelBindingSource1.DataSource = typeof(Visual_Music.SongPanel);
@@ -2233,7 +2221,7 @@
 			this.AutoScroll = true;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(1145, 505);
+			this.ClientSize = new System.Drawing.Size(1162, 505);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);
@@ -2311,8 +2299,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).EndInit();
 			this.propsTogglePanel.ResumeLayout(false);
 			this.propsTogglePanel.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.serviceContainerBindingSource)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource1)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -2359,8 +2345,6 @@
 		private System.Windows.Forms.ColumnHeader trackColumn;
 		private System.Windows.Forms.ColumnHeader normalColumn;
 		private System.Windows.Forms.ColumnHeader hilitedColumn;
-		private System.Windows.Forms.BindingSource songPanelBindingSource;
-		private System.Windows.Forms.BindingSource serviceContainerBindingSource;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Button textureBrowseBtn;
 		private System.Windows.Forms.TextBox texPathTb;
