@@ -37,7 +37,8 @@ namespace Visual_Music
 					songPanel = value;
 					songPanel.Project = this;
 					Camera.SongPanel = DefaultCamera.SongPanel = songPanel;
-					loadContent();
+					if (!loadContent())
+						songPanel = null;
 				}
 			}
 		}
@@ -185,10 +186,10 @@ namespace Visual_Music
 			SongPanel = spanel;
 		}
 
-		public void loadContent()
+		public bool loadContent()
 		{
 			if (ImportOptions == null)
-				return;
+				return true;
 			if (string.IsNullOrWhiteSpace(ImportOptions.NotePath))
 				throw new FileFormatException("Note file path missing from song file.");
 			if (!File.Exists(ImportOptions.NotePath))
@@ -201,7 +202,7 @@ namespace Visual_Music
 					trackViews[i].TrackProps.loadContent(songPanel);
 			}
 			ImportOptions.EraseCurrent = false;
-			importSong(ImportOptions);
+			return importSong(ImportOptions);
 		}
 
 		public Project(SerializationInfo info, StreamingContext ctxt) : base()
@@ -270,7 +271,7 @@ namespace Visual_Music
 			info.AddValue("userViewWidth", UserViewWidth);
 		}
 
-		public void importSong(ImportOptions options)
+		public bool importSong(ImportOptions options)
 		{ //<Open project> and <import files> meet here
 			string mixdownPath;
 			Media.closeAudioFile();
@@ -286,6 +287,7 @@ namespace Visual_Music
 				{
 					midiPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "mid"));
 					midiArg = $"-m \"{midiPath}\"";
+					File.Delete(midiPath);
 				}
 				else
 					midiPath = options.MidiOutputPath;
@@ -295,6 +297,7 @@ namespace Visual_Music
 				{
 					audioPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "wav"));
 					audioArg = $"-a \"{audioPath}\"";
+					File.Delete(audioPath);
 				}
 				else if (options.MixdownType == Midi.MixdownType.None)
 					audioPath = options.AudioPath;
@@ -305,6 +308,8 @@ namespace Visual_Music
 					string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg}";
 					var process = Process.Start("remuxer\\remuxer.exe", cmdLine);
 					process.WaitForExit();
+					if (!File.Exists(midiPath) && !File.Exists(audioPath))
+						return false; //User probably closed Remuxer before it was finished
 				}
 				options.MidiOutputPath = midiPath;
 				options.AudioPath = audioPath;
@@ -317,6 +322,7 @@ namespace Visual_Music
 			if (options.EraseCurrent)
 				DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + DefaultFileExt;
 			createTrackViews(notes.Tracks.Count, options.EraseCurrent);
+			return true;
 		}
 
 		public bool openNoteFile(ImportOptions options, out string mixdownPath)

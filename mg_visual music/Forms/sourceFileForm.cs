@@ -130,7 +130,8 @@ namespace Visual_Music
 			}
 			try
 			{
-				parent.openSourceFiles(options);
+				if (!parent.openSourceFiles(options))
+					return;
 				DialogResult = DialogResult.OK;
 				Hide();
 			}

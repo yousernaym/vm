@@ -182,6 +182,7 @@
 			this.propsTogglePanel = new System.Windows.Forms.Panel();
 			this.songPropsCb = new System.Windows.Forms.CheckBox();
 			this.trackPropsCb = new System.Windows.Forms.CheckBox();
+			this.saveMidiDialog = new System.Windows.Forms.SaveFileDialog();
 			this.upDownVpWidth = new Visual_Music.TbSlider();
 			this.trackList = new Visual_Music.ListViewNF();
 			this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -193,8 +194,6 @@
 			this.specHsBtn = new Visual_Music.HueSatButton();
 			this.diffuseHsBtn = new Visual_Music.HueSatButton();
 			this.ambientHsBtn = new Visual_Music.HueSatButton();
-			this.songPanelBindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-			this.saveMidiDialog = new System.Windows.Forms.SaveFileDialog();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -238,7 +237,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).BeginInit();
 			this.propsTogglePanel.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource1)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// openProjDialog
@@ -1714,7 +1712,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-6391, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-6442, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1726,7 +1724,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-6503, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-6554, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1736,7 +1734,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-6505, 15630);
+			this.label4.Location = new System.Drawing.Point(-6556, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2075,6 +2073,10 @@
 			this.trackPropsCb.UseVisualStyleBackColor = true;
 			this.trackPropsCb.CheckedChanged += new System.EventHandler(this.trackPropsCb_CheckedChanged);
 			// 
+			// saveMidiDialog
+			// 
+			this.saveMidiDialog.Filter = "Midi files|*.mid;*.midi|All files|*.*";
+			// 
 			// upDownVpWidth
 			// 
 			this.upDownVpWidth.AutoSize = true;
@@ -2210,14 +2212,6 @@
 			this.ambientHsBtn.UseVisualStyleBackColor = true;
 			this.ambientHsBtn.ColorChanged += new System.EventHandler(this.ambientHsBtn_ColorChanged);
 			// 
-			// songPanelBindingSource1
-			// 
-			this.songPanelBindingSource1.DataSource = typeof(Visual_Music.SongPanel);
-			// 
-			// saveMidiDialog
-			// 
-			this.saveMidiDialog.Filter = "Midi files|*.mid;*.midi|All files|*.*";
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -2303,7 +2297,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).EndInit();
 			this.propsTogglePanel.ResumeLayout(false);
 			this.propsTogglePanel.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.songPanelBindingSource1)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -2446,7 +2439,6 @@
 		private System.Windows.Forms.ToolStripMenuItem viewSidBrowserTSMI;
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.TextBox camTb;
-		private System.Windows.Forms.BindingSource songPanelBindingSource1;
 		private System.Windows.Forms.NumericUpDown specPowUd;
 		private System.Windows.Forms.NumericUpDown ambientAmountUd;
 		private System.Windows.Forms.NumericUpDown diffuseAmountUd;

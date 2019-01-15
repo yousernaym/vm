@@ -309,7 +309,7 @@ namespace Visual_Music
 		}
 
 		//Called only when iomporting note and audio files.
-		public void openSourceFiles(ImportOptions options)
+		public bool openSourceFiles(ImportOptions options)
 		{
 			saveSettings();
 			try
@@ -317,7 +317,8 @@ namespace Visual_Music
 				songPanel.SuspendPaint();
 				if (project.TrackViews == null)
 					options.EraseCurrent = true; //In order for setDefaultPitches below to be called
-				Project.importSong(options);
+				if (!Project.importSong(options))
+					return false;
 				if (options.EraseCurrent)
 				{
 					setDefaultPitches();
@@ -331,6 +332,7 @@ namespace Visual_Music
 			{
 				songPanel.ResumePaint();
 			}
+			return true;
 		}
 
 		void saveSettings()
@@ -1028,11 +1030,15 @@ namespace Visual_Music
 			{
 				songPanel.SuspendPaint();
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
+				Project tempProject = Project;
 				using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
-					project = (Project)dcs.ReadObject(stream);
-					Project.SongPanel = songPanel;
+					tempProject = (Project)dcs.ReadObject(stream);
 				}
+				tempProject.SongPanel = songPanel;
+				if (tempProject.SongPanel == null) //User probably cancelled file import process
+					return; 
+				project = tempProject;
 				project.ImportOptions.updateImportForm();
 
 				currentProjPath = fileName;
