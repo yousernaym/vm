@@ -30,16 +30,13 @@
 		{
 			this.importXmPlayBtn = new System.Windows.Forms.Button();
 			this.xmPlayLink = new System.Windows.Forms.LinkLabel();
-			this.sidLink = new System.Windows.Forms.LinkLabel();
-			this.importSidBtn = new System.Windows.Forms.Button();
 			this.browseHvscBtn = new System.Windows.Forms.Button();
 			this.hvscLink = new System.Windows.Forms.LinkLabel();
 			this.modulesCb = new System.Windows.Forms.CheckBox();
-			this.sidsCb = new System.Windows.Forms.CheckBox();
 			this.openXmPlayDialog = new System.Windows.Forms.OpenFileDialog();
 			this.openSidPlayDialog = new System.Windows.Forms.OpenFileDialog();
 			this.hvscDirTb = new System.Windows.Forms.TextBox();
-			this.songLengthCb = new System.Windows.Forms.CheckBox();
+			this.songLengthsCb = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// importXmPlayBtn
@@ -63,30 +60,9 @@
 			this.xmPlayLink.Text = "Download";
 			this.xmPlayLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.xmPlayLink_LinkClicked);
 			// 
-			// sidLink
-			// 
-			this.sidLink.AutoSize = true;
-			this.sidLink.Location = new System.Drawing.Point(139, 46);
-			this.sidLink.Name = "sidLink";
-			this.sidLink.Size = new System.Drawing.Size(55, 13);
-			this.sidLink.TabIndex = 4;
-			this.sidLink.TabStop = true;
-			this.sidLink.Text = "Download";
-			this.sidLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.sidLink_LinkClicked);
-			// 
-			// importSidBtn
-			// 
-			this.importSidBtn.Location = new System.Drawing.Point(12, 41);
-			this.importSidBtn.Name = "importSidBtn";
-			this.importSidBtn.Size = new System.Drawing.Size(121, 23);
-			this.importSidBtn.TabIndex = 3;
-			this.importSidBtn.Text = "Import Sidplayfp*.zip";
-			this.importSidBtn.UseVisualStyleBackColor = true;
-			this.importSidBtn.Click += new System.EventHandler(this.importSidBtn_Click);
-			// 
 			// browseHvscBtn
 			// 
-			this.browseHvscBtn.Location = new System.Drawing.Point(12, 116);
+			this.browseHvscBtn.Location = new System.Drawing.Point(12, 64);
 			this.browseHvscBtn.Name = "browseHvscBtn";
 			this.browseHvscBtn.Size = new System.Drawing.Size(164, 23);
 			this.browseHvscBtn.TabIndex = 7;
@@ -97,7 +73,7 @@
 			// hvscLink
 			// 
 			this.hvscLink.AutoSize = true;
-			this.hvscLink.Location = new System.Drawing.Point(182, 121);
+			this.hvscLink.Location = new System.Drawing.Point(182, 69);
 			this.hvscLink.Name = "hvscLink";
 			this.hvscLink.Size = new System.Drawing.Size(55, 13);
 			this.hvscLink.TabIndex = 8;
@@ -109,25 +85,13 @@
 			// 
 			this.modulesCb.AutoSize = true;
 			this.modulesCb.Enabled = false;
-			this.modulesCb.Location = new System.Drawing.Point(12, 70);
+			this.modulesCb.Location = new System.Drawing.Point(12, 41);
 			this.modulesCb.Name = "modulesCb";
 			this.modulesCb.Size = new System.Drawing.Size(165, 17);
 			this.modulesCb.TabIndex = 5;
 			this.modulesCb.Text = "Use XMPlay for module audio";
 			this.modulesCb.UseVisualStyleBackColor = true;
 			this.modulesCb.EnabledChanged += new System.EventHandler(this.modulesCb_EnabledChanged);
-			// 
-			// sidsCb
-			// 
-			this.sidsCb.AutoSize = true;
-			this.sidsCb.Enabled = false;
-			this.sidsCb.Location = new System.Drawing.Point(12, 93);
-			this.sidsCb.Name = "sidsCb";
-			this.sidsCb.Size = new System.Drawing.Size(156, 17);
-			this.sidsCb.TabIndex = 6;
-			this.sidsCb.Text = "Use Sidplayfp for SID audio";
-			this.sidsCb.UseVisualStyleBackColor = true;
-			this.sidsCb.EnabledChanged += new System.EventHandler(this.sidsCb_EnabledChanged);
 			// 
 			// openXmPlayDialog
 			// 
@@ -142,7 +106,7 @@
 			// 
 			// hvscDirTb
 			// 
-			this.hvscDirTb.Location = new System.Drawing.Point(12, 145);
+			this.hvscDirTb.Location = new System.Drawing.Point(12, 93);
 			this.hvscDirTb.Name = "hvscDirTb";
 			this.hvscDirTb.ReadOnly = true;
 			this.hvscDirTb.Size = new System.Drawing.Size(225, 20);
@@ -151,29 +115,26 @@
 			// 
 			// songLengthCb
 			// 
-			this.songLengthCb.AutoSize = true;
-			this.songLengthCb.Location = new System.Drawing.Point(12, 171);
-			this.songLengthCb.Name = "songLengthCb";
-			this.songLengthCb.Size = new System.Drawing.Size(178, 17);
-			this.songLengthCb.TabIndex = 11;
-			this.songLengthCb.Text = "Override internal songlengths db";
-			this.songLengthCb.UseVisualStyleBackColor = true;
-			this.songLengthCb.EnabledChanged += new System.EventHandler(this.songLengthCb_EnabledChanged);
+			this.songLengthsCb.AutoSize = true;
+			this.songLengthsCb.Location = new System.Drawing.Point(12, 119);
+			this.songLengthsCb.Name = "songLengthCb";
+			this.songLengthsCb.Size = new System.Drawing.Size(178, 17);
+			this.songLengthsCb.TabIndex = 11;
+			this.songLengthsCb.Text = "Override internal songlengths db";
+			this.songLengthsCb.UseVisualStyleBackColor = true;
+			this.songLengthsCb.EnabledChanged += new System.EventHandler(this.songLengthCb_EnabledChanged);
 			// 
 			// TpartyIntegrationForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(249, 201);
-			this.Controls.Add(this.songLengthCb);
+			this.ClientSize = new System.Drawing.Size(249, 155);
+			this.Controls.Add(this.songLengthsCb);
 			this.Controls.Add(this.hvscDirTb);
-			this.Controls.Add(this.sidsCb);
 			this.Controls.Add(this.modulesCb);
 			this.Controls.Add(this.hvscLink);
-			this.Controls.Add(this.sidLink);
 			this.Controls.Add(this.xmPlayLink);
 			this.Controls.Add(this.browseHvscBtn);
-			this.Controls.Add(this.importSidBtn);
 			this.Controls.Add(this.importXmPlayBtn);
 			this.Name = "TpartyIntegrationForm";
 			this.ShowIcon = false;
@@ -189,15 +150,12 @@
 		#endregion
 		private System.Windows.Forms.Button importXmPlayBtn;
 		private System.Windows.Forms.LinkLabel xmPlayLink;
-		private System.Windows.Forms.LinkLabel sidLink;
-		private System.Windows.Forms.Button importSidBtn;
 		private System.Windows.Forms.Button browseHvscBtn;
 		private System.Windows.Forms.LinkLabel hvscLink;
 		private System.Windows.Forms.OpenFileDialog openXmPlayDialog;
 		public System.Windows.Forms.CheckBox modulesCb;
-		public System.Windows.Forms.CheckBox sidsCb;
 		private System.Windows.Forms.OpenFileDialog openSidPlayDialog;
 		private System.Windows.Forms.TextBox hvscDirTb;
-		private System.Windows.Forms.CheckBox songLengthCb;
+		private System.Windows.Forms.CheckBox songLengthsCb;
 	}
 }

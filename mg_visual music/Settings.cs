@@ -75,8 +75,6 @@ namespace Visual_Music
 				}
 				else if (entry.Name == getKeyName(Keys.TpartyModuleMixdown))
 					Form1.TpartyIntegrationForm.ModuleMixdown = (bool)entry.Value;
-				else if (entry.Name == getKeyName(Keys.TpartySidMixdown))
-					Form1.TpartyIntegrationForm.SidMixdown = (bool)entry.Value;
 				else if (entry.Name == getKeyName(Keys.HvscSongLengths))
 					Form1.TpartyIntegrationForm.HvscSongLengths = (bool)entry.Value;
 			}
@@ -106,7 +104,6 @@ namespace Visual_Music
 
 			info.AddValue(getKeyName(Keys.HvscDir), Form1.TpartyIntegrationForm.HvscDir);
 			info.AddValue(getKeyName(Keys.TpartyModuleMixdown), Form1.TpartyIntegrationForm.ModuleMixdown);
-			info.AddValue(getKeyName(Keys.TpartySidMixdown), Form1.TpartyIntegrationForm.SidMixdown);
 			info.AddValue(getKeyName(Keys.HvscSongLengths), Form1.TpartyIntegrationForm.HvscSongLengths);
 		}
 	}

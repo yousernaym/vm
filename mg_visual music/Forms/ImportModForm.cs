@@ -60,7 +60,7 @@ namespace Visual_Music
 		new ImportModForm ImportForm;
 		public ModImportOptions() : base(Midi.FileType.Mod)
 		{
-			ImportForm = (ImportModForm)base.ImportForm;
+			ImportForm = (ImportModForm)base.ImportForm; //Cast base import form to ModImportForm to access InsTrack property
 			string ext = NotePath?.Split('.').Last().ToUpper();
 			bool xmPlayMixdownSupported = XmPlayFormats.Contains(ext);
 			MixdownType = xmPlayMixdownSupported && Form1.TpartyIntegrationForm.ModuleMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;

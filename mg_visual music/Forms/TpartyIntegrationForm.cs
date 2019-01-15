@@ -34,17 +34,15 @@ namespace Visual_Music
 			get => hvscDir;
 			set
 			{
-				hvscDir = hvscDirDialog.InitialDirectory = hvscDirTb.Text = value; songLengthCb.Enabled = HvscInstalled;
+				hvscDir = hvscDirDialog.InitialDirectory = hvscDirTb.Text = value; songLengthsCb.Enabled = HvscInstalled;
 				setXmPlayIni_hvscDir();
 			}
 		}
 		public string SongLengthsPath { get => Path.Combine(HvscDir, SongLengthsFileName); }
 		bool XmPlayInstalled { get => File.Exists(XmPlayPath); }
-		bool SidPlayInstalled { get => File.Exists(SidPlayDir + "\\" + SidPlayFileName); }
 		bool HvscInstalled { get => hvscInstalledAt(hvscDir); }
 		public bool ModuleMixdown{ get => modulesCb.Checked && XmPlayInstalled; set => modulesCb.Checked = XmPlayInstalled ? value : false; }
-		public bool SidMixdown{ get => sidsCb.Checked && SidPlayInstalled; set => sidsCb.Checked = SidPlayInstalled ? value : false; }
-		public bool HvscSongLengths { get => songLengthCb.Checked && HvscInstalled  ; set => songLengthCb.Checked = HvscInstalled ? value : false; }
+		public bool HvscSongLengths { get => songLengthsCb.Checked && HvscInstalled; set => songLengthsCb.Checked = HvscInstalled ? value : false; }
 		
 		public TpartyIntegrationForm()
 		{
@@ -203,8 +201,7 @@ namespace Visual_Music
 		void enableCheckboxes()
 		{
 			modulesCb.Enabled = XmPlayInstalled;
-			sidsCb.Enabled = SidPlayInstalled;
-			songLengthCb.Enabled = HvscInstalled;
+			songLengthsCb.Enabled = HvscInstalled;
 		}
 
 		private void TpartyIntegrationForm_Load(object sender, EventArgs e)
