@@ -17,7 +17,7 @@ namespace Visual_Music
 {
 	public partial class TpartyIntegrationForm : Form
 	{
-		const string SongLengthsFileName = "songlengths.txt";
+		const string SongLengthsFileName = "songlengths.md5";
 		static readonly public string TpartyDir = Path.Combine(Program.AppDataDir, "tparty");
 		public readonly static string XmPlayDir = Path.Combine(TpartyDir, "xmplay");
 		public readonly static string SidPlayDir = Path.Combine(TpartyDir, "sidplayfp");

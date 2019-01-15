@@ -84,7 +84,8 @@ namespace Visual_Music.Forms
 						hash1 += b.ToString("X2");
 					}
 					hash1 = hash1.ToLower();
-					using (StreamReader reader = new StreamReader(new MemoryStream(Properties.Resources.Songlengths)))
+
+					using (StreamReader reader = new StreamReader(getSongLengthsStream()))
 					{
 						while (!reader.EndOfStream)
 						{
@@ -119,6 +120,16 @@ namespace Visual_Music.Forms
 		{
 			int buttonMargin = (Height - okBtn.Bottom);
 			Height = subSongsLB.Bottom + okBtn.Height + 10 * DeviceDpi / 96 + buttonMargin;
+		}
+
+		Stream getSongLengthsStream()
+		{
+			Stream sr;
+			if (Form1.TpartyIntegrationForm.HvscSongLengths)
+				sr = new FileStream(Form1.TpartyIntegrationForm.SongLengthsPath, FileMode.Open, FileAccess.Read);
+			else
+				sr = new MemoryStream(Properties.Resources.Songlengths);
+			return sr;
 		}
 	}
 }

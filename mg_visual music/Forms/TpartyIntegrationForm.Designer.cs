@@ -113,11 +113,11 @@
 			this.hvscDirTb.TabIndex = 10;
 			this.hvscDirTb.TabStop = false;
 			// 
-			// songLengthCb
+			// songLengthsCb
 			// 
 			this.songLengthsCb.AutoSize = true;
 			this.songLengthsCb.Location = new System.Drawing.Point(12, 119);
-			this.songLengthsCb.Name = "songLengthCb";
+			this.songLengthsCb.Name = "songLengthsCb";
 			this.songLengthsCb.Size = new System.Drawing.Size(178, 17);
 			this.songLengthsCb.TabIndex = 11;
 			this.songLengthsCb.Text = "Override internal songlengths db";
@@ -140,7 +140,7 @@
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-			this.Text = "Audio settings";
+			this.Text = "Third-party integration";
 			this.Load += new System.EventHandler(this.TpartyIntegrationForm_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
