@@ -305,7 +305,10 @@ namespace Visual_Music
 				//Dous either midi or audio need to be created?
 				if (midiArg != null || audioArg != null)
 				{
-					string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg}";
+					string insTrackFlag = options.InsTrack ? "-i" : "";
+					string songLengthsFlag = $"-l {options.SongLengthS.ToString()}";
+					string subSongFlag = $"-s {options.SubSong.ToString()}";
+					string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag}";
 					var process = Process.Start("remuxer\\remuxer.exe", cmdLine);
 					process.WaitForExit();
 					if (!File.Exists(midiPath) && !File.Exists(audioPath))
