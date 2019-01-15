@@ -49,21 +49,21 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: "..\mg_visual music\bin\anycpu\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\libmikmod.dll"; DestDir: "{app}"; Flags: ignoreversion
+
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\midilib.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\MonoGame.Framework.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\NoteExtractor.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\SharpDX.Direct3D11.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\mg_visual music\bin\anycpu\Release\SharpDX.DXGI.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\mg_visual music\bin\anycpu\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\mg_visual music\Distribute\Remuxer\*"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "..\mg_visual music\Distribute\Tparty\*"; DestDir: "{#MyAppDataDir}\tparty"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\mg_visual music\Distribute\minjector.exe"; DestDir: "{app}"; Flags: ignoreversion
 ;Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.txt"; DestDir: "{#MyAppDataDir}\tparty\HVSC"; Flags: ignoreversion
-Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.md5"; DestDir: "{#MyAppDataDir}\tparty\HVSC"; Flags: ignoreversion
+;Source: "..\..\..\..\..\Audio\Filer\Tunes\emulering\c64\C64Music\DOCUMENTS\Songlengths.md5"; DestDir: "{#MyAppDataDir}\tparty\HVSC"; Flags: ignoreversion
 Source: "..\mg_visual music\Distribute\vc2017 dlls\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\mg_visual music\bin\anycpu\Release\x64\cef.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
 Source: "..\mg_visual music\bin\anycpu\Release\x64\CefSharp.BrowserSubprocess.Core.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
