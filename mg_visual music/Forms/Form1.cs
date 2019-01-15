@@ -1096,7 +1096,8 @@ namespace Visual_Music
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
 				return;
 
-			saveMixdownDialog.FileName = Path.GetFileNameWithoutExtension(saveProjDialog.FileName) + ".wav";
+			//Save audio mixdown
+			saveMixdownDialog.FileName = Path.ChangeExtension(saveProjDialog.FileName, "wav");
 			if (Project.ImportOptions.MixdownType != Midi.MixdownType.None && saveMixdownDialog.ShowDialog() == DialogResult.OK)
 			{
 				File.Copy(Media.getAudioFilePath(), saveMixdownDialog.FileName, true);
@@ -1104,7 +1105,17 @@ namespace Visual_Music
 				Project.ImportOptions.AudioPath = saveMixdownDialog.FileName;
 				Project.ImportOptions.updateImportForm(); //To update audio file path
 			}
-			
+
+			//Save midi "mixdown"
+			saveMidiDialog.FileName = Path.ChangeExtension(saveProjDialog.FileName, "mid");
+			if (!Project.ImportOptions.SavedMidi && Project.ImportOptions.NoteFileType != Midi.FileType.Midi && saveMidiDialog.ShowDialog() == DialogResult.OK)
+			{
+				File.Copy(Project.ImportOptions.MidiOutputPath, saveMidiDialog.FileName, true);
+				Project.ImportOptions.MidiOutputPath = saveMidiDialog.FileName;
+				Project.ImportOptions.SavedMidi = true;
+				Project.ImportOptions.updateImportForm(); //To update audio file path
+			}
+
 			currentProjPath = saveProjDialog.FileName;
 			ProjectFolder = Path.GetDirectoryName(currentProjPath);
 			saveSettings();

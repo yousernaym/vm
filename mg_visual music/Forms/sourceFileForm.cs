@@ -199,11 +199,12 @@ namespace Visual_Music
 		{
 			get => base.NotePath;
 		}
-		public string MidiOutputPath { get; set; }
-
+		
 		public bool EraseCurrent { get; set; }
 		public string MixdownAppPath { get; set; }
 		public string MixdownAppArgs { get; set; }
+		public string MidiOutputPath { get; set; }
+		public bool SavedMidi { get; set; }
 
 		public ImportOptions(Midi.FileType noteFileType)
 		{
@@ -237,6 +238,10 @@ namespace Visual_Music
 					MixdownAppPath = (string)entry.Value;
 				else if (entry.Name == "mixdownAppArgs")
 					MixdownAppArgs = (string)entry.Value;
+				else if (entry.Name == "midiOutputPath")
+					MidiOutputPath = (string)entry.Value;
+				else if (entry.Name == "savedMidi")
+					SavedMidi = (bool)entry.Value;
 			}
 		}
 
@@ -252,6 +257,8 @@ namespace Visual_Music
 			info.AddValue("songLengthS", SongLengthS);
 			info.AddValue("mixdownAppPath", MixdownAppPath);
 			info.AddValue("mixdownAppArgs", MixdownAppArgs);
+			info.AddValue("midiOutputPath", MidiOutputPath);
+			info.AddValue("savedMidi", SavedMidi);
 		}
 
 		public void updateImportForm()
@@ -260,6 +267,14 @@ namespace Visual_Music
 			ImportForm.AudioFilePath = AudioPath;
 			if (ImportForm.GetType() == typeof(ImportModForm))
 				((ImportModForm)ImportForm).InsTrack = InsTrack;
+
+			//If note file was not midi it was converted to midi before imported.
+			//If the midi file was saved, it will be loaded next time the project loads, and the MidiImportForm should contain the mid/audio paths used in the import so that the user can modify the paths and re-import or whatever.
+			if (SavedMidi)
+			{
+				Form1.ImportMidiForm.NoteFilePath = MidiOutputPath;
+				Form1.ImportMidiForm.AudioFilePath = AudioPath;
+			}
 		}
 
 		public bool checkNoteFile()

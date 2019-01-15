@@ -279,21 +279,34 @@ namespace Visual_Music
 			if (options.NoteFileType != Midi.FileType.Midi)
 			{
 				string noteFile = Path.GetFileName(options.NotePath);
-				string midiPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "mid"));
-				string midiArg = $"-m \"{midiPath}\"";
-				string audioPath = null, audioArg = null;
+				string midiPath = null, midiArg = null, audioPath = null, audioArg = null;
+
+				//Should midi file be created?
+				if (!options.SavedMidi)
+				{
+					midiPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "mid"));
+					midiArg = $"-m \"{midiPath}\"";
+				}
+				else
+					midiPath = options.MidiOutputPath;
+
+				//Should audio file be created?
 				if (options.MixdownType == Midi.MixdownType.Internal)
 				{
 					audioPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "wav"));
 					audioArg = $"-a \"{audioPath}\"";
 				}
 				else if (options.MixdownType == Midi.MixdownType.None)
-					audioPath = ImportOptions.AudioPath;
-				string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg}";
-				var process = Process.Start("remuxer\\remuxer.exe", cmdLine);
-				process.WaitForExit();
+					audioPath = options.AudioPath;
+
+				//Dous either midi or audio need to be created?
+				if (midiArg != null || audioArg != null)
+				{
+					string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg}";
+					var process = Process.Start("remuxer\\remuxer.exe", cmdLine);
+					process.WaitForExit();
+				}
 				options.MidiOutputPath = midiPath;
-				//options.AudioOutputPath = audioPath;
 				options.AudioPath = audioPath;
 			}
 
