@@ -311,6 +311,8 @@ namespace Visual_Music
 					string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag}";
 					var process = Process.Start("remuxer\\remuxer.exe", cmdLine);
 					process.WaitForExit();
+					Program.form1.Activate();
+					
 					if (!File.Exists(midiPath) && !File.Exists(audioPath))
 						return false; //User probably closed Remuxer before it was finished
 				}

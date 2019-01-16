@@ -249,7 +249,8 @@ namespace Visual_Music
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("rawNotePath", RawNotePath);
-			info.AddValue("audioPath", AudioPath);
+			if (MixdownType == Midi.MixdownType.None)
+				info.AddValue("audioPath", AudioPath);
 			info.AddValue("mixdownType", MixdownType);
 			info.AddValue("insTrack", InsTrack);
 			info.AddValue("noteFileType", NoteFileType);
