@@ -336,6 +336,11 @@ namespace Visual_Music
 
 				float startDraw = noteStart.X;
 				float endDraw = nextNoteStart.X;
+
+				//Don't draw if length is 0
+				if (startDraw == endDraw)
+					continue;
+
 				float curvature = calcLinearLineAngle(n, trackProps.TrackView.Curve);
 				//if (n > 0)
 				//{
@@ -358,6 +363,8 @@ namespace Visual_Music
 				if (step >= endDraw - startDraw)
 					step = (endDraw - startDraw);// * 0.999f;
 				int iterations = (int)((endDraw - startDraw) / step);
+				if (iterations < 0)
+					throw new OverflowException($"Too many vertices for note {n}, track {trackProps.TrackView.TrackNumber}.");
 				step = (endDraw - startDraw) / (iterations + 1);
 				for (float x = startDraw; x <= endDraw+0.00001f; x += step)
 				{
