@@ -264,8 +264,12 @@ namespace Visual_Music
 
 		public void updateImportForm()
 		{
+			//Clear all forms before update
+			Form1.ImportMidiForm.NoteFilePath = Form1.ImportMidiForm.AudioFilePath = Form1.ImportModForm.NoteFilePath = Form1.ImportModForm.AudioFilePath = Form1.ImportSidForm.NoteFilePath = Form1.ImportSidForm.AudioFilePath = null;
+
+			string audioPath = MixdownType == Midi.MixdownType.None ? AudioPath : null;
 			ImportForm.NoteFilePath = RawNotePath;
-			ImportForm.AudioFilePath = AudioPath;
+			ImportForm.AudioFilePath = audioPath;
 			if (ImportForm.GetType() == typeof(ImportModForm))
 				((ImportModForm)ImportForm).InsTrack = InsTrack;
 
@@ -274,7 +278,7 @@ namespace Visual_Music
 			if (SavedMidi)
 			{
 				Form1.ImportMidiForm.NoteFilePath = MidiOutputPath;
-				Form1.ImportMidiForm.AudioFilePath = AudioPath;
+				Form1.ImportMidiForm.AudioFilePath = audioPath;
 			}
 		}
 

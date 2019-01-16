@@ -286,7 +286,7 @@ namespace Visual_Music
 				if (!options.SavedMidi)
 				{
 					midiPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "mid"));
-					midiArg = $"-m \"{midiPath}\"";
+					midiArg = $"-m\"{midiPath}\"";
 					File.Delete(midiPath);
 				}
 				else
@@ -296,18 +296,18 @@ namespace Visual_Music
 				if (options.MixdownType == Midi.MixdownType.Internal)
 				{
 					audioPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "wav"));
-					audioArg = $"-a \"{audioPath}\"";
+					audioArg = $"-a\"{audioPath}\"";
 					File.Delete(audioPath);
 				}
 				else if (options.MixdownType == Midi.MixdownType.None)
 					audioPath = options.AudioPath;
 
-				//Dous either midi or audio need to be created?
+				//Does either midi or audio need to be created?
 				if (midiArg != null || audioArg != null)
 				{
 					string insTrackFlag = options.InsTrack ? "-i" : "";
-					string songLengthsFlag = $"-l {options.SongLengthS.ToString()}";
-					string subSongFlag = $"-s {options.SubSong.ToString()}";
+					string songLengthsFlag = $"-l{options.SongLengthS.ToString()}";
+					string subSongFlag = $"-s{options.SubSong.ToString()}";
 					string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag}";
 					var process = Process.Start("remuxer\\remuxer.exe", cmdLine);
 					process.WaitForExit();
