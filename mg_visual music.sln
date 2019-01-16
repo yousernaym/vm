@@ -22,11 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		InnoSetup\visual music setup script.iss = InnoSetup\visual music setup script.iss
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NoteExtractor", "..\..\c++\MyLibs\NoteExtractor\NoteExtractor.vcxproj", "{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C118ACA9-74E7-4433-8433-452B33A77716} = {C118ACA9-74E7-4433-8433-452B33A77716}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Windows", "..\..\..\Github\MonoGame\MonoGame.Framework\MonoGame.Framework.Windows.csproj", "{7DE47032-A904-4C29-BD22-2D235E8D91BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Content.Pipeline.Windows", "..\..\..\Github\MonoGame\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.Windows.csproj", "{B950DE10-AC5D-4BD9-B817-51247C4A732D}"
@@ -47,6 +42,17 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "VM", "C:\Program Files\_tes
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmikmod", "..\..\..\c++\Libs\MUSIC\libmikmod-3.3.11.1\win32\VS2005\libmikmod.vcxproj", "{C118ACA9-74E7-4433-8433-452B33A77716}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remuxer", "..\Remuxer\Remuxer\Remuxer.csproj", "{755B2ED6-5539-479A-87EB-25E40BC37540}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE} = {EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}
+		{C118ACA9-74E7-4433-8433-452B33A77716} = {C118ACA9-74E7-4433-8433-452B33A77716}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libRemuxer", "..\Remuxer\libRemuxer\libRemuxer.vcxproj", "{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C118ACA9-74E7-4433-8433-452B33A77716} = {C118ACA9-74E7-4433-8433-452B33A77716}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,18 +106,6 @@ Global
 		{883D1FB6-BB56-4D7D-9AD3-785BB2076ED9}.Release|x64.Build.0 = Release|x64
 		{883D1FB6-BB56-4D7D-9AD3-785BB2076ED9}.Release|x86.ActiveCfg = Release|Win32
 		{883D1FB6-BB56-4D7D-9AD3-785BB2076ED9}.Release|x86.Build.0 = Release|Win32
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|Any CPU.Build.0 = Debug|x64
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|x64.ActiveCfg = Debug|x64
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|x64.Build.0 = Debug|x64
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|x86.ActiveCfg = Debug|Win32
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|x86.Build.0 = Debug|Win32
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|Any CPU.ActiveCfg = Release|x64
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|Any CPU.Build.0 = Release|x64
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|x64.ActiveCfg = Release|x64
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|x64.Build.0 = Release|x64
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|x86.ActiveCfg = Release|Win32
-		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|x86.Build.0 = Release|Win32
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -166,6 +160,29 @@ Global
 		{C118ACA9-74E7-4433-8433-452B33A77716}.Release|x64.Build.0 = Release|x64
 		{C118ACA9-74E7-4433-8433-452B33A77716}.Release|x86.ActiveCfg = Release|Win32
 		{C118ACA9-74E7-4433-8433-452B33A77716}.Release|x86.Build.0 = Release|Win32
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Debug|x64.Build.0 = Debug|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Debug|x86.Build.0 = Debug|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Release|Any CPU.Build.0 = Release|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Release|x64.ActiveCfg = Release|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Release|x64.Build.0 = Release|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Release|x86.ActiveCfg = Release|Any CPU
+		{755B2ED6-5539-479A-87EB-25E40BC37540}.Release|x86.Build.0 = Release|Any CPU
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|Any CPU.ActiveCfg = Release|x64
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|Any CPU.Build.0 = Release|x64
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|x64.ActiveCfg = Debug|x64
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|x64.Build.0 = Debug|x64
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|x86.ActiveCfg = Debug|Win32
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Debug|x86.Build.0 = Debug|Win32
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|Any CPU.ActiveCfg = Release|Win32
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|x64.ActiveCfg = Release|x64
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|x64.Build.0 = Release|x64
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|x86.ActiveCfg = Release|Win32
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

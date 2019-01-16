@@ -413,6 +413,9 @@
 if $(PlatformName) == x86 set platform=win32
 xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\*.dll" "$(TargetDir)" /D /Y
 xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\*.pdb" "$(TargetDir)" /D /Y
+
+xcopy "d:\kodning\myprojects\c#\remuxer\remuxer\bin\release\remuxer.exe" "$(TargetDir)\remuxer\" /D /Y
+xcopy "$(SolutionDir)%25platform%25\release\remuxer" "$(TargetDir)\remuxer" /D /E /Y
 </PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
