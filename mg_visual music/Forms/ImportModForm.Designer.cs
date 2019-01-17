@@ -28,8 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-			this.modChTrackBtn = new System.Windows.Forms.RadioButton();
-			this.modInsTrackBtn = new System.Windows.Forms.RadioButton();
 			this.SuspendLayout();
 			// 
 			// existingAudioRbtn
@@ -44,7 +42,7 @@
 			// 
 			// Cancel
 			// 
-			this.Cancel.Location = new System.Drawing.Point(308, 271);
+			this.Cancel.Location = new System.Drawing.Point(308, 267);
 			// 
 			// label1
 			// 
@@ -54,7 +52,7 @@
 			// 
 			// eraseCurrent
 			// 
-			this.eraseCurrent.Location = new System.Drawing.Point(12, 222);
+			this.eraseCurrent.Location = new System.Drawing.Point(12, 227);
 			// 
 			// openNoteFileDlg
 			// 
@@ -64,61 +62,28 @@
 			// 
 			// Ok
 			// 
-			this.Ok.Location = new System.Drawing.Point(227, 271);
+			this.Ok.Location = new System.Drawing.Point(227, 267);
 			this.Ok.Click += new System.EventHandler(this.Ok_Click);
 			// 
-			// modChTrackBtn
+			// insTrackBtn
 			// 
-			this.modChTrackBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.modChTrackBtn.AutoSize = true;
-			this.modChTrackBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.modChTrackBtn.Location = new System.Drawing.Point(12, 277);
-			this.modChTrackBtn.Name = "modChTrackBtn";
-			this.modChTrackBtn.Size = new System.Drawing.Size(168, 17);
-			this.modChTrackBtn.TabIndex = 13;
-			this.modChTrackBtn.Text = "One track per module channel";
-			this.modChTrackBtn.UseVisualStyleBackColor = true;
+			this.insTrackBtn.Location = new System.Drawing.Point(12, 250);
 			// 
-			// modInsTrackBtn
+			// chTrackBtn
 			// 
-			this.modInsTrackBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.modInsTrackBtn.AutoSize = true;
-			this.modInsTrackBtn.Checked = true;
-			this.modInsTrackBtn.Cursor = System.Windows.Forms.Cursors.Default;
-			this.modInsTrackBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.modInsTrackBtn.Location = new System.Drawing.Point(12, 254);
-			this.modInsTrackBtn.Name = "modInsTrackBtn";
-			this.modInsTrackBtn.Size = new System.Drawing.Size(178, 17);
-			this.modInsTrackBtn.TabIndex = 12;
-			this.modInsTrackBtn.TabStop = true;
-			this.modInsTrackBtn.Text = "One track per module instrument";
-			this.modInsTrackBtn.UseVisualStyleBackColor = true;
+			this.chTrackBtn.Location = new System.Drawing.Point(12, 273);
 			// 
 			// ImportModForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(400, 306);
-			this.Controls.Add(this.modInsTrackBtn);
-			this.Controls.Add(this.modChTrackBtn);
+			this.ClientSize = new System.Drawing.Size(400, 302);
 			this.Name = "ImportModForm";
 			this.Load += new System.EventHandler(this.ImportModForm_Load);
-			this.Controls.SetChildIndex(this.BrowseAudioBtn, 0);
-			this.Controls.SetChildIndex(this.audioFilePath, 0);
-			this.Controls.SetChildIndex(this.label1, 0);
-			this.Controls.SetChildIndex(this.eraseCurrent, 0);
-			this.Controls.SetChildIndex(this.Cancel, 0);
-			this.Controls.SetChildIndex(this.label2, 0);
-			this.Controls.SetChildIndex(this.Ok, 0);
-			this.Controls.SetChildIndex(this.modChTrackBtn, 0);
-			this.Controls.SetChildIndex(this.modInsTrackBtn, 0);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.RadioButton modChTrackBtn;
-        private System.Windows.Forms.RadioButton modInsTrackBtn;
     }
 }

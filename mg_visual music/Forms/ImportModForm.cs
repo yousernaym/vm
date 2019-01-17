@@ -31,12 +31,7 @@ namespace Visual_Music
 			//string supportedFiles = "*.669; *.AMF; *.APUN; *.DSM; *.FAR; *.GDM; *.IT; *.IMF; *.MOD; *.MED; *.MTM; *.OKT; *.S3M; *.STM; *.STX; *.ULT; *.UNI; *.XM;";
 			//openNoteFileDlg.Filter = "Module files (" + supportedFiles + ") | " + supportedFiles + " | All files(*.*) | *.*";
 		}
-        public bool InsTrack
-        {
-            get { return modInsTrackBtn.Checked; }
-            set { if (value) modInsTrackBtn.Checked = true; else modChTrackBtn.Checked = true; }
-        }
-
+        
 		private void Ok_Click(object sender, EventArgs e)
         {
 			importFiles();
@@ -57,10 +52,10 @@ namespace Visual_Music
 	class ModImportOptions : ImportOptions
 	{
 		static string[] XmPlayFormats = { "IT", "XM", "S3M", "MTM", "MOD", "UMX", "MO3" };
-		new ImportModForm ImportForm;
+		//new ImportModForm ImportForm;
 		public ModImportOptions() : base(Midi.FileType.Mod)
 		{
-			ImportForm = (ImportModForm)base.ImportForm; //Cast base import form to ModImportForm to access InsTrack property
+			//ImportForm = (ImportModForm)base.ImportForm; //Cast base import form to ModImportForm to access InsTrack property
 			string ext = NotePath?.Split('.').Last().ToUpper();
 			bool xmPlayMixdownSupported = XmPlayFormats.Contains(ext);
 			MixdownType = xmPlayMixdownSupported && Form1.TpartyIntegrationForm.ModuleMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;

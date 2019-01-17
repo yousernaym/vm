@@ -359,6 +359,9 @@
     <EmbeddedResource Include="Forms\ImportNotesWithAudioForm.resx">
       <DependentUpon>ImportNotesWithAudioForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportSidForm.resx">
+      <DependentUpon>ImportSidForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ProgressForm.resx">
       <DependentUpon>ProgressForm.cs</DependentUpon>
     </EmbeddedResource>

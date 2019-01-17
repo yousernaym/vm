@@ -68,8 +68,19 @@ namespace Visual_Music
 			get => eraseCurrent.Checked;
 			set => eraseCurrent.Checked = value;
 		}
-		
-        public SourceFileForm() //For designer view
+		public bool InsTrack
+		{
+			get => insTrackBtn.Checked;
+			set
+			{
+				if (value)
+					insTrackBtn.Checked = true;
+				else
+					chTrackBtn.Checked = true;
+			}
+		}
+
+		public SourceFileForm() //For designer view
         {
             InitializeComponent();
         }
@@ -207,6 +218,7 @@ namespace Visual_Music
 		public string MidiOutputPath { get; set; }
 		public bool SavedMidi { get; set; }
 
+
 		public ImportOptions(Midi.FileType noteFileType)
 		{
 			NoteFileType = noteFileType;
@@ -271,8 +283,9 @@ namespace Visual_Music
 			string audioPath = MixdownType == Midi.MixdownType.None ? AudioPath : null;
 			ImportForm.NoteFilePath = RawNotePath;
 			ImportForm.AudioFilePath = audioPath;
-			if (ImportForm.GetType() == typeof(ImportModForm))
-				((ImportModForm)ImportForm).InsTrack = InsTrack;
+			//if (ImportForm.GetType() == typeof(ImportModForm))
+			//((ImportModForm)ImportForm).InsTrack = InsTrack;
+			ImportForm.InsTrack = InsTrack;
 
 			//If note file was not midi it was converted to midi before imported.
 			//If the midi file was saved, it will be loaded next time the project loads, and the MidiImportForm should contain the mid/audio paths used in the import so that the user can modify the paths and re-import or whatever.

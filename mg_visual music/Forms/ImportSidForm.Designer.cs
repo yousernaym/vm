@@ -37,11 +37,11 @@
 			// 
 			// Cancel
 			// 
-			this.Cancel.Location = new System.Drawing.Point(324, 228);
+			this.Cancel.Location = new System.Drawing.Point(324, 269);
 			// 
 			// eraseCurrent
 			// 
-			this.eraseCurrent.Location = new System.Drawing.Point(12, 234);
+			this.eraseCurrent.Location = new System.Drawing.Point(12, 229);
 			// 
 			// openNoteFileDlg
 			// 
@@ -50,13 +50,21 @@
 			// 
 			// Ok
 			// 
-			this.Ok.Location = new System.Drawing.Point(243, 228);
+			this.Ok.Location = new System.Drawing.Point(243, 269);
 			this.Ok.Click += new System.EventHandler(this.Ok_Click);
+			// 
+			// insTrackBtn
+			// 
+			this.insTrackBtn.Location = new System.Drawing.Point(12, 252);
+			// 
+			// chTrackBtn
+			// 
+			this.chTrackBtn.Location = new System.Drawing.Point(12, 275);
 			// 
 			// ImportSidForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(411, 263);
+			this.ClientSize = new System.Drawing.Size(411, 304);
 			this.Name = "ImportSidForm";
 			this.Load += new System.EventHandler(this.ImportSidForm_Load);
 			this.Shown += new System.EventHandler(this.ImportSidForm_Shown);

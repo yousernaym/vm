@@ -40,6 +40,8 @@
 			this.openAudioFileDlg = new System.Windows.Forms.OpenFileDialog();
 			this.eraseCurrent = new System.Windows.Forms.CheckBox();
 			this.Ok = new System.Windows.Forms.Button();
+			this.insTrackBtn = new System.Windows.Forms.RadioButton();
+			this.chTrackBtn = new System.Windows.Forms.RadioButton();
 			this.SuspendLayout();
 			// 
 			// browseNoteBtn
@@ -109,12 +111,29 @@
 			this.Ok.Name = "Ok";
 			this.Ok.UseVisualStyleBackColor = true;
 			// 
+			// insTrackBtn
+			// 
+			resources.ApplyResources(this.insTrackBtn, "insTrackBtn");
+			this.insTrackBtn.Checked = true;
+			this.insTrackBtn.Cursor = System.Windows.Forms.Cursors.Default;
+			this.insTrackBtn.Name = "insTrackBtn";
+			this.insTrackBtn.TabStop = true;
+			this.insTrackBtn.UseVisualStyleBackColor = true;
+			// 
+			// chTrackBtn
+			// 
+			resources.ApplyResources(this.chTrackBtn, "chTrackBtn");
+			this.chTrackBtn.Name = "chTrackBtn";
+			this.chTrackBtn.UseVisualStyleBackColor = true;
+			// 
 			// SourceFileForm
 			// 
 			this.AcceptButton = this.Ok;
 			resources.ApplyResources(this, "$this");
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.Cancel;
+			this.Controls.Add(this.insTrackBtn);
+			this.Controls.Add(this.chTrackBtn);
 			this.Controls.Add(this.eraseCurrent);
 			this.Controls.Add(this.Cancel);
 			this.Controls.Add(this.Ok);
@@ -147,5 +166,7 @@
         protected System.Windows.Forms.TextBox audioFilePath;
         protected System.Windows.Forms.Button Ok;
 		private System.Windows.Forms.TextBox noteFilePath;
+		protected System.Windows.Forms.RadioButton insTrackBtn;
+		protected System.Windows.Forms.RadioButton chTrackBtn;
 	}
 }

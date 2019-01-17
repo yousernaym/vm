@@ -37,7 +37,7 @@
 			// 
 			// Cancel
 			// 
-			this.Cancel.Location = new System.Drawing.Point(308, 224);
+			this.Cancel.Location = new System.Drawing.Point(308, 234);
 			// 
 			// label1
 			// 
@@ -45,7 +45,7 @@
 			// 
 			// eraseCurrent
 			// 
-			this.eraseCurrent.Location = new System.Drawing.Point(12, 345);
+			this.eraseCurrent.Location = new System.Drawing.Point(12, 240);
 			// 
 			// openNoteFileDlg
 			// 
@@ -54,13 +54,23 @@
 			// 
 			// Ok
 			// 
-			this.Ok.Location = new System.Drawing.Point(227, 224);
+			this.Ok.Location = new System.Drawing.Point(227, 234);
 			this.Ok.Click += new System.EventHandler(this.Ok_Click);
+			// 
+			// insTrackBtn
+			// 
+			this.insTrackBtn.Location = new System.Drawing.Point(90, 217);
+			this.insTrackBtn.Visible = false;
+			// 
+			// chTrackBtn
+			// 
+			this.chTrackBtn.Location = new System.Drawing.Point(90, 240);
+			this.chTrackBtn.Visible = false;
 			// 
 			// ImportMidiForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(400, 259);
+			this.ClientSize = new System.Drawing.Size(400, 269);
 			this.Name = "ImportMidiForm";
 			this.Load += new System.EventHandler(this.ImportMidiForm_Load);
 			this.ResumeLayout(false);
