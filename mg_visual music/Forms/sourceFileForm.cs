@@ -225,6 +225,7 @@ namespace Visual_Music
 			RawNotePath = ImportForm.NoteFilePath;
 			AudioPath = ImportForm.AudioFilePath;
 			EraseCurrent = ImportForm.EraseCurrent;
+			InsTrack = ImportForm.InsTrack;
 		}
 
 		public ImportOptions(SerializationInfo info, StreamingContext context)

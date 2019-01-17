@@ -59,7 +59,7 @@ namespace Visual_Music
 			string ext = NotePath?.Split('.').Last().ToUpper();
 			bool xmPlayMixdownSupported = XmPlayFormats.Contains(ext);
 			MixdownType = xmPlayMixdownSupported && Form1.TpartyIntegrationForm.ModuleMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
-			InsTrack = ImportForm.InsTrack;
+			//InsTrack = ImportForm.InsTrack;
 			MixdownAppPath = TpartyIntegrationForm.XmPlayPath;
 			MixdownAppArgs = "\"" + NotePath + "\" -boost";
 		}
