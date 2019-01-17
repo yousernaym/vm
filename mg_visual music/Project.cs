@@ -309,7 +309,9 @@ namespace Visual_Music
 					string songLengthsFlag = $"-l{options.SongLengthS.ToString()}";
 					string subSongFlag = $"-s{options.SubSong.ToString()}";
 					string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag}";
-					var process = Process.Start("remuxer\\remuxer.exe", cmdLine);
+					var startInfo = new ProcessStartInfo("remuxer.exe", cmdLine);
+					startInfo.WorkingDirectory = Path.Combine(Program.Dir, "remuxer");
+					var process = Process.Start(startInfo);
 					process.WaitForExit();
 					Program.form1.Activate();
 					
