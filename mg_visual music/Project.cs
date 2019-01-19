@@ -295,7 +295,7 @@ namespace Visual_Music
 				//Should audio file be created?
 				if (options.MixdownType == Midi.MixdownType.Internal)
 				{
-					audioPath = Path.Combine(Program.TempDir, Path.ChangeExtension(noteFile, "wav"));
+					audioPath = Path.Combine(Program.TempDir, noteFile, "wav");
 					audioArg = $"-a\"{audioPath}\"";
 					File.Delete(audioPath);
 				}
@@ -321,7 +321,11 @@ namespace Visual_Music
 				options.MidiOutputPath = midiPath;
 				options.AudioPath = audioPath;
 			}
-
+			else if (options.MixdownType == Midi.MixdownType.Internal)
+			{
+				MidMix.mixdown(options.NotePath, Path.Combine(Program.TempDir, Path.GetFileName(options.NotePath), "wav"));
+			}
+		
 			openNoteFile(options, out mixdownPath);
 			openAudioFile(string.IsNullOrWhiteSpace(mixdownPath) ? options.AudioPath : mixdownPath, options.MixdownType);
 					

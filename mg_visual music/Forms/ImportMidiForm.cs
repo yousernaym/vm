@@ -42,7 +42,7 @@ namespace Visual_Music
 	{
 		public MidiImportOptions() : base(Midi.FileType.Midi)
 		{
-			MixdownType = Midi.MixdownType.None;
+			MixdownType = MidMix.sfLoaded() ? Midi.MixdownType.Internal : Midi.MixdownType.None;
 		}
 
 		public MidiImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)

@@ -76,6 +76,7 @@ namespace Visual_Music
 
 			try
 			{
+				MidMix.init();
 				if (!Media.initMF())
 				{
 					Form1.showErrorMsgBox(null, "Couldn't initialize Media Foundation.");
@@ -89,6 +90,7 @@ namespace Visual_Music
 			}
 			finally
 			{
+				MidMix.close();
 				Media.closeMF();
 				Midi.Song.exitLib();
 				dirLock.Close();
