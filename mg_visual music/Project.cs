@@ -273,7 +273,6 @@ namespace Visual_Music
 
 		public bool importSong(ImportOptions options)
 		{ //<Open project> and <import files> meet here
-			string mixdownPath;
 			Media.closeAudioFile();
 
 			//Convert mod/sid files to mid/wav
@@ -323,11 +322,13 @@ namespace Visual_Music
 			}
 			else if (options.MixdownType == Midi.MixdownType.Internal)
 			{
-				MidMix.mixdown(options.NotePath, Path.Combine(Program.TempDir, Path.GetFileName(options.NotePath), "wav"));
+				string audioPath = Path.Combine(Program.TempDir, Path.GetFileName(options.NotePath)) + ".wav";
+				MidMix.mixdown(options.NotePath, audioPath);
+				options.AudioPath = audioPath;
 			}
-		
-			openNoteFile(options, out mixdownPath);
-			openAudioFile(string.IsNullOrWhiteSpace(mixdownPath) ? options.AudioPath : mixdownPath, options.MixdownType);
+
+			openNoteFile(options);
+			openAudioFile(options.AudioPath, options.MixdownType);
 					
 			ImportOptions = options;
 			if (options.EraseCurrent)
@@ -336,11 +337,13 @@ namespace Visual_Music
 			return true;
 		}
 
-		public bool openNoteFile(ImportOptions options, out string mixdownPath)
+		public bool openNoteFile(ImportOptions options)
 		{
 			SongPanel.Invalidate();
 			stopPlayback();
-			mixdownPath = null;
+			pbTempoEvent = 0;
+			pbTimeT = 0;
+			pbTimeS = 0;
 
 			Midi.Song newNotes = new Midi.Song();
 			string path = options.MidiOutputPath;
@@ -469,7 +472,7 @@ namespace Visual_Music
 
 		public void drawSong(Point viewportSize)
 		{
-			if (notes == null)
+			if (notes == null || trackViews == null)
 				return;
 
 			DepthStencilState oldDss = songPanel.GraphicsDevice.DepthStencilState;
