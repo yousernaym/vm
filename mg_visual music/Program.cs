@@ -84,7 +84,7 @@ namespace Visual_Music
 				}
 				Directory.CreateDirectory(TempDir);
 				dirLock = File.Create(Path.Combine(TempDir, "dontdeletefolder"));
-				Midi.Song.initLib(TempDir, Path.GetFileName(MixdownPath));
+				//Midi.Song.initLib(TempDir, Path.GetFileName(MixdownPath));
 				form1 = new Form1(args);
 				Application.Run(form1);
 			}
@@ -92,7 +92,7 @@ namespace Visual_Music
 			{
 				MidMix.close();
 				Media.closeMF();
-				Midi.Song.exitLib();
+				//Midi.Song.exitLib();
 				dirLock.Close();
 				dirLock = null;
 				try
