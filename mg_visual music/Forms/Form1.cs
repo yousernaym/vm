@@ -69,6 +69,7 @@ namespace Visual_Music
 		public SongPanel SongPanel => songPanel;
 		SongWebBrowser modWebBrowser;
 		SongWebBrowser sidWebBrowser;
+		SongWebBrowser midiWebBrowser;
 		List<Control> screens = new List<Control>();
 		Project project;
 		public Project Project => project;
@@ -105,27 +106,23 @@ namespace Visual_Music
 			Controls.Add(songScrollBar);
 			songScrollBar.BringToFront();
 
-			modWebBrowser = new SongWebBrowser(this);
-			modWebBrowser.Dock = DockStyle.Fill;
-			modWebBrowser.Url = "https://modarchive.org/index.php?request=view_searchbox";
-			modWebBrowser.Visible = false;
-			//modWebBrowser.OnBeforeBrowseEvent += OnBeforeBrowse;
-
-			sidWebBrowser = new SongWebBrowser(this);
-			sidWebBrowser.Dock = DockStyle.Fill;
-			sidWebBrowser.Url = "https://www.exotica.org.uk/wiki/Special:HVSC";
-			sidWebBrowser.Visible = false;
-
-			Controls.Add(modWebBrowser);
-			Controls.Add(sidWebBrowser);
-			modWebBrowser.BringToFront();
-			sidWebBrowser.BringToFront();
-			initSongPanel();
+			modWebBrowser = new SongWebBrowser(this, "https://modarchive.org/index.php?request=view_searchbox");
+			sidWebBrowser = new SongWebBrowser(this, "https://www.exotica.org.uk/wiki/Special:HVSC");
+			midiWebBrowser = new SongWebBrowser(this, "https://www.freemidi.org/");
 
 			screens.Add(songPanel);
 			screens.Add(modWebBrowser);
 			screens.Add(sidWebBrowser);
-
+			screens.Add(midiWebBrowser);
+			foreach (var screen in screens)
+			{
+				screen.Dock = DockStyle.Fill;
+				screen.Visible = false;
+				Controls.Add(screen);
+				screen.BringToFront();
+			}
+			initSongPanel();
+			
 			Array enumArray = Enum.GetValues(typeof(NoteStyleType));
 			foreach (NoteStyleType nse in enumArray)
 				styleList.Items.Add(nse.ToString());
@@ -1134,10 +1131,10 @@ namespace Visual_Music
 		}
 		void initSongPanel()
 		{
-			songPanel.Dock = DockStyle.Fill;
+			//songPanel.Dock = DockStyle.Fill;
 			songPanel.TabStop = false;
-			songPanel.Visible = true;
-			Controls.Add(songPanel);
+			//songPanel.Visible = true;
+			//Controls.Add(songPanel);
 			songPanel.BringToFront();
 			songPanel.MouseWheel += new MouseEventHandler(songPanel_MouseWheel);
 			//songPanel.MouseMove += new MouseEventHandler(songPanel_MouseMove);
@@ -1714,12 +1711,21 @@ namespace Visual_Music
 			changeToScreen(sidWebBrowser);
 		}
 
+		private void viewMidiBrowserTSMI_Click(object sender, EventArgs e)
+		{
+			changeToScreen(midiWebBrowser);
+		}
+
 		void changeToScreen(Control newScreen)
 		{
 			foreach (var screen in screens)
 				screen.Visible = false;
 			newScreen.Visible = true;
 			newScreen.Focus();
+			bool isSongScreen = newScreen is SongPanel;
+			songPropsCb.Enabled = trackPropsCb.Enabled = isSongScreen;
+			if (!isSongScreen)
+				songPropsPanel.Visible = trackPropsPanel.Visible = false;
 		}
 
 		private void trackPropsPanel_VisibleChanged(object sender, EventArgs e)
@@ -1796,5 +1802,7 @@ namespace Visual_Music
 			button.BackColor = colorDialog1.Color;
 			return true;
 		}
+
+		
 	}
 }

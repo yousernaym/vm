@@ -194,6 +194,7 @@
 			this.songPropsCb = new System.Windows.Forms.CheckBox();
 			this.trackPropsCb = new System.Windows.Forms.CheckBox();
 			this.saveMidiDialog = new System.Windows.Forms.SaveFileDialog();
+			this.viewMidiBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -453,7 +454,8 @@
 			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.viewSongTSMI,
             this.viewModBrowserTSMI,
-            this.viewSidBrowserTSMI});
+            this.viewSidBrowserTSMI,
+            this.viewMidiBrowserTSMI});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.viewToolStripMenuItem.Text = "View";
@@ -462,7 +464,7 @@
 			// 
 			this.viewSongTSMI.Name = "viewSongTSMI";
 			this.viewSongTSMI.ShortcutKeys = System.Windows.Forms.Keys.F1;
-			this.viewSongTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewSongTSMI.Size = new System.Drawing.Size(180, 22);
 			this.viewSongTSMI.Text = "Song";
 			this.viewSongTSMI.Click += new System.EventHandler(this.viewSongTSMI_Click);
 			// 
@@ -470,7 +472,7 @@
 			// 
 			this.viewModBrowserTSMI.Name = "viewModBrowserTSMI";
 			this.viewModBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F2;
-			this.viewModBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewModBrowserTSMI.Size = new System.Drawing.Size(180, 22);
 			this.viewModBrowserTSMI.Text = "Mod browser";
 			this.viewModBrowserTSMI.Click += new System.EventHandler(this.viewModBrowserTSMI_Click);
 			// 
@@ -478,7 +480,7 @@
 			// 
 			this.viewSidBrowserTSMI.Name = "viewSidBrowserTSMI";
 			this.viewSidBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F3;
-			this.viewSidBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewSidBrowserTSMI.Size = new System.Drawing.Size(180, 22);
 			this.viewSidBrowserTSMI.Text = "Sid browser";
 			this.viewSidBrowserTSMI.Click += new System.EventHandler(this.viewSidBrowserTSMI_Click);
 			// 
@@ -1827,7 +1829,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-6524, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-6541, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1839,7 +1841,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-6636, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-6653, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1849,7 +1851,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-6638, 15630);
+			this.label4.Location = new System.Drawing.Point(-6655, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1938,7 +1940,7 @@
 			this.resetCamBtn.Name = "resetCamBtn";
 			this.resetCamBtn.Size = new System.Drawing.Size(111, 23);
 			this.resetCamBtn.TabIndex = 5;
-			this.resetCamBtn.Text = "Reset camera";
+			this.resetCamBtn.Text = "&Reset camera";
 			this.resetCamBtn.UseVisualStyleBackColor = true;
 			this.resetCamBtn.Click += new System.EventHandler(this.resetCamBtn_Click);
 			// 
@@ -2212,6 +2214,14 @@
 			// 
 			this.saveMidiDialog.Filter = "Midi files|*.mid|All files|*.*";
 			// 
+			// viewMidiBrowserTSMI
+			// 
+			this.viewMidiBrowserTSMI.Name = "viewMidiBrowserTSMI";
+			this.viewMidiBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F4;
+			this.viewMidiBrowserTSMI.Size = new System.Drawing.Size(180, 22);
+			this.viewMidiBrowserTSMI.Text = "Midi browser";
+			this.viewMidiBrowserTSMI.Click += new System.EventHandler(this.viewMidiBrowserTSMI_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -2468,6 +2478,7 @@
 		private System.Windows.Forms.NumericUpDown fadeOutUd;
 		private System.Windows.Forms.NumericUpDown fadeInUd;
 		private System.Windows.Forms.SaveFileDialog saveMidiDialog;
+		private System.Windows.Forms.ToolStripMenuItem viewMidiBrowserTSMI;
 	}
 }
 
