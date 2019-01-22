@@ -56,6 +56,7 @@
 			this.viewSongTSMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewModBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewSidBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewMidiBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
@@ -183,7 +184,6 @@
 			this.songPropsCb = new System.Windows.Forms.CheckBox();
 			this.trackPropsCb = new System.Windows.Forms.CheckBox();
 			this.saveMidiDialog = new System.Windows.Forms.SaveFileDialog();
-			this.viewMidiBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.upDownVpWidth = new Visual_Music.TbSlider();
 			this.trackList = new Visual_Music.ListViewNF();
 			this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -394,9 +394,9 @@
 			// startStopToolStripMenuItem
 			// 
 			this.startStopToolStripMenuItem.Name = "startStopToolStripMenuItem";
-			this.startStopToolStripMenuItem.ShowShortcutKeys = false;
+			this.startStopToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Space)));
 			this.startStopToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.startStopToolStripMenuItem.Text = "Start/Stop                          Space";
+			this.startStopToolStripMenuItem.Text = "Start/Stop";
 			this.startStopToolStripMenuItem.Click += new System.EventHandler(this.startStopToolStripMenuItem_Click);
 			// 
 			// beginningToolStripMenuItem
@@ -464,7 +464,7 @@
 			// 
 			this.viewSongTSMI.Name = "viewSongTSMI";
 			this.viewSongTSMI.ShortcutKeys = System.Windows.Forms.Keys.F1;
-			this.viewSongTSMI.Size = new System.Drawing.Size(180, 22);
+			this.viewSongTSMI.Size = new System.Drawing.Size(163, 22);
 			this.viewSongTSMI.Text = "Song";
 			this.viewSongTSMI.Click += new System.EventHandler(this.viewSongTSMI_Click);
 			// 
@@ -472,7 +472,7 @@
 			// 
 			this.viewModBrowserTSMI.Name = "viewModBrowserTSMI";
 			this.viewModBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F2;
-			this.viewModBrowserTSMI.Size = new System.Drawing.Size(180, 22);
+			this.viewModBrowserTSMI.Size = new System.Drawing.Size(163, 22);
 			this.viewModBrowserTSMI.Text = "Mod browser";
 			this.viewModBrowserTSMI.Click += new System.EventHandler(this.viewModBrowserTSMI_Click);
 			// 
@@ -480,9 +480,17 @@
 			// 
 			this.viewSidBrowserTSMI.Name = "viewSidBrowserTSMI";
 			this.viewSidBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F3;
-			this.viewSidBrowserTSMI.Size = new System.Drawing.Size(180, 22);
+			this.viewSidBrowserTSMI.Size = new System.Drawing.Size(163, 22);
 			this.viewSidBrowserTSMI.Text = "Sid browser";
 			this.viewSidBrowserTSMI.Click += new System.EventHandler(this.viewSidBrowserTSMI_Click);
+			// 
+			// viewMidiBrowserTSMI
+			// 
+			this.viewMidiBrowserTSMI.Name = "viewMidiBrowserTSMI";
+			this.viewMidiBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F4;
+			this.viewMidiBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewMidiBrowserTSMI.Text = "Midi browser";
+			this.viewMidiBrowserTSMI.Click += new System.EventHandler(this.viewMidiBrowserTSMI_Click);
 			// 
 			// label7
 			// 
@@ -1714,7 +1722,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-7170, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-7204, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1726,7 +1734,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-7282, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-7316, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1736,7 +1744,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-7284, 15630);
+			this.label4.Location = new System.Drawing.Point(-7318, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2078,14 +2086,6 @@
 			// saveMidiDialog
 			// 
 			this.saveMidiDialog.Filter = "Midi files|*.mid|All files|*.*";
-			// 
-			// viewMidiBrowserTSMI
-			// 
-			this.viewMidiBrowserTSMI.Name = "viewMidiBrowserTSMI";
-			this.viewMidiBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F4;
-			this.viewMidiBrowserTSMI.Size = new System.Drawing.Size(180, 22);
-			this.viewMidiBrowserTSMI.Text = "Midi browser";
-			this.viewMidiBrowserTSMI.Click += new System.EventHandler(this.viewMidiBrowserTSMI_Click);
 			// 
 			// upDownVpWidth
 			// 

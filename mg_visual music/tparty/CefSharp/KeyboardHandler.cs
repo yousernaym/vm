@@ -1,14 +1,25 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows.Forms;
+using Visual_Music;
 
 namespace CefSharp.WinForms.Example.Handlers
 {
     public class KeyboardHandler : IKeyboardHandler
     {
-        /// <inheritdoc/>>
-        public bool OnPreKeyEvent(IWebBrowser browserControl, IBrowser browser, KeyType type, int windowsKeyCode, int nativeKeyCode, CefEventFlags modifiers, bool isSystemKey, ref bool isKeyboardShortcut)
+		Form1 form1;
+		public KeyboardHandler(Form1 form)
+		{
+			form1 = form;
+		}
+		/// <inheritdoc/>>
+		public bool OnPreKeyEvent(IWebBrowser browserControl, IBrowser browser, KeyType type, int windowsKeyCode, int nativeKeyCode, CefEventFlags modifiers, bool isSystemKey, ref bool isKeyboardShortcut)
         {
+			if (windowsKeyCode == 179) //Play/pause
+			{
+				form1.BeginInvoke(new Action(() => form1.Project.togglePlayback()));
+				return true;
+			}
 			//if (!(modifiers == CefEventFlags.ControlDown || modifiers == CefEventFlags.ShiftDown || modifiers == CefEventFlags.AltDown))
 			//{
 			//	if (windowsKeyCode < 112 || windowsKeyCode > 123 || nativeKeyCode == 0)
@@ -117,15 +128,12 @@ namespace CefSharp.WinForms.Example.Handlers
             else if (state == PreProcessControlState.MessageProcessed)
             {
 				// Most of the interesting cases get processed by PreProcessControlMessage.
-				//Only deal with function keys
-				//if (windowsKeyCode >= 112 && windowsKeyCode <= 123)
-					result = true;
+				result = true;
             }
-
-            Debug.WriteLine("OnPreKeyEvent: KeyType: {0} 0x{1:X} Modifiers: {2}", type, windowsKeyCode, modifiers);
+			
+			Debug.WriteLine("OnPreKeyEvent: KeyType: {0} 0x{1:X} Modifiers: {2}", type, windowsKeyCode, modifiers);
             Debug.WriteLine("OnPreKeyEvent PreProcessControlState: {0}", state);
-			//return false;
-            return result;
+	        return result;
         }
 
         /// <inheritdoc/>>

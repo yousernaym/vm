@@ -398,9 +398,10 @@ namespace Visual_Music
 			}
 		}
 
-			private void Form1_KeyDown(object sender, KeyEventArgs e)
+		private void Form1_KeyDown(object sender, KeyEventArgs e)
 		{
-
+			if (e.KeyCode == Keys.MediaPlayPause)
+				Project.togglePlayback();
 		}
 
 		private void Form1_KeyUp(object sender, KeyEventArgs e)

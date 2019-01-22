@@ -51,7 +51,7 @@ namespace Visual_Music
 			browser = new ChromiumWebBrowser("")
             {
                 Dock = DockStyle.Fill,
-				KeyboardHandler = new KeyboardHandler()
+				KeyboardHandler = new KeyboardHandler(mainForm)
 			};
 
 			DownloadHandler downloadHandler = new DownloadHandler();
