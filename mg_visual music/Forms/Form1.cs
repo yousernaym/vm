@@ -1018,7 +1018,6 @@ namespace Visual_Music
 		}
 		void openSongFile(string fileName)
 		{
-			Project currentProject = project;
 			try
 			{
 				songPanel.SuspendPaint();
@@ -1033,7 +1032,6 @@ namespace Visual_Music
 					return; 
 				project = tempProject;
 				project.ImportOptions.updateImportForm();
-
 				currentProjPath = fileName;
 				songLoaded(currentProjPath);
 				updateFormTitle(currentProjPath);
@@ -1044,7 +1042,6 @@ namespace Visual_Music
 				if (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
 				{
 					showErrorMsgBox("Couldn't load song.\n" + ex.Message);
-					project = currentProject;
 				}
 				else
 					throw;
@@ -1804,6 +1801,58 @@ namespace Visual_Music
 				return false;
 			button.BackColor = colorDialog1.Color;
 			return true;
+		}
+
+		private void loadPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (openPropsFileDialog.ShowDialog() != DialogResult.OK)
+				return;
+			TrackProps props;
+			DataContractSerializer dcs = new DataContractSerializer(typeof(TrackProps), projectSerializationTypes);
+			try
+			{
+				using (FileStream stream = File.Open(openPropsFileDialog.FileName, FileMode.Open))
+				{
+					props = (TrackProps)dcs.ReadObject(stream);
+				}
+				foreach (int selectedTrackIndex in trackList.SelectedIndices)
+				{
+					project.TrackViews[selectedTrackIndex].TrackProps.cloneFrom(props, TrackPropsType.TPT_All, SongPanel);
+				}
+				updateTrackListColors();
+				updateTrackControls();
+			}
+			catch (Exception ex)
+			{
+				showErrorMsgBox(ex.Message);
+			}
+			
+		}
+
+		private void savePropertiesToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			var selection = trackList.SelectedIndices;
+			if (selection.Count > 1)
+			{
+				showErrorMsgBox("Only one track can be selected.");
+				return;
+			}
+			if (savePropsFileDialog.ShowDialog() != DialogResult.OK)
+				return;
+			TrackProps props = Project.TrackViews[selection[0]].TrackProps;
+			DataContractSerializer dcs = new DataContractSerializer(typeof(TrackProps), projectSerializationTypes);
+			try
+			{
+				using (FileStream stream = File.Open(savePropsFileDialog.FileName, FileMode.Create))
+				{
+					dcs.WriteObject(stream, props);
+				}
+			}
+			catch (Exception ex)
+			{
+				showErrorMsgBox(ex.Message);
+			}
+
 		}
 	}
 }
