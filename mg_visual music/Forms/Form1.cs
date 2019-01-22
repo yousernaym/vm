@@ -71,6 +71,7 @@ namespace Visual_Music
 		SongWebBrowser sidWebBrowser;
 		SongWebBrowser midiWebBrowser;
 		List<Control> screens = new List<Control>();
+		Control currentScreen;
 		Project project;
 		public Project Project => project;
 		//float PosOffsetScale => Project.Camera.ViewportSize.X / 100.0f; //Pos offset is in percent of screen width
@@ -117,7 +118,7 @@ namespace Visual_Music
 			foreach (var screen in screens)
 			{
 				screen.Dock = DockStyle.Fill;
-				screen.Visible = false;
+				screen.Visible = true;
 				Controls.Add(screen);
 				screen.BringToFront();
 			}
@@ -134,14 +135,6 @@ namespace Visual_Music
 				selectedTrackPropsPanel.TabPages[i].Name = tptList[i];
 		}
 
-		void OnBeforeBrowse(object sender, OnBeforeBrowseEventArgs e)
-		{
-			if (e.Request.Url.EndsWith(".xm"))
-			{
-				e.CancelNavigation = true;
-				this.InvokeOnUiThreadIfRequired(() => importModuleToolStripMenuItem.PerformClick());
-			}
-		}
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			Download.init(this);
@@ -220,7 +213,7 @@ namespace Visual_Music
 				}
 			}
 		}
-
+		
 		void addInvalidateEH(Control.ControlCollection controls)
 		{
 			foreach (Control control in controls)
@@ -292,7 +285,6 @@ namespace Visual_Music
 			project.Camera.SpatialChanged = updateCamControls;
 			upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(songPanel);
-
 		}
 
 		private void updateCamControls()
@@ -1014,7 +1006,10 @@ namespace Visual_Music
 		private void openSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			openProjDialog.FileName = "";
-			if (openProjDialog.ShowDialog() != DialogResult.OK)
+			var dialogResult = openProjDialog.ShowDialog();
+			if (currentScreen is SongWebBrowser)
+				currentScreen.Focus();
+			if (dialogResult != DialogResult.OK)
 				return;
 			ProjectFolder = Path.GetDirectoryName(openProjDialog.FileName);
 			saveSettings();
@@ -1131,20 +1126,15 @@ namespace Visual_Music
 		}
 		void initSongPanel()
 		{
-			//songPanel.Dock = DockStyle.Fill;
 			songPanel.TabStop = false;
-			//songPanel.Visible = true;
-			//Controls.Add(songPanel);
-			songPanel.BringToFront();
 			songPanel.MouseWheel += new MouseEventHandler(songPanel_MouseWheel);
-			//songPanel.MouseMove += new MouseEventHandler(songPanel_MouseMove);
 			songPanel.KeyDown += new KeyEventHandler(songPanel_KeyDown);
 			SongPanel.OnSongPosChanged = delegate ()
 			{
 				if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)
 					songScrollBar.Value = (int)Project.SongPosT;
 			};
-			changeToScreen(songPanel);
+			changeToScreen(songPanel, false);
 		}
 
 		private void invalidateSongPanel(object sender, EventArgs e)
@@ -1716,16 +1706,24 @@ namespace Visual_Music
 			changeToScreen(midiWebBrowser);
 		}
 
-		void changeToScreen(Control newScreen)
+		void changeToScreen(Control newScreen, bool hideOthers = true)
 		{
-			foreach (var screen in screens)
-				screen.Visible = false;
-			newScreen.Visible = true;
-			newScreen.Focus();
+			if (!hideOthers)
+			{
+				newScreen.BringToFront();
+			}
+			else
+			{
+				foreach (var screen in screens)
+					screen.Visible = false;
+				newScreen.Visible = true;
+			}
 			bool isSongScreen = newScreen is SongPanel;
 			songPropsCb.Enabled = trackPropsCb.Enabled = isSongScreen;
 			if (!isSongScreen)
 				songPropsPanel.Visible = trackPropsPanel.Visible = false;
+			newScreen.Focus();
+			currentScreen = newScreen;
 		}
 
 		private void trackPropsPanel_VisibleChanged(object sender, EventArgs e)
@@ -1802,7 +1800,5 @@ namespace Visual_Music
 			button.BackColor = colorDialog1.Color;
 			return true;
 		}
-
-		
 	}
 }

@@ -107,8 +107,11 @@ namespace Visual_Music
         {
             SetCanGoBack(args.CanGoBack);
             SetCanGoForward(args.CanGoForward);
-			this.InvokeOnUiThreadIfRequired(() => SetIsLoading(!args.CanReload));
-			this.InvokeOnUiThreadIfRequired(() => browser.Focus()); 
+			this.InvokeOnUiThreadIfRequired(delegate
+			{
+				SetIsLoading(!args.CanReload);
+				Focus();
+			});
 		}
 
         private void OnBrowserTitleChanged(object sender, TitleChangedEventArgs args)
