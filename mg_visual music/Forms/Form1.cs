@@ -394,7 +394,7 @@ namespace Visual_Music
 			{
 				//Reset camera
 				if (e.KeyCode == Keys.R)
-					resetCamBtn.PerformClick();
+					resetCamera();
 			}
 		}
 
@@ -1478,10 +1478,14 @@ namespace Visual_Music
 			MessageBox.Show(null, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 
-		private void resetCamBtn_Click(object sender, EventArgs e)
+		void resetCamera()
 		{
 			Project.Camera = new Camera(songPanel);
 			Project.Camera.SpatialChanged = updateCamControls;
+		}
+		private void resetCamBtn_Click(object sender, EventArgs e)
+		{
+			resetCamera();
 		}
 
 		private void nudgeBackwardsToolStripMenuItem_Click(object sender, EventArgs e)
