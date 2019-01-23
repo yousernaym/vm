@@ -17,14 +17,16 @@ namespace Visual_Music
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
+		static public readonly string AppName = "Visual Music";
 		static public readonly string Dir = Path.GetDirectoryName(Application.ExecutablePath);
-		static public readonly string AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Visual Music");
+		static public readonly string AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppName);
+		static public readonly string DefaultUserFilesDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), AppName);
 		static public Form1 form1;
-		static public readonly string TempDirRoot = Path.Combine(Path.GetTempPath(), "visual music").ToLower();
-		static public readonly string TempDir = Path.Combine(TempDirRoot, Path.GetRandomFileName().ToLower()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
+		static public readonly string TempDirRoot = Path.Combine(Path.GetTempPath(), AppName).ToLower();
+		static public readonly string TempDir = Path.Combine(TempDirRoot, Path.GetRandomFileName()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
 		static public readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
 		static FileStream dirLock = null;
-		static string cefSharpFolder = "cefSharp";
+		static string cefSharpFolder = "CefSharp";
 
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]

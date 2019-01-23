@@ -380,7 +380,7 @@
             this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1267, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1352, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -532,7 +532,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(872, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(957, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 15642);
 			this.trackPropsPanel.TabIndex = 3;
@@ -550,7 +550,7 @@
             this.loadTrackPropsToolStripMenuItem,
             this.saveTrackPropsToolStripMenuItem});
 			this.trackListCM.Name = "trackListContextMenu";
-			this.trackListCM.Size = new System.Drawing.Size(228, 142);
+			this.trackListCM.Size = new System.Drawing.Size(228, 120);
 			this.trackListCM.Opening += new System.ComponentModel.CancelEventHandler(this.trackListCM_Opening);
 			// 
 			// selectAllToolStripMenuItem
@@ -2115,10 +2115,6 @@
 			// 
 			this.saveMidiDialog.Filter = "Midi files|*.mid|All files|*.*";
 			// 
-			// openTrackPropsFileDialog
-			// 
-			this.openTrackPropsFileDialog.FileName = "openFileDialog1";
-			// 
 			// trackPropsTabCM
 			// 
 			this.trackPropsTabCM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -2283,7 +2279,7 @@
 			this.AutoScroll = true;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(1284, 505);
+			this.ClientSize = new System.Drawing.Size(1369, 505);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);

@@ -7,6 +7,7 @@
 #define MyAppExeName "VM.exe"
 #define MyAppDataDir "{userappdata}\" + MyAppName
 #define SongFileType "VisualMusicSong"
+#define UserFiles "{userdocs}\" + MyAppName
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -41,6 +42,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
+Name: "docsFolder"; Description: "Create user documents subfolder"
 ;Name: "associateVms"; Description: "Associate with .vms files";
 ;Name: "associateMod"; Description: "Associate with module files";
 ;Name: "associateMod\mod"; Description: ".mod";
@@ -109,6 +111,9 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [Dirs]
 Name: "{#MyAppDataDir}"; Flags: uninsalwaysuninstall
+Name: "{#UserFiles}\Props"; Flags: uninsalwaysuninstall; Tasks: docsFolder
+Name: "{#UserFiles}\Projects"; Flags: uninsalwaysuninstall; Tasks: docsFolder
+Name: "{#UserFiles}\Videos"; Flags: uninsalwaysuninstall; Tasks: docsFolder
 
 [Registry]
 Root: HKCR; SubKey: ".vms"; ValueType: string; ValueName: ""; ValueData: "VisualMusicSong"

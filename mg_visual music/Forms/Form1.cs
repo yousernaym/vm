@@ -143,6 +143,11 @@ namespace Visual_Music
 				selectedTrackPropsPanel.TabPages[i].Name = tptList[i];
 				selectedTrackPropsPanel.TabPages[i].ContextMenuStrip = trackPropsTabCM;
 			}
+
+			TrackPropsFolder = Path.Combine(Program.DefaultUserFilesDir, "Props");
+			ProjectFolder = Path.Combine(Program.DefaultUserFilesDir, "Projects");
+			saveVideoDlg.InitialDirectory = Path.Combine(Program.DefaultUserFilesDir, "Videos");
+			openTrackPropsFileDialog.Filter = saveTrackPropsFileDialog.Filter = "Track property files|*.tp|All files|*.*";
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -150,7 +155,7 @@ namespace Visual_Music
 			Download.init(this);
 			try
 			{
-				loadSettings();
+				//loadSettings();
 			}
 			catch (Exception ex)
 			{
