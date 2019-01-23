@@ -198,6 +198,12 @@
     <Compile Include="Forms\TpartyIntegrationForm.Designer.cs">
       <DependentUpon>TpartyIntegrationForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\TrackPropsTypeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TrackPropsTypeForm.Designer.cs">
+      <DependentUpon>TrackPropsTypeForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\VideoExportForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -386,6 +392,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BaseDialog.resx">
       <DependentUpon>BaseDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TrackPropsTypeForm.resx">
+      <DependentUpon>TrackPropsTypeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\VideoExportForm.resx">
       <DependentUpon>VideoExportForm.cs</DependentUpon>

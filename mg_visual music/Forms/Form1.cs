@@ -27,6 +27,7 @@ namespace Visual_Music
 
 	public partial class Form1 : Form
 	{
+		readonly string[] TrackPropsTypeNames = { "Style", "Material", "Light", "Spatial" };
 		string[] startupArgs;
 		int TrackTexPbHeight;
 		int MaxTrackTexPbWidth;
@@ -36,6 +37,12 @@ namespace Visual_Music
 		{
 			get => openProjDialog.InitialDirectory;
 			set => openProjDialog.InitialDirectory = saveProjDialog.InitialDirectory = value;
+		}
+
+		public string TrackPropsFolder
+		{
+			get => openTrackPropsFileDialog.InitialDirectory;
+			set => openTrackPropsFileDialog.InitialDirectory = saveTrackPropsFileDialog.InitialDirectory = value;
 		}
 
 		string currentProjPath = "";
@@ -132,7 +139,10 @@ namespace Visual_Music
 
 			string[] tptList = Enum.GetNames(typeof(TrackPropsType));
 			for (int i = 0; i < selectedTrackPropsPanel.TabPages.Count; i++)
+			{
 				selectedTrackPropsPanel.TabPages[i].Name = tptList[i];
+				selectedTrackPropsPanel.TabPages[i].ContextMenuStrip = trackPropsTabCM;
+			}
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -856,7 +866,7 @@ namespace Visual_Music
 							string tabName = selectedTrackPropsPanel.SelectedTab.Name;
 							Enum.TryParse(tabName, out tpt);
 						}
-						destTrackProps.cloneFrom(sourceTrackProps, tpt, SongPanel);
+						destTrackProps.cloneFrom(sourceTrackProps, (int)tpt, SongPanel);
 						project.TrackViews[i].createOcTree(project, project.GlobalTrackProps);
 					}
 					updateTrackControls();
@@ -1091,6 +1101,8 @@ namespace Visual_Music
 			saveProjDialog.FileName = project.DefaultFileName;
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
 				return;
+			ProjectFolder = Path.GetDirectoryName(saveProjDialog.FileName);
+			saveSettings();
 
 			//Save audio mixdown
 			saveMixdownDialog.FileName = Path.ChangeExtension(saveProjDialog.FileName, "wav");
@@ -1113,8 +1125,6 @@ namespace Visual_Music
 			}
 
 			currentProjPath = saveProjDialog.FileName;
-			ProjectFolder = Path.GetDirectoryName(currentProjPath);
-			saveSettings();
 			saveSong();
 		}
 
@@ -1803,33 +1813,63 @@ namespace Visual_Music
 			return true;
 		}
 
-		private void loadPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
+		private void loadTrackPropsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (openPropsFileDialog.ShowDialog() != DialogResult.OK)
+			loadTrackProps(-1);
+		}
+
+		private void saveTrackPropsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			saveTrackProps(-1);
+		}
+
+		void loadTrackProps(int typeFlags)
+		{
+			//Show open-file-dialog.
+			if (openTrackPropsFileDialog.ShowDialog() != DialogResult.OK)
 				return;
+			TrackPropsFolder = Path.GetDirectoryName(openTrackPropsFileDialog.FileName);
+			saveSettings();
+
 			TrackProps props;
 			DataContractSerializer dcs = new DataContractSerializer(typeof(TrackProps), projectSerializationTypes);
 			try
 			{
-				using (FileStream stream = File.Open(openPropsFileDialog.FileName, FileMode.Open))
+				using (FileStream stream = File.Open(openTrackPropsFileDialog.FileName, FileMode.Open))
 				{
 					props = (TrackProps)dcs.ReadObject(stream);
 				}
-				foreach (int selectedTrackIndex in trackList.SelectedIndices)
-				{
-					project.TrackViews[selectedTrackIndex].TrackProps.cloneFrom(props, TrackPropsType.TPT_All, SongPanel);
-				}
-				updateTrackListColors();
-				updateTrackControls();
 			}
 			catch (Exception ex)
 			{
 				showErrorMsgBox(ex.Message);
+				return;
 			}
-			
-		}
 
-		private void savePropertiesToolStripMenuItem_Click(object sender, EventArgs e)
+			if (typeFlags < 0)
+			{
+				var trackPropsTypeForm = new TrackPropsTypeForm(props.TypeFlags);
+				if (trackPropsTypeForm.ShowDialog() != DialogResult.OK)
+					return;
+				typeFlags = trackPropsTypeForm.TypeFlags;
+			}
+			else //Load props to specific tab.
+			{
+				//Check if requested prop types exist in file.
+				for (int i = 0; i < Enum.GetValues(typeof(TrackPropsType)).Length - 1; i++)
+				{
+					if (((typeFlags >> i) & 1) == 1 && ((props.TypeFlags >> i) & 1) != 1)
+						throw new FileFormatException($"File doesn't contain properties of type {TrackPropsTypeNames[i]}");
+				}
+			}
+			foreach (int selectedTrackIndex in trackList.SelectedIndices)
+			{
+				project.TrackViews[selectedTrackIndex].TrackProps.cloneFrom(props, typeFlags, SongPanel);
+			}
+			updateTrackListColors();
+			updateTrackControls();
+		}
+		void saveTrackProps(int typeFlags)
 		{
 			var selection = trackList.SelectedIndices;
 			if (selection.Count > 1)
@@ -1837,13 +1877,26 @@ namespace Visual_Music
 				showErrorMsgBox("Only one track can be selected.");
 				return;
 			}
-			if (savePropsFileDialog.ShowDialog() != DialogResult.OK)
+
+			if (typeFlags < 0)
+			{
+				var trackPropsTypeForm = new TrackPropsTypeForm((int)TrackPropsType.TPT_All);
+				if (trackPropsTypeForm.ShowDialog() != DialogResult.OK)
+					return;
+				typeFlags = trackPropsTypeForm.TypeFlags;
+			}
+			//Show save-file-dialog.
+			if (saveTrackPropsFileDialog.ShowDialog() != DialogResult.OK)
 				return;
-			TrackProps props = Project.TrackViews[selection[0]].TrackProps;
+			TrackPropsFolder = Path.GetDirectoryName(saveTrackPropsFileDialog.FileName);
+			saveSettings();
+
+			TrackProps props = (TrackProps)Project.TrackViews[selection[0]].TrackProps;
+			props.TypeFlags = typeFlags;
 			DataContractSerializer dcs = new DataContractSerializer(typeof(TrackProps), projectSerializationTypes);
 			try
 			{
-				using (FileStream stream = File.Open(savePropsFileDialog.FileName, FileMode.Create))
+				using (FileStream stream = File.Open(saveTrackPropsFileDialog.FileName, FileMode.Create))
 				{
 					dcs.WriteObject(stream, props);
 				}
@@ -1853,6 +1906,19 @@ namespace Visual_Music
 				showErrorMsgBox(ex.Message);
 			}
 
+		}
+		private void loadTrackPropsTypeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			string tabName = selectedTrackPropsPanel.SelectedTab.Name;
+			int tpt = (int)Enum.Parse(typeof(TrackPropsType), tabName);
+			loadTrackProps(tpt);
+		}
+
+		private void saveTrackPropsTypeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			string tabName = selectedTrackPropsPanel.SelectedTab.Name;
+			int tpt = (int)Enum.Parse(typeof(TrackPropsType), tabName);
+			saveTrackProps(tpt);
 		}
 	}
 }

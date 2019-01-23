@@ -136,6 +136,8 @@
 			this.Controls.Add(this.xmPlayLink);
 			this.Controls.Add(this.browseHvscBtn);
 			this.Controls.Add(this.importXmPlayBtn);
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "TpartyIntegrationForm";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;

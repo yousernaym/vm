@@ -70,6 +70,8 @@
 			this.invertSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.defaultPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.loadTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.selectedTrackPropsPanel = new System.Windows.Forms.TabControl();
 			this.style = new System.Windows.Forms.TabPage();
 			this.lineStyleControl = new Visual_Music.LineStyleControl();
@@ -195,10 +197,11 @@
 			this.songPropsCb = new System.Windows.Forms.CheckBox();
 			this.trackPropsCb = new System.Windows.Forms.CheckBox();
 			this.saveMidiDialog = new System.Windows.Forms.SaveFileDialog();
-			this.savePropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.loadPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.openPropsFileDialog = new System.Windows.Forms.OpenFileDialog();
-			this.savePropsFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.openTrackPropsFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.saveTrackPropsFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.trackPropsTabCM = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.loadTrackPropsTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveTrackPtopsTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -242,6 +245,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).BeginInit();
 			this.propsTogglePanel.SuspendLayout();
+			this.trackPropsTabCM.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// openProjDialog
@@ -376,7 +380,7 @@
             this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1267, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1284, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -528,7 +532,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(872, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(889, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 15642);
 			this.trackPropsPanel.TabIndex = 3;
@@ -585,38 +589,55 @@
             this.invertSelectionToolStripMenuItem,
             this.toolStripSeparator1,
             this.defaultPropertiesToolStripMenuItem,
-            this.loadPropertiesToolStripMenuItem,
-            this.savePropertiesToolStripMenuItem});
+            this.loadTrackPropsToolStripMenuItem,
+            this.saveTrackPropsToolStripMenuItem});
 			this.trackListCM.Name = "trackListContextMenu";
-			this.trackListCM.Size = new System.Drawing.Size(211, 120);
+			this.trackListCM.Size = new System.Drawing.Size(228, 120);
 			// 
 			// selectAllToolStripMenuItem
 			// 
 			this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
 			this.selectAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-			this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+			this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
 			this.selectAllToolStripMenuItem.Text = "Select All";
 			this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
 			// 
 			// invertSelectionToolStripMenuItem
 			// 
 			this.invertSelectionToolStripMenuItem.Name = "invertSelectionToolStripMenuItem";
-			this.invertSelectionToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+			this.invertSelectionToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
 			this.invertSelectionToolStripMenuItem.Text = "Invert Selection";
 			this.invertSelectionToolStripMenuItem.Click += new System.EventHandler(this.invertSelectionToolStripMenuItem_Click);
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(207, 6);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(224, 6);
 			// 
 			// defaultPropertiesToolStripMenuItem
 			// 
 			this.defaultPropertiesToolStripMenuItem.Name = "defaultPropertiesToolStripMenuItem";
 			this.defaultPropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-			this.defaultPropertiesToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+			this.defaultPropertiesToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
 			this.defaultPropertiesToolStripMenuItem.Text = "Default Properties";
 			this.defaultPropertiesToolStripMenuItem.Click += new System.EventHandler(this.defaultPropertiesToolStripMenuItem_Click);
+			// 
+			// loadTrackPropsToolStripMenuItem
+			// 
+			this.loadTrackPropsToolStripMenuItem.Name = "loadTrackPropsToolStripMenuItem";
+			this.loadTrackPropsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
+			this.loadTrackPropsToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+			this.loadTrackPropsToolStripMenuItem.Text = "Load Properties";
+			this.loadTrackPropsToolStripMenuItem.Click += new System.EventHandler(this.loadTrackPropsToolStripMenuItem_Click);
+			// 
+			// saveTrackPropsToolStripMenuItem
+			// 
+			this.saveTrackPropsToolStripMenuItem.Name = "saveTrackPropsToolStripMenuItem";
+			this.saveTrackPropsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.T)));
+			this.saveTrackPropsToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+			this.saveTrackPropsToolStripMenuItem.Text = "Save Properties";
+			this.saveTrackPropsToolStripMenuItem.Click += new System.EventHandler(this.saveTrackPropsToolStripMenuItem_Click);
 			// 
 			// selectedTrackPropsPanel
 			// 
@@ -1843,7 +1864,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-7221, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-7306, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1855,7 +1876,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-7333, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-7418, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1865,7 +1886,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-7335, 15630);
+			this.label4.Location = new System.Drawing.Point(-7420, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2228,23 +2249,31 @@
 			// 
 			this.saveMidiDialog.Filter = "Midi files|*.mid|All files|*.*";
 			// 
-			// savePropertiesToolStripMenuItem
+			// openTrackPropsFileDialog
 			// 
-			this.savePropertiesToolStripMenuItem.Name = "savePropertiesToolStripMenuItem";
-			this.savePropertiesToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-			this.savePropertiesToolStripMenuItem.Text = "Save Properties";
-			this.savePropertiesToolStripMenuItem.Click += new System.EventHandler(this.savePropertiesToolStripMenuItem_Click);
+			this.openTrackPropsFileDialog.FileName = "openFileDialog1";
 			// 
-			// loadPropertiesToolStripMenuItem
+			// trackPropsTabCM
 			// 
-			this.loadPropertiesToolStripMenuItem.Name = "loadPropertiesToolStripMenuItem";
-			this.loadPropertiesToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-			this.loadPropertiesToolStripMenuItem.Text = "Load Properties";
-			this.loadPropertiesToolStripMenuItem.Click += new System.EventHandler(this.loadPropertiesToolStripMenuItem_Click);
+			this.trackPropsTabCM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadTrackPropsTypeToolStripMenuItem,
+            this.saveTrackPtopsTypeToolStripMenuItem});
+			this.trackPropsTabCM.Name = "trackPropsTabCM";
+			this.trackPropsTabCM.Size = new System.Drawing.Size(205, 48);
 			// 
-			// openPropsFileDialog
+			// loadTrackPropsTypeToolStripMenuItem
 			// 
-			this.openPropsFileDialog.FileName = "openFileDialog1";
+			this.loadTrackPropsTypeToolStripMenuItem.Name = "loadTrackPropsTypeToolStripMenuItem";
+			this.loadTrackPropsTypeToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+			this.loadTrackPropsTypeToolStripMenuItem.Text = "Load properties from file";
+			this.loadTrackPropsTypeToolStripMenuItem.Click += new System.EventHandler(this.loadTrackPropsTypeToolStripMenuItem_Click);
+			// 
+			// saveTrackPtopsTypeToolStripMenuItem
+			// 
+			this.saveTrackPtopsTypeToolStripMenuItem.Name = "saveTrackPtopsTypeToolStripMenuItem";
+			this.saveTrackPtopsTypeToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+			this.saveTrackPtopsTypeToolStripMenuItem.Text = "Save properties to file";
+			this.saveTrackPtopsTypeToolStripMenuItem.Click += new System.EventHandler(this.saveTrackPropsTypeToolStripMenuItem_Click);
 			// 
 			// Form1
 			// 
@@ -2253,7 +2282,7 @@
 			this.AutoScroll = true;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(1284, 505);
+			this.ClientSize = new System.Drawing.Size(1301, 505);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.songPropsPanel);
@@ -2331,6 +2360,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).EndInit();
 			this.propsTogglePanel.ResumeLayout(false);
 			this.propsTogglePanel.PerformLayout();
+			this.trackPropsTabCM.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -2503,10 +2533,13 @@
 		private System.Windows.Forms.NumericUpDown fadeInUd;
 		private System.Windows.Forms.SaveFileDialog saveMidiDialog;
 		private System.Windows.Forms.ToolStripMenuItem viewMidiBrowserTSMI;
-		private System.Windows.Forms.ToolStripMenuItem loadPropertiesToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem savePropertiesToolStripMenuItem;
-		private System.Windows.Forms.OpenFileDialog openPropsFileDialog;
-		private System.Windows.Forms.SaveFileDialog savePropsFileDialog;
+		private System.Windows.Forms.ToolStripMenuItem loadTrackPropsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem saveTrackPropsToolStripMenuItem;
+		private System.Windows.Forms.OpenFileDialog openTrackPropsFileDialog;
+		private System.Windows.Forms.SaveFileDialog saveTrackPropsFileDialog;
+		private System.Windows.Forms.ContextMenuStrip trackPropsTabCM;
+		private System.Windows.Forms.ToolStripMenuItem loadTrackPropsTypeToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem saveTrackPtopsTypeToolStripMenuItem;
 	}
 }
 

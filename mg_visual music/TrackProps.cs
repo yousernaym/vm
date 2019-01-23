@@ -32,6 +32,7 @@ namespace Visual_Music
 		public MaterialProps MaterialProps { get; set; }
 		public LightProps LightProps { get; set; }
 		public SpatialProps SpatialProps { get; set; }
+		public int TypeFlags { get; set; } //Determines which type of properties should be saved or loaded to/from file.
 
 		public TrackProps(TrackView view)
 		{
@@ -51,6 +52,9 @@ namespace Visual_Music
 					LightProps = (LightProps)entry.Value;
 				else if (entry.Name == "spatial")
 					SpatialProps = (SpatialProps)entry.Value;
+				else if (entry.Name == "typeFlags")
+					TypeFlags = (int)entry.Value;
+
 			}
 		}
 
@@ -60,6 +64,7 @@ namespace Visual_Music
 			info.AddValue("material", MaterialProps);
 			info.AddValue("light", LightProps);
 			info.AddValue("spatial", SpatialProps);
+			info.AddValue("typeFlags", TypeFlags);
 		}
 
 		public void loadContent(SongPanel songPanel)
@@ -98,20 +103,19 @@ namespace Visual_Music
 		public TrackProps clone(SongPanel songPanel)
 		{
 			TrackProps newProps = new TrackProps(TrackView);
-			newProps.cloneFrom(this, TrackPropsType.TPT_All, songPanel);
+			newProps.cloneFrom(this, (int)TrackPropsType.TPT_All, songPanel);
 			return newProps;
 		}
 
-		internal void cloneFrom(TrackProps source, TrackPropsType type, SongPanel songPanel)
+		internal void cloneFrom(TrackProps source, int type, SongPanel songPanel)
 		{
-			int iType = (int)type;
-			if ((iType & (int)TrackPropsType.TPT_Style) > 0)
+			if ((type & (int)TrackPropsType.TPT_Style) > 0)
 				StyleProps = source.StyleProps.clone();
-			if ((iType & (int)TrackPropsType.TPT_Material) > 0)
+			if ((type & (int)TrackPropsType.TPT_Material) > 0)
 				MaterialProps = source.MaterialProps.clone(songPanel);
-			if ((iType & (int)TrackPropsType.TPT_Light) > 0)
+			if ((type & (int)TrackPropsType.TPT_Light) > 0)
 				LightProps = source.LightProps.clone();
-			if ((iType & (int)TrackPropsType.TPT_Spatial) > 0)
+			if ((type & (int)TrackPropsType.TPT_Spatial) > 0)
 				SpatialProps = source.SpatialProps.clone();
 		}
 	}
@@ -121,7 +125,7 @@ namespace Visual_Music
 	{
 		internal Texture2D Texture { get; set; } = null;
 		public string Path { get; set; } = "";
-		
+
 		SamplerState samplerState = new SamplerState();
 		SamplerState samplerStateBacking = new SamplerState();
 		bool dirtySamplerState = true;
@@ -197,8 +201,8 @@ namespace Visual_Music
 		//Vector2? scroll;
 		internal Vector2 Scroll
 		{
-		    get => new Vector2((float)UScroll, (float)VScroll); 
-		    set 
+			get => new Vector2((float)UScroll, (float)VScroll);
+			set
 			{
 				UScroll = value.X;
 				VScroll = value.Y;
@@ -206,7 +210,7 @@ namespace Visual_Music
 		}
 		public float? UScroll { get; set; } = 0;
 		public float? VScroll { get; set; } = 0;
-		
+
 		//Methods----------------------
 		public TrackPropsTex()
 		{
@@ -257,7 +261,7 @@ namespace Visual_Music
 			songPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null);
 			songPanel.SpriteBatch.Draw(tex, new Vector2(0, 0), Color.White);
 			songPanel.SpriteBatch.End();
-			
+
 			Texture2D outTex = (Texture2D)renderTarget;
 			songPanel.GraphicsDevice.SetRenderTarget(null);
 			tex.Dispose();
@@ -493,7 +497,7 @@ namespace Visual_Music
 		public NoteTypeMaterial Hilited { get; set; }
 		public TrackPropsTex TexProps { get; set; } = new TrackPropsTex();
 		public TrackPropsTex HmapProps { get; set; } = new TrackPropsTex();
-		
+
 		public MaterialProps(int trackNumber, int numTracks)
 		{
 			TexProps.unloadTexture();
@@ -513,7 +517,7 @@ namespace Visual_Music
 				Hilited = new NoteTypeMaterial(); ;
 			}
 		}
-		
+
 		public MaterialProps(SerializationInfo info, StreamingContext ctxt)
 		{
 			foreach (SerializationEntry entry in info)
@@ -606,7 +610,7 @@ namespace Visual_Music
 			//	s = 1;
 			//if (l > 1)
 			//	l = 1;
-			
+
 			return new Vector4(h, s, l, (float)(Transp * globalMaterial.Transp));
 		}
 
@@ -723,11 +727,11 @@ namespace Visual_Music
 				ZOffset = value.Z;
 			}
 		}
-		
+
 		public float? XOffset { get; set; }
 		public float? YOffset { get; set; }
 		public float? ZOffset { get; set; }
-		
+
 		public SpatialProps()
 		{
 			PosOffset = new Vector3();
@@ -761,5 +765,4 @@ namespace Visual_Music
 			return (T)dcs.ReadObject(stream);
 		}
 	}
-
 }

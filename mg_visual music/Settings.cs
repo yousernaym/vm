@@ -51,6 +51,8 @@ namespace Visual_Music
 					form.openTextureDlg.InitialDirectory = (string)entry.Value;
 				else if (entry.Name == getKeyName(Keys.ProjectFolder))
 					form.ProjectFolder = (string)entry.Value;
+				else if (entry.Name == "trackPropsFolder")
+					form.TrackPropsFolder = (string)entry.Value;
 
 				else if (entry.Name == getKeyName(Keys.ModTpartyApp))
 					Form1.ImportModForm.tpartyAppTb.Text = (string)entry.Value;
@@ -94,7 +96,8 @@ namespace Visual_Music
 			info.AddValue(getKeyName(Keys.VideoFolder), form.saveVideoDlg.InitialDirectory);
 			info.AddValue(getKeyName(Keys.TextureFolder), form.openTextureDlg.InitialDirectory);
 			info.AddValue(getKeyName(Keys.ProjectFolder), form.ProjectFolder);
-
+			info.AddValue("trackPropsFolder", form.TrackPropsFolder);
+			
 			info.AddValue(getKeyName(Keys.ModTpartyApp), Form1.ImportModForm.tpartyAppTb.Text);
 			info.AddValue(getKeyName(Keys.ModTpartyArgs), Form1.ImportModForm.tpartyArgsTb.Text);
 			info.AddValue(getKeyName(Keys.ModTpartyOutput), Form1.ImportModForm.tpartyAudioTb.Text);
