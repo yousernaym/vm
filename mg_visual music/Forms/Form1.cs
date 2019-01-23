@@ -511,13 +511,10 @@ namespace Visual_Music
 			if (trackList.SelectedIndices.Count == 0)
 			{
 				selectedTrackPropsPanel.Enabled = false;
-				defaultPropertiesToolStripMenuItem.Enabled = false;
 			}
 			else
 			{
-				//transpSlider.Enabled = transpTb.Enabled = alphaLbl.Enabled = trackList.SelectedIndices[0] != 0;// || trackList.SelectedIndices.Count == 1);
 				selectedTrackPropsPanel.Enabled = true;
-				defaultPropertiesToolStripMenuItem.Enabled = true;
 				globalLightCb.Enabled = trackList.SelectedIndices[0] != 0; // || trackList.SelectedIndices.Count == 1
 			}
 			updateTrackControls();
@@ -1879,12 +1876,6 @@ namespace Visual_Music
 		void saveTrackProps(int typeFlags)
 		{
 			var selection = trackList.SelectedIndices;
-			if (selection.Count > 1)
-			{
-				showErrorMsgBox("Only one track can be selected.");
-				return;
-			}
-		
 			if (typeFlags < 0)
 			{
 				var trackPropsTypeForm = new TrackPropsTypeForm((int)TrackPropsType.TPT_All);
@@ -1892,6 +1883,7 @@ namespace Visual_Music
 					return;
 				typeFlags = trackPropsTypeForm.TypeFlags;
 			}
+			
 			//Show save-file-dialog.
 			if (saveTrackPropsFileDialog.ShowDialog() != DialogResult.OK)
 				return;
@@ -1926,6 +1918,15 @@ namespace Visual_Music
 			string tabName = selectedTrackPropsPanel.SelectedTab.Name;
 			int tpt = (int)Enum.Parse(typeof(TrackPropsType), tabName);
 			saveTrackProps(tpt);
+		}
+
+		private void trackListCM_Opening(object sender, CancelEventArgs e)
+		{
+			int numSelectedTracks = TrackList.SelectedIndices.Count;
+			defaultPropertiesToolStripMenuItem.Enabled = numSelectedTracks > 0;
+			saveTrackPropsToolStripMenuItem.Enabled = numSelectedTracks == 1;
+			loadTrackPropsToolStripMenuItem.Enabled = numSelectedTracks > 0;
+			
 		}
 	}
 }
