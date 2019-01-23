@@ -155,7 +155,7 @@ namespace Visual_Music
 			Download.init(this);
 			try
 			{
-				//loadSettings();
+				loadSettings();
 			}
 			catch (Exception ex)
 			{
@@ -278,6 +278,7 @@ namespace Visual_Music
 			saveSongAsToolStripMenuItem.Enabled = loaded;
 			exportVideoToolStripMenuItem.Enabled = loaded;
 			playbackToolStripMenuItem.Enabled = AudioLoaded;
+			actionsToolStripMenuItem.Enabled = loaded;
 
 			//if (loaded)
 			//{
@@ -406,12 +407,12 @@ namespace Visual_Music
 
 		private void songPanel_KeyDown(object sender, KeyEventArgs e)
 		{
-			if(ModifierKeys == Keys.Control)
-			{
-				//Reset camera
-				if (e.KeyCode == Keys.R)
-					resetCamera();
-			}
+			//if(ModifierKeys == Keys.Control)
+			//{
+			//	//Reset camera
+			//	if (e.KeyCode == Keys.R)
+			//		resetCamera();
+			//}
 		}
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -513,7 +514,13 @@ namespace Visual_Music
 
 		private void trackList_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (trackList.SelectedIndices.Count == 0)
+			int itemCount = trackList.SelectedIndices.Count;
+			
+			defaultPropertiesToolStripMenuItem.Enabled = defaultPropertiesToolStripMenuItem1.Enabled = itemCount > 0;
+			saveTrackPropsToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = itemCount == 1;
+			loadTrackPropsToolStripMenuItem.Enabled = loadPropertiesToolStripMenuItem.Enabled = itemCount > 0;
+
+			if (itemCount == 0)
 			{
 				selectedTrackPropsPanel.Enabled = false;
 			}
@@ -1173,20 +1180,12 @@ namespace Visual_Music
 
 		private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			trackList.Select();
-			trackList.BeginUpdate();
-			for (int i = 1; i < trackList.Items.Count; i++)
-				trackList.Items[i].Selected = true;
-			trackList.EndUpdate();
+			selectAllToolStripMenuItem1.PerformClick();
 		}
 
 		private void invertSelectionToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			trackList.Select();
-			trackList.BeginUpdate();
-			for (int i = 1; i < trackList.Items.Count; i++)
-				trackList.Items[i].Selected = !trackList.Items[i].Selected;
-			trackList.EndUpdate();
+			invertSelectionToolStripMenuItem1.PerformClick();
 		}
 
 		private void defaultPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1245,14 +1244,10 @@ namespace Visual_Music
 
 		private void trackPropsCb_CheckedChanged(object sender, EventArgs e)
 		{
+			tracksToolStripMenuItem.Enabled = trackPropsCb.Checked;
+			trackPropsPanel.Visible = trackPropsCb.Checked;
 			if (trackPropsCb.Checked)
-			{
-				trackPropsPanel.Show();
 				trackList.Focus();
-			}
-			else
-				trackPropsPanel.Hide();
-
 		}
 
 		private void songPropsCb_CheckedChanged(object sender, EventArgs e)
@@ -1740,9 +1735,9 @@ namespace Visual_Music
 				newScreen.Visible = true;
 			}
 			bool isSongScreen = newScreen is SongPanel;
-			songPropsCb.Enabled = trackPropsCb.Enabled = isSongScreen;
+			propsTogglePanel.Enabled = isSongScreen && project.Notes != null;
 			if (!isSongScreen)
-				songPropsPanel.Visible = trackPropsPanel.Visible = false;
+				songPropsCb.Checked = trackPropsCb.Checked = false;
 			newScreen.Focus();
 			currentScreen = newScreen;
 		}
@@ -1824,12 +1819,12 @@ namespace Visual_Music
 
 		private void loadTrackPropsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			loadTrackProps(-1);
+			loadPropertiesToolStripMenuItem.PerformClick();
 		}
 
 		private void saveTrackPropsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			saveTrackProps(-1);
+			savePropertiesToolStripMenuItem.PerformClick();
 		}
 
 		void loadTrackProps(int typeFlags)
@@ -1927,11 +1922,50 @@ namespace Visual_Music
 
 		private void trackListCM_Opening(object sender, CancelEventArgs e)
 		{
-			int numSelectedTracks = TrackList.SelectedIndices.Count;
-			defaultPropertiesToolStripMenuItem.Enabled = numSelectedTracks > 0;
-			saveTrackPropsToolStripMenuItem.Enabled = numSelectedTracks == 1;
-			loadTrackPropsToolStripMenuItem.Enabled = numSelectedTracks > 0;
+			//int numSelectedTracks = TrackList.SelectedIndices.Count;
+			//defaultPropertiesToolStripMenuItem.Enabled = numSelectedTracks > 0;
+			//saveTrackPropsToolStripMenuItem.Enabled = numSelectedTracks == 1;
+			//loadTrackPropsToolStripMenuItem.Enabled = numSelectedTracks > 0;
 			
+		}
+
+		private void resetCameraToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			resetCamera();
+		}
+
+		private void selectAllToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+			trackList.Select();
+			trackList.BeginUpdate();
+			for (int i = 1; i < trackList.Items.Count; i++)
+				trackList.Items[i].Selected = true;
+			trackList.EndUpdate();
+		}
+
+		private void invertSelectionToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+			trackList.Select();
+			trackList.BeginUpdate();
+			for (int i = 1; i < trackList.Items.Count; i++)
+				trackList.Items[i].Selected = !trackList.Items[i].Selected;
+			trackList.EndUpdate();
+		}
+
+		private void loadPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			loadTrackProps(-1);
+		}
+
+		private void savePropertiesToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			saveTrackProps(-1);
+		}
+
+		private void tracksToolStripMenuItem_EnabledChanged(object sender, EventArgs e)
+		{
+			//When Tracks menu item is disabled, all the sub items need to be disabled, otherwise their shortcut keys will still work.
+			selectAllToolStripMenuItem.Enabled = invertSelectionToolStripMenuItem.Enabled = defaultPropertiesToolStripMenuItem.Enabled = loadPropertiesToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = tracksToolStripMenuItem.Enabled;
 		}
 	}
 }
