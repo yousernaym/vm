@@ -311,6 +311,7 @@ namespace Visual_Music
 		public bool openSourceFiles(ImportOptions options)
 		{
 			saveSettings();
+			changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
 			try
 			{
 				songPanel.SuspendPaint();
@@ -1018,12 +1019,15 @@ namespace Visual_Music
 		{
 			openProjDialog.FileName = "";
 			var dialogResult = openProjDialog.ShowDialog();
-			if (currentScreen is SongWebBrowser)
-				currentScreen.Focus();
 			if (dialogResult != DialogResult.OK)
+			{
+				//if (currentScreen is SongWebBrowser)
+				currentScreen.Focus();
 				return;
+			}
 			ProjectFolder = Path.GetDirectoryName(openProjDialog.FileName);
 			saveSettings();
+			changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
 			openSongFile(openProjDialog.FileName);
 		}
 		void openSongFile(string fileName)
@@ -1727,7 +1731,10 @@ namespace Visual_Music
 			else
 			{
 				foreach (var screen in screens)
-					screen.Visible = false;
+				{
+					if (screen != newScreen)
+						screen.Visible = false;
+				}
 				newScreen.Visible = true;
 			}
 			bool isSongScreen = newScreen is SongPanel;
@@ -1877,7 +1884,7 @@ namespace Visual_Music
 				showErrorMsgBox("Only one track can be selected.");
 				return;
 			}
-
+		
 			if (typeFlags < 0)
 			{
 				var trackPropsTypeForm = new TrackPropsTypeForm((int)TrackPropsType.TPT_All);

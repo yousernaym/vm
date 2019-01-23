@@ -1864,7 +1864,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-7306, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-7323, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1876,7 +1876,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-7418, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-7435, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1886,7 +1886,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-7420, 15630);
+			this.label4.Location = new System.Drawing.Point(-7437, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2259,20 +2259,20 @@
             this.loadTrackPropsTypeToolStripMenuItem,
             this.saveTrackPtopsTypeToolStripMenuItem});
 			this.trackPropsTabCM.Name = "trackPropsTabCM";
-			this.trackPropsTabCM.Size = new System.Drawing.Size(205, 48);
+			this.trackPropsTabCM.Size = new System.Drawing.Size(157, 48);
 			// 
 			// loadTrackPropsTypeToolStripMenuItem
 			// 
 			this.loadTrackPropsTypeToolStripMenuItem.Name = "loadTrackPropsTypeToolStripMenuItem";
-			this.loadTrackPropsTypeToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
-			this.loadTrackPropsTypeToolStripMenuItem.Text = "Load properties from file";
+			this.loadTrackPropsTypeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+			this.loadTrackPropsTypeToolStripMenuItem.Text = "Load properties";
 			this.loadTrackPropsTypeToolStripMenuItem.Click += new System.EventHandler(this.loadTrackPropsTypeToolStripMenuItem_Click);
 			// 
 			// saveTrackPtopsTypeToolStripMenuItem
 			// 
 			this.saveTrackPtopsTypeToolStripMenuItem.Name = "saveTrackPtopsTypeToolStripMenuItem";
-			this.saveTrackPtopsTypeToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
-			this.saveTrackPtopsTypeToolStripMenuItem.Text = "Save properties to file";
+			this.saveTrackPtopsTypeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+			this.saveTrackPtopsTypeToolStripMenuItem.Text = "Save properties";
 			this.saveTrackPtopsTypeToolStripMenuItem.Click += new System.EventHandler(this.saveTrackPropsTypeToolStripMenuItem_Click);
 			// 
 			// Form1

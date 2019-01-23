@@ -128,7 +128,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(249, 155);
+			this.ClientSize = new System.Drawing.Size(249, 147);
 			this.Controls.Add(this.songLengthsCb);
 			this.Controls.Add(this.hvscDirTb);
 			this.Controls.Add(this.modulesCb);
