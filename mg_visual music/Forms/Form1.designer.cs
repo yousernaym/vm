@@ -186,9 +186,9 @@
 			this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.songToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.resetCameraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.saveCameraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.resetCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.loadCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.selectAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.defaultPropertiesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.loadPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -213,6 +213,7 @@
 			this.specHsBtn = new Visual_Music.HueSatButton();
 			this.diffuseHsBtn = new Visual_Music.HueSatButton();
 			this.ambientHsBtn = new Visual_Music.HueSatButton();
+			this.tToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -1684,7 +1685,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-7901, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-7935, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1696,7 +1697,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-8013, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-8047, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1706,7 +1707,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-8015, 15630);
+			this.label4.Location = new System.Drawing.Point(-8049, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2087,47 +2088,48 @@
 			this.tracksToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.selectAllToolStripMenuItem1,
             this.invertSelectionToolStripMenuItem1,
+            this.tToolStripMenuItem,
             this.defaultPropertiesToolStripMenuItem1,
             this.loadPropertiesToolStripMenuItem,
             this.savePropertiesToolStripMenuItem});
 			this.tracksToolStripMenuItem.Enabled = false;
 			this.tracksToolStripMenuItem.Name = "tracksToolStripMenuItem";
-			this.tracksToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
+			this.tracksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.tracksToolStripMenuItem.Text = "Tracks";
 			this.tracksToolStripMenuItem.EnabledChanged += new System.EventHandler(this.tracksToolStripMenuItem_EnabledChanged);
 			// 
 			// songToolStripMenuItem
 			// 
 			this.songToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.resetCameraToolStripMenuItem,
-            this.loadToolStripMenuItem,
-            this.saveCameraToolStripMenuItem});
+            this.resetCamToolStripMenuItem,
+            this.loadCamToolStripMenuItem,
+            this.saveCamToolStripMenuItem});
 			this.songToolStripMenuItem.Name = "songToolStripMenuItem";
-			this.songToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
+			this.songToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.songToolStripMenuItem.Text = "Camera";
 			// 
-			// resetCameraToolStripMenuItem
+			// resetCamToolStripMenuItem
 			// 
-			this.resetCameraToolStripMenuItem.Name = "resetCameraToolStripMenuItem";
-			this.resetCameraToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-			this.resetCameraToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.resetCameraToolStripMenuItem.Text = "Reset";
-			this.resetCameraToolStripMenuItem.Click += new System.EventHandler(this.resetCameraToolStripMenuItem_Click);
+			this.resetCamToolStripMenuItem.Name = "resetCamToolStripMenuItem";
+			this.resetCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+			this.resetCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.resetCamToolStripMenuItem.Text = "Reset";
+			this.resetCamToolStripMenuItem.Click += new System.EventHandler(this.resetCamToolStripMenuItem_Click);
 			// 
-			// loadToolStripMenuItem
+			// loadCamToolStripMenuItem
 			// 
-			this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-			this.loadToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-			this.loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.loadToolStripMenuItem.Text = "Load...";
+			this.loadCamToolStripMenuItem.Name = "loadCamToolStripMenuItem";
+			this.loadCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+			this.loadCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.loadCamToolStripMenuItem.Text = "Load...";
 			// 
-			// saveCameraToolStripMenuItem
+			// saveCamToolStripMenuItem
 			// 
-			this.saveCameraToolStripMenuItem.Name = "saveCameraToolStripMenuItem";
-			this.saveCameraToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+			this.saveCamToolStripMenuItem.Name = "saveCamToolStripMenuItem";
+			this.saveCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.Z)));
-			this.saveCameraToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.saveCameraToolStripMenuItem.Text = "Save...";
+			this.saveCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.saveCamToolStripMenuItem.Text = "Save...";
 			// 
 			// selectAllToolStripMenuItem1
 			// 
@@ -2185,7 +2187,7 @@
             this.jumpBackwardsToolStripMenuItem,
             this.jumpForwardToolStripMenuItem});
 			this.playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
-			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
+			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.playbackToolStripMenuItem.Text = "Playback";
 			// 
 			// startStopToolStripMenuItem
@@ -2380,6 +2382,11 @@
 			this.ambientHsBtn.TabIndex = 59;
 			this.ambientHsBtn.UseVisualStyleBackColor = true;
 			this.ambientHsBtn.ColorChanged += new System.EventHandler(this.ambientHsBtn_ColorChanged);
+			// 
+			// tToolStripMenuItem
+			// 
+			this.tToolStripMenuItem.Name = "tToolStripMenuItem";
+			this.tToolStripMenuItem.Size = new System.Drawing.Size(233, 6);
 			// 
 			// Form1
 			// 
@@ -2639,9 +2646,9 @@
 		private System.Windows.Forms.ToolStripMenuItem saveTrackPtopsTypeToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem actionsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem songToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem resetCameraToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem saveCameraToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem resetCamToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem loadCamToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem saveCamToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem tracksToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem1;
 		private System.Windows.Forms.ToolStripMenuItem defaultPropertiesToolStripMenuItem1;
@@ -2656,6 +2663,7 @@
 		private System.Windows.Forms.ToolStripMenuItem nudgeForwardToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem jumpBackwardsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem jumpForwardToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator tToolStripMenuItem;
 	}
 }
 

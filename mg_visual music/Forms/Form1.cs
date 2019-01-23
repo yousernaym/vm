@@ -1931,7 +1931,7 @@ namespace Visual_Music
 			
 		}
 
-		private void resetCameraToolStripMenuItem_Click(object sender, EventArgs e)
+		private void resetCamToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			resetCamera();
 		}
