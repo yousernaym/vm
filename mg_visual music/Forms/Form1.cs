@@ -514,22 +514,24 @@ namespace Visual_Music
 
 		private void trackList_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			int itemCount = trackList.SelectedIndices.Count;
-			
-			defaultPropertiesToolStripMenuItem.Enabled = defaultPropertiesToolStripMenuItem1.Enabled = itemCount > 0;
-			saveTrackPropsToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = itemCount == 1;
-			loadTrackPropsToolStripMenuItem.Enabled = loadPropertiesToolStripMenuItem.Enabled = itemCount > 0;
+			enableTrackSpecificMenuItem();
 
-			if (itemCount == 0)
-			{
+			if (trackList.SelectedIndices.Count == 0)
 				selectedTrackPropsPanel.Enabled = false;
-			}
 			else
 			{
 				selectedTrackPropsPanel.Enabled = true;
 				globalLightCb.Enabled = trackList.SelectedIndices[0] != 0; // || trackList.SelectedIndices.Count == 1
 			}
 			updateTrackControls();
+		}
+
+		private void enableTrackSpecificMenuItem()
+		{
+			int itemCount = trackList.SelectedIndices.Count;
+			defaultPropertiesToolStripMenuItem.Enabled = defaultPropertiesToolStripMenuItem1.Enabled = itemCount > 0 && trackPropsCb.Checked;
+			saveTrackPropsToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = itemCount == 1 && trackPropsCb.Checked;
+			loadTrackPropsToolStripMenuItem.Enabled = loadPropertiesToolStripMenuItem.Enabled = itemCount > 0 && trackPropsCb.Checked;
 		}
 
 		float getTrackBarValueNorm(object sender)
@@ -1965,7 +1967,12 @@ namespace Visual_Music
 		private void tracksToolStripMenuItem_EnabledChanged(object sender, EventArgs e)
 		{
 			//When Tracks menu item is disabled, all the sub items need to be disabled, otherwise their shortcut keys will still work.
-			selectAllToolStripMenuItem.Enabled = invertSelectionToolStripMenuItem.Enabled = defaultPropertiesToolStripMenuItem.Enabled = loadPropertiesToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = tracksToolStripMenuItem.Enabled;
+			bool enabled = tracksToolStripMenuItem.Enabled;
+			selectAllToolStripMenuItem1.Enabled = invertSelectionToolStripMenuItem1.Enabled = defaultPropertiesToolStripMenuItem1.Enabled = loadPropertiesToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = enabled;
+
+			//When Tracks menu is enabled, some sub items should remain disadled depending on how many tracks are selected.
+			if (enabled)
+				enableTrackSpecificMenuItem();
 		}
 	}
 }
