@@ -49,10 +49,34 @@
 			this.viewModBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewSidBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewMidiBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.songToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.resetCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.loadCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.tracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.selectAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.invertSelectionToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.tToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
+			this.defaultPropertiesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.loadPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.savePropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.playbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.startStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.beginningToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.endToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.nudgeBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.nudgeForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.jumpBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.jumpForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.trackPropsPanel = new System.Windows.Forms.Panel();
+			this.trackList = new Visual_Music.ListViewNF();
+			this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.normalColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.hilitedColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.trackListCM = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.invertSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,6 +86,8 @@
 			this.saveTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.selectedTrackPropsPanel = new System.Windows.Forms.TabControl();
 			this.style = new System.Windows.Forms.TabPage();
+			this.lineStyleControl = new Visual_Music.LineStyleControl();
+			this.barStyleControl = new Visual_Music.BarStyleControl();
 			this.defaultStyleBtn = new System.Windows.Forms.Button();
 			this.styleList = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -121,6 +147,10 @@
 			this.light = new System.Windows.Forms.TabPage();
 			this.defaultLightBtn = new System.Windows.Forms.Button();
 			this.lightPanel = new System.Windows.Forms.Panel();
+			this.lightFilterHsBtn = new Visual_Music.HueSatButton();
+			this.specHsBtn = new Visual_Music.HueSatButton();
+			this.diffuseHsBtn = new Visual_Music.HueSatButton();
+			this.ambientHsBtn = new Visual_Music.HueSatButton();
 			this.specPowUd = new System.Windows.Forms.NumericUpDown();
 			this.ambientAmountUd = new System.Windows.Forms.NumericUpDown();
 			this.diffuseAmountUd = new System.Windows.Forms.NumericUpDown();
@@ -171,6 +201,7 @@
 			this.fadeOutUd = new System.Windows.Forms.NumericUpDown();
 			this.fadeInUd = new System.Windows.Forms.NumericUpDown();
 			this.playbackOffsetUd = new System.Windows.Forms.NumericUpDown();
+			this.upDownVpWidth = new Visual_Music.TbSlider();
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
 			this.debugLabel = new System.Windows.Forms.Label();
@@ -183,37 +214,8 @@
 			this.trackPropsTabCM = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.loadTrackPropsTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveTrackPtopsTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.tracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.songToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.resetCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.loadCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.saveCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.selectAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-			this.defaultPropertiesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-			this.loadPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.savePropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.invertSelectionToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-			this.playbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.startStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.beginningToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.endToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.nudgeBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.nudgeForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.jumpBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.jumpForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.upDownVpWidth = new Visual_Music.TbSlider();
-			this.trackList = new Visual_Music.ListViewNF();
-			this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.normalColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.hilitedColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.lineStyleControl = new Visual_Music.LineStyleControl();
-			this.barStyleControl = new Visual_Music.BarStyleControl();
-			this.lightFilterHsBtn = new Visual_Music.HueSatButton();
-			this.specHsBtn = new Visual_Music.HueSatButton();
-			this.diffuseHsBtn = new Visual_Music.HueSatButton();
-			this.ambientHsBtn = new Visual_Music.HueSatButton();
-			this.tToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
+			this.openCamFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.saveCamFileDialog = new System.Windows.Forms.SaveFileDialog();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -439,6 +441,189 @@
 			this.viewMidiBrowserTSMI.Text = "Midi browser";
 			this.viewMidiBrowserTSMI.Click += new System.EventHandler(this.viewMidiBrowserTSMI_Click);
 			// 
+			// actionsToolStripMenuItem
+			// 
+			this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.songToolStripMenuItem,
+            this.tracksToolStripMenuItem,
+            this.playbackToolStripMenuItem});
+			this.actionsToolStripMenuItem.Enabled = false;
+			this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
+			this.actionsToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
+			this.actionsToolStripMenuItem.Text = "Actions";
+			// 
+			// songToolStripMenuItem
+			// 
+			this.songToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.resetCamToolStripMenuItem,
+            this.loadCamToolStripMenuItem,
+            this.saveCamToolStripMenuItem});
+			this.songToolStripMenuItem.Name = "songToolStripMenuItem";
+			this.songToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.songToolStripMenuItem.Text = "Camera";
+			// 
+			// resetCamToolStripMenuItem
+			// 
+			this.resetCamToolStripMenuItem.Name = "resetCamToolStripMenuItem";
+			this.resetCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+			this.resetCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.resetCamToolStripMenuItem.Text = "Reset";
+			this.resetCamToolStripMenuItem.Click += new System.EventHandler(this.resetCamToolStripMenuItem_Click);
+			// 
+			// loadCamToolStripMenuItem
+			// 
+			this.loadCamToolStripMenuItem.Name = "loadCamToolStripMenuItem";
+			this.loadCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+			this.loadCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.loadCamToolStripMenuItem.Text = "Load...";
+			this.loadCamToolStripMenuItem.Click += new System.EventHandler(this.loadCamToolStripMenuItem_Click);
+			// 
+			// saveCamToolStripMenuItem
+			// 
+			this.saveCamToolStripMenuItem.Name = "saveCamToolStripMenuItem";
+			this.saveCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.Z)));
+			this.saveCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.saveCamToolStripMenuItem.Text = "Save...";
+			this.saveCamToolStripMenuItem.Click += new System.EventHandler(this.saveCamToolStripMenuItem_Click);
+			// 
+			// tracksToolStripMenuItem
+			// 
+			this.tracksToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectAllToolStripMenuItem1,
+            this.invertSelectionToolStripMenuItem1,
+            this.tToolStripMenuItem,
+            this.defaultPropertiesToolStripMenuItem1,
+            this.loadPropertiesToolStripMenuItem,
+            this.savePropertiesToolStripMenuItem});
+			this.tracksToolStripMenuItem.Enabled = false;
+			this.tracksToolStripMenuItem.Name = "tracksToolStripMenuItem";
+			this.tracksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.tracksToolStripMenuItem.Text = "Tracks";
+			this.tracksToolStripMenuItem.EnabledChanged += new System.EventHandler(this.tracksToolStripMenuItem_EnabledChanged);
+			// 
+			// selectAllToolStripMenuItem1
+			// 
+			this.selectAllToolStripMenuItem1.Enabled = false;
+			this.selectAllToolStripMenuItem1.Name = "selectAllToolStripMenuItem1";
+			this.selectAllToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+			this.selectAllToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
+			this.selectAllToolStripMenuItem1.Text = "Select All";
+			this.selectAllToolStripMenuItem1.Click += new System.EventHandler(this.selectAllToolStripMenuItem1_Click);
+			// 
+			// invertSelectionToolStripMenuItem1
+			// 
+			this.invertSelectionToolStripMenuItem1.Enabled = false;
+			this.invertSelectionToolStripMenuItem1.Name = "invertSelectionToolStripMenuItem1";
+			this.invertSelectionToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
+			this.invertSelectionToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
+			this.invertSelectionToolStripMenuItem1.Text = "Invert Selection";
+			this.invertSelectionToolStripMenuItem1.Click += new System.EventHandler(this.invertSelectionToolStripMenuItem1_Click);
+			// 
+			// tToolStripMenuItem
+			// 
+			this.tToolStripMenuItem.Name = "tToolStripMenuItem";
+			this.tToolStripMenuItem.Size = new System.Drawing.Size(233, 6);
+			// 
+			// defaultPropertiesToolStripMenuItem1
+			// 
+			this.defaultPropertiesToolStripMenuItem1.Enabled = false;
+			this.defaultPropertiesToolStripMenuItem1.Name = "defaultPropertiesToolStripMenuItem1";
+			this.defaultPropertiesToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
+			this.defaultPropertiesToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
+			this.defaultPropertiesToolStripMenuItem1.Text = "Default Properties";
+			// 
+			// loadPropertiesToolStripMenuItem
+			// 
+			this.loadPropertiesToolStripMenuItem.Enabled = false;
+			this.loadPropertiesToolStripMenuItem.Name = "loadPropertiesToolStripMenuItem";
+			this.loadPropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+			this.loadPropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+			this.loadPropertiesToolStripMenuItem.Text = "Load properties...";
+			this.loadPropertiesToolStripMenuItem.Click += new System.EventHandler(this.loadPropertiesToolStripMenuItem_Click);
+			// 
+			// savePropertiesToolStripMenuItem
+			// 
+			this.savePropertiesToolStripMenuItem.Enabled = false;
+			this.savePropertiesToolStripMenuItem.Name = "savePropertiesToolStripMenuItem";
+			this.savePropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.P)));
+			this.savePropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+			this.savePropertiesToolStripMenuItem.Text = "Save properties...";
+			this.savePropertiesToolStripMenuItem.Click += new System.EventHandler(this.savePropertiesToolStripMenuItem_Click);
+			// 
+			// playbackToolStripMenuItem
+			// 
+			this.playbackToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.startStopToolStripMenuItem,
+            this.beginningToolStripMenuItem,
+            this.endToolStripMenuItem,
+            this.nudgeBackwardsToolStripMenuItem,
+            this.nudgeForwardToolStripMenuItem,
+            this.jumpBackwardsToolStripMenuItem,
+            this.jumpForwardToolStripMenuItem});
+			this.playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
+			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.playbackToolStripMenuItem.Text = "Playback";
+			// 
+			// startStopToolStripMenuItem
+			// 
+			this.startStopToolStripMenuItem.Name = "startStopToolStripMenuItem";
+			this.startStopToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Space)));
+			this.startStopToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+			this.startStopToolStripMenuItem.Text = "Start/Stop";
+			this.startStopToolStripMenuItem.Click += new System.EventHandler(this.startStopToolStripMenuItem_Click);
+			// 
+			// beginningToolStripMenuItem
+			// 
+			this.beginningToolStripMenuItem.Name = "beginningToolStripMenuItem";
+			this.beginningToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Home)));
+			this.beginningToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+			this.beginningToolStripMenuItem.Text = "Beginning";
+			this.beginningToolStripMenuItem.Click += new System.EventHandler(this.beginningToolStripMenuItem_Click);
+			// 
+			// endToolStripMenuItem
+			// 
+			this.endToolStripMenuItem.Name = "endToolStripMenuItem";
+			this.endToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End)));
+			this.endToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+			this.endToolStripMenuItem.Text = "End";
+			this.endToolStripMenuItem.Click += new System.EventHandler(this.endToolStripMenuItem_Click);
+			// 
+			// nudgeBackwardsToolStripMenuItem
+			// 
+			this.nudgeBackwardsToolStripMenuItem.Name = "nudgeBackwardsToolStripMenuItem";
+			this.nudgeBackwardsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Left)));
+			this.nudgeBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+			this.nudgeBackwardsToolStripMenuItem.Text = "Nudge backwards";
+			this.nudgeBackwardsToolStripMenuItem.Click += new System.EventHandler(this.nudgeBackwardsToolStripMenuItem_Click);
+			// 
+			// nudgeForwardToolStripMenuItem
+			// 
+			this.nudgeForwardToolStripMenuItem.Name = "nudgeForwardToolStripMenuItem";
+			this.nudgeForwardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Right)));
+			this.nudgeForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+			this.nudgeForwardToolStripMenuItem.Text = "Nudge forward";
+			this.nudgeForwardToolStripMenuItem.Click += new System.EventHandler(this.jumpForwardToolStripMenuItem_Click);
+			// 
+			// jumpBackwardsToolStripMenuItem
+			// 
+			this.jumpBackwardsToolStripMenuItem.Name = "jumpBackwardsToolStripMenuItem";
+			this.jumpBackwardsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.Left)));
+			this.jumpBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+			this.jumpBackwardsToolStripMenuItem.Text = "Jump backwards";
+			this.jumpBackwardsToolStripMenuItem.Click += new System.EventHandler(this.jumpBackwardsToolStripMenuItem_Click);
+			// 
+			// jumpForwardToolStripMenuItem
+			// 
+			this.jumpForwardToolStripMenuItem.Name = "jumpForwardToolStripMenuItem";
+			this.jumpForwardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.Right)));
+			this.jumpForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+			this.jumpForwardToolStripMenuItem.Text = "Jump forward";
+			this.jumpForwardToolStripMenuItem.Click += new System.EventHandler(this.jumpForwardToolStripMenuItem_Click);
+			// 
 			// label7
 			// 
 			this.label7.AutoSize = true;
@@ -477,6 +662,48 @@
 			this.trackPropsPanel.TabIndex = 3;
 			this.trackPropsPanel.Visible = false;
 			this.trackPropsPanel.VisibleChanged += new System.EventHandler(this.trackPropsPanel_VisibleChanged);
+			// 
+			// trackList
+			// 
+			this.trackList.AllowDrop = true;
+			this.trackList.BackColor = System.Drawing.Color.Black;
+			this.trackList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.trackColumn,
+            this.normalColumn,
+            this.hilitedColumn});
+			this.trackList.ContextMenuStrip = this.trackListCM;
+			this.trackList.Dock = System.Windows.Forms.DockStyle.Right;
+			this.trackList.ForeColor = System.Drawing.Color.White;
+			this.trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.trackList.HideSelection = false;
+			this.trackList.Location = new System.Drawing.Point(1, 0);
+			this.trackList.Name = "trackList";
+			this.trackList.Size = new System.Drawing.Size(186, 15642);
+			this.trackList.TabIndex = 0;
+			this.trackList.UseCompatibleStateImageBehavior = false;
+			this.trackList.View = System.Windows.Forms.View.Details;
+			this.trackList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.trackList_ItemDrag);
+			this.trackList.SelectedIndexChanged += new System.EventHandler(this.trackList_SelectedIndexChanged);
+			this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
+			this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
+			this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
+			// 
+			// trackColumn
+			// 
+			this.trackColumn.Text = "Track";
+			this.trackColumn.Width = 112;
+			// 
+			// normalColumn
+			// 
+			this.normalColumn.Text = "N";
+			this.normalColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			this.normalColumn.Width = 35;
+			// 
+			// hilitedColumn
+			// 
+			this.hilitedColumn.Text = "H";
+			this.hilitedColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			this.hilitedColumn.Width = 35;
 			// 
 			// trackListCM
 			// 
@@ -560,6 +787,27 @@
 			this.style.Size = new System.Drawing.Size(200, 15616);
 			this.style.TabIndex = 2;
 			this.style.Text = "Style";
+			// 
+			// lineStyleControl
+			// 
+			this.lineStyleControl.AutoSize = true;
+			this.lineStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
+			this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+			this.lineStyleControl.Name = "lineStyleControl";
+			this.lineStyleControl.Size = new System.Drawing.Size(184, 378);
+			this.lineStyleControl.TabIndex = 2;
+			this.lineStyleControl.Visible = false;
+			// 
+			// barStyleControl
+			// 
+			this.barStyleControl.AutoSize = true;
+			this.barStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.barStyleControl.Location = new System.Drawing.Point(3, 72);
+			this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			this.barStyleControl.Name = "barStyleControl";
+			this.barStyleControl.Size = new System.Drawing.Size(180, 55);
+			this.barStyleControl.TabIndex = 2;
 			// 
 			// defaultStyleBtn
 			// 
@@ -1335,6 +1583,58 @@
 			this.lightPanel.Size = new System.Drawing.Size(179, 223);
 			this.lightPanel.TabIndex = 30;
 			// 
+			// lightFilterHsBtn
+			// 
+			this.lightFilterHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.lightFilterHsBtn.Hue = 0F;
+			this.lightFilterHsBtn.Location = new System.Drawing.Point(104, 183);
+			this.lightFilterHsBtn.Name = "lightFilterHsBtn";
+			this.lightFilterHsBtn.Saturation = 0F;
+			this.lightFilterHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
+			this.lightFilterHsBtn.Size = new System.Drawing.Size(59, 20);
+			this.lightFilterHsBtn.TabIndex = 59;
+			this.lightFilterHsBtn.UseVisualStyleBackColor = true;
+			this.lightFilterHsBtn.ColorChanged += new System.EventHandler(this.lightFilterHsBtn_ColorChanged);
+			// 
+			// specHsBtn
+			// 
+			this.specHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.specHsBtn.Hue = 0F;
+			this.specHsBtn.Location = new System.Drawing.Point(116, 128);
+			this.specHsBtn.Name = "specHsBtn";
+			this.specHsBtn.Saturation = 0F;
+			this.specHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
+			this.specHsBtn.Size = new System.Drawing.Size(53, 20);
+			this.specHsBtn.TabIndex = 59;
+			this.specHsBtn.UseVisualStyleBackColor = true;
+			this.specHsBtn.ColorChanged += new System.EventHandler(this.specHsBtn_ColorChanged);
+			// 
+			// diffuseHsBtn
+			// 
+			this.diffuseHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.diffuseHsBtn.Hue = 0F;
+			this.diffuseHsBtn.Location = new System.Drawing.Point(116, 102);
+			this.diffuseHsBtn.Name = "diffuseHsBtn";
+			this.diffuseHsBtn.Saturation = 0F;
+			this.diffuseHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
+			this.diffuseHsBtn.Size = new System.Drawing.Size(53, 20);
+			this.diffuseHsBtn.TabIndex = 59;
+			this.diffuseHsBtn.UseVisualStyleBackColor = true;
+			this.diffuseHsBtn.ColorChanged += new System.EventHandler(this.diffuseHsBtn_ColorChanged);
+			// 
+			// ambientHsBtn
+			// 
+			this.ambientHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.ambientHsBtn.Hue = 0F;
+			this.ambientHsBtn.Location = new System.Drawing.Point(116, 78);
+			this.ambientHsBtn.Name = "ambientHsBtn";
+			this.ambientHsBtn.Saturation = 0F;
+			this.ambientHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
+			this.ambientHsBtn.Size = new System.Drawing.Size(53, 20);
+			this.ambientHsBtn.TabIndex = 59;
+			this.ambientHsBtn.UseVisualStyleBackColor = true;
+			this.ambientHsBtn.ColorChanged += new System.EventHandler(this.ambientHsBtn_ColorChanged);
+			// 
 			// specPowUd
 			// 
 			this.specPowUd.Location = new System.Drawing.Point(104, 156);
@@ -1685,7 +1985,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-7935, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-7952, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1697,7 +1997,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-8047, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-8064, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1707,7 +2007,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-8049, 15630);
+			this.label4.Location = new System.Drawing.Point(-8066, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1991,6 +2291,26 @@
 			this.playbackOffsetUd.TabIndex = 1;
 			this.playbackOffsetUd.ValueChanged += new System.EventHandler(this.playbackOffsetUd_ValueChanged);
 			// 
+			// upDownVpWidth
+			// 
+			this.upDownVpWidth.AutoSize = true;
+			this.upDownVpWidth.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.upDownVpWidth.Decimals = 3;
+			this.upDownVpWidth.Decimals2 = 2;
+			this.upDownVpWidth.ExpBase = 2D;
+			this.upDownVpWidth.Location = new System.Drawing.Point(12, 28);
+			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
+			this.upDownVpWidth.Max = 10D;
+			this.upDownVpWidth.Min = 0D;
+			this.upDownVpWidth.Name = "upDownVpWidth";
+			this.upDownVpWidth.Size = new System.Drawing.Size(180, 48);
+			this.upDownVpWidth.TabIndex = 0;
+			this.upDownVpWidth.TbWidth = 50;
+			this.upDownVpWidth.TickFreq = 1D;
+			this.upDownVpWidth.Value = 16D;
+			this.upDownVpWidth.ValueChanged += new System.EventHandler(this.upDownVpWidth_ValueChanged);
+			this.upDownVpWidth.CommitChanges += new System.EventHandler(this.upDownVpWidth_CommitChanges);
+			// 
 			// saveMixdownDialog
 			// 
 			this.saveMixdownDialog.Filter = "Wav files (*.wav)|*.wav|All files (*.*)|*.*";
@@ -2071,322 +2391,6 @@
 			this.saveTrackPtopsTypeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
 			this.saveTrackPtopsTypeToolStripMenuItem.Text = "Save properties";
 			this.saveTrackPtopsTypeToolStripMenuItem.Click += new System.EventHandler(this.saveTrackPropsTypeToolStripMenuItem_Click);
-			// 
-			// actionsToolStripMenuItem
-			// 
-			this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.songToolStripMenuItem,
-            this.tracksToolStripMenuItem,
-            this.playbackToolStripMenuItem});
-			this.actionsToolStripMenuItem.Enabled = false;
-			this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
-			this.actionsToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
-			this.actionsToolStripMenuItem.Text = "Actions";
-			// 
-			// tracksToolStripMenuItem
-			// 
-			this.tracksToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectAllToolStripMenuItem1,
-            this.invertSelectionToolStripMenuItem1,
-            this.tToolStripMenuItem,
-            this.defaultPropertiesToolStripMenuItem1,
-            this.loadPropertiesToolStripMenuItem,
-            this.savePropertiesToolStripMenuItem});
-			this.tracksToolStripMenuItem.Enabled = false;
-			this.tracksToolStripMenuItem.Name = "tracksToolStripMenuItem";
-			this.tracksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.tracksToolStripMenuItem.Text = "Tracks";
-			this.tracksToolStripMenuItem.EnabledChanged += new System.EventHandler(this.tracksToolStripMenuItem_EnabledChanged);
-			// 
-			// songToolStripMenuItem
-			// 
-			this.songToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.resetCamToolStripMenuItem,
-            this.loadCamToolStripMenuItem,
-            this.saveCamToolStripMenuItem});
-			this.songToolStripMenuItem.Name = "songToolStripMenuItem";
-			this.songToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.songToolStripMenuItem.Text = "Camera";
-			// 
-			// resetCamToolStripMenuItem
-			// 
-			this.resetCamToolStripMenuItem.Name = "resetCamToolStripMenuItem";
-			this.resetCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-			this.resetCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.resetCamToolStripMenuItem.Text = "Reset";
-			this.resetCamToolStripMenuItem.Click += new System.EventHandler(this.resetCamToolStripMenuItem_Click);
-			// 
-			// loadCamToolStripMenuItem
-			// 
-			this.loadCamToolStripMenuItem.Name = "loadCamToolStripMenuItem";
-			this.loadCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-			this.loadCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.loadCamToolStripMenuItem.Text = "Load...";
-			// 
-			// saveCamToolStripMenuItem
-			// 
-			this.saveCamToolStripMenuItem.Name = "saveCamToolStripMenuItem";
-			this.saveCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.Z)));
-			this.saveCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.saveCamToolStripMenuItem.Text = "Save...";
-			// 
-			// selectAllToolStripMenuItem1
-			// 
-			this.selectAllToolStripMenuItem1.Enabled = false;
-			this.selectAllToolStripMenuItem1.Name = "selectAllToolStripMenuItem1";
-			this.selectAllToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-			this.selectAllToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
-			this.selectAllToolStripMenuItem1.Text = "Select All";
-			this.selectAllToolStripMenuItem1.Click += new System.EventHandler(this.selectAllToolStripMenuItem1_Click);
-			// 
-			// defaultPropertiesToolStripMenuItem1
-			// 
-			this.defaultPropertiesToolStripMenuItem1.Enabled = false;
-			this.defaultPropertiesToolStripMenuItem1.Name = "defaultPropertiesToolStripMenuItem1";
-			this.defaultPropertiesToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-			this.defaultPropertiesToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
-			this.defaultPropertiesToolStripMenuItem1.Text = "Default Properties";
-			// 
-			// loadPropertiesToolStripMenuItem
-			// 
-			this.loadPropertiesToolStripMenuItem.Enabled = false;
-			this.loadPropertiesToolStripMenuItem.Name = "loadPropertiesToolStripMenuItem";
-			this.loadPropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-			this.loadPropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
-			this.loadPropertiesToolStripMenuItem.Text = "Load properties...";
-			this.loadPropertiesToolStripMenuItem.Click += new System.EventHandler(this.loadPropertiesToolStripMenuItem_Click);
-			// 
-			// savePropertiesToolStripMenuItem
-			// 
-			this.savePropertiesToolStripMenuItem.Enabled = false;
-			this.savePropertiesToolStripMenuItem.Name = "savePropertiesToolStripMenuItem";
-			this.savePropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.P)));
-			this.savePropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
-			this.savePropertiesToolStripMenuItem.Text = "Save properties...";
-			this.savePropertiesToolStripMenuItem.Click += new System.EventHandler(this.savePropertiesToolStripMenuItem_Click);
-			// 
-			// invertSelectionToolStripMenuItem1
-			// 
-			this.invertSelectionToolStripMenuItem1.Enabled = false;
-			this.invertSelectionToolStripMenuItem1.Name = "invertSelectionToolStripMenuItem1";
-			this.invertSelectionToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-			this.invertSelectionToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
-			this.invertSelectionToolStripMenuItem1.Text = "Invert Selection";
-			this.invertSelectionToolStripMenuItem1.Click += new System.EventHandler(this.invertSelectionToolStripMenuItem1_Click);
-			// 
-			// playbackToolStripMenuItem
-			// 
-			this.playbackToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.startStopToolStripMenuItem,
-            this.beginningToolStripMenuItem,
-            this.endToolStripMenuItem,
-            this.nudgeBackwardsToolStripMenuItem,
-            this.nudgeForwardToolStripMenuItem,
-            this.jumpBackwardsToolStripMenuItem,
-            this.jumpForwardToolStripMenuItem});
-			this.playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
-			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.playbackToolStripMenuItem.Text = "Playback";
-			// 
-			// startStopToolStripMenuItem
-			// 
-			this.startStopToolStripMenuItem.Name = "startStopToolStripMenuItem";
-			this.startStopToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Space)));
-			this.startStopToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.startStopToolStripMenuItem.Text = "Start/Stop";
-			this.startStopToolStripMenuItem.Click += new System.EventHandler(this.startStopToolStripMenuItem_Click);
-			// 
-			// beginningToolStripMenuItem
-			// 
-			this.beginningToolStripMenuItem.Name = "beginningToolStripMenuItem";
-			this.beginningToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Home)));
-			this.beginningToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.beginningToolStripMenuItem.Text = "Beginning";
-			this.beginningToolStripMenuItem.Click += new System.EventHandler(this.beginningToolStripMenuItem_Click);
-			// 
-			// endToolStripMenuItem
-			// 
-			this.endToolStripMenuItem.Name = "endToolStripMenuItem";
-			this.endToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End)));
-			this.endToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.endToolStripMenuItem.Text = "End";
-			this.endToolStripMenuItem.Click += new System.EventHandler(this.endToolStripMenuItem_Click);
-			// 
-			// nudgeBackwardsToolStripMenuItem
-			// 
-			this.nudgeBackwardsToolStripMenuItem.Name = "nudgeBackwardsToolStripMenuItem";
-			this.nudgeBackwardsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Left)));
-			this.nudgeBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.nudgeBackwardsToolStripMenuItem.Text = "Nudge backwards";
-			this.nudgeBackwardsToolStripMenuItem.Click += new System.EventHandler(this.nudgeBackwardsToolStripMenuItem_Click);
-			// 
-			// nudgeForwardToolStripMenuItem
-			// 
-			this.nudgeForwardToolStripMenuItem.Name = "nudgeForwardToolStripMenuItem";
-			this.nudgeForwardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Right)));
-			this.nudgeForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.nudgeForwardToolStripMenuItem.Text = "Nudge forward";
-			this.nudgeForwardToolStripMenuItem.Click += new System.EventHandler(this.jumpForwardToolStripMenuItem_Click);
-			// 
-			// jumpBackwardsToolStripMenuItem
-			// 
-			this.jumpBackwardsToolStripMenuItem.Name = "jumpBackwardsToolStripMenuItem";
-			this.jumpBackwardsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.Left)));
-			this.jumpBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.jumpBackwardsToolStripMenuItem.Text = "Jump backwards";
-			this.jumpBackwardsToolStripMenuItem.Click += new System.EventHandler(this.jumpBackwardsToolStripMenuItem_Click);
-			// 
-			// jumpForwardToolStripMenuItem
-			// 
-			this.jumpForwardToolStripMenuItem.Name = "jumpForwardToolStripMenuItem";
-			this.jumpForwardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.Right)));
-			this.jumpForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.jumpForwardToolStripMenuItem.Text = "Jump forward";
-			this.jumpForwardToolStripMenuItem.Click += new System.EventHandler(this.jumpForwardToolStripMenuItem_Click);
-			// 
-			// upDownVpWidth
-			// 
-			this.upDownVpWidth.AutoSize = true;
-			this.upDownVpWidth.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.upDownVpWidth.Decimals = 3;
-			this.upDownVpWidth.Decimals2 = 2;
-			this.upDownVpWidth.ExpBase = 2D;
-			this.upDownVpWidth.Location = new System.Drawing.Point(12, 28);
-			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
-			this.upDownVpWidth.Max = 10D;
-			this.upDownVpWidth.Min = 0D;
-			this.upDownVpWidth.Name = "upDownVpWidth";
-			this.upDownVpWidth.Size = new System.Drawing.Size(180, 48);
-			this.upDownVpWidth.TabIndex = 0;
-			this.upDownVpWidth.TbWidth = 50;
-			this.upDownVpWidth.TickFreq = 1D;
-			this.upDownVpWidth.Value = 16D;
-			this.upDownVpWidth.ValueChanged += new System.EventHandler(this.upDownVpWidth_ValueChanged);
-			this.upDownVpWidth.CommitChanges += new System.EventHandler(this.upDownVpWidth_CommitChanges);
-			// 
-			// trackList
-			// 
-			this.trackList.AllowDrop = true;
-			this.trackList.BackColor = System.Drawing.Color.Black;
-			this.trackList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.trackColumn,
-            this.normalColumn,
-            this.hilitedColumn});
-			this.trackList.ContextMenuStrip = this.trackListCM;
-			this.trackList.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackList.ForeColor = System.Drawing.Color.White;
-			this.trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-			this.trackList.HideSelection = false;
-			this.trackList.Location = new System.Drawing.Point(1, 0);
-			this.trackList.Name = "trackList";
-			this.trackList.Size = new System.Drawing.Size(186, 15642);
-			this.trackList.TabIndex = 0;
-			this.trackList.UseCompatibleStateImageBehavior = false;
-			this.trackList.View = System.Windows.Forms.View.Details;
-			this.trackList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.trackList_ItemDrag);
-			this.trackList.SelectedIndexChanged += new System.EventHandler(this.trackList_SelectedIndexChanged);
-			this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
-			this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
-			this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
-			// 
-			// trackColumn
-			// 
-			this.trackColumn.Text = "Track";
-			this.trackColumn.Width = 112;
-			// 
-			// normalColumn
-			// 
-			this.normalColumn.Text = "N";
-			this.normalColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			this.normalColumn.Width = 35;
-			// 
-			// hilitedColumn
-			// 
-			this.hilitedColumn.Text = "H";
-			this.hilitedColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			this.hilitedColumn.Width = 35;
-			// 
-			// lineStyleControl
-			// 
-			this.lineStyleControl.AutoSize = true;
-			this.lineStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
-			this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
-			this.lineStyleControl.Name = "lineStyleControl";
-			this.lineStyleControl.Size = new System.Drawing.Size(184, 378);
-			this.lineStyleControl.TabIndex = 2;
-			this.lineStyleControl.Visible = false;
-			// 
-			// barStyleControl
-			// 
-			this.barStyleControl.AutoSize = true;
-			this.barStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.barStyleControl.Location = new System.Drawing.Point(3, 72);
-			this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-			this.barStyleControl.Name = "barStyleControl";
-			this.barStyleControl.Size = new System.Drawing.Size(180, 55);
-			this.barStyleControl.TabIndex = 2;
-			// 
-			// lightFilterHsBtn
-			// 
-			this.lightFilterHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.lightFilterHsBtn.Hue = 0F;
-			this.lightFilterHsBtn.Location = new System.Drawing.Point(104, 183);
-			this.lightFilterHsBtn.Name = "lightFilterHsBtn";
-			this.lightFilterHsBtn.Saturation = 0F;
-			this.lightFilterHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
-			this.lightFilterHsBtn.Size = new System.Drawing.Size(59, 20);
-			this.lightFilterHsBtn.TabIndex = 59;
-			this.lightFilterHsBtn.UseVisualStyleBackColor = true;
-			this.lightFilterHsBtn.ColorChanged += new System.EventHandler(this.lightFilterHsBtn_ColorChanged);
-			// 
-			// specHsBtn
-			// 
-			this.specHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.specHsBtn.Hue = 0F;
-			this.specHsBtn.Location = new System.Drawing.Point(116, 128);
-			this.specHsBtn.Name = "specHsBtn";
-			this.specHsBtn.Saturation = 0F;
-			this.specHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
-			this.specHsBtn.Size = new System.Drawing.Size(53, 20);
-			this.specHsBtn.TabIndex = 59;
-			this.specHsBtn.UseVisualStyleBackColor = true;
-			this.specHsBtn.ColorChanged += new System.EventHandler(this.specHsBtn_ColorChanged);
-			// 
-			// diffuseHsBtn
-			// 
-			this.diffuseHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.diffuseHsBtn.Hue = 0F;
-			this.diffuseHsBtn.Location = new System.Drawing.Point(116, 102);
-			this.diffuseHsBtn.Name = "diffuseHsBtn";
-			this.diffuseHsBtn.Saturation = 0F;
-			this.diffuseHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
-			this.diffuseHsBtn.Size = new System.Drawing.Size(53, 20);
-			this.diffuseHsBtn.TabIndex = 59;
-			this.diffuseHsBtn.UseVisualStyleBackColor = true;
-			this.diffuseHsBtn.ColorChanged += new System.EventHandler(this.diffuseHsBtn_ColorChanged);
-			// 
-			// ambientHsBtn
-			// 
-			this.ambientHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.ambientHsBtn.Hue = 0F;
-			this.ambientHsBtn.Location = new System.Drawing.Point(116, 78);
-			this.ambientHsBtn.Name = "ambientHsBtn";
-			this.ambientHsBtn.Saturation = 0F;
-			this.ambientHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
-			this.ambientHsBtn.Size = new System.Drawing.Size(53, 20);
-			this.ambientHsBtn.TabIndex = 59;
-			this.ambientHsBtn.UseVisualStyleBackColor = true;
-			this.ambientHsBtn.ColorChanged += new System.EventHandler(this.ambientHsBtn_ColorChanged);
-			// 
-			// tToolStripMenuItem
-			// 
-			this.tToolStripMenuItem.Name = "tToolStripMenuItem";
-			this.tToolStripMenuItem.Size = new System.Drawing.Size(233, 6);
 			// 
 			// Form1
 			// 
@@ -2664,6 +2668,8 @@
 		private System.Windows.Forms.ToolStripMenuItem jumpBackwardsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem jumpForwardToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator tToolStripMenuItem;
+		private System.Windows.Forms.OpenFileDialog openCamFileDialog;
+		private System.Windows.Forms.SaveFileDialog saveCamFileDialog;
 	}
 }
 

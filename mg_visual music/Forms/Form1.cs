@@ -45,6 +45,12 @@ namespace Visual_Music
 			set => openTrackPropsFileDialog.InitialDirectory = saveTrackPropsFileDialog.InitialDirectory = value;
 		}
 
+		public string CamFolder
+		{
+			get => openCamFileDialog.InitialDirectory;
+			set => openCamFileDialog.InitialDirectory = saveCamFileDialog.InitialDirectory = value;
+		}
+		
 		string currentProjPath = "";
 
 		public ListView.ListViewItemCollection trackListItems
@@ -144,10 +150,11 @@ namespace Visual_Music
 				selectedTrackPropsPanel.TabPages[i].ContextMenuStrip = trackPropsTabCM;
 			}
 
-			TrackPropsFolder = Path.Combine(Program.DefaultUserFilesDir, "Props");
+			TrackPropsFolder = CamFolder = Path.Combine(Program.DefaultUserFilesDir, "Props");
 			ProjectFolder = Path.Combine(Program.DefaultUserFilesDir, "Projects");
 			saveVideoDlg.InitialDirectory = Path.Combine(Program.DefaultUserFilesDir, "Videos");
 			openTrackPropsFileDialog.Filter = saveTrackPropsFileDialog.Filter = "Track property files|*.tp|All files|*.*";
+			openCamFileDialog.Filter = saveCamFileDialog.Filter = "Camera files|*.cam|All files|*.*";
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -330,7 +337,7 @@ namespace Visual_Music
 					setDefaultPitches();
 					currentProjPath = "";
 					updateFormTitle("");
-					resetCamBtn.PerformClick();
+					resetCamera();
 				}
 				songLoaded(options.NotePath);
 			}
@@ -1489,9 +1496,9 @@ namespace Visual_Music
 			MessageBox.Show(null, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 
-		void resetCamera()
+		void resetCamera(Camera newCam = null)
 		{
-			Project.Camera = new Camera(songPanel);
+			Project.Camera = newCam ?? new Camera(songPanel);
 			Project.Camera.SpatialChanged = updateCamControls;
 		}
 		private void resetCamBtn_Click(object sender, EventArgs e)
@@ -1934,6 +1941,49 @@ namespace Visual_Music
 		private void resetCamToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			resetCamera();
+		}
+
+		private void loadCamToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (openCamFileDialog.ShowDialog() != DialogResult.OK)
+				return;
+			CamFolder = Path.GetDirectoryName(openCamFileDialog.FileName);
+			saveSettings();
+			
+			DataContractSerializer dcs = new DataContractSerializer(typeof(Camera), projectSerializationTypes);
+			try
+			{
+				using (FileStream stream = File.Open(openCamFileDialog.FileName, FileMode.Open))
+				{
+					Camera cam = (Camera)dcs.ReadObject(stream);
+					resetCamera(cam);
+				}
+			}
+			catch (Exception ex)
+			{
+				showErrorMsgBox(ex.Message);
+			}
+		}
+
+		private void saveCamToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (saveCamFileDialog.ShowDialog() != DialogResult.OK)
+				return;
+			CamFolder = Path.GetDirectoryName(saveCamFileDialog.FileName);
+			saveSettings();
+
+			DataContractSerializer dcs = new DataContractSerializer(typeof(Camera), projectSerializationTypes);
+			try
+			{
+				using (FileStream stream = File.Open(saveCamFileDialog.FileName, FileMode.Create))
+				{
+					dcs.WriteObject(stream, project.Camera);
+				}
+			}
+			catch (Exception ex)
+			{
+				showErrorMsgBox(ex.Message);
+			}
 		}
 
 		private void selectAllToolStripMenuItem1_Click(object sender, EventArgs e)
