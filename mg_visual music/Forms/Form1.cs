@@ -1199,9 +1199,7 @@ namespace Visual_Music
 
 		private void defaultPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Project.resetTrackProps(trackList.SelectedIndices);
-			updateTrackControls();
-			updateTrackListColors();
+			defaultPropertiesToolStripMenuItem1.PerformClick();
 		}
 
 		private void startStopToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2023,6 +2021,13 @@ namespace Visual_Music
 			//When Tracks menu is enabled, some sub items should remain disadled depending on how many tracks are selected.
 			if (enabled)
 				enableTrackSpecificMenuItem();
+		}
+
+		private void defaultPropertiesToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+			Project.resetTrackProps(trackList.SelectedIndices);
+			updateTrackControls();
+			updateTrackListColors();
 		}
 	}
 }

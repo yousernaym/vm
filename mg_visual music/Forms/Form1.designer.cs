@@ -413,7 +413,7 @@
 			// 
 			this.viewSongTSMI.Name = "viewSongTSMI";
 			this.viewSongTSMI.ShortcutKeys = System.Windows.Forms.Keys.F1;
-			this.viewSongTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewSongTSMI.Size = new System.Drawing.Size(180, 22);
 			this.viewSongTSMI.Text = "Song";
 			this.viewSongTSMI.Click += new System.EventHandler(this.viewSongTSMI_Click);
 			// 
@@ -421,7 +421,7 @@
 			// 
 			this.viewModBrowserTSMI.Name = "viewModBrowserTSMI";
 			this.viewModBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F2;
-			this.viewModBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewModBrowserTSMI.Size = new System.Drawing.Size(180, 22);
 			this.viewModBrowserTSMI.Text = "Mod browser";
 			this.viewModBrowserTSMI.Click += new System.EventHandler(this.viewModBrowserTSMI_Click);
 			// 
@@ -429,7 +429,7 @@
 			// 
 			this.viewSidBrowserTSMI.Name = "viewSidBrowserTSMI";
 			this.viewSidBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F3;
-			this.viewSidBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewSidBrowserTSMI.Size = new System.Drawing.Size(180, 22);
 			this.viewSidBrowserTSMI.Text = "Sid browser";
 			this.viewSidBrowserTSMI.Click += new System.EventHandler(this.viewSidBrowserTSMI_Click);
 			// 
@@ -437,7 +437,7 @@
 			// 
 			this.viewMidiBrowserTSMI.Name = "viewMidiBrowserTSMI";
 			this.viewMidiBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F4;
-			this.viewMidiBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewMidiBrowserTSMI.Size = new System.Drawing.Size(180, 22);
 			this.viewMidiBrowserTSMI.Text = "Midi browser";
 			this.viewMidiBrowserTSMI.Click += new System.EventHandler(this.viewMidiBrowserTSMI_Click);
 			// 
@@ -532,6 +532,7 @@
 			this.defaultPropertiesToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
 			this.defaultPropertiesToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
 			this.defaultPropertiesToolStripMenuItem1.Text = "Default Properties";
+			this.defaultPropertiesToolStripMenuItem1.Click += new System.EventHandler(this.defaultPropertiesToolStripMenuItem1_Click);
 			// 
 			// loadPropertiesToolStripMenuItem
 			// 
@@ -1985,7 +1986,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-7952, 15645);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-7969, 15645);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1997,7 +1998,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-8064, 15646);
+			this.texPathTb.Location = new System.Drawing.Point(-8081, 15646);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -2007,7 +2008,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-8066, 15630);
+			this.label4.Location = new System.Drawing.Point(-8083, 15630);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
