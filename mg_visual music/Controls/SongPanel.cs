@@ -190,17 +190,22 @@ namespace Visual_Music
 				//Frustum check----------------
 				if (selectedScreenRegion.Width == 0 || selectedScreenRegion.Height == 0)
 					return;
-				Matrix selectionFrustumMat = Project.Camera.VpMat;
+
+				//Normalize selection region so that the entire screen = [-1,-1] - [1,1]
 				RectangleF normScreenSelection = new RectangleF((float)selectedScreenRegion.X / ClientRectangle.Width, (float)selectedScreenRegion.Y / ClientRectangle.Height, (float)selectedScreenRegion.Width / ClientRectangle.Width, (float)selectedScreenRegion.Height / ClientRectangle.Height);
 				normScreenSelection.X *= 2;  normScreenSelection.Y *= -2;
 				normScreenSelection.Width *= 2; normScreenSelection.Height *= -2;
 				normScreenSelection.Offset(-1, 1);
 
-				//Scale
-				float scaleX = 2 / Math.Abs(normScreenSelection.Width), scaleY = 2.0f / Math.Abs(normScreenSelection.Height);
+				//Create frustum matrix
+				Matrix selectionFrustumMat = Project.Camera.VpMat;
+
+				//Scale frustum matrix so  that frustum shrinks to selection size
+				float scaleX = 2 / Math.Abs(normScreenSelection.Width);
+				float scaleY = 2.0f / Math.Abs(normScreenSelection.Height);
 				selectionFrustumMat *= Matrix.CreateScale(scaleX, scaleY, 1);
 
-				//Translation
+				//Translate frustum matrix from screen center to selection center
 				Vector2 normCenter = new Vector2(normScreenSelection.X + normScreenSelection.Width / 2, normScreenSelection.Y + normScreenSelection.Height / 2);
 				selectionFrustumMat *= Matrix.CreateTranslation(-normCenter.X * scaleX, -normCenter.Y * scaleY, 0);
 

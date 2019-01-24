@@ -506,8 +506,83 @@ namespace Visual_Music
 
 	public abstract class Geo
 	{
-		public List<BoundingBox> bboxes = new List<BoundingBox>();
+		public List<OBB> bboxes = new List<OBB>();
 		public abstract void Dispose();
+	}
+
+	public struct OBB
+	{
+		Vector3[] _points;
+		Plane[] _planes;
+		BoundingBox _aabb;
+		public OBB(Vector3 min, Vector3 max) :  this(new BoundingBox(min, max))
+		{
+
+		}
+		public OBB(BoundingBox aabb)
+		{
+			_points = new Vector3[8];
+			_planes = new Plane[6];
+			_aabb = aabb;
+			for (int i = 0; i < 4; i++)
+				_points[i] = aabb.Min;
+
+			_points[1].X = aabb.Max.X;
+			_points[2].X = aabb.Max.X;
+			_points[2].Y = aabb.Max.Y;
+			_points[3].Y = aabb.Max.Y;
+			for (int i = 0; i < 4; i++)
+			{
+				_points[i + 4] = _points[i];
+				_points[i + 4].Z = aabb.Max.Z;
+			}
+
+			_planes[0] = new Plane(1, 0, 0, aabb.Max.X); //Right
+			_planes[1] = new Plane(0, 1, 0, aabb.Max.Y); //Up
+			_planes[2] = new Plane(-1, 0, 0, aabb.Min.X); //Left
+			_planes[3] = new Plane(0, 0, 1, aabb.Max.Z); //Front
+			_planes[3] = new Plane(0, 0, -1, aabb.Min.Z); //Back
+		}
+
+		public bool intersects(BoundingFrustum frustum)
+		{
+			if (frustum.Intersects(_aabb))
+			{
+				foreach (var point in _points)
+				{
+					if (frustum.Contains(point) == ContainmentType.Contains)
+						return true;
+				}
+				foreach (var point in frustum.GetCorners())
+				{
+					if (contains(point))
+						return true;
+				}
+			}
+			return false;
+		}
+
+		public void translate(Vector3 offset)
+		{
+			_aabb.Min += offset;
+			_aabb.Max += offset;
+			_planes[0].D += offset.X;
+			_planes[1].D += offset.Y;
+			_planes[2].D += offset.X;
+			_planes[3].D += offset.Y;
+			_planes[4].D += offset.Z;
+			_planes[5].D += offset.Z;
+		}
+
+		bool contains(Vector3 point)
+		{
+			foreach (var plane in _planes)
+			{
+				if (point.X * plane.Normal.X + point.Y * plane.Normal.Y + point.Z * plane.Normal.Z + plane.D > 0)
+					return false;
+			}
+			return true;
+		}
 	}
 }
 	

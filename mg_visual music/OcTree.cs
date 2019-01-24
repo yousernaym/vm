@@ -129,13 +129,12 @@ namespace Visual_Music
 		{
 			foreach (var bbox in _geo.bboxes)
 			{
-				BoundingBox bb = bbox;
+				//Check AABB
+				OBB bb = bbox;
 				Vector3 posOffset = project.getSpatialNormPosOffset(trackProps);
-				bb.Min += posOffset;
-				bb.Max += posOffset;
-				bb.Min.X -= songPos;
-				bb.Max.X -= songPos;
-				if (bb.Intersects(frustum))
+				posOffset.X -= songPos;
+				bb.translate(posOffset);
+				if (bb.intersects(frustum))
 					return true;
 			}
 			return false;			

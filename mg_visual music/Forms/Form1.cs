@@ -552,9 +552,12 @@ namespace Visual_Music
 		int getTextBoxNumber(object sender)
 		{
 			int number = 0;
+			string text = ((TextBox)sender).Text;
+			if (string.IsNullOrWhiteSpace(text))
+				return 0;
 			try
 			{
-				number = Convert.ToInt32(((TextBox)sender).Text);
+				number = Convert.ToInt32(text);
 			}
 			catch { }
 			return number;
