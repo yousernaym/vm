@@ -514,6 +514,7 @@ namespace Visual_Music
 	{
 		Vector3 _center;
 		Vector3[] _spanVecs;
+		Plane[] _planes;
 		BoundingBox _aabb;
 		public OBB(Vector3 min, Vector3 max) :  this(new BoundingBox(min, max))
 		{
@@ -524,23 +525,38 @@ namespace Visual_Music
 			_aabb = aabb;
 			_center = (aabb.Min + aabb.Max) / 2f;
 			_spanVecs = new Vector3[3];
+			_planes = new Plane[6];
 
 			float scale = 1;
 			_spanVecs[0] = new Vector3(aabb.Min.X - _center.X, 0, 0) * scale; //Right
 			_spanVecs[1] = new Vector3(0, aabb.Min.Y - _center.Y, 0) * scale; //Up
 			_spanVecs[2] = new Vector3(0, 0, aabb.Min.Z - _center.Z) * scale; //Front
+
+			_planes[0] = new Plane(0, 0, 1, aabb.Max.Z);
+			_planes[1] = new Plane(0, 0, -1, -aabb.Min.Z);
+			_planes[2] = new Plane(-1, 0, 0, -aabb.Min.X);
+			_planes[3] = new Plane(1, 0, 0, aabb.Max.X);
+			_planes[4] = new Plane(0, 1, 0, aabb.Max.Y);
+			_planes[5] = new Plane(0, -1, 0, -aabb.Min.Y);
+
+
 		}
 
 		public bool intersects(BoundingFrustum frustum)
 		{
 			if (frustum.Intersects(_aabb) || true)
 			{
-				var planes = frustum.GetPlanes();
-				foreach (var plane in planes)
+				var frustumPlanes = frustum.GetPlanes();
+				foreach (var plane in frustumPlanes)
 				{
 					if (!intersects(plane))
 						return false;
 				}
+				//foreach (var plane in _planes)
+				//{
+				//	if (frustum.Intersects(plane) ==PlaneIntersectionType.Front)
+				//		return false;
+				//}
 				return true;
 			}
 			else
