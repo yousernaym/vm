@@ -564,6 +564,37 @@ namespace Visual_Music
 			_aabb.Max += offset;
 			_center += offset;
 		}
+
+		// aCorn and bCorn are arrays containing all corners (vertices) of the two OBBs
+		static bool intersectsWhenProjected(Vector3[] aCorn, Vector3[] bCorn, Vector3 axis)
+		{
+
+			// Handles the cross product = {0,0,0} case
+			if (axis == Vector3.Zero)
+				return true;
+
+			float aMin = float.MaxValue;
+			float aMax = float.MinValue;
+			float bMin = float.MaxValue;
+			float bMax = float.MinValue;
+
+			// Define two intervals, a and b. Calculate their min and max values
+			for (int i = 0; i < 8; i++)
+			{
+				float aDist = Vector3.Dot(aCorn[i], axis);
+				aMin = (aDist < aMin) ? aDist : aMin;
+				aMax = (aDist > aMax) ? aDist : aMax;
+				float bDist = Vector3.Dot(bCorn[i], axis);
+				bMin = (bDist < bMin) ? bDist : bMin;
+				bMax = (bDist > bMax) ? bDist : bMax;
+			}
+
+			// One-dimensional intersection test between a and b
+			float longSpan = Math.Max(aMax, bMax) - Math.Min(aMin, bMin);
+			float sumSpan = aMax - aMin + bMax - bMin;
+			return longSpan <= sumSpan; // Change this to <= if you want the case were they are touching but not overlapping, to count as an intersection
+		}
+
 	}
 }
 	
