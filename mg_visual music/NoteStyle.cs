@@ -514,7 +514,8 @@ namespace Visual_Music
 	{
 		Vector3 _center;
 		Vector3[] _spanVecs;
-		Plane[] _planes;
+		Vector3[] _normals;
+		Vector3[] _corners;
 		BoundingBox _aabb;
 		public OBB(Vector3 min, Vector3 max) :  this(new BoundingBox(min, max))
 		{
@@ -525,38 +526,63 @@ namespace Visual_Music
 			_aabb = aabb;
 			_center = (aabb.Min + aabb.Max) / 2f;
 			_spanVecs = new Vector3[3];
-			_planes = new Plane[6];
+			_normals = new Vector3[3];
+			_corners = new Vector3[8];
 
-			float scale = 1;
-			_spanVecs[0] = new Vector3(aabb.Min.X - _center.X, 0, 0) * scale; //Right
-			_spanVecs[1] = new Vector3(0, aabb.Min.Y - _center.Y, 0) * scale; //Up
-			_spanVecs[2] = new Vector3(0, 0, aabb.Min.Z - _center.Z) * scale; //Front
+			_spanVecs[0] = new Vector3(aabb.Min.X - _center.X, 0, 0); //Right
+			_spanVecs[1] = new Vector3(0, aabb.Min.Y - _center.Y, 0); //Up
+			_spanVecs[2] = new Vector3(0, 0, aabb.Min.Z - _center.Z); //Front
+			_normals[0] = new Vector3(1, 0, 0); //Right
+			_normals[1] = new Vector3(0, 1, 0); //Up
+			_normals[2] = new Vector3(0, 0, 1); //Front
 
-			_planes[0] = new Plane(0, 0, 1, aabb.Max.Z);
-			_planes[1] = new Plane(0, 0, -1, -aabb.Min.Z);
-			_planes[2] = new Plane(-1, 0, 0, -aabb.Min.X);
-			_planes[3] = new Plane(1, 0, 0, aabb.Max.X);
-			_planes[4] = new Plane(0, 1, 0, aabb.Max.Y);
-			_planes[5] = new Plane(0, -1, 0, -aabb.Min.Y);
+			for (int i = 0; i < 4; i++)
+				_corners[i] = aabb.Min;
 
-
+			_corners[1].X = aabb.Max.X;
+			_corners[2].X = aabb.Max.X;
+			_corners[2].Y = aabb.Max.Y;
+			_corners[3].Y = aabb.Max.Y;
+			for (int i = 0; i < 4; i++)
+			{
+				_corners[i + 4] = _corners[i];
+				_corners[i + 4].Z = aabb.Max.Z;
+			}
 		}
 
 		public bool intersects(BoundingFrustum frustum)
 		{
 			if (frustum.Intersects(_aabb) || true)
 			{
+				Vector3[] frustumCorners = frustum.GetCorners();
+				foreach (var normal in _normals)
+				{
+					if (!intersectsWhenProjected(_corners, frustumCorners, normal))
+						return false;
+				}
+
 				var frustumPlanes = frustum.GetPlanes();
 				foreach (var plane in frustumPlanes)
 				{
-					if (!intersects(plane))
+					if (!intersectsWhenProjected(_corners, frustumCorners, plane.Normal))
 						return false;
 				}
-				//foreach (var plane in _planes)
-				//{
-				//	if (frustum.Intersects(plane) ==PlaneIntersectionType.Front)
-				//		return false;
-				//}
+
+				var frustumEdges = new Vector3[6];
+				for (int i = 0; i < 4; i++)
+					frustumEdges[i] = frustumCorners[i] - frustumCorners[i + 4];
+				frustumEdges[4] = frustumCorners[0] - frustumCorners[1];
+				frustumEdges[5] = frustumCorners[0] - frustumCorners[3];
+
+				foreach (var boxEdge in _normals)
+				{
+					foreach (var frustumEdge in frustumEdges)
+					{
+						Vector3 cross = Vector3.Cross(boxEdge, frustumEdge);
+						if (!intersectsWhenProjected(_corners, frustumCorners, cross))
+							return false;
+					}
+				}
 				return true;
 			}
 			else
@@ -580,6 +606,37 @@ namespace Visual_Music
 			_aabb.Max += offset;
 			_center += offset;
 		}
+
+		// aCorn and bCorn are arrays containing all corners (vertices) of the two OBBs
+		static bool intersectsWhenProjected(Vector3[] aCorn, Vector3[] bCorn, Vector3 axis)
+		{
+
+			// Handles the cross product = {0,0,0} case
+			if (axis == Vector3.Zero)
+				return true;
+
+			float aMin = float.MaxValue;
+			float aMax = float.MinValue;
+			float bMin = float.MaxValue;
+			float bMax = float.MinValue;
+
+			// Define two intervals, a and b. Calculate their min and max values
+			for (int i = 0; i < 8; i++)
+			{
+				float aDist = Vector3.Dot(aCorn[i], axis);
+				aMin = (aDist < aMin) ? aDist : aMin;
+				aMax = (aDist > aMax) ? aDist : aMax;
+				float bDist = Vector3.Dot(bCorn[i], axis);
+				bMin = (bDist < bMin) ? bDist : bMin;
+				bMax = (bDist > bMax) ? bDist : bMax;
+			}
+
+			// One-dimensional intersection test between a and b
+			float longSpan = Math.Max(aMax, bMax) - Math.Min(aMin, bMin);
+			float sumSpan = aMax - aMin + bMax - bMin;
+			return longSpan <= sumSpan; // Change this to <= if you want the case were they are touching but not overlapping, to count as an intersection
+		}
+
 	}
 }
 	
