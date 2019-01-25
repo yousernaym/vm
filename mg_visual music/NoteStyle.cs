@@ -568,6 +568,21 @@ namespace Visual_Music
 						return false;
 				}
 
+				var frustumEdges = new Vector3[6];
+				for (int i = 0; i < 4; i++)
+					frustumEdges[i] = frustumCorners[i] - frustumCorners[i + 4];
+				frustumEdges[4] = frustumCorners[0] - frustumCorners[1];
+				frustumEdges[5] = frustumCorners[0] - frustumCorners[3];
+
+				foreach (var boxEdge in _normals)
+				{
+					foreach (var frustumEdge in frustumEdges)
+					{
+						Vector3 cross = Vector3.Cross(boxEdge, frustumEdge);
+						if (!intersectsWhenProjected(_corners, frustumCorners, cross))
+							return false;
+					}
+				}
 				return true;
 			}
 			else
