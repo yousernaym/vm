@@ -423,7 +423,7 @@ namespace Visual_Music
 					Vector3 bboxCorner1 = lineVerts[vertIndex].pos;
 					Vector3 bboxCorner2 = lineVerts[vertIndex + 1].pos;
 					bboxCorner1.Z = bboxCorner2.Z = 0;// fx.Parameters["PosOffset"].GetValueVector3().Z;
-					geo.bboxes.Add(new OBB(BoundingBox.CreateFromPoints(new Vector3[2] { bboxCorner1, bboxCorner2 })));
+					geo.bboxes.Add(new BoundingBoxEx(BoundingBox.CreateFromPoints(new Vector3[2] { bboxCorner1, bboxCorner2 })));
 					
 					vertIndex += 2;
 

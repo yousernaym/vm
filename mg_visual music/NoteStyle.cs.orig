@@ -506,30 +506,53 @@ namespace Visual_Music
 
 	public abstract class Geo
 	{
-		public List<BoundingBoxEx> bboxes = new List<BoundingBoxEx>();
+		public List<OBB> bboxes = new List<OBB>();
 		public abstract void Dispose();
 	}
 
-	public class BoundingBoxEx
+	public struct OBB
 	{
+		Vector3 _center;
+		Vector3[] _spanVecs;
+<<<<<<< HEAD
+		Plane[] _planes;
+=======
 		Vector3[] _normals;
 		Vector3[] _corners;
+>>>>>>> Frustum-OBB_SAT
 		BoundingBox _aabb;
-		
-		public BoundingBoxEx(BoundingBoxEx sourceBox) : this(sourceBox._aabb)
-		{
-			sourceBox._corners.CopyTo(_corners, 0);
-		}
-		public BoundingBoxEx(Vector3 min, Vector3 max) :  this(new BoundingBox(min, max))
+		public OBB(Vector3 min, Vector3 max) :  this(new BoundingBox(min, max))
 		{
 
 		}
-		public BoundingBoxEx(BoundingBox aabb)
+		public OBB(BoundingBox aabb)
 		{
 			_aabb = aabb;
+			_center = (aabb.Min + aabb.Max) / 2f;
+			_spanVecs = new Vector3[3];
+<<<<<<< HEAD
+			_planes = new Plane[6];
+
+			float scale = 1;
+			_spanVecs[0] = new Vector3(aabb.Min.X - _center.X, 0, 0) * scale; //Right
+			_spanVecs[1] = new Vector3(0, aabb.Min.Y - _center.Y, 0) * scale; //Up
+			_spanVecs[2] = new Vector3(0, 0, aabb.Min.Z - _center.Z) * scale; //Front
+
+			_planes[0] = new Plane(0, 0, 1, aabb.Max.Z);
+			_planes[1] = new Plane(0, 0, -1, -aabb.Min.Z);
+			_planes[2] = new Plane(-1, 0, 0, -aabb.Min.X);
+			_planes[3] = new Plane(1, 0, 0, aabb.Max.X);
+			_planes[4] = new Plane(0, 1, 0, aabb.Max.Y);
+			_planes[5] = new Plane(0, -1, 0, -aabb.Min.Y);
+
+
+=======
 			_normals = new Vector3[3];
 			_corners = new Vector3[8];
 
+			_spanVecs[0] = new Vector3(aabb.Min.X - _center.X, 0, 0); //Right
+			_spanVecs[1] = new Vector3(0, aabb.Min.Y - _center.Y, 0); //Up
+			_spanVecs[2] = new Vector3(0, 0, aabb.Min.Z - _center.Z); //Front
 			_normals[0] = new Vector3(1, 0, 0); //Right
 			_normals[1] = new Vector3(0, 1, 0); //Up
 			_normals[2] = new Vector3(0, 0, 1); //Front
@@ -546,12 +569,15 @@ namespace Visual_Music
 				_corners[i + 4] = _corners[i];
 				_corners[i + 4].Z = aabb.Max.Z;
 			}
+>>>>>>> Frustum-OBB_SAT
 		}
 
 		public bool intersects(BoundingFrustum frustum)
 		{
-			if (frustum.Intersects(_aabb)) //Coarse cull
+			if (frustum.Intersects(_aabb) || true)
 			{
+<<<<<<< HEAD
+=======
 				Vector3[] frustumCorners = frustum.GetCorners();
 				foreach (var normal in _normals)
 				{
@@ -559,13 +585,20 @@ namespace Visual_Music
 						return false;
 				}
 
+>>>>>>> Frustum-OBB_SAT
 				var frustumPlanes = frustum.GetPlanes();
-				for (int i = 1; i < 6; i++) //Skip near plane since it's parallell to far plane
-
+				foreach (var plane in frustumPlanes)
 				{
-					if (!intersectsWhenProjected(_corners, frustumCorners, frustumPlanes[i].Normal))
+					if (!intersectsWhenProjected(_corners, frustumCorners, plane.Normal))
 						return false;
 				}
+<<<<<<< HEAD
+				//foreach (var plane in _planes)
+				//{
+				//	if (frustum.Intersects(plane) ==PlaneIntersectionType.Front)
+				//		return false;
+				//}
+=======
 
 				var frustumEdges = new Vector3[6];
 				for (int i = 0; i < 4; i++)
@@ -582,30 +615,29 @@ namespace Visual_Music
 							return false;
 					}
 				}
+>>>>>>> Frustum-OBB_SAT
 				return true;
 			}
 			else
 				return false;
 		}
 
-		//bool intersects(Plane plane)
-		//{
-		//	float d = Vector3.Dot(_center, plane.Normal) + plane.D;
-		//	float projLengthSum = 0;
-		//	foreach (var v in _spanVecs)
-		//	{
-		//		projLengthSum += Math.Abs(Vector3.Dot(v, plane.Normal));
-		//	}
-		//	return d < projLengthSum;
-		//}
+		bool intersects(Plane plane)
+		{
+			float d = Vector3.Dot(_center, plane.Normal) + plane.D;
+			float projLengthSum = 0;
+			foreach (var v in _spanVecs)
+			{
+				projLengthSum += Math.Abs(Vector3.Dot(v, plane.Normal));
+			}
+			return d < projLengthSum;
+		}
 
 		public void translate(Vector3 offset)
 		{
 			_aabb.Min += offset;
 			_aabb.Max += offset;
-			for (int i = 0; i < 8; i++)
-				_corners[i] += offset;
-			//_center += offset;
+			_center += offset;
 		}
 
 		// aCorn and bCorn are arrays containing all corners (vertices) of the two OBBs
