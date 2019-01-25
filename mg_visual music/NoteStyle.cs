@@ -514,6 +514,8 @@ namespace Visual_Music
 	{
 		Vector3 _center;
 		Vector3[] _spanVecs;
+		Vector3[] _normals;
+		Vector3[] _corners;
 		BoundingBox _aabb;
 		public OBB(Vector3 min, Vector3 max) :  this(new BoundingBox(min, max))
 		{
@@ -524,23 +526,48 @@ namespace Visual_Music
 			_aabb = aabb;
 			_center = (aabb.Min + aabb.Max) / 2f;
 			_spanVecs = new Vector3[3];
+			_normals = new Vector3[3];
+			_corners = new Vector3[8];
 
-			float scale = 1;
-			_spanVecs[0] = new Vector3(aabb.Min.X - _center.X, 0, 0) * scale; //Right
-			_spanVecs[1] = new Vector3(0, aabb.Min.Y - _center.Y, 0) * scale; //Up
-			_spanVecs[2] = new Vector3(0, 0, aabb.Min.Z - _center.Z) * scale; //Front
+			_spanVecs[0] = new Vector3(aabb.Min.X - _center.X, 0, 0); //Right
+			_spanVecs[1] = new Vector3(0, aabb.Min.Y - _center.Y, 0); //Up
+			_spanVecs[2] = new Vector3(0, 0, aabb.Min.Z - _center.Z); //Front
+			_normals[0] = new Vector3(1, 0, 0); //Right
+			_normals[1] = new Vector3(0, 1, 0); //Up
+			_normals[2] = new Vector3(0, 0, 1); //Front
+
+			for (int i = 0; i < 4; i++)
+				_corners[i] = aabb.Min;
+
+			_corners[1].X = aabb.Max.X;
+			_corners[2].X = aabb.Max.X;
+			_corners[2].Y = aabb.Max.Y;
+			_corners[3].Y = aabb.Max.Y;
+			for (int i = 0; i < 4; i++)
+			{
+				_corners[i + 4] = _corners[i];
+				_corners[i + 4].Z = aabb.Max.Z;
+			}
 		}
 
 		public bool intersects(BoundingFrustum frustum)
 		{
 			if (frustum.Intersects(_aabb) || true)
 			{
-				var planes = frustum.GetPlanes();
-				foreach (var plane in planes)
+				Vector3[] frustumCorners = frustum.GetCorners();
+				foreach (var normal in _normals)
 				{
-					if (!intersects(plane))
+					if (!intersectsWhenProjected(_corners, frustumCorners, normal))
 						return false;
 				}
+
+				var frustumPlanes = frustum.GetPlanes();
+				foreach (var plane in frustumPlanes)
+				{
+					if (!intersectsWhenProjected(_corners, frustumCorners, plane.Normal))
+						return false;
+				}
+
 				return true;
 			}
 			else
