@@ -129,7 +129,6 @@ namespace Visual_Music
 		{
 			foreach (var bbox in _geo.bboxes)
 			{
-				//Check AABB
 				OBB bb = bbox;
 				Vector3 posOffset = project.getSpatialNormPosOffset(trackProps);
 				posOffset.X -= songPos;

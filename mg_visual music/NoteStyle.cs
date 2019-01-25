@@ -512,8 +512,8 @@ namespace Visual_Music
 
 	public struct OBB
 	{
-		Vector3[] _corners;
-		Vector3[] _normals;
+		Vector3 _center;
+		Vector3[] _spanVecs;
 		BoundingBox _aabb;
 		public OBB(Vector3 min, Vector3 max) :  this(new BoundingBox(min, max))
 		{
@@ -521,101 +521,49 @@ namespace Visual_Music
 		}
 		public OBB(BoundingBox aabb)
 		{
-			_corners = new Vector3[8];
-			_normals = new Vector3[3];
 			_aabb = aabb;
-			for (int i = 0; i < 4; i++)
-				_corners[i] = aabb.Min;
+			_center = (aabb.Min + aabb.Max) / 2f;
+			_spanVecs = new Vector3[3];
 
-			_corners[1].X = aabb.Max.X;
-			_corners[2].X = aabb.Max.X;
-			_corners[2].Y = aabb.Max.Y;
-			_corners[3].Y = aabb.Max.Y;
-			for (int i = 0; i < 4; i++)
-			{
-				_corners[i + 4] = _corners[i];
-				_corners[i + 4].Z = aabb.Max.Z;
-			}
-
-			_normals[0] = new Vector3(1, 0, 0); //Right
-			_normals[1] = new Vector3(0, 1, 0); //Up
-			_normals[2] = new Vector3(0, 0, 1); //Front
+			float scale = 1;
+			_spanVecs[0] = new Vector3(aabb.Min.X - _center.X, 0, 0) * scale; //Right
+			_spanVecs[1] = new Vector3(0, aabb.Min.Y - _center.Y, 0) * scale; //Up
+			_spanVecs[2] = new Vector3(0, 0, aabb.Min.Z - _center.Z) * scale; //Front
 		}
 
 		public bool intersects(BoundingFrustum frustum)
 		{
 			if (frustum.Intersects(_aabb) || true)
 			{
-				Vector3[] frustumCorners = frustum.GetCorners();
-				int i = 0;
-				foreach (var normal in _normals)
+				var planes = frustum.GetPlanes();
+				foreach (var plane in planes)
 				{
-					//if (i++ == 2)
-					//{
-						if (!intersectsWhenProjected(_corners, frustumCorners, normal))
-							return false;
-						//else return true;
-					//}
+					if (!intersects(plane))
+						return false;
 				}
-				
-				if (!intersectsWhenProjected(_corners, frustumCorners, frustum.Near.Normal))
-					return false;
-				if (!intersectsWhenProjected(_corners, frustumCorners, frustum.Right.Normal))
-					return false;
-				if (!intersectsWhenProjected(_corners, frustumCorners, frustum.Left.Normal))
-					return false;
-				if (!intersectsWhenProjected(_corners, frustumCorners, frustum.Bottom.Normal))
-					return false;
-				if (!intersectsWhenProjected(_corners, frustumCorners, frustum.Top.Normal))
-					return false;
-
-				//if (!intersectsWhenProjected(_corners, frustumCorners, frustum.Top.Normal))
-					//return false;
-
-
 				return true;
 			}
-			return false;
+			else
+				return false;
+		}
+
+		bool intersects(Plane plane)
+		{
+			float d = Vector3.Dot(_center, plane.Normal) + plane.D;
+			float projLengthSum = 0;
+			foreach (var v in _spanVecs)
+			{
+				projLengthSum += Math.Abs(Vector3.Dot(v, plane.Normal));
+			}
+			return d < projLengthSum;
 		}
 
 		public void translate(Vector3 offset)
 		{
 			_aabb.Min += offset;
 			_aabb.Max += offset;
-			for (int i = 0; i < 8; i++)
-				_corners[i] += offset;
+			_center += offset;
 		}
-
-		// aCorn and bCorn are arrays containing all corners (vertices) of the two OBBs
-		static bool intersectsWhenProjected(Vector3[] aCorn, Vector3[] bCorn, Vector3 axis)
-		{
-
-			// Handles the cross product = {0,0,0} case
-			if (axis == Vector3.Zero)
-				return true;
-
-			float aMin = float.MaxValue;
-			float aMax = float.MinValue;
-			float bMin = float.MaxValue;
-			float bMax = float.MinValue;
-
-			// Define two intervals, a and b. Calculate their min and max values
-			for (int i = 0; i < 8; i++)
-			{
-				float aDist = Vector3.Dot(aCorn[i], axis);
-				aMin = (aDist < aMin) ? aDist : aMin;
-				aMax = (aDist > aMax) ? aDist : aMax;
-				float bDist = Vector3.Dot(bCorn[i], axis);
-				bMin = (bDist < bMin) ? bDist : bMin;
-				bMax = (bDist > bMax) ? bDist : bMax;
-			}
-
-			// One-dimensional intersection test between a and b
-			float longSpan = Math.Max(aMax, bMax) - Math.Min(aMin, bMin);
-			float sumSpan = aMax - aMin + bMax - bMin;
-			return longSpan <= sumSpan; // Change this to <= if you want the case were they are touching but not overlapping, to count as an intersection
-		}
-
 	}
 }
 	
