@@ -1957,6 +1957,7 @@ namespace Visual_Music
 				using (FileStream stream = File.Open(openCamFileDialog.FileName, FileMode.Open))
 				{
 					Camera cam = (Camera)dcs.ReadObject(stream);
+					cam.SongPanel = SongPanel;
 					resetCamera(cam);
 				}
 			}
