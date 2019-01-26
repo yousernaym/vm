@@ -456,16 +456,23 @@ namespace Visual_Music
 
 		float calcLinearLineAngle(int noteIndex, Curve curve)
 		{
-			Vector2 prevVec;
+			Vector2 prevVec = Vector2.UnitX;
 			if (noteIndex > 0)
+			{
 				prevVec = curve.Keys[noteIndex - 1].NextVector;
-			else
-				prevVec = new Vector2(1, 0);
+				if (prevVec == Vector2.Zero) //This and previous note has exadtly same position
+					prevVec = Vector2.UnitX;
+			}
+
 			prevVec.X = Project.getScreenPosX((int)prevVec.X);
 			prevVec.Y = prevVec.Y * Project.NoteHeight;
+
 			Vector2 nextVec = curve.Keys[noteIndex].NextVector;
+			if (nextVec == Vector2.Zero)
+				nextVec = Vector2.UnitX;
 			nextVec.X = Project.getScreenPosX((int)nextVec.X);
 			nextVec.Y = nextVec.Y * Project.NoteHeight;
+
 			nextVec.Normalize();
 			prevVec.Normalize();
 			float angle = Vector2.Dot(nextVec, prevVec);

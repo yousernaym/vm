@@ -574,7 +574,7 @@ namespace Visual_Music
 
 		public bool intersects(BoundingFrustum frustum)
 		{
-			//Simple aabb test
+			//A simple aabb test will discard most boxes
 			if (!frustum.Intersects(_aabb))
 				return false;
 				
