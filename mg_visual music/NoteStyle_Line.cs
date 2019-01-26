@@ -304,6 +304,8 @@ namespace Visual_Music
 			int hLineVertIndex = 0;
 			int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
 			float vpLineWidth = VpLineWidth;
+			Vector3 bboxStart = Vector3.Zero;
+
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				//Get current note
@@ -367,7 +369,6 @@ namespace Visual_Music
 					throw new OverflowException($"Too many vertices for note {n}, track {trackProps.TrackView.TrackNumber}.");
 				step = (endDraw - startDraw) / (iterations + 1);
 				
-				Vector3 bboxStart = new Vector3();
 				for (float x = startDraw; x <= endDraw+0.00001f; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
@@ -423,10 +424,10 @@ namespace Visual_Music
 
 					//Create bounding box (a maximum of 1000 boxes per screen width
 					//if ((x - startDraw) / Project.Camera.ViewportSize.X * 1000 > bboxCount)
-					if (x == startDraw)
-						bboxStart = lineVerts[vertIndex].center;
+					if (bboxStart == Vector3.Zero)
+						 bboxStart = lineVerts[vertIndex].center;
 					Vector3 bboxEnd = lineVerts[vertIndex].center;
-					if (x > startDraw)// || Vector3.DistanceSquared(bboxStart, bboxEnd) > Math.Pow(Project.Camera.ViewportSize.X / 1000, 2))
+					if (x > startDraw && Vector3.DistanceSquared(bboxStart, bboxEnd) > Math.Pow(Project.Camera.ViewportSize.X / 100, 2))
 					{
 						Vector3 bboxCenter = (bboxStart + bboxEnd) / 2;
 						geo.bboxes.Add(new BoundingBoxEx(bboxCenter, bboxEnd - bboxCenter, bboxEnd - lineVerts[vertIndex].pos,  new Vector3(0,0,0)));
