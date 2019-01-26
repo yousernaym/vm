@@ -93,7 +93,7 @@ namespace Visual_Music
 				//Create bounding boxes
 				Vector3 boxMin = new Vector3(noteStart.X, noteStart.Y -  halfNoteHeight, 0);
 				Vector3 boxMax = new Vector3(noteEnd.X, noteEnd.Y + halfNoteHeight, 0);
-				geo.bboxes.Add(new BoundingBoxEx(new Vector3[2] { boxMin, boxMax }));
+				geo.bboxes.Add(new BoundingBoxEx(boxMin, boxMax));
 
 				//Create inctance data
 				Vector2 topLeft_world = new Vector2(noteStart.X, noteStart.Y - halfNoteHeight);

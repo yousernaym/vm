@@ -522,10 +522,10 @@ namespace Visual_Music
 			normals.CopyTo(_normals, 0);
 		}
 
-		public BoundingBoxEx(IEnumerable<Vector3> points)
+		public BoundingBoxEx(Vector3 min, Vector3 max)
 		{
-			_aabb = BoundingBox.CreateFromPoints(points);
-		
+			_aabb = new BoundingBox(min, max);
+
 			_normals[0] = new Vector3(1, 0, 0); //Right
 			_normals[1] = new Vector3(0, 1, 0); //Up
 			_normals[2] = new Vector3(0, 0, 1); //Front
@@ -575,7 +575,7 @@ namespace Visual_Music
 		public bool intersects(BoundingFrustum frustum)
 		{
 			//Simple aabb test
-			if (frustum.Intersects(_aabb))
+			if (!frustum.Intersects(_aabb))
 				return false;
 				
 			//SAT test
@@ -595,15 +595,17 @@ namespace Visual_Music
 					return false;
 			}
 
-			//Create frustum plane edges
+			//Create the 6 frustum plane edges that has unique directions
 			var frustumEdges = new Vector3[6];
-			for (int i = 0; i < 4; i++)
+			//Create vectors from the four corners in the near plane to the corresponding corners in the far plane
+			for (int i = 0; i < 4; i++) 
 				frustumEdges[i] = frustumCorners[i] - frustumCorners[i + 4];
+			//Create the two edges of the near plane.
 			frustumEdges[4] = frustumCorners[0] - frustumCorners[1];
 			frustumEdges[5] = frustumCorners[0] - frustumCorners[3];
 
-			//Test cross(box_edges, frustum_plane_edges)
-			foreach (var boxEdge in _normals)
+			//Test the 18 cross products between the box edges and frustum edges
+			foreach (var boxEdge in _normals)  //Box normals are parallell to edges
 			{
 				foreach (var frustumEdge in frustumEdges)
 				{
@@ -638,7 +640,6 @@ namespace Visual_Music
 		// aCorn and bCorn are arrays containing all corners (vertices) of the two OBBs
 		static bool intersectsWhenProjected(Vector3[] aCorn, Vector3[] bCorn, Vector3 axis)
 		{
-
 			// Handles the cross product = {0,0,0} case
 			if (axis == Vector3.Zero)
 				return true;
@@ -664,8 +665,6 @@ namespace Visual_Music
 			float sumSpan = aMax - aMin + bMax - bMin;
 			return longSpan <= sumSpan; // Change this to <= if you want the case were they are touching but not overlapping, to count as an intersection
 		}
-
-	
 	}
 }
 	
