@@ -157,7 +157,7 @@ namespace Visual_Music
 		protected override void Draw()
 		{
 			GraphicsDevice.Clear(Color.Transparent);
-			if (selectingRegion)
+			if (selectingRegion && selectedScreenRegion.Width != 0 && selectedScreenRegion.Height != 0)
 			{
 				SpriteBatch.Begin();
 				Rectangle normRect = normalizeRect(selectedScreenRegion);
