@@ -129,7 +129,7 @@ namespace Visual_Music
 		{
 			foreach (var bbox in _geo.bboxes)
 			{
-				BoundingBoxEx bb = new BoundingBoxEx(bbox);
+				BoundingBoxEx bb = bbox.clone();
 				Vector3 posOffset = project.getSpatialNormPosOffset(trackProps);
 				posOffset.X -= songPos;
 				bb.translate(posOffset);

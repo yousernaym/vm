@@ -512,46 +512,73 @@ namespace Visual_Music
 
 	public class BoundingBoxEx
 	{
-		Vector3[] _normals;
-		Vector3[] _corners;
+		Vector3[] _normals = new Vector3[3];
+		Vector3[] _corners = new Vector3[8];
 		BoundingBox _aabb;
+
+		BoundingBoxEx(Vector3[] corners, Vector3[] normals)
+		{
+			corners.CopyTo(_corners, 0);
+			normals.CopyTo(_normals, 0);
+		}
+
+		public BoundingBoxEx(IEnumerable<Vector3> points)
+		{
+			_aabb = BoundingBox.CreateFromPoints(points);
 		
-		public BoundingBoxEx(BoundingBoxEx sourceBox) : this(sourceBox._aabb)
-		{
-			sourceBox._corners.CopyTo(_corners, 0);
-		}
-		public BoundingBoxEx(Vector3 min, Vector3 max) :  this(new BoundingBox(min, max))
-		{
-
-		}
-		public BoundingBoxEx(BoundingBox aabb)
-		{
-			_aabb = aabb;
-			_normals = new Vector3[3];
-			_corners = new Vector3[8];
-
 			_normals[0] = new Vector3(1, 0, 0); //Right
 			_normals[1] = new Vector3(0, 1, 0); //Up
 			_normals[2] = new Vector3(0, 0, 1); //Front
 
 			for (int i = 0; i < 4; i++)
-				_corners[i] = aabb.Min;
+				_corners[i] = _aabb.Min;
 
-			_corners[1].X = aabb.Max.X;
-			_corners[2].X = aabb.Max.X;
-			_corners[2].Y = aabb.Max.Y;
-			_corners[3].Y = aabb.Max.Y;
+			_corners[1].X = _aabb.Max.X;
+			_corners[2].X = _aabb.Max.X;
+			_corners[2].Y = _aabb.Max.Y;
+			_corners[3].Y = _aabb.Max.Y;
 			for (int i = 0; i < 4; i++)
 			{
 				_corners[i + 4] = _corners[i];
-				_corners[i + 4].Z = aabb.Max.Z;
+				_corners[i + 4].Z = _aabb.Max.Z;
 			}
+		}
+
+		public BoundingBoxEx(Vector3 origin, Vector3 spanX, Vector3 spanY, Vector3 spanZ)
+		{
+			_normals[0] = spanX; _normals[0].Normalize();
+			_normals[1] = spanY; _normals[1].Normalize();
+			if (Vector3.Zero == spanZ)
+				_normals[2] = Vector3.Cross(_normals[0], _normals[1]);
+			else
+				_normals[2] = spanZ;
+			_normals[2].Normalize();
+
+			_corners[0] = origin + spanX + spanY + spanZ;
+			_corners[1] = origin - spanX + spanY + spanZ;
+			_corners[2] = origin + spanX - spanY + spanZ;
+			_corners[3] = origin - spanX - spanY + spanZ;
+			_corners[4] = origin + spanX + spanY - spanZ;
+			_corners[5] = origin - spanX + spanY - spanZ;
+			_corners[6] = origin + spanX - spanY - spanZ;
+			_corners[7] = origin - spanX - spanY - spanZ;
+			_aabb = BoundingBox.CreateFromPoints(_corners);
+		}
+
+		public BoundingBoxEx clone()
+		{
+			var newBox = new BoundingBoxEx(_corners, _normals);
+			newBox._aabb = _aabb;
+			return newBox;
 		}
 
 		public bool intersects(BoundingFrustum frustum)
 		{
 			if (frustum.Intersects(_aabb)) //Coarse cull
 			{
+				//Do SAT test
+
+				//Test box normals
 				Vector3[] frustumCorners = frustum.GetCorners();
 				foreach (var normal in _normals)
 				{
@@ -559,6 +586,7 @@ namespace Visual_Music
 						return false;
 				}
 
+				//Test frustum plane normals
 				var frustumPlanes = frustum.GetPlanes();
 				for (int i = 1; i < 6; i++) //Skip near plane since it's parallell to far plane
 
@@ -567,12 +595,14 @@ namespace Visual_Music
 						return false;
 				}
 
+				//Create frustum plane edges
 				var frustumEdges = new Vector3[6];
 				for (int i = 0; i < 4; i++)
 					frustumEdges[i] = frustumCorners[i] - frustumCorners[i + 4];
 				frustumEdges[4] = frustumCorners[0] - frustumCorners[1];
 				frustumEdges[5] = frustumCorners[0] - frustumCorners[3];
 
+				//Test cross(box_edges, frustum_plane_edges)
 				foreach (var boxEdge in _normals)
 				{
 					foreach (var frustumEdge in frustumEdges)
@@ -638,6 +668,7 @@ namespace Visual_Music
 			return longSpan <= sumSpan; // Change this to <= if you want the case were they are touching but not overlapping, to count as an intersection
 		}
 
+	
 	}
 }
 	

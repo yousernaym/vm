@@ -366,6 +366,8 @@ namespace Visual_Music
 				if (iterations < 0)
 					throw new OverflowException($"Too many vertices for note {n}, track {trackProps.TrackView.TrackNumber}.");
 				step = (endDraw - startDraw) / (iterations + 1);
+				
+				Vector3 bboxStart = new Vector3();
 				for (float x = startDraw; x <= endDraw+0.00001f; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
@@ -419,11 +421,17 @@ namespace Visual_Music
 						lineVerts[vertIndex + 1].pos = lineVerts[vertIndex - 1].pos;
 					}
 
-					//Create bounding box
-					Vector3 bboxCorner1 = lineVerts[vertIndex].pos;
-					Vector3 bboxCorner2 = lineVerts[vertIndex + 1].pos;
-					bboxCorner1.Z = bboxCorner2.Z = 0;// fx.Parameters["PosOffset"].GetValueVector3().Z;
-					geo.bboxes.Add(new BoundingBoxEx(BoundingBox.CreateFromPoints(new Vector3[2] { bboxCorner1, bboxCorner2 })));
+					//Create bounding box (a maximum of 1000 boxes per screen width
+					//if ((x - startDraw) / Project.Camera.ViewportSize.X * 1000 > bboxCount)
+					if (x == startDraw)
+						bboxStart = lineVerts[vertIndex].center;
+					Vector3 bboxEnd = lineVerts[vertIndex].center;
+					if (x > startDraw)// || Vector3.DistanceSquared(bboxStart, bboxEnd) > Math.Pow(Project.Camera.ViewportSize.X / 1000, 2))
+					{
+						Vector3 bboxCenter = (bboxStart + bboxEnd) / 2;
+						geo.bboxes.Add(new BoundingBoxEx(bboxCenter, bboxEnd - bboxCenter, bboxEnd - lineVerts[vertIndex].pos,  new Vector3(0,0,0)));
+						bboxStart = bboxEnd;
+					}
 					
 					vertIndex += 2;
 
