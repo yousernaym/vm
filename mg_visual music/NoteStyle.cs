@@ -574,48 +574,45 @@ namespace Visual_Music
 
 		public bool intersects(BoundingFrustum frustum)
 		{
-			if (frustum.Intersects(_aabb)) //Coarse cull
-			{
-				//Do SAT test
-
-				//Test box normals
-				Vector3[] frustumCorners = frustum.GetCorners();
-				foreach (var normal in _normals)
-				{
-					if (!intersectsWhenProjected(_corners, frustumCorners, normal))
-						return false;
-				}
-
-				//Test frustum plane normals
-				var frustumPlanes = frustum.GetPlanes();
-				for (int i = 1; i < 6; i++) //Skip near plane since it's parallell to far plane
-
-				{
-					if (!intersectsWhenProjected(_corners, frustumCorners, frustumPlanes[i].Normal))
-						return false;
-				}
-
-				//Create frustum plane edges
-				var frustumEdges = new Vector3[6];
-				for (int i = 0; i < 4; i++)
-					frustumEdges[i] = frustumCorners[i] - frustumCorners[i + 4];
-				frustumEdges[4] = frustumCorners[0] - frustumCorners[1];
-				frustumEdges[5] = frustumCorners[0] - frustumCorners[3];
-
-				//Test cross(box_edges, frustum_plane_edges)
-				foreach (var boxEdge in _normals)
-				{
-					foreach (var frustumEdge in frustumEdges)
-					{
-						Vector3 cross = Vector3.Cross(boxEdge, frustumEdge);
-						if (!intersectsWhenProjected(_corners, frustumCorners, cross))
-							return false;
-					}
-				}
-				return true;
-			}
-			else
+			//Simple aabb test
+			if (frustum.Intersects(_aabb))
 				return false;
+				
+			//SAT test
+			//Test box normals
+			Vector3[] frustumCorners = frustum.GetCorners();
+			foreach (var normal in _normals)
+			{
+				if (!intersectsWhenProjected(_corners, frustumCorners, normal))
+					return false;
+			}
+
+			//Test frustum plane normals
+			var frustumPlanes = frustum.GetPlanes();
+			for (int i = 1; i < 6; i++) //Skip near plane since it's parallell to far plane
+			{
+				if (!intersectsWhenProjected(_corners, frustumCorners, frustumPlanes[i].Normal))
+					return false;
+			}
+
+			//Create frustum plane edges
+			var frustumEdges = new Vector3[6];
+			for (int i = 0; i < 4; i++)
+				frustumEdges[i] = frustumCorners[i] - frustumCorners[i + 4];
+			frustumEdges[4] = frustumCorners[0] - frustumCorners[1];
+			frustumEdges[5] = frustumCorners[0] - frustumCorners[3];
+
+			//Test cross(box_edges, frustum_plane_edges)
+			foreach (var boxEdge in _normals)
+			{
+				foreach (var frustumEdge in frustumEdges)
+				{
+					Vector3 cross = Vector3.Cross(boxEdge, frustumEdge);
+					if (!intersectsWhenProjected(_corners, frustumCorners, cross))
+						return false;
+				}
+			}
+			return true;
 		}
 
 		//bool intersects(Plane plane)

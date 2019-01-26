@@ -305,6 +305,7 @@ namespace Visual_Music
 			int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
 			float vpLineWidth = VpLineWidth;
 			Vector3 bboxStart = Vector3.Zero;
+			float bboxMinSqLength = (float)Math.Pow(Project.Camera.ViewportSize.X / 100, 2);
 
 			for (int n = 0; n < noteList.Count; n++)
 			{
@@ -427,7 +428,7 @@ namespace Visual_Music
 					if (bboxStart == Vector3.Zero)
 						 bboxStart = lineVerts[vertIndex].center;
 					Vector3 bboxEnd = lineVerts[vertIndex].center;
-					if (x > startDraw && Vector3.DistanceSquared(bboxStart, bboxEnd) > Math.Pow(Project.Camera.ViewportSize.X / 100, 2))
+					if (Vector3.DistanceSquared(bboxStart, bboxEnd) > bboxMinSqLength)
 					{
 						Vector3 bboxCenter = (bboxStart + bboxEnd) / 2;
 						geo.bboxes.Add(new BoundingBoxEx(bboxCenter, bboxEnd - bboxCenter, bboxEnd - lineVerts[vertIndex].pos,  new Vector3(0,0,0)));
