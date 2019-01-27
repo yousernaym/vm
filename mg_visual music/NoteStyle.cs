@@ -350,8 +350,10 @@ namespace Visual_Music
 			//Material
 			songPanel.GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
 			songPanel.GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
-			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true };
-			songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+//			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true,
+//																			CullMode = CullMode.None };
+			//songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+			//songPanel.GraphicsDevice.RasterizerState.MultiSampleAntiAlias = true;
 			Texture2D texture;
 			Vector4 color;
 			getMaterial(trackProps, false, out color, out texture);

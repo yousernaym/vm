@@ -570,7 +570,6 @@ namespace Visual_Music
 
 			fx.Parameters["LineType"].SetValue((int)LineType);
 			fx.Parameters["HlSize"].SetValue(VpHlSize / 2.0f);
-			songPanel.GraphicsDevice.BlendState = songPanel.BlendState;
 			float radius = (float)VpLineWidth / 2.0f;
 			fx.Parameters["Radius"].SetValue(radius);
 			fx.Parameters["InnerHlSize"].SetValue(0.0f);
@@ -710,7 +709,6 @@ namespace Visual_Music
 			{ 
 				setHlCirclePos(hlPos);
 			
-				songPanel.GraphicsDevice.BlendState = BlendState.AlphaBlend;
 				fx.CurrentTechnique = fx.Techniques["Circle"];
 				fx.CurrentTechnique.Passes[0].Apply();
 				songPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, lineHlVerts, 0, 2);

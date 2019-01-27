@@ -79,7 +79,6 @@ technique Line
 {
 	pass
 	{
-		CullMode = None;
      	VertexShader = compile vs_5_0 VS();
 		PixelShader  = compile ps_5_0 PS();
 	}   
@@ -188,7 +187,6 @@ technique Arrow
 {
     pass
     {
-        CullMode = None;
         VertexShader = compile vs_5_0 HlVS();
         PixelShader  = compile ps_5_0 ArrowPS();
     }
@@ -198,7 +196,6 @@ technique Circle
 {
 	pass
 	{
-		CullMode = None;
 		VertexShader = compile vs_5_0 HlVS();
 		PixelShader  = compile ps_5_0 CirclePS();
 	}

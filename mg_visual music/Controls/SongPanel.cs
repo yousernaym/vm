@@ -77,8 +77,9 @@ namespace Visual_Music
 		public float NormMouseY { get; set; }
 		public SpriteBatch SpriteBatch { get; private set; }
 
-		public BlendState BlendState { get; private set; }
-
+		BlendState blendState;
+		RasterizerState rastState;
+		
 		Point videoSize = new Point(1920, 1080);
 		public readonly float SmallScrollStep = 1.0f / 16;
 		public readonly float LargeScrollStep = 1.0f;
@@ -91,7 +92,12 @@ namespace Visual_Music
 		{
 			stopwatch.Start();
 			SpriteBatch = new SpriteBatch(GraphicsDevice);
-			BlendState = new BlendState();
+			blendState = BlendState.AlphaBlend;
+			rastState = new RasterizerState()
+			{
+				MultiSampleAntiAlias = true,
+				CullMode = CullMode.None
+			};
 
 			//BlendState.AlphaDestinationBlend = Blend.DestinationAlpha;
 			//BlendState.AlphaSourceBlend = Blend.InverseDestinationAlpha;
@@ -100,8 +106,8 @@ namespace Visual_Music
 			//BlendState.ColorWriteChannels = ColorWriteChannels.All;
 			//BlendState.AlphaBlendFunction = BlendFunction.Add;
 			//BlendState.ColorBlendFunction = BlendFunction.Add;
-
-			BlendState = BlendState.AlphaBlend;
+	
+			//BlendState = BlendState.AlphaBlend;
 			content = new ContentManager(Services, "Content");
 			NoteStyle.sInitAllStyles(this);
 
@@ -167,7 +173,8 @@ namespace Visual_Music
 				SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
 				SpriteBatch.End();
 			}
-			GraphicsDevice.BlendState = BlendState;
+			GraphicsDevice.BlendState = blendState;
+			GraphicsDevice.RasterizerState = rastState;
 			Project.drawSong(new Point(2, 1));
 		}
 
@@ -287,6 +294,7 @@ namespace Visual_Music
 					isRenderingVideo = true;
 					RenderTarget2D[] renderTarget2d = { new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents), new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents) };
 					RenderTarget2D renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					RenderTarget2D renderTarget2d8bitFinal = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 
 					uint[] frameData = new uint[videoFrameSize.X * videoFrameSize.Y];
@@ -377,6 +385,7 @@ namespace Visual_Music
 				if (i == frameSamples - 1)
 					rt = renderTarget2d8bit; //Last pass should draw to normal rendertarget iwth 8 bits per channel
 				drawVideoFrameSample(options, renderTargetCube, rt, tex, cubeToPlaneFx);
+
 				double sampleTime = 1.0 / frameSamples / fps;
 				Project.setSongPosS(songPosS + sampleTime, false);
 				songPosS += sampleTime;
