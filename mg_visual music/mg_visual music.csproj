@@ -315,6 +315,7 @@
     <Content Include="Content\Bar.fx" />
     <Content Include="Content\CubeToPlane.fx" />
     <Content Include="Content\Line.fx" />
+    <Content Include="Content\ss.fx" />
     <Content Include="Icon.ico" />
     <None Include="Resources\nav_left_green.png" />
     <None Include="Resources\nav_plain_green.png" />

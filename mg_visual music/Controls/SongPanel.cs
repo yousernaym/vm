@@ -292,9 +292,17 @@ namespace Visual_Music
 				else
 				{
 					isRenderingVideo = true;
-					RenderTarget2D[] renderTarget2d = { new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents), new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents) };
-					RenderTarget2D renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
-					RenderTarget2D renderTarget2d8bitFinal = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					bool superSampling = !options.Sphere;
+					//superSampling = false;
+					RenderTarget2D[] renderTarget2d32bit = { new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents), new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents) };
+					int ssResoX = options.Resolution.X * (superSampling ? 8 : 1);
+					int ssResoY = options.Resolution.Y * (superSampling ? 8 : 1);
+					RenderTarget2D renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, ssResoX, ssResoY, superSampling, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					RenderTarget2D renderTargetFinal;
+					if (superSampling)
+						renderTargetFinal = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					else
+						renderTargetFinal = renderTarget2d8bit;
 					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 
 					uint[] frameData = new uint[videoFrameSize.X * videoFrameSize.Y];
@@ -327,12 +335,21 @@ namespace Visual_Music
 					Project.Camera.InvertY = !options.Sphere;
 
 					Project.setSongPosS(0, false);
-
+					Effect ssFx = Content.Load<Effect>("ss");
 					while (Project.NormSongPos < 1 && !progressForm.Cancel)
 					{
-						drawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d, renderTarget2d8bit, cubeToPlaneFx);
+						drawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d32bit, renderTarget2d8bit, cubeToPlaneFx);
+						if (superSampling)
+						{
+							GraphicsDevice.SetRenderTarget(renderTargetFinal);
+							GraphicsDevice.Clear(Color.Transparent);
+							ssFx.Parameters["FrameTex"].SetValue(renderTarget2d8bit);
+							ssFx.CurrentTechnique.Passes[0].Apply();
+
+							quad.draw();
+						}
 						GraphicsDevice.SetRenderTarget(null);
-						renderTarget2d8bit.GetData<uint>(frameData);
+						renderTargetFinal.GetData<uint>(frameData);
 												
 						bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, Project.AudioOffset + Project.PlaybackOffsetS);
 						if (!b)
