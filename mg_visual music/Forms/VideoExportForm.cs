@@ -25,14 +25,14 @@ namespace Visual_Music
 			updateResoItems();
 		}
 
-		private void resoCb_TextChanged(object sender, EventArgs e)
+		private void resoComboBox_TextChanged(object sender, EventArgs e)
 		{
-			parseReso();
+			parseReso(resoComboBox);
 		}
 
 		private void VideoExportForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (!parseReso() && DialogResult == DialogResult.OK)
+			if (!parseReso(resoComboBox) && DialogResult == DialogResult.OK)
 			{
 				e.Cancel = Visible = true;
 				MessageBox.Show(null, "Invalid resolution.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -47,6 +47,7 @@ namespace Visual_Music
 
 		void updateResoItems()
 		{
+			//Video reso
 			resoComboBox.Items.Clear();
 			if (Options.Sphere)
 			{
@@ -64,11 +65,11 @@ namespace Visual_Music
 			resoComboBox.SelectedIndex = 0;
 		}
 
-		bool parseReso()
+		bool parseReso(ComboBox resoBox)
 		{
-			resoComboBox.ForeColor = System.Drawing.Color.Red;
+			resoBox.ForeColor = System.Drawing.Color.Red;
 
-			string[] xy = resoComboBox.Text.Split('x', 'X');
+			string[] xy = resoBox.Text.Split('x', 'X');
 			if (xy.Length != 2)
 				return false;
 
@@ -85,7 +86,7 @@ namespace Visual_Music
 			if (Options.Width <= 0 || Options.Height <= 0)
 				return false;
 
-			resoComboBox.ForeColor = System.Drawing.Color.Black;
+			resoBox.ForeColor = System.Drawing.Color.Black;
 			return true;
 		}
 
@@ -93,14 +94,40 @@ namespace Visual_Music
 		{
 			Options.VrMetadata = vrMetadataCb.Checked;
 		}
+
+		private void ssResoComboBox_TextChanged(object sender, EventArgs e)
+		{
+			char lastChar = ssResoComboBox.Text[ssResoComboBox.Text.Length - 1];
+			if (lastChar == 'x' || lastChar == 'X')
+			{
+
+				string numberString = ssResoComboBox.Text.Substring(0, ssResoComboBox.Text.Length - 1);
+				int multiplier = int.Parse(numberString);
+				Options.SSAAWidth = Options.Width * multiplier;
+				Options.SSAAHeight = Options.Height * multiplier;
+				if (Options.SSAAWidth > 16384 || Options.SSAAHeight > 16384)
+				{
+					Options.SSAAWidth /= 2;
+					Options.SSAAHeight /= 2;
+				}
+				Options.EnableSSAA = true;
+			}
+			else
+			{
+				Options.EnableSSAA = false;
+				Options.SSAAWidth = Options.Width;
+				Options.SSAAHeight = Options.Height;
+			}
+		}
 	}
 
 	public class VideoExportOptions
 	{
 		public int Width;
 		public int Height;
-		public int SuperSamplingWidth; 
-		public int SuperSamplingHeight;
+		public int SSAAWidth; 
+		public int SSAAHeight;
+		public bool EnableSSAA;
 		public bool Sphere;
 		public bool Stereo;
 		public bool VrMetadata;

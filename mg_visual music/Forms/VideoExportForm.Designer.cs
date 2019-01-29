@@ -33,17 +33,19 @@
 			this.vrMetadataCb = new System.Windows.Forms.CheckBox();
 			this.resoComboBox = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.ssResoComboBox = new System.Windows.Forms.ComboBox();
+			this.label2 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// okBtn
 			// 
-			this.okBtn.Location = new System.Drawing.Point(116, 112);
-			this.okBtn.TabIndex = 50;
+			this.okBtn.Location = new System.Drawing.Point(87, 137);
+			this.okBtn.TabIndex = 60;
 			// 
 			// cancelBtn
 			// 
-			this.cancelBtn.Location = new System.Drawing.Point(197, 112);
-			this.cancelBtn.TabIndex = 60;
+			this.cancelBtn.Location = new System.Drawing.Point(168, 137);
+			this.cancelBtn.TabIndex = 70;
 			// 
 			// sphereCb
 			// 
@@ -79,14 +81,14 @@
 			this.vrMetadataCb.UseVisualStyleBackColor = true;
 			this.vrMetadataCb.CheckedChanged += new System.EventHandler(this.vrMetadataCb_CheckedChanged);
 			// 
-			// resoCb
+			// resoComboBox
 			// 
 			this.resoComboBox.FormattingEnabled = true;
 			this.resoComboBox.Location = new System.Drawing.Point(75, 65);
-			this.resoComboBox.Name = "resoCb";
+			this.resoComboBox.Name = "resoComboBox";
 			this.resoComboBox.Size = new System.Drawing.Size(121, 21);
-			this.resoComboBox.TabIndex = 61;
-			this.resoComboBox.TextChanged += new System.EventHandler(this.resoCb_TextChanged);
+			this.resoComboBox.TabIndex = 40;
+			this.resoComboBox.TextChanged += new System.EventHandler(this.resoComboBox_TextChanged);
 			// 
 			// label1
 			// 
@@ -97,10 +99,36 @@
 			this.label1.TabIndex = 62;
 			this.label1.Text = "Resolution";
 			// 
+			// ssResoComboBox
+			// 
+			this.ssResoComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.ssResoComboBox.FormattingEnabled = true;
+			this.ssResoComboBox.Items.AddRange(new object[] {
+            "8x",
+            "4x",
+            "2x",
+            "Disabled"});
+			this.ssResoComboBox.Location = new System.Drawing.Point(74, 92);
+			this.ssResoComboBox.Name = "ssResoComboBox";
+			this.ssResoComboBox.Size = new System.Drawing.Size(60, 21);
+			this.ssResoComboBox.TabIndex = 50;
+			this.ssResoComboBox.TextChanged += new System.EventHandler(this.ssResoComboBox_TextChanged);
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(33, 95);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(35, 13);
+			this.label2.TabIndex = 62;
+			this.label2.Text = "SSAA";
+			// 
 			// VideoExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(284, 147);
+			this.ClientSize = new System.Drawing.Size(255, 172);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.ssResoComboBox);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.resoComboBox);
 			this.Controls.Add(this.vrMetadataCb);
@@ -115,6 +143,8 @@
 			this.Controls.SetChildIndex(this.vrMetadataCb, 0);
 			this.Controls.SetChildIndex(this.resoComboBox, 0);
 			this.Controls.SetChildIndex(this.label1, 0);
+			this.Controls.SetChildIndex(this.ssResoComboBox, 0);
+			this.Controls.SetChildIndex(this.label2, 0);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -126,5 +156,7 @@
 		public System.Windows.Forms.CheckBox vrMetadataCb;
 		private System.Windows.Forms.ComboBox resoComboBox;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.ComboBox ssResoComboBox;
+		private System.Windows.Forms.Label label2;
 	}
 }

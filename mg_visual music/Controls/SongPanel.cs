@@ -290,17 +290,27 @@ namespace Visual_Music
 				else
 				{
 					isRenderingVideo = true;
-					bool superSampling = !options.Sphere;
-					//superSampling = false;
-					
-					RenderTarget2D[] renderTarget2d32bit = { new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents), new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents) };
-					int ssResoX = options.Width * (superSampling ? 4 : 1);
-					int ssResoY = options.Height * (superSampling ? 4 : 1);
-					RenderTarget2D renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, ssResoX, ssResoY, superSampling, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					RenderTarget2D[] renderTarget2d32bit = new RenderTarget2D[2];
+					RenderTargetCube renderTargetCube = null;
+					RenderTarget2D renderTarget2d8bit;
 					RenderTarget2D renderTargetFinal;
+					Effect cubeToPlaneFx = null;
+					int frameSamples = 1;
 					try
 					{
-						if (superSampling)
+						if (options.Sphere)
+						{
+							renderTarget2d32bit[0] = new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+							renderTarget2d32bit[1] = new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+							renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+							cubeToPlaneFx = Content.Load<Effect>("CubeToPlane");
+							cubeToPlaneFx.Parameters["CubeMap"].SetValue(renderTargetCube);
+							cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
+						}
+
+						renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, options.SSAAWidth, options.SSAAHeight, options.EnableSSAA, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+
+						if (options.EnableSSAA)
 							renderTargetFinal = new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 						else
 							renderTargetFinal = renderTarget2d8bit;
@@ -312,15 +322,7 @@ namespace Visual_Music
 						return;
 					}
 
-					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 					uint[] frameData = new uint[options.Width * options.Height];
-					//uint[][] cubeMapData = new uint[6][];
-					//for (int i = 0; i < 6; i++)
-					//cubeMapData[i] = new uint[CmFaceSide * CmFaceSide];
-
-					Effect cubeToPlaneFx = Content.Load<Effect>("CubeToPlane");
-					cubeToPlaneFx.Parameters["CubeMap"].SetValue(renderTargetCube);
-
 					UInt64 frameDuration = 0;
 					UInt64 frameStart = 0;
 					int frames = 0;
@@ -338,8 +340,6 @@ namespace Visual_Music
 						//Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
 						//Project.createOcTrees();
 					}
-					const int frameSamples = 1;
-					cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
 					Project.Camera.InvertY = !options.Sphere;
 
 					Project.setSongPosS(0, false);
@@ -347,13 +347,12 @@ namespace Visual_Music
 					while (Project.NormSongPos < 1 && !progressForm.Cancel)
 					{
 						drawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d32bit, renderTarget2d8bit, cubeToPlaneFx);
-						if (superSampling)
+						if (options.EnableSSAA)
 						{
 							GraphicsDevice.SetRenderTarget(renderTargetFinal);
 							GraphicsDevice.Clear(Color.Transparent);
 							ssFx.Parameters["FrameTex"].SetValue(renderTarget2d8bit);
 							ssFx.CurrentTechnique.Passes[0].Apply();
-
 							quad.draw();
 						}
 						GraphicsDevice.SetRenderTarget(null);
