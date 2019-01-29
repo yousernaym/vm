@@ -407,7 +407,7 @@ namespace Visual_Music
 
 			if (vidExpForm.ShowDialog() != DialogResult.OK)
 				return;
-			using (RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, vidExpForm))
+			using (RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, vidExpForm.Options))
 				renderProgressForm.ShowDialog();
 
 		}

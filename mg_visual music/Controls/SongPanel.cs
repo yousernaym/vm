@@ -175,7 +175,7 @@ namespace Visual_Music
 			}
 			GraphicsDevice.BlendState = blendState;
 			GraphicsDevice.RasterizerState = rastState;
-			Project.drawSong(new Point(2, 1));
+			Project.drawSong();
 		}
 
 		void selectRegion()
@@ -272,17 +272,15 @@ namespace Visual_Music
 			}
 		}
 
-		public void renderVideo(string videoFilePath, RenderProgressForm progressForm, VideoExportForm options)
+		public void renderVideo(string videoFilePath, RenderProgressForm progressForm, VideoExportOptions options)
 		{
 			lock (renderLock)
 			{
-				Point videoFrameSize = options.Resolution;
-				VideoFormat videoFormat = new VideoFormat((uint)videoFrameSize.X, (uint)videoFrameSize.Y);
+				VideoFormat videoFormat = new VideoFormat((uint)options.Width, (uint)options.Height);
 				//videoFormat.bitRate = 160000000;
 				videoFormat.fps = 30;
 				videoFormat.aspectNumerator = 1;
 				videoFormat.audioSampleRate = 44100;
-				//Media.closeAudioFile();
 				if (!Media.beginVideoEnc(videoFilePath, videoFormat, true))
 				{
 					lock (progressForm.cancelLock)
@@ -294,18 +292,28 @@ namespace Visual_Music
 					isRenderingVideo = true;
 					bool superSampling = !options.Sphere;
 					//superSampling = false;
-					RenderTarget2D[] renderTarget2d32bit = { new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents), new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents) };
-					int ssResoX = options.Resolution.X * (superSampling ? 8 : 1);
-					int ssResoY = options.Resolution.Y * (superSampling ? 8 : 1);
+					
+					RenderTarget2D[] renderTarget2d32bit = { new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents), new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents) };
+					int ssResoX = options.Width * (superSampling ? 4 : 1);
+					int ssResoY = options.Height * (superSampling ? 4 : 1);
 					RenderTarget2D renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, ssResoX, ssResoY, superSampling, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 					RenderTarget2D renderTargetFinal;
-					if (superSampling)
-						renderTargetFinal = new RenderTarget2D(GraphicsDevice, videoFrameSize.X, videoFrameSize.Y, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
-					else
-						renderTargetFinal = renderTarget2d8bit;
-					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					try
+					{
+						if (superSampling)
+							renderTargetFinal = new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+						else
+							renderTargetFinal = renderTarget2d8bit;
+					}
+					catch (Exception e)
+					{
+						lock (progressForm.cancelLock)
+							progressForm.Cancel = true;
+						return;
+					}
 
-					uint[] frameData = new uint[videoFrameSize.X * videoFrameSize.Y];
+					RenderTargetCube renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+					uint[] frameData = new uint[options.Width * options.Height];
 					//uint[][] cubeMapData = new uint[6][];
 					//for (int i = 0; i < 6; i++)
 					//cubeMapData[i] = new uint[CmFaceSide * CmFaceSide];
@@ -388,7 +396,7 @@ namespace Visual_Music
 			}
 		}
 
-		void drawVideoFrame(double songPosS, uint fps, int frameSamples, VideoExportForm options, RenderTargetCube renderTargetCube, RenderTarget2D[] renderTarget2d, RenderTarget2D renderTarget2d8bit, Effect cubeToPlaneFx)
+		void drawVideoFrame(double songPosS, uint fps, int frameSamples, VideoExportOptions options, RenderTargetCube renderTargetCube, RenderTarget2D[] renderTarget2d, RenderTarget2D renderTarget2d8bit, Effect cubeToPlaneFx)
 		{
 			RenderTarget2D rt = null;
 			if (!options.Sphere)
@@ -410,7 +418,7 @@ namespace Visual_Music
 		}
 
 		delegate void DrawSceneToVideoFrameFunc();
-		void drawVideoFrameSample(VideoExportForm options, RenderTargetCube renderTargetCube, RenderTarget2D renderTarget2d, Texture2D prevFrame, Effect cubeToPlaneFx)
+		void drawVideoFrameSample(VideoExportOptions options, RenderTargetCube renderTargetCube, RenderTarget2D renderTarget2d, Texture2D prevFrame, Effect cubeToPlaneFx)
 		{
 			GraphicsDevice.SetRenderTarget(renderTarget2d);
 			GraphicsDevice.Clear(Color.Transparent);
@@ -434,12 +442,12 @@ namespace Visual_Music
 					GraphicsDevice.Viewport = new Viewport(0, 0, viewport.Width / 2, viewport.Height);
 
 				}
-				Project.drawSong(options.Resolution);
+				Project.drawSong();
 				if (options.Stereo)
 				{
 					Project.Camera.Eye = 1;
 					GraphicsDevice.Viewport = new Viewport(viewport.Width / 2, 0, viewport.Width / 2, viewport.Height);
-					Project.drawSong(options.Resolution);
+					Project.drawSong();
 				}
 			}
 		}
@@ -454,7 +462,7 @@ namespace Visual_Music
 				Project.Camera.CubeMapFace = i;
 				GraphicsDevice.Clear(Color.Transparent);
 				//GraphicsDevice.Clear(new Color((uint)i * 1000));
-				Project.drawSong(new Point(CmFaceSide, CmFaceSide));
+				Project.drawSong();
 			}
 			Project.Camera.Eye = 0;
 			cubeToPlaneFx.Parameters["PrevFrame"].SetValue(prevFrame);

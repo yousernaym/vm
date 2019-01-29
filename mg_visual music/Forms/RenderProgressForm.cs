@@ -10,7 +10,7 @@ namespace Visual_Music
 {
 	public partial class RenderProgressForm : ProgressForm
 	{
-		delegate void Delegate_renderVideo(string file, RenderProgressForm progressForm, VideoExportForm options);
+		delegate void Delegate_renderVideo(string file, RenderProgressForm progressForm, VideoExportOptions options);
 		delegate void Delegate_updateProgress(double progress);
 		delegate void Delegate_void_noparams();
 		delegate void Delegate_void_string(string str);
@@ -31,7 +31,7 @@ namespace Visual_Music
 		{
 			InitializeComponent();
 		}
-		public RenderProgressForm(SongPanel _songPanel, string file, VideoExportForm options)
+		public RenderProgressForm(SongPanel _songPanel, string file, VideoExportOptions options)
 		{
 			InitializeComponent();
 			songPanel = _songPanel;

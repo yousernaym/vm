@@ -31,7 +31,7 @@
 			this.sphereCb = new System.Windows.Forms.CheckBox();
 			this.StereoscopicCb = new System.Windows.Forms.CheckBox();
 			this.vrMetadataCb = new System.Windows.Forms.CheckBox();
-			this.resoCb = new System.Windows.Forms.ComboBox();
+			this.resoComboBox = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
@@ -77,15 +77,16 @@
 			this.vrMetadataCb.TabIndex = 20;
 			this.vrMetadataCb.Text = "Inject metadata";
 			this.vrMetadataCb.UseVisualStyleBackColor = true;
+			this.vrMetadataCb.CheckedChanged += new System.EventHandler(this.vrMetadataCb_CheckedChanged);
 			// 
 			// resoCb
 			// 
-			this.resoCb.FormattingEnabled = true;
-			this.resoCb.Location = new System.Drawing.Point(75, 65);
-			this.resoCb.Name = "resoCb";
-			this.resoCb.Size = new System.Drawing.Size(121, 21);
-			this.resoCb.TabIndex = 61;
-			this.resoCb.TextChanged += new System.EventHandler(this.resoCb_TextChanged);
+			this.resoComboBox.FormattingEnabled = true;
+			this.resoComboBox.Location = new System.Drawing.Point(75, 65);
+			this.resoComboBox.Name = "resoCb";
+			this.resoComboBox.Size = new System.Drawing.Size(121, 21);
+			this.resoComboBox.TabIndex = 61;
+			this.resoComboBox.TextChanged += new System.EventHandler(this.resoCb_TextChanged);
 			// 
 			// label1
 			// 
@@ -101,7 +102,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.ClientSize = new System.Drawing.Size(284, 147);
 			this.Controls.Add(this.label1);
-			this.Controls.Add(this.resoCb);
+			this.Controls.Add(this.resoComboBox);
 			this.Controls.Add(this.vrMetadataCb);
 			this.Controls.Add(this.StereoscopicCb);
 			this.Controls.Add(this.sphereCb);
@@ -112,7 +113,7 @@
 			this.Controls.SetChildIndex(this.sphereCb, 0);
 			this.Controls.SetChildIndex(this.StereoscopicCb, 0);
 			this.Controls.SetChildIndex(this.vrMetadataCb, 0);
-			this.Controls.SetChildIndex(this.resoCb, 0);
+			this.Controls.SetChildIndex(this.resoComboBox, 0);
 			this.Controls.SetChildIndex(this.label1, 0);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -123,7 +124,7 @@
 		public System.Windows.Forms.CheckBox StereoscopicCb;
 		private System.Windows.Forms.CheckBox sphereCb;
 		public System.Windows.Forms.CheckBox vrMetadataCb;
-		private System.Windows.Forms.ComboBox resoCb;
+		private System.Windows.Forms.ComboBox resoComboBox;
 		private System.Windows.Forms.Label label1;
 	}
 }

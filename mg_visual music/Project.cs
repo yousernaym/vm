@@ -470,7 +470,7 @@ namespace Visual_Music
 				TrackViews[i].createOcTree(this, GlobalTrackProps);
 		}
 
-		public void drawSong(Point viewportSize)
+		public void drawSong()
 		{
 			if (notes == null || trackViews == null)
 				return;
