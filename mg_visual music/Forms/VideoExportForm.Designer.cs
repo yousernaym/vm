@@ -86,7 +86,7 @@
 			this.resoComboBox.FormattingEnabled = true;
 			this.resoComboBox.Location = new System.Drawing.Point(75, 65);
 			this.resoComboBox.Name = "resoComboBox";
-			this.resoComboBox.Size = new System.Drawing.Size(121, 21);
+			this.resoComboBox.Size = new System.Drawing.Size(101, 21);
 			this.resoComboBox.TabIndex = 40;
 			this.resoComboBox.TextChanged += new System.EventHandler(this.resoComboBox_TextChanged);
 			// 
@@ -110,7 +110,7 @@
             "Disabled"});
 			this.ssResoComboBox.Location = new System.Drawing.Point(74, 92);
 			this.ssResoComboBox.Name = "ssResoComboBox";
-			this.ssResoComboBox.Size = new System.Drawing.Size(60, 21);
+			this.ssResoComboBox.Size = new System.Drawing.Size(102, 21);
 			this.ssResoComboBox.TabIndex = 50;
 			this.ssResoComboBox.TextChanged += new System.EventHandler(this.ssResoComboBox_TextChanged);
 			// 

@@ -15,6 +15,7 @@ namespace Visual_Music
 		public VideoExportForm()
 		{
 			InitializeComponent();
+			ssResoComboBox.SelectedIndex = 0;
 			updateResoItems();
 		}
 
@@ -87,6 +88,7 @@ namespace Visual_Music
 				return false;
 
 			resoBox.ForeColor = System.Drawing.Color.Black;
+			updateSsReso();
 			return true;
 		}
 
@@ -97,6 +99,11 @@ namespace Visual_Music
 
 		private void ssResoComboBox_TextChanged(object sender, EventArgs e)
 		{
+			updateSsReso();
+		}
+
+		void updateSsReso()
+		{
 			char lastChar = ssResoComboBox.Text[ssResoComboBox.Text.Length - 1];
 			if (lastChar == 'x' || lastChar == 'X')
 			{
@@ -105,7 +112,7 @@ namespace Visual_Music
 				int multiplier = int.Parse(numberString);
 				Options.SSAAWidth = Options.Width * multiplier;
 				Options.SSAAHeight = Options.Height * multiplier;
-				if (Options.SSAAWidth > 16384 || Options.SSAAHeight > 16384)
+				while (Options.SSAAWidth > 16384 || Options.SSAAHeight > 16384)
 				{
 					Options.SSAAWidth /= 2;
 					Options.SSAAHeight /= 2;

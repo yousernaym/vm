@@ -292,17 +292,23 @@ namespace Visual_Music
 					isRenderingVideo = true;
 					RenderTarget2D[] renderTarget2d32bit = new RenderTarget2D[2];
 					RenderTargetCube renderTargetCube = null;
-					RenderTarget2D renderTarget2d8bit;
-					RenderTarget2D renderTargetFinal;
+					RenderTarget2D renderTarget2d8bit = null;
+					RenderTarget2D renderTargetFinal = null;
 					Effect cubeToPlaneFx = null;
+					Effect ssFx = null;
 					int frameSamples = 1;
+
+					double normSongPosBackup = Project.NormSongPos;
+					float viewWidthQnBackup = Project.ViewWidthQn;
+					int maxPitchBackup = Project.MaxPitch;
+					int minPitchBackup = Project.MinPitch;
 					try
 					{
 						if (options.Sphere)
 						{
-							renderTarget2d32bit[0] = new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
-							renderTarget2d32bit[1] = new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
-							renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+							for (int i = 0; i < 2; i++)
+								renderTarget2d32bit[i] = new RenderTarget2D(GraphicsDevice, options.SSAAWidth, options.SSAAHeight, options.EnableSSAA, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+							renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.DiscardContents);
 							cubeToPlaneFx = Content.Load<Effect>("CubeToPlane");
 							cubeToPlaneFx.Parameters["CubeMap"].SetValue(renderTargetCube);
 							cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
@@ -314,6 +320,55 @@ namespace Visual_Music
 							renderTargetFinal = new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 						else
 							renderTargetFinal = renderTarget2d8bit;
+
+						uint[] frameData = new uint[options.Width * options.Height];
+						
+						UInt64 frameDuration = 0;
+						UInt64 frameStart = 0;
+						int frames = 0;
+						double songPosS = 0;
+						
+						if (options.Sphere)
+						{
+							//Project.ViewWidthQn /= 3;
+							//int pitchChange = (int)((Project.MaxPitch - Project.MinPitch) / 5.0f);
+							//Project.MaxPitch -= (int)(pitchChange / 1.3f);
+							//Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
+							//Project.createOcTrees();
+						}
+						Project.Camera.InvertY = !options.Sphere;
+
+						Project.setSongPosS(0, false);
+						ssFx = Content.Load<Effect>("ss");
+						while (Project.NormSongPos < 1 && !progressForm.Cancel)
+						{
+							drawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d32bit, renderTarget2d8bit, cubeToPlaneFx);
+							if (options.EnableSSAA)
+							{
+								GraphicsDevice.SetRenderTarget(renderTargetFinal);
+								GraphicsDevice.Clear(Color.Transparent);
+								ssFx.Parameters["FrameTex"].SetValue(renderTarget2d8bit);
+								ssFx.CurrentTechnique.Passes[0].Apply();
+								quad.draw();
+							}
+							GraphicsDevice.SetRenderTarget(null);
+							renderTargetFinal.GetData<uint>(frameData);
+
+							bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, Project.AudioOffset + Project.PlaybackOffsetS);
+							if (!b)
+							{
+								lock (progressForm.cancelLock)
+									progressForm.Cancel = true;
+								progressForm.showMessage("Couldn't add frame");
+								break;
+							}
+							frameStart += frameDuration;
+							double frameTimeS = 1.0 / videoFormat.fps;
+							Project.setSongPosS(songPosS + frameTimeS, false);
+							songPosS += frameTimeS;
+							progressForm.updateProgress(Project.NormSongPos);
+							frames++;
+						}
 					}
 					catch (Exception e)
 					{
@@ -321,64 +376,22 @@ namespace Visual_Music
 							progressForm.Cancel = true;
 						return;
 					}
-
-					uint[] frameData = new uint[options.Width * options.Height];
-					UInt64 frameDuration = 0;
-					UInt64 frameStart = 0;
-					int frames = 0;
-					double songPosS = 0;
-					double normSongPosBackup = Project.NormSongPos;
-
-					float viewWidthQnBackup = Project.ViewWidthQn;
-					int maxPitchBackup = Project.MaxPitch;
-					int minPitchBackup = Project.MinPitch;
-					if (options.Sphere)
+					finally
 					{
-						//Project.ViewWidthQn /= 3;
-						//int pitchChange = (int)((Project.MaxPitch - Project.MinPitch) / 5.0f);
-						//Project.MaxPitch -= (int)(pitchChange / 1.3f);
-						//Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
-						//Project.createOcTrees();
-					}
-					Project.Camera.InvertY = !options.Sphere;
-
-					Project.setSongPosS(0, false);
-					Effect ssFx = Content.Load<Effect>("ss");
-					while (Project.NormSongPos < 1 && !progressForm.Cancel)
-					{
-						drawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d32bit, renderTarget2d8bit, cubeToPlaneFx);
+						Project.NormSongPos = normSongPosBackup;
+						Project.ViewWidthQn = viewWidthQnBackup;
+						Project.MaxPitch = maxPitchBackup;
+						Project.MinPitch = minPitchBackup;
+						Project.createOcTrees();
+						endVideoRender();
+						
+						renderTargetCube?.Dispose();
+						for (int i = 0; i < 2; i++)
+							renderTarget2d32bit[i]?.Dispose();
+						renderTarget2d8bit?.Dispose();
 						if (options.EnableSSAA)
-						{
-							GraphicsDevice.SetRenderTarget(renderTargetFinal);
-							GraphicsDevice.Clear(Color.Transparent);
-							ssFx.Parameters["FrameTex"].SetValue(renderTarget2d8bit);
-							ssFx.CurrentTechnique.Passes[0].Apply();
-							quad.draw();
-						}
-						GraphicsDevice.SetRenderTarget(null);
-						renderTargetFinal.GetData<uint>(frameData);
-												
-						bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, Project.AudioOffset + Project.PlaybackOffsetS);
-						if (!b)
-						{
-							lock (progressForm.cancelLock)
-								progressForm.Cancel = true;
-							progressForm.showMessage("Couldn't add frame");
-							break;
-						}
-						frameStart += frameDuration;
-						double frameTimeS = 1.0 / videoFormat.fps;
-						Project.setSongPosS(songPosS + frameTimeS, false);
-						songPosS += frameTimeS;
-						progressForm.updateProgress(Project.NormSongPos);
-						frames++;
+							renderTargetFinal?.Dispose();
 					}
-					Project.NormSongPos = normSongPosBackup;
-					Project.ViewWidthQn = viewWidthQnBackup;
-					Project.MaxPitch = maxPitchBackup;
-					Project.MinPitch = minPitchBackup;
-					Project.createOcTrees();
-					endVideoRender();
 					if (options.VrMetadata)
 					{
 						Process injector = new Process();
@@ -402,7 +415,7 @@ namespace Visual_Music
 				frameSamples = 1;
 			for (int i = 0; i < frameSamples; i++)
 			{
-				rt = renderTarget2d[i % 2];
+				//rt = renderTarget2d[i % 2];
 				RenderTarget2D tex = null;
 				if (i > 0)
 					tex = renderTarget2d[(i + 1) % 2]; //Only blend with output of previous pass if not first pass
@@ -421,7 +434,6 @@ namespace Visual_Music
 		{
 			GraphicsDevice.SetRenderTarget(renderTarget2d);
 			GraphicsDevice.Clear(Color.Transparent);
-			
 			if (options.Sphere)
 			{
 				if (options.Stereo)
