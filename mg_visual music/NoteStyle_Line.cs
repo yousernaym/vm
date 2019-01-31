@@ -305,7 +305,7 @@ namespace Visual_Music
 			int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
 			float vpLineWidth = VpLineWidth;
 			Vector3 bboxStart = Vector3.Zero;
-			float bboxMinSqLength = (float)Math.Pow(Project.Camera.ViewportSize.X / 100, 2);
+			float bboxMinSqLength = (float)Math.Pow(Project.Camera.ViewportSize.X / 1000, 2);
 
 			for (int n = 0; n < noteList.Count; n++)
 			{
