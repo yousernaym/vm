@@ -104,10 +104,10 @@
 			this.ssResoComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ssResoComboBox.FormattingEnabled = true;
 			this.ssResoComboBox.Items.AddRange(new object[] {
-            "8x",
-            "4x",
+            "Disabled",
             "2x",
-            "Disabled"});
+            "4x",
+            "8x"});
 			this.ssResoComboBox.Location = new System.Drawing.Point(74, 92);
 			this.ssResoComboBox.Name = "ssResoComboBox";
 			this.ssResoComboBox.Size = new System.Drawing.Size(102, 21);
@@ -154,9 +154,9 @@
 		public System.Windows.Forms.CheckBox StereoscopicCb;
 		private System.Windows.Forms.CheckBox sphereCb;
 		public System.Windows.Forms.CheckBox vrMetadataCb;
-		private System.Windows.Forms.ComboBox resoComboBox;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.ComboBox ssResoComboBox;
 		private System.Windows.Forms.Label label2;
+		public System.Windows.Forms.ComboBox resoComboBox;
+		public System.Windows.Forms.ComboBox ssResoComboBox;
 	}
 }

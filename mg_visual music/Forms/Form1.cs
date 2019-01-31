@@ -74,8 +74,8 @@ namespace Visual_Music
 		public static ImportModForm ImportModForm;
 		public static ImportSidForm ImportSidForm;
 		static TpartyIntegrationForm tpartyIntegrationForm;
-		static public TpartyIntegrationForm TpartyIntegrationForm => tpartyIntegrationForm;
-		VideoExportForm vidExpForm;
+		public static TpartyIntegrationForm TpartyIntegrationForm => tpartyIntegrationForm;
+		public static VideoExportForm VidExpForm;
 
 		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor) };
 		SongPanel songPanel = new SongPanel();
@@ -111,7 +111,7 @@ namespace Visual_Music
 			ImportModForm = new ImportModForm(this);
 			ImportSidForm = new ImportSidForm(this);
 			tpartyIntegrationForm = new TpartyIntegrationForm();
-			vidExpForm = new VideoExportForm();
+			VidExpForm = new VideoExportForm();
 			ResizeRedraw = true;
 
 			songScrollBar.Dock = DockStyle.Bottom;
@@ -405,11 +405,12 @@ namespace Visual_Music
 			saveVideoDlg.InitialDirectory = Path.GetDirectoryName(saveVideoDlg.FileName);
 			saveSettings();
 
-			if (vidExpForm.ShowDialog() != DialogResult.OK)
+			if (VidExpForm.ShowDialog() != DialogResult.OK)
 				return;
-			using (RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, vidExpForm.Options))
+			
+			using (RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, VidExpForm.Options))
 				renderProgressForm.ShowDialog();
-
+			saveSettings();
 		}
 
 		private void songPanel_KeyDown(object sender, KeyEventArgs e)

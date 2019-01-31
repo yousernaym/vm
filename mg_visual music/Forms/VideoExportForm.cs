@@ -6,6 +6,7 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using System.Runtime.Serialization;
 
 namespace Visual_Music
 {
@@ -15,7 +16,7 @@ namespace Visual_Music
 		public VideoExportForm()
 		{
 			InitializeComponent();
-			ssResoComboBox.SelectedIndex = 0;
+			ssResoComboBox.SelectedIndex = 2;
 			updateResoItems();
 		}
 
@@ -33,7 +34,7 @@ namespace Visual_Music
 
 		private void VideoExportForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (!parseReso(resoComboBox) && DialogResult == DialogResult.OK)
+			if (DialogResult == DialogResult.OK && !parseReso(resoComboBox))
 			{
 				e.Cancel = Visible = true;
 				MessageBox.Show(null, "Invalid resolution.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -107,7 +108,6 @@ namespace Visual_Music
 			char lastChar = ssResoComboBox.Text[ssResoComboBox.Text.Length - 1];
 			if (lastChar == 'x' || lastChar == 'X')
 			{
-
 				string numberString = ssResoComboBox.Text.Substring(0, ssResoComboBox.Text.Length - 1);
 				int multiplier = int.Parse(numberString);
 				Options.SSAAWidth = Options.Width * multiplier;
@@ -126,9 +126,17 @@ namespace Visual_Music
 				Options.SSAAHeight = Options.Height;
 			}
 		}
+
+		internal void updateControls(VideoExportOptions options)
+		{
+			sphereCb.Checked = options.Sphere;
+			vrMetadataCb.Checked = options.VrMetadata;
+			StereoscopicCb.Checked = options.Stereo;
+		}
 	}
 
-	public class VideoExportOptions
+	[Serializable]
+	public class VideoExportOptions : ISerializable
 	{
 		public int Width;
 		public int Height;
@@ -138,5 +146,46 @@ namespace Visual_Music
 		public bool Sphere;
 		public bool Stereo;
 		public bool VrMetadata;
+
+		public VideoExportOptions()
+		{
+
+		}
+
+		public VideoExportOptions(SerializationInfo info, StreamingContext context)
+		{
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "videoSphere")
+					Sphere = (bool)entry.Value;
+				else if (entry.Name == "videoVrMeta")
+					VrMetadata = (bool)entry.Value;
+				else if (entry.Name == "videoVrStereo")
+					Stereo = (bool)entry.Value;
+				else if (entry.Name == "videoWidth")
+					Width = (int)entry.Value;
+				else if (entry.Name == "videoHeight")
+					Height = (int)entry.Value;
+				else if (entry.Name == "videoSSAAWidth")
+					SSAAWidth = (int)entry.Value;
+				else if (entry.Name == "videoSSAAHeight")
+					SSAAHeight = (int)entry.Value;
+				else if (entry.Name == "videoEnableSSAA")
+					EnableSSAA = (bool)entry.Value;
+			}
+		}
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("videoSphere", Form1.VidExpForm.Options.Sphere);
+			info.AddValue("videoVrMeta", Form1.VidExpForm.Options.VrMetadata);
+			info.AddValue("videoVrStereo", Form1.VidExpForm.Options.Stereo);
+			info.AddValue("videoWidth", Form1.VidExpForm.Options.Width);
+			info.AddValue("videoHeight", Form1.VidExpForm.Options.Height);
+			info.AddValue("videoSSAAWidth", Form1.VidExpForm.Options.SSAAWidth);
+			info.AddValue("videoSSAAHeight", Form1.VidExpForm.Options.SSAAHeight);
+			info.AddValue("videoEnableSSAA", Form1.VidExpForm.Options.EnableSSAA);
+		}
+
+		
 	}
 }

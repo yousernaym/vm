@@ -13,7 +13,7 @@ namespace Visual_Music
 	{
 		enum Keys { MidiNoteFolder, ModNoteFolder, SidNoteFolder, MidiAudioFolder, ModAudioFolder, SidAudioFolder, VideoFolder, TextureFolder, ProjectFolder, ModTpartyApp, ModTpartyArgs, ModTpartyOutput, SidTpartyApp, SidTpartyArgs, SidTpartyOutput, HvscDir, TpartyModuleMixdown, TpartySidMixdown, HvscSongLengths, DefaultInsTrack}
 		public static readonly string FilePath = Path.Combine(Program.AppDataDir, "settings.xml");
-		public static Type[] Types = { typeof(string), typeof(bool) };
+		public static Type[] Types = { typeof(string), typeof(bool), typeof(VideoExportOptions) };
 
 		//public bool DefaultInsTrack { get; set; } = true; //preserve latest import form setting instead
 
@@ -27,6 +27,7 @@ namespace Visual_Music
 		public Settings(SerializationInfo info, StreamingContext context)
 		{
 			Form1 form = Program.form1;
+			
 			foreach (SerializationEntry entry in info)
 			{
 				if (entry.Name == getKeyName(Keys.DefaultInsTrack))
@@ -81,6 +82,22 @@ namespace Visual_Music
 					Form1.TpartyIntegrationForm.ModuleMixdown = (bool)entry.Value;
 				else if (entry.Name == getKeyName(Keys.HvscSongLengths))
 					Form1.TpartyIntegrationForm.HvscSongLengths = (bool)entry.Value;
+
+				else if (entry.Name == "videoExportOptions")
+				{
+					VideoExportOptions options = (VideoExportOptions)entry.Value;
+					Form1.VidExpForm.updateControls(options);
+				}
+				else if (entry.Name == "videoExportFormResoIndex")
+				{
+					if (Form1.VidExpForm.resoComboBox.Items.Count > (int)entry.Value)
+						Form1.VidExpForm.resoComboBox.SelectedIndex = (int)entry.Value;
+				}
+				else if (entry.Name == "videoExportFormSsIndex")
+				{
+					if (Form1.VidExpForm.ssResoComboBox.Items.Count > (int)entry.Value)
+						Form1.VidExpForm.ssResoComboBox.SelectedIndex = (int)entry.Value;
+				}
 			}
 
 		}
@@ -111,6 +128,10 @@ namespace Visual_Music
 			info.AddValue(getKeyName(Keys.HvscDir), Form1.TpartyIntegrationForm.HvscDir);
 			info.AddValue(getKeyName(Keys.TpartyModuleMixdown), Form1.TpartyIntegrationForm.ModuleMixdown);
 			info.AddValue(getKeyName(Keys.HvscSongLengths), Form1.TpartyIntegrationForm.HvscSongLengths);
+
+			info.AddValue("videoExportOptions", Form1.VidExpForm.Options);
+			info.AddValue("videoExportFormResoIndex", Form1.VidExpForm.resoComboBox.SelectedIndex);
+			info.AddValue("videoExportFormSsIndex", Form1.VidExpForm.ssResoComboBox.SelectedIndex);
 		}
 	}
 }

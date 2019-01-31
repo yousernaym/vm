@@ -308,7 +308,7 @@ namespace Visual_Music
 						{
 							for (int i = 0; i < 2; i++)
 								renderTarget2d32bit[i] = new RenderTarget2D(GraphicsDevice, options.SSAAWidth, options.SSAAHeight, options.EnableSSAA, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
-							renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.DiscardContents);
+							renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 							cubeToPlaneFx = Content.Load<Effect>("CubeToPlane");
 							cubeToPlaneFx.Parameters["CubeMap"].SetValue(renderTargetCube);
 							cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
