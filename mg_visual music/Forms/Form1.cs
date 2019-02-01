@@ -400,17 +400,16 @@ namespace Visual_Music
 
 		private void exportVideoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			if (VidExpForm.ShowDialog() != DialogResult.OK)
+				return;
 			if (saveVideoDlg.ShowDialog(this) != DialogResult.OK)
 				return;
 			saveVideoDlg.InitialDirectory = Path.GetDirectoryName(saveVideoDlg.FileName);
+
 			saveSettings();
 
-			if (VidExpForm.ShowDialog() != DialogResult.OK)
-				return;
-			
 			using (RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, VidExpForm.Options))
 				renderProgressForm.ShowDialog();
-			saveSettings();
 		}
 
 		private void songPanel_KeyDown(object sender, KeyEventArgs e)

@@ -34,10 +34,18 @@ namespace Visual_Music
 
 		private void VideoExportForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (DialogResult == DialogResult.OK && !parseReso(resoComboBox))
+			if (DialogResult == DialogResult.OK)
 			{
-				e.Cancel = Visible = true;
-				MessageBox.Show(null, "Invalid resolution.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				if (!parseReso(resoComboBox))
+				{
+					e.Cancel = Visible = true;
+					MessageBox.Show(null, "Invalid resolution.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
+				if (!parseFps())
+				{
+					e.Cancel = Visible = true;
+					MessageBox.Show(null, "Invalid FPS setting.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
 			}
 		}
 
@@ -132,6 +140,24 @@ namespace Visual_Music
 			sphereCb.Checked = options.Sphere;
 			vrMetadataCb.Checked = options.VrMetadata;
 			StereoscopicCb.Checked = options.Stereo;
+			fpsTb.Text = options.Fps.ToString();
+		}
+
+		private void fpsTb_TextChanged(object sender, EventArgs e)
+		{
+			parseFps();
+			
+
+		}
+
+		bool parseFps()
+		{
+			bool b = float.TryParse(fpsTb.Text, out Options.Fps);
+			if (b)
+				fpsTb.ForeColor = System.Drawing.Color.Black;
+			else
+				fpsTb.ForeColor = System.Drawing.Color.Red;
+			return b;
 		}
 	}
 
@@ -146,6 +172,7 @@ namespace Visual_Music
 		public bool Sphere;
 		public bool Stereo;
 		public bool VrMetadata;
+		public float Fps;
 
 		public VideoExportOptions()
 		{
@@ -172,6 +199,8 @@ namespace Visual_Music
 					SSAAHeight = (int)entry.Value;
 				else if (entry.Name == "videoEnableSSAA")
 					EnableSSAA = (bool)entry.Value;
+				else if (entry.Name == "fps")
+					Fps = (float)entry.Value;
 			}
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -184,8 +213,9 @@ namespace Visual_Music
 			info.AddValue("videoSSAAWidth", Form1.VidExpForm.Options.SSAAWidth);
 			info.AddValue("videoSSAAHeight", Form1.VidExpForm.Options.SSAAHeight);
 			info.AddValue("videoEnableSSAA", Form1.VidExpForm.Options.EnableSSAA);
+			info.AddValue("fps", Fps);
 		}
 
-		
+
 	}
 }

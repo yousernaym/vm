@@ -278,7 +278,7 @@ namespace Visual_Music
 			{
 				VideoFormat videoFormat = new VideoFormat((uint)options.Width, (uint)options.Height);
 				//videoFormat.bitRate = 160000000;
-				videoFormat.fps = 30;
+				videoFormat.fps = options.Fps;
 				videoFormat.aspectNumerator = 1;
 				videoFormat.audioSampleRate = 44100;
 				if (!Media.beginVideoEnc(videoFilePath, videoFormat, true))
@@ -408,7 +408,7 @@ namespace Visual_Music
 			}
 		}
 
-		void drawVideoFrame(double songPosS, uint fps, int frameSamples, VideoExportOptions options, RenderTargetCube renderTargetCube, RenderTarget2D[] renderTarget2d, RenderTarget2D renderTarget2d8bit, Effect cubeToPlaneFx)
+		void drawVideoFrame(double songPosS, float fps, int frameSamples, VideoExportOptions options, RenderTargetCube renderTargetCube, RenderTarget2D[] renderTarget2d, RenderTarget2D renderTarget2d8bit, Effect cubeToPlaneFx)
 		{
 			RenderTarget2D rt = null;
 			if (!options.Sphere)

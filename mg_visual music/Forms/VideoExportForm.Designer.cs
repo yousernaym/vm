@@ -35,16 +35,18 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.ssResoComboBox = new System.Windows.Forms.ComboBox();
 			this.label2 = new System.Windows.Forms.Label();
+			this.fpsTb = new System.Windows.Forms.TextBox();
+			this.label3 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// okBtn
 			// 
-			this.okBtn.Location = new System.Drawing.Point(87, 137);
+			this.okBtn.Location = new System.Drawing.Point(87, 173);
 			this.okBtn.TabIndex = 60;
 			// 
 			// cancelBtn
 			// 
-			this.cancelBtn.Location = new System.Drawing.Point(168, 137);
+			this.cancelBtn.Location = new System.Drawing.Point(168, 173);
 			this.cancelBtn.TabIndex = 70;
 			// 
 			// sphereCb
@@ -123,10 +125,30 @@
 			this.label2.TabIndex = 62;
 			this.label2.Text = "SSAA";
 			// 
+			// fpsTb
+			// 
+			this.fpsTb.Location = new System.Drawing.Point(75, 119);
+			this.fpsTb.Name = "fpsTb";
+			this.fpsTb.Size = new System.Drawing.Size(46, 20);
+			this.fpsTb.TabIndex = 71;
+			this.fpsTb.Text = "60";
+			this.fpsTb.TextChanged += new System.EventHandler(this.fpsTb_TextChanged);
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(42, 122);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(27, 13);
+			this.label3.TabIndex = 62;
+			this.label3.Text = "FPS";
+			// 
 			// VideoExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(255, 172);
+			this.ClientSize = new System.Drawing.Size(255, 208);
+			this.Controls.Add(this.fpsTb);
+			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.ssResoComboBox);
 			this.Controls.Add(this.label1);
@@ -145,6 +167,8 @@
 			this.Controls.SetChildIndex(this.label1, 0);
 			this.Controls.SetChildIndex(this.ssResoComboBox, 0);
 			this.Controls.SetChildIndex(this.label2, 0);
+			this.Controls.SetChildIndex(this.label3, 0);
+			this.Controls.SetChildIndex(this.fpsTb, 0);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -158,5 +182,7 @@
 		private System.Windows.Forms.Label label2;
 		public System.Windows.Forms.ComboBox resoComboBox;
 		public System.Windows.Forms.ComboBox ssResoComboBox;
+		private System.Windows.Forms.TextBox fpsTb;
+		private System.Windows.Forms.Label label3;
 	}
 }

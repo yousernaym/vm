@@ -11,12 +11,12 @@ namespace Visual_Music
 	{
 		public UInt32 width;
 		public UInt32 height;
-		public UInt32 fps;
+		public float fps;
 		public UInt32 bitRate;
 		public UInt32 audioSampleRate;
 		public UInt32 aspectNumerator;
 		public UInt32 aspectDenominator;
-		public VideoFormat(UInt32 _width, UInt32 _height, UInt32 _fps = 30u, UInt32 _bitRate = 150000000u, UInt32 _audioSampleRate = 48000u, UInt32 _aspectNumerator = 1u, UInt32 _aspectDenominator = 1u)
+		public VideoFormat(UInt32 _width, UInt32 _height, float _fps = 30f, UInt32 _bitRate = 150000000u, UInt32 _audioSampleRate = 48000u, UInt32 _aspectNumerator = 1u, UInt32 _aspectDenominator = 1u)
 		{
 			width = _width;
 			height = _height;
