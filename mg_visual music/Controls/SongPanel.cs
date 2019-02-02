@@ -25,6 +25,7 @@ namespace Visual_Music
 
 	public class SongPanel : GraphicsDeviceControl
 	{
+		public SpriteFont LyricsFont { get; private set; }
 		GdiPoint previousMousePos = MousePosition;
 
 		[DllImport("user32.dll")]
@@ -110,6 +111,7 @@ namespace Visual_Music
 			//BlendState = BlendState.AlphaBlend;
 			content = new ContentManager(Services, "Content");
 			NoteStyle.sInitAllStyles(this);
+			LyricsFont = Content.Load<SpriteFont>("Font");
 
 			regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
 			regionSelectTexture.SetData(new[] { Color.White });

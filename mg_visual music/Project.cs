@@ -21,6 +21,7 @@ namespace Visual_Music
 	[Serializable()]
 	public class Project : ISerializable
 	{
+		public string Lyrics { get; set; } = "En massa text.";
 		public float UserViewWidth = 1000f;
 		const float NormPitchMargin = 1 / 100.0f;
 		float PitchMargin => NormPitchMargin * Camera.ViewportSize.Y;
@@ -248,6 +249,8 @@ namespace Visual_Music
 					Camera = (Camera)entry.Value;
 				else if (entry.Name == "userViewWidth")
 					UserViewWidth = (float)entry.Value;
+				else if (entry.Name == "lyrics")
+					Lyrics = (string)entry.Value;
 			}
 			//noteFileType = (Midi.FileType)info.GetValue("noteFileType", typeof(Midi.FileType));
 		}
@@ -269,6 +272,7 @@ namespace Visual_Music
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
 			info.AddValue("camera", Camera);
 			info.AddValue("userViewWidth", UserViewWidth);
+			info.AddValue("lyrics", Lyrics);
 		}
 
 		public bool importSong(ImportOptions options)
@@ -488,6 +492,37 @@ namespace Visual_Music
 				trackViews[t].drawTrack(GlobalTrackProps, SongPanel.ForceDefaultNoteStyle);
 			}
 			songPanel.GraphicsDevice.DepthStencilState = oldDss;
+			var effect = new BasicEffect(songPanel.GraphicsDevice)
+			{
+				TextureEnabled = true,
+				VertexColorEnabled = true,
+			};
+			Viewport viewport = SongPanel.GraphicsDevice.Viewport;
+			//effect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
+			effect.Projection = Camera.ProjMat;
+			effect.View = Camera.ViewMat;
+			//effect.World = Matrix.CreateScale(1, -1, 1);
+
+			Vector2 songPanelSize = new Vector2(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
+			Vector2 scale = new Vector2(Camera.ViewportSize.X / songPanelSize.X, -Camera.ViewportSize.Y / songPanelSize.Y);
+			float textHeight = -SongPanel.LyricsFont.MeasureString(Lyrics).Y * scale.Y;
+
+			SongPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
+			SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, Lyrics, new Vector2(-SongPosP, -Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+			SongPanel.SpriteBatch.End();
+
+
+			//effect.World = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(textPosition);
+			//effect.View = Camera.ViewMat;
+			////effect.Projection = Camera.ProjMat;
+
+			//const string message = "hello, world!";
+			//Vector2 textOrigin = Vector2.Zero;// SongPanel.LyricsFont.MeasureString(message) / 2;
+			//const float textSize = 1;// 0.25f;
+
+			//SongPanel.SpriteBatch.Begin(0, null, null, DepthStencilState.DepthRead, RasterizerState.CullNone, effect);
+			//SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, message, Vector2.Zero, Color.White, 0, textOrigin, textSize, 0, 0);
+			//SongPanel.SpriteBatch.End();
 		}
 
 		public int screenPosToSongPos(float normScreenPos)
