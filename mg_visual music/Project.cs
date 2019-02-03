@@ -503,8 +503,7 @@ namespace Visual_Music
 			Viewport viewport = SongPanel.GraphicsDevice.Viewport;
 			//effect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
 			effect.Projection = Camera.ProjMat;
-			effect.View = Camera.ViewMat;
-			//effect.World = Matrix.CreateScale(1, -1, 1);
+			effect.View = Matrix.CreateTranslation(new Vector3(0, 0, -Camera.ProjMat.M11 / 2));
 			Vector2 songPanelSize = new Vector2(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
 			Vector2 scale = new Vector2(Camera.ViewportSize.X / songPanelSize.X, -Camera.ViewportSize.Y / songPanelSize.Y);
 
@@ -514,21 +513,9 @@ namespace Visual_Music
 				if (string.IsNullOrWhiteSpace(lyricsSegment.Lyrics))
 					continue;
 				float textHeight = -SongPanel.LyricsFont.MeasureString(lyricsSegment.Lyrics).Y * scale.Y;
-				SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP, -Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+				SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP + getScreenPosX(secondsToTicks(lyricsSegment.Time) + PlaybackOffsetT), -Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
 			}
 			SongPanel.SpriteBatch.End();
-
-			//effect.World = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(textPosition);
-			//effect.View = Camera.ViewMat;
-			////effect.Projection = Camera.ProjMat;
-
-			//const string message = "hello, world!";
-			//Vector2 textOrigin = Vector2.Zero;// SongPanel.LyricsFont.MeasureString(message) / 2;
-			//const float textSize = 1;// 0.25f;
-
-			//SongPanel.SpriteBatch.Begin(0, null, null, DepthStencilState.DepthRead, RasterizerState.CullNone, effect);
-			//SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, message, Vector2.Zero, Color.White, 0, textOrigin, textSize, 0, 0);
-			//SongPanel.SpriteBatch.End();
 		}
 
 		public int screenPosToSongPos(float normScreenPos)
@@ -786,9 +773,9 @@ namespace Visual_Music
 			p.Y = getScreenPosY((float)pitch);
 			return p;
 		}
-		public float getScreenPosX(double timeS)
+		public float getScreenPosX(double timeT)
 		{
-			return (float)((timeS / viewWidthT) * (Camera.ViewportSize.X));
+			return (float)((timeT / viewWidthT) * (Camera.ViewportSize.X));
 		}
 
 		public float getScreenPosY(float pitch)
