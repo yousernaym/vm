@@ -2050,12 +2050,13 @@ namespace Visual_Music
 
 		private void lyricsGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
 		{
-			showErrorMsgBox("The entered value har an invalid format.");
+			showErrorMsgBox("The entered value has an invalid format.");
 			e.ThrowException = false;
 		}
 
 		private void lyricsGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
 		{
+			songPanel.Invalidate();
 		}
 
 		private void lyricsGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
