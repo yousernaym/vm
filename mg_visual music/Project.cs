@@ -512,10 +512,10 @@ namespace Visual_Music
 			SongPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
 			foreach (var lyricsSegment in Lyrics)
 			{
-				if (string.IsNullOrWhiteSpace(lyricsSegment.Text))
+				if (string.IsNullOrWhiteSpace(lyricsSegment.Lyrics))
 					continue;
-				float textHeight = -SongPanel.LyricsFont.MeasureString(lyricsSegment.Text).Y * scale.Y;
-				SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Text, new Vector2(-SongPosP, -Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+				float textHeight = -SongPanel.LyricsFont.MeasureString(lyricsSegment.Lyrics).Y * scale.Y;
+				SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP, -Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
 			}
 			SongPanel.SpriteBatch.End();
 
@@ -866,7 +866,7 @@ namespace Visual_Music
 	public class LyricsSegment : ISerializable
 	{
 		public float Time { get; set; }
-		public string Text { get; set; }
+		public string Lyrics { get; set; }
 		public LyricsSegment()
 		{
 		}
@@ -877,15 +877,15 @@ namespace Visual_Music
 			{
 				if (entry.Name == "time")
 					Time = (float)entry.Value;
-				else if (entry.Name == "text")
-					Text = (string)entry.Value;
+				else if (entry.Name == "lyrics")
+					Lyrics = (string)entry.Value;
 			}
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
 			{
 				info.AddValue("time", Time);
-				info.AddValue("text", Text);
+				info.AddValue("lyrics", Lyrics);
 		}
 
 	}

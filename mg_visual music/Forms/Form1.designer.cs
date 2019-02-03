@@ -175,9 +175,7 @@
 			this.setDefaultBtn = new System.Windows.Forms.Button();
 			this.openTextureDlg = new System.Windows.Forms.OpenFileDialog();
 			this.songPropsPanel = new System.Windows.Forms.Panel();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.camTb = new System.Windows.Forms.TextBox();
-			this.resetCamBtn = new System.Windows.Forms.Button();
 			this.defaultPitchesBtn = new System.Windows.Forms.Button();
 			this.minPitchUd = new System.Windows.Forms.NumericUpDown();
 			this.maxPitchUd = new System.Windows.Forms.NumericUpDown();
@@ -208,7 +206,7 @@
 			this.saveCamFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.lyricsGridView = new System.Windows.Forms.DataGridView();
 			this.TimeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.TextColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.LyricsColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.upDownVpWidth = new Visual_Music.TbSlider();
 			this.trackList = new Visual_Music.ListViewNF();
 			this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -220,6 +218,7 @@
 			this.specHsBtn = new Visual_Music.HueSatButton();
 			this.diffuseHsBtn = new Visual_Music.HueSatButton();
 			this.ambientHsBtn = new Visual_Music.HueSatButton();
+			this.camLabel = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -256,7 +255,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).BeginInit();
 			this.songPropsPanel.SuspendLayout();
-			this.groupBox3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).BeginInit();
@@ -399,7 +397,7 @@
             this.actionsToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1284, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1267, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -662,9 +660,9 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(889, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(872, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
-			this.trackPropsPanel.Size = new System.Drawing.Size(395, 16394);
+			this.trackPropsPanel.Size = new System.Drawing.Size(395, 16254);
 			this.trackPropsPanel.TabIndex = 3;
 			this.trackPropsPanel.Visible = false;
 			this.trackPropsPanel.VisibleChanged += new System.EventHandler(this.trackPropsPanel_VisibleChanged);
@@ -734,7 +732,7 @@
 			this.selectedTrackPropsPanel.Location = new System.Drawing.Point(187, 0);
 			this.selectedTrackPropsPanel.Name = "selectedTrackPropsPanel";
 			this.selectedTrackPropsPanel.SelectedIndex = 0;
-			this.selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 16394);
+			this.selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 16254);
 			this.selectedTrackPropsPanel.TabIndex = 14;
 			// 
 			// style
@@ -748,7 +746,7 @@
 			this.style.Controls.Add(this.label1);
 			this.style.Location = new System.Drawing.Point(4, 22);
 			this.style.Name = "style";
-			this.style.Size = new System.Drawing.Size(200, 16368);
+			this.style.Size = new System.Drawing.Size(200, 16228);
 			this.style.TabIndex = 2;
 			this.style.Text = "Style";
 			// 
@@ -800,7 +798,7 @@
 			this.material.Location = new System.Drawing.Point(4, 22);
 			this.material.Name = "material";
 			this.material.Padding = new System.Windows.Forms.Padding(3);
-			this.material.Size = new System.Drawing.Size(200, 16368);
+			this.material.Size = new System.Drawing.Size(200, 16228);
 			this.material.TabIndex = 0;
 			this.material.Text = "Material";
 			// 
@@ -1483,7 +1481,7 @@
 			this.light.Location = new System.Drawing.Point(4, 22);
 			this.light.Name = "light";
 			this.light.Padding = new System.Windows.Forms.Padding(3);
-			this.light.Size = new System.Drawing.Size(200, 16368);
+			this.light.Size = new System.Drawing.Size(200, 16228);
 			this.light.TabIndex = 1;
 			this.light.Text = "Light";
 			// 
@@ -1768,7 +1766,7 @@
 			this.spatial.Location = new System.Drawing.Point(4, 22);
 			this.spatial.Name = "spatial";
 			this.spatial.Padding = new System.Windows.Forms.Padding(3);
-			this.spatial.Size = new System.Drawing.Size(200, 16368);
+			this.spatial.Size = new System.Drawing.Size(200, 16228);
 			this.spatial.TabIndex = 3;
 			this.spatial.Text = "Spatial";
 			this.spatial.UseVisualStyleBackColor = true;
@@ -1876,7 +1874,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-8173, 16247);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-8292, 16247);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1888,7 +1886,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-8285, 16248);
+			this.texPathTb.Location = new System.Drawing.Point(-8404, 16248);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1898,7 +1896,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-8287, 16232);
+			this.label4.Location = new System.Drawing.Point(-8406, 16232);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1908,7 +1906,7 @@
 			// resetDefaultBtn
 			// 
 			this.resetDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.resetDefaultBtn.Location = new System.Drawing.Point(336, 33068);
+			this.resetDefaultBtn.Location = new System.Drawing.Point(336, 32627);
 			this.resetDefaultBtn.Name = "resetDefaultBtn";
 			this.resetDefaultBtn.Size = new System.Drawing.Size(170, 23);
 			this.resetDefaultBtn.TabIndex = 13;
@@ -1919,7 +1917,7 @@
 			// setDefaultBtn
 			// 
 			this.setDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.setDefaultBtn.Location = new System.Drawing.Point(334, 33068);
+			this.setDefaultBtn.Location = new System.Drawing.Point(334, 32627);
 			this.setDefaultBtn.Name = "setDefaultBtn";
 			this.setDefaultBtn.Size = new System.Drawing.Size(170, 23);
 			this.setDefaultBtn.TabIndex = 12;
@@ -1933,7 +1931,8 @@
 			// 
 			// songPropsPanel
 			// 
-			this.songPropsPanel.Controls.Add(this.groupBox3);
+			this.songPropsPanel.Controls.Add(this.camLabel);
+			this.songPropsPanel.Controls.Add(this.camTb);
 			this.songPropsPanel.Controls.Add(this.defaultPitchesBtn);
 			this.songPropsPanel.Controls.Add(this.minPitchUd);
 			this.songPropsPanel.Controls.Add(this.maxPitchUd);
@@ -1956,44 +1955,24 @@
 			this.songPropsPanel.Dock = System.Windows.Forms.DockStyle.Left;
 			this.songPropsPanel.Location = new System.Drawing.Point(0, 24);
 			this.songPropsPanel.Name = "songPropsPanel";
-			this.songPropsPanel.Size = new System.Drawing.Size(209, 16394);
+			this.songPropsPanel.Size = new System.Drawing.Size(209, 16254);
 			this.songPropsPanel.TabIndex = 17;
 			this.songPropsPanel.Visible = false;
 			this.songPropsPanel.VisibleChanged += new System.EventHandler(this.songPropsPanel_VisibleChanged);
 			// 
-			// groupBox3
-			// 
-			this.groupBox3.Controls.Add(this.camTb);
-			this.groupBox3.Controls.Add(this.resetCamBtn);
-			this.groupBox3.Location = new System.Drawing.Point(3, 299);
-			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(189, 174);
-			this.groupBox3.TabIndex = 6;
-			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "Camera";
-			// 
 			// camTb
 			// 
-			this.camTb.Location = new System.Drawing.Point(9, 19);
+			this.camTb.Location = new System.Drawing.Point(12, 336);
 			this.camTb.Multiline = true;
 			this.camTb.Name = "camTb";
-			this.camTb.Size = new System.Drawing.Size(156, 120);
+			this.camTb.ReadOnly = true;
+			this.camTb.Size = new System.Drawing.Size(111, 120);
 			this.camTb.TabIndex = 6;
 			this.camTb.TextChanged += new System.EventHandler(this.camTb_TextChanged);
 			// 
-			// resetCamBtn
-			// 
-			this.resetCamBtn.Location = new System.Drawing.Point(9, 145);
-			this.resetCamBtn.Name = "resetCamBtn";
-			this.resetCamBtn.Size = new System.Drawing.Size(111, 23);
-			this.resetCamBtn.TabIndex = 5;
-			this.resetCamBtn.Text = "Reset camera";
-			this.resetCamBtn.UseVisualStyleBackColor = true;
-			this.resetCamBtn.Click += new System.EventHandler(this.resetCamBtn_Click);
-			// 
 			// defaultPitchesBtn
 			// 
-			this.defaultPitchesBtn.Location = new System.Drawing.Point(12, 270);
+			this.defaultPitchesBtn.Location = new System.Drawing.Point(12, 272);
 			this.defaultPitchesBtn.Name = "defaultPitchesBtn";
 			this.defaultPitchesBtn.Size = new System.Drawing.Size(111, 23);
 			this.defaultPitchesBtn.TabIndex = 4;
@@ -2269,12 +2248,13 @@
 			this.lyricsGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.lyricsGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.TimeColumn,
-            this.TextColumn});
+            this.LyricsColumn});
 			this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.lyricsGridView.Location = new System.Drawing.Point(209, 16268);
 			this.lyricsGridView.Name = "lyricsGridView";
-			this.lyricsGridView.Size = new System.Drawing.Size(680, 150);
+			this.lyricsGridView.Size = new System.Drawing.Size(663, 10);
 			this.lyricsGridView.TabIndex = 0;
+			this.lyricsGridView.Visible = false;
 			this.lyricsGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.lyricsGridView_CellEndEdit);
 			this.lyricsGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.lyricsGridView_CellValidating);
 			this.lyricsGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.lyricsGridView_DataError);
@@ -2290,12 +2270,12 @@
 			this.TimeColumn.Name = "TimeColumn";
 			this.TimeColumn.Width = 68;
 			// 
-			// TextColumn
+			// LyricsColumn
 			// 
-			this.TextColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-			this.TextColumn.DataPropertyName = "Text";
-			this.TextColumn.HeaderText = "Text";
-			this.TextColumn.Name = "TextColumn";
+			this.LyricsColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+			this.LyricsColumn.DataPropertyName = "Lyrics";
+			this.LyricsColumn.HeaderText = "Lyrics";
+			this.LyricsColumn.Name = "LyricsColumn";
 			// 
 			// upDownVpWidth
 			// 
@@ -2332,7 +2312,7 @@
 			this.trackList.HideSelection = false;
 			this.trackList.Location = new System.Drawing.Point(1, 0);
 			this.trackList.Name = "trackList";
-			this.trackList.Size = new System.Drawing.Size(186, 16394);
+			this.trackList.Size = new System.Drawing.Size(186, 16254);
 			this.trackList.TabIndex = 0;
 			this.trackList.UseCompatibleStateImageBehavior = false;
 			this.trackList.View = System.Windows.Forms.View.Details;
@@ -2432,13 +2412,22 @@
 			this.ambientHsBtn.UseVisualStyleBackColor = true;
 			this.ambientHsBtn.ColorChanged += new System.EventHandler(this.ambientHsBtn_ColorChanged);
 			// 
+			// camLabel
+			// 
+			this.camLabel.AutoSize = true;
+			this.camLabel.Location = new System.Drawing.Point(12, 320);
+			this.camLabel.Name = "camLabel";
+			this.camLabel.Size = new System.Drawing.Size(43, 13);
+			this.camLabel.TabIndex = 7;
+			this.camLabel.Text = "Camera";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1301, 505);
+			this.ClientSize = new System.Drawing.Size(1284, 505);
 			this.Controls.Add(this.lyricsGridView);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
@@ -2508,8 +2497,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).EndInit();
 			this.songPropsPanel.ResumeLayout(false);
 			this.songPropsPanel.PerformLayout();
-			this.groupBox3.ResumeLayout(false);
-			this.groupBox3.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).EndInit();
@@ -2628,7 +2615,6 @@
 		public System.Windows.Forms.SaveFileDialog saveVideoDlg;
 		public System.Windows.Forms.OpenFileDialog openTextureDlg;
 		private System.Windows.Forms.SaveFileDialog saveMixdownDialog;
-		private System.Windows.Forms.Button resetCamBtn;
 		private System.Windows.Forms.TabPage spatial;
 		private System.Windows.Forms.Button defaultSpatialBtn;
 		private System.Windows.Forms.Label label20;
@@ -2651,7 +2637,6 @@
 		private System.Windows.Forms.ToolStripMenuItem viewSongTSMI;
 		private System.Windows.Forms.ToolStripMenuItem viewModBrowserTSMI;
 		private System.Windows.Forms.ToolStripMenuItem viewSidBrowserTSMI;
-		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.TextBox camTb;
 		private System.Windows.Forms.NumericUpDown specPowUd;
 		private System.Windows.Forms.NumericUpDown ambientAmountUd;
@@ -2714,7 +2699,8 @@
 		private System.Windows.Forms.SaveFileDialog saveCamFileDialog;
 		private System.Windows.Forms.DataGridView lyricsGridView;
 		private System.Windows.Forms.DataGridViewTextBoxColumn TimeColumn;
-		private System.Windows.Forms.DataGridViewTextBoxColumn TextColumn;
+		private System.Windows.Forms.DataGridViewTextBoxColumn LyricsColumn;
+		private System.Windows.Forms.Label camLabel;
 	}
 }
 

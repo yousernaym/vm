@@ -286,6 +286,8 @@ namespace Visual_Music
 			exportVideoToolStripMenuItem.Enabled = loaded;
 			playbackToolStripMenuItem.Enabled = AudioLoaded;
 			actionsToolStripMenuItem.Enabled = loaded;
+			loadCamToolStripMenuItem.Enabled = loaded;
+			saveCamToolStripMenuItem.Enabled = loaded;
 
 			//if (loaded)
 			//{
@@ -1264,9 +1266,15 @@ namespace Visual_Music
 		private void songPropsCb_CheckedChanged(object sender, EventArgs e)
 		{
 			if (songPropsCb.Checked)
+			{
 				songPropsPanel.Show();
+				lyricsGridView.Show();
+			}
 			else
+			{
 				songPropsPanel.Hide();
+				lyricsGridView.Hide();
+			}
 		}
 
 		private void maxPitchUd_ValueChanged(object sender, EventArgs e)
