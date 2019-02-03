@@ -22,7 +22,7 @@ namespace Visual_Music
 	[Serializable()]
 	public class Project : ISerializable
 	{
-		public BindingList<LyricsSegment> Lyrics { get; set; } = new BindingList<LyricsSegment>();
+		public BindingList<LyricsSegment> LyricsSigments { get; private set; } = new BindingList<LyricsSegment>();
 
 		public float UserViewWidth = 1000f;
 		const float NormPitchMargin = 1 / 100.0f;
@@ -187,7 +187,6 @@ namespace Visual_Music
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
-			Lyrics.Add(new LyricsSegment(0));
 		}
 
 		public bool loadContent()
@@ -253,7 +252,7 @@ namespace Visual_Music
 				else if (entry.Name == "userViewWidth")
 					UserViewWidth = (float)entry.Value;
 				else if (entry.Name == "lyrics")
-					Lyrics = (BindingList<LyricsSegment>)entry.Value;
+					LyricsSigments = (BindingList<LyricsSegment>)entry.Value;
 			}
 			//noteFileType = (Midi.FileType)info.GetValue("noteFileType", typeof(Midi.FileType));
 		}
@@ -275,7 +274,7 @@ namespace Visual_Music
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
 			info.AddValue("camera", Camera);
 			info.AddValue("userViewWidth", UserViewWidth);
-			info.AddValue("lyrics", Lyrics);
+			info.AddValue("lyrics", LyricsSigments);
 		}
 
 		public bool importSong(ImportOptions options)
@@ -510,7 +509,7 @@ namespace Visual_Music
 			Vector2 scale = new Vector2(Camera.ViewportSize.X / songPanelSize.X, -Camera.ViewportSize.Y / songPanelSize.Y);
 
 			SongPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
-			foreach (var lyricsSegment in Lyrics)
+			foreach (var lyricsSegment in LyricsSigments)
 			{
 				if (string.IsNullOrWhiteSpace(lyricsSegment.Lyrics))
 					continue;
@@ -855,13 +854,18 @@ namespace Visual_Music
 			return value * Camera.ViewportSize.X / UserViewWidth;
 		}
 
-		public void insertLyrics()
+		public int insertLyrics()
 		{
-			for (int i = 0; i < Lyrics.Count; i++)
+			for (int i = 0; i < LyricsSigments.Count; i++)
 			{
-				if (Lyrics[i].Time > SongPosS)
-					Lyrics.Insert(i, new LyricsSegment((float)SongPosS));
+				if (LyricsSigments[i].Time >= SongPosS)
+				{
+					LyricsSigments.Insert(i, new LyricsSegment((float)SongPosS));
+					return i;
+				}
 			}
+			LyricsSigments.Add(new LyricsSegment((float)SongPosS));
+			return LyricsSigments.Count - 1;
 		}
 
 	}
