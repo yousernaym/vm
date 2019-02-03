@@ -52,9 +52,10 @@ with.
     -->
     <CharacterRegions>
       <CharacterRegion>
-        <Start>&#32;</Start>
-        <End>&#126;</End>
+        <Start>&#10;</Start>
+        <End>&#255;</End>
       </CharacterRegion>
+    
     </CharacterRegions>
   </Asset>
 </XnaContent>

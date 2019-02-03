@@ -77,7 +77,7 @@ namespace Visual_Music
 		public static TpartyIntegrationForm TpartyIntegrationForm => tpartyIntegrationForm;
 		public static VideoExportForm VidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor) };
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment) };
 		SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
 		SongWebBrowser modWebBrowser;
@@ -304,6 +304,7 @@ namespace Visual_Music
 			maxPitchUd.Value = Project.MaxPitch;
 			minPitchUd.Value = Project.MinPitch;
 			updatingControls = false;
+			lyricsGridView.DataSource = project.Lyrics;
 
 			project.Camera.SpatialChanged = updateCamControls;
 			upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
@@ -2032,6 +2033,25 @@ namespace Visual_Music
 			Project.resetTrackProps(trackList.SelectedIndices);
 			updateTrackControls();
 			updateTrackListColors();
+		}
+
+		private void lyricsGridView_Paint(object sender, PaintEventArgs e)
+		{
+			lyricsGridView.Height = lyricsGridView.Rows.GetRowsHeight(DataGridViewElementStates.None) + lyricsGridView.ColumnHeadersHeight + 2;
+		}
+
+		private void lyricsGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
+		{
+			showErrorMsgBox("The entered value har an invalid format.");
+			e.ThrowException = false;
+		}
+
+		private void lyricsGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+		{
+		}
+
+		private void lyricsGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+		{
 		}
 	}
 }

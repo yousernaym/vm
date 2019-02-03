@@ -12,6 +12,7 @@ using System.IO.Compression;
 using System.Runtime.Serialization;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
+using System.ComponentModel;
 
 namespace Visual_Music
 {
@@ -21,7 +22,8 @@ namespace Visual_Music
 	[Serializable()]
 	public class Project : ISerializable
 	{
-		public string Lyrics { get; set; } = "En massa text.";
+		public BindingList<LyricsSegment> Lyrics { get; set; } = new BindingList<LyricsSegment>();
+
 		public float UserViewWidth = 1000f;
 		const float NormPitchMargin = 1 / 100.0f;
 		float PitchMargin => NormPitchMargin * Camera.ViewportSize.Y;
@@ -185,6 +187,7 @@ namespace Visual_Music
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
+			Lyrics.Add(new LyricsSegment());
 		}
 
 		public bool loadContent()
@@ -250,7 +253,7 @@ namespace Visual_Music
 				else if (entry.Name == "userViewWidth")
 					UserViewWidth = (float)entry.Value;
 				else if (entry.Name == "lyrics")
-					Lyrics = (string)entry.Value;
+					Lyrics = (BindingList<LyricsSegment>)entry.Value;
 			}
 			//noteFileType = (Midi.FileType)info.GetValue("noteFileType", typeof(Midi.FileType));
 		}
@@ -492,6 +495,7 @@ namespace Visual_Music
 				trackViews[t].drawTrack(GlobalTrackProps, SongPanel.ForceDefaultNoteStyle);
 			}
 			songPanel.GraphicsDevice.DepthStencilState = oldDss;
+
 			var effect = new BasicEffect(songPanel.GraphicsDevice)
 			{
 				TextureEnabled = true,
@@ -502,15 +506,18 @@ namespace Visual_Music
 			effect.Projection = Camera.ProjMat;
 			effect.View = Camera.ViewMat;
 			//effect.World = Matrix.CreateScale(1, -1, 1);
-
 			Vector2 songPanelSize = new Vector2(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
 			Vector2 scale = new Vector2(Camera.ViewportSize.X / songPanelSize.X, -Camera.ViewportSize.Y / songPanelSize.Y);
-			float textHeight = -SongPanel.LyricsFont.MeasureString(Lyrics).Y * scale.Y;
 
 			SongPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
-			SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, Lyrics, new Vector2(-SongPosP, -Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+			foreach (var lyricsSegment in Lyrics)
+			{
+				if (string.IsNullOrWhiteSpace(lyricsSegment.Text))
+					continue;
+				float textHeight = -SongPanel.LyricsFont.MeasureString(lyricsSegment.Text).Y * scale.Y;
+				SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Text, new Vector2(-SongPosP, -Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+			}
 			SongPanel.SpriteBatch.End();
-
 
 			//effect.World = Matrix.CreateScale(1, -1, 1) * Matrix.CreateTranslation(textPosition);
 			//effect.View = Camera.ViewMat;
@@ -849,10 +856,37 @@ namespace Visual_Music
 		}
 	}
 
-
 	static class SongFormat
 	{
 		public const int writeVersion = 1;
 		public static int readVersion;
+	}
+
+	[Serializable]
+	public class LyricsSegment : ISerializable
+	{
+		public float Time { get; set; }
+		public string Text { get; set; }
+		public LyricsSegment()
+		{
+		}
+
+		public LyricsSegment(SerializationInfo info, StreamingContext ctxt) : base()
+		{
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "time")
+					Time = (float)entry.Value;
+				else if (entry.Name == "text")
+					Text = (string)entry.Value;
+			}
+		}
+
+		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+			{
+				info.AddValue("time", Time);
+				info.AddValue("text", Text);
+		}
+
 	}
 }
