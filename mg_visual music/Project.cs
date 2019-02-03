@@ -169,7 +169,7 @@ namespace Visual_Music
 				}
 			}
 		}
-		
+
 		bool isPlaying;
 		public bool IsPlaying
 		{
@@ -183,11 +183,11 @@ namespace Visual_Music
 		}
 		bool tempPausing;
 		public bool AudioHasStarted { get; set; }
-		
+
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
-			Lyrics.Add(new LyricsSegment());
+			Lyrics.Add(new LyricsSegment(0));
 		}
 
 		public bool loadContent()
@@ -320,7 +320,7 @@ namespace Visual_Music
 					var process = Process.Start(startInfo);
 					process.WaitForExit();
 					Program.form1.Activate();
-					
+
 					if (!File.Exists(midiPath) && !File.Exists(audioPath))
 						return false; //User probably closed Remuxer before it was finished
 				}
@@ -336,7 +336,7 @@ namespace Visual_Music
 
 			openNoteFile(options);
 			openAudioFile(options.AudioPath, options.MixdownType);
-					
+
 			ImportOptions = options;
 			if (options.EraseCurrent)
 				DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + DefaultFileExt;
@@ -359,7 +359,7 @@ namespace Visual_Music
 			newNotes.openFile(path);
 			if (newNotes.Tracks == null || newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
 				throw new FileFormatException(new Uri(options.RawNotePath), "No notes found.");
-									
+
 			notes = newNotes;
 			notes.createNoteBsp();
 
@@ -378,13 +378,13 @@ namespace Visual_Music
 				file = ImportNotesWithAudioForm.runTpartyProcess();
 
 			//if (string.IsNullOrWhiteSpace(file))
-				//return;
+			//return;
 			if (!File.Exists(file))  //If loading project file and audio file is no longer where it should be, or tparty process failed, keep loading/importing but skip audio. (If importing, import won't even start if trying to import with non-empty incorrect audio path.)
 				return;
-						
+
 			if (!Media.openAudioFile(file))
 				throw new FileFormatException(new Uri(file));
-						
+
 			if (notes != null)
 				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + AudioOffset));
 		}
@@ -472,7 +472,7 @@ namespace Visual_Music
 				return;
 			vertViewWidthQn = viewWidthQn;
 			//for (int i = TrackViews.Count - 1; i > 0; i--)
-			
+
 			for (int i = 1; i < trackViews.Count; i++)
 				TrackViews[i].createOcTree(this, GlobalTrackProps);
 		}
@@ -650,7 +650,7 @@ namespace Visual_Music
 				pbTimeS = pbTimeT = 0;
 				pbTempoEvent = firstTempoEvent;
 			}
-		
+
 			int nextTempoEvent = pbTempoEvent;
 			while (pbTimeS < seconds)
 			{
@@ -663,7 +663,7 @@ namespace Visual_Music
 					nextTempoEvent++;
 					double nextTempoTimeS = (notes.TempoEvents[nextTempoEvent].Time + playbackOffsetT - pbTimeT) / (notes.TicksPerBeat * currentBps) + pbTimeS;
 					nextTimeStepS = nextTempoTimeS;
-					if (nextTimeStepS > seconds) 
+					if (nextTimeStepS > seconds)
 						nextTimeStepS = seconds; //always causes loop to exit
 					else
 						pbTempoEvent = nextTempoEvent;
@@ -716,7 +716,7 @@ namespace Visual_Music
 						Media.startPlaybackAtTime(0);
 					}
 				}
-				else 
+				else
 				{
 					if (!Media.playbackIsRunning()) //playback reached end of song
 					{
@@ -726,7 +726,7 @@ namespace Visual_Music
 					else
 						timeS = Media.getPlaybackPos() + AudioOffset + PlaybackOffsetS;
 				}
-				
+
 				setSongPosS(timeS, true);
 				if (NormSongPos > 1)
 					togglePlayback();
@@ -774,7 +774,7 @@ namespace Visual_Music
 		public void stopPlayback()
 		{
 			IsPlaying = false;
-//			bAudioPlayback = false;
+			//			bAudioPlayback = false;
 			if (!Media.stopPlayback())
 				MessageBox.Show("An error occured while stopping playback.");
 			NormSongPos = 0;
@@ -791,7 +791,7 @@ namespace Visual_Music
 		{
 			return (float)((timeS / viewWidthT) * (Camera.ViewportSize.X));
 		}
-	
+
 		public float getScreenPosY(float pitch)
 		{
 			return (pitch - MinPitch) * NoteHeight + NoteHeight / 2.0f + PitchMargin - Camera.ViewportSize.Y / 2;
@@ -800,7 +800,7 @@ namespace Visual_Music
 		{ //Returns time in ticks
 			return screenX / Camera.ViewportSize.X * viewWidthT; //Far right -> screenX = viewPortSize / 2
 		}
-		
+
 		public float SongLengthP => (float)(SongLengthT * Camera.ViewportSize.X) / viewWidthT;
 
 		public int SmallScrollStepT => (int)(ViewWidthT * SongPanel.SmallScrollStep);
@@ -854,6 +854,16 @@ namespace Visual_Music
 		{
 			return value * Camera.ViewportSize.X / UserViewWidth;
 		}
+
+		public void insertLyrics()
+		{
+			for (int i = 0; i < Lyrics.Count; i++)
+			{
+				if (Lyrics[i].Time > SongPosS)
+					Lyrics.Insert(i, new LyricsSegment((float)SongPosS));
+			}
+		}
+
 	}
 
 	static class SongFormat
@@ -867,8 +877,9 @@ namespace Visual_Music
 	{
 		public float Time { get; set; }
 		public string Lyrics { get; set; }
-		public LyricsSegment()
+		public LyricsSegment(float time)
 		{
+			Time = time;
 		}
 
 		public LyricsSegment(SerializationInfo info, StreamingContext ctxt) : base()
@@ -883,10 +894,10 @@ namespace Visual_Music
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
-			{
-				info.AddValue("time", Time);
-				info.AddValue("lyrics", Lyrics);
+		{
+			info.AddValue("time", Time);
+			info.AddValue("lyrics", Lyrics);
 		}
-
 	}
 }
+

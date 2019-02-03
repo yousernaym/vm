@@ -288,6 +288,7 @@ namespace Visual_Music
 			actionsToolStripMenuItem.Enabled = loaded;
 			loadCamToolStripMenuItem.Enabled = loaded;
 			saveCamToolStripMenuItem.Enabled = loaded;
+			insertLyricsHereToolStripMenuItem.Enabled = loaded;
 
 			//if (loaded)
 			//{
@@ -2061,6 +2062,11 @@ namespace Visual_Music
 
 		private void lyricsGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
+		}
+
+		private void insertLyricsHereToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			project.insertLyrics();
 		}
 	}
 }
