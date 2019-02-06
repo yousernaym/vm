@@ -33,7 +33,7 @@
 			this.vrMetadataCb = new System.Windows.Forms.CheckBox();
 			this.resoComboBox = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.ssResoComboBox = new System.Windows.Forms.ComboBox();
+			this.ssFactorComboBox = new System.Windows.Forms.ComboBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.fpsTb = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
@@ -103,18 +103,18 @@
 			// 
 			// ssResoComboBox
 			// 
-			this.ssResoComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.ssResoComboBox.FormattingEnabled = true;
-			this.ssResoComboBox.Items.AddRange(new object[] {
+			this.ssFactorComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.ssFactorComboBox.FormattingEnabled = true;
+			this.ssFactorComboBox.Items.AddRange(new object[] {
             "Disabled",
             "2x",
             "4x",
             "8x"});
-			this.ssResoComboBox.Location = new System.Drawing.Point(74, 92);
-			this.ssResoComboBox.Name = "ssResoComboBox";
-			this.ssResoComboBox.Size = new System.Drawing.Size(102, 21);
-			this.ssResoComboBox.TabIndex = 50;
-			this.ssResoComboBox.TextChanged += new System.EventHandler(this.ssResoComboBox_TextChanged);
+			this.ssFactorComboBox.Location = new System.Drawing.Point(74, 92);
+			this.ssFactorComboBox.Name = "ssResoComboBox";
+			this.ssFactorComboBox.Size = new System.Drawing.Size(102, 21);
+			this.ssFactorComboBox.TabIndex = 50;
+			this.ssFactorComboBox.TextChanged += new System.EventHandler(this.ssFactorComboBox_TextChanged);
 			// 
 			// label2
 			// 
@@ -131,7 +131,7 @@
 			this.fpsTb.Name = "fpsTb";
 			this.fpsTb.Size = new System.Drawing.Size(46, 20);
 			this.fpsTb.TabIndex = 71;
-			this.fpsTb.Text = "60";
+			this.fpsTb.Text = "0";
 			this.fpsTb.TextChanged += new System.EventHandler(this.fpsTb_TextChanged);
 			// 
 			// label3
@@ -150,7 +150,7 @@
 			this.Controls.Add(this.fpsTb);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
-			this.Controls.Add(this.ssResoComboBox);
+			this.Controls.Add(this.ssFactorComboBox);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.resoComboBox);
 			this.Controls.Add(this.vrMetadataCb);
@@ -165,7 +165,7 @@
 			this.Controls.SetChildIndex(this.vrMetadataCb, 0);
 			this.Controls.SetChildIndex(this.resoComboBox, 0);
 			this.Controls.SetChildIndex(this.label1, 0);
-			this.Controls.SetChildIndex(this.ssResoComboBox, 0);
+			this.Controls.SetChildIndex(this.ssFactorComboBox, 0);
 			this.Controls.SetChildIndex(this.label2, 0);
 			this.Controls.SetChildIndex(this.label3, 0);
 			this.Controls.SetChildIndex(this.fpsTb, 0);
@@ -181,7 +181,7 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
 		public System.Windows.Forms.ComboBox resoComboBox;
-		public System.Windows.Forms.ComboBox ssResoComboBox;
+		public System.Windows.Forms.ComboBox ssFactorComboBox;
 		private System.Windows.Forms.TextBox fpsTb;
 		private System.Windows.Forms.Label label3;
 	}

@@ -6,10 +6,10 @@
 - Loading of songlengths.txt directly from HVSC.
 - Use context menus for download links to download songs instead of import, or open import form instead of directly importing.
   Maybe also add default behaviour setting.
-- Handle variable CIA speed for sid songs.
 - Let user specify view width in song properties.
 
 Done:
+- Handle variable CIA speed for sid songs.
 - Playback start offset and fade in/out of brightness.
 - Specify colors for the different light types.
 - Fix alpha blending and line vertices at turns.

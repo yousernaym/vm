@@ -16,8 +16,8 @@ namespace Visual_Music
 		public VideoExportForm()
 		{
 			InitializeComponent();
-			ssResoComboBox.SelectedIndex = 2;
 			updateResoItems();
+			setOptions(Options);
 		}
 
 		private void sphereCb_CheckedChanged(object sender, EventArgs e)
@@ -29,6 +29,7 @@ namespace Visual_Music
 
 		private void resoComboBox_TextChanged(object sender, EventArgs e)
 		{
+			Options.resoIndex = resoComboBox.SelectedIndex;
 			parseReso(resoComboBox);
 		}
 
@@ -97,7 +98,6 @@ namespace Visual_Music
 				return false;
 
 			resoBox.ForeColor = System.Drawing.Color.Black;
-			updateSsReso();
 			return true;
 		}
 
@@ -106,48 +106,39 @@ namespace Visual_Music
 			Options.VrMetadata = vrMetadataCb.Checked;
 		}
 
-		private void ssResoComboBox_TextChanged(object sender, EventArgs e)
+		private void ssFactorComboBox_TextChanged(object sender, EventArgs e)
 		{
-			updateSsReso();
+			updateSsFactor();
 		}
 
-		void updateSsReso()
+		void updateSsFactor()
 		{
-			char lastChar = ssResoComboBox.Text[ssResoComboBox.Text.Length - 1];
+			if (string.IsNullOrEmpty(ssFactorComboBox.Text))
+				return;
+			char lastChar = ssFactorComboBox.Text[ssFactorComboBox.Text.Length - 1];
 			if (lastChar == 'x' || lastChar == 'X')
 			{
-				string numberString = ssResoComboBox.Text.Substring(0, ssResoComboBox.Text.Length - 1);
-				int multiplier = int.Parse(numberString);
-				Options.SSAAWidth = Options.Width * multiplier;
-				Options.SSAAHeight = Options.Height * multiplier;
-				while (Options.SSAAWidth > 16384 || Options.SSAAHeight > 16384)
-				{
-					Options.SSAAWidth /= 2;
-					Options.SSAAHeight /= 2;
-				}
-				Options.EnableSSAA = true;
+				string numberString = ssFactorComboBox.Text.Substring(0, ssFactorComboBox.Text.Length - 1);
+				Options.SSAAFactor  = int.Parse(numberString);
 			}
 			else
-			{
-				Options.EnableSSAA = false;
-				Options.SSAAWidth = Options.Width;
-				Options.SSAAHeight = Options.Height;
-			}
+				Options.SSAAFactor = 1;
 		}
 
-		internal void updateControls(VideoExportOptions options)
+		internal void setOptions(VideoExportOptions options)
 		{
+			Options = options;
 			sphereCb.Checked = options.Sphere;
 			vrMetadataCb.Checked = options.VrMetadata;
 			StereoscopicCb.Checked = options.Stereo;
 			fpsTb.Text = options.Fps.ToString();
+			resoComboBox.SelectedIndex = options.resoIndex;
+			ssFactorComboBox.SelectedIndex = options.ssaaIndex;
 		}
 
 		private void fpsTb_TextChanged(object sender, EventArgs e)
 		{
 			parseFps();
-			
-
 		}
 
 		bool parseFps()
@@ -164,15 +155,47 @@ namespace Visual_Music
 	[Serializable]
 	public class VideoExportOptions : ISerializable
 	{
-		public int Width;
-		public int Height;
-		public int SSAAWidth; 
-		public int SSAAHeight;
-		public bool EnableSSAA;
+		int width;
+		public int Width
+		{
+			get => width;
+			set
+			{
+				width = value;
+				updateSSAAReso();
+			}
+		}
+		int height;
+		public int Height
+		{
+			get => height;
+			set
+			{
+				height = value;
+				updateSSAAReso();
+			}
+		}
+	
+		public int SSAAWidth { get; private set; }
+		public int SSAAHeight { get; private set; }
+
+		int ssaaFactor = 4;
+		public int SSAAFactor
+		{
+			get => ssaaFactor;
+			set
+			{
+				ssaaFactor = value;
+				updateSSAAReso();
+			}
+		}
+		public bool EnableSSAA => ssaaFactor > 1;
 		public bool Sphere;
 		public bool Stereo;
 		public bool VrMetadata;
-		public float Fps;
+		public float Fps = 60;
+		internal int resoIndex;
+		internal int ssaaIndex => (int)Math.Log(ssaaFactor, 2);
 
 		public VideoExportOptions()
 		{
@@ -183,39 +206,43 @@ namespace Visual_Music
 		{
 			foreach (SerializationEntry entry in info)
 			{
-				if (entry.Name == "videoSphere")
+				if (entry.Name == "sphere")
 					Sphere = (bool)entry.Value;
-				else if (entry.Name == "videoVrMeta")
+				else if (entry.Name == "vrMeta")
 					VrMetadata = (bool)entry.Value;
-				else if (entry.Name == "videoVrStereo")
+				else if (entry.Name == "vrStereo")
 					Stereo = (bool)entry.Value;
-				else if (entry.Name == "videoWidth")
-					Width = (int)entry.Value;
-				else if (entry.Name == "videoHeight")
-					Height = (int)entry.Value;
-				else if (entry.Name == "videoSSAAWidth")
-					SSAAWidth = (int)entry.Value;
-				else if (entry.Name == "videoSSAAHeight")
-					SSAAHeight = (int)entry.Value;
-				else if (entry.Name == "videoEnableSSAA")
-					EnableSSAA = (bool)entry.Value;
+				//else if (entry.Name == "width")
+				//	Width = (int)entry.Value;
+				//else if (entry.Name == "height")
+				//	Height = (int)entry.Value;
+				else if (entry.Name == "resoIndex")
+					resoIndex = (int)entry.Value;
+				else if (entry.Name == "ssaaFactor")
+					SSAAFactor = (int)entry.Value;
 				else if (entry.Name == "fps")
 					Fps = (float)entry.Value;
 			}
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("videoSphere", Form1.VidExpForm.Options.Sphere);
-			info.AddValue("videoVrMeta", Form1.VidExpForm.Options.VrMetadata);
-			info.AddValue("videoVrStereo", Form1.VidExpForm.Options.Stereo);
-			info.AddValue("videoWidth", Form1.VidExpForm.Options.Width);
-			info.AddValue("videoHeight", Form1.VidExpForm.Options.Height);
-			info.AddValue("videoSSAAWidth", Form1.VidExpForm.Options.SSAAWidth);
-			info.AddValue("videoSSAAHeight", Form1.VidExpForm.Options.SSAAHeight);
-			info.AddValue("videoEnableSSAA", Form1.VidExpForm.Options.EnableSSAA);
+			info.AddValue("sphere", Form1.VidExpForm.Options.Sphere);
+			info.AddValue("vrMeta", Form1.VidExpForm.Options.VrMetadata);
+			info.AddValue("vrStereo", Form1.VidExpForm.Options.Stereo);
+			info.AddValue("resoIndex", Math.Max(0, Form1.VidExpForm.Options.resoIndex));
+			info.AddValue("ssaaFactor", Form1.VidExpForm.Options.SSAAFactor);
 			info.AddValue("fps", Fps);
 		}
 
-
+		void updateSSAAReso()
+		{
+			SSAAWidth = Width * ssaaFactor;
+			SSAAHeight = Height * ssaaFactor;
+			while (SSAAWidth > 16384 || SSAAHeight > 16384)
+			{
+				SSAAWidth /= 2;
+				SSAAHeight /= 2;
+			}
+		}
 	}
 }

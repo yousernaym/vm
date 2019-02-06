@@ -84,20 +84,7 @@ namespace Visual_Music
 					Form1.TpartyIntegrationForm.HvscSongLengths = (bool)entry.Value;
 
 				else if (entry.Name == "videoExportOptions")
-				{
-					VideoExportOptions options = (VideoExportOptions)entry.Value;
-					Form1.VidExpForm.updateControls(options);
-				}
-				else if (entry.Name == "videoExportFormResoIndex")
-				{
-					if (Form1.VidExpForm.resoComboBox.Items.Count > (int)entry.Value)
-						Form1.VidExpForm.resoComboBox.SelectedIndex = (int)entry.Value;
-				}
-				else if (entry.Name == "videoExportFormSsIndex")
-				{
-					if (Form1.VidExpForm.ssResoComboBox.Items.Count > (int)entry.Value)
-						Form1.VidExpForm.ssResoComboBox.SelectedIndex = (int)entry.Value;
-				}
+					Form1.VidExpForm.setOptions((VideoExportOptions)entry.Value);
 			}
 
 		}
@@ -130,8 +117,6 @@ namespace Visual_Music
 			info.AddValue(getKeyName(Keys.HvscSongLengths), Form1.TpartyIntegrationForm.HvscSongLengths);
 
 			info.AddValue("videoExportOptions", Form1.VidExpForm.Options);
-			info.AddValue("videoExportFormResoIndex", Form1.VidExpForm.resoComboBox.SelectedIndex);
-			info.AddValue("videoExportFormSsIndex", Form1.VidExpForm.ssResoComboBox.SelectedIndex);
 		}
 	}
 }

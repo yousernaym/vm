@@ -1068,7 +1068,8 @@ namespace Visual_Music
 				}
 				tempProject.SongPanel = songPanel;
 				if (tempProject.SongPanel == null) //User probably cancelled file import process
-					return; 
+					return;
+				//lyricsGridView.DataSource = null;
 				project = tempProject;
 				project.ImportOptions.updateImportForm();
 				currentProjPath = fileName;
@@ -2066,6 +2067,7 @@ namespace Visual_Music
 
 		private void insertLyricsHereToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			songPropsCb.Checked = true;
 			int row = project.insertLyrics();
 			var cell = lyricsGridView.Rows[row].Cells[1];
 			lyricsGridView.CurrentCell = cell;
@@ -2074,12 +2076,12 @@ namespace Visual_Music
 
 		private void lyricsGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
 		{
-			lyricsGridView.Visible = project.LyricsSigments.Count > 0;
+			if (project.LyricsSigments.Count == 0)
+				lyricsGridView.Hide();
 		}
 
 		private void lyricsGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
 		{
-			songPropsCb.Checked = true;
 		}
 	}
 }
