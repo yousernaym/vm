@@ -99,6 +99,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Cloneable.cs" />
     <Compile Include="Controls\BarStyleControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

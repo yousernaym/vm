@@ -32,12 +32,13 @@ VSOutput VS(VSInput IN)
 	//OUT.pos.z = 0;
 	//OUT.pos.w = 1;
     OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw - TexScrollOffset;
-	if (IN.rect.x  < SongPos && IN.rect.x + IN.rect.z > SongPos)
+    float4 scaledRect = IN.rect * VertWidthScale;
+    if (scaledRect.x < SongPos && scaledRect.x + scaledRect.z > SongPos)
 		OUT.color = HlColor;
 	else
 		OUT.color = Color;
 	OUT.normPos = IN.normPos;// *2 - 1;
-	OUT.worldSize = IN.rect.zw;
+    OUT.worldSize = scaledRect.zw;
     return OUT;
 }
 

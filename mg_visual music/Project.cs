@@ -60,10 +60,10 @@ namespace Visual_Music
 			set { trackViews = value; }
 		}
 
-		//float viewWidthQn = DefaultViewWidthQn;
+		float viewWidthQn;// = DefaultViewWidthQn;
 		public float ViewWidthQn
 		{
-			get { return KeyFrames; }
+			get { return viewWidthQn; }
 			set
 			{
 				viewWidthQn = value;
@@ -71,6 +71,12 @@ namespace Visual_Music
 					viewWidthT = viewWidthQn * notes.TicksPerBeat;
 			}
 		}
+
+		public KeyFrame getKeyFrameAtSongPos()
+		{
+			return KeyFrames[(int)SongPosT];
+		}
+
 		float vertViewWidthQn;
 		public float VertWidthScale => vertViewWidthQn / viewWidthQn;
 
@@ -186,8 +192,10 @@ namespace Visual_Music
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
-			LyricsSegments = new BindingList<LyricsSegment>;
+			LyricsSegments = new BindingList<LyricsSegment>();
 			KeyFrames = new KeyFrames();
+			KeyFrames.insert(0);
+			ViewWidthQn = KeyFrames[0].ViewWidthQn;
 		}
 
 		public bool loadContent()
@@ -365,7 +373,8 @@ namespace Visual_Music
 
 			if (options.EraseCurrent)
 			{
-				ViewWidthQn = DefaultViewWidthQn;
+				KeyFrames = new KeyFrames();
+				KeyFrames.insert(0);
 				AudioOffset = playbackOffsetS = FadeIn = FadeOut = 0;
 				NormSongPos = 0;
 			}
@@ -689,9 +698,9 @@ namespace Visual_Music
 
 		public void update(double deltaTimeS)
 		{
-			var interpolatedFrame = KeyFrames.createInterpolatedFrame(songPosT);
+			var interpolatedFrame = KeyFrames.createInterpolatedFrame((int)SongPosT);
 			ViewWidthQn = interpolatedFrame.ViewWidthQn;
-			Camera = interpolatedFrame.Camera;
+			//Camera = interpolatedFrame.Camera;
 			Camera.update(deltaTimeS);
 			//Scroll song depending on user input or playback position.
 			if (IsPlaying)
@@ -859,9 +868,9 @@ namespace Visual_Music
 			return LyricsSegments.Count - 1;
 		}
 
-		public insertKeyFrame()
+		public void insertKeyFrame()
 		{
-			KeyFrames.insert(songPosT);
+			KeyFrames.insert((int)SongPosT);
 		}
 	}
 

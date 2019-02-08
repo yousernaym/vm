@@ -378,7 +378,7 @@ namespace Visual_Music
 	//Tab props
 
 	[Serializable()]
-	public class StyleProps : CloneableProps<StyleProps>, ISerializable
+	public class StyleProps : Cloneable<StyleProps>, ISerializable
 	{
 		public NoteStyleType? Type { get; set; }
 		NoteStyle[] styles = new NoteStyle[Enum.GetNames(typeof(NoteStyleType)).Length];
@@ -488,7 +488,7 @@ namespace Visual_Music
 	}
 
 	[Serializable()]
-	public class MaterialProps : CloneableProps<MaterialProps>, ISerializable
+	public class MaterialProps : Cloneable<MaterialProps>, ISerializable
 	{
 		public float? Transp { get; set; }
 		public float? Hue { get; set; }
@@ -630,7 +630,7 @@ namespace Visual_Music
 	}
 
 	[Serializable()]
-	public class LightProps : CloneableProps<LightProps>, ISerializable
+	public class LightProps : Cloneable<LightProps>, ISerializable
 	{
 		public bool? UseGlobalLight { get; set; }
 		internal Vector3 Dir
@@ -715,7 +715,7 @@ namespace Visual_Music
 	}
 
 	[Serializable()]
-	public class SpatialProps : CloneableProps<SpatialProps>, ISerializable
+	public class SpatialProps : Cloneable<SpatialProps>, ISerializable
 	{
 		internal Vector3 PosOffset
 		{
@@ -751,18 +751,5 @@ namespace Visual_Music
 			info.AddValue("posOffset", PosOffset);
 		}
 
-	}
-
-	abstract public class CloneableProps<T>
-	{
-		public T clone()
-		{
-			DataContractSerializer dcs = new DataContractSerializer(typeof(T), Form1.projectSerializationTypes);
-			MemoryStream stream = new MemoryStream();
-			dcs.WriteObject(stream, this);
-			stream.Flush();
-			stream.Position = 0;
-			return (T)dcs.ReadObject(stream);
-		}
 	}
 }

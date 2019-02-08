@@ -457,7 +457,10 @@ namespace Visual_Music
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
 		{
-			Project.ViewWidthQn = (float)((TbSlider)sender).Value;
+			var keyFrame = project.getKeyFrameAtSongPos();
+			if (keyFrame == null)
+				return;
+			keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
 			songScrollBar.SmallChange = Project.SmallScrollStepT;
 			songScrollBar.LargeChange = Project.LargeScrollStepT;
 		}
@@ -2086,7 +2089,7 @@ namespace Visual_Music
 
 		private void insertKeyFrameToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			project.KeyFrames
+			project.insertKeyFrame();
 		}
 	}
 }

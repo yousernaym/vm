@@ -63,7 +63,8 @@ namespace Visual_Music
 			get => spatialChanged;
 			set
 			{
-				value();
+				if (value != null)
+					value();
 				spatialChanged = value;
 			}
 		}
