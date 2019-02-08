@@ -211,6 +211,7 @@
       <DependentUpon>VideoExportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Download.cs" />
+    <Compile Include="KeyFrame.cs" />
     <Compile Include="MidMix.cs" />
     <Compile Include="NoteStyle_Bar.cs" />
     <Compile Include="NoteStyle_Line.cs" />

@@ -307,7 +307,7 @@ namespace Visual_Music
 			maxPitchUd.Value = Project.MaxPitch;
 			minPitchUd.Value = Project.MinPitch;
 			updatingControls = false;
-			lyricsGridView.DataSource = project.LyricsSigments;
+			lyricsGridView.DataSource = project.LyricsSegments;
 
 			project.Camera.SpatialChanged = updateCamControls;
 			upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
@@ -1270,7 +1270,7 @@ namespace Visual_Music
 			if (songPropsCb.Checked)
 			{
 				songPropsPanel.Show();
-				lyricsGridView.Visible = project.LyricsSigments.Count > 0;
+				lyricsGridView.Visible = project.LyricsSegments.Count > 0;
 			}
 			else
 			{
@@ -2076,12 +2076,17 @@ namespace Visual_Music
 
 		private void lyricsGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
 		{
-			if (project.LyricsSigments.Count == 0)
+			if (project.LyricsSegments.Count == 0)
 				lyricsGridView.Hide();
 		}
 
 		private void lyricsGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
 		{
+		}
+
+		private void insertKeyFrameToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			project.KeyFrames
 		}
 	}
 }

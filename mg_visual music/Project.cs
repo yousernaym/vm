@@ -22,7 +22,8 @@ namespace Visual_Music
 	[Serializable()]
 	public class Project : ISerializable
 	{
-		public BindingList<LyricsSegment> LyricsSigments { get; private set; } = new BindingList<LyricsSegment>();
+		public KeyFrames KeyFrames { get; set; }
+		public BindingList<LyricsSegment> LyricsSegments { get; private set; }
 
 		public float UserViewWidth = 1000f;
 		const float NormPitchMargin = 1 / 100.0f;
@@ -59,12 +60,10 @@ namespace Visual_Music
 			set { trackViews = value; }
 		}
 
-		public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen
-
-		float viewWidthQn = DefaultViewWidthQn;
+		//float viewWidthQn = DefaultViewWidthQn;
 		public float ViewWidthQn
 		{
-			get { return viewWidthQn; }
+			get { return KeyFrames; }
 			set
 			{
 				viewWidthQn = value;
@@ -187,6 +186,8 @@ namespace Visual_Music
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
+			LyricsSegments = new BindingList<LyricsSegment>;
+			KeyFrames = new KeyFrames();
 		}
 
 		public bool loadContent()
@@ -252,7 +253,7 @@ namespace Visual_Music
 				else if (entry.Name == "userViewWidth")
 					UserViewWidth = (float)entry.Value;
 				else if (entry.Name == "lyrics")
-					LyricsSigments = (BindingList<LyricsSegment>)entry.Value;
+					LyricsSegments = (BindingList<LyricsSegment>)entry.Value;
 			}
 			//noteFileType = (Midi.FileType)info.GetValue("noteFileType", typeof(Midi.FileType));
 		}
@@ -274,7 +275,7 @@ namespace Visual_Music
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
 			info.AddValue("camera", Camera);
 			info.AddValue("userViewWidth", UserViewWidth);
-			info.AddValue("lyrics", LyricsSigments);
+			info.AddValue("lyrics", LyricsSegments);
 		}
 
 		public bool importSong(ImportOptions options)
@@ -508,7 +509,7 @@ namespace Visual_Music
 			Vector2 scale = new Vector2(Camera.ViewportSize.X / songPanelSize.X, -Camera.ViewportSize.Y / songPanelSize.Y);
 
 			SongPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
-			foreach (var lyricsSegment in LyricsSigments)
+			foreach (var lyricsSegment in LyricsSegments)
 			{
 				if (string.IsNullOrWhiteSpace(lyricsSegment.Lyrics))
 					continue;
@@ -688,6 +689,9 @@ namespace Visual_Music
 
 		public void update(double deltaTimeS)
 		{
+			var interpolatedFrame = KeyFrames.createInterpolatedFrame(songPosT);
+			ViewWidthQn = interpolatedFrame.ViewWidthQn;
+			Camera = interpolatedFrame.Camera;
 			Camera.update(deltaTimeS);
 			//Scroll song depending on user input or playback position.
 			if (IsPlaying)
@@ -843,18 +847,22 @@ namespace Visual_Music
 
 		public int insertLyrics()
 		{
-			for (int i = 0; i < LyricsSigments.Count; i++)
+			for (int i = 0; i < LyricsSegments.Count; i++)
 			{
-				if (LyricsSigments[i].Time >= SongPosS)
+				if (LyricsSegments[i].Time >= SongPosS)
 				{
-					LyricsSigments.Insert(i, new LyricsSegment((float)SongPosS));
+					LyricsSegments.Insert(i, new LyricsSegment((float)SongPosS));
 					return i;
 				}
 			}
-			LyricsSigments.Add(new LyricsSegment((float)SongPosS));
-			return LyricsSigments.Count - 1;
+			LyricsSegments.Add(new LyricsSegment((float)SongPosS));
+			return LyricsSegments.Count - 1;
 		}
 
+		public insertKeyFrame()
+		{
+			KeyFrames.insert(songPosT);
+		}
 	}
 
 	static class SongFormat
