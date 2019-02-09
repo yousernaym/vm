@@ -3,17 +3,19 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using System.Collections;
 
 namespace Visual_Music
 {
 	[Serializable]
-	public class KeyFrames : ISerializable
+	public class KeyFrames : ISerializable, IEnumerable<KeyValuePair<int, KeyFrame>>
 	{
 		SortedList<int, KeyFrame> frameList;
 
 		public KeyFrames()
 		{
 			frameList = new SortedList<int, KeyFrame>();
+			frameList.Add(0, new KeyFrame());
 		}
 
 		public KeyFrames(SerializationInfo info, StreamingContext ctxt)
@@ -30,9 +32,15 @@ namespace Visual_Music
 			info.AddValue("frameList", frameList);
 		}
 
-		public void insert(int songPosT)
+		public int insert(int songPosT)
 		{
-			frameList.Add(songPosT, createInterpolatedFrame(songPosT));
+			if (!frameList.ContainsKey(songPosT))
+			{
+				frameList.Add(songPosT, createInterpolatedFrame(songPosT));
+				return frameList.IndexOfKey(songPosT);
+			}
+			else
+				return -1;
 		}
 
 		public KeyFrame createInterpolatedFrame(int songPosT)
@@ -99,6 +107,29 @@ namespace Visual_Music
 		private Quaternion interpolate(Quaternion value1, Quaternion value2, float interpolant)
 		{
 			return value1 * (1 - interpolant) + value2 * interpolant;
+		}
+
+		public void removeIndex(int index)
+		{
+			frameList.RemoveAt(index);
+		}
+
+		public int keyAtIndex(int index)
+		{
+			if (index < frameList.Count)
+				return frameList.Keys[index];
+			else
+				return -1;
+		}
+
+		public IEnumerator<KeyValuePair<int, KeyFrame>> GetEnumerator()
+		{
+			return frameList.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.GetEnumerator();
 		}
 	}
 

@@ -22,8 +22,8 @@ namespace Visual_Music
 	[Serializable()]
 	public class Project : ISerializable
 	{
-		public KeyFrames KeyFrames { get; set; }
-		public BindingList<LyricsSegment> LyricsSegments { get; private set; }
+		public KeyFrames KeyFrames { get; set; } = new KeyFrames();
+		public BindingList<LyricsSegment> LyricsSegments { get; private set; } = new BindingList<LyricsSegment>();
 
 		public float UserViewWidth = 1000f;
 		const float NormPitchMargin = 1 / 100.0f;
@@ -192,9 +192,9 @@ namespace Visual_Music
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
-			LyricsSegments = new BindingList<LyricsSegment>();
-			KeyFrames = new KeyFrames();
-			KeyFrames.insert(0);
+			//LyricsSegments = new BindingList<LyricsSegment>();
+			//KeyFrames = new KeyFrames();
+			//KeyFrames.insert(0);
 			ViewWidthQn = KeyFrames[0].ViewWidthQn;
 		}
 
@@ -262,6 +262,9 @@ namespace Visual_Music
 					UserViewWidth = (float)entry.Value;
 				else if (entry.Name == "lyrics")
 					LyricsSegments = (BindingList<LyricsSegment>)entry.Value;
+				else if (entry.Name == "keyFrames")
+					KeyFrames = (KeyFrames)entry.Value;
+
 			}
 			//noteFileType = (Midi.FileType)info.GetValue("noteFileType", typeof(Midi.FileType));
 		}
@@ -284,6 +287,7 @@ namespace Visual_Music
 			info.AddValue("camera", Camera);
 			info.AddValue("userViewWidth", UserViewWidth);
 			info.AddValue("lyrics", LyricsSegments);
+			info.AddValue("keyFrames", KeyFrames);
 		}
 
 		public bool importSong(ImportOptions options)
@@ -868,9 +872,16 @@ namespace Visual_Music
 			return LyricsSegments.Count - 1;
 		}
 
-		public void insertKeyFrame()
+		public int insertKeyFrameAtSongPos()
 		{
-			KeyFrames.insert((int)SongPosT);
+			return KeyFrames.insert((int)SongPosT);
+		}
+
+		public void goToKeyFrame(int index)
+		{
+			int newPosT = KeyFrames.keyAtIndex(index);
+			if (SongLengthT > 0 && newPosT >= 0)
+				NormSongPos = newPosT / SongLengthT;
 		}
 	}
 

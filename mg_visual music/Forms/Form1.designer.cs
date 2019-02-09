@@ -30,6 +30,7 @@
 		{
 			this.components = new System.ComponentModel.Container();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 			this.openProjDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveProjDialog = new System.Windows.Forms.SaveFileDialog();
@@ -71,6 +72,7 @@
 			this.jumpBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.jumpForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.insertLyricsHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.insertKeyFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
@@ -186,7 +188,6 @@
 			this.setDefaultBtn = new System.Windows.Forms.Button();
 			this.openTextureDlg = new System.Windows.Forms.OpenFileDialog();
 			this.songPropsPanel = new System.Windows.Forms.Panel();
-			this.keyframeLV = new Visual_Music.ListViewNF();
 			this.camLabel = new System.Windows.Forms.Label();
 			this.camTb = new System.Windows.Forms.TextBox();
 			this.defaultPitchesBtn = new System.Windows.Forms.Button();
@@ -221,7 +222,9 @@
 			this.lyricsGridView = new System.Windows.Forms.DataGridView();
 			this.TimeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.LyricsColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.insertKeyFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.keyFramesDGV = new System.Windows.Forms.DataGridView();
+			this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Description = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -266,6 +269,7 @@
 			this.propsTogglePanel.SuspendLayout();
 			this.trackPropsTabCM.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.lyricsGridView)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.keyFramesDGV)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// openProjDialog
@@ -467,7 +471,7 @@
             this.loadCamToolStripMenuItem,
             this.saveCamToolStripMenuItem});
 			this.songToolStripMenuItem.Name = "songToolStripMenuItem";
-			this.songToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.songToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
 			this.songToolStripMenuItem.Text = "Camera";
 			// 
 			// resetCamToolStripMenuItem
@@ -506,7 +510,7 @@
             this.savePropertiesToolStripMenuItem});
 			this.tracksToolStripMenuItem.Enabled = false;
 			this.tracksToolStripMenuItem.Name = "tracksToolStripMenuItem";
-			this.tracksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.tracksToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
 			this.tracksToolStripMenuItem.Text = "Tracks";
 			this.tracksToolStripMenuItem.EnabledChanged += new System.EventHandler(this.tracksToolStripMenuItem_EnabledChanged);
 			// 
@@ -572,7 +576,7 @@
             this.jumpBackwardsToolStripMenuItem,
             this.jumpForwardToolStripMenuItem});
 			this.playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
-			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
 			this.playbackToolStripMenuItem.Text = "Playback";
 			// 
 			// startStopToolStripMenuItem
@@ -637,9 +641,16 @@
 			// 
 			this.insertLyricsHereToolStripMenuItem.Name = "insertLyricsHereToolStripMenuItem";
 			this.insertLyricsHereToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-			this.insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
 			this.insertLyricsHereToolStripMenuItem.Text = "Insert lyrics";
 			this.insertLyricsHereToolStripMenuItem.Click += new System.EventHandler(this.insertLyricsHereToolStripMenuItem_Click);
+			// 
+			// insertKeyFrameToolStripMenuItem
+			// 
+			this.insertKeyFrameToolStripMenuItem.Name = "insertKeyFrameToolStripMenuItem";
+			this.insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+			this.insertKeyFrameToolStripMenuItem.Text = "Insert key frame";
+			this.insertKeyFrameToolStripMenuItem.Click += new System.EventHandler(this.insertKeyFrameToolStripMenuItem_Click);
 			// 
 			// label7
 			// 
@@ -2002,7 +2013,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-8462, 16247);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-8649, 16247);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -2014,7 +2025,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-8574, 16248);
+			this.texPathTb.Location = new System.Drawing.Point(-8761, 16248);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -2024,7 +2035,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-8576, 16232);
+			this.label4.Location = new System.Drawing.Point(-8763, 16232);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2059,7 +2070,6 @@
 			// 
 			// songPropsPanel
 			// 
-			this.songPropsPanel.Controls.Add(this.keyframeLV);
 			this.songPropsPanel.Controls.Add(this.camLabel);
 			this.songPropsPanel.Controls.Add(this.camTb);
 			this.songPropsPanel.Controls.Add(this.defaultPitchesBtn);
@@ -2084,21 +2094,10 @@
 			this.songPropsPanel.Dock = System.Windows.Forms.DockStyle.Left;
 			this.songPropsPanel.Location = new System.Drawing.Point(0, 24);
 			this.songPropsPanel.Name = "songPropsPanel";
-			this.songPropsPanel.Size = new System.Drawing.Size(339, 16294);
+			this.songPropsPanel.Size = new System.Drawing.Size(197, 16294);
 			this.songPropsPanel.TabIndex = 17;
 			this.songPropsPanel.Visible = false;
 			this.songPropsPanel.VisibleChanged += new System.EventHandler(this.songPropsPanel_VisibleChanged);
-			// 
-			// keyframeLV
-			// 
-			this.keyframeLV.BackColor = System.Drawing.Color.Black;
-			this.keyframeLV.Dock = System.Windows.Forms.DockStyle.Right;
-			this.keyframeLV.ForeColor = System.Drawing.Color.White;
-			this.keyframeLV.Location = new System.Drawing.Point(199, 0);
-			this.keyframeLV.Name = "keyframeLV";
-			this.keyframeLV.Size = new System.Drawing.Size(140, 16294);
-			this.keyframeLV.TabIndex = 8;
-			this.keyframeLV.UseCompatibleStateImageBehavior = false;
 			// 
 			// camLabel
 			// 
@@ -2419,9 +2418,9 @@
             this.TimeColumn,
             this.LyricsColumn});
 			this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.lyricsGridView.Location = new System.Drawing.Point(339, 16268);
+			this.lyricsGridView.Location = new System.Drawing.Point(197, 16268);
 			this.lyricsGridView.Name = "lyricsGridView";
-			this.lyricsGridView.Size = new System.Drawing.Size(533, 50);
+			this.lyricsGridView.Size = new System.Drawing.Size(675, 50);
 			this.lyricsGridView.TabIndex = 0;
 			this.lyricsGridView.Visible = false;
 			this.lyricsGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.lyricsGridView_CellEndEdit);
@@ -2448,12 +2447,39 @@
 			this.LyricsColumn.HeaderText = "Lyrics";
 			this.LyricsColumn.Name = "LyricsColumn";
 			// 
-			// insertKeyFrameToolStripMenuItem
+			// keyFramesDGV
 			// 
-			this.insertKeyFrameToolStripMenuItem.Name = "insertKeyFrameToolStripMenuItem";
-			this.insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.insertKeyFrameToolStripMenuItem.Text = "Insert key frame";
-			this.insertKeyFrameToolStripMenuItem.Click += new System.EventHandler(this.insertKeyFrameToolStripMenuItem_Click);
+			this.keyFramesDGV.AllowUserToAddRows = false;
+			this.keyFramesDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.keyFramesDGV.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Time,
+            this.Description});
+			this.keyFramesDGV.Dock = System.Windows.Forms.DockStyle.Left;
+			this.keyFramesDGV.Location = new System.Drawing.Point(197, 24);
+			this.keyFramesDGV.Name = "keyFramesDGV";
+			this.keyFramesDGV.Size = new System.Drawing.Size(210, 16244);
+			this.keyFramesDGV.TabIndex = 23;
+			this.keyFramesDGV.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.keyFramesDGV_RowsAdded);
+			this.keyFramesDGV.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.keyFramesDGV_RowsRemoved);
+			this.keyFramesDGV.SelectionChanged += new System.EventHandler(this.keyFramesDGV_SelectionChanged);
+			this.keyFramesDGV.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.keyFramesDGV_UserDeletingRow);
+			// 
+			// Time
+			// 
+			this.Time.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+			dataGridViewCellStyle2.Format = "N0";
+			dataGridViewCellStyle2.NullValue = null;
+			this.Time.DefaultCellStyle = dataGridViewCellStyle2;
+			this.Time.FillWeight = 30F;
+			this.Time.HeaderText = "Time";
+			this.Time.Name = "Time";
+			// 
+			// Description
+			// 
+			this.Description.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+			this.Description.FillWeight = 80F;
+			this.Description.HeaderText = "Description";
+			this.Description.Name = "Description";
 			// 
 			// Form1
 			// 
@@ -2462,6 +2488,7 @@
 			this.AutoScroll = true;
 			this.AutoSize = true;
 			this.ClientSize = new System.Drawing.Size(1284, 505);
+			this.Controls.Add(this.keyFramesDGV);
 			this.Controls.Add(this.lyricsGridView);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
@@ -2540,6 +2567,7 @@
 			this.propsTogglePanel.PerformLayout();
 			this.trackPropsTabCM.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.lyricsGridView)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.keyFramesDGV)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -2736,8 +2764,10 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn LyricsColumn;
 		private System.Windows.Forms.Label camLabel;
 		private System.Windows.Forms.ToolStripMenuItem insertLyricsHereToolStripMenuItem;
-		private ListViewNF keyframeLV;
 		private System.Windows.Forms.ToolStripMenuItem insertKeyFrameToolStripMenuItem;
+		private System.Windows.Forms.DataGridView keyFramesDGV;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Time;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Description;
 	}
 }
 

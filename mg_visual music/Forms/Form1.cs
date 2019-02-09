@@ -77,7 +77,7 @@ namespace Visual_Music
 		public static TpartyIntegrationForm TpartyIntegrationForm => tpartyIntegrationForm;
 		public static VideoExportForm VidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment) };
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment), typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame) };
 		SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
 		SongWebBrowser modWebBrowser;
@@ -306,12 +306,20 @@ namespace Visual_Music
 			fadeOutUd.Value = (decimal)project.FadeOut;
 			maxPitchUd.Value = Project.MaxPitch;
 			minPitchUd.Value = Project.MinPitch;
+			buildKeyFramesDGV();
 			updatingControls = false;
 			lyricsGridView.DataSource = project.LyricsSegments;
 
 			project.Camera.SpatialChanged = updateCamControls;
 			upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(songPanel);
+		}
+
+		private void buildKeyFramesDGV()
+		{
+			keyFramesDGV.Rows.Clear();
+			foreach (var frame in Project.KeyFrames)
+				keyFramesDGV.Rows.Add(frame.Key, "");
 		}
 
 		private void updateCamControls()
@@ -2089,7 +2097,44 @@ namespace Visual_Music
 
 		private void insertKeyFrameToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			project.insertKeyFrame();
+			int row = project.insertKeyFrameAtSongPos();
+			if (row < 0)
+			{
+				showErrorMsgBox("A keyframe already exists here.");
+				return;
+			}
+			
+			//keyFramesDGV.Rows.Add(project.SongPosT, "");
+			//keyFramesDGV.Sort(keyFramesDGV.Columns[0], ListSortDirection.Ascending);
+			buildKeyFramesDGV(); //Rebuild table to get exact sorting of underlying integer keys.
+			songPropsCb.Checked = true;
+			var cell = keyFramesDGV.Rows[row].Cells[1];
+			keyFramesDGV.CurrentCell = cell;
+			keyFramesDGV.BeginEdit(true);
+		}
+
+		private void keyFramesDGV_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+		{
+		
+		}
+
+		private void keyFramesDGV_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
+		{
+			if (updatingControls)
+				return;
+			project.KeyFrames.removeIndex(e.RowIndex);
+
+		}
+
+		private void keyFramesDGV_SelectionChanged(object sender, EventArgs e)
+		{
+			project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
+		}
+
+		private void keyFramesDGV_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+		{
+			if (keyFramesDGV.Rows.Count == 1)
+				e.Cancel = true;
 		}
 	}
 }
