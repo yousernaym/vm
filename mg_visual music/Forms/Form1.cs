@@ -317,9 +317,11 @@ namespace Visual_Music
 
 		private void buildKeyFramesDGV()
 		{
+			updatingControls = true;
 			keyFramesDGV.Rows.Clear();
 			foreach (var frame in Project.KeyFrames)
 				keyFramesDGV.Rows.Add(frame.Key, "");
+			updatingControls = false;
 		}
 
 		private void updateCamControls()
@@ -2104,12 +2106,10 @@ namespace Visual_Music
 				return;
 			}
 			
-			//keyFramesDGV.Rows.Add(project.SongPosT, "");
-			//keyFramesDGV.Sort(keyFramesDGV.Columns[0], ListSortDirection.Ascending);
-			buildKeyFramesDGV(); //Rebuild table to get exact sorting of underlying integer keys.
+			keyFramesDGV.Rows.Insert(row, project.SongPosT, "");
 			songPropsCb.Checked = true;
-			var cell = keyFramesDGV.Rows[row].Cells[1];
-			keyFramesDGV.CurrentCell = cell;
+			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
+			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[1]; //Select cell in Description column
 			keyFramesDGV.BeginEdit(true);
 		}
 
