@@ -16,6 +16,7 @@ using System.IO.Compression;
 using CefSharp.Example.RequestEventHandler;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Globalization;
 
 namespace Visual_Music
 {
@@ -97,6 +98,8 @@ namespace Visual_Music
 		{
 			InitializeComponent();
 			//Application.Idle += delegate { songPanel.update(); };
+			//keyFramesDGV.Columns[0].CellTemplate.ValueType = typeof(Int32);
+
 			project = new Project(SongPanel);
 			startupArgs = args;
 			TrackTexPbHeight = trackTexPb.Height;
@@ -1283,12 +1286,16 @@ namespace Visual_Music
 			if (songPropsCb.Checked)
 			{
 				songPropsPanel.Show();
-				lyricsGridView.Visible = project.LyricsSegments.Count > 0;
+				if (project.LyricsSegments.Count > 0)
+					lyricsGridView.Show();
+				if (project.KeyFrames.Count > 1)
+					keyFramesDGV.Show();
 			}
 			else
 			{
 				songPropsPanel.Hide();
 				lyricsGridView.Hide();
+				keyFramesDGV.Hide();
 			}
 		}
 
@@ -2065,22 +2072,33 @@ namespace Visual_Music
 
 		private void lyricsGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
 		{
-			showErrorMsgBox("The entered value has an invalid format.");
-			e.ThrowException = false;
+			//showErrorMsgBox("The entered value has an invalid format.");
+			//e.ThrowException = false;
 		}
 
 		private void lyricsGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
 		{
-			songPanel.Invalidate();
+			if (e.ColumnIndex != 0)
+				return;
+			float time;
+			if (!float.TryParse((string)e.FormattedValue, out time))
+			{
+				showErrorMsgBox("Invalid format.");
+				e.Cancel = true;
+			}
+			else
+				songPanel.Invalidate();
 		}
 
 		private void lyricsGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
+
 		}
 
 		private void insertLyricsHereToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			songPropsCb.Checked = true;
+			lyricsGridView.Show();
 			int row = project.insertLyrics();
 			var cell = lyricsGridView.Rows[row].Cells[1];
 			lyricsGridView.CurrentCell = cell;
@@ -2091,10 +2109,6 @@ namespace Visual_Music
 		{
 			if (project.LyricsSegments.Count == 0)
 				lyricsGridView.Hide();
-		}
-
-		private void lyricsGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
-		{
 		}
 
 		private void insertKeyFrameToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2108,6 +2122,7 @@ namespace Visual_Music
 			
 			keyFramesDGV.Rows.Insert(row, project.SongPosT, "");
 			songPropsCb.Checked = true;
+			keyFramesDGV.Show();
 			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
 			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[1]; //Select cell in Description column
 			keyFramesDGV.BeginEdit(true);
@@ -2123,18 +2138,88 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			project.KeyFrames.removeIndex(e.RowIndex);
-
+			if (project.KeyFrames.Count == 1)
+				keyFramesDGV.Hide();
 		}
 
 		private void keyFramesDGV_SelectionChanged(object sender, EventArgs e)
 		{
-			project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
+			if (keyFramesDGV.CurrentRow != null)
+				project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
 		}
 
 		private void keyFramesDGV_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
 		{
 			if (keyFramesDGV.Rows.Count == 1)
 				e.Cancel = true;
+		}
+
+		private void keyFramesDGV_Paint(object sender, PaintEventArgs e)
+		{
+			//keyFramesDGV.Height = keyFramesDGV.Rows.GetRowsHeight(DataGridViewElementStates.None) + keyFramesDGV.ColumnHeadersHeight + 2;
+		}
+
+		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			e.Cancel = false;
+		}
+
+		private void keyFramesDGV_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+		{
+			//if (e.ColumnIndex != 0)
+			//	return;
+			//int time;
+			//string str = e.FormattedValue.ToString();//.Replace(" ", "");
+
+			//if (!int.TryParse(str, out time))
+			//{
+			//	char c = str[2];
+			//	showErrorMsgBox("Invalid format.");
+			//	e.Cancel = true;
+			//}
+			//else
+			//{
+			//	//if (time != (int)keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value)
+			//	if (time != project.KeyFrames.Keys[e.ColumnIndex])
+			//	{
+			//		if (project.KeyFrames.changeTimeOfFrame(e.ColumnIndex, time) < 0)
+			//			showErrorMsgBox("A key frame already exists at this position.");
+			//	}
+			//}
+		}
+
+		private void keyFramesDGV_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+		{
+			if (e.ColumnIndex != 0)
+				return;
+			int time;
+			string str = keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+			if (!int.TryParse(str, out time))
+			{
+				showErrorMsgBox("Invalid format.");
+			}
+			else
+			{
+				//if (time != (int)keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value)
+				if (time != project.KeyFrames.Keys[e.RowIndex])
+				{
+					int newRowIndex = project.KeyFrames.changeTimeOfFrame(e.RowIndex, time);
+					if (newRowIndex < 0)
+					{
+						showErrorMsgBox("A key frame already exists at this position.");
+						keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = project.KeyFrames.Keys[e.RowIndex];
+					}
+					else
+					{
+						var row = keyFramesDGV.Rows[e.RowIndex];
+						updatingControls = true;
+						keyFramesDGV.Rows.RemoveAt(e.RowIndex);
+						updatingControls = false;
+						keyFramesDGV.Rows.Insert(newRowIndex, row);
+						keyFramesDGV.CurrentCell = keyFramesDGV.Rows[newRowIndex].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
+					}
+				}
+			}
 		}
 	}
 }

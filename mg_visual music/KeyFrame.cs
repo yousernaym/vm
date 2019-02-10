@@ -131,6 +131,20 @@ namespace Visual_Music
 		{
 			return this.GetEnumerator();
 		}
+
+		public int Count => frameList.Count;
+		public IList<int> Keys => frameList.Keys;
+
+		internal int changeTimeOfFrame(int frameNumber, int time)
+		{
+			if (frameList.ContainsKey(time))
+				return -1;
+
+			var frame = frameList.Values[frameNumber];
+			frameList.RemoveAt(frameNumber);
+			frameList.Add(time, frame);
+			return frameList.IndexOfKey(time);
+		}
 	}
 
 	//KeyFrame------------------
