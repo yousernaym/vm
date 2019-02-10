@@ -93,6 +93,7 @@ namespace Visual_Music
 		public static Settings Settings { get => settings; }
 		ScrollBar songScrollBar = new HScrollBar();
 		NoteStyleControl currentNoteStyleControl;
+		int keyFrameLockRow = -1;
 
 		public Form1(string[] args)
 		{
@@ -2144,6 +2145,13 @@ namespace Visual_Music
 
 		private void keyFramesDGV_SelectionChanged(object sender, EventArgs e)
 		{
+			if (updatingControls)
+				return;
+			if (keyFrameLockRow >= 0)
+			{
+				keyFramesDGV.CurrentCell = keyFramesDGV.Rows[keyFrameLockRow].Cells[0];
+				keyFrameLockRow = -1;
+			}
 			if (keyFramesDGV.CurrentRow != null)
 				project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
 		}
@@ -2191,8 +2199,10 @@ namespace Visual_Music
 		private void keyFramesDGV_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
 			string str = keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+			keyFrameLockRow = e.RowIndex; //If enter was pressed, the currently selected row will change to the next row, firing the SelectionChanged event. In that event handler we can change back to the value in keyFrameLockRow.
 			if (e.ColumnIndex == 0)
 			{
+				//Time column edited
 				int time;
 				if (!int.TryParse(str, out time))
 				{
@@ -2200,23 +2210,30 @@ namespace Visual_Music
 				}
 				else
 				{
-					//if (time != (int)keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value)
 					if (time != project.KeyFrames.Keys[e.RowIndex])
 					{
+						//A new time was entered.
 						int newRowIndex = project.KeyFrames.changeTimeOfFrame(e.RowIndex, time);
 						if (newRowIndex < 0)
 						{
+							//Frame with specified time already exists
 							showErrorMsgBox("A key frame already exists at this position.");
 							keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = project.KeyFrames.Keys[e.RowIndex];
 						}
-						else
+						else if(newRowIndex != e.RowIndex)
 						{
+							//The new time caused need for sorting
 							var row = keyFramesDGV.Rows[e.RowIndex];
 							updatingControls = true;
 							keyFramesDGV.Rows.RemoveAt(e.RowIndex);
-							updatingControls = false;
 							keyFramesDGV.Rows.Insert(newRowIndex, row);
-							keyFramesDGV.CurrentCell = keyFramesDGV.Rows[newRowIndex].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
+							updatingControls = false;
+
+							//If the last row is edited, the selection won't go to next row, and the SelectionChanged event won't fire unless we set current cell explicitly.
+							if (e.RowIndex == keyFramesDGV.Rows.Count - 1)
+								keyFramesDGV.CurrentCell = keyFramesDGV.Rows[newRowIndex].Cells[0];
+							else
+								keyFrameLockRow = newRowIndex;
 						}
 					}
 				}
@@ -2225,6 +2242,11 @@ namespace Visual_Music
 			{
 				project.KeyFrames.Values[e.RowIndex].Desc = str;
 			}
+		}
+
+		private void keyFramesDGV_KeyDown(object sender, KeyEventArgs e)
+		{
+		
 		}
 	}
 }
