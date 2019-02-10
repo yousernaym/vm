@@ -134,7 +134,8 @@ namespace Visual_Music
 
 		public int Count => frameList.Count;
 		public IList<int> Keys => frameList.Keys;
-
+		public IList<KeyFrame> Values => frameList.Values;
+		
 		internal int changeTimeOfFrame(int frameNumber, int time)
 		{
 			if (frameList.ContainsKey(time))
@@ -152,6 +153,7 @@ namespace Visual_Music
 	public class KeyFrame : Cloneable<KeyFrame>, ISerializable
 	{
 		public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen with default camera
+		public string Desc;
 		public Camera Camera;
 		public float ViewWidthQn;
 
@@ -165,7 +167,9 @@ namespace Visual_Music
 		{
 			foreach (SerializationEntry entry in info)
 			{
-				if (entry.Name == "qn_viewWidth")
+				if (entry.Name == "desc")
+					Desc = (string)entry.Value;
+				else if (entry.Name == "qn_viewWidth")
 					ViewWidthQn = (float)entry.Value;
 				else if (entry.Name == "camera")
 					Camera = (Camera)entry.Value;
@@ -174,6 +178,7 @@ namespace Visual_Music
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
+			info.AddValue("desc", Desc);
 			info.AddValue("qn_viewWidth", ViewWidthQn);
 			info.AddValue("camera", Camera);
 		}

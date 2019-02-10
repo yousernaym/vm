@@ -323,7 +323,7 @@ namespace Visual_Music
 			updatingControls = true;
 			keyFramesDGV.Rows.Clear();
 			foreach (var frame in Project.KeyFrames)
-				keyFramesDGV.Rows.Add(frame.Key, "");
+				keyFramesDGV.Rows.Add(frame.Key, frame.Value.Desc);
 			updatingControls = false;
 		}
 
@@ -2190,35 +2190,40 @@ namespace Visual_Music
 
 		private void keyFramesDGV_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
-			if (e.ColumnIndex != 0)
-				return;
-			int time;
 			string str = keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
-			if (!int.TryParse(str, out time))
+			if (e.ColumnIndex == 0)
 			{
-				showErrorMsgBox("Invalid format.");
-			}
-			else
-			{
-				//if (time != (int)keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value)
-				if (time != project.KeyFrames.Keys[e.RowIndex])
+				int time;
+				if (!int.TryParse(str, out time))
 				{
-					int newRowIndex = project.KeyFrames.changeTimeOfFrame(e.RowIndex, time);
-					if (newRowIndex < 0)
+					showErrorMsgBox("Invalid format.");
+				}
+				else
+				{
+					//if (time != (int)keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value)
+					if (time != project.KeyFrames.Keys[e.RowIndex])
 					{
-						showErrorMsgBox("A key frame already exists at this position.");
-						keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = project.KeyFrames.Keys[e.RowIndex];
-					}
-					else
-					{
-						var row = keyFramesDGV.Rows[e.RowIndex];
-						updatingControls = true;
-						keyFramesDGV.Rows.RemoveAt(e.RowIndex);
-						updatingControls = false;
-						keyFramesDGV.Rows.Insert(newRowIndex, row);
-						keyFramesDGV.CurrentCell = keyFramesDGV.Rows[newRowIndex].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
+						int newRowIndex = project.KeyFrames.changeTimeOfFrame(e.RowIndex, time);
+						if (newRowIndex < 0)
+						{
+							showErrorMsgBox("A key frame already exists at this position.");
+							keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = project.KeyFrames.Keys[e.RowIndex];
+						}
+						else
+						{
+							var row = keyFramesDGV.Rows[e.RowIndex];
+							updatingControls = true;
+							keyFramesDGV.Rows.RemoveAt(e.RowIndex);
+							updatingControls = false;
+							keyFramesDGV.Rows.Insert(newRowIndex, row);
+							keyFramesDGV.CurrentCell = keyFramesDGV.Rows[newRowIndex].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
+						}
 					}
 				}
+			}
+			else if (e.ColumnIndex == 1)
+			{
+				project.KeyFrames.Values[e.RowIndex].Desc = str;
 			}
 		}
 	}
