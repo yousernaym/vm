@@ -471,6 +471,8 @@ namespace Visual_Music
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
 		{
+			if (updatingControls)
+				return;
 			var keyFrame = project.getKeyFrameAtSongPos();
 			if (keyFrame == null)
 				return;
@@ -1186,8 +1188,41 @@ namespace Visual_Music
 			songPanel.KeyDown += new KeyEventHandler(songPanel_KeyDown);
 			SongPanel.OnSongPosChanged = delegate ()
 			{
+				updatingControls = true;
 				if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)
 					songScrollBar.Value = (int)Project.SongPosT;
+				upDownVpWidth.Value = project.ViewWidthQn;
+
+				if (keyFramesDGV.Rows.Count == 0) //App is closing
+					return;
+				int atKeyFrame = -1;
+				if (project.KeyFrames.Keys[0] >= project.SongPosT)
+					atKeyFrame = 0;
+				else if (project.KeyFrames.Keys[project.KeyFrames.Count - 1] <= project.SongPosT)
+					atKeyFrame = project.KeyFrames.Count - 1;
+				else if (project.KeyFrames.Count > 2)
+				{
+					for (int i = project.KeyFrames.Count - 2; i >= 1; i--)
+					{
+						if (project.KeyFrames.Keys[i] < project.SongPosT)
+						{
+							keyFramesDGV.CurrentCell = keyFramesDGV.Rows[i].Cells[0]; //Point at this row but deselect it
+							break;
+						}
+					}
+				}
+				if (atKeyFrame >= 0)
+				{
+					upDownVpWidth.Enabled = true;
+					keyFramesDGV.CurrentCell = keyFramesDGV.Rows[atKeyFrame].Cells[0];
+				}
+				else
+				{
+					upDownVpWidth.Enabled = false;
+					if (keyFramesDGV.CurrentCell != null)
+						keyFramesDGV.CurrentCell.Selected = false;
+				}
+				updatingControls = false;
 			};
 			changeToScreen(songPanel, false);
 		}
@@ -1581,6 +1616,8 @@ namespace Visual_Music
 
 		private void songScrollBar_ValueChanged(object sender, EventArgs e)
 		{
+			if (updatingControls)
+				return;
 			Project.NormSongPos = songScrollBar.Value / Project.SongLengthT;
 		}
 
@@ -2153,7 +2190,11 @@ namespace Visual_Music
 				keyFrameLockRow = -1;
 			}
 			if (keyFramesDGV.CurrentRow != null)
+			{
 				project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
+				upDownVpWidth.Value = project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].ViewWidthQn;
+				upDownVpWidth.Enabled = true;
+			}
 		}
 
 		private void keyFramesDGV_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
@@ -2174,26 +2215,6 @@ namespace Visual_Music
 
 		private void keyFramesDGV_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
 		{
-			//if (e.ColumnIndex != 0)
-			//	return;
-			//int time;
-			//string str = e.FormattedValue.ToString();//.Replace(" ", "");
-
-			//if (!int.TryParse(str, out time))
-			//{
-			//	char c = str[2];
-			//	showErrorMsgBox("Invalid format.");
-			//	e.Cancel = true;
-			//}
-			//else
-			//{
-			//	//if (time != (int)keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value)
-			//	if (time != project.KeyFrames.Keys[e.ColumnIndex])
-			//	{
-			//		if (project.KeyFrames.changeTimeOfFrame(e.ColumnIndex, time) < 0)
-			//			showErrorMsgBox("A key frame already exists at this position.");
-			//	}
-			//}
 		}
 
 		private void keyFramesDGV_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -2220,7 +2241,7 @@ namespace Visual_Music
 							showErrorMsgBox("A key frame already exists at this position.");
 							keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = project.KeyFrames.Keys[e.RowIndex];
 						}
-						else if(newRowIndex != e.RowIndex)
+						else if (newRowIndex != e.RowIndex)
 						{
 							//The new time caused need for sorting
 							var row = keyFramesDGV.Rows[e.RowIndex];
@@ -2229,12 +2250,19 @@ namespace Visual_Music
 							keyFramesDGV.Rows.Insert(newRowIndex, row);
 							updatingControls = false;
 
-							//If the last row is edited, the selection won't go to next row, and the SelectionChanged event won't fire unless we set current cell explicitly.
+							//If the last row is edited, the selection won't go to next row, and the SelectionChanged event won't fire so instead of setting keyFrameLockRow here we set CurrentCell immediately.
 							if (e.RowIndex == keyFramesDGV.Rows.Count - 1)
 								keyFramesDGV.CurrentCell = keyFramesDGV.Rows[newRowIndex].Cells[0];
 							else
 								keyFrameLockRow = newRowIndex;
 						}
+						else
+						{
+							//No sorting, so no SelectionChanged so need to update song pos here
+							project.goToKeyFrame(newRowIndex);
+							upDownVpWidth.Enabled = true;
+						}
+
 					}
 				}
 			}
