@@ -73,7 +73,7 @@ namespace Visual_Music
 				resoComboBox.Items.Add("3840 x 2160");
 				resoComboBox.Items.Add("1920 x 1080");
 			}
-			resoComboBox.SelectedIndex = 0;
+			resoComboBox.SelectedIndex = Options.resoIndex;
 		}
 
 		bool parseReso(ComboBox resoBox)
@@ -194,7 +194,19 @@ namespace Visual_Music
 		public bool Stereo;
 		public bool VrMetadata;
 		public float Fps = 60;
-		internal int resoIndex;
+		internal int resoIndex
+		{
+			get => Sphere ? sphereResoIndex : nonSphereResoIndex;
+			set
+			{
+				if (Sphere)
+					sphereResoIndex = value;
+				else
+					nonSphereResoIndex = value;
+			}
+		}
+		internal int sphereResoIndex;
+		internal int nonSphereResoIndex;
 		internal int ssaaIndex => (int)Math.Log(ssaaFactor, 2);
 
 		public VideoExportOptions()
@@ -212,12 +224,10 @@ namespace Visual_Music
 					VrMetadata = (bool)entry.Value;
 				else if (entry.Name == "vrStereo")
 					Stereo = (bool)entry.Value;
-				//else if (entry.Name == "width")
-				//	Width = (int)entry.Value;
-				//else if (entry.Name == "height")
-				//	Height = (int)entry.Value;
-				else if (entry.Name == "resoIndex")
-					resoIndex = (int)entry.Value;
+				else if (entry.Name == "sphereResoIndex")
+					sphereResoIndex = (int)entry.Value;
+				else if (entry.Name == "nonSphereResoIndex")
+					nonSphereResoIndex = (int)entry.Value;
 				else if (entry.Name == "ssaaFactor")
 					SSAAFactor = (int)entry.Value;
 				else if (entry.Name == "fps")
@@ -229,7 +239,8 @@ namespace Visual_Music
 			info.AddValue("sphere", Form1.VidExpForm.Options.Sphere);
 			info.AddValue("vrMeta", Form1.VidExpForm.Options.VrMetadata);
 			info.AddValue("vrStereo", Form1.VidExpForm.Options.Stereo);
-			info.AddValue("resoIndex", Math.Max(0, Form1.VidExpForm.Options.resoIndex));
+			info.AddValue("sphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.sphereResoIndex));
+			info.AddValue("nonSphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.nonSphereResoIndex));
 			info.AddValue("ssaaFactor", Form1.VidExpForm.Options.SSAAFactor);
 			info.AddValue("fps", Fps);
 		}
