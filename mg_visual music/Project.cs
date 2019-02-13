@@ -385,6 +385,13 @@ namespace Visual_Music
 			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
 			return true;
 		}
+
+		public void interpolateFrames()
+		{
+			var interpolatedFrame = KeyFrames.createInterpolatedFrame((int)SongPosT);
+			ViewWidthQn = interpolatedFrame.ViewWidthQn;
+		}
+
 		public void openAudioFile(string file, Midi.MixdownType mixdownType)
 		{
 			if (mixdownType == Midi.MixdownType.Tparty)
@@ -702,8 +709,7 @@ namespace Visual_Music
 
 		public void update(double deltaTimeS)
 		{
-			var interpolatedFrame = KeyFrames.createInterpolatedFrame((int)SongPosT);
-			ViewWidthQn = interpolatedFrame.ViewWidthQn;
+			interpolateFrames();
 			//Camera = interpolatedFrame.Camera;
 			Camera.update(deltaTimeS);
 			//Scroll song depending on user input or playback position.
