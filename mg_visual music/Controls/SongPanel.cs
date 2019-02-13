@@ -470,6 +470,7 @@ namespace Visual_Music
 		{
 			Project.Camera.Eye = eye;
 
+
 			for (int i = 0; i < 6; i++)
 			{
 				GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
@@ -506,6 +507,9 @@ namespace Visual_Music
 
 			cubeToPlaneFx.Parameters["ViewportSize"].SetValue(new Vector2(vpBounds.Z, vpBounds.W));
 			cubeToPlaneFx.Parameters["PrevFrameScaleOffset"].SetValue(prevFrameSO);
+			Vector3 lookAt = -Project.Camera.ViewMat.Right;
+			Vector4 LookAt = new Vector4(lookAt.X, lookAt.Y, lookAt.Z, (float)Math.Cos(150f / 360 * Math.PI));
+			cubeToPlaneFx.Parameters["LookAt"].SetValue(LookAt);
 			GraphicsDevice.Viewport = new Viewport((int)vpBounds.X, (int)vpBounds.Y, (int)vpBounds.Z, (int)vpBounds.W);
 
 			cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();

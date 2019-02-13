@@ -9,6 +9,7 @@ float2 ViewportSize;
 float2 PrevFrameScaleOffset;
 float FrameSamples = 1;
 bool IsFirstFrame;
+float4 LookAt; //Used to limit FOV. Clip if cos of angle from xyz < w. w = -1 means no clipping.
 
 // Input parameters
 texture CubeMap;
@@ -59,6 +60,8 @@ float4 getColor(float2 planeCoords)
 	cmCoords.x = cos(phi) * cos(theta);
 	cmCoords.y = sin(phi);
 	cmCoords.z = cos(phi) * sin(theta);
+    if (dot(cmCoords, LookAt.xyz) < LookAt.w)
+		return float4(0, 0, 0, 0);
 	return texCUBE(CubeMapSampler, normalize(cmCoords));
 }
 

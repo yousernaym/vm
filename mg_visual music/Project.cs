@@ -192,9 +192,6 @@ namespace Visual_Music
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
-			//LyricsSegments = new BindingList<LyricsSegment>();
-			//KeyFrames = new KeyFrames();
-			//KeyFrames.insert(0);
 			ViewWidthQn = KeyFrames[0].ViewWidthQn;
 		}
 
@@ -378,7 +375,6 @@ namespace Visual_Music
 			if (options.EraseCurrent)
 			{
 				KeyFrames = new KeyFrames();
-				KeyFrames.insert(0);
 				AudioOffset = playbackOffsetS = FadeIn = FadeOut = 0;
 				NormSongPos = 0;
 			}
