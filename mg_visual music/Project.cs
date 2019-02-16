@@ -22,7 +22,7 @@ namespace Visual_Music
 	[Serializable()]
 	public class Project : ISerializable
 	{
-		public KeyFrames KeyFrames { get; set; } = new KeyFrames();
+		public KeyFrames KeyFrames;
 		public BindingList<LyricsSegment> LyricsSegments { get; private set; } = new BindingList<LyricsSegment>();
 
 		public float UserViewWidth = 1000f;
@@ -192,8 +192,10 @@ namespace Visual_Music
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
-			ViewWidthQn = KeyFrames[0].ViewWidthQn;
+			//ViewWidthQn = KeyFrames[0].ViewWidthQn;
+			KeyFrames = new KeyFrames(SongPanel);
 		}
+
 
 		public bool loadContent()
 		{
@@ -374,7 +376,7 @@ namespace Visual_Music
 
 			if (options.EraseCurrent)
 			{
-				KeyFrames = new KeyFrames();
+				KeyFrames = new KeyFrames(SongPanel);
 				AudioOffset = playbackOffsetS = FadeIn = FadeOut = 0;
 				NormSongPos = 0;
 			}
@@ -386,6 +388,8 @@ namespace Visual_Music
 		{
 			var interpolatedFrame = KeyFrames.createInterpolatedFrame((int)SongPosT);
 			ViewWidthQn = interpolatedFrame.ViewWidthQn;
+			interpolatedFrame.Camera.SpatialChanged = Camera.SpatialChanged;
+			Camera = interpolatedFrame.Camera;
 		}
 
 		public void openAudioFile(string file, Midi.MixdownType mixdownType)
@@ -707,7 +711,10 @@ namespace Visual_Music
 		{
 			interpolateFrames();
 			//Camera = interpolatedFrame.Camera;
-			Camera.update(deltaTimeS);
+			var keyFrame = getKeyFrameAtSongPos();
+			if (keyFrame != null)
+				keyFrame.Camera.update(deltaTimeS);
+			//Camera.update(deltaTimeS);
 			//Scroll song depending on user input or playback position.
 			if (IsPlaying)
 			{

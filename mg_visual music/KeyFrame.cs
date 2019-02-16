@@ -11,11 +11,13 @@ namespace Visual_Music
 	public class KeyFrames : ISerializable, IEnumerable<KeyValuePair<int, KeyFrame>>
 	{
 		SortedList<int, KeyFrame> frameList;
+		SongPanel songPanel;
 
-		public KeyFrames()
+		public KeyFrames(SongPanel spanel)
 		{
 			frameList = new SortedList<int, KeyFrame>();
-			frameList.Add(0, new KeyFrame());
+			songPanel = spanel;
+			frameList.Add(0, new KeyFrame(songPanel));
 		}
 
 		public KeyFrames(SerializationInfo info, StreamingContext ctxt)
@@ -46,11 +48,11 @@ namespace Visual_Music
 		public KeyFrame createInterpolatedFrame(int songPosT)
 		{
 			if (frameList.Count == 0)
-				return new KeyFrame();
+				return new KeyFrame(songPanel);
 			if (frameList.Count == 1)
-				return frameList.Values[0].clone();
+				return frameList.Values[0];
 			if (frameList.ContainsKey(songPosT))
-				return frameList[songPosT].clone();
+				return frameList[songPosT];
 			int index1 = frameList.Count - 1;
 			for (int i = 0; i < frameList.Count; i++)
 			{
@@ -74,6 +76,8 @@ namespace Visual_Music
 			outFrame.Camera.Pos = interpolate(frame1.Camera.Pos, frame2.Camera.Pos, interpolant);
 			outFrame.Camera.Orientation = interpolate(frame1.Camera.Orientation, frame2.Camera.Orientation, interpolant);
 			outFrame.Camera.SongPanel = frame1.Camera.SongPanel;
+			outFrame.Camera.SpatialChanged = frame1.Camera.SpatialChanged;
+
 			return outFrame;
 		}
 
@@ -157,10 +161,12 @@ namespace Visual_Music
 		public Camera Camera;
 		public float ViewWidthQn;
 
-		public KeyFrame()
+		public KeyFrame(SongPanel songPanel)
 		{
 			ViewWidthQn = DefaultViewWidthQn;
 			Camera = new Camera();
+			Camera.SongPanel = songPanel;
+			Camera.SpatialChanged = songPanel.Project.Camera.SpatialChanged;
 		}
 
 		public KeyFrame(SerializationInfo info, StreamingContext ctxt)

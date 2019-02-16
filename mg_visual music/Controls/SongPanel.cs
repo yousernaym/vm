@@ -769,8 +769,14 @@ namespace Visual_Music
 				return;
 
 			//Control camera
-			if (Project.Camera.control(e.KeyCode, true))
+			var keyFrame = Project.getKeyFrameAtSongPos();
+			if (keyFrame == null)
+				return;
+			if (keyFrame.Camera.control(e.KeyCode, true))
+			{
+				Project.Camera.SpatialChanged?.Invoke();
 				e.SuppressKeyPress = true;
+			}
 
 			//Start/stop playback
 			if (e.KeyCode == WinKeys.Space)

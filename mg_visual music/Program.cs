@@ -37,6 +37,11 @@ namespace Visual_Music
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			AppDomain.CurrentDomain.AssemblyResolve += Resolver;
+
+			//In case the program crashed previously, kill the cefsharp processes that stayed open. Otherwise multiple crashes will cause the number of processes to build up and hog the cpu. This has the drawback of killing cefsharp processes created by other programs, but it's very convenient when debugging a crash.
+			Process[] cefSharpProcesses = Process.GetProcessesByName("CefSharp.BrowserSubProcess");
+			foreach (var process in cefSharpProcesses)
+				process.Kill();
 			LoadApp(args);
 		}
 

@@ -207,7 +207,7 @@ namespace Visual_Music
 			tpartyOutputFile = e.FullPath;
 			//tpartyDoneEvent.Set();
 			//Process[] components = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tpartyProcess.StartInfo.FileName)));
-			//if (components.Length > 0)
+			//if (components.Length > 0)R
 			//{
 			if (!tpartyProcess.HasExited)
 			{
