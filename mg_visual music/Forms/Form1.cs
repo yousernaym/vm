@@ -1093,6 +1093,8 @@ namespace Visual_Music
 					return;
 				//lyricsGridView.DataSource = null;
 				project = tempProject;
+				if (project.KeyFrames == null) //Old project file format
+					project.KeyFrames = new KeyFrames(SongPanel);
 				project.ImportOptions.updateImportForm();
 				currentProjPath = fileName;
 				songLoaded(currentProjPath);
