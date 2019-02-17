@@ -301,6 +301,7 @@
     <Reference Include="MonoGameSceneGraph, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoGame.SceneGraph.1.2.0.1\lib\scenegraph\MonoGameSceneGraph.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />

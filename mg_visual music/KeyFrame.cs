@@ -50,9 +50,9 @@ namespace Visual_Music
 			if (frameList.Count == 0)
 				return new KeyFrame(songPanel);
 			if (frameList.Count == 1)
-				return frameList.Values[0];
+				return frameList.Values[0].clone();
 			if (frameList.ContainsKey(songPosT))
-				return frameList[songPosT];
+				return frameList[songPosT].clone();
 			int index1 = frameList.Count - 1;
 			for (int i = 0; i < frameList.Count; i++)
 			{
@@ -81,6 +81,7 @@ namespace Visual_Music
 			return outFrame;
 		}
 
+		//Returns keyframe that matches current song position if there's a match, otherwise null
 		public KeyFrame this[int key]
 		{
 			get
@@ -110,7 +111,7 @@ namespace Visual_Music
 
 		private Quaternion interpolate(Quaternion value1, Quaternion value2, float interpolant)
 		{
-			return value1 * (1 - interpolant) + value2 * interpolant;
+			return Quaternion.Slerp(value1, value2, interpolant);
 		}
 
 		public void removeIndex(int index)

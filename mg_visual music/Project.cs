@@ -384,11 +384,13 @@ namespace Visual_Music
 			return true;
 		}
 
-		public void interpolateFrames()
+		public void interpolateFrames(bool videoRendering)
 		{
 			var interpolatedFrame = KeyFrames.createInterpolatedFrame((int)SongPosT);
 			ViewWidthQn = interpolatedFrame.ViewWidthQn;
-			interpolatedFrame.Camera.SpatialChanged = Camera.SpatialChanged;
+			interpolatedFrame.Camera.SongPanel= Camera.SongPanel;
+			if (!videoRendering)
+				interpolatedFrame.Camera.SpatialChanged = Camera.SpatialChanged;
 			Camera = interpolatedFrame.Camera;
 		}
 
@@ -709,7 +711,7 @@ namespace Visual_Music
 
 		public void update(double deltaTimeS)
 		{
-			interpolateFrames();
+			interpolateFrames(false);
 			//Camera = interpolatedFrame.Camera;
 			var keyFrame = getKeyFrameAtSongPos();
 			if (keyFrame != null)

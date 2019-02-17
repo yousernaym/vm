@@ -1099,15 +1099,15 @@ namespace Visual_Music
 				updateFormTitle(currentProjPath);
 				project.DefaultFileName = Path.GetFileName(currentProjPath);
 			}
-			catch (Exception ex)
-			{
-				if (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
-				{
-					showErrorMsgBox("Couldn't load song.\n" + ex.Message);
-				}
-				else
-					throw;
-			}
+			//catch (Exception ex)
+			//{
+			//	if (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
+			//	{
+			//		showErrorMsgBox("Couldn't load song.\n" + ex.Message);
+			//	}
+			//	else
+			//		throw;
+			//}
 			finally
 			{
 				songPanel.ResumePaint();
@@ -1569,8 +1569,11 @@ namespace Visual_Music
 
 		void resetCamera(Camera newCam = null)
 		{
-			Project.Camera = newCam ?? new Camera(songPanel);
-			Project.Camera.SpatialChanged = updateCamControls;
+			var keyFrame = project.getKeyFrameAtSongPos();
+			if (keyFrame == null)
+				return;
+			keyFrame.Camera = newCam ?? new Camera(songPanel);
+			keyFrame.Camera.SpatialChanged = updateCamControls;
 		}
 		private void resetCamBtn_Click(object sender, EventArgs e)
 		{
@@ -2029,7 +2032,6 @@ namespace Visual_Music
 				using (FileStream stream = File.Open(openCamFileDialog.FileName, FileMode.Open))
 				{
 					Camera cam = (Camera)dcs.ReadObject(stream);
-					cam.SongPanel = SongPanel;
 					resetCamera(cam);
 				}
 			}
@@ -2119,16 +2121,13 @@ namespace Visual_Music
 
 		private void lyricsGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
 		{
-			if (e.ColumnIndex != 0)
-				return;
+			songPanel.Invalidate();
 			float time;
-			if (!float.TryParse((string)e.FormattedValue, out time))
+			if (e.ColumnIndex == 0 && !float.TryParse((string)e.FormattedValue, out time))
 			{
 				showErrorMsgBox("Invalid format.");
 				e.Cancel = true;
 			}
-			else
-				songPanel.Invalidate();
 		}
 
 		private void lyricsGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)

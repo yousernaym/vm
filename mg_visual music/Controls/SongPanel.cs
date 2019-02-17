@@ -344,7 +344,7 @@ namespace Visual_Music
 						ssFx = Content.Load<Effect>("ss");
 						while (Project.NormSongPos < 1 && !progressForm.Cancel)
 						{
-							Project.interpolateFrames();
+							Project.interpolateFrames(true);
 							drawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d32bit, renderTarget2d8bit, cubeToPlaneFx);
 							if (options.EnableSSAA)
 							{
