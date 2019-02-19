@@ -192,8 +192,8 @@ namespace Visual_Music
 		public Project(SongPanel spanel)
 		{
 			SongPanel = spanel;
-			//ViewWidthQn = KeyFrames[0].ViewWidthQn;
 			KeyFrames = new KeyFrames(SongPanel);
+			ViewWidthQn = KeyFrames[0].ViewWidthQn;
 		}
 
 
@@ -372,6 +372,7 @@ namespace Visual_Music
 				throw new FileFormatException(new Uri(options.RawNotePath), "No notes found.");
 
 			notes = newNotes;
+			Debug.Assert(notes != null);
 			notes.createNoteBsp();
 
 			if (options.EraseCurrent)

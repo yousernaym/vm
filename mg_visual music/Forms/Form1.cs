@@ -1083,7 +1083,7 @@ namespace Visual_Music
 			{
 				songPanel.SuspendPaint();
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
-				Project tempProject = Project;
+				Project tempProject;
 				using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
 					tempProject = (Project)dcs.ReadObject(stream);
@@ -1101,15 +1101,17 @@ namespace Visual_Music
 				updateFormTitle(currentProjPath);
 				project.DefaultFileName = Path.GetFileName(currentProjPath);
 			}
-			//catch (Exception ex)
-			//{
-			//	if (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
-			//	{
-			//		showErrorMsgBox("Couldn't load song.\n" + ex.Message);
-			//	}
-			//	else
-			//		throw;
-			//}
+			catch (Exception ex)
+			{
+				if (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
+				{
+					showErrorMsgBox("Couldn't load song.\n" + ex.Message);
+				}
+				else
+					throw;
+				SongPanel.Project = project;
+				project.Camera.SongPanel = project.DefaultCamera.SongPanel = SongPanel;
+			}
 			finally
 			{
 				songPanel.ResumePaint();
