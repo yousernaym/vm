@@ -1578,6 +1578,7 @@ namespace Visual_Music
 			if (keyFrame == null)
 				return;
 			keyFrame.Camera = newCam ?? new Camera(songPanel);
+			keyFrame.Camera.SongPanel = songPanel;
 			keyFrame.Camera.SpatialChanged = updateCamControls;
 		}
 		private void resetCamBtn_Click(object sender, EventArgs e)
