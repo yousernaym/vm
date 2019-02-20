@@ -1095,6 +1095,7 @@ namespace Visual_Music
 				project = tempProject;
 				if (project.KeyFrames == null) //Old project file format
 					project.KeyFrames = new KeyFrames(SongPanel);
+				
 				project.ImportOptions.updateImportForm();
 				currentProjPath = fileName;
 				songLoaded(currentProjPath);

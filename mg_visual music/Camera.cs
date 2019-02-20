@@ -175,7 +175,7 @@ namespace Visual_Music
 		public Matrix VpMat => ViewMat * ProjMat;
 		public SongPanel SongPanel { get; set; }
 
-		public bool MouseRot { get; set; } = false;
+		public static bool MouseRot { get; set; } = false;
 
 		//Methods/////////////////////////////////
 		public Camera(SongPanel spanel = null)

@@ -41,6 +41,11 @@ namespace Visual_Music
 					songPanel = value;
 					songPanel.Project = this;
 					Camera.SongPanel = DefaultCamera.SongPanel = songPanel;
+					if (KeyFrames != null)
+					{
+						foreach (var kframe in KeyFrames.Values)
+							kframe.Camera.SongPanel = SongPanel;
+					}
 					if (!loadContent())
 						songPanel = null;
 				}

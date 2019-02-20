@@ -706,7 +706,7 @@ namespace Visual_Music
 			{
 				RightMbPressed = true;
 				mousePosScrollSong = true;
-				if (Project.IsPlaying)
+				if (Project.IsPlaying && !Camera.MouseRot)
 				{
 					isPausingWhileScrolling = true;
 					Project.togglePlayback();
@@ -747,12 +747,17 @@ namespace Visual_Music
 
 			NormMouseX = (float)(clientP.X - middleX) * 2 / ClientRectangle.Width;
 			NormMouseY = (float)(clientP.Y) / ClientRectangle.Height;
-			if (Project.Camera.MouseRot)
+			if (Camera.MouseRot)
 			{
-				Invalidate();
-				NormMouseY = (float)(clientP.Y - middleY) * 2 / ClientRectangle.Width;
-				Cursor.Position = PointToScreen(new GdiPoint(middleX, middleY));
-				Project.Camera.ApplyMouseRot(NormMouseX, NormMouseY);
+				if (Project.IsPlaying)
+					Camera.MouseRot = false;
+				else
+				{
+					Invalidate();
+					NormMouseY = (float)(clientP.Y - middleY) * 2 / ClientRectangle.Width;
+					Cursor.Position = PointToScreen(new GdiPoint(middleX, middleY));
+					Project.getKeyFrameAtSongPos()?.Camera.ApplyMouseRot(NormMouseX, NormMouseY);
+				}
 
 			}
 		}
