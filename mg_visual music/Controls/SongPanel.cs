@@ -338,7 +338,7 @@ namespace Visual_Music
 							//Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
 							//Project.createOcTrees();
 						}
-						Project.Camera.InvertY = !options.Sphere;
+						Camera.InvertY = !options.Sphere;
 
 						Project.setSongPosS(0, false);
 						ssFx = Content.Load<Effect>("ss");
@@ -521,7 +521,7 @@ namespace Visual_Music
 			GraphicsDevice.SetRenderTarget(null);
 			Media.endVideoEnc();
 			Project.Camera.CubeMapFace = -1;
-			Project.Camera.InvertY = false;
+			Camera.InvertY = false;
 			Project.Camera.Eye = 0;
 			quad.Pos = new Vector2(0, 0);
 			quad.Size = new Vector2(1, 1);

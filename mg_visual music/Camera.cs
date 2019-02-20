@@ -22,7 +22,7 @@ namespace Visual_Music
 		public BoundingFrustum Frustum => new BoundingFrustum(VpMat);
 		public int Eye { get; set; } = 0;   //Stereoscopic rendering: -1 = left, 0 = center(monoscopic), 1 = right
 		public float EyeOffset { get; set; } = 0.02f;   //1 = 100% of viewport width, ie. 0.5 will put the center at the edge of an eye's view.
-		public bool InvertY { get; set; } = false;
+		public static bool InvertY { get; set; } = false;
 		public int CubeMapFace { get; set; } = -1; //-1 = normal rendering
 		public float Fov { get; set; } = (float)Math.PI / 4.0f;
 		Vector3 pos = new Vector3();

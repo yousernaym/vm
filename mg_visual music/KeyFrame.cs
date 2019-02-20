@@ -72,6 +72,7 @@ namespace Visual_Music
 
 			KeyFrame outFrame = frame1.clone();
 			float interpolant = (float)(songPosT - frameList.Keys[index1]) / (frameList.Keys[index1 + 1] - frameList.Keys[index1]);
+			interpolant = (float)(1 - Math.Cos(interpolant * Math.PI)) / 2f;
 			outFrame.ViewWidthQn = (float)Math.Pow(2, interpolate((float)Math.Log(frame1.ViewWidthQn, 2), (float)Math.Log(frame2.ViewWidthQn, 2), interpolant));
 			outFrame.Camera.Pos = interpolate(frame1.Camera.Pos, frame2.Camera.Pos, interpolant);
 			outFrame.Camera.Orientation = interpolate(frame1.Camera.Orientation, frame2.Camera.Orientation, interpolant);
