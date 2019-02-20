@@ -308,6 +308,11 @@ namespace Visual_Music
 
 		internal void ApplyMouseRot(float x, float y)
 		{
+			const float maxStep = 0.03f;
+			if (Math.Abs(x) > maxStep)
+				x *= maxStep / Math.Abs(x);
+			if (Math.Abs(y) > maxStep)
+				y *= maxStep / Math.Abs(y);
 			Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(-x, -y, 0);
 		}
 

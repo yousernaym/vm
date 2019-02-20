@@ -754,7 +754,9 @@ namespace Visual_Music
 				else
 				{
 					Invalidate();
-					NormMouseY = (float)(clientP.Y - middleY) * 2 / ClientRectangle.Width;
+					float screenHeight = Screen.GetWorkingArea(this).Height;
+					NormMouseX = (float)(clientP.X - middleX) * 2 / screenHeight;
+					NormMouseY = (float)(clientP.Y - middleY) * 2 / screenHeight;
 					Cursor.Position = PointToScreen(new GdiPoint(middleX, middleY));
 					Project.getKeyFrameAtSongPos()?.Camera.ApplyMouseRot(NormMouseX, NormMouseY);
 				}
