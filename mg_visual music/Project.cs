@@ -20,7 +20,7 @@ namespace Visual_Music
 	public enum SourceSongType { Midi, Mod, Sid };
 
 	[Serializable()]
-	public class Project : ISerializable
+	public class Project : Cloneable<Project>, ISerializable
 	{
 		public KeyFrames KeyFrames;
 		public BindingList<LyricsSegment> LyricsSegments { get; private set; } = new BindingList<LyricsSegment>();
@@ -153,7 +153,11 @@ namespace Visual_Music
 		}
 
 		Midi.Song notes;
-		public Midi.Song Notes { get { return notes; } }
+		public Midi.Song Notes
+		{
+			get => notes;
+			set => notes = value;
+		}
 
 		public double SongLengthT => (notes != null ? notes.SongLengthT : 0) + playbackOffsetT; //Song length in ticks
 		public double SongLengthS { get; private set; }

@@ -1197,6 +1197,7 @@ namespace Visual_Music
 			SongPanel.OnSongPosChanged = delegate ()
 			{
 				updatingControls = true;
+				SongPanel.Invalidate();
 				if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)
 					songScrollBar.Value = (int)Project.SongPosT;
 				upDownVpWidth.Value = project.ViewWidthQn;
@@ -2203,6 +2204,7 @@ namespace Visual_Music
 				upDownVpWidth.Value = project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].ViewWidthQn;
 				upDownVpWidth.Enabled = true;
 			}
+			SongPanel.Invalidate();
 		}
 
 		private void keyFramesDGV_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
