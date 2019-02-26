@@ -902,7 +902,7 @@ namespace Visual_Music
 		{
 			int newPosT = KeyFrames.keyAtIndex(index);
 			if (SongLengthT > 0 && newPosT >= 0)
-				NormSongPos = newPosT / SongLengthT;
+				NormSongPos = (newPosT + 0.5) / SongLengthT;
 		}
 	}
 

@@ -335,7 +335,6 @@ namespace Visual_Music
 			Quaternion orient = project.Camera.Orientation;
 			camTb.Text = $"{pos.X}\r\n{pos.Y}\r\n{pos.Z}\r\n\r\n{orient.X}\r\n{orient.Y}\r\n{orient.Z}\r\n{orient.W}";
 			updatingControls = false;
-
 		}
 
 		//Called only when iomporting note and audio files.
@@ -476,10 +475,14 @@ namespace Visual_Music
 		{
 			if (updatingControls)
 				return;
-			var keyFrame = project.getKeyFrameAtSongPos();
-			if (keyFrame == null)
-				return;
-			keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
+			//var keyFrame = project.getKeyFrameAtSongPos();
+			//if (keyFrame == null)
+			//return;
+			for (int i = 0; i < keyFramesDGV.SelectedRows.Count; i++)
+			{
+				project.KeyFrames.Values[keyFramesDGV.SelectedRows[i].Index].ViewWidthQn = (float)((TbSlider)sender).Value;
+			}
+			//keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
 			songScrollBar.SmallChange = Project.SmallScrollStepT;
 			songScrollBar.LargeChange = Project.LargeScrollStepT;
 		}
@@ -1575,12 +1578,16 @@ namespace Visual_Music
 
 		void resetCamera(Camera newCam = null)
 		{
-			var keyFrame = project.getKeyFrameAtSongPos();
-			if (keyFrame == null)
-				return;
-			keyFrame.Camera = newCam ?? new Camera(songPanel);
-			keyFrame.Camera.SongPanel = songPanel;
-			keyFrame.Camera.SpatialChanged = updateCamControls;
+			//var keyFrame = project.getKeyFrameAtSongPos();
+			//if (keyFrame == null)
+			//	return;
+			for (int i = 0; i < keyFramesDGV.SelectedRows.Count; i++)
+			{
+				var keyFrame = project.KeyFrames.Values[keyFramesDGV.SelectedRows[i].Index];
+				keyFrame.Camera = newCam ?? new Camera(songPanel);
+				keyFrame.Camera.SongPanel = songPanel;
+				keyFrame.Camera.SpatialChanged = updateCamControls;
+			}
 		}
 		private void resetCamBtn_Click(object sender, EventArgs e)
 		{

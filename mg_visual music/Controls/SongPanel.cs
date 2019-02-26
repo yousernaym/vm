@@ -304,6 +304,7 @@ namespace Visual_Music
 					Project videoProject = Project;//.clone();
 					//videoProject.Notes = Project.Notes;
 					//videoProject.SongPanel = Project.SongPanel;
+					//videoProject.createOcTrees();
 					double songPosBackup = Project.SongPosS;
 					float viewWidthQnBackup = Project.ViewWidthQn;
 					int maxPitchBackup = Project.MaxPitch;
