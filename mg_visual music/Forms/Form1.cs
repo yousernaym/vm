@@ -475,15 +475,11 @@ namespace Visual_Music
 		{
 			if (updatingControls)
 				return;
-			//var keyFrame = project.getKeyFrameAtSongPos();
-			//if (keyFrame == null)
-			//return;
 			for (int i = 0; i < project.KeyFrames.Count; i++)
 			{
 				if (project.KeyFrames.Values[i].Selected)
 					project.KeyFrames.Values[i].ViewWidthQn = (float)((TbSlider)sender).Value;
 			}
-			//keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
 			songScrollBar.SmallChange = Project.SmallScrollStepT;
 			songScrollBar.LargeChange = Project.LargeScrollStepT;
 		}
@@ -1095,7 +1091,6 @@ namespace Visual_Music
 				tempProject.SongPanel = songPanel;
 				if (tempProject.SongPanel == null) //User probably cancelled file import process
 					return;
-				//lyricsGridView.DataSource = null;
 				project = tempProject;
 				if (project.KeyFrames == null) //Old project file format
 					project.KeyFrames = new KeyFrames(SongPanel);
@@ -1231,7 +1226,6 @@ namespace Visual_Music
 				}
 				else
 				{
-					//upDownVpWidth.Enabled = false;
 					if (keyFramesDGV.CurrentCell != null)
 						keyFramesDGV.CurrentCell.Selected = false;
 				}
@@ -2212,8 +2206,10 @@ namespace Visual_Music
 			if (keyFramesDGV.CurrentRow != null)
 			{
 				project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
+				updatingControls = true;
 				upDownVpWidth.Value = project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].ViewWidthQn;
-				upDownVpWidth.Enabled = true;
+				updatingControls = false;
+
 			}
 			SongPanel.Invalidate();
 		}
