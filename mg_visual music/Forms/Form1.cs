@@ -478,9 +478,10 @@ namespace Visual_Music
 			//var keyFrame = project.getKeyFrameAtSongPos();
 			//if (keyFrame == null)
 			//return;
-			for (int i = 0; i < keyFramesDGV.SelectedRows.Count; i++)
+			for (int i = 0; i < project.KeyFrames.Count; i++)
 			{
-				project.KeyFrames.Values[keyFramesDGV.SelectedRows[i].Index].ViewWidthQn = (float)((TbSlider)sender).Value;
+				if (project.KeyFrames.Values[i].Selected)
+					project.KeyFrames.Values[i].ViewWidthQn = (float)((TbSlider)sender).Value;
 			}
 			//keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
 			songScrollBar.SmallChange = Project.SmallScrollStepT;
@@ -1230,7 +1231,7 @@ namespace Visual_Music
 				}
 				else
 				{
-					upDownVpWidth.Enabled = false;
+					//upDownVpWidth.Enabled = false;
 					if (keyFramesDGV.CurrentCell != null)
 						keyFramesDGV.CurrentCell.Selected = false;
 				}
@@ -2205,6 +2206,9 @@ namespace Visual_Music
 				keyFramesDGV.CurrentCell = keyFramesDGV.Rows[keyFrameLockRow].Cells[0];
 				keyFrameLockRow = -1;
 			}
+
+			updateKeyFrameSelection();
+			
 			if (keyFramesDGV.CurrentRow != null)
 			{
 				project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
@@ -2275,7 +2279,7 @@ namespace Visual_Music
 						}
 						else
 						{
-							//No sorting, so no SelectionChanged so need to update song pos here
+							//No sorting, so no SelectionChanged, so we need to update song pos here
 							project.goToKeyFrame(newRowIndex);
 							upDownVpWidth.Enabled = true;
 						}
@@ -2292,6 +2296,19 @@ namespace Visual_Music
 		private void keyFramesDGV_KeyDown(object sender, KeyEventArgs e)
 		{
 		
+		}
+
+		private void keyFramesDGV_CurrentCellChanged(object sender, EventArgs e)
+		{
+			updateKeyFrameSelection();
+		}
+
+		void updateKeyFrameSelection()
+		{
+			for (int i = 0; i < keyFramesDGV.Rows.Count; i++)
+				project.KeyFrames.Values[i].Selected = keyFramesDGV.Rows[i].Selected;
+			if (keyFramesDGV.CurrentRow != null)
+				project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].Selected = true;
 		}
 	}
 }

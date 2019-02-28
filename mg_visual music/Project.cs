@@ -723,9 +723,14 @@ namespace Visual_Music
 		{
 			interpolateFrames(false);
 			//Camera = interpolatedFrame.Camera;
-			var keyFrame = getKeyFrameAtSongPos();
-			if (keyFrame != null)
-				keyFrame.Camera.update(deltaTimeS);
+			//var keyFrame = getKeyFrameAtSongPos();
+			//if (keyFrame != null)
+				//keyFrame.Camera.update(deltaTimeS);
+			foreach (var keyFrame in KeyFrames)
+			{
+				if (keyFrame.Value.Selected)
+					keyFrame.Value.Camera.update(deltaTimeS);
+			}
 			//Camera.update(deltaTimeS);
 			//Scroll song depending on user input or playback position.
 			if (IsPlaying)

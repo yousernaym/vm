@@ -43,7 +43,7 @@ namespace Visual_Music
 			}
 			else
 				return -1;
-		}
+			}
 
 		public KeyFrame createInterpolatedFrame(int songPosT)
 		{
@@ -160,6 +160,7 @@ namespace Visual_Music
 	{
 		public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen with default camera
 		public string Desc;
+		public bool Selected;
 		public Camera Camera;
 		public float ViewWidthQn;
 

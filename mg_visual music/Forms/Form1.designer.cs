@@ -404,7 +404,7 @@
             this.actionsToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1267, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1284, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -685,7 +685,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(872, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(889, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 16294);
 			this.trackPropsPanel.TabIndex = 3;
@@ -2421,7 +2421,7 @@
 			this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.lyricsGridView.Location = new System.Drawing.Point(197, 16268);
 			this.lyricsGridView.Name = "lyricsGridView";
-			this.lyricsGridView.Size = new System.Drawing.Size(675, 50);
+			this.lyricsGridView.Size = new System.Drawing.Size(692, 50);
 			this.lyricsGridView.TabIndex = 0;
 			this.lyricsGridView.Visible = false;
 			this.lyricsGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.lyricsGridView_CellEndEdit);
@@ -2463,6 +2463,7 @@
 			this.keyFramesDGV.Visible = false;
 			this.keyFramesDGV.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.keyFramesDGV_CellEndEdit);
 			this.keyFramesDGV.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.keyFramesDGV_CellValidating);
+			this.keyFramesDGV.CurrentCellChanged += new System.EventHandler(this.keyFramesDGV_CurrentCellChanged);
 			this.keyFramesDGV.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.keyFramesDGV_RowsAdded);
 			this.keyFramesDGV.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.keyFramesDGV_RowsRemoved);
 			this.keyFramesDGV.SelectionChanged += new System.EventHandler(this.keyFramesDGV_SelectionChanged);
@@ -2495,7 +2496,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1284, 505);
+			this.ClientSize = new System.Drawing.Size(1301, 505);
 			this.Controls.Add(this.keyFramesDGV);
 			this.Controls.Add(this.lyricsGridView);
 			this.Controls.Add(this.debugLabel);
