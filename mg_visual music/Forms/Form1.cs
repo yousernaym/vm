@@ -1340,8 +1340,7 @@ namespace Visual_Music
 				songPropsPanel.Show();
 				if (project.LyricsSegments.Count > 0)
 					lyricsGridView.Show();
-				if (project.KeyFrames.Count > 1)
-					keyFramesDGV.Show();
+				keyFramesDGV.Show();
 			}
 			else
 			{
@@ -2174,7 +2173,6 @@ namespace Visual_Music
 			
 			keyFramesDGV.Rows.Insert(row, project.SongPosT, "");
 			songPropsCb.Checked = true;
-			keyFramesDGV.Show();
 			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
 			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[1]; //Select cell in Description column
 			keyFramesDGV.BeginEdit(true);
@@ -2190,8 +2188,6 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 			project.KeyFrames.removeIndex(e.RowIndex);
-			if (project.KeyFrames.Count == 1)
-				keyFramesDGV.Hide();
 		}
 
 		private void keyFramesDGV_SelectionChanged(object sender, EventArgs e)

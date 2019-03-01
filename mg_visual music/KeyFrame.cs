@@ -17,7 +17,9 @@ namespace Visual_Music
 		{
 			frameList = new SortedList<int, KeyFrame>();
 			songPanel = spanel;
-			frameList.Add(0, new KeyFrame(songPanel));
+			var keyFrame0 = new KeyFrame(songPanel);
+			keyFrame0.Desc = "Key frame 0";
+			frameList.Add(0, keyFrame0);
 		}
 
 		public KeyFrames(SerializationInfo info, StreamingContext ctxt)
