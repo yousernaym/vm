@@ -562,9 +562,8 @@ namespace Visual_Music
 		private void enableTrackSpecificMenuItem()
 		{
 			int itemCount = trackList.SelectedIndices.Count;
-			defaultPropertiesToolStripMenuItem.Enabled = defaultPropertiesToolStripMenuItem1.Enabled = itemCount > 0 && trackPropsCb.Checked;
-			saveTrackPropsToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = itemCount == 1 && trackPropsCb.Checked;
-			loadTrackPropsToolStripMenuItem.Enabled = loadPropertiesToolStripMenuItem.Enabled = itemCount > 0 && trackPropsCb.Checked;
+			defaultPropertiesToolStripMenuItem1.Enabled = defaultPropertiesToolStripMenuItem.Enabled = loadTrackPropsToolStripMenuItem.Enabled = loadPropertiesToolStripMenuItem.Enabled = saveTrackPropsToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = itemCount > 0 || !trackPropsCb.Checked;
+			saveTrackPropsToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = itemCount == 1 || !trackPropsCb.Checked;
 		}
 
 		float getTrackBarValueNorm(object sender)
@@ -1256,12 +1255,20 @@ namespace Visual_Music
 
 		private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			selectAllToolStripMenuItem1.PerformClick();
+			trackList.Select();
+			trackList.BeginUpdate();
+			for (int i = 1; i < trackList.Items.Count; i++)
+				trackList.Items[i].Selected = true;
+			trackList.EndUpdate();
 		}
 
 		private void invertSelectionToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			invertSelectionToolStripMenuItem1.PerformClick();
+			trackList.Select();
+			trackList.BeginUpdate();
+			for (int i = 1; i < trackList.Items.Count; i++)
+				trackList.Items[i].Selected = !trackList.Items[i].Selected;
+			trackList.EndUpdate();
 		}
 
 		private void defaultPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1318,7 +1325,7 @@ namespace Visual_Music
 
 		private void trackPropsCb_CheckedChanged(object sender, EventArgs e)
 		{
-			tracksToolStripMenuItem.Enabled = trackPropsCb.Checked;
+			enableTrackSpecificMenuItem();
 			trackPropsPanel.Visible = trackPropsCb.Checked;
 			if (trackPropsCb.Checked)
 				trackList.Focus();
@@ -1922,7 +1929,7 @@ namespace Visual_Music
 
 		void loadTrackProps(int typeFlags)
 		{
-			//Show open-file-dialog.
+			//Show open-file dialog.
 			if (openTrackPropsFileDialog.ShowDialog() != DialogResult.OK)
 				return;
 			TrackPropsFolder = Path.GetDirectoryName(openTrackPropsFileDialog.FileName);
@@ -1959,16 +1966,21 @@ namespace Visual_Music
 						throw new FileFormatException($"File doesn't contain properties of type {TrackPropsTypeNames[i]}");
 				}
 			}
-			foreach (int selectedTrackIndex in trackList.SelectedIndices)
+			if (trackPropsCb.Checked)
 			{
-				project.TrackViews[selectedTrackIndex].TrackProps.cloneFrom(props, typeFlags, SongPanel);
+				foreach (int selectedTrackIndex in trackList.SelectedIndices)
+				{
+					project.TrackViews[selectedTrackIndex].TrackProps.cloneFrom(props, typeFlags, SongPanel);
+				}
 			}
+			else
+				project.TrackViews[0].TrackProps.cloneFrom(props, typeFlags, SongPanel);
+
 			updateTrackListColors();
 			updateTrackControls();
 		}
 		void saveTrackProps(int typeFlags)
 		{
-			var selection = trackList.SelectedIndices;
 			if (typeFlags < 0)
 			{
 				var trackPropsTypeForm = new TrackPropsTypeForm((int)TrackPropsType.TPT_All);
@@ -1977,13 +1989,14 @@ namespace Visual_Music
 				typeFlags = trackPropsTypeForm.TypeFlags;
 			}
 			
-			//Show save-file-dialog.
+			//Show save-file dialog.
 			if (saveTrackPropsFileDialog.ShowDialog() != DialogResult.OK)
 				return;
 			TrackPropsFolder = Path.GetDirectoryName(saveTrackPropsFileDialog.FileName);
 			saveSettings();
 
-			TrackProps props = (TrackProps)Project.TrackViews[selection[0]].TrackProps;
+			int trackIndex = trackPropsCb.Checked ? trackList.SelectedIndices[0] : 0;
+			TrackProps props = (TrackProps)Project.TrackViews[trackIndex].TrackProps;
 			props.TypeFlags = typeFlags;
 			DataContractSerializer dcs = new DataContractSerializer(typeof(TrackProps), projectSerializationTypes);
 			try
@@ -2070,24 +2083,6 @@ namespace Visual_Music
 			}
 		}
 
-		private void selectAllToolStripMenuItem1_Click(object sender, EventArgs e)
-		{
-			trackList.Select();
-			trackList.BeginUpdate();
-			for (int i = 1; i < trackList.Items.Count; i++)
-				trackList.Items[i].Selected = true;
-			trackList.EndUpdate();
-		}
-
-		private void invertSelectionToolStripMenuItem1_Click(object sender, EventArgs e)
-		{
-			trackList.Select();
-			trackList.BeginUpdate();
-			for (int i = 1; i < trackList.Items.Count; i++)
-				trackList.Items[i].Selected = !trackList.Items[i].Selected;
-			trackList.EndUpdate();
-		}
-
 		private void loadPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			loadTrackProps(-1);
@@ -2101,17 +2096,24 @@ namespace Visual_Music
 		private void tracksToolStripMenuItem_EnabledChanged(object sender, EventArgs e)
 		{
 			//When Tracks menu item is disabled, all the sub items need to be disabled, otherwise their shortcut keys will still work.
-			bool enabled = tracksToolStripMenuItem.Enabled;
-			selectAllToolStripMenuItem1.Enabled = invertSelectionToolStripMenuItem1.Enabled = defaultPropertiesToolStripMenuItem1.Enabled = loadPropertiesToolStripMenuItem.Enabled = savePropertiesToolStripMenuItem.Enabled = enabled;
+			//bool enabled = tracksToolStripMenuItem.Enabled;
 
 			//When Tracks menu is enabled, some sub items should remain disadled depending on how many tracks are selected.
-			if (enabled)
-				enableTrackSpecificMenuItem();
+			//if (enabled)
+				//enableTrackSpecificMenuItem();
 		}
 
 		private void defaultPropertiesToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
-			Project.resetTrackProps(trackList.SelectedIndices);
+			//Project.resetTrackProps(trackPropsCb.Checked ? trackList.SelectedIndices : null);
+			if (trackList.SelectedIndices != null)
+			{
+				foreach (int index in trackList.SelectedIndices)
+					Project.TrackViews[index].TrackProps.resetProps();
+			}
+			else
+				Project.TrackViews[0].TrackProps.resetProps();
+			Project.createOcTrees();
 			updateTrackControls();
 			updateTrackListColors();
 		}

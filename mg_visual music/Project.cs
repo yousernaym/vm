@@ -624,8 +624,13 @@ namespace Visual_Music
 
 		public void resetTrackProps(ListView.SelectedIndexCollection indices)
 		{
-			foreach (int index in indices)
-				trackViews[index].TrackProps.resetProps();
+			if (indices != null)
+			{
+				foreach (int index in indices)
+					trackViews[index].TrackProps.resetProps();
+			}
+			else
+				trackViews[0].TrackProps.resetProps();
 			createOcTrees();
 		}
 
