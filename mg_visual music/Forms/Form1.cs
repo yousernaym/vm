@@ -293,7 +293,9 @@ namespace Visual_Music
 			loadCamToolStripMenuItem.Enabled = loaded;
 			saveCamToolStripMenuItem.Enabled = loaded;
 			insertLyricsHereToolStripMenuItem.Enabled = loaded;
-
+			loadTrackPropsToolStripMenuItem.Enabled = loaded;
+			saveTrackPropsToolStripMenuItem.Enabled = loaded;
+			insertKeyFrameToolStripMenuItem.Enabled = loaded;
 			//if (loaded)
 			//{
 			createTrackList();

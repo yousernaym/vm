@@ -481,6 +481,7 @@
 			// 
 			// loadCamToolStripMenuItem
 			// 
+			this.loadCamToolStripMenuItem.Enabled = false;
 			this.loadCamToolStripMenuItem.Name = "loadCamToolStripMenuItem";
 			this.loadCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
 			this.loadCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
@@ -489,6 +490,7 @@
 			// 
 			// saveCamToolStripMenuItem
 			// 
+			this.saveCamToolStripMenuItem.Enabled = false;
 			this.saveCamToolStripMenuItem.Name = "saveCamToolStripMenuItem";
 			this.saveCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.Z)));
@@ -517,6 +519,7 @@
 			// 
 			// loadPropertiesToolStripMenuItem
 			// 
+			this.loadPropertiesToolStripMenuItem.Enabled = false;
 			this.loadPropertiesToolStripMenuItem.Name = "loadPropertiesToolStripMenuItem";
 			this.loadPropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
 			this.loadPropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
@@ -525,6 +528,7 @@
 			// 
 			// savePropertiesToolStripMenuItem
 			// 
+			this.savePropertiesToolStripMenuItem.Enabled = false;
 			this.savePropertiesToolStripMenuItem.Name = "savePropertiesToolStripMenuItem";
 			this.savePropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.P)));
@@ -606,6 +610,7 @@
 			// 
 			// insertLyricsHereToolStripMenuItem
 			// 
+			this.insertLyricsHereToolStripMenuItem.Enabled = false;
 			this.insertLyricsHereToolStripMenuItem.Name = "insertLyricsHereToolStripMenuItem";
 			this.insertLyricsHereToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
 			this.insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
@@ -614,6 +619,7 @@
 			// 
 			// insertKeyFrameToolStripMenuItem
 			// 
+			this.insertKeyFrameToolStripMenuItem.Enabled = false;
 			this.insertKeyFrameToolStripMenuItem.Name = "insertKeyFrameToolStripMenuItem";
 			this.insertKeyFrameToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K)));
 			this.insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
@@ -1867,7 +1873,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-9635, 16247);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-9737, 16247);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1879,7 +1885,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-9747, 16248);
+			this.texPathTb.Location = new System.Drawing.Point(-9849, 16248);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1889,7 +1895,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-9749, 16232);
+			this.label4.Location = new System.Drawing.Point(-9851, 16232);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
