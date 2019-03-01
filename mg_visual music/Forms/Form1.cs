@@ -475,10 +475,10 @@ namespace Visual_Music
 		{
 			if (updatingControls)
 				return;
-			for (int i = 0; i < project.KeyFrames.Count; i++)
+			foreach (var keyFrame in project.KeyFrames.Values)
 			{
-				if (project.KeyFrames.Values[i].Selected)
-					project.KeyFrames.Values[i].ViewWidthQn = (float)((TbSlider)sender).Value;
+				if (keyFrame.Selected)
+					keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
 			}
 			songScrollBar.SmallChange = Project.SmallScrollStepT;
 			songScrollBar.LargeChange = Project.LargeScrollStepT;
@@ -1573,15 +1573,14 @@ namespace Visual_Music
 
 		void resetCamera(Camera newCam = null)
 		{
-			//var keyFrame = project.getKeyFrameAtSongPos();
-			//if (keyFrame == null)
-			//	return;
-			for (int i = 0; i < keyFramesDGV.SelectedRows.Count; i++)
+			foreach (var keyFrame in project.KeyFrames.Values)
 			{
-				var keyFrame = project.KeyFrames.Values[keyFramesDGV.SelectedRows[i].Index];
-				keyFrame.Camera = newCam ?? new Camera(songPanel);
-				keyFrame.Camera.SongPanel = songPanel;
-				keyFrame.Camera.SpatialChanged = updateCamControls;
+				if (keyFrame.Selected)
+				{
+					keyFrame.Camera = newCam ?? new Camera(songPanel);
+					keyFrame.Camera.SongPanel = songPanel;
+					keyFrame.Camera.SpatialChanged = updateCamControls;
+				}
 			}
 		}
 		private void resetCamBtn_Click(object sender, EventArgs e)

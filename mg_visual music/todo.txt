@@ -9,7 +9,6 @@
 - Let user specify view width in song properties.
 - Fix arp effect in mods.
 - Check bug in midi parsing.
-- Keep playing song when user holds right mouse button if caps lock is active.
 
 Done:
 - Handle variable CIA speed for sid songs.

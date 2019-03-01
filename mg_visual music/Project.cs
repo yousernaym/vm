@@ -722,16 +722,12 @@ namespace Visual_Music
 		public void update(double deltaTimeS)
 		{
 			interpolateFrames(false);
-			//Camera = interpolatedFrame.Camera;
-			//var keyFrame = getKeyFrameAtSongPos();
-			//if (keyFrame != null)
-				//keyFrame.Camera.update(deltaTimeS);
-			foreach (var keyFrame in KeyFrames)
+			foreach (var keyFrame in KeyFrames.Values)
 			{
-				if (keyFrame.Value.Selected)
-					keyFrame.Value.Camera.update(deltaTimeS);
+				if (keyFrame.Selected)
+					keyFrame.Camera.update(deltaTimeS);
 			}
-			//Camera.update(deltaTimeS);
+			
 			//Scroll song depending on user input or playback position.
 			if (IsPlaying)
 			{
