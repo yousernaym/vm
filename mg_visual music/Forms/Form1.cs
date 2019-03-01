@@ -2235,7 +2235,7 @@ namespace Visual_Music
 
 		private void keyFramesDGV_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
-			string str = keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+			string str = keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value?.ToString();
 			keyFrameLockRow = e.RowIndex; //If enter was pressed, the currently selected row will change to the next row, firing the SelectionChanged event. In that event handler we can change back to the value in keyFrameLockRow.
 			if (e.ColumnIndex == 0)
 			{
