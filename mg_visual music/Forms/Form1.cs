@@ -302,7 +302,7 @@ namespace Visual_Music
 			updateTrackControls();
 			//}
 			updatingControls = true;
-			upDownVpWidth.Value = Project.ViewWidthQn;
+			upDownVpWidth.Value = Project.KeyFrames[0].ViewWidthQn;
 			audioOffsetS.Value = (decimal)Project.AudioOffset;
 			project.PlaybackOffsetS = project.PlaybackOffsetS;
 			playbackOffsetUd.Value = (decimal)project.PlaybackOffsetS;
@@ -317,7 +317,7 @@ namespace Visual_Music
 			lyricsGridView.DataSource = project.LyricsSegments;
 
 			project.Camera.SpatialChanged = updateCamControls;
-			upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
+			//upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(songPanel);
 		}
 
@@ -475,6 +475,8 @@ namespace Visual_Music
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
 		{
+			songScrollBar.SmallChange = Project.SmallScrollStepT;
+			songScrollBar.LargeChange = Project.LargeScrollStepT;
 			if (updatingControls)
 				return;
 			foreach (var keyFrame in project.KeyFrames.Values)
@@ -482,8 +484,6 @@ namespace Visual_Music
 				if (keyFrame.Selected)
 					keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
 			}
-			songScrollBar.SmallChange = Project.SmallScrollStepT;
-			songScrollBar.LargeChange = Project.LargeScrollStepT;
 		}
 
 		private void upDownVpWidth_MouseUp(object sender, MouseEventArgs e)
@@ -1213,7 +1213,7 @@ namespace Visual_Music
 				{
 					for (int i = project.KeyFrames.Count - 2; i >= 1; i--)
 					{
-						if (project.KeyFrames.Keys[i] < project.SongPosT)
+						if (project.KeyFrames.Keys[i] <= project.SongPosT)
 						{
 							keyFramesDGV.CurrentCell = keyFramesDGV.Rows[i].Cells[0]; //Point at this row but deselect it
 							break;
@@ -2301,7 +2301,10 @@ namespace Visual_Music
 		void updateKeyFrameSelection()
 		{
 			for (int i = 0; i < keyFramesDGV.Rows.Count; i++)
-				project.KeyFrames.Values[i].Selected = keyFramesDGV.Rows[i].Selected;
+			{
+				if (i < project.KeyFrames.Count)
+					project.KeyFrames.Values[i].Selected = keyFramesDGV.Rows[i].Selected;
+			}
 			if (keyFramesDGV.CurrentRow != null)
 				project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].Selected = true;
 		}
