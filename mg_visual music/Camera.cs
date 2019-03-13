@@ -36,7 +36,6 @@ namespace Visual_Music
 					if (SongPanel != null)
 						SongPanel.Invalidate();
 					pos = value;
-					SpatialChanged?.Invoke();
 				}
 			}
 		}
@@ -51,20 +50,19 @@ namespace Visual_Music
 					if(SongPanel != null)
 						SongPanel.Invalidate();
 					orientation = value;
-					SpatialChanged?.Invoke();
 				}
 			}
 		}
 		Matrix NonCubeRotMat => Matrix.CreateFromQuaternion(Orientation);
 
-		Action spatialChanged;
-		public Action SpatialChanged
+		static Action spatialChanged;
+		public static Action SpatialChanged
 		{
 			get => spatialChanged;
 			set
 			{
-				if (value != null)
-					value();
+				//if (value != null)
+					//value();
 				spatialChanged = value;
 			}
 		}
@@ -229,6 +227,8 @@ namespace Visual_Music
 			Pos += Vector3.Transform(moveVel, RotMat) * (float)deltaTime;
 			Vector3 scaledRotVel = (rotVel + mouseRotVel) * (float)deltaTime;
 			Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(scaledRotVel.Y, scaledRotVel.X, scaledRotVel.Z);
+			if (Vector3.Zero != moveVel || Vector3.Zero != scaledRotVel)
+				SpatialChanged?.Invoke();
 		}
 
 		public bool control(WinKeys key, bool isKeyDown)
@@ -297,7 +297,8 @@ namespace Visual_Music
 				SongPanel.NormMouseX = SongPanel.NormMouseY = 0;
 				Cursor.Position = SongPanel.PointToScreen(new GdiPoint(SongPanel.ClientRectangle.Width / 2, SongPanel.ClientRectangle.Height / 2));
 			}
-
+			//if (keyMatch)
+				//SpatialChanged?.Invoke();
 			return keyMatch;
 		}
 

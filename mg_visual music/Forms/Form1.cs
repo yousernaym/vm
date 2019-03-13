@@ -94,13 +94,14 @@ namespace Visual_Music
 		ScrollBar songScrollBar = new HScrollBar();
 		NoteStyleControl currentNoteStyleControl;
 		int keyFrameLockRow = -1;
+		bool updatingCamTb = false;
 
 		public Form1(string[] args)
 		{
 			InitializeComponent();
 			//Application.Idle += delegate { songPanel.update(); };
 			//keyFramesDGV.Columns[0].CellTemplate.ValueType = typeof(Int32);
-
+			Camera.SpatialChanged = updateCamControls;
 			project = new Project(SongPanel);
 			startupArgs = args;
 			TrackTexPbHeight = trackTexPb.Height;
@@ -316,7 +317,7 @@ namespace Visual_Music
 			updatingControls = false;
 			lyricsGridView.DataSource = project.LyricsSegments;
 
-			project.Camera.SpatialChanged = updateCamControls;
+			//project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
 			//upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(songPanel);
 		}
@@ -332,6 +333,8 @@ namespace Visual_Music
 
 		private void updateCamControls()
 		{
+			if (project == null)
+				return;
 			updatingControls = true;
 			Vector3 pos = project.Camera.Pos;
 			Quaternion orient = project.Camera.Orientation;
@@ -356,7 +359,7 @@ namespace Visual_Music
 					setDefaultPitches();
 					currentProjPath = "";
 					updateFormTitle("");
-					resetCamera();
+					resetCameras(false);
 				}
 				songLoaded(options.NotePath);
 			}
@@ -427,8 +430,11 @@ namespace Visual_Music
 
 			saveSettings();
 
+			//var scBackup = Camera.SpatialChanged;
+			//Camera.SpatialChanged = null;
 			using (RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, VidExpForm.Options))
 				renderProgressForm.ShowDialog();
+			//Camera.SpatialChanged = scBackup;
 		}
 
 		private void songPanel_KeyDown(object sender, KeyEventArgs e)
@@ -1230,6 +1236,7 @@ namespace Visual_Music
 					if (keyFramesDGV.CurrentCell != null)
 						keyFramesDGV.CurrentCell.Selected = false;
 				}
+				updateCamControls();
 				updatingControls = false;
 			};
 			changeToScreen(songPanel, false);
@@ -1579,21 +1586,22 @@ namespace Visual_Music
 			MessageBox.Show(null, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 
-		void resetCamera(Camera newCam = null)
+		void resetCameras(bool onlySelected, Camera newCam = null)
 		{
 			foreach (var keyFrame in project.KeyFrames.Values)
 			{
-				if (keyFrame.Selected)
+				if (keyFrame.Selected || !onlySelected)
 				{
 					keyFrame.Camera = newCam ?? new Camera(songPanel);
 					keyFrame.Camera.SongPanel = songPanel;
-					keyFrame.Camera.SpatialChanged = updateCamControls;
 				}
 			}
+			project.interpolateFrames();
+			updateCamControls();
 		}
 		private void resetCamBtn_Click(object sender, EventArgs e)
 		{
-			resetCamera();
+			resetCameras(true);
 		}
 
 		private void nudgeBackwardsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1863,7 +1871,6 @@ namespace Visual_Music
 			int elementIndex = 0;
 			Vector3 pos = new Vector3();
 			Quaternion orient = new Quaternion();
-
 			foreach (string line in camTb.Lines)
 			{
 				if (string.IsNullOrWhiteSpace(line))
@@ -1889,7 +1896,12 @@ namespace Visual_Music
 						break;
 					case 2:
 						pos.Z = element;
-						project.Camera.Pos = pos;
+						//project.Camera.Pos = pos;
+						foreach (var keyFrame in project.KeyFrames.Values)
+						{
+							if (keyFrame.Selected)
+								keyFrame.Camera.Pos = pos;
+						}
 						break;
 					case 3:
 						orient.X = element;
@@ -1902,7 +1914,12 @@ namespace Visual_Music
 						break;
 					case 6:
 						orient.W = element;
-						project.Camera.Orientation = orient;
+						//project.Camera.Orientation = orient;
+						foreach (var keyFrame in project.KeyFrames.Values)
+						{
+							if (keyFrame.Selected)
+								keyFrame.Camera.Orientation = orient;
+						}
 						break;
 				}
 				elementIndex++;
@@ -2038,7 +2055,7 @@ namespace Visual_Music
 
 		private void resetCamToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			resetCamera();
+			resetCameras(true);
 		}
 
 		private void loadCamToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2054,7 +2071,7 @@ namespace Visual_Music
 				using (FileStream stream = File.Open(openCamFileDialog.FileName, FileMode.Open))
 				{
 					Camera cam = (Camera)dcs.ReadObject(stream);
-					resetCamera(cam);
+					resetCameras(true, cam);
 				}
 			}
 			catch (Exception ex)

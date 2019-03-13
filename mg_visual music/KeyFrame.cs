@@ -79,7 +79,6 @@ namespace Visual_Music
 			outFrame.Camera.Pos = interpolate(frame1.Camera.Pos, frame2.Camera.Pos, interpolant);
 			outFrame.Camera.Orientation = interpolate(frame1.Camera.Orientation, frame2.Camera.Orientation, interpolant);
 			outFrame.Camera.SongPanel = frame1.Camera.SongPanel;
-			outFrame.Camera.SpatialChanged = frame1.Camera.SpatialChanged;
 
 			return outFrame;
 		}
@@ -171,7 +170,6 @@ namespace Visual_Music
 			ViewWidthQn = DefaultViewWidthQn;
 			Camera = new Camera();
 			Camera.SongPanel = songPanel;
-			Camera.SpatialChanged = songPanel.Project.Camera.SpatialChanged;
 		}
 
 		public KeyFrame(SerializationInfo info, StreamingContext ctxt)
@@ -198,7 +196,6 @@ namespace Visual_Music
 		{
 			var newFrame = base.clone();
 			newFrame.Camera.SongPanel = Camera.SongPanel;
-			newFrame.Camera.SpatialChanged = Camera.SpatialChanged;
 			return newFrame;
 		}
 	}

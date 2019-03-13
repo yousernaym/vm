@@ -301,7 +301,8 @@ namespace Visual_Music
 					Effect ssFx = null;
 					int frameSamples = 1;
 
-					Project videoProject = Project;//.clone();
+					Project videoProject = Project;//.clone(); //Cloning doesn't work for some reason, so changes made to the project needs to be restored after video has been rendered.
+
 					//videoProject.Notes = Project.Notes;
 					//videoProject.SongPanel = Project.SongPanel;
 					//videoProject.createOcTrees();
@@ -309,6 +310,7 @@ namespace Visual_Music
 					float viewWidthQnBackup = Project.ViewWidthQn;
 					int maxPitchBackup = Project.MaxPitch;
 					int minPitchBackup = Project.MinPitch;
+					
 					try
 					{
 						if (options.Sphere)
@@ -344,12 +346,12 @@ namespace Visual_Music
 							//videoProject.createOcTrees();
 						}
 						Camera.InvertY = !options.Sphere;
-
+						
 						videoProject.setSongPosS(0, false);
 						ssFx = Content.Load<Effect>("ss");
 						while (videoProject.NormSongPos < 1 && !progressForm.Cancel)
 						{
-							videoProject.interpolateFrames(true);
+							videoProject.interpolateFrames();
 							drawVideoFrame(videoProject, songPosS, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d32bit, renderTarget2d8bit, cubeToPlaneFx);
 							if (options.EnableSSAA)
 							{
@@ -378,7 +380,7 @@ namespace Visual_Music
 							frames++;
 						}
 					}
-					catch (Exception e)
+					catch (Exception)
 					{
 						lock (progressForm.cancelLock)
 							progressForm.Cancel = true;
@@ -786,7 +788,7 @@ namespace Visual_Music
 				return;
 			if (keyFrame.Camera.control(e.KeyCode, true))
 			{
-				Project.Camera.SpatialChanged?.Invoke();
+				Camera.SpatialChanged?.Invoke();
 				e.SuppressKeyPress = true;
 			}
 
