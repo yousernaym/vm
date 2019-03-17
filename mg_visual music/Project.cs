@@ -20,16 +20,10 @@ namespace Visual_Music
 	public enum SourceSongType { Midi, Mod, Sid };
 
 	[Serializable()]
-	public class Project : Cloneable<Project>, ISerializable
+	public class Project : ISerializable
 	{
 		public KeyFrames KeyFrames;
-		public BindingList<LyricsSegment> LyricsSegments { get; private set; } = new BindingList<LyricsSegment>();
-
-		public float UserViewWidth = 1000f;
-		const float NormPitchMargin = 1 / 100.0f;
-		float PitchMargin => NormPitchMargin * Camera.ViewportSize.Y;
-		public float NoteHeight => (Camera.ViewportSize.Y - PitchMargin * 2) / NumPitches;
-
+		public ProjProps Props = new ProjProps();
 		SongPanel songPanel;
 		public SongPanel SongPanel
 		{
@@ -40,7 +34,7 @@ namespace Visual_Music
 				{
 					songPanel = value;
 					songPanel.Project = this;
-					Camera.SongPanel = DefaultCamera.SongPanel = songPanel;
+					Props.Camera.SongPanel = songPanel;
 					if (KeyFrames != null)
 					{
 						foreach (var kframe in KeyFrames.Values)
@@ -53,8 +47,9 @@ namespace Visual_Music
 		}
 		TimeSpan pbStartSysTime = new TimeSpan(0);
 		double pbStartSongTimeS;
-
-		//Serialization----------------------------------
+		public float ViewWidthT => notes == null ? 0 : Props.ViewWidthQn * notes.TicksPerBeat; //Number of ticks that fits on screen
+		float vertViewWidthQn;
+		public float VertWidthScale => vertViewWidthQn / Props.ViewWidthQn;
 
 		public ImportOptions ImportOptions { get; set; }
 
@@ -65,85 +60,14 @@ namespace Visual_Music
 			set { trackViews = value; }
 		}
 
-		float viewWidthQn;// = DefaultViewWidthQn;
-		public float ViewWidthQn
-		{
-			get { return viewWidthQn; }
-			set
-			{
-				viewWidthQn = value;
-				if (notes != null)
-					viewWidthT = viewWidthQn * notes.TicksPerBeat;
-			}
-		}
-
-		public KeyFrame getKeyFrameAtSongPos()
-		{
-			return KeyFrames[(int)SongPosT];
-		}
-
-		float vertViewWidthQn;
-		public float VertWidthScale => vertViewWidthQn / viewWidthQn;
-
-		float viewWidthT; ////Number of ticks that fits on screen
-		public float ViewWidthT { get => viewWidthT; }
-
-		public double AudioOffset { get; set; }
-		float playbackOffsetS = 0;
-		public float PlaybackOffsetS
-		{
-			get => playbackOffsetS;
-			set
-			{
-				playbackOffsetS = value;
-
-				firstTempoEvent = pbTempoEvent = 0;
-				pbTimeS = pbTimeT = playbackOffsetT = 0;
-
-				//Set playbackOffsetT
-				if (value >= 0)
-					playbackOffsetT = (float)(value * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat);
-				else
-					playbackOffsetT = (float)-secondsToTicks((double)-value);
-
-				//Set firstTempoEvent (if playback offset is negative, playback may start after second event in which firstTempoEvent shouldn't be zero)
-				if (value < 0)
-				{
-					double offsetT = -playbackOffsetT;
-					for (int i = 0; i < notes.TempoEvents.Count; i++)
-					{
-						if (notes.TempoEvents[i].Time <= offsetT)
-							firstTempoEvent = i;
-						else
-							break;
-					}
-				}
-
-				pbTimeS = pbTimeT = 0;
-				pbTempoEvent = firstTempoEvent;
-				SongLengthS = normSongPosToSeconds(1);
-			}
-		}
-		float playbackOffsetT = 0;
-		public float PlaybackOffsetT => playbackOffsetT;
-
 		int firstTempoEvent = 0;
-		public float PlaybackOffsetP => getScreenPosX(playbackOffsetT);
 
 		//Current playback position to seek from
 		int pbTempoEvent = 0;
 		double pbTimeT = 0;
 		double pbTimeS = 0;
 
-		public float FadeIn { get; set; } = 0;
-		public float FadeOut { get; set; } = 0;
-
-		public int MinPitch { get; set; }
-		public int MaxPitch { get; set; }
-		int NumPitches { get { return MaxPitch - MinPitch + 1; } }
-
-		public Camera Camera { get; set; } = new Camera();
-		public Camera DefaultCamera { get; } = new Camera();
+		//public Camera DefaultCamera { get; } = new Camera();
 		//----------------------------------------------------
 
 		public TrackProps GlobalTrackProps
@@ -183,6 +107,9 @@ namespace Visual_Music
 				}
 			}
 		}
+		float playbackOffsetT = 0;
+		public float PlaybackOffsetT => playbackOffsetT;
+		public float PlaybackOffsetP => getScreenPosX(playbackOffsetT);
 
 		bool isPlaying;
 		public bool IsPlaying
@@ -202,7 +129,8 @@ namespace Visual_Music
 		{
 			SongPanel = spanel;
 			KeyFrames = new KeyFrames(SongPanel);
-			ViewWidthQn = KeyFrames[0].ViewWidthQn;
+			Props.ViewWidthQn = KeyFrames[0].ViewWidthQn;
+			Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 		}
 
 
@@ -225,7 +153,7 @@ namespace Visual_Music
 			return importSong(ImportOptions);
 		}
 
-		public Project(SerializationInfo info, StreamingContext ctxt) : base()
+		public Project(SerializationInfo info, StreamingContext ctxt)
 		{
 			foreach (SerializationEntry entry in info)
 			{
@@ -235,20 +163,6 @@ namespace Visual_Music
 					ImportOptions = (ImportOptions)entry.Value;
 				else if (entry.Name == "trackViews")
 					trackViews = (List<TrackView>)entry.Value;
-				else if (entry.Name == "qn_viewWidth")
-					ViewWidthQn = (float)entry.Value;
-				else if (entry.Name == "audioOffset")
-					AudioOffset = (double)entry.Value;
-				else if (entry.Name == "playbackOffsetS")
-					playbackOffsetS = (float)entry.Value;
-				else if (entry.Name == "fadeIn")
-					FadeIn = (float)entry.Value;
-				else if (entry.Name == "fadeOut")
-					FadeOut = (float)entry.Value;
-				else if (entry.Name == "maxPitch")
-					MaxPitch = (int)entry.Value;
-				else if (entry.Name == "minPitch")
-					MinPitch = (int)entry.Value;
 				else if (entry.Name == "tpartyApp")
 					ImportNotesWithAudioForm.TpartyApp = (string)entry.Value;
 				else if (entry.Name == "tpartyArgs")
@@ -264,15 +178,13 @@ namespace Visual_Music
 						ImportNotesWithAudioForm.TpartyOutputDir = dir;
 					}
 				}
-				else if (entry.Name == "camera")
-					Camera = (Camera)entry.Value;
-				else if (entry.Name == "userViewWidth")
-					UserViewWidth = (float)entry.Value;
-				else if (entry.Name == "lyrics")
-					LyricsSegments = (BindingList<LyricsSegment>)entry.Value;
 				else if (entry.Name == "keyFrames")
 					KeyFrames = (KeyFrames)entry.Value;
-
+				else if (entry.Name == "props")
+				{
+					Props = (ProjProps)entry.Value;
+					Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
+				}
 			}
 			//noteFileType = (Midi.FileType)info.GetValue("noteFileType", typeof(Midi.FileType));
 		}
@@ -282,20 +194,12 @@ namespace Visual_Music
 			info.AddValue("version", SongFormat.writeVersion);
 			info.AddValue("importOptions", ImportOptions);
 			info.AddValue("trackViews", trackViews);
-			info.AddValue("qn_viewWidth", ViewWidthQn);
-			info.AddValue("audioOffset", AudioOffset);
-			info.AddValue("playbackOffsetS", playbackOffsetS);
-			info.AddValue("fadeIn", FadeIn);
-			info.AddValue("fadeOut", FadeOut);
-			info.AddValue("maxPitch", MaxPitch);
-			info.AddValue("minPitch", MinPitch);
 			info.AddValue("tpartyApp", ImportNotesWithAudioForm.TpartyApp);
 			info.AddValue("tpartyArgs", ImportNotesWithAudioForm.TpartyArgs);
 			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
-			info.AddValue("camera", Camera);
-			info.AddValue("userViewWidth", UserViewWidth);
-			info.AddValue("lyrics", LyricsSegments);
 			info.AddValue("keyFrames", KeyFrames);
+			info.AddValue("props", Props);
+
 		}
 
 		public bool importSong(ImportOptions options)
@@ -387,19 +291,19 @@ namespace Visual_Music
 			if (options.EraseCurrent)
 			{
 				KeyFrames = new KeyFrames(SongPanel);
-				AudioOffset = playbackOffsetS = FadeIn = FadeOut = 0;
+				Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
 				NormSongPos = 0;
 			}
-			viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
+			//viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
 			return true;
 		}
 
 		public void interpolateFrames()
 		{
 			var interpolatedFrame = KeyFrames.createInterpolatedFrame((int)SongPosT);
-			ViewWidthQn = interpolatedFrame.ViewWidthQn;
+			Props.ViewWidthQn = interpolatedFrame.ViewWidthQn;
 			//interpolatedFrame.Camera.SongPanel= Camera.SongPanel;
-			Camera = interpolatedFrame.Camera;
+			Props.Camera = interpolatedFrame.Camera;
 		}
 
 		public void openAudioFile(string file, Midi.MixdownType mixdownType)
@@ -416,13 +320,13 @@ namespace Visual_Music
 				throw new FileFormatException(new Uri(file));
 
 			if (notes != null)
-				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + AudioOffset));
+				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + Props.AudioOffset));
 		}
 
 		public void resetPitchLimits()
 		{
-			MaxPitch = Notes.MaxPitch;
-			MinPitch = Notes.MinPitch;
+			Props.MaxPitch = Notes.MaxPitch;
+			Props.MinPitch = Notes.MinPitch;
 		}
 
 		public void showNoteInfo(GdiPoint location)
@@ -498,9 +402,9 @@ namespace Visual_Music
 
 		public void createOcTrees()
 		{
-			if (trackViews == null || viewWidthQn == 0 || Notes == null)
+			if (trackViews == null || Props.ViewWidthQn == 0 || Notes == null)
 				return;
-			vertViewWidthQn = viewWidthQn;
+			vertViewWidthQn = Props.ViewWidthQn;
 			//for (int i = TrackViews.Count - 1; i > 0; i--)
 
 			for (int i = 1; i < trackViews.Count; i++)
@@ -533,18 +437,18 @@ namespace Visual_Music
 			};
 			Viewport viewport = SongPanel.GraphicsDevice.Viewport;
 			//effect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
-			effect.Projection = Camera.ProjMat;
-			effect.View = Matrix.CreateTranslation(new Vector3(0, 0, -Camera.ProjMat.M11 / 2));
+			effect.Projection = Props.Camera.ProjMat;
+			effect.View = Matrix.CreateTranslation(new Vector3(0, 0, -Props.Camera.ProjMat.M11 / 2));
 			Vector2 songPanelSize = new Vector2(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
-			Vector2 scale = new Vector2(Camera.ViewportSize.X / songPanelSize.X, -Camera.ViewportSize.Y / songPanelSize.Y);
+			Vector2 scale = new Vector2(Props.Camera.ViewportSize.X / songPanelSize.X, -Props.Camera.ViewportSize.Y / songPanelSize.Y);
 
 			SongPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
-			foreach (var lyricsSegment in LyricsSegments)
+			foreach (var lyricsSegment in Props.LyricsSegments)
 			{
 				if (string.IsNullOrWhiteSpace(lyricsSegment.Lyrics))
 					continue;
 				float textHeight = -SongPanel.LyricsFont.MeasureString(lyricsSegment.Lyrics).Y * scale.Y;
-				SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP + getScreenPosX(secondsToTicks(lyricsSegment.Time) + PlaybackOffsetT), -Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+				SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP + getScreenPosX(secondsToTicks(lyricsSegment.Time) + PlaybackOffsetT), -Props.Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
 			}
 			SongPanel.SpriteBatch.End();
 		}
@@ -561,10 +465,10 @@ namespace Visual_Music
 		public int getPitch(float normPosY)
 		{
 			normPosY = 1 - normPosY;
-			float height = 1 - NormPitchMargin * 2;
+			float height = 1 - ProjProps.NormPitchMargin * 2;
 			float noteHeight = height / Notes.NumPitches;
-			float pos = normPosY - NormPitchMargin;
-			return MinPitch + (int)(pos / noteHeight);
+			float pos = normPosY - ProjProps.NormPitchMargin;
+			return Props.MinPitch + (int)(pos / noteHeight);
 		}
 		public TrackProps mergeTrackProps(ListView.SelectedIndexCollection listIndices)
 		{
@@ -699,9 +603,9 @@ namespace Visual_Music
 		public void setSongPosS(double newTimeS, bool updateScreen)
 		{
 			double offsetS = 0, offsetT = 0;
-			if (PlaybackOffsetS < 0)
+			if (Props.PlaybackOffsetS < 0)
 			{
-				offsetS = -PlaybackOffsetS;
+				offsetS = -Props.PlaybackOffsetS;
 				offsetT = -playbackOffsetT;
 			}
 			pbTimeT = secondsToTicks(newTimeS);
@@ -738,7 +642,7 @@ namespace Visual_Music
 				if (!AudioHasStarted)
 				{
 					timeS = (SongPanel.TotalTimeElapsed - pbStartSysTime).TotalSeconds + pbStartSongTimeS;
-					if (timeS > AudioOffset + PlaybackOffsetS)
+					if (timeS > Props.AudioOffset + Props.PlaybackOffsetS)
 					{
 						AudioHasStarted = true;
 						Media.startPlaybackAtTime(0);
@@ -752,7 +656,7 @@ namespace Visual_Music
 						timeS = SongPosS;
 					}
 					else
-						timeS = Media.getPlaybackPos() + AudioOffset + PlaybackOffsetS;
+						timeS = Media.getPlaybackPos() + Props.AudioOffset + Props.PlaybackOffsetS;
 				}
 
 				setSongPosS(timeS, true);
@@ -780,7 +684,7 @@ namespace Visual_Music
 			else
 			{
 				double songPosS = SongPosS;
-				double startTime = songPosS - AudioOffset - PlaybackOffsetS;
+				double startTime = songPosS - Props.AudioOffset - Props.PlaybackOffsetS;
 				if (startTime >= 0)
 				{
 					if (!Media.startPlaybackAtTime(startTime))
@@ -817,19 +721,19 @@ namespace Visual_Music
 		}
 		public float getScreenPosX(double timeT)
 		{
-			return (float)((timeT / viewWidthT) * (Camera.ViewportSize.X));
+			return (float)((timeT / ViewWidthT) * (Props.Camera.ViewportSize.X));
 		}
 
 		public float getScreenPosY(float pitch)
 		{
-			return (pitch - MinPitch) * NoteHeight + NoteHeight / 2.0f + PitchMargin - Camera.ViewportSize.Y / 2;
+			return (pitch - Props.MinPitch) * Props.NoteHeight + Props.NoteHeight / 2.0f + Props.PitchMargin - Props.Camera.ViewportSize.Y / 2;
 		}
 		public double pixelsToTicks(double screenX)
 		{ //Returns time in ticks
-			return screenX / Camera.ViewportSize.X * viewWidthT; //Far right -> screenX = viewPortSize / 2
+			return screenX / Props.Camera.ViewportSize.X * ViewWidthT; //Far right -> screenX = viewPortSize / 2
 		}
 
-		public float SongLengthP => (float)(SongLengthT * Camera.ViewportSize.X) / viewWidthT;
+		public float SongLengthP => (float)(SongLengthT * Props.Camera.ViewportSize.X) / ViewWidthT;
 
 		public int SmallScrollStepT => (int)(ViewWidthT * SongPanel.SmallScrollStep);
 		public int LargeScrollStepT => (int)(ViewWidthT * SongPanel.LargeScrollStep);
@@ -876,25 +780,25 @@ namespace Visual_Music
 
 		public float normalizeVpScalar(float value)
 		{
-			return value * Camera.ViewportSize.X / UserViewWidth;
+			return value * Props.Camera.ViewportSize.X / Props.UserViewWidth;
 		}
 		public Vector3 normalizeVpVector(Vector3 value)
 		{
-			return value * Camera.ViewportSize.X / UserViewWidth;
+			return value * Props.Camera.ViewportSize.X / Props.UserViewWidth;
 		}
 
 		public int insertLyrics()
 		{
-			for (int i = 0; i < LyricsSegments.Count; i++)
+			for (int i = 0; i < Props.LyricsSegments.Count; i++)
 			{
-				if (LyricsSegments[i].Time >= SongPosS)
+				if (Props.LyricsSegments[i].Time >= SongPosS)
 				{
-					LyricsSegments.Insert(i, new LyricsSegment((float)SongPosS));
+					Props.LyricsSegments.Insert(i, new LyricsSegment((float)SongPosS));
 					return i;
 				}
 			}
-			LyricsSegments.Add(new LyricsSegment((float)SongPosS));
-			return LyricsSegments.Count - 1;
+			Props.LyricsSegments.Add(new LyricsSegment((float)SongPosS));
+			return Props.LyricsSegments.Count - 1;
 		}
 
 		public int insertKeyFrameAtSongPos()
@@ -907,6 +811,40 @@ namespace Visual_Music
 			int newPosT = KeyFrames.keyAtIndex(index);
 			if (SongLengthT > 0 && newPosT >= 0)
 				NormSongPos = (newPosT + 0.5) / SongLengthT;
+		}
+
+		public KeyFrame getKeyFrameAtSongPos()
+		{
+			return KeyFrames[(int)SongPosT];
+		}
+
+		void onPlaybackOffsetSChanged()
+		{
+			firstTempoEvent = pbTempoEvent = 0;
+			pbTimeS = pbTimeT = playbackOffsetT = 0;
+
+			//Set playbackOffsetT
+			if (Props.PlaybackOffsetS >= 0)
+				playbackOffsetT = (float)(Props.PlaybackOffsetS * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat);
+			else
+				playbackOffsetT = (float)-secondsToTicks((double)-Props.PlaybackOffsetS);
+
+			//Set firstTempoEvent (if playback offset is negative, playback may start after second event in which firstTempoEvent shouldn't be zero)
+			if (Props.PlaybackOffsetS < 0)
+			{
+				double offsetT = -playbackOffsetT;
+				for (int i = 0; i < notes.TempoEvents.Count; i++)
+				{
+					if (notes.TempoEvents[i].Time <= offsetT)
+						firstTempoEvent = i;
+					else
+						break;
+				}
+			}
+
+			pbTimeS = pbTimeT = 0;
+			pbTempoEvent = firstTempoEvent;
+			SongLengthS = normSongPosToSeconds(1);
 		}
 	}
 

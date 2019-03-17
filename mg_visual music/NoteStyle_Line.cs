@@ -158,8 +158,8 @@ namespace Visual_Music
 
 		void calcTexCoords(out double x1, out double y1, out double x2, out double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect, bool forceTiling)
 		{
-			double vpSizeX = Project.Camera.ViewportSize.X;
-			double vpSizeY = Project.Camera.ViewportSize.Y;
+			double vpSizeX = Project.Props.Camera.ViewportSize.X;
+			double vpSizeY = Project.Props.Camera.ViewportSize.Y;
 			
 			double texSizeX = (double)texProps.Texture.Width * TexTileScale;
 			double texSizeY = (double)texProps.Texture.Height * TexTileScale;
@@ -305,7 +305,7 @@ namespace Visual_Music
 			int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
 			float vpLineWidth = VpLineWidth;
 			Vector3 bboxStart = Vector3.Zero;
-			float bboxMinSqLength = (float)Math.Pow(Project.Camera.ViewportSize.X / 1000, 2);
+			float bboxMinSqLength = (float)Math.Pow(Project.Props.Camera.ViewportSize.X / 1000, 2);
 
 			for (int n = 0; n < noteList.Count; n++)
 			{
@@ -465,13 +465,13 @@ namespace Visual_Music
 			}
 
 			prevVec.X = Project.getScreenPosX((int)prevVec.X);
-			prevVec.Y = prevVec.Y * Project.NoteHeight;
+			prevVec.Y = prevVec.Y * Project.Props.NoteHeight;
 
 			Vector2 nextVec = curve.Keys[noteIndex].NextVector;
 			if (nextVec == Vector2.Zero)
 				nextVec = Vector2.UnitX;
 			nextVec.X = Project.getScreenPosX((int)nextVec.X);
-			nextVec.Y = nextVec.Y * Project.NoteHeight;
+			nextVec.Y = nextVec.Y * Project.Props.NoteHeight;
 
 			nextVec.Normalize();
 			prevVec.Normalize();
@@ -577,10 +577,10 @@ namespace Visual_Music
 			fx.CurrentTechnique = fx.Techniques["Line"];
 			fx.Parameters["DiscardAtOnce"].SetValue(true);
 			fx.CurrentTechnique.Passes[0].Apply();
-			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
+			trackProps.TrackView.ocTree.drawGeo(Project.Props.Camera);
 			fx.Parameters["DiscardAtOnce"].SetValue(false);
 			fx.CurrentTechnique.Passes[0].Apply();
-			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
+			trackProps.TrackView.ocTree.drawGeo(Project.Props.Camera);
 
 			DepthStencilState oldDss = songPanel.GraphicsDevice.DepthStencilState;
 			songPanel.GraphicsDevice.DepthStencilState = DepthStencilState.None;

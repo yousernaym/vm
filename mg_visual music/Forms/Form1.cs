@@ -78,7 +78,7 @@ namespace Visual_Music
 		public static TpartyIntegrationForm TpartyIntegrationForm => tpartyIntegrationForm;
 		public static VideoExportForm VidExpForm;
 
-		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment), typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame) };
+		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment), typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps) };
 		SongPanel songPanel = new SongPanel();
 		public SongPanel SongPanel => songPanel;
 		SongWebBrowser modWebBrowser;
@@ -94,7 +94,6 @@ namespace Visual_Music
 		ScrollBar songScrollBar = new HScrollBar();
 		NoteStyleControl currentNoteStyleControl;
 		int keyFrameLockRow = -1;
-		bool updatingCamTb = false;
 
 		public Form1(string[] args)
 		{
@@ -304,18 +303,18 @@ namespace Visual_Music
 			//}
 			updatingControls = true;
 			upDownVpWidth.Value = Project.KeyFrames[0].ViewWidthQn;
-			audioOffsetS.Value = (decimal)Project.AudioOffset;
-			project.PlaybackOffsetS = project.PlaybackOffsetS;
-			playbackOffsetUd.Value = (decimal)project.PlaybackOffsetS;
+			audioOffsetS.Value = (decimal)Project.Props.AudioOffset;
+			project.Props.PlaybackOffsetS = project.Props.PlaybackOffsetS;
+			playbackOffsetUd.Value = (decimal)project.Props.PlaybackOffsetS;
 			songScrollBar.Maximum = (int)Project.SongLengthT;
 			songScrollBar.Value = (int)Project.SongPosT;
-			fadeInUd.Value = (decimal)project.FadeIn;
-			fadeOutUd.Value = (decimal)project.FadeOut;
-			maxPitchUd.Value = Project.MaxPitch;
-			minPitchUd.Value = Project.MinPitch;
+			fadeInUd.Value = (decimal)project.Props.FadeIn;
+			fadeOutUd.Value = (decimal)project.Props.FadeOut;
+			maxPitchUd.Value = Project.Props.MaxPitch;
+			minPitchUd.Value = Project.Props.MinPitch;
 			buildKeyFramesDGV();
 			updatingControls = false;
-			lyricsGridView.DataSource = project.LyricsSegments;
+			lyricsGridView.DataSource = project.Props.LyricsSegments;
 
 			//project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
 			//upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
@@ -336,8 +335,8 @@ namespace Visual_Music
 			if (project == null)
 				return;
 			updatingControls = true;
-			Vector3 pos = project.Camera.Pos;
-			Quaternion orient = project.Camera.Orientation;
+			Vector3 pos = project.Props.Camera.Pos;
+			Quaternion orient = project.Props.Camera.Orientation;
 			camTb.Text = $"{pos.X}\r\n{pos.Y}\r\n{pos.Z}\r\n\r\n{orient.X}\r\n{orient.Y}\r\n{orient.Z}\r\n{orient.W}";
 			updatingControls = false;
 		}
@@ -499,7 +498,7 @@ namespace Visual_Music
 
 		private void audioOffsetS_ValueChanged(object sender, EventArgs e)
 		{
-			Project.AudioOffset = (float)audioOffsetS.Value;
+			Project.Props.AudioOffset = (float)audioOffsetS.Value;
 		}
 
 		private void playbackOffsetUd_ValueChanged(object sender, EventArgs e)
@@ -510,19 +509,19 @@ namespace Visual_Music
 			if (-playbackOffsetUd.Value > songLengthWithoutPbOffset)
 				playbackOffsetUd.Value = -songLengthWithoutPbOffset;
 
-			project.PlaybackOffsetS = (float)playbackOffsetUd.Value;
+			project.Props.PlaybackOffsetS = (float)playbackOffsetUd.Value;
 			songScrollBar.Maximum = (int)Project.SongLengthT;
 			songScrollBar.Value = (int)Project.SongPosT;
 		}
 
 		private void fadeInUd_ValueChanged(object sender, EventArgs e)
 		{
-			project.FadeIn = (float)((NumericUpDown)sender).Value;
+			project.Props.FadeIn = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void fadeOutUd_ValueChanged(object sender, EventArgs e)
 		{
-			project.FadeOut = (float)((NumericUpDown)sender).Value;
+			project.Props.FadeOut = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void trackPropsBtn_Click(object sender, EventArgs e)
@@ -1117,7 +1116,7 @@ namespace Visual_Music
 				else
 					throw;
 				SongPanel.Project = project;
-				project.Camera.SongPanel = project.DefaultCamera.SongPanel = SongPanel;
+				project.Props.Camera.SongPanel = SongPanel;
 			}
 			finally
 			{
@@ -1206,7 +1205,7 @@ namespace Visual_Music
 				SongPanel.Invalidate();
 				if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)
 					songScrollBar.Value = (int)Project.SongPosT;
-				upDownVpWidth.Value = project.ViewWidthQn;
+				upDownVpWidth.Value = project.Props.ViewWidthQn;
 
 				if (keyFramesDGV.Rows.Count == 0) //App is closing
 					return;
@@ -1345,7 +1344,7 @@ namespace Visual_Music
 			if (songPropsCb.Checked)
 			{
 				songPropsPanel.Show();
-				if (project.LyricsSegments.Count > 0)
+				if (project.Props.LyricsSegments.Count > 0)
 					lyricsGridView.Show();
 				keyFramesDGV.Show();
 			}
@@ -1363,7 +1362,7 @@ namespace Visual_Music
 				return;
 			if ((int)maxPitchUd.Value < Project.Notes.MinPitch)
 				maxPitchUd.Value = Project.Notes.MinPitch;
-			Project.MaxPitch = (int)maxPitchUd.Value;
+			Project.Props.MaxPitch = (int)maxPitchUd.Value;
 			project.createOcTrees();
 		}
 
@@ -1373,15 +1372,15 @@ namespace Visual_Music
 				return;
 			if ((int)minPitchUd.Value > Project.Notes.MaxPitch)
 				minPitchUd.Value = Project.Notes.MaxPitch;
-			Project.MinPitch = (int)minPitchUd.Value;
+			Project.Props.MinPitch = (int)minPitchUd.Value;
 			project.createOcTrees();
 		}
 
 		void setDefaultPitches()
 		{
 			project.resetPitchLimits();
-			maxPitchUd.Value = (decimal)Project.MaxPitch;
-			minPitchUd.Value = (decimal)Project.MinPitch;
+			maxPitchUd.Value = (decimal)Project.Props.MaxPitch;
+			minPitchUd.Value = (decimal)Project.Props.MinPitch;
 		}
 
 		private void defaultPitchesBtn_Click(object sender, EventArgs e)
@@ -2092,7 +2091,7 @@ namespace Visual_Music
 			{
 				using (FileStream stream = File.Open(saveCamFileDialog.FileName, FileMode.Create))
 				{
-					dcs.WriteObject(stream, project.Camera);
+					dcs.WriteObject(stream, project.Props.Camera);
 				}
 			}
 			catch (Exception ex)
@@ -2175,7 +2174,7 @@ namespace Visual_Music
 
 		private void lyricsGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
 		{
-			if (project.LyricsSegments.Count == 0)
+			if (project.Props.LyricsSegments.Count == 0)
 				lyricsGridView.Hide();
 		}
 

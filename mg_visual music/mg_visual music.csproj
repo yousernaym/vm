@@ -221,6 +221,7 @@
     <Compile Include="OcTree.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Project.cs" />
+    <Compile Include="ProjProps.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\SongPanel.cs">
       <SubType>Component</SubType>

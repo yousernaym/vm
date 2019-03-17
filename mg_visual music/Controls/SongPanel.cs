@@ -208,7 +208,7 @@ namespace Visual_Music
 				normScreenSelection.Offset(-1, 1);
 
 				//Create frustum matrix
-				Matrix selectionFrustumMat = Project.Camera.VpMat;
+				Matrix selectionFrustumMat = Project.Props.Camera.VpMat;
 
 				//Scale frustum matrix so  that frustum shrinks to selection size
 				float scaleX = 2 / Math.Abs(normScreenSelection.Width);
@@ -222,7 +222,7 @@ namespace Visual_Music
 				//Create frustum
 				BoundingFrustum selectionFrustum = new BoundingFrustum(selectionFrustumMat);
 
-				float songPos = ((float)Project.SongPosT / Project.ViewWidthT + 0.5f) * Project.Camera.ViewportSize.X - Project.Camera.ViewportSize.X / 2.0f;
+				float songPos = ((float)Project.SongPosT / Project.ViewWidthT + 0.5f) * Project.Props.Camera.ViewportSize.X - Project.Props.Camera.ViewportSize.X / 2.0f;
 				for (int i = 1; i < Project.TrackViews.Count; i++)
 				{
 					if (Project.TrackViews[i].MidiTrack.Notes.Count > 0 &&
@@ -307,9 +307,9 @@ namespace Visual_Music
 					//videoProject.SongPanel = Project.SongPanel;
 					//videoProject.createOcTrees();
 					double songPosBackup = Project.SongPosS;
-					float viewWidthQnBackup = Project.ViewWidthQn;
-					int maxPitchBackup = Project.MaxPitch;
-					int minPitchBackup = Project.MinPitch;
+					float viewWidthQnBackup = Project.Props.ViewWidthQn;
+					int maxPitchBackup = Project.Props.MaxPitch;
+					int minPitchBackup = Project.Props.MinPitch;
 					
 					try
 					{
@@ -364,7 +364,7 @@ namespace Visual_Music
 							GraphicsDevice.SetRenderTarget(null);
 							renderTargetFinal.GetData<uint>(frameData);
 
-							bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, videoProject.AudioOffset + videoProject.PlaybackOffsetS);
+							bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, videoProject.Props.AudioOffset + videoProject.Props.PlaybackOffsetS);
 							if (!b)
 							{
 								lock (progressForm.cancelLock)
@@ -389,9 +389,9 @@ namespace Visual_Music
 					finally
 					{
 						Project.setSongPosS(songPosBackup, false);
-						Project.ViewWidthQn = viewWidthQnBackup;
-						Project.MaxPitch = maxPitchBackup;
-						Project.MinPitch = minPitchBackup;
+						Project.Props.ViewWidthQn = viewWidthQnBackup;
+						Project.Props.MaxPitch = maxPitchBackup;
+						Project.Props.MinPitch = minPitchBackup;
 						Project.createOcTrees();
 						endVideoRender();
 						
@@ -459,14 +459,14 @@ namespace Visual_Music
 				Viewport viewport = GraphicsDevice.Viewport;
 				if (options.Stereo)
 				{
-					project.Camera.Eye = -1;
+					project.Props.Camera.Eye = -1;
 					GraphicsDevice.Viewport = new Viewport(0, 0, viewport.Width / 2, viewport.Height);
 
 				}
 				project.drawSong();
 				if (options.Stereo)
 				{
-					project.Camera.Eye = 1;
+					project.Props.Camera.Eye = 1;
 					GraphicsDevice.Viewport = new Viewport(viewport.Width / 2, 0, viewport.Width / 2, viewport.Height);
 					project.drawSong();
 				}
@@ -475,18 +475,18 @@ namespace Visual_Music
 
 		void drawSphere(Project project, RenderTargetCube renderTargetCube, RenderTarget2D renderTarget2d, Texture2D prevFrame, Effect cubeToPlaneFx, int eye = 0)
 		{
-			project.Camera.Eye = eye;
+			project.Props.Camera.Eye = eye;
 
 
 			for (int i = 0; i < 6; i++)
 			{
 				GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
-				project.Camera.CubeMapFace = i;
+				project.Props.Camera.CubeMapFace = i;
 				GraphicsDevice.Clear(Color.Transparent);
 				//GraphicsDevice.Clear(new Color((uint)i * 1000));
 				project.drawSong();
 			}
-			project.Camera.Eye = 0;
+			project.Props.Camera.Eye = 0;
 			cubeToPlaneFx.Parameters["PrevFrame"].SetValue(prevFrame);
 			cubeToPlaneFx.Parameters["IsFirstFrame"].SetValue(prevFrame == null);
 			GraphicsDevice.SetRenderTarget(renderTarget2d);
@@ -514,7 +514,7 @@ namespace Visual_Music
 
 			cubeToPlaneFx.Parameters["ViewportSize"].SetValue(new Vector2(vpBounds.Z, vpBounds.W));
 			cubeToPlaneFx.Parameters["PrevFrameScaleOffset"].SetValue(prevFrameSO);
-			Vector3 lookAt = -project.Camera.ViewMat.Right;
+			Vector3 lookAt = -project.Props.Camera.ViewMat.Right;
 			Vector4 LookAt = new Vector4(lookAt.X, lookAt.Y, lookAt.Z, (float)Math.Cos(150f / 360 * Math.PI));
 			cubeToPlaneFx.Parameters["LookAt"].SetValue(LookAt);
 			GraphicsDevice.Viewport = new Viewport((int)vpBounds.X, (int)vpBounds.Y, (int)vpBounds.Z, (int)vpBounds.W);
@@ -527,9 +527,9 @@ namespace Visual_Music
 		{
 			GraphicsDevice.SetRenderTarget(null);
 			Media.endVideoEnc();
-			Project.Camera.CubeMapFace = -1;
+			Project.Props.Camera.CubeMapFace = -1;
 			Camera.InvertY = false;
-			Project.Camera.Eye = 0;
+			Project.Props.Camera.Eye = 0;
 			quad.Pos = new Vector2(0, 0);
 			quad.Size = new Vector2(1, 1);
 			isRenderingVideo = false;

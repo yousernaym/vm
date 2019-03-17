@@ -78,7 +78,7 @@ namespace Visual_Music
 			if (noteList.Count == 0)
 				return;
 
-			float halfNoteHeight = Project.NoteHeight / 2;
+			float halfNoteHeight = Project.Props.NoteHeight / 2;
 			int instanceIndex = 0;
 			double songPosP = Project.SongPosP;
 			
@@ -142,7 +142,7 @@ namespace Visual_Music
 		{
 			float songPosP;
 			base.drawTrack(midiTrack, trackProps, texMaterial, out songPosP);
-			trackProps.TrackView.ocTree.drawGeo(Project.Camera);
+			trackProps.TrackView.ocTree.drawGeo(Project.Props.Camera);
 		}
 				
 		public static void sInit()

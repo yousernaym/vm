@@ -155,7 +155,7 @@ namespace Visual_Music
 	[Serializable()]
 	abstract public class NoteStyle : ISerializable
 	{
-		public float TexTileScale => Project.Camera.ViewportSize.X / 1920;
+		public float TexTileScale => Project.Props.Camera.ViewportSize.X / 1920;
 		protected const int NumDynamicVerts = 30000;
 		public class Textures
 		{
@@ -291,18 +291,18 @@ namespace Visual_Music
 			float songFade = 1;
 			float songPosS = (float)Project.SongPosS;
 			float songLength = (float)Project.SongLengthS;
-			if (songPosS < Project.FadeIn)
-				songFade = songPosS / Project.FadeIn;
-			else if (songLength - songPosS < Project.FadeOut)
-				songFade = (songLength - songPosS) / Project.FadeOut;
+			if (songPosS < Project.Props.FadeIn)
+				songFade = songPosS / Project.Props.FadeIn;
+			else if (songLength - songPosS < Project.Props.FadeOut)
+				songFade = (songLength - songPosS) / Project.Props.FadeOut;
 
 			fx.Parameters["SongFade"].SetValue(songFade);
-			fx.Parameters["BlurredEdge"].SetValue(0.002f * Project.Camera.ViewportSize.X);
+			fx.Parameters["BlurredEdge"].SetValue(0.002f * Project.Props.Camera.ViewportSize.X);
 			songPosP = Project.SongPosP - Project.PlaybackOffsetP;
 			fx.Parameters["SongPos"].SetValue(songPosP);
-			fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Camera.ViewportSize.X, Project.Camera.ViewportSize.Y));
-			fx.Parameters["VpMat"].SetValue(Project.Camera.VpMat);
-			fx.Parameters["ProjScale"].SetValue(new Vector2(Project.Camera.ProjMat.M11, Project.Camera.ProjMat.M22));
+			fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Props.Camera.ViewportSize.X, Project.Props.Camera.ViewportSize.Y));
+			fx.Parameters["VpMat"].SetValue(Project.Props.Camera.VpMat);
+			fx.Parameters["ProjScale"].SetValue(new Vector2(Project.Props.Camera.ProjMat.M11, Project.Props.Camera.ProjMat.M22));
 
 			fx.Parameters["VertWidthScale"].SetValue(Project.VertWidthScale);
 			//fx.Parameters["TexWidthScale"].SetValue(texMaterial.TexProps.UAnchor == TexAnchorEnum.Screen ? VertWidthScale : 1);
@@ -380,7 +380,7 @@ namespace Visual_Music
 			//Spatial props
 			fx.Parameters["PosOffset"].SetValue(Project.getSpatialNormPosOffset(trackProps)); ;
 
-			fx.Parameters["CamPos"].SetValue(Project.Camera.Pos);
+			fx.Parameters["CamPos"].SetValue(Project.Props.Camera.Pos);
 
 			//Texture scrolling including adjustment for screen anchoring
 			if (texture != null)
@@ -390,15 +390,15 @@ namespace Visual_Music
 				if (texProps.UAnchor == TexAnchorEnum.Screen)
 				{
 					Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
-					float xOffset = songPosP + Project.Camera.ViewportSize.X / 2;
+					float xOffset = songPosP + Project.Props.Camera.ViewportSize.X / 2;
 					if ((bool)texProps.UTile)
 					{
 						if ((bool)texProps.KeepAspect)
-							texSize.X /= texSize.Y * Project.Camera.XYRatio;
+							texSize.X /= texSize.Y * Project.Props.Camera.XYRatio;
 						xOffset /= texSize.X;;
 					}
 					else
-						xOffset /= Project.Camera.ViewportSize.X;
+						xOffset /= Project.Props.Camera.ViewportSize.X;
 
 					texScrollOffset.X += xOffset;
 				}
@@ -466,8 +466,8 @@ namespace Visual_Music
 		protected Vector2 calcTexCoords(Vector2 texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, MaterialProps texMaterial)
 		{
 			Vector2 coords = new Vector2();
-			coords.X = calcTexCoordComponent(texSize.X, Project.Camera.ViewportSize.X, notePos.X, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor, true);
-			coords.Y = calcTexCoordComponent(texSize.Y, Project.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texMaterial.TexProps.VTile, (TexAnchorEnum)texMaterial.TexProps.VAnchor, false);
+			coords.X = calcTexCoordComponent(texSize.X, Project.Props.Camera.ViewportSize.X, notePos.X, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor, true);
+			coords.Y = calcTexCoordComponent(texSize.Y, Project.Props.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texMaterial.TexProps.VTile, (TexAnchorEnum)texMaterial.TexProps.VAnchor, false);
 			coords.Y *= -1;
 			return coords;
 		}

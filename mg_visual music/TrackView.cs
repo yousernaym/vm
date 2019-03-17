@@ -126,8 +126,8 @@ namespace Visual_Music
 				return;
 			Midi.Note firstNote = midiTrack.Notes[0];
 			Midi.Note lastNote = midiTrack.Notes[midiTrack.Notes.Count - 1];
-			Vector2 minPos2d = project.getScreenPos(firstNote.start, project.MinPitch);
-			Vector2 maxPos2d = project.getScreenPos(lastNote.start, project.MaxPitch);
+			Vector2 minPos2d = project.getScreenPos(firstNote.start, project.Props.MinPitch);
+			Vector2 maxPos2d = project.getScreenPos(lastNote.start, project.Props.MaxPitch);
 
 			//Todo: use posOffset.z for z-component
 			Vector3 minPos = new Vector3(minPos2d.X, minPos2d.Y, 0);
