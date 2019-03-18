@@ -369,8 +369,8 @@ namespace Visual_Music
 			for (int i = startTrack; i < numTracks; i++)
 			{
 				//New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
-				TrackView view = new TrackView(i, numTracks, notes, trackViews[0].TrackProps);
-				trackViews.Add(view);
+				TrackView view = new TrackView(i, numTracks, notes);
+				addTrackView(view);
 			}
 			//if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
 			//trackViews.RemoveRange(numTracks, startTrack - numTracks);
@@ -382,6 +382,12 @@ namespace Visual_Music
 			}
 			trackViews = tvCopy;
 			createOcTrees();
+		}
+
+		private void addTrackView(TrackView view)
+		{
+			trackViews.Add(view);
+			view.TrackProps.GlobalProps = TrackViews[0].TrackProps;
 		}
 
 		public void createOcTrees()

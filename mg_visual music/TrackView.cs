@@ -42,12 +42,12 @@ namespace Visual_Music
 			set { midiTrack = value; }
 		}
 
-		public TrackView(int _trackNumber, int _numTracks, Midi.Song song, TrackProps globalProps)
+		public TrackView(int _trackNumber, int _numTracks, Midi.Song song)
 		{
 			trackNumber = _trackNumber;
 			numTracks = _numTracks;
 			midiTrack = song.Tracks[_trackNumber];
-			TrackProps = new TrackProps(this, globalProps);
+			TrackProps = new TrackProps(this);
 			createCurve();
 		}
 

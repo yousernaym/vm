@@ -320,11 +320,10 @@ namespace Visual_Music
 
 		private void buildKeyFramesDGV()
 		{
-			updatingControls = true;
 			keyFramesDGV.Rows.Clear();
 			foreach (var frame in Project.KeyFrames)
 				keyFramesDGV.Rows.Add(frame.Key, frame.Value.Desc);
-			updatingControls = false;
+			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[0].Cells[0];
 		}
 
 		private void updateCamControls()

@@ -34,10 +34,9 @@ namespace Visual_Music
 		public SpatialProps SpatialProps { get; set; }
 		public int TypeFlags { get; set; } //Determines which type of properties should be saved or loaded to/from file.
 
-		public TrackProps(TrackView view, TrackProps _globalProps)
+		public TrackProps(TrackView view)
 		{
 			TrackView = view;
-			GlobalProps = _globalProps;
 			resetProps();
 		}
 
@@ -103,7 +102,7 @@ namespace Visual_Music
 
 		public TrackProps clone(SongPanel songPanel)
 		{
-			TrackProps newProps = new TrackProps(TrackView, GlobalProps);
+			TrackProps newProps = new TrackProps(TrackView);
 			newProps.cloneFrom(this, (int)TrackPropsType.TPT_All, songPanel);
 			return newProps;
 		}
