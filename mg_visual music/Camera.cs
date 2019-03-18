@@ -53,7 +53,7 @@ namespace Visual_Music
 				}
 			}
 		}
-		Matrix NonCubeRotMat => Matrix.CreateFromQuaternion(Orientation);
+		public Matrix NonCubeRotMat => Matrix.CreateFromQuaternion(Orientation);
 
 		static Action spatialChanged;
 		public static Action SpatialChanged
@@ -76,7 +76,7 @@ namespace Visual_Music
 		const float moveSpeed = 0.5f;
 
 		
-		Matrix RotMat
+		public Matrix RotMat
 		{
 			get
 			{

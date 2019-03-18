@@ -437,11 +437,11 @@ namespace Visual_Music
 			{
 				if (options.Stereo)
 				{
-					drawSphere(renderTargetCube, renderTarget2d, prevFrame, cubeToPlaneFx, -1);
-					drawSphere(renderTargetCube, renderTarget2d, prevFrame, cubeToPlaneFx, 1);
+					drawSphere(options, renderTargetCube, renderTarget2d, prevFrame, cubeToPlaneFx, -1);
+					drawSphere(options, renderTargetCube, renderTarget2d, prevFrame, cubeToPlaneFx, 1);
 				}
 				else
-					drawSphere(renderTargetCube, renderTarget2d, prevFrame, cubeToPlaneFx);
+					drawSphere(options, renderTargetCube, renderTarget2d, prevFrame, cubeToPlaneFx);
 			}
 			else
 			{
@@ -462,7 +462,7 @@ namespace Visual_Music
 			}
 		}
 
-		void drawSphere(RenderTargetCube renderTargetCube, RenderTarget2D renderTarget2d, Texture2D prevFrame, Effect cubeToPlaneFx, int eye = 0)
+		void drawSphere(VideoExportOptions options, RenderTargetCube renderTargetCube, RenderTarget2D renderTarget2d, Texture2D prevFrame, Effect cubeToPlaneFx, int eye = 0)
 		{
 			Project.Props.Camera.Eye = eye;
 			for (int i = 0; i < 6; i++)
@@ -473,6 +473,7 @@ namespace Visual_Music
 				//GraphicsDevice.Clear(new Color((uint)i * 1000));
 				Project.drawSong();
 			}
+			Project.Props.Camera.CubeMapFace = -1;
 			Project.Props.Camera.Eye = 0;
 			cubeToPlaneFx.Parameters["PrevFrame"].SetValue(prevFrame);
 			cubeToPlaneFx.Parameters["IsFirstFrame"].SetValue(prevFrame == null);
@@ -501,11 +502,9 @@ namespace Visual_Music
 
 			cubeToPlaneFx.Parameters["ViewportSize"].SetValue(new Vector2(vpBounds.Z, vpBounds.W));
 			cubeToPlaneFx.Parameters["PrevFrameScaleOffset"].SetValue(prevFrameSO);
-			Vector3 lookAt = -Project.Props.Camera.ViewMat.Right;
-			Vector4 LookAt = new Vector4(lookAt.X, lookAt.Y, lookAt.Z, (float)Math.Cos(150f / 360 * Math.PI));
-			cubeToPlaneFx.Parameters["LookAt"].SetValue(LookAt);
-			GraphicsDevice.Viewport = new Viewport((int)vpBounds.X, (int)vpBounds.Y, (int)vpBounds.Z, (int)vpBounds.W);
+			cubeToPlaneFx.Parameters["FovLimit"].SetValue(options.Stereo ? (float)Math.Cos(150f / 360 * Math.PI) : -1);
 
+			GraphicsDevice.Viewport = new Viewport((int)vpBounds.X, (int)vpBounds.Y, (int)vpBounds.Z, (int)vpBounds.W);
 			cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();
 			quad.draw();
 		}

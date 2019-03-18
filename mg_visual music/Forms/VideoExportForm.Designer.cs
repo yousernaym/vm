@@ -54,9 +54,9 @@
 			this.sphereCb.AutoSize = true;
 			this.sphereCb.Location = new System.Drawing.Point(12, 12);
 			this.sphereCb.Name = "sphereCb";
-			this.sphereCb.Size = new System.Drawing.Size(85, 17);
+			this.sphereCb.Size = new System.Drawing.Size(70, 17);
 			this.sphereCb.TabIndex = 10;
-			this.sphereCb.Text = "360 degrees";
+			this.sphereCb.Text = "Spherical";
 			this.sphereCb.UseVisualStyleBackColor = true;
 			this.sphereCb.CheckedChanged += new System.EventHandler(this.sphereCb_CheckedChanged);
 			// 
@@ -101,7 +101,7 @@
 			this.label1.TabIndex = 62;
 			this.label1.Text = "Resolution";
 			// 
-			// ssResoComboBox
+			// ssFactorComboBox
 			// 
 			this.ssFactorComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.ssFactorComboBox.FormattingEnabled = true;
@@ -111,7 +111,7 @@
             "4x",
             "8x"});
 			this.ssFactorComboBox.Location = new System.Drawing.Point(74, 92);
-			this.ssFactorComboBox.Name = "ssResoComboBox";
+			this.ssFactorComboBox.Name = "ssFactorComboBox";
 			this.ssFactorComboBox.Size = new System.Drawing.Size(102, 21);
 			this.ssFactorComboBox.TabIndex = 50;
 			this.ssFactorComboBox.TextChanged += new System.EventHandler(this.ssFactorComboBox_TextChanged);

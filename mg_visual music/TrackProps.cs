@@ -20,7 +20,7 @@ namespace Visual_Music
 		internal TrackView TrackView { get; set; }
 		static int NumTracks { get => TrackView.NumTracks; }
 		int TrackNumber { get => TrackView.TrackNumber; }
-		public TrackProps GlobalProps { get; set; }
+		internal TrackProps GlobalProps { get; set; }
 
 		internal NoteStyle ActiveNoteStyle
 		{
