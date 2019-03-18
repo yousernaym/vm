@@ -66,8 +66,6 @@ namespace Visual_Music
 			if (finished != true)
 			{
 				e.Cancel = true;
-				//if (DialogResult.Yes == MessageBox.Show(this, "Are you sure you want to stop rendering?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2))
-				//new Thread(delegate(){
 				using (StopRenderingMb cancelMb = new StopRenderingMb())
 				{
 					if (DialogResult.Yes == cancelMb.ShowDialog(this))

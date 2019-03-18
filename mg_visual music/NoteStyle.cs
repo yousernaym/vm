@@ -172,8 +172,8 @@ namespace Visual_Music
 		//	set { trackProps = value; }
 		//}
 
-		protected static SongPanel songPanel;
-		protected static Project Project => songPanel.Project;
+		protected static SongPanel SongPanel => Form1.SongPanel;
+		protected static Project Project => SongPanel.Project;
 		
 		//Serializable----------
 		protected NoteStyleType styleType; //Set in constructor of inherited class
@@ -226,37 +226,12 @@ namespace Visual_Music
 			info.AddValue("selectedModEntryIndex", SelectedModEntryIndex);
 		}
 
-		public static void sInitAllStyles(SongPanel _songPanel)
+		public static void sInitAllStyles()
 		{
-			songPanel = _songPanel;
 			NoteStyle_Bar.sInit();
 			NoteStyle_Line.sInit();
-
-			int radius = 20;
-			Color[] texData = new Color[radius * 2 * radius * 2];
-			float alphaMargin = 3;
-			for (int j = 0; j < radius * 2; j++)
-			{
-				for (int i = 0; i < radius * 2; i++)
-				{
-					int i2 = i - radius, j2 = j - radius;
-					Color c = Color.White;
-					float distFromCenter = (float)Math.Sqrt(i2 * i2 + j2 * j2);
-
-					if (distFromCenter >= (float)radius - alphaMargin)
-					{
-						float distFromOpaque = distFromCenter - (float)radius + alphaMargin;
-						float alpha = (alphaMargin - distFromOpaque) / alphaMargin;
-						if (alpha < 0)
-							alpha = 0;
-						c = Color.White * alpha;
-					}
-					texData[i + j * radius * 2] = c;
-				}
-			}
 		}
 		public abstract void loadFx();
-		//abstract public void createOcTree(Vector3 minPos, Vector3 size, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps globalTrackProps, TrackProps trackProps, Material texMaterial);
 		public abstract void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
 		public abstract void drawGeoChunk(Geo geo);
 
@@ -348,8 +323,8 @@ namespace Visual_Music
 			}
 
 			//Material
-			songPanel.GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
-			songPanel.GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
+			SongPanel.GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
+			SongPanel.GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
 //			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true,
 //																			CullMode = CullMode.None };
 			//songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;

@@ -79,16 +79,13 @@ namespace Visual_Music
 		public static VideoExportForm VidExpForm;
 
 		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment), typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps) };
-		SongPanel songPanel = new SongPanel();
-		public SongPanel SongPanel => songPanel;
+		static public SongPanel SongPanel { get; private set; } = new SongPanel();
 		SongWebBrowser modWebBrowser;
 		SongWebBrowser sidWebBrowser;
 		SongWebBrowser midiWebBrowser;
 		List<Control> screens = new List<Control>();
 		Control currentScreen;
-		Project project;
-		public Project Project => project;
-		//float PosOffsetScale => Project.Camera.ViewportSize.X / 100.0f; //Pos offset is in percent of screen width
+		public Project Project { get; private set; } = new Project();
 		static Settings settings = new Settings();
 		public static Settings Settings { get => settings; }
 		ScrollBar songScrollBar = new HScrollBar();
@@ -98,10 +95,10 @@ namespace Visual_Music
 		public Form1(string[] args)
 		{
 			InitializeComponent();
-			//Application.Idle += delegate { songPanel.update(); };
+			//Application.Idle += delegate { SongPanel.update(); };
 			//keyFramesDGV.Columns[0].CellTemplate.ValueType = typeof(Int32);
 			Camera.SpatialChanged = updateCamControls;
-			project = new Project(SongPanel);
+			SongPanel.Project = Project;
 			startupArgs = args;
 			TrackTexPbHeight = trackTexPb.Height;
 			MaxTrackTexPbWidth = trackTexPb.Width;
@@ -128,7 +125,7 @@ namespace Visual_Music
 			sidWebBrowser = new SongWebBrowser(this, "https://www.exotica.org.uk/wiki/Special:HVSC");
 			midiWebBrowser = new SongWebBrowser(this, "https://www.freemidi.org/");
 
-			screens.Add(songPanel);
+			screens.Add(SongPanel);
 			screens.Add(modWebBrowser);
 			screens.Add(sidWebBrowser);
 			screens.Add(midiWebBrowser);
@@ -173,7 +170,7 @@ namespace Visual_Music
 				MessageBox.Show(ex.Message, "Error in " + Settings.FilePath, MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 			//upDownVpWidth.Focus();
-			//upDownVpWidth.Value = songPanel.Qn_viewWidth;
+			//upDownVpWidth.Value = SongPanel.Qn_viewWidth;
 
 			bool bSongFile = false;
 			bool bMidiFile = false;
@@ -267,7 +264,7 @@ namespace Visual_Music
 		{
 			ImportMidiForm.Hide();
 			if (ImportMidiForm.ShowDialog(this) == DialogResult.OK)
-				songPanel.Focus();
+				SongPanel.Focus();
 		}
 		private void importModuleToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -304,21 +301,21 @@ namespace Visual_Music
 			updatingControls = true;
 			upDownVpWidth.Value = Project.KeyFrames[0].ViewWidthQn;
 			audioOffsetS.Value = (decimal)Project.Props.AudioOffset;
-			project.Props.PlaybackOffsetS = project.Props.PlaybackOffsetS;
-			playbackOffsetUd.Value = (decimal)project.Props.PlaybackOffsetS;
+			Project.Props.PlaybackOffsetS = Project.Props.PlaybackOffsetS;
+			playbackOffsetUd.Value = (decimal)Project.Props.PlaybackOffsetS;
 			songScrollBar.Maximum = (int)Project.SongLengthT;
 			songScrollBar.Value = (int)Project.SongPosT;
-			fadeInUd.Value = (decimal)project.Props.FadeIn;
-			fadeOutUd.Value = (decimal)project.Props.FadeOut;
+			fadeInUd.Value = (decimal)Project.Props.FadeIn;
+			fadeOutUd.Value = (decimal)Project.Props.FadeOut;
 			maxPitchUd.Value = Project.Props.MaxPitch;
 			minPitchUd.Value = Project.Props.MinPitch;
 			buildKeyFramesDGV();
 			updatingControls = false;
-			lyricsGridView.DataSource = project.Props.LyricsSegments;
+			lyricsGridView.DataSource = Project.Props.LyricsSegments;
 
 			//project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
 			//upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
-			changeToScreen(songPanel);
+			changeToScreen(SongPanel);
 		}
 
 		private void buildKeyFramesDGV()
@@ -332,11 +329,11 @@ namespace Visual_Music
 
 		private void updateCamControls()
 		{
-			if (project == null)
+			if (Project == null)
 				return;
 			updatingControls = true;
-			Vector3 pos = project.Props.Camera.Pos;
-			Quaternion orient = project.Props.Camera.Orientation;
+			Vector3 pos = Project.Props.Camera.Pos;
+			Quaternion orient = Project.Props.Camera.Orientation;
 			camTb.Text = $"{pos.X}\r\n{pos.Y}\r\n{pos.Z}\r\n\r\n{orient.X}\r\n{orient.Y}\r\n{orient.Z}\r\n{orient.W}";
 			updatingControls = false;
 		}
@@ -348,8 +345,8 @@ namespace Visual_Music
 			changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
 			try
 			{
-				songPanel.SuspendPaint();
-				if (project.TrackViews == null)
+				SongPanel.SuspendPaint();
+				if (Project.TrackViews == null)
 					options.EraseCurrent = true; //In order for setDefaultPitches below to be called
 				if (!Project.importSong(options))
 					return false;
@@ -364,7 +361,7 @@ namespace Visual_Music
 			}
 			finally
 			{
-				songPanel.ResumePaint();
+				SongPanel.ResumePaint();
 			}
 			return true;
 		}
@@ -390,7 +387,7 @@ namespace Visual_Music
 			}
 		}
 
-		private void songPanel_MouseWheel(object sender, MouseEventArgs e)
+		private void SongPanel_MouseWheel(object sender, MouseEventArgs e)
 		{
 			if (Project.Notes == null)
 				return;
@@ -431,19 +428,9 @@ namespace Visual_Music
 
 			//var scBackup = Camera.SpatialChanged;
 			//Camera.SpatialChanged = null;
-			using (RenderProgressForm renderProgressForm = new RenderProgressForm(songPanel, saveVideoDlg.FileName, VidExpForm.Options))
+			using (RenderProgressForm renderProgressForm = new RenderProgressForm(SongPanel, saveVideoDlg.FileName, VidExpForm.Options))
 				renderProgressForm.ShowDialog();
 			//Camera.SpatialChanged = scBackup;
-		}
-
-		private void songPanel_KeyDown(object sender, KeyEventArgs e)
-		{
-			//if(ModifierKeys == Keys.Control)
-			//{
-			//	//Reset camera
-			//	if (e.KeyCode == Keys.R)
-			//		resetCamera();
-			//}
 		}
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -454,7 +441,7 @@ namespace Visual_Music
 
 		private void Form1_KeyUp(object sender, KeyEventArgs e)
 		{
-			if (project != null)
+			if (Project != null)
 			{
 				//Project.Camera.toggleMouseControl(e.KeyCode, true))
 				var keyFrame = Project.getKeyFrameAtSongPos();
@@ -463,16 +450,16 @@ namespace Visual_Music
 				//Project.Camera.control(e.KeyCode, false);
 				if (e.KeyCode == Keys.Z)
 				{
-					songPanel.ForceDefaultNoteStyle = false;
-					for (int t = 1; t < project.TrackViews.Count; t++)
+					SongPanel.ForceDefaultNoteStyle = false;
+					for (int t = 1; t < Project.TrackViews.Count; t++)
 					{
-						TrackProps tprops = project.TrackViews[t].TrackProps;
+						TrackProps tprops = Project.TrackViews[t].TrackProps;
 						Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
 					}
 				}
 				else if (e.KeyCode == Keys.ControlKey && Project.VertWidthScale != 1)
 				{
-					project.createOcTrees();
+					Project.createOcTrees();
 					SongPanel.Invalidate();
 				}
 			}
@@ -484,7 +471,7 @@ namespace Visual_Music
 			songScrollBar.LargeChange = Project.LargeScrollStepT;
 			if (updatingControls)
 				return;
-			foreach (var keyFrame in project.KeyFrames.Values)
+			foreach (var keyFrame in Project.KeyFrames.Values)
 			{
 				if (keyFrame.Selected)
 					keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
@@ -493,7 +480,7 @@ namespace Visual_Music
 
 		private void upDownVpWidth_MouseUp(object sender, MouseEventArgs e)
 		{
-			project.createOcTrees();
+			Project.createOcTrees();
 		}
 
 		private void audioOffsetS_ValueChanged(object sender, EventArgs e)
@@ -505,23 +492,23 @@ namespace Visual_Music
 		{
 			if (updatingControls)
 				return;
-			decimal songLengthWithoutPbOffset = (decimal)project.ticksToSeconds(project.Notes.SongLengthT);
+			decimal songLengthWithoutPbOffset = (decimal)Project.ticksToSeconds(Project.Notes.SongLengthT);
 			if (-playbackOffsetUd.Value > songLengthWithoutPbOffset)
 				playbackOffsetUd.Value = -songLengthWithoutPbOffset;
 
-			project.Props.PlaybackOffsetS = (float)playbackOffsetUd.Value;
+			Project.Props.PlaybackOffsetS = (float)playbackOffsetUd.Value;
 			songScrollBar.Maximum = (int)Project.SongLengthT;
 			songScrollBar.Value = (int)Project.SongPosT;
 		}
 
 		private void fadeInUd_ValueChanged(object sender, EventArgs e)
 		{
-			project.Props.FadeIn = (float)((NumericUpDown)sender).Value;
+			Project.Props.FadeIn = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void fadeOutUd_ValueChanged(object sender, EventArgs e)
 		{
-			project.Props.FadeOut = (float)((NumericUpDown)sender).Value;
+			Project.Props.FadeOut = (float)((NumericUpDown)sender).Value;
 		}
 
 		private void trackPropsBtn_Click(object sender, EventArgs e)
@@ -761,7 +748,7 @@ namespace Visual_Music
 		{
 			mergedTrackProps = Project.mergeTrackProps(trackList.SelectedIndices);
 			Invalidate();
-			songPanel.Invalidate();
+			SongPanel.Invalidate();
 			updatingControls = true;
 			if (mergedTrackProps != null)
 			{
@@ -893,7 +880,7 @@ namespace Visual_Music
 						newItems[i] = (ListViewItem)selectedItems[i].Clone();
 						int index = dropIndex + i + 1;
 						Project.TrackViews.Insert(index, Project.TrackViews[selectedItems[i].Index]);
-						//songPanel.Notes.Tracks.Insert(index, songPanel.Notes.Tracks[selectedItems[i].Index]);
+						//SongPanel.Notes.Tracks.Insert(index, SongPanel.Notes.Tracks[selectedItems[i].Index]);
 						trackList.Items.Insert(index, newItems[i]);
 					}
 					for (int i = 0; i < selectedItems.Length; i++)
@@ -921,7 +908,7 @@ namespace Visual_Music
 							Enum.TryParse(tabName, out tpt);
 						}
 						destTrackProps.cloneFrom(sourceTrackProps, (int)tpt, SongPanel);
-						project.TrackViews[i].createOcTree(project, project.GlobalTrackProps);
+						Project.TrackViews[i].createOcTree(Project, Project.GlobalTrackProps);
 					}
 					updateTrackControls();
 					updateTrackListColors();
@@ -1001,13 +988,13 @@ namespace Visual_Music
 
 			if (updatingControls)
 				return;
-			//songPanel.Invalidate();
+			//SongPanel.Invalidate();
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 			{
 				NoteStyleType type = (NoteStyleType)Enum.Parse(typeof(NoteStyleType), (string)styleList.SelectedItem);
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.StyleProps.Type = type;
 			}
-			project.createOcTrees();
+			Project.createOcTrees();
 			updateTrackControls();
 		}
 
@@ -1037,7 +1024,7 @@ namespace Visual_Music
 					//Texture2d.FromStream fails if file is loaded outside of for loop
 					using (FileStream stream = File.Open(openTextureDlg.FileName, FileMode.Open))
 					{
-						getActiveTexProps(i).loadTexture(openTextureDlg.FileName, stream, songPanel);
+						getActiveTexProps(i).loadTexture(openTextureDlg.FileName, stream, SongPanel);
 					}
 				}
 			}
@@ -1046,7 +1033,7 @@ namespace Visual_Music
 				getActiveTexProps(i).Path = "";
 				MessageBox.Show(ex.Message);
 			}
-			project.createOcTrees();
+			Project.createOcTrees();
 			updateTrackControls();
 		}
 
@@ -1087,25 +1074,14 @@ namespace Visual_Music
 		{
 			try
 			{
-				songPanel.SuspendPaint();
+				SongPanel.SuspendPaint();
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
 				Project tempProject;
 				using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
 					tempProject = (Project)dcs.ReadObject(stream);
 				}
-				tempProject.SongPanel = songPanel;
-				if (tempProject.SongPanel == null) //User probably cancelled file import process
-					return;
-				project = tempProject;
-				if (project.KeyFrames == null) //Old project file format
-					project.KeyFrames = new KeyFrames(SongPanel);
-				
-				project.ImportOptions.updateImportForm();
-				currentProjPath = fileName;
-				songLoaded(currentProjPath);
-				updateFormTitle(currentProjPath);
-				project.DefaultFileName = Path.GetFileName(currentProjPath);
+				Project = tempProject;
 			}
 			catch (Exception ex)
 			{
@@ -1115,13 +1091,22 @@ namespace Visual_Music
 				}
 				else
 					throw;
-				SongPanel.Project = project;
-				project.Props.Camera.SongPanel = SongPanel;
+				SongPanel.Project = Project;
+				return;
 			}
 			finally
 			{
-				songPanel.ResumePaint();
+				SongPanel.ResumePaint();
 			}
+
+			if (Project.KeyFrames == null) //Old project file format
+				Project.KeyFrames = new KeyFrames();
+
+			Project.ImportOptions.updateImportForm();
+			currentProjPath = fileName;
+			songLoaded(currentProjPath);
+			updateFormTitle(currentProjPath);
+			Project.DefaultFileName = Path.GetFileName(currentProjPath);
 		}
 
 		void updateFormTitle(string path)
@@ -1148,7 +1133,7 @@ namespace Visual_Music
 				string tempPath = Path.Combine(Program.TempDir, "tempprojectfile");
 				using (FileStream stream = File.Open(tempPath, FileMode.Create))
 				{
-					dcs.WriteObject(stream, project);
+					dcs.WriteObject(stream, Project);
 				}
 				File.Copy(tempPath, currentProjPath, true);
 				updateFormTitle(currentProjPath);
@@ -1160,7 +1145,7 @@ namespace Visual_Music
 		}
 		void saveSongAs()
 		{
-			saveProjDialog.FileName = project.DefaultFileName;
+			saveProjDialog.FileName = Project.DefaultFileName;
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
 				return;
 			ProjectFolder = Path.GetDirectoryName(saveProjDialog.FileName);
@@ -1196,29 +1181,28 @@ namespace Visual_Music
 		}
 		void initSongPanel()
 		{
-			songPanel.TabStop = false;
-			songPanel.MouseWheel += new MouseEventHandler(songPanel_MouseWheel);
-			songPanel.KeyDown += new KeyEventHandler(songPanel_KeyDown);
+			SongPanel.TabStop = false;
+			SongPanel.MouseWheel += new MouseEventHandler(SongPanel_MouseWheel);
 			SongPanel.OnSongPosChanged = delegate ()
 			{
 				updatingControls = true;
 				SongPanel.Invalidate();
 				if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)
 					songScrollBar.Value = (int)Project.SongPosT;
-				upDownVpWidth.Value = project.Props.ViewWidthQn;
+				upDownVpWidth.Value = Project.Props.ViewWidthQn;
 
 				if (keyFramesDGV.Rows.Count == 0) //App is closing
 					return;
 				int atKeyFrame = -1;
-				if (project.KeyFrames.Keys[0] >= project.SongPosT)
+				if (Project.KeyFrames.Keys[0] >= Project.SongPosT)
 					atKeyFrame = 0;
-				else if (project.KeyFrames.Keys[project.KeyFrames.Count - 1] <= project.SongPosT)
-					atKeyFrame = project.KeyFrames.Count - 1;
-				else if (project.KeyFrames.Count > 2)
+				else if (Project.KeyFrames.Keys[Project.KeyFrames.Count - 1] <= Project.SongPosT)
+					atKeyFrame = Project.KeyFrames.Count - 1;
+				else if (Project.KeyFrames.Count > 2)
 				{
-					for (int i = project.KeyFrames.Count - 2; i >= 1; i--)
+					for (int i = Project.KeyFrames.Count - 2; i >= 1; i--)
 					{
-						if (project.KeyFrames.Keys[i] <= project.SongPosT)
+						if (Project.KeyFrames.Keys[i] <= Project.SongPosT)
 						{
 							keyFramesDGV.CurrentCell = keyFramesDGV.Rows[i].Cells[0]; //Point at this row but deselect it
 							break;
@@ -1238,13 +1222,13 @@ namespace Visual_Music
 				updateCamControls();
 				updatingControls = false;
 			};
-			changeToScreen(songPanel, false);
+			changeToScreen(SongPanel, false);
 		}
 
 		private void invalidateSongPanel(object sender, EventArgs e)
 		{
-			songPanel.Invalidate();
-			//songScrollBar.Value = songPanel.SongPosT;
+			SongPanel.Invalidate();
+			//songScrollBar.Value = SongPanel.SongPosT;
 		}
 
 		private void trackPropsPanel_Paint(object sender, PaintEventArgs e)
@@ -1303,7 +1287,7 @@ namespace Visual_Music
 		{
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.resetStyle();
-			project.createOcTrees();
+			Project.createOcTrees();
 			updateTrackControls();
 		}
 
@@ -1344,7 +1328,7 @@ namespace Visual_Music
 			if (songPropsCb.Checked)
 			{
 				songPropsPanel.Show();
-				if (project.Props.LyricsSegments.Count > 0)
+				if (Project.Props.LyricsSegments.Count > 0)
 					lyricsGridView.Show();
 				keyFramesDGV.Show();
 			}
@@ -1363,7 +1347,7 @@ namespace Visual_Music
 			if ((int)maxPitchUd.Value < Project.Notes.MinPitch)
 				maxPitchUd.Value = Project.Notes.MinPitch;
 			Project.Props.MaxPitch = (int)maxPitchUd.Value;
-			project.createOcTrees();
+			Project.createOcTrees();
 		}
 
 		private void minPitchUd_ValueChanged(object sender, EventArgs e)
@@ -1373,12 +1357,12 @@ namespace Visual_Music
 			if ((int)minPitchUd.Value > Project.Notes.MaxPitch)
 				minPitchUd.Value = Project.Notes.MaxPitch;
 			Project.Props.MinPitch = (int)minPitchUd.Value;
-			project.createOcTrees();
+			Project.createOcTrees();
 		}
 
 		void setDefaultPitches()
 		{
-			project.resetPitchLimits();
+			Project.resetPitchLimits();
 			maxPitchUd.Value = (decimal)Project.Props.MaxPitch;
 			minPitchUd.Value = (decimal)Project.Props.MinPitch;
 		}
@@ -1424,7 +1408,7 @@ namespace Visual_Music
 					getActiveTexProps(i).UTile = ((CheckBox)sender).Checked;
 					getActiveTexProps(i).VTile = ((CheckBox)sender).Checked;
 				}
-				project.createOcTrees();
+				Project.createOcTrees();
 				updateTrackControls();
 			}
 		}
@@ -1450,7 +1434,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UTile = ((CheckBox)sender).Checked;
-			project.createOcTrees();
+			Project.createOcTrees();
 			updateTrackControls();
 		}
 
@@ -1460,7 +1444,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).VTile = ((CheckBox)sender).Checked;
-			project.createOcTrees();
+			Project.createOcTrees();
 			updateTrackControls();
 		}
 
@@ -1470,7 +1454,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = getActiveTexProps(i).VAnchor = TexAnchorEnum.Note;
-			project.createOcTrees();
+			Project.createOcTrees();
 			updateTrackControls();
 		}
 
@@ -1480,7 +1464,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = getActiveTexProps(i).VAnchor = TexAnchorEnum.Screen;
-			project.createOcTrees();
+			Project.createOcTrees();
 			updateTrackControls();
 		}
 
@@ -1490,7 +1474,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = TexAnchorEnum.Song;
-			project.createOcTrees();
+			Project.createOcTrees();
 			updateTrackControls();
 		}
 
@@ -1500,7 +1484,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = TexAnchorEnum.Note;
-			project.createOcTrees();
+			Project.createOcTrees();
 		}
 
 		private void noteVAnchorRb_Click(object sender, EventArgs e)
@@ -1509,7 +1493,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).VAnchor = TexAnchorEnum.Note;
-			project.createOcTrees();
+			Project.createOcTrees();
 		}
 
 		private void screenUAnchorRb_Click(object sender, EventArgs e)
@@ -1518,7 +1502,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = TexAnchorEnum.Screen;
-			project.createOcTrees();
+			Project.createOcTrees();
 		}
 
 		private void screenVAnchorRb_Click(object sender, EventArgs e)
@@ -1527,7 +1511,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).VAnchor = TexAnchorEnum.Screen;
-			project.createOcTrees();
+			Project.createOcTrees();
 		}
 
 		private void songAnchorRb_Click(object sender, EventArgs e)
@@ -1536,7 +1520,7 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).UAnchor = TexAnchorEnum.Song;
-			project.createOcTrees();
+			Project.createOcTrees();
 		}
 
 		private void texUScrollUD_ValueChanged(object sender, EventArgs e)
@@ -1561,14 +1545,14 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				getActiveTexProps(i).KeepAspect = ((CheckBox)sender).Checked;
-			project.createOcTrees();
+			Project.createOcTrees();
 		}
 
 		private void importSidSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			ImportSidForm.Hide();
 			if (ImportSidForm.ShowDialog(this) == DialogResult.OK)
-				songPanel.Focus();
+				SongPanel.Focus();
 		}
 
 		private void tpartyToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1587,15 +1571,14 @@ namespace Visual_Music
 
 		void resetCameras(bool onlySelected, Camera newCam = null)
 		{
-			foreach (var keyFrame in project.KeyFrames.Values)
+			foreach (var keyFrame in Project.KeyFrames.Values)
 			{
 				if (keyFrame.Selected || !onlySelected)
 				{
-					keyFrame.Camera = newCam ?? new Camera(songPanel);
-					keyFrame.Camera.SongPanel = songPanel;
+					keyFrame.Camera = newCam ?? new Camera();
 				}
 			}
-			project.interpolateFrames();
+			Project.interpolateFrames();
 			updateCamControls();
 		}
 		private void resetCamBtn_Click(object sender, EventArgs e)
@@ -1629,10 +1612,10 @@ namespace Visual_Music
 
 		void updatePlaybackPosWhilePlaying()
 		{
-			if (project.IsPlaying)
+			if (Project.IsPlaying)
 			{
-				project.togglePlayback();
-				project.togglePlayback();
+				Project.togglePlayback();
+				Project.togglePlayback();
 			}
 		}
 		void songScrollBar_Scroll(object sender, ScrollEventArgs e)
@@ -1802,14 +1785,14 @@ namespace Visual_Music
 
 		private void upDownVpWidth_CommitChanges(object sender, EventArgs e)
 		{
-			if (project.VertWidthScale != 1)
-				project.createOcTrees();
-			songPanel.Invalidate();
+			if (Project.VertWidthScale != 1)
+				Project.createOcTrees();
+			SongPanel.Invalidate();
 		}
 
 		private void viewSongTSMI_Click(object sender, EventArgs e)
 		{
-			changeToScreen(songPanel);
+			changeToScreen(SongPanel);
 		}
 
 		private void viewModBrowserTSMI_Click(object sender, EventArgs e)
@@ -1843,7 +1826,7 @@ namespace Visual_Music
 				newScreen.Visible = true;
 			}
 			bool isSongScreen = newScreen is SongPanel;
-			propsTogglePanel.Enabled = isSongScreen && project.Notes != null;
+			propsTogglePanel.Enabled = isSongScreen && Project.Notes != null;
 			if (!isSongScreen)
 				songPropsCb.Checked = trackPropsCb.Checked = false;
 			newScreen.Focus();
@@ -1896,7 +1879,7 @@ namespace Visual_Music
 					case 2:
 						pos.Z = element;
 						//project.Camera.Pos = pos;
-						foreach (var keyFrame in project.KeyFrames.Values)
+						foreach (var keyFrame in Project.KeyFrames.Values)
 						{
 							if (keyFrame.Selected)
 								keyFrame.Camera.Pos = pos;
@@ -1914,7 +1897,7 @@ namespace Visual_Music
 					case 6:
 						orient.W = element;
 						//project.Camera.Orientation = orient;
-						foreach (var keyFrame in project.KeyFrames.Values)
+						foreach (var keyFrame in Project.KeyFrames.Values)
 						{
 							if (keyFrame.Selected)
 								keyFrame.Camera.Orientation = orient;
@@ -1987,11 +1970,11 @@ namespace Visual_Music
 			{
 				foreach (int selectedTrackIndex in trackList.SelectedIndices)
 				{
-					project.TrackViews[selectedTrackIndex].TrackProps.cloneFrom(props, typeFlags, SongPanel);
+					Project.TrackViews[selectedTrackIndex].TrackProps.cloneFrom(props, typeFlags, SongPanel);
 				}
 			}
 			else
-				project.TrackViews[0].TrackProps.cloneFrom(props, typeFlags, SongPanel);
+				Project.TrackViews[0].TrackProps.cloneFrom(props, typeFlags, SongPanel);
 
 			updateTrackListColors();
 			updateTrackControls();
@@ -2091,7 +2074,7 @@ namespace Visual_Music
 			{
 				using (FileStream stream = File.Open(saveCamFileDialog.FileName, FileMode.Create))
 				{
-					dcs.WriteObject(stream, project.Props.Camera);
+					dcs.WriteObject(stream, Project.Props.Camera);
 				}
 			}
 			catch (Exception ex)
@@ -2148,7 +2131,7 @@ namespace Visual_Music
 
 		private void lyricsGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
 		{
-			songPanel.Invalidate();
+			SongPanel.Invalidate();
 			float time;
 			if (e.ColumnIndex == 0 && !float.TryParse((string)e.FormattedValue, out time))
 			{
@@ -2166,7 +2149,7 @@ namespace Visual_Music
 		{
 			songPropsCb.Checked = true;
 			lyricsGridView.Show();
-			int row = project.insertLyrics();
+			int row = Project.insertLyrics();
 			var cell = lyricsGridView.Rows[row].Cells[1];
 			lyricsGridView.CurrentCell = cell;
 			lyricsGridView.BeginEdit(true);
@@ -2174,20 +2157,20 @@ namespace Visual_Music
 
 		private void lyricsGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
 		{
-			if (project.Props.LyricsSegments.Count == 0)
+			if (Project.Props.LyricsSegments.Count == 0)
 				lyricsGridView.Hide();
 		}
 
 		private void insertKeyFrameToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			int row = project.insertKeyFrameAtSongPos();
+			int row = Project.insertKeyFrameAtSongPos();
 			if (row < 0)
 			{
 				showErrorMsgBox("A keyframe already exists here.");
 				return;
 			}
 			
-			keyFramesDGV.Rows.Insert(row, project.SongPosT, "");
+			keyFramesDGV.Rows.Insert(row, Project.SongPosT, "");
 			songPropsCb.Checked = true;
 			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
 			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[1]; //Select cell in Description column
@@ -2203,7 +2186,7 @@ namespace Visual_Music
 		{
 			if (updatingControls)
 				return;
-			project.KeyFrames.removeIndex(e.RowIndex);
+			Project.KeyFrames.removeIndex(e.RowIndex);
 		}
 
 		private void keyFramesDGV_SelectionChanged(object sender, EventArgs e)
@@ -2220,9 +2203,9 @@ namespace Visual_Music
 			
 			if (keyFramesDGV.CurrentRow != null)
 			{
-				project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
+				Project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
 				updatingControls = true;
-				upDownVpWidth.Value = project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].ViewWidthQn;
+				upDownVpWidth.Value = Project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].ViewWidthQn;
 				updatingControls = false;
 
 			}
@@ -2263,15 +2246,15 @@ namespace Visual_Music
 				}
 				else
 				{
-					if (time != project.KeyFrames.Keys[e.RowIndex])
+					if (time != Project.KeyFrames.Keys[e.RowIndex])
 					{
 						//A new time was entered.
-						int newRowIndex = project.KeyFrames.changeTimeOfFrame(e.RowIndex, time);
+						int newRowIndex = Project.KeyFrames.changeTimeOfFrame(e.RowIndex, time);
 						if (newRowIndex < 0)
 						{
 							//Frame with specified time already exists
 							showErrorMsgBox("A key frame already exists at this position.");
-							keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = project.KeyFrames.Keys[e.RowIndex];
+							keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = Project.KeyFrames.Keys[e.RowIndex];
 						}
 						else if (newRowIndex != e.RowIndex)
 						{
@@ -2291,7 +2274,7 @@ namespace Visual_Music
 						else
 						{
 							//No sorting, so no SelectionChanged, so we need to update song pos here
-							project.goToKeyFrame(newRowIndex);
+							Project.goToKeyFrame(newRowIndex);
 							upDownVpWidth.Enabled = true;
 						}
 
@@ -2300,7 +2283,7 @@ namespace Visual_Music
 			}
 			else if (e.ColumnIndex == 1)
 			{
-				project.KeyFrames.Values[e.RowIndex].Desc = str;
+				Project.KeyFrames.Values[e.RowIndex].Desc = str;
 			}
 		}
 
@@ -2318,11 +2301,11 @@ namespace Visual_Music
 		{
 			for (int i = 0; i < keyFramesDGV.Rows.Count; i++)
 			{
-				if (i < project.KeyFrames.Count)
-					project.KeyFrames.Values[i].Selected = keyFramesDGV.Rows[i].Selected;
+				if (i < Project.KeyFrames.Count)
+					Project.KeyFrames.Values[i].Selected = keyFramesDGV.Rows[i].Selected;
 			}
 			if (keyFramesDGV.CurrentRow != null)
-				project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].Selected = true;
+				Project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].Selected = true;
 		}
 	}
 }

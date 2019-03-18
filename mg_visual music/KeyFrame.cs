@@ -11,13 +11,12 @@ namespace Visual_Music
 	public class KeyFrames : ISerializable, IEnumerable<KeyValuePair<int, KeyFrame>>
 	{
 		SortedList<int, KeyFrame> frameList;
-		SongPanel songPanel;
+		SongPanel SongPanel => Form1.SongPanel;
 
-		public KeyFrames(SongPanel spanel)
+		public KeyFrames()
 		{
 			frameList = new SortedList<int, KeyFrame>();
-			songPanel = spanel;
-			var keyFrame0 = new KeyFrame(songPanel);
+			var keyFrame0 = new KeyFrame();
 			keyFrame0.Desc = "Key frame 0";
 			frameList.Add(0, keyFrame0);
 		}
@@ -50,7 +49,7 @@ namespace Visual_Music
 		public KeyFrame createInterpolatedFrame(int songPosT)
 		{
 			if (frameList.Count == 0)
-				return new KeyFrame(songPanel);
+				return new KeyFrame();
 			if (frameList.Count == 1)
 				return frameList.Values[0].clone();
 			if (frameList.ContainsKey(songPosT))
@@ -78,7 +77,6 @@ namespace Visual_Music
 			outFrame.ViewWidthQn = (float)Math.Pow(2, interpolate((float)Math.Log(frame1.ViewWidthQn, 2), (float)Math.Log(frame2.ViewWidthQn, 2), interpolant));
 			outFrame.Camera.Pos = interpolate(frame1.Camera.Pos, frame2.Camera.Pos, interpolant);
 			outFrame.Camera.Orientation = interpolate(frame1.Camera.Orientation, frame2.Camera.Orientation, interpolant);
-			outFrame.Camera.SongPanel = frame1.Camera.SongPanel;
 
 			return outFrame;
 		}
@@ -157,7 +155,7 @@ namespace Visual_Music
 
 	//KeyFrame------------------
 	[Serializable]
-	public class KeyFrame : Cloneable<KeyFrame>, ISerializable
+	public class KeyFrame : ISerializable
 	{
 		public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen with default camera
 		public string Desc;
@@ -165,11 +163,10 @@ namespace Visual_Music
 		public Camera Camera;
 		public float ViewWidthQn;
 
-		public KeyFrame(SongPanel songPanel)
+		public KeyFrame()
 		{
 			ViewWidthQn = DefaultViewWidthQn;
 			Camera = new Camera();
-			Camera.SongPanel = songPanel;
 		}
 
 		public KeyFrame(SerializationInfo info, StreamingContext ctxt)
@@ -190,13 +187,6 @@ namespace Visual_Music
 			info.AddValue("desc", Desc);
 			info.AddValue("qn_viewWidth", ViewWidthQn);
 			info.AddValue("camera", Camera);
-		}
-
-		new public KeyFrame clone()
-		{
-			var newFrame = base.clone();
-			newFrame.Camera.SongPanel = Camera.SongPanel;
-			return newFrame;
 		}
 	}
 }

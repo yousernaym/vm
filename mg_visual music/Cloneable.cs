@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Visual_Music
 {
-	abstract public class Cloneable<T>
+	static public class Cloning
 	{
-		public T clone()
+		static public T clone<T>(this T obj)
 		{
 			DataContractSerializer dcs = new DataContractSerializer(typeof(T), Form1.projectSerializationTypes);
 			MemoryStream stream = new MemoryStream();
-			dcs.WriteObject(stream, this);
+			dcs.WriteObject(stream, obj);
 			stream.Flush();
 			stream.Position = 0;
 			return (T)dcs.ReadObject(stream);

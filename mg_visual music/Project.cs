@@ -24,27 +24,8 @@ namespace Visual_Music
 	{
 		public KeyFrames KeyFrames;
 		public ProjProps Props = new ProjProps();
-		SongPanel songPanel;
-		public SongPanel SongPanel
-		{
-			get => songPanel;
-			set
-			{
-				if (songPanel != value)
-				{
-					songPanel = value;
-					songPanel.Project = this;
-					Props.Camera.SongPanel = songPanel;
-					if (KeyFrames != null)
-					{
-						foreach (var kframe in KeyFrames.Values)
-							kframe.Camera.SongPanel = SongPanel;
-					}
-					if (!loadContent())
-						songPanel = null;
-				}
-			}
-		}
+		SongPanel SongPanel => Form1.SongPanel;
+				
 		TimeSpan pbStartSysTime = new TimeSpan(0);
 		double pbStartSongTimeS;
 		public float ViewWidthT => notes == null ? 0 : Props.ViewWidthQn * notes.TicksPerBeat; //Number of ticks that fits on screen
@@ -101,7 +82,7 @@ namespace Visual_Music
 					normSongPos = Math.Max(0, normSongPos);
 					normSongPos = Math.Min(1, normSongPos);
 					//SongPanel.paint();
-					songPanel.Invalidate();
+					SongPanel.Invalidate();
 					if (SongPanel.OnSongPosChanged != null)
 						SongPanel.OnSongPosChanged();
 				}
@@ -125,10 +106,9 @@ namespace Visual_Music
 		bool tempPausing;
 		public bool AudioHasStarted { get; set; }
 
-		public Project(SongPanel spanel)
+		public Project()
 		{
-			SongPanel = spanel;
-			KeyFrames = new KeyFrames(SongPanel);
+			KeyFrames = new KeyFrames();
 			Props.ViewWidthQn = KeyFrames[0].ViewWidthQn;
 			Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 		}
@@ -147,13 +127,13 @@ namespace Visual_Music
 			if (trackViews != null)
 			{
 				for (int i = 0; i < trackViews.Count; i++)
-					trackViews[i].TrackProps.loadContent(songPanel);
+					trackViews[i].TrackProps.loadContent(SongPanel);
 			}
 			ImportOptions.EraseCurrent = false;
 			return importSong(ImportOptions);
 		}
 
-		public Project(SerializationInfo info, StreamingContext ctxt)
+		public Project(SerializationInfo info, StreamingContext ctxt) : base()
 		{
 			foreach (SerializationEntry entry in info)
 			{
@@ -162,7 +142,11 @@ namespace Visual_Music
 				else if (entry.Name == "importOptions")
 					ImportOptions = (ImportOptions)entry.Value;
 				else if (entry.Name == "trackViews")
+				{
 					trackViews = (List<TrackView>)entry.Value;
+					foreach (var tv in trackViews)
+						tv.TrackProps.GlobalProps = TrackViews[0].TrackProps;
+				}
 				else if (entry.Name == "tpartyApp")
 					ImportNotesWithAudioForm.TpartyApp = (string)entry.Value;
 				else if (entry.Name == "tpartyArgs")
@@ -186,7 +170,8 @@ namespace Visual_Music
 					Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 				}
 			}
-			//noteFileType = (Midi.FileType)info.GetValue("noteFileType", typeof(Midi.FileType));
+			Form1.SongPanel.Project = this;
+			loadContent();
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -290,7 +275,7 @@ namespace Visual_Music
 
 			if (options.EraseCurrent)
 			{
-				KeyFrames = new KeyFrames(SongPanel);
+				KeyFrames = new KeyFrames();
 				Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
 				NormSongPos = 0;
 			}
@@ -384,7 +369,7 @@ namespace Visual_Music
 			for (int i = startTrack; i < numTracks; i++)
 			{
 				//New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
-				TrackView view = new TrackView(i, numTracks, notes);
+				TrackView view = new TrackView(i, numTracks, notes, trackViews[0].TrackProps);
 				trackViews.Add(view);
 			}
 			//if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
@@ -396,7 +381,6 @@ namespace Visual_Music
 					tvCopy.Add(trackViews[i]);
 			}
 			trackViews = tvCopy;
-			TrackProps.GlobalProps = trackViews[0].TrackProps;
 			createOcTrees();
 		}
 
@@ -416,21 +400,21 @@ namespace Visual_Music
 			if (notes == null || trackViews == null)
 				return;
 
-			DepthStencilState oldDss = songPanel.GraphicsDevice.DepthStencilState;
+			DepthStencilState oldDss = SongPanel.GraphicsDevice.DepthStencilState;
 			DepthStencilState dss = new DepthStencilState();
 			dss.StencilEnable = true;
 			dss.StencilFunction = CompareFunction.Greater;
 			dss.StencilPass = StencilOperation.Replace;
 			dss.ReferenceStencil = 1;
-			songPanel.GraphicsDevice.DepthStencilState = dss;
+			SongPanel.GraphicsDevice.DepthStencilState = dss;
 			for (int t = 1; t < trackViews.Count; t++)
 			{
-				songPanel.GraphicsDevice.Clear(ClearOptions.Stencil | ClearOptions.DepthBuffer, Color.AliceBlue, 1, 0);
+				SongPanel.GraphicsDevice.Clear(ClearOptions.Stencil | ClearOptions.DepthBuffer, Color.AliceBlue, 1, 0);
 				trackViews[t].drawTrack(GlobalTrackProps, SongPanel.ForceDefaultNoteStyle);
 			}
-			songPanel.GraphicsDevice.DepthStencilState = oldDss;
+			SongPanel.GraphicsDevice.DepthStencilState = oldDss;
 
-			var effect = new BasicEffect(songPanel.GraphicsDevice)
+			var effect = new BasicEffect(SongPanel.GraphicsDevice)
 			{
 				TextureEnabled = true,
 				VertexColorEnabled = true,
@@ -845,6 +829,23 @@ namespace Visual_Music
 			pbTimeS = pbTimeT = 0;
 			pbTempoEvent = firstTempoEvent;
 			SongLengthS = normSongPosToSeconds(1);
+		}
+
+		public Project clone()
+		{
+			Project dest = Cloning.clone(this);
+
+			for (int i = 0; i < trackViews.Count; i++)
+			{
+				dest.trackViews[i] = trackViews[i].clone();
+				dest.trackViews[i].TrackProps.GlobalProps = trackViews[0].TrackProps.GlobalProps;
+			}
+			dest.notes = notes;
+			dest.Props = Props.clone();
+			dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
+			dest.Props.OnPlaybackOffsetSChanged();
+			//createTrackViews(dest.TrackViews.Count, false);
+			return dest;
 		}
 	}
 

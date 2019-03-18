@@ -20,7 +20,7 @@ namespace Visual_Music
 		internal TrackView TrackView { get; set; }
 		static int NumTracks { get => TrackView.NumTracks; }
 		int TrackNumber { get => TrackView.TrackNumber; }
-		static public TrackProps GlobalProps { get; set; }
+		public TrackProps GlobalProps { get; set; }
 
 		internal NoteStyle ActiveNoteStyle
 		{
@@ -34,9 +34,10 @@ namespace Visual_Music
 		public SpatialProps SpatialProps { get; set; }
 		public int TypeFlags { get; set; } //Determines which type of properties should be saved or loaded to/from file.
 
-		public TrackProps(TrackView view)
+		public TrackProps(TrackView view, TrackProps _globalProps)
 		{
 			TrackView = view;
+			GlobalProps = _globalProps;
 			resetProps();
 		}
 
@@ -102,7 +103,7 @@ namespace Visual_Music
 
 		public TrackProps clone(SongPanel songPanel)
 		{
-			TrackProps newProps = new TrackProps(TrackView);
+			TrackProps newProps = new TrackProps(TrackView, GlobalProps);
 			newProps.cloneFrom(this, (int)TrackPropsType.TPT_All, songPanel);
 			return newProps;
 		}
@@ -378,7 +379,7 @@ namespace Visual_Music
 	//Tab props
 
 	[Serializable()]
-	public class StyleProps : Cloneable<StyleProps>, ISerializable
+	public class StyleProps : ISerializable
 	{
 		public NoteStyleType? Type { get; set; }
 		NoteStyle[] styles = new NoteStyle[Enum.GetNames(typeof(NoteStyleType)).Length];
@@ -479,16 +480,16 @@ namespace Visual_Music
 			}
 		}
 
-		new public StyleProps clone()
+		public StyleProps clone()
 		{
-			StyleProps dest = base.clone();
+			StyleProps dest = Cloning.clone(this);
 			dest.loadFx();
 			return dest;
 		}
 	}
 
 	[Serializable()]
-	public class MaterialProps : Cloneable<MaterialProps>, ISerializable
+	public class MaterialProps : ISerializable
 	{
 		public float? Transp { get; set; }
 		public float? Hue { get; set; }
@@ -623,14 +624,14 @@ namespace Visual_Music
 		}
 		public MaterialProps clone(SongPanel songPanel)
 		{
-			MaterialProps dest = base.clone();
+			MaterialProps dest = Cloning.clone(this);
 			dest.loadContent(songPanel);
 			return dest;
 		}
 	}
 
 	[Serializable()]
-	public class LightProps : Cloneable<LightProps>, ISerializable
+	public class LightProps : ISerializable
 	{
 		public bool? UseGlobalLight { get; set; }
 		internal Vector3 Dir
@@ -715,7 +716,7 @@ namespace Visual_Music
 	}
 
 	[Serializable()]
-	public class SpatialProps : Cloneable<SpatialProps>, ISerializable
+	public class SpatialProps : ISerializable
 	{
 		internal Vector3 PosOffset
 		{

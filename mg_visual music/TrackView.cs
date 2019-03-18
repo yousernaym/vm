@@ -42,12 +42,12 @@ namespace Visual_Music
 			set { midiTrack = value; }
 		}
 
-		public TrackView(int _trackNumber, int _numTracks, Midi.Song song)
+		public TrackView(int _trackNumber, int _numTracks, Midi.Song song, TrackProps globalProps)
 		{
 			trackNumber = _trackNumber;
 			numTracks = _numTracks;
 			midiTrack = song.Tracks[_trackNumber];
-			TrackProps = new TrackProps(this);
+			TrackProps = new TrackProps(this, globalProps);
 			createCurve();
 		}
 
@@ -140,6 +140,17 @@ namespace Visual_Music
 			ocTree = new OcTree<Geo>(minPos, maxPos - minPos, new Vector3(1000, 1000, 1000), noteStyle.createGeoChunk, noteStyle.drawGeoChunk);
 			ocTree.createGeo(midiTrack, TrackProps, globalTrackProps, texMaterial);
 			//TrackProps.SelectedNoteStyle.createOcTree(minPos, maxPos - minPos, midiTrack, songDrawProps, globalTrackProps, TrackProps, texMaterial);
+		}
+
+		public TrackView clone()
+		{
+			var dest = Cloning.clone(this);
+			dest.TrackProps = TrackProps.clone();
+			dest.TrackProps.TrackView = this;
+			dest.midiTrack = midiTrack;
+			dest.ocTree = ocTree;
+			dest.curve = curve;
+			return dest;
 		}
 	}		
 }

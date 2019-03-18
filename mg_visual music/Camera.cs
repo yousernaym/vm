@@ -171,14 +171,13 @@ namespace Visual_Music
 		}
 
 		public Matrix VpMat => ViewMat * ProjMat;
-		public SongPanel SongPanel { get; set; }
+		static public SongPanel SongPanel => Form1.SongPanel;
 
 		public static bool MouseRot { get; set; } = false;
 
 		//Methods/////////////////////////////////
-		public Camera(SongPanel spanel = null)
+		public Camera()
 		{
-			SongPanel = spanel;
 			XYRatio = 16.0f / 9;
 			Vector3 newPos = pos;
 			newPos.Z = Math.Abs(ProjMat.M11) / 2;

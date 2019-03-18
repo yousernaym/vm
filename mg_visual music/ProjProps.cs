@@ -35,8 +35,7 @@ namespace Visual_Music
 		public float PitchMargin => NormPitchMargin * Camera.ViewportSize.Y;
 		public float NoteHeight => (Camera.ViewportSize.Y - PitchMargin * 2) / NumPitches;
 		public Camera Camera { get; set; } = new Camera();
-
-
+		
 		public ProjProps()
 		{
 			
@@ -80,5 +79,12 @@ namespace Visual_Music
 			info.AddValue("camera", Camera);
 			info.AddValue("userViewWidth", UserViewWidth);
 		}
+		//public ProjProps clone()
+		//{
+		//	var dest = Cloning.clone(this);
+		//	dest.OnPlaybackOffsetSChanged = OnPlaybackOffsetSChanged;
+		//	dest.OnPlaybackOffsetSChanged?.Invoke();
+		//	return dest;
+		//}
 	}
 }
