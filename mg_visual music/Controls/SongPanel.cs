@@ -396,12 +396,18 @@ namespace Visual_Music
 						Process injector = new Process();
 						injector.StartInfo.FileName = "minjector.exe";
 						string stereo = options.Stereo ? "--stereo top-bottom" : "";
-						injector.StartInfo.Arguments = " -i " + stereo + " \"" + videoFilePath + "\" \"" + videoFilePath + "_\"";
+						string outputPath = videoFilePath + "_";
+						injector.StartInfo.Arguments = " -i " + stereo + " \"" + videoFilePath + "\" \"" + outputPath + "\"";
 						injector.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 						injector.Start();
 						injector.WaitForExit();
-						File.Delete(videoFilePath);
-						File.Move(videoFilePath + "_", videoFilePath);
+
+						//If user cancelled rendering very quickly, the video file won't get written to, and no output file will be created by the injector
+						if (File.Exists(outputPath))
+						{
+							File.Delete(videoFilePath);
+							File.Move(outputPath, videoFilePath);
+						}
 					}
 				}
 			}
