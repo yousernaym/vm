@@ -146,7 +146,7 @@ namespace Visual_Music
 		{
 			var dest = Cloning.clone(this);
 			dest.TrackProps = TrackProps.clone();
-			dest.TrackProps.TrackView = this;
+			dest.TrackProps.TrackView = dest;
 			dest.midiTrack = midiTrack;
 			dest.ocTree = ocTree;
 			dest.curve = curve;

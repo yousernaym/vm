@@ -70,6 +70,8 @@
 			this.jumpForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.insertLyricsHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.insertKeyFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
@@ -401,7 +403,7 @@
             this.actionsToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1267, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1284, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -455,7 +457,9 @@
             this.tracksToolStripMenuItem,
             this.playbackToolStripMenuItem,
             this.insertLyricsHereToolStripMenuItem,
-            this.insertKeyFrameToolStripMenuItem});
+            this.insertKeyFrameToolStripMenuItem,
+            this.undoToolStripMenuItem,
+            this.redoToolStripMenuItem});
 			this.actionsToolStripMenuItem.Enabled = false;
 			this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
 			this.actionsToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
@@ -483,7 +487,7 @@
 			// 
 			this.loadCamToolStripMenuItem.Enabled = false;
 			this.loadCamToolStripMenuItem.Name = "loadCamToolStripMenuItem";
-			this.loadCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+			this.loadCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
 			this.loadCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.loadCamToolStripMenuItem.Text = "Load...";
 			this.loadCamToolStripMenuItem.Click += new System.EventHandler(this.loadCamToolStripMenuItem_Click);
@@ -493,7 +497,7 @@
 			this.saveCamToolStripMenuItem.Enabled = false;
 			this.saveCamToolStripMenuItem.Name = "saveCamToolStripMenuItem";
 			this.saveCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.Z)));
+            | System.Windows.Forms.Keys.V)));
 			this.saveCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.saveCamToolStripMenuItem.Text = "Save...";
 			this.saveCamToolStripMenuItem.Click += new System.EventHandler(this.saveCamToolStripMenuItem_Click);
@@ -626,6 +630,23 @@
 			this.insertKeyFrameToolStripMenuItem.Text = "Insert key frame";
 			this.insertKeyFrameToolStripMenuItem.Click += new System.EventHandler(this.insertKeyFrameToolStripMenuItem_Click);
 			// 
+			// undoToolStripMenuItem
+			// 
+			this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
+			this.undoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+			this.undoToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+			this.undoToolStripMenuItem.Text = "Undo";
+			this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
+			// 
+			// redoToolStripMenuItem
+			// 
+			this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+			this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.Z)));
+			this.redoToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+			this.redoToolStripMenuItem.Text = "Redo";
+			this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
+			// 
 			// label7
 			// 
 			this.label7.AutoSize = true;
@@ -658,7 +679,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(872, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(889, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 16294);
 			this.trackPropsPanel.TabIndex = 3;
@@ -1988,7 +2009,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-9754, 16247);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-9771, 16247);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -2000,7 +2021,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-9866, 16248);
+			this.texPathTb.Location = new System.Drawing.Point(-9883, 16248);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -2010,7 +2031,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-9868, 16232);
+			this.label4.Location = new System.Drawing.Point(-9885, 16232);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2394,7 +2415,7 @@
 			this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.lyricsGridView.Location = new System.Drawing.Point(197, 16268);
 			this.lyricsGridView.Name = "lyricsGridView";
-			this.lyricsGridView.Size = new System.Drawing.Size(675, 50);
+			this.lyricsGridView.Size = new System.Drawing.Size(692, 50);
 			this.lyricsGridView.TabIndex = 0;
 			this.lyricsGridView.Visible = false;
 			this.lyricsGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.lyricsGridView_CellEndEdit);
@@ -2469,7 +2490,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1284, 505);
+			this.ClientSize = new System.Drawing.Size(1301, 505);
 			this.Controls.Add(this.keyFramesDGV);
 			this.Controls.Add(this.lyricsGridView);
 			this.Controls.Add(this.debugLabel);
@@ -2748,6 +2769,8 @@
 		private System.Windows.Forms.DataGridView keyFramesDGV;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Time;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Description;
+		private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
 	}
 }
 

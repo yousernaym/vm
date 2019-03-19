@@ -33,7 +33,6 @@ namespace Visual_Music
 		int TrackTexPbHeight;
 		int MaxTrackTexPbWidth;
 
-		//EventHandler eh_invalidateSongPanel;
 		public string ProjectFolder
 		{
 			get => openProjDialog.InitialDirectory;
@@ -86,6 +85,8 @@ namespace Visual_Music
 		List<Control> screens = new List<Control>();
 		Control currentScreen;
 		public Project Project { get; private set; } = new Project();
+		LinkedList<Project> undoItems = new LinkedList<Project>();
+		LinkedListNode<Project> currentUndoItem;
 		static Settings settings = new Settings();
 		public static Settings Settings { get => settings; }
 		ScrollBar songScrollBar = new HScrollBar();
@@ -95,14 +96,12 @@ namespace Visual_Music
 		public Form1(string[] args)
 		{
 			InitializeComponent();
-			//Application.Idle += delegate { SongPanel.update(); };
-			//keyFramesDGV.Columns[0].CellTemplate.ValueType = typeof(Int32);
+			
 			Camera.SpatialChanged = updateCamControls;
 			SongPanel.Project = Project;
 			startupArgs = args;
 			TrackTexPbHeight = trackTexPb.Height;
 			MaxTrackTexPbWidth = trackTexPb.Width;
-			//eh_invalidateSongPanel = new EventHandler(invalidateSongPanel);
 			trackListGfxObj = trackList.CreateGraphics();
 			SetStyle(ControlStyles.OptimizedDoubleBuffer |
 			ControlStyles.UserPaint |
@@ -142,7 +141,7 @@ namespace Visual_Music
 			foreach (NoteStyleType nse in enumArray)
 				styleList.Items.Add(nse.ToString());
 
-			addInvalidateEH(this.Controls);
+			addEventHandlers(this.Controls);
 
 			string[] tptList = Enum.GetNames(typeof(TrackPropsType));
 			for (int i = 0; i < selectedTrackPropsPanel.TabPages.Count; i++)
@@ -237,14 +236,20 @@ namespace Visual_Music
 			}
 		}
 		
-		void addInvalidateEH(Control.ControlCollection controls)
+		void addEventHandlers(Control.ControlCollection controls)
 		{
 			foreach (Control control in controls)
 			{
 				if (control.GetType() == typeof(TextBox))
+				{
 					((TextBox)control).TextChanged += invalidateSongPanel;
+					((TextBox)control).Validated += addUndoItem;
+				}
 				else if (control.GetType() == typeof(NumericUpDown))
+				{
 					((NumericUpDown)control).ValueChanged += invalidateSongPanel;
+					((NumericUpDown)control).ValueChanged += addUndoItem;
+				}
 				else if (control.GetType() == typeof(CheckBox))
 					((CheckBox)control).CheckedChanged += invalidateSongPanel;
 				else if (control.GetType() == typeof(Button))
@@ -256,7 +261,7 @@ namespace Visual_Music
 				else if (control.GetType() == typeof(HueSatButton))
 					((HueSatButton)control).ColorChanged += invalidateSongPanel;
 				if (control.Controls.Count > 0)
-					addInvalidateEH(control.Controls);
+					addEventHandlers(control.Controls);
 			}
 		}
 
@@ -313,6 +318,9 @@ namespace Visual_Music
 			updatingControls = false;
 			lyricsGridView.DataSource = Project.Props.LyricsSegments;
 
+			undoItems.Clear();
+			undoItems.AddLast(Project.clone());
+			currentUndoItem = undoItems.Last;
 			//project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
 			//upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(SongPanel);
@@ -1228,6 +1236,35 @@ namespace Visual_Music
 		{
 			SongPanel.Invalidate();
 			//songScrollBar.Value = SongPanel.SongPosT;
+		}
+
+		private void addUndoItem(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+		
+			undoItems.AddAfter(currentUndoItem, Project.clone());
+			currentUndoItem = currentUndoItem.Next;
+			while (currentUndoItem.Next != null) ;
+				undoItems.Remove(currentUndoItem.Next);
+		}
+
+		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			currentUndoItem = currentUndoItem.Previous;
+			Project = currentUndoItem.Value;
+			updateTrackControls();
+			updateTrackListColors();
+			SongPanel.Invalidate();
+		}
+
+		private void redoToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			currentUndoItem = currentUndoItem.Next;
+			Project = currentUndoItem.Value;
+			updateTrackControls();
+			updateTrackListColors();
+			SongPanel.Invalidate();
 		}
 
 		private void trackPropsPanel_Paint(object sender, PaintEventArgs e)
@@ -2306,5 +2343,7 @@ namespace Visual_Music
 			if (keyFramesDGV.CurrentRow != null)
 				Project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].Selected = true;
 		}
+
+	
 	}
 }

@@ -850,7 +850,7 @@ namespace Visual_Music
 			dest.Props = Props.clone();
 			dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
 			dest.Props.OnPlaybackOffsetSChanged();
-			//createTrackViews(dest.TrackViews.Count, false);
+			dest.createTrackViews(dest.TrackViews.Count, false);
 			return dest;
 		}
 	}
