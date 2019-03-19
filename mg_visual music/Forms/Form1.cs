@@ -1245,23 +1245,33 @@ namespace Visual_Music
 		
 			undoItems.AddAfter(currentUndoItem, Project.clone());
 			currentUndoItem = currentUndoItem.Next;
-			while (currentUndoItem.Next != null) ;
+			while (currentUndoItem.Next != null)
 				undoItems.Remove(currentUndoItem.Next);
+			undoToolStripMenuItem.Enabled = true;
+			redoToolStripMenuItem.Enabled = false;
 		}
 
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			currentUndoItem = currentUndoItem.Previous;
-			Project = currentUndoItem.Value;
-			updateTrackControls();
-			updateTrackListColors();
-			SongPanel.Invalidate();
+			applyUndoItem();
+			if (currentUndoItem.Previous == null)
+				undoToolStripMenuItem.Enabled = false;
+			redoToolStripMenuItem.Enabled = true;
 		}
 
 		private void redoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			currentUndoItem = currentUndoItem.Next;
-			Project = currentUndoItem.Value;
+			applyUndoItem();
+			if (currentUndoItem.Next == null)
+				redoToolStripMenuItem.Enabled = false;
+			undoToolStripMenuItem.Enabled = true;
+		}
+
+		void applyUndoItem()
+		{
+			Project = currentUndoItem.Value.clone();
 			updateTrackControls();
 			updateTrackListColors();
 			SongPanel.Invalidate();
