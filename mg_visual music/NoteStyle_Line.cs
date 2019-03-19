@@ -304,8 +304,8 @@ namespace Visual_Music
 			int hLineVertIndex = 0;
 			int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
 			float vpLineWidth = VpLineWidth;
-			Vector3 bboxStart = Vector3.Zero;
-			float bboxMinSqLength = (float)Math.Pow(Project.Props.Camera.ViewportSize.X / 1000, 2);
+			float maxNumBboxesPerScreenWidth = 1000;
+			float bboxMinSqLength = (float)Math.Pow(Project.Props.Camera.ViewportSize.X / maxNumBboxesPerScreenWidth, 2);
 
 			for (int n = 0; n < noteList.Count; n++)
 			{
@@ -369,7 +369,9 @@ namespace Visual_Music
 				if (iterations < 0)
 					throw new OverflowException($"Too many vertices for note {n}, track {trackProps.TrackView.TrackNumber}.");
 				step = (endDraw - startDraw) / (iterations + 1);
-				
+
+				Vector3 bboxStart = Vector3.Zero;
+
 				for (float x = startDraw; x <= endDraw+0.00001f; x += step)
 				{
 					Vector3 center, normal, vertexOffset;
@@ -423,8 +425,7 @@ namespace Visual_Music
 						lineVerts[vertIndex + 1].pos = lineVerts[vertIndex - 1].pos;
 					}
 
-					//Create bounding box (a maximum of 1000 boxes per screen width
-					//if ((x - startDraw) / Project.Camera.ViewportSize.X * 1000 > bboxCount)
+					//Create bounding box
 					if (bboxStart == Vector3.Zero)
 						 bboxStart = lineVerts[vertIndex].center;
 					Vector3 bboxEnd = lineVerts[vertIndex].center;
@@ -449,6 +450,7 @@ namespace Visual_Music
 					endOfSegment = true; //One draw call per note. Can be used to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
 				if (endOfSegment)
 					createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
+			
 				completeNoteListIndex++;
 			}
 			createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
