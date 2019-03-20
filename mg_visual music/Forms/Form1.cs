@@ -251,7 +251,10 @@ namespace Visual_Music
 					((NumericUpDown)control).ValueChanged += addUndoItem;
 				}
 				else if (control.GetType() == typeof(CheckBox))
+				{
 					((CheckBox)control).CheckedChanged += invalidateSongPanel;
+					((CheckBox)control).CheckedChanged += addUndoItem;
+				}
 				else if (control.GetType() == typeof(Button))
 					((Button)control).Click += invalidateSongPanel;
 				else if (control.GetType() == typeof(RadioButton))
@@ -1088,6 +1091,7 @@ namespace Visual_Music
 				{
 					tempProject = (Project)dcs.ReadObject(stream);
 				}
+				tempProject.loadContent();
 				Project = tempProject;
 			}
 			catch (Exception ex)
@@ -1409,8 +1413,10 @@ namespace Visual_Music
 		void setDefaultPitches()
 		{
 			Project.resetPitchLimits();
+			updatingControls = true;
 			maxPitchUd.Value = (decimal)Project.Props.MaxPitch;
 			minPitchUd.Value = (decimal)Project.Props.MinPitch;
+			updatingControls = false;
 		}
 
 		private void defaultPitchesBtn_Click(object sender, EventArgs e)

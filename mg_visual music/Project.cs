@@ -124,17 +124,18 @@ namespace Visual_Music
 				throw new FileNotFoundException("Note file missing: " + ImportOptions.NotePath);
 			if (!string.IsNullOrWhiteSpace(ImportOptions.AudioPath) && !File.Exists(ImportOptions.AudioPath))
 				Form1.showWarningMsgBox("Audio file missing: " + ImportOptions.AudioPath);
-			if (trackViews != null)
-			{
-				for (int i = 0; i < trackViews.Count; i++)
-					trackViews[i].TrackProps.loadContent(SongPanel);
-			}
+			//if (trackViews != null)
+			//{
+			//	for (int i = 0; i < trackViews.Count; i++)
+			//		trackViews[i].TrackProps.loadContent(SongPanel);
+			//}
 			ImportOptions.EraseCurrent = false;
 			return importSong(ImportOptions);
 		}
 
 		public Project(SerializationInfo info, StreamingContext ctxt) : base()
 		{
+			Form1.SongPanel.Project = this;
 			foreach (SerializationEntry entry in info)
 			{
 				if (entry.Name == "version")
@@ -145,7 +146,10 @@ namespace Visual_Music
 				{
 					trackViews = (List<TrackView>)entry.Value;
 					foreach (var tv in trackViews)
+					{
 						tv.TrackProps.GlobalProps = TrackViews[0].TrackProps;
+						tv.TrackProps.loadContent(SongPanel);
+					}
 				}
 				else if (entry.Name == "tpartyApp")
 					ImportNotesWithAudioForm.TpartyApp = (string)entry.Value;
@@ -170,8 +174,6 @@ namespace Visual_Music
 					Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 				}
 			}
-			Form1.SongPanel.Project = this;
-			loadContent();
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -842,9 +844,12 @@ namespace Visual_Music
 			Project dest = Cloning.clone(this);
 
 			for (int i = 0; i < trackViews.Count; i++)
-			{
-				dest.trackViews[i] = trackViews[i].clone();
-				dest.trackViews[i].TrackProps.GlobalProps = trackViews[0].TrackProps.GlobalProps;
+			{																																																																																																																																																																																																																																																																																							
+				//dest.trackViews[i] = trackViews[i].clone();
+				dest.trackViews[i].MidiTrack = trackViews[i].MidiTrack;
+				dest.trackViews[i].ocTree = trackViews[i].ocTree;
+				dest.trackViews[i].Curve = trackViews[i].Curve;
+				//dest.trackViews[i].TrackProps.GlobalProps = trackViews[0].TrackProps.GlobalProps;
 			}
 			dest.notes = notes;
 			dest.Props = Props.clone();
