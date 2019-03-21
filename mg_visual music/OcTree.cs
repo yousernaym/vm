@@ -111,7 +111,7 @@ namespace Visual_Music
 			}
 		}
 
-		public void dispose()
+		public void Dispose()
 		{
 			if (_geo != null)
 				_geo.Dispose();
@@ -120,7 +120,7 @@ namespace Visual_Music
 				foreach (var node in _nodes)
 				{
 					if (node != null)
-						node.dispose();
+						node.Dispose();
 				}
 			}
 		}

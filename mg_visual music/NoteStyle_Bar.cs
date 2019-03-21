@@ -118,7 +118,7 @@ namespace Visual_Music
 
 		void createVb(ref int count, BarGeo geo)
 		{
-			VertexBuffer vb = new VertexBuffer(SongPanel.GraphicsDevice, instanceVertDecl, count, BufferUsage.WriteOnly);
+			VertexBuffer vb = new VertexBuffer(GraphicsDevice, instanceVertDecl, count, BufferUsage.WriteOnly);
 			vb.SetData(instanceVerts, 0, count);
 			geo.instanceBindingList.Add(new VertexBufferBinding(vb, 0, 1));
 			count = 0;
@@ -127,14 +127,14 @@ namespace Visual_Music
 		public override void drawGeoChunk(Geo geo)
 		{
 			BarGeo barGeo = (BarGeo)geo;
-			SongPanel.GraphicsDevice.Indices = indexBuf;
+			GraphicsDevice.Indices = indexBuf;
 			fx.CurrentTechnique = fx.Techniques["Technique1"];
 			fx.CurrentTechnique.Passes["Pass1"].Apply();
 			
 			foreach (var instanceBinding in barGeo.instanceBindingList)
 			{
-				SongPanel.GraphicsDevice.SetVertexBuffers(meshBinding, instanceBinding);
-				SongPanel.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, instanceBinding.VertexBuffer.VertexCount);
+				GraphicsDevice.SetVertexBuffers(meshBinding, instanceBinding);
+				GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleStrip, 0, 0, 2, instanceBinding.VertexBuffer.VertexCount);
 			}
 		}
 
@@ -149,10 +149,10 @@ namespace Visual_Music
 		{
 			//Mesh vb
 			meshVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0));
-			meshVb = new VertexBuffer(SongPanel.GraphicsDevice, meshVertDecl, 4, BufferUsage.WriteOnly);
+			meshVb = new VertexBuffer(GraphicsDevice, meshVertDecl, 4, BufferUsage.WriteOnly);
 			//Instance vb
 			instanceVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.Position, 1), new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 0));
-			//instanceVb = new DynamicVertexBuffer(songPanel.GraphicsDevice, instanceVertDecl, NumDynamicVerts, BufferUsage.WriteOnly);
+			//instanceVb = new DynamicVertexBuffer(GraphicsDevice, instanceVertDecl, NumDynamicVerts, BufferUsage.WriteOnly);
 			BarMeshVertex[] meshVerts =
 			{
 				new BarMeshVertex(0,0),
@@ -162,7 +162,7 @@ namespace Visual_Music
 			};
 			meshVb.SetData(meshVerts);
 			//Index buffer
-			indexBuf = new IndexBuffer(SongPanel.GraphicsDevice, typeof(short), 4, BufferUsage.WriteOnly);
+			indexBuf = new IndexBuffer(GraphicsDevice, typeof(short), 4, BufferUsage.WriteOnly);
 			short[] indices = { 0, 1, 2, 3 };
 			indexBuf.SetData(indices);
 			//Bindings

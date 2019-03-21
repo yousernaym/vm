@@ -1091,6 +1091,7 @@ namespace Visual_Music
 				{
 					tempProject = (Project)dcs.ReadObject(stream);
 				}
+				SongPanel.Project = tempProject;
 				tempProject.loadContent();
 				Project = tempProject;
 			}
@@ -1109,7 +1110,6 @@ namespace Visual_Music
 			{
 				SongPanel.ResumePaint();
 			}
-
 			if (Project.KeyFrames == null) //Old project file format
 				Project.KeyFrames = new KeyFrames();
 
@@ -1250,7 +1250,10 @@ namespace Visual_Music
 			undoItems.AddAfter(currentUndoItem, Project.clone());
 			currentUndoItem = currentUndoItem.Next;
 			while (currentUndoItem.Next != null)
+			{
+				currentUndoItem.Next.Value.Dispose();
 				undoItems.Remove(currentUndoItem.Next);
+			}
 			undoToolStripMenuItem.Enabled = true;
 			redoToolStripMenuItem.Enabled = false;
 		}
@@ -1275,7 +1278,11 @@ namespace Visual_Music
 
 		void applyUndoItem()
 		{
-			Project = currentUndoItem.Value.clone();
+			var source = currentUndoItem.Value.clone();
+			Project.Props = source.Props;
+			Project.TrackViews = source.TrackViews;
+			
+			//SongPanel.Project = Project;
 			updateTrackControls();
 			updateTrackListColors();
 			SongPanel.Invalidate();

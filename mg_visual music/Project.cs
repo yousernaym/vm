@@ -20,7 +20,7 @@ namespace Visual_Music
 	public enum SourceSongType { Midi, Mod, Sid };
 
 	[Serializable()]
-	public class Project : ISerializable
+	public class Project : ISerializable, IDisposable
 	{
 		public KeyFrames KeyFrames;
 		public ProjProps Props = new ProjProps();
@@ -135,7 +135,6 @@ namespace Visual_Music
 
 		public Project(SerializationInfo info, StreamingContext ctxt) : base()
 		{
-			Form1.SongPanel.Project = this;
 			foreach (SerializationEntry entry in info)
 			{
 				if (entry.Name == "version")
@@ -145,10 +144,11 @@ namespace Visual_Music
 				else if (entry.Name == "trackViews")
 				{
 					trackViews = (List<TrackView>)entry.Value;
+					TrackView.NumTracks = TrackViews.Count;
 					foreach (var tv in trackViews)
 					{
+						tv.TrackProps.TrackView = tv;
 						tv.TrackProps.GlobalProps = TrackViews[0].TrackProps;
-						tv.TrackProps.loadContent(SongPanel);
 					}
 				}
 				else if (entry.Name == "tpartyApp")
@@ -360,6 +360,7 @@ namespace Visual_Music
 			{
 				//No need to update visual props
 				// Update notes
+
 				if (trackViews[i].TrackNumber >= notes.Tracks.Count) //The new note file has fewer tracks than the currently loaded
 					continue;
 
@@ -397,8 +398,6 @@ namespace Visual_Music
 			if (trackViews == null || Props.ViewWidthQn == 0 || Notes == null)
 				return;
 			vertViewWidthQn = Props.ViewWidthQn;
-			//for (int i = TrackViews.Count - 1; i > 0; i--)
-
 			for (int i = 1; i < trackViews.Count; i++)
 				TrackViews[i].createOcTree(this, GlobalTrackProps);
 		}
@@ -846,17 +845,24 @@ namespace Visual_Music
 			for (int i = 0; i < trackViews.Count; i++)
 			{																																																																																																																																																																																																																																																																																							
 				//dest.trackViews[i] = trackViews[i].clone();
+				//dest.TrackViews[i].TrackProps.GlobalProps = dest.TrackViews[0].TrackProps;
 				dest.trackViews[i].MidiTrack = trackViews[i].MidiTrack;
 				dest.trackViews[i].ocTree = trackViews[i].ocTree;
 				dest.trackViews[i].Curve = trackViews[i].Curve;
-				//dest.trackViews[i].TrackProps.GlobalProps = trackViews[0].TrackProps.GlobalProps;
 			}
 			dest.notes = notes;
 			dest.Props = Props.clone();
 			dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
 			dest.Props.OnPlaybackOffsetSChanged();
-			dest.createTrackViews(dest.TrackViews.Count, false);
+			//dest.createOcTrees();
+			//dest.createTrackViews(dest.TrackViews.Count, false);
 			return dest;
+		}
+
+		public void Dispose()
+		{
+			foreach (var tv in trackViews)
+				tv.ocTree?.Dispose();
 		}
 	}
 

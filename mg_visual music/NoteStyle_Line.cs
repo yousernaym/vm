@@ -307,6 +307,12 @@ namespace Visual_Music
 			float maxNumBboxesPerScreenWidth = 1000;
 			float bboxMinSqLength = (float)Math.Pow(Project.Props.Camera.ViewportSize.X / maxNumBboxesPerScreenWidth, 2);
 
+			//for (int i = 0; i < 100; i++)
+			//{
+			//	vertIndex = 30000;
+			//	createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
+			//}
+			//return;
 			for (int n = 0; n < noteList.Count; n++)
 			{
 				//Get current note
@@ -523,14 +529,15 @@ namespace Visual_Music
 			LineGeo lineGeo = (LineGeo)geo;
 			foreach (var vb in lineGeo.lineVb)
 			{
-				SongPanel.GraphicsDevice.SetVertexBuffer(vb);
-				SongPanel.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, 3, vb.VertexCount - 5);
+				GraphicsDevice.SetVertexBuffer(vb);
+				GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip, 3, vb.VertexCount - 5);
 			}
 			foreach (var vb in lineGeo.hLineVb)
 			{
-				SongPanel.GraphicsDevice.SetVertexBuffer(vb);
-				SongPanel.GraphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, vb.VertexCount);
+				GraphicsDevice.SetVertexBuffer(vb);
+				GraphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, vb.VertexCount);
 			}
+			
 		}
 
 		void createLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo, float lineWidth)
@@ -542,14 +549,14 @@ namespace Visual_Music
 				{
 					if (numHLineVerts > 1)
 					{
-						VertexBuffer vb = new VertexBuffer(SongPanel.GraphicsDevice, lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
+						VertexBuffer vb = new VertexBuffer(GraphicsDevice, lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
 						vb.SetData(hLineVerts, 0, numHLineVerts);
 						geo.hLineVb.Add(vb);
 						numHLineVerts = 0;
 					}
 					if (numVerts > 5)
 					{
-						VertexBuffer vb = new VertexBuffer(SongPanel.GraphicsDevice, lineVertDecl, numVerts, BufferUsage.WriteOnly);
+						VertexBuffer vb = new VertexBuffer(GraphicsDevice, lineVertDecl, numVerts, BufferUsage.WriteOnly);
 						vb.SetData(lineVerts, 0, numVerts);
 						geo.lineVb.Add(vb);
 						numVerts = 3;
@@ -584,10 +591,10 @@ namespace Visual_Music
 			fx.CurrentTechnique.Passes[0].Apply();
 			trackProps.TrackView.ocTree.drawGeo(Project.Props.Camera);
 
-			DepthStencilState oldDss = SongPanel.GraphicsDevice.DepthStencilState;
-			SongPanel.GraphicsDevice.DepthStencilState = DepthStencilState.None;
+			DepthStencilState oldDss = GraphicsDevice.DepthStencilState;
+			GraphicsDevice.DepthStencilState = DepthStencilState.None;
 			drawHighLights(midiTrack, trackProps, songPosP);
-			SongPanel.GraphicsDevice.DepthStencilState = oldDss;
+			GraphicsDevice.DepthStencilState = oldDss;
 		}
 
 		void drawHighLights(Midi.Track midiTrack, TrackProps trackProps, float songPosP)
@@ -705,7 +712,7 @@ namespace Visual_Music
 
 				fx.CurrentTechnique = fx.Techniques["Arrow"];
 				fx.CurrentTechnique.Passes[0].Apply();
-				SongPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
+				GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
 			}
 			else if (HlType == LineHlType.Circle)
 			{ 
@@ -713,7 +720,7 @@ namespace Visual_Music
 			
 				fx.CurrentTechnique = fx.Techniques["Circle"];
 				fx.CurrentTechnique.Passes[0].Apply();
-				SongPanel.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, lineHlVerts, 0, 2);
+				GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, lineHlVerts, 0, 2);
 			}
 		}
 

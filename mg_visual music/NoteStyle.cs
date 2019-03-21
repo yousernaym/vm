@@ -173,6 +173,7 @@ namespace Visual_Music
 		//}
 
 		protected static SongPanel SongPanel => Form1.SongPanel;
+		protected static GraphicsDevice GraphicsDevice => SongPanel.GraphicsDevice;
 		protected static Project Project => SongPanel.Project;
 		
 		//Serializable----------
@@ -323,12 +324,12 @@ namespace Visual_Music
 			}
 
 			//Material
-			SongPanel.GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
-			SongPanel.GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
-//			songPanel.GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true,
+			GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
+			GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
+//			GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true,
 //																			CullMode = CullMode.None };
-			//songPanel.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-			//songPanel.GraphicsDevice.RasterizerState.MultiSampleAntiAlias = true;
+			//GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+			//GraphicsDevice.RasterizerState.MultiSampleAntiAlias = true;
 			Texture2D texture;
 			Vector4 color;
 			getMaterial(trackProps, false, out color, out texture);
@@ -481,7 +482,7 @@ namespace Visual_Music
 		}
 	}
 
-	public abstract class Geo
+	public abstract class Geo : IDisposable
 	{
 		public List<BoundingBoxEx> bboxes = new List<BoundingBoxEx>();
 		public abstract void Dispose();

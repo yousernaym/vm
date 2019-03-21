@@ -67,9 +67,9 @@ namespace Visual_Music
 			info.AddValue("typeFlags", TypeFlags);
 		}
 
-		public void loadContent(SongPanel songPanel)
+		public void loadContent()
 		{
-			MaterialProps.loadContent(songPanel);
+			MaterialProps.loadContent();
 		}
 
 		public void resetStyle()
@@ -112,7 +112,7 @@ namespace Visual_Music
 			if ((type & (int)TrackPropsType.TPT_Style) > 0)
 				StyleProps = source.StyleProps.clone();
 			if ((type & (int)TrackPropsType.TPT_Material) > 0)
-				MaterialProps = source.MaterialProps.clone(songPanel);
+				MaterialProps = source.MaterialProps.clone();
 			if ((type & (int)TrackPropsType.TPT_Light) > 0)
 				LightProps = source.LightProps.clone();
 			if ((type & (int)TrackPropsType.TPT_Spatial) > 0)
@@ -300,13 +300,13 @@ namespace Visual_Music
 			}
 		}
 
-		internal void loadContent(SongPanel songPanel)
+		internal void loadContent()
 		{
 			//Deserialization inits PJath but not Texture because Texture2D is not serializable, and you can't load texture before the device is created.
 			try
 			{
 				if (!string.IsNullOrEmpty(Path))
-					loadTexture(Path, songPanel);
+					loadTexture(Path, Form1.SongPanel);
 			}
 			catch (Exception)
 			{
@@ -412,7 +412,10 @@ namespace Visual_Music
 			foreach (SerializationEntry entry in info)
 			{
 				if (entry.Name == "noteStyles")
+				{
 					styles = (NoteStyle[])entry.Value;
+					loadFx();
+				}
 				else if (entry.Name == "noteStyleType")
 					Type = (NoteStyleType)entry.Value;
 			}
@@ -482,7 +485,7 @@ namespace Visual_Music
 		public StyleProps clone()
 		{
 			StyleProps dest = Cloning.clone(this);
-			dest.loadFx();
+			//dest.loadFx();
 			return dest;
 		}
 	}
@@ -547,10 +550,10 @@ namespace Visual_Music
 			info.AddValue("hmapProps", HmapProps);
 		}
 
-		internal void loadContent(SongPanel songPanel)
+		internal void loadContent()
 		{
-			TexProps.loadContent(songPanel);
-			HmapProps.loadContent(songPanel);
+			TexProps.loadContent();
+			HmapProps.loadContent();
 		}
 
 		public Texture2D getTexture(bool bhilited, MaterialProps globalMaterial)
@@ -621,10 +624,9 @@ namespace Visual_Music
 			else
 				return HmapProps;
 		}
-		public MaterialProps clone(SongPanel songPanel)
+		public MaterialProps clone()
 		{
 			MaterialProps dest = Cloning.clone(this);
-			dest.loadContent(songPanel);
 			return dest;
 		}
 	}
