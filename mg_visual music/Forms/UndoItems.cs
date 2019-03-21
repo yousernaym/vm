@@ -21,6 +21,8 @@ namespace Visual_Music
 		public Item Current => currentItem == null ? null : currentItem.Value;
 		public Item Previous => currentItem.Previous == null ? null : currentItem.Previous.Value;
 		public Item Next => currentItem.Next == null ? null : currentItem.Next.Value;
+		public string UndoDesc => Current == null ? "" : Current.Desc;
+		public string RedoDesc => Next == null ? "" : Next.Desc;
 
 		public void clear()
 		{

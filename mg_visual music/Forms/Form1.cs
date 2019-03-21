@@ -1249,6 +1249,7 @@ namespace Visual_Music
 			undoItems.add(desc, Project);
 			undoToolStripMenuItem.Enabled = true;
 			redoToolStripMenuItem.Enabled = false;
+			updateUndoRedoDesc();
 		}
 
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1276,6 +1277,13 @@ namespace Visual_Music
 			updateTrackPropsControls();
 			updateTrackListColors();
 			SongPanel.Invalidate();
+			updateUndoRedoDesc();
+		}
+
+		void updateUndoRedoDesc()
+		{
+			undoToolStripMenuItem.Text = "Undo " + undoItems.UndoDesc;
+			redoToolStripMenuItem.Text = "Redo " + undoItems.RedoDesc;
 		}
 
 		private void trackPropsPanel_Paint(object sender, PaintEventArgs e)
