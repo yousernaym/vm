@@ -680,7 +680,7 @@ namespace Visual_Music
 		protected override void OnResize(EventArgs e)
 		{
 			Invalidate();
-			Project.createOcTrees();
+			//Project.createOcTrees();
 		}
 
 		protected override void OnMouseDown(MouseEventArgs e)
