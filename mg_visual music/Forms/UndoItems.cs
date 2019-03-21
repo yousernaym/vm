@@ -13,14 +13,8 @@ namespace Visual_Music
 				Desc = desc;
 				Project = project;
 			}
-			public void restoreTo(Project dest)
-			{
-				var source = Project.clone();
-				dest.Props = source.Props;
-				dest.TrackViews = source.TrackViews;
-			}
-
 		}
+
 		LinkedList<Item> items = new LinkedList<Item>();
 		LinkedListNode<Item> currentItem;
 

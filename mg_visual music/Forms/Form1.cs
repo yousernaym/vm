@@ -472,7 +472,7 @@ namespace Visual_Music
 
 		private void commitViewWidthQnChange()
 		{
-			if (Project.VertWidthScale == 1)
+			if (Project.FxViewWidthQnScale == 1)
 				return;
 			Project.createOcTrees();
 			SongPanel.Invalidate();
@@ -1271,7 +1271,7 @@ namespace Visual_Music
 
 		void applyUndoItem()
 		{
-			undoItems.Current.restoreTo(Project);
+			Project.copyPropsFrom(undoItems.Current.Project);
 			updateProjPropsControls();
 			updateTrackPropsControls();
 			updateTrackListColors();

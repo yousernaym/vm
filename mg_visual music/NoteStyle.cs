@@ -280,7 +280,7 @@ namespace Visual_Music
 			fx.Parameters["VpMat"].SetValue(Project.Props.Camera.VpMat);
 			fx.Parameters["ProjScale"].SetValue(new Vector2(Project.Props.Camera.ProjMat.M11, Project.Props.Camera.ProjMat.M22));
 
-			fx.Parameters["VertWidthScale"].SetValue(Project.VertWidthScale);
+			fx.Parameters["VertWidthScale"].SetValue(Project.FxViewWidthQnScale);
 			//fx.Parameters["TexWidthScale"].SetValue(texMaterial.TexProps.UAnchor == TexAnchorEnum.Screen ? VertWidthScale : 1);
 
 			//Common notestyle props

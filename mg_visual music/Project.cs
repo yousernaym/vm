@@ -30,7 +30,7 @@ namespace Visual_Music
 		double pbStartSongTimeS;
 		public float ViewWidthT => notes == null ? 0 : Props.ViewWidthQn * notes.TicksPerBeat; //Number of ticks that fits on screen
 		float vertViewWidthQn;
-		public float VertWidthScale => vertViewWidthQn / Props.ViewWidthQn;
+		public float FxViewWidthQnScale => vertViewWidthQn / Props.ViewWidthQn;
 
 		public ImportOptions ImportOptions { get; set; }
 
@@ -852,6 +852,7 @@ namespace Visual_Music
 			}
 			dest.notes = notes;
 			dest.Props = Props.clone();
+			dest.vertViewWidthQn = Props.ViewWidthQn;
 			dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
 			dest.Props.OnPlaybackOffsetSChanged();
 			//dest.createOcTrees();
@@ -863,6 +864,15 @@ namespace Visual_Music
 		{
 			foreach (var tv in trackViews)
 				tv.ocTree?.Dispose();
+		}
+
+		public void copyPropsFrom(Project project)
+		{
+			var source = project.clone();
+			Props = source.Props;
+			vertViewWidthQn = Props.ViewWidthQn;
+			TrackViews = source.TrackViews;
+			KeyFrames = source.KeyFrames;
 		}
 	}
 
