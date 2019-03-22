@@ -17,6 +17,7 @@ using CefSharp.Example.RequestEventHandler;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace Visual_Music
 {
@@ -93,10 +94,19 @@ namespace Visual_Music
 		NoteStyleControl currentNoteStyleControl;
 		int keyFrameLockRow = -1;
 
+		[DllImport("user32.dll")]
+		static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
 		public Form1(string[] args)
 		{
 			InitializeComponent();
-			
+
+			//Turn off caps lock
+			if (Control.IsKeyLocked(Keys.CapsLock))
+			{
+				pressCapsLock();
+			}
+
 			Camera.OnUserUpdating = updateCamControls;
 			Camera.OnUserUpdated = ()=>addUndoItem("Edit Camera");
 
@@ -157,6 +167,14 @@ namespace Visual_Music
 			saveVideoDlg.InitialDirectory = Path.Combine(Program.DefaultUserFilesDir, "Videos");
 			openTrackPropsFileDialog.Filter = saveTrackPropsFileDialog.Filter = "Track property files|*.tp|All files|*.*";
 			openCamFileDialog.Filter = saveCamFileDialog.Filter = "Camera files|*.cam|All files|*.*";
+		}
+
+		static public void pressCapsLock()
+		{
+			const int KEYEVENTF_EXTENDEDKEY = 0x1;
+			const int KEYEVENTF_KEYUP = 0x2;
+			keybd_event(0x14, 0x45, KEYEVENTF_EXTENDEDKEY, (UIntPtr)0);
+			keybd_event(0x14, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, (UIntPtr)0);
 		}
 
 		private void Form1_Load(object sender, EventArgs e)

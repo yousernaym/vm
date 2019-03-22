@@ -28,9 +28,6 @@ namespace Visual_Music
 		public SpriteFont LyricsFont { get; private set; }
 		GdiPoint previousMousePos = MousePosition;
 
-		[DllImport("user32.dll")]
-		static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
-
 		//Jdlc.Timers.TimerQueueTimer timer = new Jdlc.Timers.TimerQueueTimer();
 		System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
 		public delegate void Delegate_songPosChanged();
@@ -144,16 +141,7 @@ namespace Visual_Music
 			Project.update(deltaTimeS);
 			scrollSong();
 			
-			if (Control.IsKeyLocked(WinKeys.CapsLock))
-			{
-				const int KEYEVENTF_EXTENDEDKEY = 0x1;
-				const int KEYEVENTF_KEYUP = 0x2;
-				keybd_event(0x14, 0x45, KEYEVENTF_EXTENDEDKEY, (UIntPtr)0);
-				keybd_event(0x14, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, (UIntPtr)0);
-			}
-
 			timer.Start();
-
 		}
 
 		protected override void Dispose(bool disposing)
@@ -703,7 +691,7 @@ namespace Visual_Music
 			{
 				RightMbPressed = true;
 				mousePosScrollSong = true;
-				if (Project.IsPlaying && !Camera.MouseRot)
+				if (Project.IsPlaying)
 				{
 					isPausingWhileScrolling = true;
 					Project.togglePlayback();
@@ -746,18 +734,12 @@ namespace Visual_Music
 			NormMouseY = (float)(clientP.Y) / ClientRectangle.Height;
 			if (Camera.MouseRot)
 			{
-				if (Project.IsPlaying)
-					Camera.MouseRot = false;
-				else
-				{
-					Invalidate();
-					float screenHeight = Screen.GetWorkingArea(this).Height;
-					NormMouseX = (float)(clientP.X - middleX) * 2 / screenHeight;
-					NormMouseY = (float)(clientP.Y - middleY) * 2 / screenHeight;
-					Cursor.Position = PointToScreen(new GdiPoint(middleX, middleY));
-					Project.getKeyFrameAtSongPos()?.Camera.ApplyMouseRot(NormMouseX, NormMouseY);
-				}
-
+				Invalidate();
+				float screenHeight = Screen.GetWorkingArea(this).Height;
+				NormMouseX = (float)(clientP.X - middleX) * 2 / screenHeight;
+				NormMouseY = (float)(clientP.Y - middleY) * 2 / screenHeight;
+				Cursor.Position = PointToScreen(new GdiPoint(middleX, middleY));
+				Project.getKeyFrameAtSongPos()?.Camera.ApplyMouseRot(NormMouseX, NormMouseY);
 			}
 		}
 

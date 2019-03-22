@@ -668,7 +668,7 @@ namespace Visual_Music
 		}
 		public void togglePlayback()
 		{
-			if (Media.getAudioLength() == 0)
+			if (Media.getAudioLength() == 0 || Camera.MouseRot)
 				return;
 			IsPlaying = !IsPlaying;
 			//bAudioPlayback = !bAudioPlayback;
@@ -697,6 +697,12 @@ namespace Visual_Music
 					AudioHasStarted = false;
 				}
 			}
+		}
+
+		public void pausePlayback()
+		{
+			if (isPlaying)
+				togglePlayback();
 		}
 
 		public void stopPlayback()

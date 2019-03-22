@@ -281,13 +281,26 @@ namespace Visual_Music
 				shiftPressed = isKeyDown;
 			if (key == WinKeys.ControlKey)
 				ctrlPressed = isKeyDown;*/
-			if (key == WinKeys.CapsLock && !keyDown)
+
+			//Use mouse movement and mouse buttons to rotate the camera while caps lock is active and pressed down.
+			//When released, send a caps lock press to deactivate.
+			//Make sure the caps lock is off When the app starts
+			if (key == WinKeys.CapsLock)
 			{
-				MouseRot = !MouseRot;
-				if (!MouseRot)
-					OnUserUpdated?.Invoke();
-				SongPanel.NormMouseX = SongPanel.NormMouseY = 0;
-				Cursor.Position = SongPanel.PointToScreen(new GdiPoint(SongPanel.ClientRectangle.Width / 2, SongPanel.ClientRectangle.Height / 2));
+				if (Control.IsKeyLocked(WinKeys.CapsLock))
+				{
+					if (keyDown)
+					{
+						SongPanel.Project.pausePlayback();
+						SongPanel.NormMouseX = SongPanel.NormMouseY = 0;
+						Cursor.Position = SongPanel.PointToScreen(new GdiPoint(SongPanel.ClientRectangle.Width / 2, SongPanel.ClientRectangle.Height / 2));
+					}
+					else if (MouseRot)
+						OnUserUpdated?.Invoke();
+					MouseRot = keyDown;
+					if (!keyDown)
+						Form1.pressCapsLock(); //If releasing caps lock, turn it off
+				}
 			}
 			if (keyMatch && !keyDown)
 				OnUserUpdated?.Invoke();
