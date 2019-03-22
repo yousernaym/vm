@@ -778,7 +778,7 @@ namespace Visual_Music
 				return;
 			if (keyFrame.Camera.control(e.KeyCode, true))
 			{
-				Camera.SpatialChanged?.Invoke();
+				Camera.OnUserUpdating?.Invoke();
 				e.SuppressKeyPress = true;
 			}
 

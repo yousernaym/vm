@@ -97,7 +97,9 @@ namespace Visual_Music
 		{
 			InitializeComponent();
 			
-			Camera.SpatialChanged = updateCamControls;
+			Camera.OnUserUpdating = updateCamControls;
+			Camera.OnUserUpdated = ()=>addUndoItem("Edit Camera");
+
 			SongPanel.Project = Project;
 			startupArgs = args;
 			TrackTexPbHeight = trackTexPb.Height;
@@ -342,7 +344,9 @@ namespace Visual_Music
 			updateProjPropsControls();
 
 			undoItems.clear();
+			undoToolStripMenuItem.Enabled = redoToolStripMenuItem.Enabled = false;
 			undoItems.add("", Project);
+			updateUndoRedoDesc();
 			//project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
 			//upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(SongPanel);

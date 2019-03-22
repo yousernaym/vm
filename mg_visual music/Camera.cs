@@ -55,18 +55,9 @@ namespace Visual_Music
 		}
 		public Matrix NonCubeRotMat => Matrix.CreateFromQuaternion(Orientation);
 
-		static Action spatialChanged;
-		public static Action SpatialChanged
-		{
-			get => spatialChanged;
-			set
-			{
-				//if (value != null)
-					//value();
-				spatialChanged = value;
-			}
-		}
-
+		public static Action OnUserUpdating;
+		public static Action OnUserUpdated;
+		
 		public Vector3 ViewportPos => getViewportPos(pos);
 
 		Vector3 moveVel = new Vector3();
@@ -227,12 +218,12 @@ namespace Visual_Music
 			Vector3 scaledRotVel = (rotVel + mouseRotVel) * (float)deltaTime;
 			Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(scaledRotVel.Y, scaledRotVel.X, scaledRotVel.Z);
 			if (Vector3.Zero != moveVel || Vector3.Zero != scaledRotVel)
-				SpatialChanged?.Invoke();
+				OnUserUpdating?.Invoke();
 		}
 
-		public bool control(WinKeys key, bool isKeyDown)
+		public bool control(WinKeys key, bool keyDown)
 		{
-			float startOrStop = isKeyDown ? 1 : 0;
+			float startOrStop = keyDown ? 1 : 0;
 			bool keyMatch = false;
 			if (key == WinKeys.Q)
 			{
@@ -290,14 +281,16 @@ namespace Visual_Music
 				shiftPressed = isKeyDown;
 			if (key == WinKeys.ControlKey)
 				ctrlPressed = isKeyDown;*/
-			if (key == WinKeys.CapsLock && isKeyDown)
+			if (key == WinKeys.CapsLock && !keyDown)
 			{
 				MouseRot = !MouseRot;
+				if (!MouseRot)
+					OnUserUpdated?.Invoke();
 				SongPanel.NormMouseX = SongPanel.NormMouseY = 0;
 				Cursor.Position = SongPanel.PointToScreen(new GdiPoint(SongPanel.ClientRectangle.Width / 2, SongPanel.ClientRectangle.Height / 2));
 			}
-			//if (keyMatch)
-				//SpatialChanged?.Invoke();
+			if (keyMatch && !keyDown)
+				OnUserUpdated?.Invoke();
 			return keyMatch;
 		}
 
@@ -314,6 +307,7 @@ namespace Visual_Music
 			if (Math.Abs(y) > maxStep)
 				y *= maxStep / Math.Abs(y);
 			Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(-x, -y, 0);
+			OnUserUpdating?.Invoke();
 		}
 
 		//public void reset()
