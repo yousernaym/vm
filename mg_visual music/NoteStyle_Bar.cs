@@ -142,7 +142,7 @@ namespace Visual_Music
 		{
 			float songPosP;
 			base.drawTrack(midiTrack, trackProps, texMaterial, out songPosP);
-			trackProps.TrackView.ocTree.drawGeo(Project.Props.Camera);
+			trackProps.TrackView.OcTree.drawGeo(Project.Props.Camera);
 		}
 				
 		public static void sInit()

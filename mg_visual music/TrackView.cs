@@ -14,7 +14,17 @@ namespace Visual_Music
 	[Serializable()]
 	public class TrackView : ISerializable
 	{
-		public OcTree<Geo> ocTree;
+		
+		OcTree<Geo> ocTree;
+		public OcTree<Geo> OcTree
+		{
+			set
+			{
+				ocTree?.Dispose();
+				ocTree = value?.AddRef();
+			}
+			get => ocTree;
+		}
 		public TrackProps TrackProps { get; set; }
 		int trackNumber;
 		public int TrackNumber
@@ -137,8 +147,8 @@ namespace Visual_Music
 			//if (ocTree != null)
 				//ocTree.dispose();
 			NoteStyle noteStyle = TrackProps.ActiveNoteStyle;
-			ocTree = new OcTree<Geo>(minPos, maxPos - minPos, new Vector3(1000, 1000, 1000), noteStyle.createGeoChunk, noteStyle.drawGeoChunk);
-			ocTree.createGeo(midiTrack, TrackProps, globalTrackProps, texMaterial);
+			OcTree = new OcTree<Geo>(minPos, maxPos - minPos, new Vector3(1000, 1000, 1000), noteStyle.createGeoChunk, noteStyle.drawGeoChunk);
+			OcTree.createGeo(midiTrack, TrackProps, globalTrackProps, texMaterial);
 			//TrackProps.SelectedNoteStyle.createOcTree(minPos, maxPos - minPos, midiTrack, songDrawProps, globalTrackProps, TrackProps, texMaterial);
 		}
 

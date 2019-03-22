@@ -243,7 +243,10 @@ namespace Visual_Music
 				if (control.GetType() == typeof(TextBox))
 					((TextBox)control).TextChanged += invalidateSongPanel;
 				else if (control.GetType() == typeof(NumericUpDown))
+				{
 					((NumericUpDown)control).ValueChanged += invalidateSongPanel;
+					((NumericUpDown)control).ValueChanged += addUndoItem;
+				}
 				else if (control.GetType() == typeof(CheckBox))
 					((CheckBox)control).CheckedChanged += invalidateSongPanel;
 				else if (control.GetType() == typeof(Button))
@@ -300,7 +303,7 @@ namespace Visual_Music
 			updateProjPropsControls();
 
 			undoItems.clear();
-			undoItems.add("", Project.clone());
+			undoItems.add("", Project);
 			//project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
 			//upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
 			changeToScreen(SongPanel);
@@ -1241,7 +1244,17 @@ namespace Visual_Music
 			//songScrollBar.Value = SongPanel.SongPosT;
 		}
 
-		private void addUndoItem(string desc)
+		private void addUndoItem(object sender, EventArgs e)
+		{
+			if (((Control)sender).Tag == null)
+				return;
+			string desc = ((Control)sender).Tag.ToString();
+			if (string.IsNullOrEmpty(desc))
+				return;
+			addUndoItem(desc);
+		}
+
+		void addUndoItem(string desc)
 		{
 			if (updatingControls)
 				return;

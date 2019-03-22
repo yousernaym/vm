@@ -7,6 +7,7 @@ namespace Visual_Music
 {
 	public class OcTree<Geo> where Geo : Visual_Music.Geo
 	{
+		int refCOunt = 0;
 		protected OcTree<Geo>[] _nodes;
 		protected bool _isEmpty = true;
 		protected BoundingBox _bbox;
@@ -111,8 +112,17 @@ namespace Visual_Music
 			}
 		}
 
+		public OcTree<Geo> AddRef()
+		{
+			refCOunt++;
+			return this;
+		}
 		public void Dispose()
 		{
+			if (refCOunt-- == 0)
+				throw new AccessViolationException("Object already disposed");
+			if (refCOunt > 0)
+				return;
 			if (_geo != null)
 				_geo.Dispose();
 			if (_nodes != null)

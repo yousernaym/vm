@@ -586,10 +586,10 @@ namespace Visual_Music
 			fx.CurrentTechnique = fx.Techniques["Line"];
 			fx.Parameters["DiscardAtOnce"].SetValue(true);
 			fx.CurrentTechnique.Passes[0].Apply();
-			trackProps.TrackView.ocTree.drawGeo(Project.Props.Camera);
+			trackProps.TrackView.OcTree.drawGeo(Project.Props.Camera);
 			fx.Parameters["DiscardAtOnce"].SetValue(false);
 			fx.CurrentTechnique.Passes[0].Apply();
-			trackProps.TrackView.ocTree.drawGeo(Project.Props.Camera);
+			trackProps.TrackView.OcTree.drawGeo(Project.Props.Camera);
 
 			DepthStencilState oldDss = GraphicsDevice.DepthStencilState;
 			GraphicsDevice.DepthStencilState = DepthStencilState.None;

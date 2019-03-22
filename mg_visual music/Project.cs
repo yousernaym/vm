@@ -38,7 +38,12 @@ namespace Visual_Music
 		public List<TrackView> TrackViews
 		{
 			get { return trackViews; }
-			set { trackViews = value; }
+			set
+			{
+				foreach (var tv in trackViews)
+					tv.OcTree?.Dispose();
+				trackViews = value;
+			}
 		}
 
 		int firstTempoEvent = 0;
@@ -847,7 +852,7 @@ namespace Visual_Music
 				//dest.trackViews[i] = trackViews[i].clone();
 				//dest.TrackViews[i].TrackProps.GlobalProps = dest.TrackViews[0].TrackProps;
 				dest.trackViews[i].MidiTrack = trackViews[i].MidiTrack;
-				dest.trackViews[i].ocTree = trackViews[i].ocTree;
+				dest.trackViews[i].OcTree = trackViews[i].OcTree;
 				dest.trackViews[i].Curve = trackViews[i].Curve;
 			}
 			dest.notes = notes;
@@ -863,7 +868,7 @@ namespace Visual_Music
 		public void Dispose()
 		{
 			foreach (var tv in trackViews)
-				tv.ocTree?.Dispose();
+				tv.OcTree?.Dispose();
 		}
 
 		public void copyPropsFrom(Project project)
@@ -873,6 +878,7 @@ namespace Visual_Music
 			vertViewWidthQn = Props.ViewWidthQn;
 			TrackViews = source.TrackViews;
 			KeyFrames = source.KeyFrames;
+			//source.Dispose();
 		}
 	}
 
