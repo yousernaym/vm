@@ -235,30 +235,69 @@ namespace Visual_Music
 				}
 			}
 		}
-		
+
+		void addMenuItemEventHandlers(ToolStripItemCollection items)
+		{
+			foreach (ToolStripMenuItem item in items)
+			{
+				item.Click += addUndoItem;
+				item.Click += invalidateSongPanel;
+				addMenuItemEventHandlers(item.DropDownItems);
+			}
+		}
+
 		void addEventHandlers(Control.ControlCollection controls)
 		{
 			foreach (Control control in controls)
 			{
 				if (control.GetType() == typeof(TextBox))
+				{
 					((TextBox)control).TextChanged += invalidateSongPanel;
+					((TextBox)control).Validated += addUndoItem;
+				}
 				else if (control.GetType() == typeof(NumericUpDown))
 				{
 					((NumericUpDown)control).ValueChanged += invalidateSongPanel;
 					((NumericUpDown)control).ValueChanged += addUndoItem;
 				}
 				else if (control.GetType() == typeof(CheckBox))
+				{
 					((CheckBox)control).CheckedChanged += invalidateSongPanel;
+					((CheckBox)control).CheckedChanged += addUndoItem;
+				}
 				else if (control.GetType() == typeof(Button))
+				{
 					((Button)control).Click += invalidateSongPanel;
+					((Button)control).Click += addUndoItem;
+				}
 				else if (control.GetType() == typeof(RadioButton))
+				{
 					((RadioButton)control).CheckedChanged += invalidateSongPanel;
+					((RadioButton)control).CheckedChanged += addUndoItem;
+				}
 				else if (control.GetType() == typeof(ComboBox))
+				{
 					((ComboBox)control).SelectedValueChanged += invalidateSongPanel;
+					((ComboBox)control).SelectedValueChanged += addUndoItem;
+				}
 				else if (control.GetType() == typeof(HueSatButton))
+				{
 					((HueSatButton)control).ColorChanged += invalidateSongPanel;
-				if (control.Controls.Count > 0)
+					((HueSatButton)control).ColorChanged += addUndoItem;
+				}
+				else if (control.GetType() == typeof(DataGridView))
+				{
+					((DataGridView)control).CellEndEdit += addUndoItem;
+					((DataGridView)control).RowsRemoved += addUndoItem;
+				}
+				else if (control.GetType() == typeof(MenuStrip))
+					addMenuItemEventHandlers(((MenuStrip)control).Items);
+				else if (control.GetType() == typeof(ContextMenuStrip))
+					addMenuItemEventHandlers(((ContextMenuStrip)control).Items);
+				else if (control.Controls.Count > 0)
 					addEventHandlers(control.Controls);
+				else
+					control.Click += invalidateSongPanel;
 			}
 		}
 
@@ -324,8 +363,8 @@ namespace Visual_Music
 			minPitchUd.Value = Project.Props.MinPitch;
 			buildKeyFramesDGV();
 			updateCamControls();
-			updatingControls = false;
 			lyricsGridView.DataSource = Project.Props.LyricsSegments;
+			updatingControls = false;
 		}
 
 		private void buildKeyFramesDGV()
@@ -450,26 +489,26 @@ namespace Visual_Music
 
 		private void Form1_KeyUp(object sender, KeyEventArgs e)
 		{
-			if (Project != null)
+			if (Project == null || Project.Notes == null)
+				return;
+			
+			//Project.Camera.toggleMouseControl(e.KeyCode, true))
+			var keyFrame = Project.getKeyFrameAtSongPos();
+			if (keyFrame != null)
+				keyFrame.Camera.control(e.KeyCode, false);
+			//Project.Camera.control(e.KeyCode, false);
+			if (e.KeyCode == Keys.Z)
 			{
-				//Project.Camera.toggleMouseControl(e.KeyCode, true))
-				var keyFrame = Project.getKeyFrameAtSongPos();
-				if (keyFrame != null)
-					keyFrame.Camera.control(e.KeyCode, false);
-				//Project.Camera.control(e.KeyCode, false);
-				if (e.KeyCode == Keys.Z)
+				SongPanel.ForceDefaultNoteStyle = false;
+				for (int t = 1; t < Project.TrackViews.Count; t++)
 				{
-					SongPanel.ForceDefaultNoteStyle = false;
-					for (int t = 1; t < Project.TrackViews.Count; t++)
-					{
-						TrackProps tprops = Project.TrackViews[t].TrackProps;
-						Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
-					}
+					TrackProps tprops = Project.TrackViews[t].TrackProps;
+					Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
 				}
-				else if (e.KeyCode == Keys.ControlKey)
-				{
-					commitViewWidthQnChange();
-				}
+			}
+			else if (e.KeyCode == Keys.ControlKey)
+			{
+				commitViewWidthQnChange();
 			}
 		}
 
@@ -1246,9 +1285,14 @@ namespace Visual_Music
 
 		private void addUndoItem(object sender, EventArgs e)
 		{
-			if (((Control)sender).Tag == null)
+			object tag = null;
+			if (sender is Control)
+				tag = ((Control)sender).Tag;
+			else if (sender is ToolStripMenuItem )
+				tag = ((ToolStripMenuItem)sender).Tag;
+			if (tag == null)
 				return;
-			string desc = ((Control)sender).Tag.ToString();
+			string desc = tag.ToString();
 			if (string.IsNullOrEmpty(desc))
 				return;
 			addUndoItem(desc);
@@ -1359,9 +1403,9 @@ namespace Visual_Music
 			updateTrackPropsControls();
 		}
 
-		private void resetBtn_Click(object sender, EventArgs e)
+		private void defaultMaterial_Click(object sender, EventArgs e)
 		{
-			unloadTexBtn.PerformClick();// _Click(null, null);
+			//unloadTexBtn.PerformClick();// _Click(null, null);
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.resetMaterial();
 			updateTrackPropsControls();
@@ -2047,6 +2091,7 @@ namespace Visual_Music
 			else
 				Project.TrackViews[0].TrackProps.cloneFrom(props, typeFlags, SongPanel);
 
+			addUndoItem("Load Track Properties");
 			updateTrackListColors();
 			updateTrackPropsControls();
 		}
@@ -2131,6 +2176,7 @@ namespace Visual_Music
 			{
 				showErrorMsgBox(ex.Message);
 			}
+			addUndoItem("Load Camera");
 		}
 
 		private void saveCamToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2245,7 +2291,8 @@ namespace Visual_Music
 			songPropsCb.Checked = true;
 			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
 			keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[1]; //Select cell in Description column
-			keyFramesDGV.BeginEdit(true);
+			//keyFramesDGV.BeginEdit(true);
+			addUndoItem("Insert Key Frame");
 		}
 
 		private void keyFramesDGV_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)

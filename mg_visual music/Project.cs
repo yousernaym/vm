@@ -846,22 +846,21 @@ namespace Visual_Music
 		public Project clone()
 		{
 			Project dest = Cloning.clone(this);
-
+					
 			for (int i = 0; i < trackViews.Count; i++)
-			{																																																																																																																																																																																																																																																																																							
+			{
 				//dest.trackViews[i] = trackViews[i].clone();
 				//dest.TrackViews[i].TrackProps.GlobalProps = dest.TrackViews[0].TrackProps;
 				dest.trackViews[i].MidiTrack = trackViews[i].MidiTrack;
 				dest.trackViews[i].OcTree = trackViews[i].OcTree;
 				dest.trackViews[i].Curve = trackViews[i].Curve;
 			}
+			
 			dest.notes = notes;
 			dest.Props = Props.clone();
 			dest.vertViewWidthQn = Props.ViewWidthQn;
 			dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
 			dest.Props.OnPlaybackOffsetSChanged();
-			//dest.createOcTrees();
-			//dest.createTrackViews(dest.TrackViews.Count, false);
 			return dest;
 		}
 

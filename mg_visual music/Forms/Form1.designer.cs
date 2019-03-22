@@ -404,7 +404,7 @@
             this.actionsToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1488, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1301, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -471,7 +471,7 @@
 			this.undoToolStripMenuItem.Enabled = false;
 			this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
 			this.undoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-			this.undoToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+			this.undoToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
 			this.undoToolStripMenuItem.Text = "Undo";
 			this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
 			// 
@@ -481,7 +481,7 @@
 			this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
 			this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.Z)));
-			this.redoToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+			this.redoToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
 			this.redoToolStripMenuItem.Text = "Redo";
 			this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
 			// 
@@ -492,7 +492,7 @@
             this.loadCamToolStripMenuItem,
             this.saveCamToolStripMenuItem});
 			this.songToolStripMenuItem.Name = "songToolStripMenuItem";
-			this.songToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+			this.songToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
 			this.songToolStripMenuItem.Text = "Camera";
 			// 
 			// resetCamToolStripMenuItem
@@ -500,6 +500,7 @@
 			this.resetCamToolStripMenuItem.Name = "resetCamToolStripMenuItem";
 			this.resetCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
 			this.resetCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.resetCamToolStripMenuItem.Tag = "Reset Camera";
 			this.resetCamToolStripMenuItem.Text = "Reset";
 			this.resetCamToolStripMenuItem.Click += new System.EventHandler(this.resetCamToolStripMenuItem_Click);
 			// 
@@ -509,6 +510,7 @@
 			this.loadCamToolStripMenuItem.Name = "loadCamToolStripMenuItem";
 			this.loadCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
 			this.loadCamToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.loadCamToolStripMenuItem.Tag = "";
 			this.loadCamToolStripMenuItem.Text = "Load...";
 			this.loadCamToolStripMenuItem.Click += new System.EventHandler(this.loadCamToolStripMenuItem_Click);
 			// 
@@ -529,7 +531,7 @@
             this.loadPropertiesToolStripMenuItem,
             this.savePropertiesToolStripMenuItem});
 			this.tracksToolStripMenuItem.Name = "tracksToolStripMenuItem";
-			this.tracksToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+			this.tracksToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
 			this.tracksToolStripMenuItem.Text = "Tracks";
 			this.tracksToolStripMenuItem.EnabledChanged += new System.EventHandler(this.tracksToolStripMenuItem_EnabledChanged);
 			// 
@@ -538,6 +540,7 @@
 			this.defaultPropertiesToolStripMenuItem1.Name = "defaultPropertiesToolStripMenuItem1";
 			this.defaultPropertiesToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
 			this.defaultPropertiesToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
+			this.defaultPropertiesToolStripMenuItem1.Tag = "Default Track Properties";
 			this.defaultPropertiesToolStripMenuItem1.Text = "Default Properties";
 			this.defaultPropertiesToolStripMenuItem1.Click += new System.EventHandler(this.defaultPropertiesToolStripMenuItem1_Click);
 			// 
@@ -547,6 +550,7 @@
 			this.loadPropertiesToolStripMenuItem.Name = "loadPropertiesToolStripMenuItem";
 			this.loadPropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
 			this.loadPropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+			this.loadPropertiesToolStripMenuItem.Tag = "";
 			this.loadPropertiesToolStripMenuItem.Text = "Load properties...";
 			this.loadPropertiesToolStripMenuItem.Click += new System.EventHandler(this.loadPropertiesToolStripMenuItem_Click);
 			// 
@@ -571,7 +575,7 @@
             this.jumpBackwardsToolStripMenuItem,
             this.jumpForwardToolStripMenuItem});
 			this.playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
-			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
 			this.playbackToolStripMenuItem.Text = "Playback";
 			// 
 			// startStopToolStripMenuItem
@@ -637,8 +641,9 @@
 			this.insertLyricsHereToolStripMenuItem.Enabled = false;
 			this.insertLyricsHereToolStripMenuItem.Name = "insertLyricsHereToolStripMenuItem";
 			this.insertLyricsHereToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-			this.insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-			this.insertLyricsHereToolStripMenuItem.Text = "Insert lyrics";
+			this.insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+			this.insertLyricsHereToolStripMenuItem.Tag = "Insert Lyrics";
+			this.insertLyricsHereToolStripMenuItem.Text = "Insert Lyrics";
 			this.insertLyricsHereToolStripMenuItem.Click += new System.EventHandler(this.insertLyricsHereToolStripMenuItem_Click);
 			// 
 			// insertKeyFrameToolStripMenuItem
@@ -646,8 +651,9 @@
 			this.insertKeyFrameToolStripMenuItem.Enabled = false;
 			this.insertKeyFrameToolStripMenuItem.Name = "insertKeyFrameToolStripMenuItem";
 			this.insertKeyFrameToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K)));
-			this.insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-			this.insertKeyFrameToolStripMenuItem.Text = "Insert key frame";
+			this.insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+			this.insertKeyFrameToolStripMenuItem.Tag = "";
+			this.insertKeyFrameToolStripMenuItem.Text = "Insert Key Frame";
 			this.insertKeyFrameToolStripMenuItem.Click += new System.EventHandler(this.insertKeyFrameToolStripMenuItem_Click);
 			// 
 			// label7
@@ -682,7 +688,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(1093, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(906, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 16294);
 			this.trackPropsPanel.TabIndex = 3;
@@ -779,6 +785,7 @@
 			this.defaultStyleBtn.Name = "defaultStyleBtn";
 			this.defaultStyleBtn.Size = new System.Drawing.Size(179, 23);
 			this.defaultStyleBtn.TabIndex = 0;
+			this.defaultStyleBtn.Tag = "Default Style";
 			this.defaultStyleBtn.Text = "Default Style";
 			this.defaultStyleBtn.UseVisualStyleBackColor = true;
 			this.defaultStyleBtn.Click += new System.EventHandler(this.defaultStyleBtn_Click);
@@ -1262,7 +1269,7 @@
 			this.defaultMtrlBtn.TabIndex = 10;
 			this.defaultMtrlBtn.Text = "Default Material";
 			this.defaultMtrlBtn.UseVisualStyleBackColor = true;
-			this.defaultMtrlBtn.Click += new System.EventHandler(this.resetBtn_Click);
+			this.defaultMtrlBtn.Click += new System.EventHandler(this.defaultMaterial_Click);
 			// 
 			// alphaLbl
 			// 
@@ -1897,7 +1904,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-10077, 16247);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-10315, 16247);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1909,7 +1916,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-10189, 16248);
+			this.texPathTb.Location = new System.Drawing.Point(-10427, 16248);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1919,7 +1926,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-10191, 16232);
+			this.label4.Location = new System.Drawing.Point(-10429, 16232);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -1999,6 +2006,7 @@
 			this.camTb.Name = "camTb";
 			this.camTb.Size = new System.Drawing.Size(111, 120);
 			this.camTb.TabIndex = 6;
+			this.camTb.Tag = "Edit Camera";
 			this.camTb.TextChanged += new System.EventHandler(this.camTb_TextChanged);
 			// 
 			// defaultPitchesBtn
@@ -2007,6 +2015,7 @@
 			this.defaultPitchesBtn.Name = "defaultPitchesBtn";
 			this.defaultPitchesBtn.Size = new System.Drawing.Size(111, 23);
 			this.defaultPitchesBtn.TabIndex = 4;
+			this.defaultPitchesBtn.Tag = "Reset Pitches";
 			this.defaultPitchesBtn.Text = "Reset pitches";
 			this.defaultPitchesBtn.UseVisualStyleBackColor = true;
 			this.defaultPitchesBtn.Click += new System.EventHandler(this.defaultPitchesBtn_Click);
@@ -2027,6 +2036,7 @@
 			this.minPitchUd.Name = "minPitchUd";
 			this.minPitchUd.Size = new System.Drawing.Size(52, 20);
 			this.minPitchUd.TabIndex = 3;
+			this.minPitchUd.Tag = "Edit Min Pitch";
 			this.minPitchUd.ValueChanged += new System.EventHandler(this.minPitchUd_ValueChanged);
 			// 
 			// maxPitchUd
@@ -2045,6 +2055,7 @@
 			this.maxPitchUd.Name = "maxPitchUd";
 			this.maxPitchUd.Size = new System.Drawing.Size(52, 20);
 			this.maxPitchUd.TabIndex = 2;
+			this.maxPitchUd.Tag = "Edit Max Pitch";
 			this.maxPitchUd.ValueChanged += new System.EventHandler(this.maxPitchUd_ValueChanged);
 			// 
 			// label26
@@ -2142,6 +2153,7 @@
 			this.fadeOutUd.Name = "fadeOutUd";
 			this.fadeOutUd.Size = new System.Drawing.Size(52, 20);
 			this.fadeOutUd.TabIndex = 1;
+			this.fadeOutUd.Tag = "Edit Fade Out";
 			this.fadeOutUd.ValueChanged += new System.EventHandler(this.fadeOutUd_ValueChanged);
 			// 
 			// fadeInUd
@@ -2166,6 +2178,7 @@
 			this.fadeInUd.Name = "fadeInUd";
 			this.fadeInUd.Size = new System.Drawing.Size(52, 20);
 			this.fadeInUd.TabIndex = 1;
+			this.fadeInUd.Tag = "Edit Fade In";
 			this.fadeInUd.ValueChanged += new System.EventHandler(this.fadeInUd_ValueChanged);
 			// 
 			// playbackOffsetUd
@@ -2190,6 +2203,7 @@
 			this.playbackOffsetUd.Name = "playbackOffsetUd";
 			this.playbackOffsetUd.Size = new System.Drawing.Size(52, 20);
 			this.playbackOffsetUd.TabIndex = 1;
+			this.playbackOffsetUd.Tag = "Edit Playback Offset";
 			this.playbackOffsetUd.ValueChanged += new System.EventHandler(this.playbackOffsetUd_ValueChanged);
 			// 
 			// saveMixdownDialog
@@ -2283,8 +2297,9 @@
 			this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.lyricsGridView.Location = new System.Drawing.Point(197, 16268);
 			this.lyricsGridView.Name = "lyricsGridView";
-			this.lyricsGridView.Size = new System.Drawing.Size(896, 50);
+			this.lyricsGridView.Size = new System.Drawing.Size(709, 50);
 			this.lyricsGridView.TabIndex = 0;
+			this.lyricsGridView.Tag = "Edit Lyrics";
 			this.lyricsGridView.Visible = false;
 			this.lyricsGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.lyricsGridView_CellEndEdit);
 			this.lyricsGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.lyricsGridView_CellValidating);
@@ -2322,6 +2337,7 @@
 			this.keyFramesDGV.Name = "keyFramesDGV";
 			this.keyFramesDGV.Size = new System.Drawing.Size(210, 16244);
 			this.keyFramesDGV.TabIndex = 23;
+			this.keyFramesDGV.Tag = "Edit Key Frames";
 			this.keyFramesDGV.Visible = false;
 			this.keyFramesDGV.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.keyFramesDGV_CellEndEdit);
 			this.keyFramesDGV.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.keyFramesDGV_CellValidating);
@@ -2493,7 +2509,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1505, 505);
+			this.ClientSize = new System.Drawing.Size(1318, 505);
 			this.Controls.Add(this.keyFramesDGV);
 			this.Controls.Add(this.lyricsGridView);
 			this.Controls.Add(this.debugLabel);
