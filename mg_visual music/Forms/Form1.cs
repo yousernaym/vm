@@ -2456,7 +2456,5 @@ namespace Visual_Music
 			if (keyFramesDGV.CurrentRow != null)
 				Project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].Selected = true;
 		}
-
-	
 	}
 }
