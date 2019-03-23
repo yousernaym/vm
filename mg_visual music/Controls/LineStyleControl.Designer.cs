@@ -33,7 +33,9 @@
 			this.shrinkingHlCb = new System.Windows.Forms.CheckBox();
 			this.lineHlTypeList = new System.Windows.Forms.ComboBox();
 			this.movingHlCb = new System.Windows.Forms.CheckBox();
+			this.label3 = new System.Windows.Forms.Label();
 			this.label29 = new System.Windows.Forms.Label();
+			this.hlMovementPowUd = new System.Windows.Forms.NumericUpDown();
 			this.hlSizeUpDown = new System.Windows.Forms.NumericUpDown();
 			this.label27 = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
@@ -45,14 +47,12 @@
 			this.label12 = new System.Windows.Forms.Label();
 			this.lineControlsPanel = new System.Windows.Forms.Panel();
 			this.continuousCb = new System.Windows.Forms.CheckBox();
-			this.hlMovementPowUd = new System.Windows.Forms.NumericUpDown();
-			this.label3 = new System.Windows.Forms.Label();
 			this.groupBox3.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.hlMovementPowUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.hlSizeUpDown)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lineWidthUd)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.qnGapFillUd)).BeginInit();
 			this.lineControlsPanel.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.hlMovementPowUd)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// modGbox
@@ -84,6 +84,7 @@
 			this.hlBorderCb.Name = "hlBorderCb";
 			this.hlBorderCb.Size = new System.Drawing.Size(57, 17);
 			this.hlBorderCb.TabIndex = 50;
+			this.hlBorderCb.Tag = "Border";
 			this.hlBorderCb.Text = "Border";
 			this.hlBorderCb.UseVisualStyleBackColor = true;
 			this.hlBorderCb.CheckedChanged += new System.EventHandler(this.hlBorderCb_CheckedChanged);
@@ -95,6 +96,7 @@
 			this.shrinkingHlCb.Name = "shrinkingHlCb";
 			this.shrinkingHlCb.Size = new System.Drawing.Size(70, 17);
 			this.shrinkingHlCb.TabIndex = 40;
+			this.shrinkingHlCb.Tag = "Shrinking";
 			this.shrinkingHlCb.Text = "Shrinking";
 			this.shrinkingHlCb.UseVisualStyleBackColor = true;
 			this.shrinkingHlCb.CheckedChanged += new System.EventHandler(this.shrinkingHlCb_CheckedChanged);
@@ -108,6 +110,7 @@
 			this.lineHlTypeList.Name = "lineHlTypeList";
 			this.lineHlTypeList.Size = new System.Drawing.Size(109, 21);
 			this.lineHlTypeList.TabIndex = 10;
+			this.lineHlTypeList.Tag = "Change Highlight Type";
 			this.lineHlTypeList.ValueMember = "Value";
 			this.lineHlTypeList.SelectedIndexChanged += new System.EventHandler(this.lineHlTypeList_SelectedIndexChanged);
 			// 
@@ -118,9 +121,19 @@
 			this.movingHlCb.Name = "movingHlCb";
 			this.movingHlCb.Size = new System.Drawing.Size(61, 17);
 			this.movingHlCb.TabIndex = 30;
+			this.movingHlCb.Tag = "Moving";
 			this.movingHlCb.Text = "Moving";
 			this.movingHlCb.UseVisualStyleBackColor = true;
 			this.movingHlCb.CheckedChanged += new System.EventHandler(this.movingHlCb_CheckedChanged);
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(6, 78);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(89, 13);
+			this.label3.TabIndex = 14;
+			this.label3.Text = "Movement power";
 			// 
 			// label29
 			// 
@@ -131,12 +144,33 @@
 			this.label29.TabIndex = 14;
 			this.label29.Text = "Size";
 			// 
+			// hlMovementPowUd
+			// 
+			this.hlMovementPowUd.DecimalPlaces = 1;
+			this.hlMovementPowUd.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+			this.hlMovementPowUd.Location = new System.Drawing.Point(101, 76);
+			this.hlMovementPowUd.Name = "hlMovementPowUd";
+			this.hlMovementPowUd.Size = new System.Drawing.Size(61, 20);
+			this.hlMovementPowUd.TabIndex = 20;
+			this.hlMovementPowUd.Tag = "Edit Highlight Movement power";
+			this.hlMovementPowUd.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.hlMovementPowUd.ValueChanged += new System.EventHandler(this.hlMovementPowUd_ValueChanged);
+			// 
 			// hlSizeUpDown
 			// 
 			this.hlSizeUpDown.Location = new System.Drawing.Point(101, 46);
 			this.hlSizeUpDown.Name = "hlSizeUpDown";
 			this.hlSizeUpDown.Size = new System.Drawing.Size(61, 20);
 			this.hlSizeUpDown.TabIndex = 20;
+			this.hlSizeUpDown.Tag = "Edit Highlight Size";
 			this.hlSizeUpDown.ValueChanged += new System.EventHandler(this.hlSizeUpDown_ValueChanged);
 			// 
 			// label27
@@ -168,6 +202,7 @@
 			this.lineWidthUd.Name = "lineWidthUd";
 			this.lineWidthUd.Size = new System.Drawing.Size(58, 20);
 			this.lineWidthUd.TabIndex = 20;
+			this.lineWidthUd.Tag = "Edit Line Width";
 			this.lineWidthUd.Value = new decimal(new int[] {
             1,
             0,
@@ -184,6 +219,7 @@
 			this.lineTypeList.Name = "lineTypeList";
 			this.lineTypeList.Size = new System.Drawing.Size(102, 21);
 			this.lineTypeList.TabIndex = 10;
+			this.lineTypeList.Tag = "Change Line Type";
 			this.lineTypeList.ValueMember = "Value";
 			this.lineTypeList.SelectedIndexChanged += new System.EventHandler(this.lineTypeList_SelectedIndexChanged);
 			// 
@@ -212,6 +248,7 @@
 			this.qnGapFillUd.Name = "qnGapFillUd";
 			this.qnGapFillUd.Size = new System.Drawing.Size(59, 20);
 			this.qnGapFillUd.TabIndex = 30;
+			this.qnGapFillUd.Tag = "Edit Fill gaps";
 			this.qnGapFillUd.ValueChanged += new System.EventHandler(this.qnGapFillUd_ValueChanged);
 			// 
 			// label12
@@ -248,37 +285,11 @@
 			this.continuousCb.Name = "continuousCb";
 			this.continuousCb.Size = new System.Drawing.Size(79, 17);
 			this.continuousCb.TabIndex = 40;
+			this.continuousCb.TabStop = false;
+			this.continuousCb.Tag = "Continuous";
 			this.continuousCb.Text = "Continuous";
 			this.continuousCb.UseVisualStyleBackColor = true;
 			this.continuousCb.CheckedChanged += new System.EventHandler(this.continuousCb_CheckedChanged);
-			// 
-			// hlMovementPowUd
-			// 
-			this.hlMovementPowUd.DecimalPlaces = 1;
-			this.hlMovementPowUd.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-			this.hlMovementPowUd.Location = new System.Drawing.Point(101, 76);
-			this.hlMovementPowUd.Name = "hlMovementPowUd";
-			this.hlMovementPowUd.Size = new System.Drawing.Size(61, 20);
-			this.hlMovementPowUd.TabIndex = 20;
-			this.hlMovementPowUd.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.hlMovementPowUd.ValueChanged += new System.EventHandler(this.hlMovementPowUd_ValueChanged);
-			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(6, 78);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(89, 13);
-			this.label3.TabIndex = 14;
-			this.label3.Text = "Movement power";
 			// 
 			// LineStyleControl
 			// 
@@ -291,12 +302,12 @@
 			this.Controls.SetChildIndex(this.lineControlsPanel, 0);
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.hlMovementPowUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.hlSizeUpDown)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.lineWidthUd)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.qnGapFillUd)).EndInit();
 			this.lineControlsPanel.ResumeLayout(false);
 			this.lineControlsPanel.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.hlMovementPowUd)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

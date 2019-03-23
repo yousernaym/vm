@@ -57,6 +57,7 @@
 			this.colorDestBtn = new System.Windows.Forms.Button();
 			this.angleDestUd = new System.Windows.Forms.NumericUpDown();
 			this.pixelPosGb = new System.Windows.Forms.GroupBox();
+			this.squareAspectCb = new System.Windows.Forms.CheckBox();
 			this.yOriginCb = new System.Windows.Forms.CheckBox();
 			this.xOriginCb = new System.Windows.Forms.CheckBox();
 			this.label8 = new System.Windows.Forms.Label();
@@ -65,7 +66,6 @@
 			this.combineXYCombo = new System.Windows.Forms.ComboBox();
 			this.label9 = new System.Windows.Forms.Label();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-			this.squareAspectCb = new System.Windows.Forms.CheckBox();
 			this.modEntryCm.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.modEntryBs)).BeginInit();
 			this.modGbox.SuspendLayout();
@@ -91,6 +91,7 @@
 			this.modEntryCombo.Name = "modEntryCombo";
 			this.modEntryCombo.Size = new System.Drawing.Size(158, 21);
 			this.modEntryCombo.TabIndex = 10;
+			this.modEntryCombo.Tag = "Change Modulation Item";
 			this.modEntryCombo.SelectedValueChanged += new System.EventHandler(this.modEntryCombo_SelectedValueChanged);
 			// 
 			// modEntryCm
@@ -101,13 +102,14 @@
             this.deleteMi,
             this.cloneMi});
 			this.modEntryCm.Name = "modEntryCm";
-			this.modEntryCm.Size = new System.Drawing.Size(211, 70);
+			this.modEntryCm.Size = new System.Drawing.Size(211, 92);
 			// 
 			// newMi
 			// 
 			this.newMi.Name = "newMi";
 			this.newMi.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
 			this.newMi.Size = new System.Drawing.Size(210, 22);
+			this.newMi.Tag = "New Modulation Entry";
 			this.newMi.Text = "New entry";
 			this.newMi.Click += new System.EventHandler(this.newMi_Click);
 			// 
@@ -117,6 +119,7 @@
 			this.deleteMi.Name = "deleteMi";
 			this.deleteMi.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
 			this.deleteMi.Size = new System.Drawing.Size(210, 22);
+			this.deleteMi.Tag = "Delete Modulation Entry";
 			this.deleteMi.Text = "Delete entry";
 			this.deleteMi.Click += new System.EventHandler(this.deleteMi_Click);
 			// 
@@ -127,6 +130,7 @@
 			this.cloneMi.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.N)));
 			this.cloneMi.Size = new System.Drawing.Size(210, 22);
+			this.cloneMi.Tag = "Clone Modulation Entry";
 			this.cloneMi.Text = "Clone entry";
 			this.cloneMi.Click += new System.EventHandler(this.cloneMi_Click);
 			// 
@@ -183,6 +187,7 @@
 			this.invertCb.Name = "invertCb";
 			this.invertCb.Size = new System.Drawing.Size(53, 17);
 			this.invertCb.TabIndex = 70;
+			this.invertCb.Tag = "Invert";
 			this.invertCb.Text = "Invert";
 			this.invertCb.UseVisualStyleBackColor = true;
 			this.invertCb.CheckedChanged += new System.EventHandler(this.invertCb_CheckedChanged);
@@ -199,6 +204,7 @@
 			this.startUd.Name = "startUd";
 			this.startUd.Size = new System.Drawing.Size(76, 20);
 			this.startUd.TabIndex = 10;
+			this.startUd.Tag = "Edit Start";
 			this.startUd.ValueChanged += new System.EventHandler(this.startUd_ValueChanged);
 			// 
 			// discardStopCb
@@ -209,6 +215,7 @@
 			this.discardStopCb.Name = "discardStopCb";
 			this.discardStopCb.Size = new System.Drawing.Size(111, 17);
 			this.discardStopCb.TabIndex = 60;
+			this.discardStopCb.Tag = "Discard after Stop";
 			this.discardStopCb.Text = "Discard after Stop";
 			this.discardStopCb.UseVisualStyleBackColor = true;
 			this.discardStopCb.CheckedChanged += new System.EventHandler(this.discardStopCb_CheckedChanged);
@@ -243,6 +250,7 @@
 			this.powerUd.Name = "powerUd";
 			this.powerUd.Size = new System.Drawing.Size(76, 20);
 			this.powerUd.TabIndex = 50;
+			this.powerUd.Tag = "Edit Fade power";
 			this.powerUd.ValueChanged += new System.EventHandler(this.powerUd_ValueChanged);
 			// 
 			// label19
@@ -275,6 +283,7 @@
 			this.fadeOutUd.Name = "fadeOutUd";
 			this.fadeOutUd.Size = new System.Drawing.Size(76, 20);
 			this.fadeOutUd.TabIndex = 40;
+			this.fadeOutUd.Tag = "Edit Fade out";
 			this.fadeOutUd.ValueChanged += new System.EventHandler(this.fadeOutUd_ValueChanged);
 			// 
 			// label42
@@ -298,6 +307,7 @@
 			this.stopUd.Name = "stopUd";
 			this.stopUd.Size = new System.Drawing.Size(76, 20);
 			this.stopUd.TabIndex = 20;
+			this.stopUd.Tag = "Edit Stop";
 			this.stopUd.ValueChanged += new System.EventHandler(this.stopUd_ValueChanged);
 			// 
 			// fadeInUd
@@ -312,6 +322,7 @@
 			this.fadeInUd.Name = "fadeInUd";
 			this.fadeInUd.Size = new System.Drawing.Size(76, 20);
 			this.fadeInUd.TabIndex = 30;
+			this.fadeInUd.Tag = "Edit Fade in";
 			this.fadeInUd.ValueChanged += new System.EventHandler(this.fadeInUd_ValueChanged);
 			// 
 			// destinationsGb
@@ -335,6 +346,7 @@
 			this.angleDestCb.Name = "angleDestCb";
 			this.angleDestCb.Size = new System.Drawing.Size(53, 17);
 			this.angleDestCb.TabIndex = 30;
+			this.angleDestCb.Tag = "Angle";
 			this.angleDestCb.Text = "Angle";
 			this.angleDestCb.UseVisualStyleBackColor = true;
 			this.angleDestCb.CheckedChanged += new System.EventHandler(this.angleDestCb_CheckedChanged);
@@ -355,6 +367,7 @@
 			this.colorDestCb.Name = "colorDestCb";
 			this.colorDestCb.Size = new System.Drawing.Size(50, 17);
 			this.colorDestCb.TabIndex = 10;
+			this.colorDestCb.Tag = "Color";
 			this.colorDestCb.Text = "Color";
 			this.colorDestCb.UseVisualStyleBackColor = true;
 			this.colorDestCb.CheckedChanged += new System.EventHandler(this.colorDestCb_CheckedChanged);
@@ -366,6 +379,7 @@
 			this.colorDestBtn.Name = "colorDestBtn";
 			this.colorDestBtn.Size = new System.Drawing.Size(85, 23);
 			this.colorDestBtn.TabIndex = 20;
+			this.colorDestBtn.Tag = "Edit Color";
 			this.colorDestBtn.UseVisualStyleBackColor = false;
 			this.colorDestBtn.Click += new System.EventHandler(this.colorDestBtn_Click);
 			// 
@@ -380,6 +394,7 @@
 			this.angleDestUd.Name = "angleDestUd";
 			this.angleDestUd.Size = new System.Drawing.Size(39, 20);
 			this.angleDestUd.TabIndex = 40;
+			this.angleDestUd.Tag = "Edit Angle";
 			this.angleDestUd.Value = new decimal(new int[] {
             45,
             0,
@@ -404,6 +419,18 @@
 			this.pixelPosGb.TabStop = false;
 			this.pixelPosGb.Text = "Pixel position";
 			// 
+			// squareAspectCb
+			// 
+			this.squareAspectCb.AutoSize = true;
+			this.squareAspectCb.Location = new System.Drawing.Point(6, 100);
+			this.squareAspectCb.Name = "squareAspectCb";
+			this.squareAspectCb.Size = new System.Drawing.Size(95, 17);
+			this.squareAspectCb.TabIndex = 60;
+			this.squareAspectCb.Tag = "Square aspect";
+			this.squareAspectCb.Text = "Square aspect";
+			this.squareAspectCb.UseVisualStyleBackColor = true;
+			this.squareAspectCb.CheckedChanged += new System.EventHandler(this.squareAspectCb_CheckedChanged);
+			// 
 			// yOriginCb
 			// 
 			this.yOriginCb.AutoSize = true;
@@ -411,6 +438,7 @@
 			this.yOriginCb.Name = "yOriginCb";
 			this.yOriginCb.Size = new System.Drawing.Size(33, 17);
 			this.yOriginCb.TabIndex = 40;
+			this.yOriginCb.Tag = "Y Origin";
 			this.yOriginCb.Text = "Y";
 			this.yOriginCb.UseVisualStyleBackColor = true;
 			this.yOriginCb.CheckedChanged += new System.EventHandler(this.yOriginCb_CheckedChanged);
@@ -422,6 +450,7 @@
 			this.xOriginCb.Name = "xOriginCb";
 			this.xOriginCb.Size = new System.Drawing.Size(33, 17);
 			this.xOriginCb.TabIndex = 30;
+			this.xOriginCb.Tag = "X Origin";
 			this.xOriginCb.Text = "X";
 			this.xOriginCb.UseVisualStyleBackColor = true;
 			this.xOriginCb.CheckedChanged += new System.EventHandler(this.xOriginCb_CheckedChanged);
@@ -459,6 +488,7 @@
 			this.yOriginUd.Name = "yOriginUd";
 			this.yOriginUd.Size = new System.Drawing.Size(43, 20);
 			this.yOriginUd.TabIndex = 20;
+			this.yOriginUd.Tag = "Edit Y Origin";
 			this.yOriginUd.Value = new decimal(new int[] {
             5,
             0,
@@ -489,6 +519,7 @@
 			this.xOriginUd.Name = "xOriginUd";
 			this.xOriginUd.Size = new System.Drawing.Size(45, 20);
 			this.xOriginUd.TabIndex = 10;
+			this.xOriginUd.Tag = "Edit X Origin";
 			this.xOriginUd.Value = new decimal(new int[] {
             5,
             0,
@@ -509,6 +540,7 @@
 			this.combineXYCombo.Name = "combineXYCombo";
 			this.combineXYCombo.Size = new System.Drawing.Size(92, 21);
 			this.combineXYCombo.TabIndex = 50;
+			this.combineXYCombo.Tag = "Change Combine";
 			this.combineXYCombo.SelectedIndexChanged += new System.EventHandler(this.combineXYCombo_SelectedIndexChanged);
 			// 
 			// label9
@@ -519,17 +551,6 @@
 			this.label9.Size = new System.Drawing.Size(48, 13);
 			this.label9.TabIndex = 38;
 			this.label9.Text = "Combine";
-			// 
-			// squareAspectCb
-			// 
-			this.squareAspectCb.AutoSize = true;
-			this.squareAspectCb.Location = new System.Drawing.Point(6, 100);
-			this.squareAspectCb.Name = "squareAspectCb";
-			this.squareAspectCb.Size = new System.Drawing.Size(95, 17);
-			this.squareAspectCb.TabIndex = 60;
-			this.squareAspectCb.Text = "Square aspect";
-			this.squareAspectCb.UseVisualStyleBackColor = true;
-			this.squareAspectCb.CheckedChanged += new System.EventHandler(this.squareAspectCb_CheckedChanged);
 			// 
 			// NoteStyleControl
 			// 

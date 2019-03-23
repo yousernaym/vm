@@ -283,7 +283,7 @@ namespace Visual_Music
 				else if (control.GetType() == typeof(CheckBox))
 				{
 					((CheckBox)control).CheckedChanged += invalidateSongPanel;
-					((CheckBox)control).CheckedChanged += addUndoItem;
+					((CheckBox)control).Click += addUndoItem;
 				}
 				else if (control.GetType() == typeof(Button))
 				{
@@ -293,12 +293,12 @@ namespace Visual_Music
 				else if (control.GetType() == typeof(RadioButton))
 				{
 					((RadioButton)control).CheckedChanged += invalidateSongPanel;
-					((RadioButton)control).CheckedChanged += addUndoItem;
+					((RadioButton)control).Click += addUndoItem;
 				}
 				else if (control.GetType() == typeof(ComboBox))
 				{
-					((ComboBox)control).SelectedValueChanged += invalidateSongPanel;
-					((ComboBox)control).SelectedValueChanged += addUndoItem;
+					((ComboBox)control).SelectedIndexChanged += invalidateSongPanel;
+					((ComboBox)control).SelectedIndexChanged += addUndoItem;
 				}
 				else if (control.GetType() == typeof(HueSatButton))
 				{
@@ -310,6 +310,9 @@ namespace Visual_Music
 					((DataGridView)control).CellEndEdit += addUndoItem;
 					((DataGridView)control).RowsRemoved += addUndoItem;
 				}
+				else if (control.GetType() == typeof(Label))
+					((Label)control).Click += addUndoItem;
+			
 				else if (control.GetType() == typeof(MenuStrip))
 					addMenuItemEventHandlers(((MenuStrip)control).Items);
 				else if (control.GetType() == typeof(ContextMenuStrip))
@@ -1317,6 +1320,12 @@ namespace Visual_Music
 			string desc = tag.ToString();
 			if (string.IsNullOrEmpty(desc))
 				return;
+
+			if (sender.GetType() == typeof(CheckBox))
+			{
+				string action = ((CheckBox)sender).Checked ? "Check " : "Uncheck ";
+				desc = action + desc;
+			}	
 			addUndoItem(desc);
 		}
 

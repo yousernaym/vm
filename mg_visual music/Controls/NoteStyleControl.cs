@@ -70,6 +70,7 @@ namespace Visual_Music
 					combineXYCombo.SelectedIndex = -1;
 				else
 					combineXYCombo.SelectedIndex = (int)modEntry.CombineXY;
+				updateXYOriginEnabled();
 				squareAspectCb.CheckState = Form1.toCheckState(modEntry.SquareAspect);
 				colorDestCb.CheckState = Form1.toCheckState(modEntry.ColorDestEnable);
 				angleDestCb.CheckState = Form1.toCheckState(modEntry.AngleDestEnable);
@@ -149,8 +150,8 @@ namespace Visual_Music
 		{
 			if (UpdatingControls)
 				return;
-			combineXYCombo.Enabled = xOriginCb.Checked && yOriginCb.Checked;
-			xOriginUd.Enabled = xOriginCb.Checked;
+			updateXYOriginEnabled();
+			
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.XOriginEnable = xOriginCb.Checked;
 		}
@@ -159,10 +160,17 @@ namespace Visual_Music
 		{
 			if (UpdatingControls)
 				return;
-			combineXYCombo.Enabled = xOriginCb.Checked && yOriginCb.Checked;
-			yOriginUd.Enabled = yOriginCb.Checked;
+			updateXYOriginEnabled();
+
 			for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
 				TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.YOriginEnable = yOriginCb.Checked;
+		}
+
+		private void updateXYOriginEnabled()
+		{
+			combineXYCombo.Enabled = xOriginCb.Checked && yOriginCb.Checked;
+			xOriginUd.Enabled = xOriginCb.Checked;
+			yOriginUd.Enabled = yOriginCb.Checked;
 		}
 
 		private void combineXYCombo_SelectedIndexChanged(object sender, EventArgs e)
