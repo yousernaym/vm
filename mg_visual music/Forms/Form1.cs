@@ -941,67 +941,61 @@ namespace Visual_Music
 		}
 		private void trackList_DragDrop(object sender, DragEventArgs e)
 		{
-			try
-			{
-				ListViewItem dragToItem = getListViewItem(trackList, e);
-				int dropIndex = dragToItem.Index;
-				ListViewItem[] selectedItems = new ListViewItem[trackList.SelectedIndices.Count];
-				ListViewItem[] newItems = new ListViewItem[trackList.SelectedIndices.Count];
+			
+			ListViewItem dragToItem = getListViewItem(trackList, e);
+			int dropIndex = dragToItem.Index;
+			ListViewItem[] selectedItems = new ListViewItem[trackList.SelectedIndices.Count];
+			ListViewItem[] newItems = new ListViewItem[trackList.SelectedIndices.Count];
 
-				trackList.BeginUpdate();
-				if ((e.KeyState & 8) != 8) //CTRL not pressed
-				{
-					for (int i = 0; i < selectedItems.Length; i++)
-						selectedItems[i] = trackList.SelectedItems[i];
-					for (int i = 0; i < selectedItems.Length; i++)
-						selectedItems[i].Selected = false; //Remove selection of old items before inserting new ones, otherwise all sorts of weird exceptions might occur
-					for (int i = 0; i < selectedItems.Length; i++)
-					{
-						newItems[i] = (ListViewItem)selectedItems[i].Clone();
-						int index = dropIndex + i + 1;
-						Project.TrackViews.Insert(index, Project.TrackViews[selectedItems[i].Index]);
-						//SongPanel.Notes.Tracks.Insert(index, SongPanel.Notes.Tracks[selectedItems[i].Index]);
-						trackList.Items.Insert(index, newItems[i]);
-					}
-					for (int i = 0; i < selectedItems.Length; i++)
-					{
-						Project.TrackViews.RemoveAt(selectedItems[i].Index);
-						trackList.Items.Remove(selectedItems[i]);
-					}
-					for (int i = 0; i < selectedItems.Length; i++)
-						newItems[i].Selected = true;    //After removal of old items it's now safe to select new items
-														//for (int i = 0; i < Project.TrackViews.Count; i++)
-														//Project.TrackViews[i].TrackNumber = i;
-				}
-				else //CTRL pressed
-				{
-					bool onlyCopyCurrentTab = (e.KeyState & 4) != 4; //SHIFT not pressed
-					TrackView sourceTrackView = Project.TrackViews[dropIndex];
-					TrackProps sourceTrackProps = sourceTrackView.TrackProps;
-					for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-					{
-						TrackProps destTrackProps = Project.TrackViews[trackList.SelectedIndices[i]].TrackProps;
-						TrackPropsType tpt = TrackPropsType.TPT_All;
-						if (onlyCopyCurrentTab)
-						{
-							string tabName = selectedTrackPropsPanel.SelectedTab.Name;
-							Enum.TryParse(tabName, out tpt);
-						}
-						destTrackProps.cloneFrom(sourceTrackProps, (int)tpt, SongPanel);
-						Project.TrackViews[i].createOcTree(Project, Project.GlobalTrackProps);
-					}
-					updateTrackPropsControls();
-					updateTrackListColors();
-				}
-			}
-			catch (Exception ex)
+			trackList.BeginUpdate();
+			if ((e.KeyState & 8) != 8) //CTRL not pressed
 			{
-				MessageBox.Show(ex.Message);
+				for (int i = 0; i < selectedItems.Length; i++)
+					selectedItems[i] = trackList.SelectedItems[i];
+				for (int i = 0; i < selectedItems.Length; i++)
+					selectedItems[i].Selected = false; //Remove selection of old items before inserting new ones, otherwise all sorts of weird exceptions might occur
+				for (int i = 0; i < selectedItems.Length; i++)
+				{
+					newItems[i] = (ListViewItem)selectedItems[i].Clone();
+					int index = dropIndex + i + 1;
+					Project.TrackViews.Insert(index, Project.TrackViews[selectedItems[i].Index]);
+					//SongPanel.Notes.Tracks.Insert(index, SongPanel.Notes.Tracks[selectedItems[i].Index]);
+					trackList.Items.Insert(index, newItems[i]);
+				}
+				for (int i = 0; i < selectedItems.Length; i++)
+				{
+					Project.TrackViews.RemoveAt(selectedItems[i].Index);
+					trackList.Items.Remove(selectedItems[i]);
+				}
+				for (int i = 0; i < selectedItems.Length; i++)
+					newItems[i].Selected = true;    //After removal of old items it's now safe to select new items											
+													
+				//for (int i = 0; i < Project.TrackViews.Count; i++)
+				//Project.TrackViews[i].TrackNumber = i;
+				addUndoItem("Reorder tracks");
 			}
-			finally
+			else //CTRL pressed
 			{
-				trackList.EndUpdate();
+				bool onlyCopyCurrentTab = (e.KeyState & 4) != 4; //SHIFT not pressed
+				TrackView sourceTrackView = Project.TrackViews[dropIndex];
+				TrackProps sourceTrackProps = sourceTrackView.TrackProps;
+				for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				{
+					TrackProps destTrackProps = Project.TrackViews[trackList.SelectedIndices[i]].TrackProps;
+					TrackPropsType tpt = TrackPropsType.TPT_All;
+					if (onlyCopyCurrentTab)
+					{
+						string tabName = selectedTrackPropsPanel.SelectedTab.Name;
+						Enum.TryParse(tabName, out tpt);
+					}
+					destTrackProps.cloneFrom(sourceTrackProps, (int)tpt, SongPanel);
+					Project.TrackViews[i].createOcTree(Project, Project.GlobalTrackProps);
+				}
+				updateTrackPropsControls();
+				updateTrackListColors();
+				addUndoItem("Copy track propesties");
 			}
+			trackList.EndUpdate();
 		}
 
 		private void trackList_DragEnter(object sender, DragEventArgs e)
@@ -1367,7 +1361,10 @@ namespace Visual_Music
 			Project.copyPropsFrom(undoItems.Current.Project);
 			updateProjPropsControls();
 			updateTrackPropsControls();
-			updateTrackListColors();
+			if (undoItems.RedoDesc == "Reorder tracks")
+				createTrackList();
+			else
+				updateTrackListColors();
 			SongPanel.Invalidate();
 			updateUndoRedoDesc();
 		}
