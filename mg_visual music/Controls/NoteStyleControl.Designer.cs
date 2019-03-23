@@ -91,7 +91,7 @@
 			this.modEntryCombo.Name = "modEntryCombo";
 			this.modEntryCombo.Size = new System.Drawing.Size(158, 21);
 			this.modEntryCombo.TabIndex = 10;
-			this.modEntryCombo.Tag = "Change Modulation Item";
+			this.modEntryCombo.Tag = "Change Modulation Entry";
 			this.modEntryCombo.SelectedValueChanged += new System.EventHandler(this.modEntryCombo_SelectedValueChanged);
 			// 
 			// modEntryCm
@@ -102,7 +102,7 @@
             this.deleteMi,
             this.cloneMi});
 			this.modEntryCm.Name = "modEntryCm";
-			this.modEntryCm.Size = new System.Drawing.Size(211, 92);
+			this.modEntryCm.Size = new System.Drawing.Size(211, 70);
 			// 
 			// newMi
 			// 

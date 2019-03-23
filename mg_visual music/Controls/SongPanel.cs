@@ -759,11 +759,8 @@ namespace Visual_Music
 			if (keyFrame == null)
 				return;
 			if (keyFrame.Camera.control(e.KeyCode, true))
-			{
-				Camera.OnUserUpdating?.Invoke();
 				e.SuppressKeyPress = true;
-			}
-
+			
 			//Start/stop playback
 			if (e.KeyCode == WinKeys.Space)
 			{

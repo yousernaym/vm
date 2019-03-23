@@ -19,6 +19,7 @@ namespace Visual_Music
 	[Serializable]
 	public class Camera : ISerializable
 	{
+		float controlScale = 0;
 		public BoundingFrustum Frustum => new BoundingFrustum(VpMat);
 		public int Eye { get; set; } = 0;   //Stereoscopic rendering: -1 = left, 0 = center(monoscopic), 1 = right
 		public float EyeOffset { get; set; } = 0.02f;   //1 = 100% of viewport width, ie. 0.5 will put the center at the edge of an eye's view.
@@ -223,57 +224,59 @@ namespace Visual_Music
 
 		public bool control(WinKeys key, bool keyDown)
 		{
-			float startOrStop = keyDown ? 1 : 0;
+			if (controlScale == 0 && !keyDown) 
+				return false;
+			controlScale = keyDown ? 1 : 0;
 			bool keyMatch = false;
 			if (key == WinKeys.Q)
 			{
-				rotVel.Y = rotSpeed * startOrStop;
+				rotVel.Y = rotSpeed * controlScale;
 				keyMatch = true;
 			}
 			if (key == WinKeys.E)
 			{
-				rotVel.Y = -rotSpeed * startOrStop;
+				rotVel.Y = -rotSpeed * controlScale;
 				keyMatch = true;
 			}
 			if (key == WinKeys.W)
 			{
-				moveVel = Vector3.Forward * moveSpeed * startOrStop;
+				moveVel = Vector3.Forward * moveSpeed * controlScale;
 				keyMatch = true;
 			}
 			if (key == WinKeys.S)
 			{
-				moveVel = -Vector3.Forward * moveSpeed * startOrStop;
+				moveVel = -Vector3.Forward * moveSpeed * controlScale;
 				keyMatch = true;
 			}
 			if (key == WinKeys.A)
 			{
-				moveVel = Vector3.Left * moveSpeed * startOrStop;
+				moveVel = Vector3.Left * moveSpeed * controlScale;
 				keyMatch = true;
 			}
 			if (key == WinKeys.D)
 			{
-				moveVel = -Vector3.Left * moveSpeed * startOrStop;
+				moveVel = -Vector3.Left * moveSpeed * controlScale;
 				keyMatch = true;
 			}
 			if (key == WinKeys.R)
 			{
-				moveVel = Vector3.Up * moveSpeed * startOrStop;
+				moveVel = Vector3.Up * moveSpeed * controlScale;
 				keyMatch = true;
 			}
 			if (key == WinKeys.F)
 			{
-				moveVel = -Vector3.Up * moveSpeed * startOrStop;
+				moveVel = -Vector3.Up * moveSpeed * controlScale;
 				keyMatch = true;
 			}
 
 			if (key == WinKeys.X)
 			{
-				rotVel.Z = rotSpeed * startOrStop;
+				rotVel.Z = rotSpeed * controlScale;
 				keyMatch = true;
 			}
 			if (key == WinKeys.C)
 			{
-				rotVel.Z = -rotSpeed * startOrStop;
+				rotVel.Z = -rotSpeed * controlScale;
 				keyMatch = true;
 			}
 
@@ -302,8 +305,12 @@ namespace Visual_Music
 						Form1.pressCapsLock(); //If releasing caps lock, turn it off
 				}
 			}
-			if (keyMatch && !keyDown)
-				OnUserUpdated?.Invoke();
+			if (keyMatch)
+			{
+				OnUserUpdating?.Invoke();
+				if (!keyDown)
+					OnUserUpdated?.Invoke();
+			}
 			return keyMatch;
 		}
 
