@@ -258,11 +258,15 @@ namespace Visual_Music
 
 		void addMenuItemEventHandlers(ToolStripItemCollection items)
 		{
-			foreach (ToolStripMenuItem item in items)
+			foreach (var item in items)
 			{
-				item.Click += addUndoItem;
-				item.Click += invalidateSongPanel;
-				addMenuItemEventHandlers(item.DropDownItems);
+				if (item is ToolStripMenuItem)
+				{
+					ToolStripMenuItem menuItem = (ToolStripMenuItem)item;
+					menuItem.Click += addUndoItem;
+					menuItem.Click += invalidateSongPanel;
+					addMenuItemEventHandlers(menuItem.DropDownItems);
+				}
 			}
 		}
 
@@ -270,6 +274,8 @@ namespace Visual_Music
 		{
 			foreach (Control control in controls)
 			{
+				if (control.ContextMenuStrip != null)
+					addMenuItemEventHandlers(control.ContextMenuStrip.Items);
 				if (control.GetType() == typeof(TextBox))
 				{
 					((TextBox)control).TextChanged += invalidateSongPanel;
@@ -315,8 +321,6 @@ namespace Visual_Music
 			
 				else if (control.GetType() == typeof(MenuStrip))
 					addMenuItemEventHandlers(((MenuStrip)control).Items);
-				else if (control.GetType() == typeof(ContextMenuStrip))
-					addMenuItemEventHandlers(((ContextMenuStrip)control).Items);
 				else if (control.Controls.Count > 0)
 					addEventHandlers(control.Controls);
 				else
