@@ -61,7 +61,7 @@ namespace Visual_Music
 			MixdownType = xmPlayMixdownSupported && Form1.TpartyIntegrationForm.ModuleMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
 			//InsTrack = ImportForm.InsTrack;
 			MixdownAppPath = TpartyIntegrationForm.XmPlayPath;
-			MixdownAppArgs = "\"" + NotePath + "\" -boost";
+			MixdownAppArgs = "\"%notefilepath\" -boost";
 		}
 
 		public ModImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)

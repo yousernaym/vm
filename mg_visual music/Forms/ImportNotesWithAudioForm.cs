@@ -93,7 +93,7 @@ namespace Visual_Music
 				if (options.MixdownType != Midi.MixdownType.None)
                 {   //No existing audio file, do mixdown
                     if (options.MixdownType == Midi.MixdownType.Tparty)
-                    {   //Mixdown with xmplay or sidplayfp
+                    {   //Mixdown with xmplay
 						//string folder = Application.StartupPath + "\\plugins\\xmplay";
 						importUsingTpartyMixdown(options, TpartyIntegrationForm.MixdownOutputDir);
                     }

@@ -197,20 +197,22 @@ namespace Visual_Music
 		public string RawNotePath
 		{
 			get => rawNotePath; //Note path as entered at import, either local file or url.
-			set
-			{
-				rawNotePath = value;
-				if (value.IsUrl())
-					base.NotePath = value.downloadFile();
-				else
-					base.NotePath = value;
-			}
+			set => rawNotePath = value;
 		}
 
 		new public string NotePath
 		{
 			get => base.NotePath;
+			private set => base.NotePath = value;
 		}
+		//	set
+		//	{
+		//		if (value.IsUrl())
+		//			NotePath = RawNotePath.downloadFile();
+		//		else
+		//			NotePath = RawNotePath;
+		//	}
+		//}
 		
 		public bool EraseCurrent { get; set; }
 		public string MixdownAppPath { get; set; }
@@ -223,6 +225,7 @@ namespace Visual_Music
 		{
 			NoteFileType = noteFileType;
 			RawNotePath = ImportForm.NoteFilePath;
+			setNotePath();
 			AudioPath = ImportForm.AudioFilePath;
 			EraseCurrent = ImportForm.EraseCurrent;
 			InsTrack = ImportForm.InsTrack;
@@ -299,6 +302,7 @@ namespace Visual_Music
 
 		public bool checkNoteFile()
 		{
+			return true;
 			if (string.IsNullOrWhiteSpace(NotePath))
 			{
 				MessageBox.Show("Note file path required.");
@@ -310,6 +314,14 @@ namespace Visual_Music
 				return false;
 			}
 			return true;
+		}
+
+		public void setNotePath()
+		{
+			if (rawNotePath.IsUrl())
+				NotePath = rawNotePath.downloadFile();
+			else
+				NotePath = rawNotePath;
 		}
 	}
 }

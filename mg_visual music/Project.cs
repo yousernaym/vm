@@ -123,17 +123,13 @@ namespace Visual_Music
 		{
 			if (ImportOptions == null)
 				return true;
-			if (string.IsNullOrWhiteSpace(ImportOptions.NotePath))
-				throw new FileFormatException("Note file path missing from song file.");
-			if (!File.Exists(ImportOptions.NotePath))
-				throw new FileNotFoundException("Note file missing: " + ImportOptions.NotePath);
-			if (!string.IsNullOrWhiteSpace(ImportOptions.AudioPath) && !File.Exists(ImportOptions.AudioPath))
-				Form1.showWarningMsgBox("Audio file missing: " + ImportOptions.AudioPath);
+
 			//if (trackViews != null)
 			//{
 			//	for (int i = 0; i < trackViews.Count; i++)
 			//		trackViews[i].TrackProps.loadContent(SongPanel);
 			//}
+			ImportOptions.setNotePath();
 			ImportOptions.EraseCurrent = false;
 			return importSong(ImportOptions);
 		}
@@ -196,6 +192,12 @@ namespace Visual_Music
 
 		public bool importSong(ImportOptions options)
 		{ //<Open project> and <import files> meet here
+			if (string.IsNullOrWhiteSpace(ImportOptions.NotePath))
+				throw new FileFormatException("Note file path missing.");
+			if (!File.Exists(ImportOptions.NotePath))
+				throw new FileNotFoundException("Note file missing: " + ImportOptions.NotePath);
+			if (!string.IsNullOrWhiteSpace(ImportOptions.AudioPath) && !File.Exists(ImportOptions.AudioPath))
+				Form1.showWarningMsgBox("Audio file missing: " + ImportOptions.AudioPath);
 			Media.closeAudioFile();
 
 			//Convert mod/sid files to mid/wav
@@ -251,6 +253,7 @@ namespace Visual_Music
 			}
 
 			openNoteFile(options);
+			ImportNotesWithAudioForm.TpartyArgs = options.MixdownAppArgs?.Replace("%notefilepath", options.NotePath);
 			openAudioFile(options.AudioPath, options.MixdownType);
 
 			ImportOptions = options;
