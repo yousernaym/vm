@@ -285,6 +285,7 @@ namespace Visual_Music
 				KeyFrames = new KeyFrames();
 				Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
 				NormSongPos = 0;
+				resetPitchLimits();
 			}
 			//viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
 			return true;

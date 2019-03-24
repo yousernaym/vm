@@ -423,13 +423,10 @@ namespace Visual_Music
 			try
 			{
 				SongPanel.SuspendPaint();
-				if (Project.TrackViews == null)
-					options.EraseCurrent = true; //In order for setDefaultPitches below to be called
 				if (!Project.importSong(options))
 					return false;
 				if (options.EraseCurrent)
 				{
-					setDefaultPitches();
 					currentProjPath = "";
 					updateFormTitle("");
 					resetCameras(false);
@@ -1507,7 +1504,7 @@ namespace Visual_Music
 			Project.createOcTrees();
 		}
 
-		void setDefaultPitches()
+		void resetPitchLimits()
 		{
 			Project.resetPitchLimits();
 			updatingControls = true;
@@ -1518,7 +1515,7 @@ namespace Visual_Music
 
 		private void defaultPitchesBtn_Click(object sender, EventArgs e)
 		{
-			setDefaultPitches();
+			resetPitchLimits();
 		}
 
 		private void disableTextureCb_CheckedChanged(object sender, EventArgs e)
