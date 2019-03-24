@@ -93,6 +93,7 @@ namespace Visual_Music
 		ScrollBar songScrollBar = new HScrollBar();
 		NoteStyleControl currentNoteStyleControl;
 		int keyFrameLockRow = -1;
+		bool unsavedChanges = false;
 
 		[DllImport("user32.dll")]
 		static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
@@ -431,6 +432,7 @@ namespace Visual_Music
 					updateFormTitle("");
 					resetCameras(false);
 				}
+				unsavedChanges = true;
 				songLoaded(options.NotePath);
 			}
 			finally
@@ -1179,6 +1181,7 @@ namespace Visual_Music
 			songLoaded(currentProjPath);
 			updateFormTitle(currentProjPath);
 			Project.DefaultFileName = Path.GetFileName(currentProjPath);
+			unsavedChanges = false;
 		}
 
 		void updateFormTitle(string path)
@@ -1189,15 +1192,14 @@ namespace Visual_Music
 		}
 		private void saveSongToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (string.IsNullOrEmpty(currentProjPath))
-			{
-				saveSongAs();
-				return;
-			}
 			saveSong();
 		}
-		void saveSong()
+		bool saveSong()
 		{
+			if (string.IsNullOrEmpty(currentProjPath))
+			{
+				return saveSongAs();
+			}
 			try
 			{
 				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
@@ -1209,17 +1211,20 @@ namespace Visual_Music
 				}
 				File.Copy(tempPath, currentProjPath, true);
 				updateFormTitle(currentProjPath);
+				unsavedChanges = false;
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show(ex.Message);
+				return false;
 			}
+			return true;
 		}
-		void saveSongAs()
+		bool saveSongAs()
 		{
 			saveProjDialog.FileName = Project.DefaultFileName;
 			if (saveProjDialog.ShowDialog() != DialogResult.OK)
-				return;
+				return false;
 			ProjectFolder = Path.GetDirectoryName(saveProjDialog.FileName);
 			saveSettings();
 
@@ -1244,7 +1249,7 @@ namespace Visual_Music
 			}
 
 			currentProjPath = saveProjDialog.FileName;
-			saveSong();
+			return saveSong();
 		}
 
 		private void saveSongAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1333,6 +1338,7 @@ namespace Visual_Music
 			undoToolStripMenuItem.Enabled = true;
 			redoToolStripMenuItem.Enabled = false;
 			updateUndoRedoDesc();
+			unsavedChanges = true;
 		}
 
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2372,7 +2378,12 @@ namespace Visual_Music
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			e.Cancel = false;
+			e.Cancel = false; //Set to false to be able to close even if there is an error in a DataGridView
+			if (unsavedChanges)
+			{
+				DialogResult dr = MessageBox.Show("Do you want to save unsaved changes before exiting?", "", MessageBoxButtons.YesNoCancel);
+				e.Cancel = dr == DialogResult.Yes && !saveSong() || dr == DialogResult.Cancel;
+			}
 		}
 
 		private void keyFramesDGV_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
