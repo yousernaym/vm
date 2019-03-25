@@ -22,30 +22,7 @@ namespace Visual_Music
 			get => noteFilePath.Text;
 			set => noteFilePath.Text = value;
 		}
-			//get
-			//{
-			//	//If a file has been previously downloaded to temp dir, return path to that file.
-			//	if (!string.IsNullOrWhiteSpace(DownloadedFilePath))
-			//	{
-			//		if (!File.Exists(DownloadedFilePath))
-			//			DownloadedFilePath = null;
-			//		return DownloadedFilePath;
-			//	}
-			//	//If noteFilePath textbox is a URL, download file to temp dir and return path to that file, otherwise return
-			//	else if (noteFilePath.Text.IsUrl())
-			//		return DownloadedFilePath = noteFilePath.Text.downloadFile();
-			//	//Return path as written in textbox
-			//	else
-			//		return noteFilePath.Text;
-			//}
-			//set
-			//{
-			//	if (noteFilePath.Text.Equals(value))
-			//		return;
-			//	noteFilePath.Text = value;
-			//	DownloadedFilePath = null;
-			//}
-		//}
+				
         virtual public string AudioFilePath
 		{
 			get { return audioFilePath.Text; }
@@ -217,9 +194,9 @@ namespace Visual_Music
 		public bool EraseCurrent { get; set; }
 		public string MixdownAppPath { get; set; }
 		public string MixdownAppArgs { get; set; }
+		public string MixdownOutputDir { get; set; }
 		public string MidiOutputPath { get; set; }
 		public bool SavedMidi { get; set; }
-
 
 		public ImportOptions(Midi.FileType noteFileType)
 		{
@@ -255,6 +232,17 @@ namespace Visual_Music
 					MixdownAppPath = (string)entry.Value;
 				else if (entry.Name == "mixdownAppArgs")
 					MixdownAppArgs = (string)entry.Value;
+				else if (entry.Name == "mixdownOutputDir")
+				{
+					string dir = ((string)entry.Value);
+					if (!string.IsNullOrWhiteSpace(dir))
+					{
+						dir = dir.ToLower();
+						if (dir.Contains(Program.TempDirRoot))
+							dir = Program.TempDir;
+						MixdownOutputDir = dir;
+					}
+				}
 				else if (entry.Name == "midiOutputPath")
 					MidiOutputPath = (string)entry.Value;
 				else if (entry.Name == "savedMidi")
@@ -275,6 +263,7 @@ namespace Visual_Music
 			info.AddValue("songLengthS", SongLengthS);
 			info.AddValue("mixdownAppPath", MixdownAppPath);
 			info.AddValue("mixdownAppArgs", MixdownAppArgs);
+			info.AddValue("mixdownOutputDir", MixdownOutputDir);
 			info.AddValue("midiOutputPath", MidiOutputPath);
 			info.AddValue("savedMidi", SavedMidi);
 		}

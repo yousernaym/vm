@@ -62,14 +62,14 @@ namespace Visual_Music
 				else if (entry.Name == getKeyName(Keys.ModTpartyArgs))
 					Form1.ImportModForm.tpartyArgsTb.Text = (string)entry.Value;
 				else if (entry.Name == getKeyName(Keys.ModTpartyOutput))
-					Form1.ImportModForm.tpartyAudioTb.Text = (string)entry.Value;
+					Form1.ImportModForm.tpartyOutputTb.Text = (string)entry.Value;
 
 				else if (entry.Name == getKeyName(Keys.SidTpartyApp))
 					Form1.ImportSidForm.tpartyAppTb.Text = (string)entry.Value;
 				else if (entry.Name == getKeyName(Keys.SidTpartyArgs))
 					Form1.ImportSidForm.tpartyArgsTb.Text = (string)entry.Value;
 				else if (entry.Name == getKeyName(Keys.SidTpartyOutput))
-					Form1.ImportSidForm.tpartyAudioTb.Text = (string)entry.Value;
+					Form1.ImportSidForm.tpartyOutputTb.Text = (string)entry.Value;
 
 				else if (entry.Name == getKeyName(Keys.HvscDir))
 				{
@@ -107,10 +107,10 @@ namespace Visual_Music
 
 			info.AddValue(getKeyName(Keys.ModTpartyApp), Form1.ImportModForm.tpartyAppTb.Text);
 			info.AddValue(getKeyName(Keys.ModTpartyArgs), Form1.ImportModForm.tpartyArgsTb.Text);
-			info.AddValue(getKeyName(Keys.ModTpartyOutput), Form1.ImportModForm.tpartyAudioTb.Text);
+			info.AddValue(getKeyName(Keys.ModTpartyOutput), Form1.ImportModForm.tpartyOutputTb.Text);
 			info.AddValue(getKeyName(Keys.SidTpartyApp), Form1.ImportSidForm.tpartyAppTb.Text);
 			info.AddValue(getKeyName(Keys.SidTpartyArgs), Form1.ImportSidForm.tpartyArgsTb.Text);
-			info.AddValue(getKeyName(Keys.SidTpartyOutput), Form1.ImportSidForm.tpartyAudioTb.Text);
+			info.AddValue(getKeyName(Keys.SidTpartyOutput), Form1.ImportSidForm.tpartyOutputTb.Text);
 
 			info.AddValue(getKeyName(Keys.HvscDir), Form1.TpartyIntegrationForm.HvscDir);
 			info.AddValue(getKeyName(Keys.TpartyModuleMixdown), Form1.TpartyIntegrationForm.ModuleMixdown);

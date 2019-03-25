@@ -152,21 +152,7 @@ namespace Visual_Music
 						tv.TrackProps.GlobalProps = TrackViews[0].TrackProps;
 					}
 				}
-				else if (entry.Name == "tpartyApp")
-					ImportNotesWithAudioForm.TpartyApp = (string)entry.Value;
-				else if (entry.Name == "tpartyArgs")
-					ImportNotesWithAudioForm.TpartyArgs = (string)entry.Value;
-				else if (entry.Name == "tpartyOutputDir")
-				{
-					string dir = ((string)entry.Value);
-					if (!string.IsNullOrWhiteSpace(dir))
-					{
-						dir = dir.ToLower();
-						if (dir.Contains(Program.TempDirRoot))
-							dir = Program.TempDir;
-						ImportNotesWithAudioForm.TpartyOutputDir = dir;
-					}
-				}
+			
 				else if (entry.Name == "keyFrames")
 					KeyFrames = (KeyFrames)entry.Value;
 				else if (entry.Name == "props")
@@ -182,9 +168,6 @@ namespace Visual_Music
 			info.AddValue("version", SongFormat.writeVersion);
 			info.AddValue("importOptions", ImportOptions);
 			info.AddValue("trackViews", trackViews);
-			info.AddValue("tpartyApp", ImportNotesWithAudioForm.TpartyApp);
-			info.AddValue("tpartyArgs", ImportNotesWithAudioForm.TpartyArgs);
-			info.AddValue("tpartyOutputDir", ImportNotesWithAudioForm.TpartyOutputDir);
 			info.AddValue("keyFrames", KeyFrames);
 			info.AddValue("props", Props);
 
@@ -192,12 +175,12 @@ namespace Visual_Music
 
 		public bool importSong(ImportOptions options)
 		{ //<Open project> and <import files> meet here
-			if (string.IsNullOrWhiteSpace(ImportOptions.NotePath))
+			if (string.IsNullOrWhiteSpace(options.NotePath))
 				throw new FileFormatException("Note file path missing.");
-			if (!File.Exists(ImportOptions.NotePath))
-				throw new FileNotFoundException("Note file missing: " + ImportOptions.NotePath);
-			if (!string.IsNullOrWhiteSpace(ImportOptions.AudioPath) && !File.Exists(ImportOptions.AudioPath))
-				Form1.showWarningMsgBox("Audio file missing: " + ImportOptions.AudioPath);
+			if (!File.Exists(options.NotePath))
+				throw new FileNotFoundException("Note file missing: " + options.NotePath);
+			if (!string.IsNullOrWhiteSpace(options.AudioPath) && !File.Exists(options.AudioPath))
+				Form1.showWarningMsgBox("Audio file missing: " + options.AudioPath);
 			Media.closeAudioFile();
 
 			//Convert mod/sid files to mid/wav
@@ -253,8 +236,7 @@ namespace Visual_Music
 			}
 
 			openNoteFile(options);
-			ImportNotesWithAudioForm.TpartyArgs = options.MixdownAppArgs?.Replace("%notefilepath", options.NotePath);
-			openAudioFile(options.AudioPath, options.MixdownType);
+			openAudioFile(options);
 
 			ImportOptions = options;
 			if (options.EraseCurrent)
@@ -302,14 +284,15 @@ namespace Visual_Music
 			Props.Camera = interpolatedFrame.Camera;
 		}
 
-		public void openAudioFile(string file, Midi.MixdownType mixdownType)
+		public void openAudioFile(ImportOptions options)
 		{
-			if (mixdownType == Midi.MixdownType.Tparty)
-				file = ImportNotesWithAudioForm.runTpartyProcess();
+			string file = options.AudioPath;
+			if (options.MixdownType == Midi.MixdownType.Tparty)
+				file = ImportNotesWithAudioForm.runTpartyProcess(options);
 
 			//if (string.IsNullOrWhiteSpace(file))
 			//return;
-			if (!File.Exists(file))  //If loading project file and audio file is no longer where it should be, or tparty process failed, keep loading/importing but skip audio. (If importing, import won't even start if trying to import with non-empty incorrect audio path.)
+			if (!File.Exists(file))  //If loading project file, and audio file is no longer where it should be, or tparty process failed, keep loading/importing but skip audio. (If importing, import won't even start if trying to import with non-empty incorrect audio path.)
 				return;
 
 			if (!Media.openAudioFile(file))

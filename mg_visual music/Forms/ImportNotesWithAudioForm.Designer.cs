@@ -33,7 +33,7 @@
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.tpartyAppTb = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
-			this.tpartyAudioTb = new System.Windows.Forms.TextBox();
+			this.tpartyOutputTb = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.tPartyMixdownPnl = new System.Windows.Forms.Panel();
 			this.tpartyArgsTb = new System.Windows.Forms.TextBox();
@@ -125,10 +125,10 @@
 			// 
 			// tpartyAudioTb
 			// 
-			this.tpartyAudioTb.Location = new System.Drawing.Point(85, 51);
-			this.tpartyAudioTb.Name = "tpartyAudioTb";
-			this.tpartyAudioTb.Size = new System.Drawing.Size(249, 20);
-			this.tpartyAudioTb.TabIndex = 9;
+			this.tpartyOutputTb.Location = new System.Drawing.Point(85, 51);
+			this.tpartyOutputTb.Name = "tpartyAudioTb";
+			this.tpartyOutputTb.Size = new System.Drawing.Size(249, 20);
+			this.tpartyOutputTb.TabIndex = 9;
 			// 
 			// label4
 			// 
@@ -147,7 +147,7 @@
 			this.tPartyMixdownPnl.Controls.Add(this.browseTpartyExeBtn);
 			this.tPartyMixdownPnl.Controls.Add(this.tpartyAppTb);
 			this.tPartyMixdownPnl.Controls.Add(this.label3);
-			this.tPartyMixdownPnl.Controls.Add(this.tpartyAudioTb);
+			this.tPartyMixdownPnl.Controls.Add(this.tpartyOutputTb);
 			this.tPartyMixdownPnl.Controls.Add(this.label4);
 			this.tPartyMixdownPnl.Location = new System.Drawing.Point(15, 128);
 			this.tPartyMixdownPnl.Name = "tPartyMixdownPnl";
@@ -240,7 +240,7 @@
         protected System.Windows.Forms.RadioButton existingAudioRbtn;
         protected System.Windows.Forms.RadioButton thirdPartyMixdownRbtn;
 		public System.Windows.Forms.TextBox tpartyAppTb;
-		public System.Windows.Forms.TextBox tpartyAudioTb;
+		public System.Windows.Forms.TextBox tpartyOutputTb;
 		public System.Windows.Forms.TextBox tpartyArgsTb;
 	}
 }
