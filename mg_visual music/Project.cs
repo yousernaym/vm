@@ -131,8 +131,9 @@ namespace Visual_Music
 			return importSong(ImportOptions);
 		}
 
-		public Project(SerializationInfo info, StreamingContext ctxt) : base()
+		public Project(SerializationInfo info, StreamingContext ctxt)
 		{
+			Props = new ProjProps();
 			foreach (SerializationEntry entry in info)
 			{
 				if (entry.Name == "version")
@@ -157,7 +158,9 @@ namespace Visual_Music
 					Props = (ProjProps)entry.Value;
 					Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 				}
+				Props.readOldProjectFile(entry);
 			}
+			Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
