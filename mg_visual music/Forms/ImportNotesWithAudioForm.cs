@@ -63,9 +63,6 @@ namespace Visual_Music
 
         new protected void importFiles(ImportOptions options)
         {
-			if (!options.checkNoteFile())
-				return;
-
 			if (existingAudioRbtn.Checked)
             {   //No user-specified command line
 				if (!String.IsNullOrWhiteSpace(options.AudioPath))
@@ -121,13 +118,10 @@ namespace Visual_Music
 			}
 			catch (Exception e)
 			{
-				Form1.showErrorMsgBox(e.Message, "Couldn't create audio file" + processName);
+				Form1.showWarningMsgBox(e.Message, $"An unexpected error occurred with process: {tpartyProcess.StartInfo.FileName}");
 				return null;
 			}
-			finally
-			{
-				//tpartyProcess.Dispose();
-			}
+		
 			return tpartyOutputFile;
 		}
 		
@@ -135,13 +129,13 @@ namespace Visual_Music
         {
 			if (!Directory.Exists(options.MixdownOutputDir))
 			{
-				MessageBox.Show("Couldn't find directory: \n" + options.MixdownOutputDir, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Form1.showWarningMsgBox("Couldn't find mixdown directory: \n" + options.MixdownOutputDir);
 				return false;
 			}
 			try { watcher.Path = options.MixdownOutputDir; }
 			catch (System.ArgumentException e)
 			{
-				MessageBox.Show(e.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Form1.showWarningMsgBox(e.Message);
 				return false;
 			}
 			
@@ -188,15 +182,6 @@ namespace Visual_Music
 			{
 				tpartyProcess.Kill();
 			}
-		}
-
-		private void runTpartyBtn_Click(object sender, EventArgs e)
-		{
-			//if (!checkNoteFile())
-				//return;
-//			createTpartyProcess(tpartyAppTb.Text,
-	//				   tpartyArgsTb.Text.Replace("%notefilepath", "\"" + noteFilePath.Text + "\""));
-
 		}
 	}
 }

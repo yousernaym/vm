@@ -109,24 +109,26 @@ namespace Visual_Music
 
 		protected void importFiles(ImportOptions options)
         {
-			if (!options.checkNoteFile())
-				return;
-			if (options.MixdownType == Midi.MixdownType.None && !string.IsNullOrWhiteSpace(options.AudioPath) && !File.Exists(options.AudioPath))
+			if (options.MixdownType == Midi.MixdownType.None && !string.IsNullOrWhiteSpace(options.AudioPath))
 			{
-				Form1.showErrorMsgBox("Couldn't find audio file.");
-				return;
-			}
-			try
-			{
-				if (!parent.openSourceFiles(options))
+				//Audio file was specified. Make sure the path is correct and the file is a valid audio file, otherwise aort import and let user try again.
+				if (!File.Exists(options.AudioPath))
+				{
+					//Audio file not found
+					Form1.showErrorMsgBox("Couldn't find audio file: " + options.AudioPath);
 					return;
-				DialogResult = DialogResult.OK;
-				Hide();
+				}
+				if (!Media.openAudioFile(options.AudioPath))
+				{
+					//Not a valid audio file
+					Form1.showErrorMsgBox("Couldn't open audio file: " + options.AudioPath);
+					return;
+				}
 			}
-			catch (FileFormatException ex)
-			{
-				Form1.showErrorMsgBox(ex.Message);
-			}
+			if (!parent.openSourceFiles(options))
+				return;
+			DialogResult = DialogResult.OK;
+			Hide();
 		}
 
 		private void SourceFileForm_VisibleChanged(object sender, EventArgs e)
@@ -291,15 +293,14 @@ namespace Visual_Music
 
 		public bool checkNoteFile()
 		{
-			return true;
+			string error = null;
 			if (string.IsNullOrWhiteSpace(NotePath))
-			{
-				MessageBox.Show("Note file path required.");
-				return false;
-			}
+				error = "Note file path missing.";
 			else if (!File.Exists(NotePath))
+				error = "Note file missing: " + NotePath;
+			if (error != null)
 			{
-				MessageBox.Show("Note file not found.");
+				Form1.showErrorMsgBox(error);
 				return false;
 			}
 			return true;
