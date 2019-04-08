@@ -80,29 +80,30 @@ namespace Visual_Music
 			info.AddValue("userViewWidth", UserViewWidth);
 		}
 
-		internal void readOldProjectFile(SerializationEntry entry)
-		{
-			if (entry.Name == "qn_viewWidth")
-				ViewWidthQn = (float)entry.Value;
-			else if (entry.Name == "audioOffset")
-				AudioOffset = (double)entry.Value;
-			else if (entry.Name == "playbackOffsetS")
-				playbackOffsetS = (float)entry.Value;
-			else if (entry.Name == "fadeIn")
-				FadeIn = (float)entry.Value;
-			else if (entry.Name == "fadeOut")
-				FadeOut = (float)entry.Value;
-			else if (entry.Name == "maxPitch")
-				MaxPitch = (int)entry.Value;
-			else if (entry.Name == "minPitch")
-				MinPitch = (int)entry.Value;
-			else if (entry.Name == "lyrics")
-				LyricsSegments = (BindingList<LyricsSegment>)entry.Value;
-			else if (entry.Name == "camera")
-				Camera = (Camera)entry.Value;
-			else if (entry.Name == "userViewWidth")
-				UserViewWidth = (float)entry.Value;
-		}
+		//internal void readOldProjectFile(SerializationEntry entry)
+		//{
+		//	if (entry.Name == "qn_viewWidth")
+		//		ViewWidthQn = (float)entry.Value;
+		//	else if (entry.Name == "audioOffset")
+		//		AudioOffset = (double)entry.Value;
+		//	else if (entry.Name == "playbackOffsetS")
+		//		playbackOffsetS = (float)entry.Value;
+		//	else if (entry.Name == "fadeIn")
+		//		FadeIn = (float)entry.Value;
+		//	else if (entry.Name == "fadeOut")
+		//		FadeOut = (float)entry.Value;
+		//	else if (entry.Name == "maxPitch")
+		//		MaxPitch = (int)entry.Value;
+		//	else if (entry.Name == "minPitch")
+		//		MinPitch = (int)entry.Value;
+		//	else if (entry.Name == "lyrics")
+		//		LyricsSegments = (BindingList<LyricsSegment>)entry.Value;
+		//	else if (entry.Name == "camera")
+		//		Camera = (Camera)entry.Value;
+		//	else if (entry.Name == "userViewWidth")
+		//		UserViewWidth = (float)entry.Value;
+		//}
+
 		//public ProjProps clone()
 		//{
 		//	var dest = Cloning.clone(this);
