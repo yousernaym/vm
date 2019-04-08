@@ -94,8 +94,9 @@ namespace Visual_Music
 		NoteStyleControl currentNoteStyleControl;
 		int keyFrameLockRow = -1;
 		bool unsavedChanges = false;
+        bool viewWidthQnChangedWithCtrl = false;
 
-		[DllImport("user32.dll")]
+        [DllImport("user32.dll")]
 		static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
 
 		public Form1(string[] args)
@@ -471,7 +472,8 @@ namespace Visual_Music
 
 			if (ModifierKeys.HasFlag(Keys.Control)) //Change view width
 			{
-				upDownVpWidth.Value *= (float)Math.Pow(1.1, -delta);
+                viewWidthQnChangedWithCtrl = true;
+                upDownVpWidth.Value *= (float)Math.Pow(1.1, -delta);
 			}
 			else //scroll
 			{
@@ -534,7 +536,7 @@ namespace Visual_Music
 					Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
 				}
 			}
-			else if (e.KeyCode == Keys.ControlKey)
+			else if (e.KeyCode == Keys.ControlKey && viewWidthQnChangedWithCtrl)
 			{
 				commitViewWidthQnChange();
 			}
