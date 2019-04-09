@@ -210,11 +210,11 @@ namespace Visual_Music
 				//Create frustum
 				BoundingFrustum selectionFrustum = new BoundingFrustum(selectionFrustumMat);
 
-				float songPos = ((float)Project.SongPosT / Project.ViewWidthT + 0.5f) * Project.Props.Camera.ViewportSize.X - Project.Props.Camera.ViewportSize.X / 2.0f;
+				//float songPos = ((float)Project.SongPosT / Project.ViewWidthT + 0.5f) * Project.Props.Camera.ViewportSize.X - Project.Props.Camera.ViewportSize.X / 2.0f;
 				for (int i = 1; i < Project.TrackViews.Count; i++)
 				{
 					if (Project.TrackViews[i].MidiTrack.Notes.Count > 0 &&
-						Project.TrackViews[i].OcTree.areObjectsInFrustum(selectionFrustum, songPos, Project, Project.TrackViews[i].TrackProps))
+						Project.TrackViews[i].OcTree.areObjectsInFrustum(selectionFrustum, Project.SongPosP - Project.PlaybackOffsetP, Project, Project.TrackViews[i].TrackProps))
 					{
 						((Form1)Parent).trackListItems[i].Selected = true;
 						selectedCount++; ;
