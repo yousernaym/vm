@@ -221,24 +221,27 @@ namespace Visual_Music
 		{
 			foreach (var entry in info)
 			{
-				if (entry.Name == "path")
-					Path = (string)entry.Value;
-				else if (entry.Name == "disableTexture")
-					DisableTexture = (bool)entry.Value;
-				else if (entry.Name == "pointSmp")
-					PointSmp = (bool)entry.Value;
-				else if (entry.Name == "texColBlend")
-					TexColBlend = (bool)entry.Value;
-				else if (entry.Name == "keepAspect")
-					keepAspect = (bool)entry.Value;
-				else if (entry.Name == "uTile")
-					uTile = (bool)entry.Value;
-				else if (entry.Name == "vTile")
-					vTile = (bool)entry.Value;
-				else if (entry.Name == "anchor")
-					Anchor = (Point)entry.Value;
-				else if (entry.Name == "scroll")
-					Scroll = (Vector2)entry.Value;
+                if (entry.Name == "path")
+                {
+                    Path = (string)entry.Value;
+                    loadContent();
+                }
+                else if (entry.Name == "disableTexture")
+                    DisableTexture = (bool)entry.Value;
+                else if (entry.Name == "pointSmp")
+                    PointSmp = (bool)entry.Value;
+                else if (entry.Name == "texColBlend")
+                    TexColBlend = (bool)entry.Value;
+                else if (entry.Name == "keepAspect")
+                    keepAspect = (bool)entry.Value;
+                else if (entry.Name == "uTile")
+                    uTile = (bool)entry.Value;
+                else if (entry.Name == "vTile")
+                    vTile = (bool)entry.Value;
+                else if (entry.Name == "anchor")
+                    Anchor = (Point)entry.Value;
+                else if (entry.Name == "scroll")
+                    Scroll = (Vector2)entry.Value;
 			}
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
