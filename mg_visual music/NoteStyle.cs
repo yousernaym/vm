@@ -472,8 +472,7 @@ namespace Visual_Music
 			}
 			else //Anchor at song start. Can only be true for U
 			{
-				//float songPos = Project.getSongPosP((float)notePos + posOffset);
-				float x = Project.getScreenPosX(Project.SongPosT) + notePos + posOffset;
+				float x = Project.SongPosP + notePos + posOffset;
 				if (!tile)
 					return x / Project.SongLengthP;
 				else

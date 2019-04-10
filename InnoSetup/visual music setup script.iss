@@ -42,7 +42,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
-Name: "docsFolder"; Description: "Create user documents subfolder"
+Name: "docsFolder"; Description: "Create subfolder in user's Documents folder"
 ;Name: "associateVms"; Description: "Associate with .vms files";
 ;Name: "associateMod"; Description: "Associate with module files";
 ;Name: "associateMod\mod"; Description: ".mod";

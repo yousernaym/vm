@@ -80,7 +80,6 @@ namespace Visual_Music
 
 			float halfNoteHeight = Project.Props.NoteHeight / 2;
 			int instanceIndex = 0;
-			double songPosP = Project.SongPosP;
 			
 			for (int n = 0; n < noteList.Count; n++)
 			{
