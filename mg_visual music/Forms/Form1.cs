@@ -70,8 +70,6 @@ namespace Visual_Music
 
 		TrackProps mergedTrackProps;
 		const string trackPropsBtnText = "&Track Properties";
-		string foldersFileName = Program.Dir + "\\folders";
-		//SourceFileForm sourceFileForm;
 		public static ImportMidiForm ImportMidiForm;
 		public static ImportModForm ImportModForm;
 		public static ImportSidForm ImportSidForm;
@@ -95,8 +93,9 @@ namespace Visual_Music
 		int keyFrameLockRow = -1;
 		bool unsavedChanges = false;
         bool viewWidthQnChangedWithCtrl = false;
+		bool textBoxEdited = false;
 
-        [DllImport("user32.dll")]
+		[DllImport("user32.dll")]
 		static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
 
 		public Form1(string[] args)
@@ -281,7 +280,16 @@ namespace Visual_Music
 				if (control.GetType() == typeof(TextBox))
 				{
 					((TextBox)control).TextChanged += invalidateSongPanel;
+					((TextBox)control).TextChanged += delegate 
+					{
+						if (!updatingControls)
+							textBoxEdited = true;
+					};
 					((TextBox)control).Validated += addUndoItem;
+				}
+				else if (control.GetType() == typeof(TrackBar))
+				{
+					control.Validated += addUndoItem;
 				}
 				else if (control.GetType() == typeof(NumericUpDown))
 				{
@@ -1312,6 +1320,16 @@ namespace Visual_Music
 
 		private void addUndoItem(object sender, EventArgs e)
 		{
+			if (sender is TextBox)
+			{
+				if (!textBoxEdited)
+				{
+					textBoxEdited = false;
+					return;
+				}
+				textBoxEdited = false;
+			}
+
 			object tag = null;
 			if (sender is Control)
 				tag = ((Control)sender).Tag;
