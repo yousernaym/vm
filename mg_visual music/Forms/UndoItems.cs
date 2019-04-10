@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Visual_Music
 {
@@ -50,6 +51,11 @@ namespace Visual_Music
 					items.Remove(currentItem.Next);
 				}
 			}
+		}
+
+		void replaceLast(string desc, Project project)
+		{
+			
 		}
 
 		public static UndoItems operator++(UndoItems obj)

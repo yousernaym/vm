@@ -94,6 +94,7 @@ namespace Visual_Music
 		bool unsavedChanges = false;
         bool viewWidthQnChangedWithCtrl = false;
 		bool textBoxEdited = false;
+		bool focusChanged = false;
 
 		[DllImport("user32.dll")]
 		static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
@@ -264,6 +265,7 @@ namespace Visual_Music
 				if (item is ToolStripMenuItem)
 				{
 					ToolStripMenuItem menuItem = (ToolStripMenuItem)item;
+					menuItem.Click += onFocusChanged;
 					menuItem.Click += addUndoItem;
 					menuItem.Click += invalidateSongPanel;
 					addMenuItemEventHandlers(menuItem.DropDownItems);
@@ -277,15 +279,11 @@ namespace Visual_Music
 			{
 				if (control.ContextMenuStrip != null)
 					addMenuItemEventHandlers(control.ContextMenuStrip.Items);
+				control.LostFocus += onFocusChanged;
 				if (control.GetType() == typeof(TextBox))
 				{
 					((TextBox)control).TextChanged += invalidateSongPanel;
-					((TextBox)control).TextChanged += delegate 
-					{
-						if (!updatingControls)
-							textBoxEdited = true;
-					};
-					((TextBox)control).Validated += addUndoItem;
+					((TextBox)control).TextChanged += addUndoItem;
 				}
 				else if (control.GetType() == typeof(TrackBar))
 				{
@@ -336,6 +334,11 @@ namespace Visual_Music
 				else
 					control.Click += invalidateSongPanel;
 			}
+		}
+
+		private void onFocusChanged(object sender, EventArgs e)
+		{
+			focusChanged = true;
 		}
 
 		private void importMidiSongToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1320,16 +1323,6 @@ namespace Visual_Music
 
 		private void addUndoItem(object sender, EventArgs e)
 		{
-			if (sender is TextBox)
-			{
-				if (!textBoxEdited)
-				{
-					textBoxEdited = false;
-					return;
-				}
-				textBoxEdited = false;
-			}
-
 			object tag = null;
 			if (sender is Control)
 				tag = ((Control)sender).Tag;
@@ -1340,6 +1333,8 @@ namespace Visual_Music
 			string desc = tag.ToString();
 			if (string.IsNullOrEmpty(desc))
 				return;
+
+			
 
 			if (sender.GetType() == typeof(CheckBox))
 			{
@@ -1354,7 +1349,13 @@ namespace Visual_Music
 			if (updatingControls)
 				return;
 
+			if (!focusChanged)
+				undoItems--;
 			undoItems.add(desc, Project);
+			//else
+				//.replaceLast(desc, Project);
+			focusChanged = false;
+
 			undoToolStripMenuItem.Enabled = true;
 			redoToolStripMenuItem.Enabled = false;
 			updateUndoRedoDesc();
