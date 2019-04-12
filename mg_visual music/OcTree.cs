@@ -8,7 +8,7 @@ namespace Visual_Music
 	public class OcTree<Geo> where Geo : Visual_Music.Geo
 	{
 		int refCOunt = 0;
-		protected OcTree<Geo>[] _nodes;
+		protected OcTree<Geo>[] _nodes = null;
 		protected bool _isEmpty = true;
 		protected BoundingBox _bbox;
 		protected List<BoundingBox> _objects = new List<BoundingBox>();
@@ -36,7 +36,8 @@ namespace Visual_Music
 				return;
 
 			#region Create sub-nodes
-			 _nodes = new OcTree<Geo>[8];
+			/*
+			_nodes = new OcTree<Geo>[8];
 			Vector3 subNodeSize;
 			subNodeSize.X = size.X > minSize.X ? size.X / 2 : size.X;
 			subNodeSize.Y = size.Y > minSize.Y ? size.Y / 2 : size.Y;
@@ -60,6 +61,7 @@ namespace Visual_Music
 					break;
 				minPos.Z += subNodeSize.Z;
 			}
+			*/
 			#endregion
 		}
 
