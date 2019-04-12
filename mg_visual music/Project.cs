@@ -853,8 +853,8 @@ namespace Visual_Music
 			}
 			
 			dest.notes = notes;
-			dest.Props = Props.clone();
-			dest.vertViewWidthQn = Props.ViewWidthQn;
+			//dest.Props = Props.clone();
+			dest.vertViewWidthQn = vertViewWidthQn;
 			dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
 			dest.Props.OnPlaybackOffsetSChanged();
 			return dest;
