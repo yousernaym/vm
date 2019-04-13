@@ -150,7 +150,7 @@ namespace Visual_Music
 						tv.TrackProps.GlobalProps = TrackViews[0].TrackProps;
 					}
 				}
-			
+
 				else if (entry.Name == "keyFrames")
 					KeyFrames = (KeyFrames)entry.Value;
 				else if (entry.Name == "props")
@@ -158,6 +158,8 @@ namespace Visual_Music
 					Props = (ProjProps)entry.Value;
 					Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 				}
+				else if (entry.Name == "vertWidthQn")
+					vertViewWidthQn = (float)entry.Value;
 			}
 			//Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 		}
@@ -169,7 +171,7 @@ namespace Visual_Music
 			info.AddValue("trackViews", trackViews);
 			info.AddValue("keyFrames", KeyFrames);
 			info.AddValue("props", Props);
-
+			info.AddValue("vertWidthQn", vertViewWidthQn);
 		}
 
 		public bool importSong(ImportOptions options)
@@ -236,7 +238,10 @@ namespace Visual_Music
 
 			ImportOptions = options;
 			if (options.EraseCurrent)
+			{
 				DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + DefaultFileExt;
+				Props.ViewWidthQn = vertViewWidthQn = ProjProps.DefaultViewWidthQn;
+			}
 			createTrackViews(notes.Tracks.Count, options.EraseCurrent);
 			return true;
 		}
@@ -385,7 +390,7 @@ namespace Visual_Music
 					tvCopy.Add(trackViews[i]);
 			}
 			trackViews = tvCopy;
-			createOcTrees();
+			createOcTrees(false);
 		}
 
 		private void addTrackView(TrackView view)
@@ -394,13 +399,18 @@ namespace Visual_Music
 			view.TrackProps.GlobalProps = TrackViews[0].TrackProps;
 		}
 
-		public void createOcTrees()
+		public void createOcTrees(bool resetVertScale = true)
 		{
 			if (trackViews == null || Props.ViewWidthQn == 0 || Notes == null)
 				return;
-			vertViewWidthQn = Props.ViewWidthQn;
+			float viewWidthQnBackup = Props.ViewWidthQn;
+			if (resetVertScale)
+				vertViewWidthQn = Props.ViewWidthQn;
+			else
+				Props.ViewWidthQn = vertViewWidthQn;
 			for (int i = 1; i < trackViews.Count; i++)
 				TrackViews[i].createOcTree(this, GlobalTrackProps);
+			Props.ViewWidthQn = viewWidthQnBackup;
 		}
 
 		public void drawSong()
@@ -854,7 +864,7 @@ namespace Visual_Music
 			
 			dest.notes = notes;
 			//dest.Props = Props.clone();
-			dest.vertViewWidthQn = vertViewWidthQn;
+			//dest.vertViewWidthQn = vertViewWidthQn;
 			dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
 			dest.Props.OnPlaybackOffsetSChanged();
 			return dest;

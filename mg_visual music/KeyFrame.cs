@@ -157,7 +157,6 @@ namespace Visual_Music
 	[Serializable]
 	public class KeyFrame : ISerializable
 	{
-		public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen with default camera
 		public string Desc;
 		public bool Selected;
 		public Camera Camera;
@@ -165,7 +164,7 @@ namespace Visual_Music
 
 		public KeyFrame()
 		{
-			ViewWidthQn = DefaultViewWidthQn;
+			ViewWidthQn = ProjProps.DefaultViewWidthQn;
 			Camera = new Camera();
 		}
 

@@ -7,6 +7,7 @@ namespace Visual_Music
 	[Serializable]
 	public class ProjProps : ISerializable
 	{
+		public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen with default camera
 		public BindingList<LyricsSegment> LyricsSegments { get; private set; } = new BindingList<LyricsSegment>();
 		public float ViewWidthQn { get; set; }
 		
