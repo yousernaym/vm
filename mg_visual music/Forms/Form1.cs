@@ -347,6 +347,7 @@ namespace Visual_Music
 			if (ImportMidiForm.ShowDialog(this) == DialogResult.OK)
 				SongPanel.Focus();
 		}
+
 		private void importModuleToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			ImportModForm.Hide();
@@ -2414,7 +2415,7 @@ namespace Visual_Music
 		private void keyFramesDGV_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
 			string str = keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value?.ToString();
-			keyFrameLockRow = e.RowIndex; //If enter was pressed, the currently selected row will change to the next row, firing the SelectionChanged event. In that event handler we can change back to the value in keyFrameLockRow.
+			keyFrameLockRow = e.RowIndex; //If enter was pressed, the currently selected row will change to the next row, firing the SelectionChanged event. In that event handler we can change back the selected row to keyFrameLockRow.
 			if (e.ColumnIndex == 0)
 			{
 				//Time column edited
@@ -2425,6 +2426,13 @@ namespace Visual_Music
 				}
 				else
 				{
+					//Check if the entered time value is bigger than the song length
+					if (time >= Project.SongLengthT)
+					{
+						time = (int)Project.SongLengthT;
+						keyFramesDGV.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = time;//.ToString();
+					}
+
 					if (time != Project.KeyFrames.Keys[e.RowIndex])
 					{
 						//A new time was entered.
@@ -2462,6 +2470,7 @@ namespace Visual_Music
 			}
 			else if (e.ColumnIndex == 1)
 			{
+				//Description column edited
 				Project.KeyFrames.Values[e.RowIndex].Desc = str;
 			}
 		}
