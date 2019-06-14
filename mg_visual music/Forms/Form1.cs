@@ -1172,14 +1172,9 @@ namespace Visual_Music
 				tempProject.loadContent();
 				Project = tempProject;
 			}
-			catch (Exception ex)
+			catch (Exception ex) when (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
 			{
-				if (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
-				{
-					showErrorMsgBox("Couldn't load song.\n" + ex.Message);
-				}
-				else
-					throw;
+				showErrorMsgBox("Couldn't load song.\n" + ex.Message);
 				SongPanel.Project = Project;
 				return;
 			}

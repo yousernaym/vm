@@ -131,9 +131,9 @@ namespace Visual_Music
 			return importSong(ImportOptions);
 		}
 
-		public Project(SerializationInfo info, StreamingContext ctxt)
+		public Project(SerializationInfo info, StreamingContext ctxt) : this()
 		{
-			Props = new ProjProps();
+		//	Props = new ProjProps();
 			foreach (SerializationEntry entry in info)
 			{
 				if (entry.Name == "version")
@@ -160,8 +160,29 @@ namespace Visual_Music
 				}
 				else if (entry.Name == "vertWidthQn")
 					vertViewWidthQn = (float)entry.Value;
+
+				//Compatibility
+				else if (entry.Name == "qn_viewWidth")
+				{
+					Props.ViewWidthQn = (float)entry.Value;
+					vertViewWidthQn = Props.ViewWidthQn;
+				}
+				else if (entry.Name == "audioOffset")
+					Props.AudioOffset = (double)entry.Value;
+				else if (entry.Name == "fadeIn")
+					Props.FadeIn = (float)entry.Value;
+				else if (entry.Name == "fadeOut")
+					Props.FadeOut = (float)entry.Value;
+				else if (entry.Name == "maxPitch")
+					Props.MaxPitch = (int)entry.Value;
+				else if (entry.Name == "minPitch")
+					Props.MinPitch = (int)entry.Value;
+				else if (entry.Name == "camera")
+					KeyFrames[0].Camera = (Camera)entry.Value;
+				else if (entry.Name == "userViewWidth")
+					Props.UserViewWidth = (float)entry.Value;
+				Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 			}
-			//Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -903,7 +924,7 @@ namespace Visual_Music
 			Time = time;
 		}
 
-		public LyricsSegment(SerializationInfo info, StreamingContext ctxt) : base()
+		public LyricsSegment(SerializationInfo info, StreamingContext ctxt)
 		{
 			foreach (SerializationEntry entry in info)
 			{
