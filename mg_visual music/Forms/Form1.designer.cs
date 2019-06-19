@@ -329,7 +329,7 @@
 			// 
 			this.importMidiToolStripMenuItem.Name = "importMidiToolStripMenuItem";
 			this.importMidiToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
-			this.importMidiToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.importMidiToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
 			this.importMidiToolStripMenuItem.Text = "Import midi song...";
 			this.importMidiToolStripMenuItem.Click += new System.EventHandler(this.importMidiSongToolStripMenuItem_Click);
 			// 
@@ -338,7 +338,7 @@
 			this.importModuleToolStripMenuItem.Name = "importModuleToolStripMenuItem";
 			this.importModuleToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.M)));
-			this.importModuleToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.importModuleToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
 			this.importModuleToolStripMenuItem.Text = "Import module...";
 			this.importModuleToolStripMenuItem.Click += new System.EventHandler(this.importModuleToolStripMenuItem_Click);
 			// 
@@ -347,7 +347,7 @@
 			this.importSidSongToolStripMenuItem.Name = "importSidSongToolStripMenuItem";
 			this.importSidSongToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-			this.importSidSongToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.importSidSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
 			this.importSidSongToolStripMenuItem.Text = "Import sid song...";
 			this.importSidSongToolStripMenuItem.Click += new System.EventHandler(this.importSidSongToolStripMenuItem_Click);
 			// 
@@ -355,7 +355,7 @@
 			// 
 			this.openSongToolStripMenuItem.Name = "openSongToolStripMenuItem";
 			this.openSongToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-			this.openSongToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.openSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
 			this.openSongToolStripMenuItem.Text = "Open project...";
 			this.openSongToolStripMenuItem.Click += new System.EventHandler(this.openSongToolStripMenuItem_Click);
 			// 
@@ -364,7 +364,7 @@
 			this.saveSongToolStripMenuItem.Enabled = false;
 			this.saveSongToolStripMenuItem.Name = "saveSongToolStripMenuItem";
 			this.saveSongToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-			this.saveSongToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.saveSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
 			this.saveSongToolStripMenuItem.Text = "Save project";
 			this.saveSongToolStripMenuItem.Click += new System.EventHandler(this.saveSongToolStripMenuItem_Click);
 			// 
@@ -374,7 +374,7 @@
 			this.saveSongAsToolStripMenuItem.Name = "saveSongAsToolStripMenuItem";
 			this.saveSongAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-			this.saveSongAsToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.saveSongAsToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
 			this.saveSongAsToolStripMenuItem.Text = "Save project as...";
 			this.saveSongAsToolStripMenuItem.Click += new System.EventHandler(this.saveSongAsToolStripMenuItem_Click);
 			// 
@@ -383,7 +383,7 @@
 			this.exportVideoToolStripMenuItem.Enabled = false;
 			this.exportVideoToolStripMenuItem.Name = "exportVideoToolStripMenuItem";
 			this.exportVideoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
-			this.exportVideoToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.exportVideoToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
 			this.exportVideoToolStripMenuItem.Text = "Export video...";
 			this.exportVideoToolStripMenuItem.Click += new System.EventHandler(this.exportVideoToolStripMenuItem_Click);
 			// 
@@ -391,7 +391,7 @@
 			// 
 			this.tpartyToolStripMenuItem.Name = "tpartyToolStripMenuItem";
 			this.tpartyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
-			this.tpartyToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.tpartyToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
 			this.tpartyToolStripMenuItem.Text = "Third-party integration...";
 			this.tpartyToolStripMenuItem.Click += new System.EventHandler(this.tpartyToolStripMenuItem_Click);
 			// 
@@ -404,7 +404,7 @@
             this.actionsToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(941, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(975, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -688,7 +688,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(546, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(580, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 22045);
 			this.trackPropsPanel.TabIndex = 3;
@@ -1940,7 +1940,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-10930, 21998);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-10947, 21998);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -1952,7 +1952,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-11042, 21999);
+			this.texPathTb.Location = new System.Drawing.Point(-11059, 21999);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -1962,7 +1962,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-11044, 21983);
+			this.label4.Location = new System.Drawing.Point(-11061, 21983);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2245,6 +2245,7 @@
 			// saveMixdownDialog
 			// 
 			this.saveMixdownDialog.Filter = "Wav files (*.wav)|*.wav|All files (*.*)|*.*";
+			this.saveMixdownDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.SaveMixdownDialog_FileOk);
 			// 
 			// colorDialog1
 			// 
@@ -2288,7 +2289,7 @@
 			this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.lyricsGridView.Location = new System.Drawing.Point(197, 22019);
 			this.lyricsGridView.Name = "lyricsGridView";
-			this.lyricsGridView.Size = new System.Drawing.Size(349, 50);
+			this.lyricsGridView.Size = new System.Drawing.Size(383, 50);
 			this.lyricsGridView.TabIndex = 0;
 			this.lyricsGridView.Tag = "Edit Lyrics";
 			this.lyricsGridView.Visible = false;
@@ -2545,7 +2546,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(958, 378);
+			this.ClientSize = new System.Drawing.Size(992, 378);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.keyFramesDGV);

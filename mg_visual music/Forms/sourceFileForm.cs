@@ -295,13 +295,13 @@ namespace Visual_Music
 		{
 			string error = null;
 			if (string.IsNullOrWhiteSpace(NotePath))
-				error = "Note file path missing.";
+				error = "Note file path is empty.";
 			else if (!File.Exists(NotePath))
 				error = "Note file missing: " + NotePath;
 			if (error != null)
 			{
-				Form1.showErrorMsgBox(error);
-				return false;
+				//Form1.showErrorMsgBox(error);
+				throw new FileNotFoundException(error);
 			}
 			return true;
 		}

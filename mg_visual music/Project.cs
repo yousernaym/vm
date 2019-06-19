@@ -199,7 +199,7 @@ namespace Visual_Music
 		{ //<Open project> and <import files> meet here
 			if (!options.checkNoteFile())
 				return false;
-			
+
 			Media.closeAudioFile();
 
 			//Convert mod/sid files to mid/wav
@@ -284,7 +284,6 @@ namespace Visual_Music
 				throw new FileFormatException(new Uri(options.RawNotePath), "No notes found.");
 
 			notes = newNotes;
-			Debug.Assert(notes != null);
 			notes.createNoteBsp();
 
 			if (options.EraseCurrent)
@@ -701,8 +700,8 @@ namespace Visual_Music
 			//bAudioPlayback = !bAudioPlayback;
 			if (!IsPlaying)
 			{
-				if (!Media.pausePlayback())
-					MessageBox.Show("An error occured while pausing playback.");
+				Media.pausePlayback();
+				//MessageBox.Show("An error occured while pausing playback.");
 			}
 			else
 			{
@@ -710,8 +709,8 @@ namespace Visual_Music
 				double startTime = songPosS - Props.AudioOffset - Props.PlaybackOffsetS;
 				if (startTime >= 0)
 				{
-					if (!Media.startPlaybackAtTime(startTime))
-						MessageBox.Show("An error occured while starting playback.");
+					Media.startPlaybackAtTime(startTime);
+						//MessageBox.Show("An error occured while starting playback.");
 					if (!Media.playbackIsRunning()) //Assuming this is because we tried to start playback after end of audio
 						IsPlaying = false;
 					else
@@ -736,8 +735,8 @@ namespace Visual_Music
 		{
 			IsPlaying = false;
 			//			bAudioPlayback = false;
-			if (!Media.stopPlayback())
-				MessageBox.Show("An error occured while stopping playback.");
+			Media.stopPlayback();
+			// MessageBox.Show("An error occured while stopping playback.");
 			NormSongPos = 0;
 		}
 

@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Visual_Music
 {
@@ -93,7 +94,6 @@ namespace Visual_Music
 		int keyFrameLockRow = -1;
 		bool unsavedChanges = false;
         bool viewWidthQnChangedWithCtrl = false;
-		bool textBoxEdited = false;
 		bool focusChanged = false;
 
 		[DllImport("user32.dll")]
@@ -364,6 +364,7 @@ namespace Visual_Music
 				trackPropsCb.Checked = false;
 				songPropsCb.Checked = false;
 			}
+
 			saveSongToolStripMenuItem.Enabled = loaded;
 			saveSongAsToolStripMenuItem.Enabled = loaded;
 			exportVideoToolStripMenuItem.Enabled = loaded;
@@ -375,6 +376,7 @@ namespace Visual_Music
 			loadTrackPropsToolStripMenuItem.Enabled = loaded;
 			saveTrackPropsToolStripMenuItem.Enabled = loaded;
 			insertKeyFrameToolStripMenuItem.Enabled = loaded;
+
 			//if (loaded)
 			//{
 			createTrackList();
@@ -917,6 +919,7 @@ namespace Visual_Music
 			}
 			updatingControls = false;
 		}
+
 		void updateTrackListColors()
 		{
 			trackList.BeginUpdate();
@@ -1169,7 +1172,8 @@ namespace Visual_Music
 					tempProject = (Project)dcs.ReadObject(stream);
 				}
 				SongPanel.Project = tempProject;
-				tempProject.loadContent();
+				bool loadSucceeded = tempProject.loadContent();
+				Debug.Assert(loadSucceeded);
 				Project = tempProject;
 			}
 			catch (Exception ex) when (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
@@ -1191,6 +1195,7 @@ namespace Visual_Music
 			updateFormTitle(currentProjPath);
 			Project.DefaultFileName = Path.GetFileName(currentProjPath);
 			unsavedChanges = false;
+
 		}
 
 		void updateFormTitle(string path)
@@ -1239,9 +1244,9 @@ namespace Visual_Music
 
 			//Save audio mixdown
 			saveMixdownDialog.FileName = Path.ChangeExtension(saveProjDialog.FileName, "wav");
+
 			if (Project.ImportOptions.MixdownType != Midi.MixdownType.None && saveMixdownDialog.ShowDialog() == DialogResult.OK)
 			{
-				File.Copy(Media.getAudioFilePath(), saveMixdownDialog.FileName, true);
 				Project.ImportOptions.MixdownType = Midi.MixdownType.None;
 				Project.ImportOptions.AudioPath = saveMixdownDialog.FileName;
 				Project.ImportOptions.updateImportForm(); //To update audio file path
@@ -2489,6 +2494,16 @@ namespace Visual_Music
 			}
 			if (keyFramesDGV.CurrentRow != null)
 				Project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].Selected = true;
+		}
+
+		private void SaveMixdownDialog_FileOk(object sender, CancelEventArgs e)
+		{
+			try { File.Copy(Media.getAudioFilePath(), saveMixdownDialog.FileName, true); }
+			catch (IOException ex)
+			{
+				showErrorMsgBox(ex.Message);
+				e.Cancel = true;
+			}
 		}
 	}
 }
