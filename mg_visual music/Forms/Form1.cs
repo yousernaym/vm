@@ -1539,6 +1539,7 @@ namespace Visual_Music
 			maxPitchUd.Value = (decimal)Project.Props.MaxPitch;
 			minPitchUd.Value = (decimal)Project.Props.MinPitch;
 			updatingControls = false;
+			Project.createOcTrees();
 		}
 
 		private void defaultPitchesBtn_Click(object sender, EventArgs e)
