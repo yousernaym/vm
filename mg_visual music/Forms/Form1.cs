@@ -317,7 +317,7 @@ namespace Visual_Music
 				else if (control.GetType() == typeof(HueSatButton))
 				{
 					((HueSatButton)control).ColorChanged += invalidateSongPanel;
-					((HueSatButton)control).ColorChanged += addUndoItem;
+					((HueSatButton)control).ColorSubmitted += addUndoItem;
 				}
 				else if (control.GetType() == typeof(DataGridView))
 				{
@@ -1899,7 +1899,23 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecAmount = (float)specAmountUd.Value;
 		}
 
-		private void ambientHsBtn_ColorChanged(object sender, EventArgs e)
+		private void MasterLightAmountUD_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.MasterAmount = (float)masterLightAmountUd.Value;
+		}
+
+		private void specPowUd_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecPower = (float)specPowUd.Value;
+		}
+
+		private void ambientHsBtn_ColorChanged(object sender, ColorChangedTventArgs e)
 		{
 			if (updatingControls)
 				return;
@@ -1907,7 +1923,7 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.AmbientColor = gdiToXnaCol(ambientHsBtn.SelectedColor);
 		}
 
-		private void diffuseHsBtn_ColorChanged(object sender, EventArgs e)
+		private void diffuseHsBtn_ColorChanged(object sender, ColorChangedTventArgs e)
 		{
 			if (updatingControls)
 				return;
@@ -1915,7 +1931,7 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.DiffuseColor = gdiToXnaCol(diffuseHsBtn.SelectedColor);
 		}
 
-		private void specHsBtn_ColorChanged(object sender, EventArgs e)
+		private void specHsBtn_ColorChanged(object sender, ColorChangedTventArgs e)
 		{
 			if (updatingControls)
 				return;
@@ -1923,7 +1939,7 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecColor = gdiToXnaCol(specHsBtn.SelectedColor);
 		}
 
-		private void masterLightHsBtn_ColorChanged(object sender, EventArgs e)
+		private void masterLightHsBtn_ColorChanged(object sender, ColorChangedTventArgs e)
 		{
 			if (updatingControls)
 				return;
@@ -1931,7 +1947,6 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.MasterColor = gdiToXnaCol(masterLightHsBtn.SelectedColor);
 		}
 		
-
 		public static XnaColor gdiToXnaCol(GdiColor gdiCol)
 		{
 			return new XnaColor(gdiCol.R, gdiCol.G, gdiCol.B);
@@ -1946,22 +1961,6 @@ namespace Visual_Music
 				XnaColor c = (XnaColor)xnaCol;
 				return GdiColor.FromArgb(c.A, c.R, c.G, c.B);
 			}
-		}
-
-		private void specPowUd_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecPower = (float)specPowUd.Value;
-		}
-
-		private void MasterLightAmountUD_ValueChanged(object sender, EventArgs e)
-		{
-			if (updatingControls)
-				return;
-			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.MasterAmount = (float)masterLightAmountUd.Value;
 		}
 
 		private void upDownVpWidth_CommitChanges(object sender, EventArgs e)

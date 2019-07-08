@@ -14,7 +14,9 @@ namespace Visual_Music
 	class HueSatButton : Button
 	{
 		public delegate void ColorChangedEH(HueSatButton sender, ColorChangedTventArgs e);
-		public event ColorChangedEH ColorChanged;
+		public event EventHandler<ColorChangedTventArgs> ColorChanged;
+		public event EventHandler ColorSubmitted;
+
 		public float Hue
 		{
 			get => form.Hue;
@@ -59,6 +61,8 @@ namespace Visual_Music
 				updateColor();
 				ColorChanged?.Invoke(this, new ColorChangedTventArgs(true));
 			}
+			else
+				ColorSubmitted?.Invoke(this, new EventArgs());
 		}
 
 		private void form_SelectionChanged(object sender, EventArgs e)

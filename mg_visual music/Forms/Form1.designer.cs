@@ -406,7 +406,7 @@
             this.actionsToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(992, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1043, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -690,7 +690,7 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(597, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(648, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
 			this.trackPropsPanel.Size = new System.Drawing.Size(395, 22045);
 			this.trackPropsPanel.TabIndex = 3;
@@ -1660,7 +1660,7 @@
 			this.masterLightHsBtn.TabIndex = 59;
 			this.masterLightHsBtn.Tag = "Edit Master color";
 			this.masterLightHsBtn.UseVisualStyleBackColor = true;
-			this.masterLightHsBtn.ColorChanged += new System.EventHandler(this.masterLightHsBtn_ColorChanged);
+			this.masterLightHsBtn.ColorChanged += new System.EventHandler<Visual_Music.ColorChangedTventArgs>(this.masterLightHsBtn_ColorChanged);
 			// 
 			// specHsBtn
 			// 
@@ -1674,7 +1674,7 @@
 			this.specHsBtn.TabIndex = 59;
 			this.specHsBtn.Tag = "Edit Specular color";
 			this.specHsBtn.UseVisualStyleBackColor = true;
-			this.specHsBtn.ColorChanged += new System.EventHandler(this.specHsBtn_ColorChanged);
+			this.specHsBtn.ColorChanged += new System.EventHandler<Visual_Music.ColorChangedTventArgs>(this.specHsBtn_ColorChanged);
 			// 
 			// diffuseHsBtn
 			// 
@@ -1688,7 +1688,7 @@
 			this.diffuseHsBtn.TabIndex = 59;
 			this.diffuseHsBtn.Tag = "Edit Diffuse  color";
 			this.diffuseHsBtn.UseVisualStyleBackColor = true;
-			this.diffuseHsBtn.ColorChanged += new System.EventHandler(this.diffuseHsBtn_ColorChanged);
+			this.diffuseHsBtn.ColorChanged += new System.EventHandler<Visual_Music.ColorChangedTventArgs>(this.diffuseHsBtn_ColorChanged);
 			// 
 			// ambientHsBtn
 			// 
@@ -1702,7 +1702,7 @@
 			this.ambientHsBtn.TabIndex = 59;
 			this.ambientHsBtn.Tag = "Edit Ambient color";
 			this.ambientHsBtn.UseVisualStyleBackColor = true;
-			this.ambientHsBtn.ColorChanged += new System.EventHandler(this.ambientHsBtn_ColorChanged);
+			this.ambientHsBtn.ColorChanged += new System.EventHandler<Visual_Music.ColorChangedTventArgs>(this.ambientHsBtn_ColorChanged);
 			// 
 			// specPowUd
 			// 
@@ -2086,7 +2086,7 @@
 			// textureBrowseBtn
 			// 
 			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-10981, 21998);
+			this.textureBrowseBtn.Location = new System.Drawing.Point(-10998, 21998);
 			this.textureBrowseBtn.Name = "textureBrowseBtn";
 			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
 			this.textureBrowseBtn.TabIndex = 11;
@@ -2098,7 +2098,7 @@
 			// texPathTb
 			// 
 			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-11093, 21999);
+			this.texPathTb.Location = new System.Drawing.Point(-11110, 21999);
 			this.texPathTb.Name = "texPathTb";
 			this.texPathTb.Size = new System.Drawing.Size(123, 20);
 			this.texPathTb.TabIndex = 10;
@@ -2108,7 +2108,7 @@
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-11095, 21983);
+			this.label4.Location = new System.Drawing.Point(-11112, 21983);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(43, 13);
 			this.label4.TabIndex = 9;
@@ -2455,7 +2455,7 @@
 			this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.lyricsGridView.Location = new System.Drawing.Point(197, 22019);
 			this.lyricsGridView.Name = "lyricsGridView";
-			this.lyricsGridView.Size = new System.Drawing.Size(400, 50);
+			this.lyricsGridView.Size = new System.Drawing.Size(451, 50);
 			this.lyricsGridView.TabIndex = 0;
 			this.lyricsGridView.Tag = "Edit Lyrics";
 			this.lyricsGridView.Visible = false;
@@ -2577,7 +2577,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1009, 378);
+			this.ClientSize = new System.Drawing.Size(1060, 378);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.keyFramesDGV);
