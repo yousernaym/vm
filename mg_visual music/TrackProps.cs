@@ -660,7 +660,8 @@ namespace Visual_Music
 		public float? SpecAmount { get; set; }
 		public Color? SpecColor { get; set; } = Color.White;
 		public float? SpecPower { get; set; }
-		public Color? Filter { get; set; } = Color.White;
+		public float? MasterAmount { get; set; } = 1;
+		public Color? MasterColor { get; set; } = Color.White;
 
 		public LightProps(int trackNumber)
 		{
@@ -672,7 +673,8 @@ namespace Visual_Music
 			AmbientAmount = 0.2f;
 			DiffuseAmount = 2;
 			SpecAmount = 1;
-			AmbientColor = DiffuseColor = SpecColor = Filter = Color.White;
+			MasterAmount = 1;
+			AmbientColor = DiffuseColor = SpecColor = MasterColor = Color.White;
 			SpecPower = 50;
 		}
 
@@ -698,8 +700,10 @@ namespace Visual_Music
 					SpecColor = (Color)entry.Value;
 				else if (entry.Name == "specPower")
 					SpecPower = (float)entry.Value;
-				else if (entry.Name == "color")
-					Filter = (Color)entry.Value;
+				else if (entry.Name == "masterAmount")
+					MasterAmount = (float)entry.Value;
+				else if (entry.Name == "masterColor")
+					MasterColor = (Color)entry.Value;
 			}
 		}
 
@@ -710,12 +714,12 @@ namespace Visual_Music
 			info.AddValue("ambientAmount", AmbientAmount);
 			info.AddValue("diffuseAmount", DiffuseAmount);
 			info.AddValue("specAmount", SpecAmount);
+			info.AddValue("masterAmount", MasterAmount);
 			info.AddValue("ambientColor", AmbientColor);
 			info.AddValue("diffuseColor", DiffuseColor);
 			info.AddValue("specColor", SpecColor);
 			info.AddValue("specPower", SpecPower);
-			info.AddValue("color", Filter);
-
+			info.AddValue("masterColor", MasterColor);
 		}
 	}
 

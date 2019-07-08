@@ -902,13 +902,14 @@ namespace Visual_Music
 				setNumericUdValue(lightDirZUd, mergedTrackProps.LightProps.DirZ);
 
 				setNumericUdValue(ambientAmountUd, mergedTrackProps.LightProps.AmbientAmount);
-				setNumericUdValue(diffuseAmountUd, mergedTrackProps.LightProps.DiffuseAmount);
-				setNumericUdValue(specAmountUd, mergedTrackProps.LightProps.SpecAmount);
 				ambientHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.AmbientColor);
+				setNumericUdValue(diffuseAmountUd, mergedTrackProps.LightProps.DiffuseAmount);
 				diffuseHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.DiffuseColor);
+				setNumericUdValue(specAmountUd, mergedTrackProps.LightProps.SpecAmount);
 				specHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.SpecColor);
-				lightFilterHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.Filter);
 				setNumericUdValue(specPowUd, mergedTrackProps.LightProps.SpecPower);
+				setNumericUdValue(masterLightAmountUd, mergedTrackProps.LightProps.MasterAmount);
+				masterLightHsBtn.SelectedColor = xnaToGdiCol(mergedTrackProps.LightProps.MasterColor);
 				//-------------------------------
 
 				//Spatial---------------------------------
@@ -1334,8 +1335,6 @@ namespace Visual_Music
 			string desc = tag.ToString();
 			if (string.IsNullOrEmpty(desc))
 				return;
-
-			
 
 			if (sender.GetType() == typeof(CheckBox))
 			{
@@ -1924,12 +1923,12 @@ namespace Visual_Music
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecColor = gdiToXnaCol(specHsBtn.SelectedColor);
 		}
 
-		private void lightFilterHsBtn_ColorChanged(object sender, EventArgs e)
+		private void masterLightHsBtn_ColorChanged(object sender, EventArgs e)
 		{
 			if (updatingControls)
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.Filter = gdiToXnaCol(lightFilterHsBtn.SelectedColor);
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.MasterColor = gdiToXnaCol(masterLightHsBtn.SelectedColor);
 		}
 		
 
@@ -1955,6 +1954,14 @@ namespace Visual_Music
 				return;
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.SpecPower = (float)specPowUd.Value;
+		}
+
+		private void MasterLightAmountUD_ValueChanged(object sender, EventArgs e)
+		{
+			if (updatingControls)
+				return;
+			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+				Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.LightProps.MasterAmount = (float)masterLightAmountUd.Value;
 		}
 
 		private void upDownVpWidth_CommitChanges(object sender, EventArgs e)

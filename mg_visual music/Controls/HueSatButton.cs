@@ -13,7 +13,8 @@ namespace Visual_Music
 	[DefaultEvent("ColorChanged")]
 	class HueSatButton : Button
 	{
-		public event EventHandler ColorChanged;
+		public delegate void ColorChangedEH(HueSatButton sender, ColorChangedTventArgs e);
+		public event ColorChangedEH ColorChanged;
 		public float Hue
 		{
 			get => form.Hue;
@@ -26,7 +27,7 @@ namespace Visual_Music
 		}
 		public Color SelectedColor
 		{
-			get => new HslColor(Hue, Saturation, 0.5);
+			get => toGdiColor();
 			set
 			{
 				HslColor c = value;
@@ -44,11 +45,11 @@ namespace Visual_Music
 		public HueSatButton()
 		{
 			form.SelectionChanged += form_SelectionChanged;
-			Click += OnClick;
+			Click += this_Click;
 			Text = "";
 		}
 
-		private void OnClick(object sender, EventArgs e)
+		private void this_Click(object sender, EventArgs e)
 		{
 			float hue = Hue, sat = Saturation;
 			if (form.ShowDialog() != DialogResult.OK)
@@ -56,19 +57,33 @@ namespace Visual_Music
 				Hue = hue;
 				Saturation = sat;
 				updateColor();
-				ColorChanged(sender, e);
-			}			
+				ColorChanged?.Invoke(this, new ColorChangedTventArgs(true));
+			}
 		}
 
 		private void form_SelectionChanged(object sender, EventArgs e)
 		{
 			updateColor();
-			ColorChanged?.Invoke(sender, e);
+			ColorChanged?.Invoke(this, new ColorChangedTventArgs(false));
 		}
 
 		void updateColor()
 		{
-			BackColor = new HslColor(Hue, Saturation, 0.5 + (1 - Saturation) / 2); ;
+			BackColor = toGdiColor();
+		}
+
+		Color toGdiColor()
+		{
+			return new HslColor(Hue, Saturation, 0.5 + (1 - Saturation) / 2);
+		}
+	}
+
+	public class ColorChangedTventArgs : EventArgs
+	{
+		public bool ChangesCanceled { get; }
+		public ColorChangedTventArgs(bool changesCanceled)
+		{
+			ChangesCanceled = changesCanceled;
 		}
 	}
 }
