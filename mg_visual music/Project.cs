@@ -197,9 +197,7 @@ namespace Visual_Music
 
 		public bool importSong(ImportOptions options)
 		{ //<Open project> and <import files> meet here
-			if (!options.checkNoteFile())
-				return false;
-
+			options.checkNoteFile();
 			Media.closeAudioFile();
 
 			//Convert mod/sid files to mid/wav

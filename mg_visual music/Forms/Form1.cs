@@ -1029,36 +1029,29 @@ namespace Visual_Music
 
 		private void trackList_DragOver(object sender, DragEventArgs e)
 		{
-			try
+			ListViewItem dragToItem = getListViewItem(trackList, e);
+
+			if (dragToItem == null)
 			{
-				ListViewItem dragToItem = getListViewItem(trackList, e);
-
-				if (dragToItem == null)
-				{
-					e.Effect = DragDropEffects.None;
-					return;
-				}
-
-				trackList.RedrawItems(0, trackList.Items.Count - 1, false);
-				System.Drawing.Rectangle bounds = dragToItem.GetBounds(ItemBoundsPortion.Entire);
-				bounds.Offset(0, -1);
-				if ((e.KeyState & 8) != 8)
-				{
-					e.Effect = DragDropEffects.Scroll | DragDropEffects.Move;
-					trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Left, bounds.Bottom), new GdiPoint(bounds.Right, bounds.Bottom));
-				}
-				else
-				{
-					e.Effect = DragDropEffects.Scroll | DragDropEffects.Copy;
-					trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Left, bounds.Top), new GdiPoint(bounds.Right, bounds.Top));
-					trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Left, bounds.Bottom), new GdiPoint(bounds.Right, bounds.Bottom));
-					trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Left, bounds.Top), new GdiPoint(bounds.Left, bounds.Bottom));
-					trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Right, bounds.Top), new GdiPoint(bounds.Right, bounds.Bottom));
-				}
+				e.Effect = DragDropEffects.None;
+				return;
 			}
-			catch (Exception ex)
+
+			trackList.RedrawItems(0, trackList.Items.Count - 1, false);
+			System.Drawing.Rectangle bounds = dragToItem.GetBounds(ItemBoundsPortion.Entire);
+			bounds.Offset(0, -1);
+			if ((e.KeyState & 8) != 8)
 			{
-				MessageBox.Show(ex.Message);
+				e.Effect = DragDropEffects.Scroll | DragDropEffects.Move;
+				trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Left, bounds.Bottom), new GdiPoint(bounds.Right, bounds.Bottom));
+			}
+			else
+			{
+				e.Effect = DragDropEffects.Scroll | DragDropEffects.Copy;
+				trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Left, bounds.Top), new GdiPoint(bounds.Right, bounds.Top));
+				trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Left, bounds.Bottom), new GdiPoint(bounds.Right, bounds.Bottom));
+				trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Left, bounds.Top), new GdiPoint(bounds.Left, bounds.Bottom));
+				trackListGfxObj.DrawLine(trackListPen, new GdiPoint(bounds.Right, bounds.Top), new GdiPoint(bounds.Right, bounds.Bottom));
 			}
 		}
 
@@ -1179,7 +1172,15 @@ namespace Visual_Music
 			}
 			catch (Exception ex) when (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
 			{
-				showErrorMsgBox("Couldn't load song.\n" + ex.Message);
+				string message;
+				if (ex is FileNotFoundException)
+					message = "File missing:" + ((FileNotFoundException)ex).FileName;
+				else if (ex is FileFormatException)
+					message = "Couldn't read source file:\n" + ((FileFormatException)ex).SourceUri.LocalPath;
+				else
+					message = "Couldn't read project file.";
+				showErrorMsgBox(message);
+				
 				SongPanel.Project = Project;
 				return;
 			}
