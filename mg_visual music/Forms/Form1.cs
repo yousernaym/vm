@@ -1176,7 +1176,7 @@ namespace Visual_Music
 				if (ex is FileNotFoundException)
 					message = "File missing:" + ((FileNotFoundException)ex).FileName;
 				else if (ex is FileFormatException)
-					message = "Couldn't read source file:\n" + ((FileFormatException)ex).SourceUri.LocalPath;
+					message = "Couldn't read source file:\n" + ((FileFormatException)ex).SourceUri.LocalPath + "\n\n" + ex.Message;
 				else
 					message = "Couldn't read project file.";
 				showErrorMsgBox(message);

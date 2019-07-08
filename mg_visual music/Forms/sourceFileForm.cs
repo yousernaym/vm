@@ -115,13 +115,13 @@ namespace Visual_Music
 				if (!File.Exists(options.AudioPath))
 				{
 					//Audio file not found
-					Form1.showErrorMsgBox("Couldn't find audio file: " + options.AudioPath);
+					Form1.showErrorMsgBox("Couldn't find audio file.");
 					return;
 				}
 				if (!Media.openAudioFile(options.AudioPath))
 				{
 					//Not a valid audio file
-					Form1.showErrorMsgBox("Couldn't open audio file: " + options.AudioPath);
+					Form1.showErrorMsgBox("Couldn't read audio file.");
 					return;
 				}
 			}
@@ -131,8 +131,16 @@ namespace Visual_Music
 				Form1.showErrorMsgBox(ex.Message);
 				return;
 			}
-			if (!parent.openSourceFiles(options))
+			try
+			{
+				if (!parent.openSourceFiles(options))
+					return;
+			}
+			catch (FileFormatException ex)
+			{
+				Form1.showErrorMsgBox("Couldn't read note file.\n" + ex.Message);
 				return;
+			}
 			DialogResult = DialogResult.OK;
 			Hide();
 		}
