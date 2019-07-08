@@ -998,7 +998,8 @@ namespace Visual_Music
 				TrackProps sourceTrackProps = sourceTrackView.TrackProps;
 				for (int i = 0; i < trackList.SelectedIndices.Count; i++)
 				{
-					TrackProps destTrackProps = Project.TrackViews[trackList.SelectedIndices[i]].TrackProps;
+					var trackNumber = trackList.SelectedIndices[i];
+					TrackProps destTrackProps = Project.TrackViews[trackNumber].TrackProps;
 					TrackPropsType tpt = TrackPropsType.TPT_All;
 					if (onlyCopyCurrentTab)
 					{
@@ -1006,7 +1007,7 @@ namespace Visual_Music
 						Enum.TryParse(tabName, out tpt);
 					}
 					destTrackProps.cloneFrom(sourceTrackProps, (int)tpt, SongPanel);
-					Project.TrackViews[i].createOcTree(Project, Project.GlobalTrackProps);
+					Project.TrackViews[trackNumber].createOcTree(Project, Project.GlobalTrackProps);
 				}
 				updateTrackPropsControls();
 				updateTrackListColors();
