@@ -43,16 +43,16 @@
 			// 
 			this.importXmPlayBtn.Location = new System.Drawing.Point(12, 12);
 			this.importXmPlayBtn.Name = "importXmPlayBtn";
-			this.importXmPlayBtn.Size = new System.Drawing.Size(121, 23);
+			this.importXmPlayBtn.Size = new System.Drawing.Size(94, 23);
 			this.importXmPlayBtn.TabIndex = 1;
-			this.importXmPlayBtn.Text = "Import XMPlay*.zip";
+			this.importXmPlayBtn.Text = "Import XMPlay";
 			this.importXmPlayBtn.UseVisualStyleBackColor = true;
 			this.importXmPlayBtn.Click += new System.EventHandler(this.importXmPlayBtn_Click);
 			// 
 			// xmPlayLink
 			// 
 			this.xmPlayLink.AutoSize = true;
-			this.xmPlayLink.Location = new System.Drawing.Point(139, 17);
+			this.xmPlayLink.Location = new System.Drawing.Point(112, 17);
 			this.xmPlayLink.Name = "xmPlayLink";
 			this.xmPlayLink.Size = new System.Drawing.Size(55, 13);
 			this.xmPlayLink.TabIndex = 2;

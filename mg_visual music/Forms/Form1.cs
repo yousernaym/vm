@@ -813,7 +813,7 @@ namespace Visual_Music
 						}
 					}
 				}
-				catch (FileNotFoundException)
+				catch (Exception ex) when (ex is FileNotFoundException || ex is  DirectoryNotFoundException)
 				{
 					trackTexPb.Image = (Image)trackTexPb.ErrorImage.Clone();
 					trackTexPb.Width = trackTexPb.ErrorImage.Width;
