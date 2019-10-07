@@ -1183,12 +1183,16 @@ namespace Visual_Music
 				}
 				catch (Exception ex) when (ex is FormatException || ex is FileNotFoundException)
 				{
-					string message;
 					DialogResult dlgResult = DialogResult.OK;
+					var locateFileDlg = new LocateFile();
 					if (ex is FileNotFoundException)
-						dlgResult = new LocateFile().ShowDialog();// message = "File missing:" + ((FileNotFoundException)ex).FileName;
+					{
+						dlgResult = locateFileDlg.ShowDialog(((FileNotFoundException)ex).FileName, LocateFile.Reason.Missing, true);
+						if (dlgResult == DialogResult.OK)
+							tempProject.ImportOptions.RawNotePath = locateFileDlg.Path;
+					}
 					else if (ex is FileFormatException)
-						dlgResult = new LocateFile().ShowDialog(); //message = "Invalid file:\n" + ((FileFormatException)ex).SourceUri.LocalPath + "\n\n" + ex.Message;
+						dlgResult = locateFileDlg.ShowDialog(((FileFormatException)ex).SourceUri.LocalPath, LocateFile.Reason.Corrupt, true, ex.Message);
 
 					if (dlgResult == DialogResult.Cancel)
 					{

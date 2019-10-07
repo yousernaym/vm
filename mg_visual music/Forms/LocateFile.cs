@@ -10,9 +10,10 @@ using System.Windows.Forms;
 
 namespace Visual_Music
 {
-	public partial class LocateFile : BaseDialog
+	public partial class LocateFile : Form
 	{
-		string Path => fileTb.Text;
+		public enum Reason { Missing, Corrupt };
+		public string Path { get; private set; }
 		public LocateFile()
 		{
 			InitializeComponent();
@@ -22,14 +23,38 @@ namespace Visual_Music
 		{
 			 
 		}
-		new public DialogResult ShowDialog()
+		public DialogResult ShowDialog(string path, Reason reason, bool critical, string optionalMsg = "")
 		{
+			string msg;
+			if (reason == Reason.Missing)
+			{
+				msg = "File missing: ";
+				okBtn.Text = "Locate file";
+			}
+			else
+			{
+				msg = "Invalid file format: ";
+				okBtn.Text = "Select different file";
+			}
+			cancelBtn.Text = critical ? "Cancel" : "Ignore";
+			msg += path;
+			msg += "\n\n" + optionalMsg;
+			messageLabel.Text = msg;
+			Path = path;
 			return base.ShowDialog();
 		}
 
-		private void browseBtn_Click(object sender, EventArgs e)
+		private void OkBtn_Click_1(object sender, EventArgs e)
 		{
-
+			var fileDialog = new OpenFileDialog();
+			fileDialog.InitialDirectory = Path;
+			fileDialog.FileName = Path;
+			if (fileDialog.ShowDialog() == DialogResult.OK)
+			{
+				Path = fileDialog.FileName;
+				DialogResult = DialogResult.OK;
+				Close();
+			}
 		}
 	}
 }
