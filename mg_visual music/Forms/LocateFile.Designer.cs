@@ -28,36 +28,63 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.messageLabel = new System.Windows.Forms.Label();
+			this.okBtn = new System.Windows.Forms.Button();
+			this.cancelBtn = new System.Windows.Forms.Button();
+			this.messageTb = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
-			// messageLabel
+			// okBtn
 			// 
-			this.messageLabel.AutoSize = true;
-			this.messageLabel.Location = new System.Drawing.Point(12, 9);
-			this.messageLabel.Name = "messageLabel";
-			this.messageLabel.Size = new System.Drawing.Size(35, 13);
-			this.messageLabel.TabIndex = 5;
-			this.messageLabel.Text = "label1";
+			this.okBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.okBtn.Location = new System.Drawing.Point(194, 136);
+			this.okBtn.Name = "okBtn";
+			this.okBtn.Size = new System.Drawing.Size(75, 23);
+			this.okBtn.TabIndex = 0;
+			this.okBtn.Text = "button1";
+			this.okBtn.UseVisualStyleBackColor = true;
+			this.okBtn.Click += new System.EventHandler(this.OkBtn_Click);
+			// 
+			// cancelBtn
+			// 
+			this.cancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.cancelBtn.Location = new System.Drawing.Point(275, 136);
+			this.cancelBtn.Name = "cancelBtn";
+			this.cancelBtn.Size = new System.Drawing.Size(75, 23);
+			this.cancelBtn.TabIndex = 0;
+			this.cancelBtn.Text = "button1";
+			this.cancelBtn.UseVisualStyleBackColor = true;
+			// 
+			// messageTb
+			// 
+			this.messageTb.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.messageTb.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.messageTb.Location = new System.Drawing.Point(12, 12);
+			this.messageTb.Multiline = true;
+			this.messageTb.Name = "messageTb";
+			this.messageTb.ReadOnly = true;
+			this.messageTb.Size = new System.Drawing.Size(338, 118);
+			this.messageTb.TabIndex = 1;
+			this.messageTb.TabStop = false;
 			// 
 			// LocateFile
 			// 
-			this.AcceptButton = null;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(332, 109);
-			this.Controls.Add(this.messageLabel);
+			this.CancelButton = this.cancelBtn;
+			this.ClientSize = new System.Drawing.Size(362, 171);
+			this.Controls.Add(this.messageTb);
+			this.Controls.Add(this.cancelBtn);
+			this.Controls.Add(this.okBtn);
 			this.Name = "LocateFile";
-			this.Text = "Locate file";
-			this.Controls.SetChildIndex(this.okBtn, 0);
-			this.Controls.SetChildIndex(this.cancelBtn, 0);
-			this.Controls.SetChildIndex(this.messageLabel, 0);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 		}
 
 		#endregion
-		private System.Windows.Forms.Label messageLabel;
+
+		private System.Windows.Forms.Button okBtn;
+		private System.Windows.Forms.Button cancelBtn;
+		private System.Windows.Forms.TextBox messageTb;
 	}
 }

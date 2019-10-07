@@ -19,10 +19,6 @@ namespace Visual_Music
 			InitializeComponent();
 		}
 
-		private void OkBtn_Click(object sender, EventArgs e)
-		{
-			 
-		}
 		public DialogResult ShowDialog(string path, Reason reason, bool critical, string optionalMsg = "")
 		{
 			string msg;
@@ -39,12 +35,12 @@ namespace Visual_Music
 			cancelBtn.Text = critical ? "Cancel" : "Ignore";
 			msg += path;
 			msg += "\n\n" + optionalMsg;
-			messageLabel.Text = msg;
+			messageTb.Text = msg;
 			Path = path;
 			return base.ShowDialog();
 		}
 
-		private void OkBtn_Click_1(object sender, EventArgs e)
+		private void OkBtn_Click(object sender, EventArgs e)
 		{
 			var fileDialog = new OpenFileDialog();
 			fileDialog.InitialDirectory = Path;
