@@ -175,6 +175,12 @@
     <Compile Include="Forms\ImportSidForm.Designer.cs">
       <DependentUpon>ImportSidForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\LocateFile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\LocateFile.Designer.cs">
+      <DependentUpon>LocateFile.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ProgressForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -375,6 +381,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportSidForm.resx">
       <DependentUpon>ImportSidForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\LocateFile.resx">
+      <DependentUpon>LocateFile.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ProgressForm.resx">
       <DependentUpon>ProgressForm.cs</DependentUpon>

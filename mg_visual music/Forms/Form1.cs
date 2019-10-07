@@ -1157,38 +1157,50 @@ namespace Visual_Music
 		}
 		void openSongFile(string fileName)
 		{
+			Project tempProject;
+			DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
 			try
 			{
-				SongPanel.SuspendPaint();
-				DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
-				Project tempProject;
 				using (FileStream stream = File.Open(fileName, FileMode.Open))
 				{
 					tempProject = (Project)dcs.ReadObject(stream);
 				}
-				SongPanel.Project = tempProject;
-				bool loadSucceeded = tempProject.loadContent();
-				Debug.Assert(loadSucceeded);
-				Project = tempProject;
 			}
-			catch (Exception ex) when (ex is FormatException || ex is SerializationException || ex is FileNotFoundException)
+			catch (SerializationException)
 			{
-				string message;
-				if (ex is FileNotFoundException)
-					message = "File missing:" + ((FileNotFoundException)ex).FileName;
-				else if (ex is FileFormatException)
-					message = "Couldn't read source file:\n" + ((FileFormatException)ex).SourceUri.LocalPath + "\n\n" + ex.Message;
-				else
-					message = "Couldn't read project file.";
-				showErrorMsgBox(message);
-				
-				SongPanel.Project = Project;
+				showErrorMsgBox("Invalid project file.");
 				return;
 			}
-			finally
+			do
 			{
-				SongPanel.ResumePaint();
-			}
+				try
+				{
+					SongPanel.SuspendPaint();
+					SongPanel.Project = tempProject;
+					tempProject.loadContent();
+					Project = tempProject;
+					break;
+				}
+				catch (Exception ex) when (ex is FormatException || ex is FileNotFoundException)
+				{
+					string message;
+					DialogResult dlgResult = DialogResult.OK;
+					if (ex is FileNotFoundException)
+						dlgResult = new LocateFile().ShowDialog();// message = "File missing:" + ((FileNotFoundException)ex).FileName;
+					else if (ex is FileFormatException)
+						dlgResult = new LocateFile().ShowDialog(); //message = "Invalid file:\n" + ((FileFormatException)ex).SourceUri.LocalPath + "\n\n" + ex.Message;
+
+					if (dlgResult == DialogResult.Cancel)
+					{
+						SongPanel.Project = Project;
+						return;
+					}
+				}
+				finally
+				{
+					SongPanel.ResumePaint();
+				}
+			} while (true);
 			if (Project.KeyFrames == null) //Old project file format
 				Project.KeyFrames = new KeyFrames();
 
@@ -1198,7 +1210,6 @@ namespace Visual_Music
 			updateFormTitle(currentProjPath);
 			Project.DefaultFileName = Path.GetFileName(currentProjPath);
 			unsavedChanges = false;
-
 		}
 
 		void updateFormTitle(string path)

@@ -156,17 +156,17 @@
 		#endregion
 
 		private System.Windows.Forms.Button browseNoteBtn;
-		private System.Windows.Forms.OpenFileDialog openAudioFileDlg;
         protected System.Windows.Forms.Label label2;
         protected System.Windows.Forms.Button Cancel;
         protected System.Windows.Forms.Label label1;
         protected System.Windows.Forms.CheckBox eraseCurrent;
-        protected System.Windows.Forms.OpenFileDialog openNoteFileDlg;
         protected System.Windows.Forms.Button BrowseAudioBtn;
         protected System.Windows.Forms.TextBox audioFilePath;
         protected System.Windows.Forms.Button Ok;
 		private System.Windows.Forms.TextBox noteFilePath;
 		protected System.Windows.Forms.RadioButton insTrackBtn;
 		protected System.Windows.Forms.RadioButton chTrackBtn;
+		private System.Windows.Forms.OpenFileDialog openAudioFileDlg;
+		protected System.Windows.Forms.OpenFileDialog openNoteFileDlg;
 	}
 }
