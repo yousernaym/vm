@@ -36,7 +36,7 @@
 			// okBtn
 			// 
 			this.okBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.okBtn.Location = new System.Drawing.Point(194, 136);
+			this.okBtn.Location = new System.Drawing.Point(194, 100);
 			this.okBtn.Name = "okBtn";
 			this.okBtn.Size = new System.Drawing.Size(75, 23);
 			this.okBtn.TabIndex = 0;
@@ -47,7 +47,8 @@
 			// cancelBtn
 			// 
 			this.cancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.cancelBtn.Location = new System.Drawing.Point(275, 136);
+			this.cancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.cancelBtn.Location = new System.Drawing.Point(275, 100);
 			this.cancelBtn.Name = "cancelBtn";
 			this.cancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.cancelBtn.TabIndex = 0;
@@ -62,7 +63,7 @@
 			this.messageTb.Multiline = true;
 			this.messageTb.Name = "messageTb";
 			this.messageTb.ReadOnly = true;
-			this.messageTb.Size = new System.Drawing.Size(338, 118);
+			this.messageTb.Size = new System.Drawing.Size(338, 82);
 			this.messageTb.TabIndex = 1;
 			this.messageTb.TabStop = false;
 			// 
@@ -71,7 +72,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.cancelBtn;
-			this.ClientSize = new System.Drawing.Size(362, 171);
+			this.ClientSize = new System.Drawing.Size(362, 135);
 			this.Controls.Add(this.messageTb);
 			this.Controls.Add(this.cancelBtn);
 			this.Controls.Add(this.okBtn);

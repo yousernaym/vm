@@ -1,0 +1,20 @@
+[submodule "Dependencies/midiLib"]
+	path = Dependencies/midiLib
+	url = https://github.com/yousernaym/midiLib.git
+	branch = master
+[submodule "Dependencies/MidMix"]
+	path = Dependencies/MidMix
+	url = https://github.com/yousernaym/MidMix.git
+	branch = master
+[submodule "Dependencies/Media"]
+	path = Dependencies/Media
+	url = https://github.com/yousernaym/Media.git
+	branch = master
+[submodule "Dependencies/Remuxer"]
+	path = Dependencies/Remuxer
+	url = https://github.com/yousernaym/Remuxer.git
+	branch = master
+[submodule "Dependencies/MonoGame"]
+	path = Dependencies/MonoGame
+	url = https://github.com/yousernaym/MonoGame.git
+	branch = My_branch
