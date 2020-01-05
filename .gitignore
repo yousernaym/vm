@@ -30,6 +30,9 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 
+**/Visual Music setup.exe
+/mg_visual music/grafik/
+
 #Exceptions
 !/mg_visual music/Distribute/**
 
