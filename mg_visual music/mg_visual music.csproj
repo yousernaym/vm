@@ -336,6 +336,9 @@
     <None Include="Resources\ModFormats.txt" />
     <None Include="Resources\MidiFormats.txt" />
     <None Include="Resources\SidFormats.txt" />
+    <Content Include="minjector.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="todo.txt" />
     <None Include="Resources\Songlengths.md5" />
   </ItemGroup>
