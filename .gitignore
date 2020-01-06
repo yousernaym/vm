@@ -32,6 +32,13 @@ packages/
 
 **/Visual Music setup.exe
 /mg_visual music/grafik/
+*.wav
+*.mod
+*.xm
+*.it
+*.s3m
+*.stm
+*.mp3
 
 #Exceptions
 !/mg_visual music/Distribute/**
