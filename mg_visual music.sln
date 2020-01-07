@@ -45,6 +45,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libRemuxer", "Dependencies\
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remuxer", "Dependencies\Remuxer\Remuxer\Remuxer.csproj", "{755B2ED6-5539-479A-87EB-25E40BC37540}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE} = {EBEBED4A-5B1A-4EB2-85FE-6E73C88B50DE}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmikmod", "Dependencies\Remuxer\libRemuxer\libmikmod-3.3.11.1\win32\VS2005\libmikmod.vcxproj", "{C118ACA9-74E7-4433-8433-452B33A77716}"
 EndProject

@@ -66,7 +66,7 @@ namespace Visual_Music
 
 			// For AnyCPU, Set BrowserSubProcessPath based on app bitness at runtime
 			string platformString = Environment.Is64BitProcess ? "x64" : "x86";
-			// For x86, use root app folder
+			// For x86, use root cefsharp folder
 			#if X86
 				platformString = "";
 			#endif

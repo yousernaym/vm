@@ -445,13 +445,11 @@
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <PropertyGroup>
     <PostBuildEvent>set platform=x64
-if $(PlatformName) == x86 set platform=win32
 xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\*.dll" "$(TargetDir)" /D /Y
 xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\*.pdb" "$(TargetDir)" /D /Y
 
-xcopy "d:\kodning\myprojects\c#\remuxer\remuxer\bin\release\remuxer.exe" "$(TargetDir)\remuxer\" /D /Y
-xcopy "$(SolutionDir)%25platform%25\release\remuxer" "$(TargetDir)\remuxer" /D /E /Y
-</PostBuildEvent>
+xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\remuxer" "$(TargetDir)remuxer" /D /E /Y /S /I
+xcopy "$(TargetDir)%25platform%25" "$(TargetDir)cefsharp\%25platform%25" /D /Y /S /I</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
