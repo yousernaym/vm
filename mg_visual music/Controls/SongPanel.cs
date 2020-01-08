@@ -28,7 +28,6 @@ namespace Visual_Music
 		public SpriteFont LyricsFont { get; private set; }
 		GdiPoint previousMousePos = MousePosition;
 
-		//Jdlc.Timers.TimerQueueTimer timer = new Jdlc.Timers.TimerQueueTimer();
 		System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
 		public delegate void Delegate_songPosChanged();
 		public Delegate_songPosChanged OnSongPosChanged { get; set; }
