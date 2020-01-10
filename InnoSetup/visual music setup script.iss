@@ -21,7 +21,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-OutputDir=D:\kodning\MyProjects\c#\mg_visual music\InnoSetup
+OutputDir=.
 OutputBaseFilename={#MyAppName} setup
 Compression=lzma
 SolidCompression=yes
@@ -50,56 +50,56 @@ Name: "docsFolder"; Description: "Create subfolder in user's Documents folder"
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-Source: "..\mg_visual music\bin\anycpu\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\midilib.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\MonoGame.Framework.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\SharpDX.Direct3D11.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\kodning\MyProjects\c#\mg_visual music\mg_visual music\bin\anycpu\Release\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\SharpDX.DXGI.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\mg_visual music\bin\anycpu\Release\Remuxer\*.dll"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\Remuxer\Remuxer.exe"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
-Source: "..\mg_visual music\Distribute\Tparty\*"; DestDir: "{#MyAppDataDir}\tparty"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\mg_visual music\Distribute\minjector.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\Distribute\vc2017 dlls\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\VisualMusic\bin\anycpu\Release\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\midilib.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\MonoGame.Framework.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\SharpDX.Direct3D11.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\SharpDX.DXGI.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\*.dll"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\Remuxer.exe"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
+Source: "..\VisualMusic\Distribute\Tparty\*"; DestDir: "{#MyAppDataDir}\tparty"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\VisualMusic\Distribute\minjector.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\Distribute\vc2017 dlls\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
 
 ;Cefsharp
-Source: "..\mg_visual music\bin\anycpu\Release\x64\cef.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\CefSharp.BrowserSubprocess.Core.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\CefSharp.BrowserSubprocess.exe"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\CefSharp.Core.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\CefSharp.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\CefSharp.WinForms.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\cef_100_percent.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\cef_200_percent.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\cef_extensions.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\chrome_elf.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\d3dcompiler_47.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\icudtl.dat"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\libcef.dll"; DestDir: "{app}\cefsharp\x64"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\natives_blob.bin"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\snapshot_blob.bin"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\locales\*"; DestDir: "{app}\cefsharp\x64\locales\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\swiftshader\libEGL.dll"; DestDir: "{app}\cefsharp\x64\swiftshader\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\swiftshader\libGLESv2.dll"; DestDir: "{app}\cefsharp\x64\swiftshader\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\v8_context_snapshot.bin"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\anycpu\Release\x64\chrome_elf.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
-Source: "..\mg_visual music\Distribute\cefsharp\LICENSE.txt"; DestDir: "{app}\cefsharp"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\cef.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\CefSharp.BrowserSubprocess.Core.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\CefSharp.BrowserSubprocess.exe"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\CefSharp.Core.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\CefSharp.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\CefSharp.WinForms.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\cef_100_percent.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\cef_200_percent.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\cef_extensions.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\chrome_elf.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\d3dcompiler_47.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\icudtl.dat"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\libcef.dll"; DestDir: "{app}\cefsharp\x64"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\natives_blob.bin"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\snapshot_blob.bin"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\locales\*"; DestDir: "{app}\cefsharp\x64\locales\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\swiftshader\libEGL.dll"; DestDir: "{app}\cefsharp\x64\swiftshader\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\swiftshader\libGLESv2.dll"; DestDir: "{app}\cefsharp\x64\swiftshader\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\v8_context_snapshot.bin"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\x64\chrome_elf.dll"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
+Source: "..\VisualMusic\Distribute\cefsharp\LICENSE.txt"; DestDir: "{app}\cefsharp"; Flags: ignoreversion
 
 ;Midmix + fluidsynth
-Source: "..\mg_visual music\bin\AnyCPU\Release\MidMix.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\AnyCPU\Release\libfluidsynth-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\AnyCPU\Release\glib-2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\AnyCPU\Release\libcharset.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\AnyCPU\Release\libcharset.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\AnyCPU\Release\pcre.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\AnyCPU\Release\libiconv.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\AnyCPU\Release\libintl.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\Distribute\soundfont.sf2"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\MidMix.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\libfluidsynth-1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\glib-2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\libcharset.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\libcharset.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\pcre.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\libiconv.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\libintl.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\Distribute\soundfont.sf2"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

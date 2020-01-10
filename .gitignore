@@ -31,8 +31,8 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 
-/mg_visual music/grafik/
-/mg_visual music/Distribute/
+/VisualMusic/grafik/
+/VisualMusic/Distribute/
 *.wav
 *.mod
 *.xm
@@ -42,5 +42,5 @@ packages/
 *.mp3
 
 #Exceptions
-!/mg_visual music/minjector.exe
+!/VisualMusic/minjector.exe
 
