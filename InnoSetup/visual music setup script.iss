@@ -99,7 +99,7 @@ Source: "..\mg_visual music\bin\AnyCPU\Release\libcharset.dll"; DestDir: "{app}"
 Source: "..\mg_visual music\bin\AnyCPU\Release\pcre.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\mg_visual music\bin\AnyCPU\Release\libiconv.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\mg_visual music\bin\AnyCPU\Release\libintl.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mg_visual music\bin\AnyCPU\Release\OmegaGMGS2.sf2"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\mg_visual music\Distribute\soundfont.sf2"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

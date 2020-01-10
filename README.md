@@ -1,17 +1,12 @@
 # Visual Music
 
-An app for visualizing note-based music files.
-Supports midi, tracker and sid files. Can produce accompanying audio automatically (requires a soundfont file for midi songs) or you can supply your own mixed down audio file.
-Can export mp4 video files with support for 360-degree videos.
+A Windows app that visualizes note-based music files.
+Supports midi, tracker and sid files. Can produce accompanying audio automatically or you can supply your own mixed down audio file.
+Can export mp4 video files with support for 360-degree video.
 
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-
-### Prerequisites
+## Installing
 
 Installing vcpkg and fluidsynth:
-
 ```
 git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
@@ -20,31 +15,30 @@ vcpkg integrate install
 vcpkg install fluidsynth
 ```
 
-### Installing
-
+Installing Visual Music:
 ```
 git clone https://github.com/yousernaym/vm.git
 cd vm
 bootstrap.bat
 ```
-Then open the solution with Visual Studio 2019 or later and build.
+Then open the solution with Visual Studio and build.
+For playback of general midi songs, get a [soundfont file](https://musescore.org/en/node/109371), rename it to soundfont.sf2 and put it in the app folder (eg., bin/debug).
 
 ## Author
 
-Michael Hällström - [yousernaym](https://github.com/yousernaym)
+[Michael Hällström](mailto:mickehapps@outlook.com)
 
 ## Acknowledgments
 
-* Third-party dependencies:
-[MonoGame](http://www.monogame.net/)
-[Fluidsynth](http://www.fluidsynth.org/)
-[libmikmod](http://mikmod.sourceforge.net/)
-[libsidplayfp](https://sourceforge.net/projects/sidplay-residfp/) (from my command-line tool [Remuxer](https://github.com/yousernaym/Remuxer)
-[Media Foundation](https://docs.microsoft.com/en-us/windows/win32/medfound/microsoft-media-foundation-sdk)
-[Spatial Media Metadata Injector](https://github.com/google/spatial-media)
-[CefSharp](https://github.com/cefsharp/CefSharp)
-[README-Template.md]([https://gist.github.com/PurpleBooth/109311bb0361f32d87a2#file-readme-template-md)])
-[WinForms XNA](https://github.com/SimonDarksideJ/XNAGameStudio/wiki/WinForms-Series-1-Graphics-Device)
+Third-party dependencies:
+*[MonoGame](http://www.monogame.net/)
+*[Fluidsynth](http://www.fluidsynth.org/)
+*[libmikmod](http://mikmod.sourceforge.net/)
+*[libsidplayfp](https://sourceforge.net/projects/sidplay-residfp/) (from my command-line tool [Remuxer](https://github.com/yousernaym/Remuxer)
+*[Media Foundation](https://docs.microsoft.com/en-us/windows/win32/medfound/microsoft-media-foundation-sdk)
+*[Spatial Media Metadata Injector](https://github.com/google/spatial-media)
+*[CefSharp](https://github.com/cefsharp/CefSharp)
+*[README-Template.md]([https://gist.github.com/PurpleBooth/109311bb0361f32d87a2#file-readme-template-md)])
+*[XNA WinForms](https://github.com/SimonDarksideJ/XNAGameStudio/wiki/WinForms-Series-1-Graphics-Device)
 
-
-Inspired by [Stephen Malinowski](https://www.youtube.com/user/smalin)
+Inspiration: [smalin](https://www.youtube.com/user/smalin)

@@ -2,6 +2,7 @@
 #Ignore thumbnails created by Windows
 Thumbs.db
 #Ignore files built by Visual Studio
+*.exe
 *.obj
 *.pdb
 *.user
@@ -30,8 +31,8 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 
-**/Visual Music setup.exe
 /mg_visual music/grafik/
+/mg_visual music/Distribute/
 *.wav
 *.mod
 *.xm
@@ -41,5 +42,5 @@ packages/
 *.mp3
 
 #Exceptions
-!/mg_visual music/Distribute/**
+!/mg_visual music/minjector.exe
 
