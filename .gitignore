@@ -32,7 +32,7 @@ _ReSharper*/
 packages/
 
 /VisualMusic/grafik/
-/VisualMusic/Distribute/
+/InnoSetup/Files
 *.wav
 *.mod
 *.xm
