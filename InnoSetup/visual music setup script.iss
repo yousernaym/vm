@@ -93,7 +93,7 @@ Source: "Files\cefsharp\LICENSE.txt"; DestDir: "{app}\cefsharp"; Flags: ignoreve
 
 ;Midmix + fluidsynth
 Source: "..\VisualMusic\bin\AnyCPU\Release\MidMix.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\AnyCPU\Release\libfluidsynth-1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\libfluidsynth-2.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\AnyCPU\Release\glib-2.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\AnyCPU\Release\libcharset.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\AnyCPU\Release\libcharset.dll"; DestDir: "{app}"; Flags: ignoreversion
