@@ -40,7 +40,6 @@ packages/
 *.s3m
 *.stm
 *.mp3
-*.sf2
 *.png
 *.jpeg
 *.jpg
@@ -49,4 +48,4 @@ packages/
 !/VisualMusic/minjector.exe
 !/InnoSetup/Files/**
 
-
+*.sf2
