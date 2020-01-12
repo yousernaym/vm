@@ -42,7 +42,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
-Name: "docsFolder"; Description: "Create subfolder in user's Documents folder"
+Name: "docsFolder"; Description: "Create folder '<user>\Documents\Visual Music'"
 ;Name: "associateVms"; Description: "Associate with .vms files";
 ;Name: "associateMod"; Description: "Associate with module files";
 ;Name: "associateMod\mod"; Description: ".mod";
@@ -51,7 +51,7 @@ Name: "docsFolder"; Description: "Create subfolder in user's Documents folder"
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: "..\VisualMusic\bin\anycpu\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-
+Source: "Files\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -66,7 +66,6 @@ Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\Remuxer.exe"; DestDir: "{app}
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\roms\*"; DestDir: "{app}\Remuxer\Roms"; Flags: ignoreversion
 Source: "Files\Tparty\*"; DestDir: "{#MyAppDataDir}\tparty"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\VisualMusic\minjector.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "Files\vc2017 dlls\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
 
 ;Cefsharp
 Source: "..\VisualMusic\bin\anycpu\Release\x64\cef.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
@@ -108,7 +107,8 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{tmp}\VC_redist.x64.exe"; Parameters:  "/quiet /norestart";  StatusMsg: "Installing Visual C++ Redistributable";
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: postinstall skipifsilent
 
 [Dirs]
 Name: "{#MyAppDataDir}"; Flags: uninsalwaysuninstall

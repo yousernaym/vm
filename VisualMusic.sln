@@ -17,7 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualMusic", "VisualMusic\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36B4ABDD-6238-44FB-8EF4-119823880343}"
 	ProjectSection(SolutionItems) = preProject
-		bootstrap.bat = bootstrap.bat
 		README.md = README.md
 		InnoSetup\visual music setup script.iss = InnoSetup\visual music setup script.iss
 	EndProjectSection

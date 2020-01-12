@@ -4,9 +4,9 @@ A Windows app that visualizes note-based music files.
 Supports midi, tracker and sid files. Can produce accompanying audio automatically or you can supply your own mixed down audio file.
 Can export mp4 video files with support for 360-degree videos.
 
-## Installing prerequisites
+## Prerequisites
 
-Vcpkg and Fluidsynth:
+Install Vcpkg and Fluidsynth:
 ```
 git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
@@ -14,6 +14,7 @@ bootstrap-vcpkg.bat
 vcpkg integrate install
 vcpkg install fluidsynth
 ```
+Install [Git LFS](https://git-lfs.github.com/)
 
 ## Installing Visual Music
 ```
@@ -21,7 +22,7 @@ git clone https://github.com/yousernaym/vm.git
 cd vm
 bootstrap.bat
 ```
-Then open VisualMusic.sln with Visual Studio and build.
+Then open VisualMusic.sln in Visual Studio and build.
 For playback of general midi songs, get a [soundfont file](https://musescore.org/en/node/109371), rename it to soundfont.sf2 and put it in the app folder (eg., bin/debug).
 
 ## Author
