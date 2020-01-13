@@ -198,8 +198,6 @@ namespace VisualMusic
 		public bool importSong(ImportOptions options)
 		{ //<Open project> and <import files> meet here
 			options.checkNoteFile();
-			Media.closeAudioFile();
-
 			//Convert mod/sid files to mid/wav
 			if (options.NoteFileType != Midi.FileType.Midi)
 			{
@@ -240,7 +238,7 @@ namespace VisualMusic
 					Program.form1.Activate();
 
 					if (!File.Exists(midiPath) && !File.Exists(audioPath))
-						return false; //User probably closed Remuxer before it was finished
+						return false;
 				}
 				options.MidiOutputPath = midiPath;
 				options.AudioPath = audioPath;
@@ -305,30 +303,27 @@ namespace VisualMusic
 
 		public void openAudioFile(ImportOptions options)
 		{
-			//if audio file was specified in import dialog it is already loaded
-			if (Media.getAudioLength() == 0)
-			{
-				string file = options.AudioPath;
+			Media.closeAudioFile();
+			string file = options.AudioPath;
 				
-				//Third-party mixdown needed?
-				if (options.MixdownType == Midi.MixdownType.Tparty)
-					file = ImportNotesWithAudioForm.runTpartyProcess(options);
+			//Third-party mixdown needed?
+			if (options.MixdownType == Midi.MixdownType.Tparty)
+				file = ImportNotesWithAudioForm.runTpartyProcess(options);
 
-				if (file == null) //If file is null then appropriate warnings should have been displayed in runTpartyProcess.
-					return;
+			if (file == null) //If file is null then appropriate warnings should have been displayed in runTpartyProcess.
+				return;
 			
-				//Check if audio file exists and is valid. Otherwise just show warning. These wasnings should only show if loading a project file. If importing through an import form these checks have already been made in SourceFileForm.importFiles, and would have aborted the import if failed
-				if (!File.Exists(file))
-				{
-					if (!string.IsNullOrWhiteSpace(file))
-						Form1.showWarningMsgBox("Audio file not found: " + file);
-					return;
-				}
-				if (!Media.openAudioFile(file))
-				{
-					Form1.showWarningMsgBox("Couldn't open audio file: " + file);
-					return;
-				}
+			//Check if audio file exists and is valid. Otherwise just show warning. These wasnings should only show if loading a project file. If importing through an import form these checks have already been made in SourceFileForm.importFiles, and would have aborted the import if failed
+			if (!File.Exists(file))
+			{
+				if (!string.IsNullOrWhiteSpace(file))
+					Form1.showWarningMsgBox("Audio file not found: " + file);
+				return;
+			}
+			if (!Media.openAudioFile(file))
+			{
+				Form1.showWarningMsgBox("Couldn't open audio file: " + file);
+				return;
 			}
 			if (notes != null)
 				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + Props.AudioOffset));
