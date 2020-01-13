@@ -320,7 +320,8 @@ namespace VisualMusic
 				//Check if audio file exists and is valid. Otherwise just show warning. These wasnings should only show if loading a project file. If importing through an import form these checks have already been made in SourceFileForm.importFiles, and would have aborted the import if failed
 				if (!File.Exists(file))
 				{
-					Form1.showWarningMsgBox("Audio file not found: " + file);
+					if (!string.IsNullOrWhiteSpace(file))
+						Form1.showWarningMsgBox("Audio file not found: " + file);
 					return;
 				}
 				if (!Media.openAudioFile(file))
