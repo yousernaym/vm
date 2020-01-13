@@ -64,7 +64,6 @@ Source: "..\VisualMusic\bin\anycpu\Release\Content\*"; DestDir: "{app}\Content";
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\*.dll"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\Remuxer.exe"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\roms\*"; DestDir: "{app}\Remuxer\Roms"; Flags: ignoreversion
-Source: "Files\Tparty\*"; DestDir: "{#MyAppDataDir}\tparty"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\VisualMusic\minjector.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ;Cefsharp

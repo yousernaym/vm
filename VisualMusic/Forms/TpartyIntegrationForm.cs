@@ -22,8 +22,10 @@ namespace VisualMusic
 		public readonly static string XmPlayDir = Path.Combine(TpartyDir, "xmplay");
 		public readonly static string SidPlayDir = Path.Combine(TpartyDir, "sidplayfp");
 		public const string XmPlayFileName = "xmplay.exe";
+		public const string XmPlayIniFileName = "xmplay.ini";
 		public const string SidPlayFileName = "sidplayfp.exe";
 		public readonly static string XmPlayPath = Path.Combine(XmPlayDir, XmPlayFileName);
+		public readonly static string XmPlayIniPath = Path.Combine(XmPlayDir, XmPlayIniFileName);
 		public readonly static string SidPlayPath = Path.Combine(SidPlayDir, SidPlayFileName);
 		public readonly static string MixdownOutputDir = Program.TempDir;
 		
@@ -53,6 +55,11 @@ namespace VisualMusic
 			//hvscDirDialog.FileOk += new System.ComponentModel.CancelEventHandler(hvscDirDialog_FileOk);
 			hvscDirDialog.Title = @"Browse to C64Music\DOCUMENTS";
 			Directory.CreateDirectory(MixdownOutputDir);
+			if (!File.Exists(XmPlayIniPath))
+			{
+				Directory.CreateDirectory(XmPlayDir);
+				File.Copy(Path.Combine(Program.Dir, XmPlayIniFileName), XmPlayIniPath);
+			}
 			setXmPlayIni_outputDir();
 		}
 
@@ -244,8 +251,7 @@ namespace VisualMusic
 		{
 			if (string.IsNullOrEmpty(section))
 				section = "XMPlay";
-			string file = XmPlayDir + "\\xmplay.ini";
-			string[] iniLines = File.ReadAllLines(file);
+			string[] iniLines = File.ReadAllLines(XmPlayIniPath);
 			int sectionStart = -1;
 			for (int i = 0; i < iniLines.Length; i++)
 			{
@@ -260,7 +266,7 @@ namespace VisualMusic
 				}
 			}
 			if (sectionStart < 0)
-				throw new Exception("Couldn't find section " + section + " in " + file);
+				throw new Exception("Couldn't find section " + section + " in " + XmPlayIniPath);
 			bool keyFound = false;
 			for (int i = sectionStart; i < iniLines.Length; i++)
 			{
@@ -276,8 +282,8 @@ namespace VisualMusic
 				}
 			}
 			if (!keyFound)
-				throw new Exception("Couldn't find key " + key + " in " + file);
-			File.WriteAllLines(file, iniLines);
+				throw new Exception("Couldn't find key " + key + " in " + XmPlayIniPath);
+			File.WriteAllLines(XmPlayIniPath, iniLines);
 		}
 	}
 }

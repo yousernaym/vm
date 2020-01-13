@@ -336,13 +336,15 @@
     </Content>
     <Content Include="todo.txt" />
     <None Include="Resources\Songlengths.md5" />
+    <None Include="xmplay.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
     <None Include="app.config" />
     <None Include="app.manifest" />
     <Content Include="Content\NoteStyle.fx" />
-    <None Include="Distribute\Tparty\xmplay\xmplay.ini" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\SongPanel.datasource" />
   </ItemGroup>
