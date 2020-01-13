@@ -36,7 +36,8 @@ namespace VisualMusic
 			get => hvscDir;
 			set
 			{
-				hvscDir = hvscDirDialog.InitialDirectory = hvscDirTb.Text = value; songLengthsCb.Enabled = HvscInstalled;
+				hvscDir = hvscDirDialog.InitialDirectory = hvscDirTb.Text = value;
+				songLengthsCb.Enabled = HvscInstalled;
 				setXmPlayIni_hvscDir();
 			}
 		}
@@ -137,7 +138,7 @@ namespace VisualMusic
 			if (openXmPlayDialog.ShowDialog() == DialogResult.OK)
 			{
 				setXmPlayIni_outputDir();
-				setXmPlayIni_hvscDir();
+				//setXmPlayIni_hvscDir();
 				Directory.CreateDirectory(MixdownOutputDir);
 			}
 		}
