@@ -1011,7 +1011,7 @@ namespace VisualMusic
 				}
 				updateTrackPropsControls();
 				updateTrackListColors();
-				addUndoItem("Copy track propesties");
+				addUndoItem("Copy track properties");
 			}
 			trackList.EndUpdate();
 		}

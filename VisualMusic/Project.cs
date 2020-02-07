@@ -23,7 +23,17 @@ namespace VisualMusic
 	public class Project : ISerializable, IDisposable
 	{
 		public KeyFrames KeyFrames;
-		public ProjProps Props = new ProjProps();
+		ProjProps props = new ProjProps();
+		public ProjProps Props
+		{
+			get => props;
+			set
+			{
+				props = value;
+				props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
+				Props.OnPlaybackOffsetSChanged();
+			}
+		}
 		SongPanel SongPanel => Form1.SongPanel;
 				
 		TimeSpan pbStartSysTime = new TimeSpan(0);
@@ -154,10 +164,7 @@ namespace VisualMusic
 				else if (entry.Name == "keyFrames")
 					KeyFrames = (KeyFrames)entry.Value;
 				else if (entry.Name == "props")
-				{
 					Props = (ProjProps)entry.Value;
-					Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
-				}
 				else if (entry.Name == "vertWidthQn")
 					vertViewWidthQn = (float)entry.Value;
 
@@ -181,7 +188,6 @@ namespace VisualMusic
 					KeyFrames[0].Camera = (Camera)entry.Value;
 				else if (entry.Name == "userViewWidth")
 					Props.UserViewWidth = (float)entry.Value;
-				Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
 			}
 		}
 
@@ -836,6 +842,8 @@ namespace VisualMusic
 
 		void onPlaybackOffsetSChanged()
 		{
+			if (notes == null)
+				return;
 			firstTempoEvent = pbTempoEvent = 0;
 			pbTimeS = pbTimeT = playbackOffsetT = 0;
 
