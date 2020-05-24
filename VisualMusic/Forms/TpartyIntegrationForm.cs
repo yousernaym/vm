@@ -39,6 +39,7 @@ namespace VisualMusic
 		}
 
 		ProgressForm songLengthsDownloadForm;
+		bool silentSongLengthsDownload;
 		readonly string tempSongLengthDownloadPath;
 
 		bool XmPlayInstalled { get => File.Exists(XmPlayPath); }
@@ -232,27 +233,33 @@ namespace VisualMusic
 
 		private void updateSongLengthsBtn_Click(object sender, EventArgs e)
 		{
-			downloadSonglengths();
+			downloadSonglengths(false);
 		}
 
-		public void downloadSonglengths()
+		public void downloadSonglengths(bool silent)
 		{
+			silentSongLengthsDownload = silent;
 			WebClient webClient = new WebClient();
 			webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(WebClient_SongLengthsDownloadCompleted);
-			webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
+			if (!silent)
+				webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
 			try
 			{
 				webClient.DownloadFileAsync(new Uri(songLengthsUrlTb.Text), tempSongLengthDownloadPath);
 			}
 			catch (UriFormatException)
 			{
-				Form1.showErrorMsgBox("Invalid url.");
+				if (!silent)
+					Form1.showErrorMsgBox("Invalid url.");
 				return;
 			}
-			
-			songLengthsDownloadForm = new ProgressForm();
-			if (songLengthsDownloadForm.ShowDialog() == DialogResult.Cancel)
-				webClient.CancelAsync();
+
+			if (!silent)
+			{
+				songLengthsDownloadForm = new ProgressForm();
+				if (songLengthsDownloadForm.ShowDialog() == DialogResult.Cancel)
+					webClient.CancelAsync();
+			}
 		}
 
 		private void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -262,17 +269,20 @@ namespace VisualMusic
 
 		private void WebClient_SongLengthsDownloadCompleted(object sender, AsyncCompletedEventArgs e)
 		{
-			songLengthsDownloadForm.Close();
+			if (!silentSongLengthsDownload)
+				songLengthsDownloadForm.Close();
 			if (e.Cancelled)
 			{
 				File.Delete(tempSongLengthDownloadPath);
-				MessageBox.Show("Update cancelled.");
+				if (!silentSongLengthsDownload)
+					MessageBox.Show("Update cancelled.");
 				return;
 			}
 			else if (e.Error != null)
 			{
 				File.Delete(tempSongLengthDownloadPath);
-				Form1.showErrorMsgBox("Couldn't download file from the specified url.");
+				if (!silentSongLengthsDownload)
+					Form1.showErrorMsgBox("Couldn't download file from the specified url.");
 				return;
 			}
 			

@@ -79,7 +79,7 @@ namespace VisualMusic
 				else if (entry.Name == "videoExportOptions")
 					Form1.VidExpForm.setOptions((VideoExportOptions)entry.Value);
 			}
-
+			Form1.TpartyIntegrationForm.downloadSonglengths(true);
 		}
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
