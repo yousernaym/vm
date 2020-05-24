@@ -238,6 +238,13 @@ namespace VisualMusic
 
 		public void downloadSonglengths(bool silent)
 		{
+			if (silent && File.Exists(SongLengthsPath))
+			{
+				var fi = new FileInfo(SongLengthsPath);
+				var daysSinceDownload = (DateTime.Now - fi.LastWriteTime).TotalDays;
+				if (daysSinceDownload < 30)
+					return;
+			}
 			silentSongLengthsDownload = silent;
 			WebClient webClient = new WebClient();
 			webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(WebClient_SongLengthsDownloadCompleted);
