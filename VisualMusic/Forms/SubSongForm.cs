@@ -73,6 +73,9 @@ namespace VisualMusic.Forms
 
 		string[] getSongLengths(string songPath)
 		{
+			string songLengthsFilename = Form1.TpartyIntegrationForm.SongLengthsPath;
+			if (!File.Exists(songLengthsFilename))
+				return null;
 			using (var stream = File.OpenRead(songPath))
 			{
 				using (var md5 = MD5.Create())
@@ -85,7 +88,7 @@ namespace VisualMusic.Forms
 					}
 					hash1 = hash1.ToLower();
 
-					using (StreamReader reader = new StreamReader(getSongLengthsStream()))
+					using (StreamReader reader = new StreamReader(new FileStream(songLengthsFilename, FileMode.Open, FileAccess.Read)))
 					{
 						while (!reader.EndOfStream)
 						{
@@ -120,11 +123,6 @@ namespace VisualMusic.Forms
 		{
 			int buttonMargin = (Height - okBtn.Bottom);
 			Height = subSongsLB.Bottom + okBtn.Height + 10 * DeviceDpi / 96 + buttonMargin;
-		}
-
-		Stream getSongLengthsStream()
-		{
-			return new FileStream(Form1.TpartyIntegrationForm.SongLengthsPath, FileMode.Open, FileAccess.Read);
 		}
 	}
 }
