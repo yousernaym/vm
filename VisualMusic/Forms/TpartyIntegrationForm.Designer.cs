@@ -30,13 +30,13 @@
 		{
 			this.importXmPlayBtn = new System.Windows.Forms.Button();
 			this.xmPlayLink = new System.Windows.Forms.LinkLabel();
-			this.browseHvscBtn = new System.Windows.Forms.Button();
-			this.hvscLink = new System.Windows.Forms.LinkLabel();
 			this.modulesCb = new System.Windows.Forms.CheckBox();
 			this.openXmPlayDialog = new System.Windows.Forms.OpenFileDialog();
 			this.openSidPlayDialog = new System.Windows.Forms.OpenFileDialog();
-			this.hvscDirTb = new System.Windows.Forms.TextBox();
-			this.songLengthsCb = new System.Windows.Forms.CheckBox();
+			this.songLengthsUrlTb = new System.Windows.Forms.TextBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.updateSongLengthsBtn = new System.Windows.Forms.Button();
+			this.defaultSongLengthsBtn = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// importXmPlayBtn
@@ -60,36 +60,15 @@
 			this.xmPlayLink.Text = "Download";
 			this.xmPlayLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.xmPlayLink_LinkClicked);
 			// 
-			// browseHvscBtn
-			// 
-			this.browseHvscBtn.Location = new System.Drawing.Point(12, 64);
-			this.browseHvscBtn.Name = "browseHvscBtn";
-			this.browseHvscBtn.Size = new System.Drawing.Size(164, 23);
-			this.browseHvscBtn.TabIndex = 7;
-			this.browseHvscBtn.Text = "Browse for HVSC folder";
-			this.browseHvscBtn.UseVisualStyleBackColor = true;
-			this.browseHvscBtn.Click += new System.EventHandler(this.browseHvscBtn_Click);
-			// 
-			// hvscLink
-			// 
-			this.hvscLink.AutoSize = true;
-			this.hvscLink.Location = new System.Drawing.Point(182, 69);
-			this.hvscLink.Name = "hvscLink";
-			this.hvscLink.Size = new System.Drawing.Size(55, 13);
-			this.hvscLink.TabIndex = 8;
-			this.hvscLink.TabStop = true;
-			this.hvscLink.Text = "Download";
-			this.hvscLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.hvscLink_LinkClicked);
-			// 
 			// modulesCb
 			// 
 			this.modulesCb.AutoSize = true;
 			this.modulesCb.Enabled = false;
 			this.modulesCb.Location = new System.Drawing.Point(12, 41);
 			this.modulesCb.Name = "modulesCb";
-			this.modulesCb.Size = new System.Drawing.Size(165, 17);
-			this.modulesCb.TabIndex = 5;
-			this.modulesCb.Text = "Use XMPlay for module audio";
+			this.modulesCb.Size = new System.Drawing.Size(186, 17);
+			this.modulesCb.TabIndex = 3;
+			this.modulesCb.Text = "Use XMPlay for supported formats";
 			this.modulesCb.UseVisualStyleBackColor = true;
 			this.modulesCb.EnabledChanged += new System.EventHandler(this.modulesCb_EnabledChanged);
 			// 
@@ -104,37 +83,55 @@
     "|*.*";
 			this.openSidPlayDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openXmPlaySidPluginDialog_FileOk);
 			// 
-			// hvscDirTb
+			// songLengthsUrlTb
 			// 
-			this.hvscDirTb.Location = new System.Drawing.Point(12, 93);
-			this.hvscDirTb.Name = "hvscDirTb";
-			this.hvscDirTb.ReadOnly = true;
-			this.hvscDirTb.Size = new System.Drawing.Size(225, 20);
-			this.hvscDirTb.TabIndex = 10;
-			this.hvscDirTb.TabStop = false;
+			this.songLengthsUrlTb.Location = new System.Drawing.Point(12, 103);
+			this.songLengthsUrlTb.Name = "songLengthsUrlTb";
+			this.songLengthsUrlTb.Size = new System.Drawing.Size(415, 20);
+			this.songLengthsUrlTb.TabIndex = 10;
+			this.songLengthsUrlTb.TabStop = false;
+			this.songLengthsUrlTb.Text = "https://www.hvsc.c64.org/download/C64Music/DOCUMENTS/Songlengths.md5";
 			// 
-			// songLengthsCb
+			// label1
 			// 
-			this.songLengthsCb.AutoSize = true;
-			this.songLengthsCb.Location = new System.Drawing.Point(12, 119);
-			this.songLengthsCb.Name = "songLengthsCb";
-			this.songLengthsCb.Size = new System.Drawing.Size(178, 17);
-			this.songLengthsCb.TabIndex = 11;
-			this.songLengthsCb.Text = "Override internal songlengths db";
-			this.songLengthsCb.UseVisualStyleBackColor = true;
-			this.songLengthsCb.EnabledChanged += new System.EventHandler(this.songLengthCb_EnabledChanged);
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(12, 87);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(113, 13);
+			this.label1.TabIndex = 11;
+			this.label1.Text = "HVSC song lenghts url";
+			// 
+			// updateSongLengthsBtn
+			// 
+			this.updateSongLengthsBtn.Location = new System.Drawing.Point(12, 129);
+			this.updateSongLengthsBtn.Name = "updateSongLengthsBtn";
+			this.updateSongLengthsBtn.Size = new System.Drawing.Size(57, 23);
+			this.updateSongLengthsBtn.TabIndex = 11;
+			this.updateSongLengthsBtn.Text = "&Update";
+			this.updateSongLengthsBtn.UseVisualStyleBackColor = true;
+			this.updateSongLengthsBtn.Click += new System.EventHandler(this.updateSongLengthsBtn_Click);
+			// 
+			// defaultSongLengthsBtn
+			// 
+			this.defaultSongLengthsBtn.Location = new System.Drawing.Point(75, 129);
+			this.defaultSongLengthsBtn.Name = "defaultSongLengthsBtn";
+			this.defaultSongLengthsBtn.Size = new System.Drawing.Size(57, 23);
+			this.defaultSongLengthsBtn.TabIndex = 12;
+			this.defaultSongLengthsBtn.Text = "&Default";
+			this.defaultSongLengthsBtn.UseVisualStyleBackColor = true;
+			this.defaultSongLengthsBtn.Click += new System.EventHandler(this.defaultSongLengthsBtn_Click);
 			// 
 			// TpartyIntegrationForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(249, 147);
-			this.Controls.Add(this.songLengthsCb);
-			this.Controls.Add(this.hvscDirTb);
+			this.ClientSize = new System.Drawing.Size(436, 164);
+			this.Controls.Add(this.defaultSongLengthsBtn);
+			this.Controls.Add(this.updateSongLengthsBtn);
+			this.Controls.Add(this.label1);
+			this.Controls.Add(this.songLengthsUrlTb);
 			this.Controls.Add(this.modulesCb);
-			this.Controls.Add(this.hvscLink);
 			this.Controls.Add(this.xmPlayLink);
-			this.Controls.Add(this.browseHvscBtn);
 			this.Controls.Add(this.importXmPlayBtn);
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
@@ -152,12 +149,12 @@
 		#endregion
 		private System.Windows.Forms.Button importXmPlayBtn;
 		private System.Windows.Forms.LinkLabel xmPlayLink;
-		private System.Windows.Forms.Button browseHvscBtn;
-		private System.Windows.Forms.LinkLabel hvscLink;
 		private System.Windows.Forms.OpenFileDialog openXmPlayDialog;
 		public System.Windows.Forms.CheckBox modulesCb;
 		private System.Windows.Forms.OpenFileDialog openSidPlayDialog;
-		private System.Windows.Forms.TextBox hvscDirTb;
-		private System.Windows.Forms.CheckBox songLengthsCb;
+		private System.Windows.Forms.TextBox songLengthsUrlTb;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Button updateSongLengthsBtn;
+		private System.Windows.Forms.Button defaultSongLengthsBtn;
 	}
 }

@@ -12,13 +12,13 @@ using System.IO;
 using System.IO.Compression;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Text.RegularExpressions;
+using System.Net;
 
 namespace VisualMusic
 {
 	public partial class TpartyIntegrationForm : Form
 	{
-		const string SongLengthsFileName = "songlengths.md5";
-		static readonly public string TpartyDir = Path.Combine(Program.AppDataDir, "tparty");
+		public readonly static string TpartyDir = Path.Combine(Program.AppDataDir, "tparty");
 		public readonly static string XmPlayDir = Path.Combine(TpartyDir, "xmplay");
 		public readonly static string SidPlayDir = Path.Combine(TpartyDir, "sidplayfp");
 		public const string XmPlayFileName = "xmplay.exe";
@@ -28,33 +28,26 @@ namespace VisualMusic
 		public readonly static string XmPlayIniPath = Path.Combine(XmPlayDir, XmPlayIniFileName);
 		public readonly static string SidPlayPath = Path.Combine(SidPlayDir, SidPlayFileName);
 		public readonly static string MixdownOutputDir = Program.TempDir;
-		
-		CommonOpenFileDialog hvscDirDialog = new CommonOpenFileDialog();
-		string hvscDir = "";
-		public string HvscDir
+
+		const string DefaultSongLengthsUrl = "https://www.hvsc.c64.org/download/C64Music/DOCUMENTS/Songlengths.md5";
+		public readonly string SongLengthsPath = Path.Combine(TpartyDir, "hvsc", "songlenghts.md5");
+		string songLengthsUrl;
+		public string SongLengthsUrl
 		{
-			get => hvscDir;
-			set
-			{
-				hvscDir = hvscDirDialog.InitialDirectory = hvscDirTb.Text = value;
-				songLengthsCb.Enabled = HvscInstalled;
-				setXmPlayIni_hvscDir();
-			}
+			get => songLengthsUrl;
+			set => songLengthsUrl = songLengthsUrlTb.Text = value;
 		}
-		public string SongLengthsPath { get => Path.Combine(HvscDir, SongLengthsFileName); }
+
+		ProgressForm songLengthsDownloadForm;
+		readonly string tempSongLengthDownloadPath;
+
 		bool XmPlayInstalled { get => File.Exists(XmPlayPath); }
-		bool HvscInstalled { get => hvscInstalledAt(hvscDir); }
 		public bool ModuleMixdown{ get => modulesCb.Checked && XmPlayInstalled; set => modulesCb.Checked = XmPlayInstalled ? value : false; }
-		public bool HvscSongLengths { get => songLengthsCb.Checked && HvscInstalled; set => songLengthsCb.Checked = HvscInstalled ? value : false; }
-		
+				
 		public TpartyIntegrationForm()
 		{
 			InitializeComponent();
 			enableCheckboxes();
-			hvscDirDialog.IsFolderPicker = true;
-			hvscDirDialog.EnsurePathExists = true;
-			//hvscDirDialog.FileOk += new System.ComponentModel.CancelEventHandler(hvscDirDialog_FileOk);
-			hvscDirDialog.Title = @"Browse to C64Music\DOCUMENTS";
 			Directory.CreateDirectory(MixdownOutputDir);
 			if (!File.Exists(XmPlayIniPath))
 			{
@@ -62,6 +55,8 @@ namespace VisualMusic
 				File.Copy(Path.Combine(Program.Dir, XmPlayIniFileName), XmPlayIniPath);
 			}
 			setXmPlayIni_outputDir();
+			SongLengthsUrl = DefaultSongLengthsUrl;
+			tempSongLengthDownloadPath = SongLengthsPath + "_";
 		}
 
 		private void xmPlayLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -72,11 +67,6 @@ namespace VisualMusic
 		private void sidLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
 			Process.Start("https://sourceforge.net/projects/sidplay-residfp/files/sidplayfp/1.4/");
-		}
-
-		private void hvscLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-		{
-			Process.Start("http://www.hvsc.c64.org/#download");
 		}
 
 		void importZip(string zipPath, string checkForEntry, string extractionDir, CancelEventArgs e, bool keepDirStructure = false)
@@ -138,7 +128,6 @@ namespace VisualMusic
 			if (openXmPlayDialog.ShowDialog() == DialogResult.OK)
 			{
 				setXmPlayIni_outputDir();
-				//setXmPlayIni_hvscDir();
 				Directory.CreateDirectory(MixdownOutputDir);
 			}
 		}
@@ -146,7 +135,6 @@ namespace VisualMusic
 		private void importSidBtn_Click(object sender, EventArgs e)
 		{
 			openSidPlayDialog.ShowDialog();
-			//setXmPlayIni_hvscDir();
 		}
 
 		protected override bool ProcessDialogKey(Keys keyData)
@@ -159,30 +147,6 @@ namespace VisualMusic
 			return base.ProcessDialogKey(keyData);
 		}
 
-		private void browseHvscBtn_Click(object sender, EventArgs e)
-		{
-			bool close = false;
-			while (!close)
-			{
-				if (hvscDirDialog.ShowDialog() == CommonFileDialogResult.Ok)
-				{
-					close = true;
-					string newDir = hvscDirDialog.InitialDirectory = hvscDirDialog.FileName;
-					if (!hvscInstalledAt(newDir))
-					{
-						Form1.showErrorMsgBox(SongLengthsFileName + " not found in specified folder.");
-						close = false;
-					}
-					else
-						HvscDir = newDir;
-				}
-				else
-					close = true;
-			}
-			enableCheckboxes();
-			Focus();
-		}
-
 		private void openXmPlayDialog_FileOk(object sender, CancelEventArgs e)
 		{
 			importZip(openXmPlayDialog.FileName, XmPlayFileName, XmPlayDir, e);
@@ -193,23 +157,9 @@ namespace VisualMusic
 			importZip(openSidPlayDialog.FileName, SidPlayFileName, SidPlayDir, e);
 		}
 
-		private void hvscDirDialog_FileOk(object sender, CancelEventArgs e)
-		{
-			string oldDir = HvscDir;
-			HvscDir = hvscDirDialog.FileName;
-			if (!HvscInstalled)
-			{
-				Form1.showErrorMsgBox("songlengths.txt not found in specified folder.");
-				HvscDir = oldDir;
-				e.Cancel = true;
-			}
-			enableCheckboxes();
-		}
-
 		void enableCheckboxes()
 		{
 			modulesCb.Enabled = XmPlayInstalled;
-			songLengthsCb.Enabled = HvscInstalled;
 		}
 
 		private void TpartyIntegrationForm_Load(object sender, EventArgs e)
@@ -235,15 +185,6 @@ namespace VisualMusic
 			cb.Checked = cb.Enabled;
 		}
 
-		bool hvscInstalledAt(string dir)
-		{
-			return File.Exists(Path.Combine(dir,SongLengthsFileName));
-		}
-		
-		void setXmPlayIni_hvscDir()
-		{
-			setXmPlayIniValue("SID_.*", "documents", HvscDir);
-		}
 		void setXmPlayIni_outputDir()
 		{
 			setXmPlayIniValue("", "WritePath", MixdownOutputDir + "\\");
@@ -285,6 +226,54 @@ namespace VisualMusic
 			if (!keyFound)
 				throw new Exception("Couldn't find key " + key + " in " + XmPlayIniPath);
 			File.WriteAllLines(XmPlayIniPath, iniLines);
+		}
+
+		private void updateSongLengthsBtn_Click(object sender, EventArgs e)
+		{
+			downloadSonglengths();
+		}
+
+		public void downloadSonglengths()
+		{
+			WebClient webClient = new WebClient();
+			webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(WebClient_SongLengthsDownloadCompleted);
+			webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
+			webClient.DownloadFileAsync(new Uri(songLengthsUrlTb.Text), tempSongLengthDownloadPath);
+			
+			songLengthsDownloadForm = new ProgressForm();
+			if (songLengthsDownloadForm.ShowDialog() == DialogResult.Cancel)
+				webClient.CancelAsync();
+		}
+
+		private void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+		{
+			songLengthsDownloadForm.updateProgress(e.ProgressPercentage);
+		}
+
+		private void WebClient_SongLengthsDownloadCompleted(object sender, AsyncCompletedEventArgs e)
+		{
+			songLengthsDownloadForm.Close();
+			if (e.Cancelled)
+			{
+				File.Delete(tempSongLengthDownloadPath);
+				MessageBox.Show("Update cancelled.");
+				return;
+			}
+			else if (e.Error != null)
+			{
+				File.Delete(tempSongLengthDownloadPath);
+				Form1.showErrorMsgBox("Couldn't download file from the specified url");
+				return;
+			}
+			
+			File.Delete(SongLengthsPath);
+			File.Move(tempSongLengthDownloadPath, SongLengthsPath);
+			SongLengthsUrl = songLengthsUrlTb.Text;
+		}
+
+		private void defaultSongLengthsBtn_Click(object sender, EventArgs e)
+		{
+			SongLengthsUrl = songLengthsUrlTb.Text = DefaultSongLengthsUrl;
 		}
 	}
 }

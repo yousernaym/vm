@@ -124,12 +124,7 @@ namespace VisualMusic.Forms
 
 		Stream getSongLengthsStream()
 		{
-			Stream sr;
-			if (Form1.TpartyIntegrationForm.HvscSongLengths)
-				sr = new FileStream(Form1.TpartyIntegrationForm.SongLengthsPath, FileMode.Open, FileAccess.Read);
-			else
-				sr = new MemoryStream(Properties.Resources.Songlengths);
-			return sr;
+			return new FileStream(Form1.TpartyIntegrationForm.SongLengthsPath, FileMode.Open, FileAccess.Read);
 		}
 	}
 }

@@ -39,7 +39,6 @@ namespace VisualMusic
 				if (percent > 100)
 					percent = 100;
 				Text =  $"{ProgressText}: {percent.ToString()}%";
-
 				ProgressAtTime pat = new ProgressAtTime();
 				pat.time = stopwatch.Elapsed.TotalSeconds;
 				pat.normProgress = normProgress;
