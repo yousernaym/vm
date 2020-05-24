@@ -240,7 +240,15 @@ namespace VisualMusic
 			WebClient webClient = new WebClient();
 			webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(WebClient_SongLengthsDownloadCompleted);
 			webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
-			webClient.DownloadFileAsync(new Uri(songLengthsUrlTb.Text), tempSongLengthDownloadPath);
+			try
+			{
+				webClient.DownloadFileAsync(new Uri(songLengthsUrlTb.Text), tempSongLengthDownloadPath);
+			}
+			catch (UriFormatException)
+			{
+				Form1.showErrorMsgBox("Invalid url.");
+				return;
+			}
 			
 			songLengthsDownloadForm = new ProgressForm();
 			if (songLengthsDownloadForm.ShowDialog() == DialogResult.Cancel)
@@ -264,7 +272,7 @@ namespace VisualMusic
 			else if (e.Error != null)
 			{
 				File.Delete(tempSongLengthDownloadPath);
-				Form1.showErrorMsgBox("Couldn't download file from the specified url");
+				Form1.showErrorMsgBox("Couldn't download file from the specified url.");
 				return;
 			}
 			
