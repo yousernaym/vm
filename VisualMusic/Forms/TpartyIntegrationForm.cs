@@ -54,6 +54,8 @@ namespace VisualMusic
 				Directory.CreateDirectory(XmPlayDir);
 				File.Copy(Path.Combine(Program.Dir, XmPlayIniFileName), XmPlayIniPath);
 			}
+			if (!Directory.Exists(Path.GetDirectoryName(SongLengthsPath)))
+				Directory.CreateDirectory(Path.GetDirectoryName(SongLengthsPath));
 			setXmPlayIni_outputDir();
 			SongLengthsUrl = DefaultSongLengthsUrl;
 			tempSongLengthDownloadPath = SongLengthsPath + "_";
