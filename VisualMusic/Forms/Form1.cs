@@ -1184,6 +1184,7 @@ namespace VisualMusic
 				catch (IOException e)
 				{
 					showErrorMsgBox(e.Message);
+					SongPanel.Project = Project;
 					return;
 				}
 				catch (Exception ex) when (ex is FormatException || ex is FileNotFoundException)
