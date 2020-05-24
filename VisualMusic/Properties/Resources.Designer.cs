@@ -126,15 +126,5 @@ namespace VisualMusic.Properties {
                 return ResourceManager.GetString("SidFormats", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] Songlengths {
-            get {
-                object obj = ResourceManager.GetObject("Songlengths", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }
