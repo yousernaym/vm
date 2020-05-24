@@ -136,7 +136,7 @@ namespace VisualMusic
 
 			modWebBrowser = new SongWebBrowser(this, "https://modarchive.org/index.php?request=view_searchbox");
 			sidWebBrowser = new SongWebBrowser(this, "https://www.exotica.org.uk/wiki/Special:HVSC");
-			midiWebBrowser = new SongWebBrowser(this, "https://www.freemidi.org/");
+			midiWebBrowser = new SongWebBrowser(this, "https://bitmidi.com/");
 
 			screens.Add(SongPanel);
 			screens.Add(modWebBrowser);
@@ -1180,6 +1180,11 @@ namespace VisualMusic
 					tempProject.loadContent();
 					Project = tempProject;
 					break;
+				}
+				catch (IOException e)
+				{
+					showErrorMsgBox(e.Message);
+					return;
 				}
 				catch (Exception ex) when (ex is FormatException || ex is FileNotFoundException)
 				{

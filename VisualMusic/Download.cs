@@ -61,7 +61,8 @@ namespace VisualMusic
 
 		public bool Active { set => this.InvokeOnUiThreadIfRequired(() => Visible = value); }
 
-	AutoResetEvent checkFileNameEvent = new AutoResetEvent(false);
+		string url;
+		AutoResetEvent checkFileNameEvent = new AutoResetEvent(false);
 
 		public Client() : base("")
 		{
@@ -79,7 +80,7 @@ namespace VisualMusic
 
 		private void OnAddressChanged(object sender, AddressChangedEventArgs e)
 		{
-			progressForm.DialogResult = DialogResult.Cancel;
+			progressForm.DialogResult = DialogResult.Abort;
 		}
 
 		private void OnLoadError(object sender, LoadErrorEventArgs e)
@@ -109,15 +110,27 @@ namespace VisualMusic
 
 		public new string Load(string url)
 		{
-			Active = true;
-			base.Load(url);
-			if (progressForm.ShowDialog() != DialogResult.OK)
+			DialogResult dlgRes = DialogResult.Abort;
+			this.url = url;
+			try
 			{
-				savePath = null;
-				if (downloadHandler.UpdateCallback != null && !downloadHandler.UpdateCallback.IsDisposed)
-					downloadHandler.UpdateCallback.Cancel();
+				Active = true;
+				base.Load(url);
+				dlgRes = progressForm.ShowDialog();
 			}
-			Active = false;
+			finally
+			{
+				if (dlgRes != DialogResult.OK)
+				{
+					savePath = null;
+					if (downloadHandler.UpdateCallback != null && !downloadHandler.UpdateCallback.IsDisposed)
+						downloadHandler.UpdateCallback.Cancel();
+				}
+				Active = false;
+			}
+			if (dlgRes == DialogResult.Abort)
+				throw new IOException("Unexpected error while downloading from url: " + url);
+
 			return savePath;
 		}
 	}
