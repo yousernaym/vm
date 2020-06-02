@@ -351,7 +351,7 @@ namespace VisualMusic
 			fx.Parameters["DiffuseColor"].SetValue(((Color)lightProps.DiffuseColor).ToVector4() * (float)lightProps.DiffuseAmount);
 			fx.Parameters["SpecColor"].SetValue(((Color)lightProps.SpecColor).ToVector4() * (float)lightProps.SpecAmount);
 			fx.Parameters["SpecPower"].SetValue((float)(lightProps.SpecPower));
-			fx.Parameters["LightFilter"].SetValue(((Color)lightProps.MasterColor).ToVector4());
+			fx.Parameters["LightFilter"].SetValue(((Color)lightProps.MasterColor).ToVector4() * (float)lightProps.MasterAmount);
 
 			//Spatial props
 			fx.Parameters["PosOffset"].SetValue(Project.getSpatialNormPosOffset(trackProps)); ;

@@ -47,9 +47,7 @@ float4 PS(VSOutput IN) : COLOR0
 	float4 color = getPixelColor(IN.color, IN.texCoords);
     color = modulate(IN.normPos, IN.worldSize, color, float3(0, 0, 1), IN.worldPos.xyz);
 	
-    return color;
-	//return float4(1, 1, 1, color.r*10);
-	//return float4(ColorDest[0])+float4(0,0,0,color.x);
+	return color;
 }
 
 technique Technique1
