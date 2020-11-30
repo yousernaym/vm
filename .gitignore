@@ -43,9 +43,4 @@ packages/
 *.png
 *.jpeg
 *.jpg
-
-#Exceptions
-!/VisualMusic/minjector.exe
-!/InnoSetup/Files/**
-
 *.sf2

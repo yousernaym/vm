@@ -26,8 +26,7 @@ namespace VisualMusic
 		static public readonly string TempDir = Path.Combine(TempDirRoot, Path.GetRandomFileName()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
 		static public readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
 		static FileStream dirLock = null;
-		static string cefSharpFolder = "CefSharp";
-
+		
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
 		static void Main(string[] args)

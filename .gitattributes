@@ -1,4 +1,0 @@
-InnoSetup/Files/** filter=lfs diff=lfs merge=lfs -text
-VisualMusic/minjector.exe filter=lfs diff=lfs merge=lfs -text
-VisualMusic/Resources/Songlengths.md5 filter=lfs diff=lfs merge=lfs -text
-

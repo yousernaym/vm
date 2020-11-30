@@ -313,9 +313,6 @@
     <None Include="Resources\ModFormats.txt" />
     <None Include="Resources\MidiFormats.txt" />
     <None Include="Resources\SidFormats.txt" />
-    <Content Include="minjector.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="todo.txt" />
     <None Include="xmplay.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -425,7 +422,7 @@
     <PostBuildEvent>set platform=x64
 xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\*.dll" "$(TargetDir)" /D /Y
 xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\*.pdb" "$(TargetDir)" /D /Y
-
+xcopy "$(SolutionDir)Dependencies\spatial-media\dist\minjector.exe" "$(TargetDir)" /D /Y
 xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\remuxer" "$(TargetDir)remuxer" /D /E /Y /S /I
 xcopy "$(TargetDir)%25platform%25" "$(TargetDir)cefsharp\%25platform%25" /D /Y /S /I</PostBuildEvent>
   </PropertyGroup>
