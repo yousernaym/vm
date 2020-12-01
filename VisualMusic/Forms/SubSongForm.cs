@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,19 +13,19 @@ namespace VisualMusic.Forms
 {
 	public partial class SubSongForm : VisualMusic.BaseDialog
 	{
-		int _defaultSong;
-		List<int> songLengthList;
-		int _selectedSong;
+		int defaultSong;
+		List<float> songLengthList;
+		int selectedSong;
 		public int SelectedSong
 		{
-			get => _selectedSong;
+			get => selectedSong;
 			set
 			{
-				_selectedSong = Math.Max(value, 1);
-				_selectedSong = Math.Min(_selectedSong, NumSongs);
-				subSongsLB.SelectedIndex = _selectedSong - 1;
-				if (_selectedSong - 1 < songLengthList.Count)
-					SongLengthS = songLengthList[_selectedSong - 1];
+				selectedSong = Math.Max(value, 1);
+				selectedSong = Math.Min(selectedSong, NumSongs);
+				subSongsLB.SelectedIndex = selectedSong - 1;
+				if (selectedSong - 1 < songLengthList.Count)
+					SongLengthS = songLengthList[selectedSong - 1];
 				else
 					SongLengthS = 0;
 			}
@@ -42,27 +43,27 @@ namespace VisualMusic.Forms
 				NumSongs = (file.ReadByte() << 8) | file.ReadByte();
 				if (NumSongs < 1)
 					NumSongs = 1;
-				_defaultSong = (file.ReadByte() << 8) | file.ReadByte();
-				if (_defaultSong < 0 || _defaultSong > NumSongs)
-					_defaultSong = 1;
+				defaultSong = (file.ReadByte() << 8) | file.ReadByte();
+				if (defaultSong < 0 || defaultSong > NumSongs)
+					defaultSong = 1;
 			}
 
 			subSongsLB.Items.Clear();
 			string[] songLengthStrings = getSongLengths(songPath);
-			songLengthList = new List<int>();
+			songLengthList = new List<float>();
 			for (int i = 0; i < NumSongs; i++)
 			{
-				string defaultSuffix = i == _defaultSong - 1 ? " (default song)" : "";
+				string defaultSuffix = i == defaultSong - 1 ? " (default song)" : "";
 				if (songLengthStrings != null && songLengthStrings.Length > i)
 				{
 					subSongsLB.Items.Add((i + 1) + " - " + songLengthStrings[i] + defaultSuffix);
 					string[] minsec = ((string)songLengthStrings[i]).Split(':');
-					songLengthList.Add(int.Parse(minsec[0]) * 60 + int.Parse(minsec[1]));
+					songLengthList.Add(float.Parse(minsec[0]) * 60 + float.Parse(minsec[1], CultureInfo.InvariantCulture));
 				}
 				else
 					subSongsLB.Items.Add(i + " - unknown length" + defaultSuffix);
 			}
-			SelectedSong = _defaultSong;
+			SelectedSong = defaultSong;
 		}
 		
 		public SubSongForm()
