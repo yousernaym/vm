@@ -5,17 +5,14 @@ Supports midi, tracker and sid files. Can produce accompanying audio automatical
 Can export mp4 video files with support for 360-degree videos.  
 [Example video](https://www.youtube.com/watch?v=I5NhREgxhDw)
 
-## Building the source
+## Prerequisites
 
-### Prerequisites
-
-The following components are required for building:
-* [Visual Studio](https://visualstudio.microsoft.com/) with the following workloads:
+* Install [Visual Studio](https://visualstudio.microsoft.com/) with the following workloads:
 	* .NET desktop development
 	* Desktop development with C++  
-* [MonoGame for Visual Studio](http://community.monogame.net/t/monogame-3-7-1-release/11173)  
-* [Python 3](https://www.python.org/), and make sure it is added to PATH (needed for 360-degree videos)
-* Vcpkg and Fluidsynth (needed for General Midi songs):
+* Install [MonoGame for Visual Studio](http://community.monogame.net/t/monogame-3-7-1-release/11173)  
+* Install [Python 3](https://www.python.org/), and make sure it is added to PATH (needed for 360-degree videos)
+* Install Vcpkg and Fluidsynth (needed for General Midi songs):
 ```
 git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
@@ -23,17 +20,8 @@ bootstrap-vcpkg.bat
 vcpkg integrate install
 vcpkg install fluidsynth:x64-windows
 ```
-A [soundfont file](https://musescore.org/en/node/109371) named *soundfont.sf2* needs to be present in the app folder (eg. bin\Debug) to get General Midi audio, but is not needed to run the program.  
-
-### Building
-
-```
-git clone https://github.com/yousernaym/vm.git
-cd vm
-bootstrap
-```
-Then build and run (at this point Python is not needed anymore).  
-For optimal module playback, import XmPlay: **File -> Third-party integration.. -> Import XmPlay**.  
+* Run `bootstrap.bat` in the repo folder. After this is done, Python is not needed anymore.
+* (Optional) To get General Midi audio, place a [soundfont file](https://musescore.org/en/node/109371) named `soundfont.sf2` in the app folder (eg., bin\Debug).
 
 ## Usage
 
@@ -50,8 +38,17 @@ Hold Caps Lock and move mouse and/or click mouse buttons.
 Press CTRL-K to insert a key frame at the current playback position.  
 Changes to supported properties will be stored in the currently highlighted key frame. Only Viewport widht and Camera is supported atm.
 
+### XMPlay
+For optimal module playback, import XmPlay: `File -> Third-party integration.. -> Import XmPlay`.
 
 The rest should be self explanatory or possible to figure out with some experimentation.
+
+## Sub projects
+
+* [Remuxer](https://github.com/yousernaym/remuxer) - Mod/sid import (command-line tool)
+* [Midilib](https://github.com/yousernaym/midilib) - Midi import (C# class library)
+* [MidMix](https://github.com/yousernaym/midmix) - General Midi audio mixdown (C++ dll)
+* [Media](https://github.com/yousernaym/media) - Video export, audio playback (C++ dll)
 
 ## Author
 
