@@ -333,6 +333,7 @@ namespace VisualMusic
 			}
 			if (notes != null)
 				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + Props.AudioOffset));
+			AudioFilePath = file;
 
 		}
 
@@ -767,6 +768,8 @@ namespace VisualMusic
 		public int LargeScrollStepT => (int)(ViewWidthT * SongPanel.LargeScrollStep);
 
 		public string DefaultFileName { get; set; }
+		public string AudioFilePath { get; private set; }
+
 		public const string DefaultFileExt = ".vms";
 
 		public float getCurveScreenY(float x, Curve curve)

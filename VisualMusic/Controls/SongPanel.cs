@@ -234,7 +234,6 @@ namespace VisualMusic
 				Invalidate();
 			}
 		}
-
 		Rectangle normalizeRect(Rectangle _rect)
 		{
 			Rectangle rect = new Rectangle(_rect.X, _rect.Y, _rect.Width, _rect.Height);
@@ -267,11 +266,8 @@ namespace VisualMusic
 			lock (renderLock)
 			{
 				VideoFormat videoFormat = new VideoFormat((uint)options.Width, (uint)options.Height);
-				//videoFormat.bitRate = 160000000;
 				videoFormat.fps = options.Fps;
-				videoFormat.aspectNumerator = 1;
-				videoFormat.audioSampleRate = 48000;
-				if (!Media.beginVideoEnc(videoFilePath, videoFormat, true))
+				if (!Media.beginVideoEnc(videoFilePath, Project.AudioFilePath, videoFormat, Project.Props.AudioOffset + Project.Props.PlaybackOffsetS, options.Sphere && options.SphericalMetadata, AVCodecID.AV_CODEC_ID_H264))
 				{
 					lock (progressForm.cancelLock)
 						progressForm.Cancel = true;
@@ -312,8 +308,6 @@ namespace VisualMusic
 
 						uint[] frameData = new uint[options.Width * options.Height];
 						
-						UInt64 frameDuration = 0;
-						UInt64 frameStart = 0;
 						int frames = 0;
 						double songPosS = 0;
 						
@@ -325,7 +319,7 @@ namespace VisualMusic
 							//Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
 							//Project.createOcTrees();
 						}
-						Camera.InvertY = !options.Sphere;
+						//Camera.InvertY = !options.Sphere;
 						
 						Project.setSongPosS(0, false);
 						ssFx = Content.Load<Effect>("ss");
@@ -344,7 +338,7 @@ namespace VisualMusic
 							GraphicsDevice.SetRenderTarget(null);
 							renderTargetFinal.GetData<uint>(frameData);
 
-							bool b = Media.writeFrame(frameData, frameStart, ref frameDuration, Project.Props.AudioOffset + Project.Props.PlaybackOffsetS);
+							bool b = Media.writeFrame(frameData);
 							if (!b)
 							{
 								lock (progressForm.cancelLock)
@@ -352,7 +346,6 @@ namespace VisualMusic
 								progressForm.showMessage("Couldn't add frame");
 								break;
 							}
-							frameStart += frameDuration;
 							double frameTimeS = 1.0 / videoFormat.fps;
 							Project.setSongPosS(songPosS + frameTimeS, false);
 							songPosS += frameTimeS;
@@ -377,24 +370,6 @@ namespace VisualMusic
 						renderTarget2d8bit?.Dispose();
 						if (options.EnableSSAA)
 							renderTargetFinal?.Dispose();
-					}
-					if (options.VrMetadata)
-					{
-						Process injector = new Process();
-						injector.StartInfo.FileName = "minjector.exe";
-						string stereo = options.Stereo ? "--stereo top-bottom" : "";
-						string outputPath = videoFilePath + "_";
-						injector.StartInfo.Arguments = " -i " + stereo + " \"" + videoFilePath + "\" \"" + outputPath + "\"";
-						injector.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-						injector.Start();
-						injector.WaitForExit();
-
-						//If user cancelled rendering very quickly, the video file won't get written to, and no output file will be created by the injector
-						if (File.Exists(outputPath))
-						{
-							File.Delete(videoFilePath);
-							File.Move(outputPath, videoFilePath);
-						}
 					}
 				}
 			}

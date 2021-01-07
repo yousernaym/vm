@@ -10,7 +10,7 @@ namespace VisualMusic
 {
 	public partial class RenderProgressForm : ProgressForm
 	{
-		delegate void Delegate_renderVideo(string file, RenderProgressForm progressForm, VideoExportOptions options);
+		delegate void Delegate_renderVideo(string videoFilePath, RenderProgressForm progressForm, VideoExportOptions options);
 		delegate void Delegate_updateProgress(double progress);
 		delegate void Delegate_void_noparams();
 		delegate void Delegate_void_string(string str);

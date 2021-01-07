@@ -23,7 +23,7 @@ namespace VisualMusic
 		private void sphereCb_CheckedChanged(object sender, EventArgs e)
 		{
 			Options.Sphere = sphereCb.Checked;
-			vrMetadataCb.Enabled = vrMetadataCb.Checked = sphereCb.Checked;
+			sphericalMetadataCb.Enabled = sphericalMetadataCb.Checked = sphereCb.Checked;
 			updateResoItems();
 		}
 
@@ -103,7 +103,7 @@ namespace VisualMusic
 
 		private void vrMetadataCb_CheckedChanged(object sender, EventArgs e)
 		{
-			Options.VrMetadata = vrMetadataCb.Checked;
+			Options.SphericalMetadata = sphericalMetadataCb.Checked;
 		}
 
 		private void ssFactorComboBox_TextChanged(object sender, EventArgs e)
@@ -129,7 +129,7 @@ namespace VisualMusic
 		{
 			Options = options;
 			sphereCb.Checked = options.Sphere;
-			vrMetadataCb.Checked = options.VrMetadata;
+			sphericalMetadataCb.Checked = options.SphericalMetadata;
 			StereoscopicCb.Checked = options.Stereo;
 			fpsTb.Text = options.Fps.ToString();
 			resoComboBox.SelectedIndex = options.resoIndex;
@@ -192,7 +192,7 @@ namespace VisualMusic
 		public bool EnableSSAA => ssaaFactor > 1;
 		public bool Sphere;
 		public bool Stereo;
-		public bool VrMetadata;
+		public bool SphericalMetadata;
 		public float Fps = 60;
 		internal int resoIndex
 		{
@@ -221,7 +221,7 @@ namespace VisualMusic
 				if (entry.Name == "sphere")
 					Sphere = (bool)entry.Value;
 				else if (entry.Name == "vrMeta")
-					VrMetadata = (bool)entry.Value;
+					SphericalMetadata = (bool)entry.Value;
 				else if (entry.Name == "vrStereo")
 					Stereo = (bool)entry.Value;
 				else if (entry.Name == "sphereResoIndex")
@@ -237,7 +237,7 @@ namespace VisualMusic
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("sphere", Form1.VidExpForm.Options.Sphere);
-			info.AddValue("vrMeta", Form1.VidExpForm.Options.VrMetadata);
+			info.AddValue("vrMeta", Form1.VidExpForm.Options.SphericalMetadata);
 			info.AddValue("vrStereo", Form1.VidExpForm.Options.Stereo);
 			info.AddValue("sphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.sphereResoIndex));
 			info.AddValue("nonSphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.nonSphereResoIndex));
