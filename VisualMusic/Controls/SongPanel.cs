@@ -267,7 +267,7 @@ namespace VisualMusic
 			{
 				VideoFormat videoFormat = new VideoFormat((uint)options.Width, (uint)options.Height);
 				videoFormat.fps = options.Fps;
-				if (!Media.beginVideoEnc(videoFilePath, Project.AudioFilePath, videoFormat, Project.Props.AudioOffset + Project.Props.PlaybackOffsetS, options.Sphere && options.SphericalMetadata, AVCodecID.AV_CODEC_ID_H264))
+				if (!Media.beginVideoEnc(videoFilePath, Project.AudioFilePath, videoFormat, Project.Props.AudioOffset + Project.Props.PlaybackOffsetS, options.Sphere && options.SphericalMetadata, options.SphericalStereo, AVCodecID.AV_CODEC_ID_H264))
 				{
 					lock (progressForm.cancelLock)
 						progressForm.Cancel = true;
@@ -292,16 +292,16 @@ namespace VisualMusic
 						if (options.Sphere)
 						{
 							for (int i = 0; i < 2; i++)
-								renderTarget2d32bit[i] = new RenderTarget2D(GraphicsDevice, options.SSAAWidth, options.SSAAHeight, options.EnableSSAA, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+								renderTarget2d32bit[i] = new RenderTarget2D(GraphicsDevice, options.SSAAWidth, options.SSAAHeight, options.SSAAEnabled, SurfaceFormat.Vector4, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 							renderTargetCube = new RenderTargetCube(GraphicsDevice, CmFaceSide, true, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 							cubeToPlaneFx = Content.Load<Effect>("CubeToPlane");
 							cubeToPlaneFx.Parameters["CubeMap"].SetValue(renderTargetCube);
 							cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)frameSamples);
 						}
 
-						renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, options.SSAAWidth, options.SSAAHeight, options.EnableSSAA, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
+						renderTarget2d8bit = new RenderTarget2D(GraphicsDevice, options.SSAAWidth, options.SSAAHeight, options.SSAAEnabled, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 
-						if (options.EnableSSAA)
+						if (options.SSAAEnabled)
 							renderTargetFinal = new RenderTarget2D(GraphicsDevice, options.Width, options.Height, false, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
 						else
 							renderTargetFinal = renderTarget2d8bit;
@@ -327,7 +327,7 @@ namespace VisualMusic
 						{
 							Project.interpolateFrames();
 							drawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d32bit, renderTarget2d8bit, cubeToPlaneFx);
-							if (options.EnableSSAA)
+							if (options.SSAAEnabled)
 							{
 								GraphicsDevice.SetRenderTarget(renderTargetFinal);
 								GraphicsDevice.Clear(Color.Transparent);
@@ -368,7 +368,7 @@ namespace VisualMusic
 						for (int i = 0; i < 2; i++)
 							renderTarget2d32bit[i]?.Dispose();
 						renderTarget2d8bit?.Dispose();
-						if (options.EnableSSAA)
+						if (options.SSAAEnabled)
 							renderTargetFinal?.Dispose();
 					}
 				}
@@ -403,7 +403,7 @@ namespace VisualMusic
 			GraphicsDevice.Clear(Color.Transparent);
 			if (options.Sphere)
 			{
-				if (options.Stereo)
+				if (options.SphericalStereo)
 				{
 					drawSphere(options, renderTargetCube, renderTarget2d, prevFrame, cubeToPlaneFx, -1);
 					drawSphere(options, renderTargetCube, renderTarget2d, prevFrame, cubeToPlaneFx, 1);
@@ -414,14 +414,14 @@ namespace VisualMusic
 			else
 			{
 				Viewport viewport = GraphicsDevice.Viewport;
-				if (options.Stereo)
+				if (options.SphericalStereo)
 				{
 					Project.Props.Camera.Eye = -1;
 					GraphicsDevice.Viewport = new Viewport(0, 0, viewport.Width / 2, viewport.Height);
 
 				}
 				Project.drawSong();
-				if (options.Stereo)
+				if (options.SphericalStereo)
 				{
 					Project.Props.Camera.Eye = 1;
 					GraphicsDevice.Viewport = new Viewport(viewport.Width / 2, 0, viewport.Width / 2, viewport.Height);
@@ -470,7 +470,7 @@ namespace VisualMusic
 
 			cubeToPlaneFx.Parameters["ViewportSize"].SetValue(new Vector2(vpBounds.Z, vpBounds.W));
 			cubeToPlaneFx.Parameters["PrevFrameScaleOffset"].SetValue(prevFrameSO);
-			cubeToPlaneFx.Parameters["FovLimit"].SetValue(options.Stereo ? (float)Math.Cos(150f / 360 * Math.PI) : -1);
+			cubeToPlaneFx.Parameters["FovLimit"].SetValue(options.SphericalStereo ? (float)Math.Cos(150f / 360 * Math.PI) : -1);
 
 			GraphicsDevice.Viewport = new Viewport((int)vpBounds.X, (int)vpBounds.Y, (int)vpBounds.Z, (int)vpBounds.W);
 			cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();

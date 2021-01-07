@@ -29,7 +29,7 @@ namespace VisualMusic
 
 		private void resoComboBox_TextChanged(object sender, EventArgs e)
 		{
-			Options.resoIndex = resoComboBox.SelectedIndex;
+			Options.ResoIndex = resoComboBox.SelectedIndex;
 			parseReso(resoComboBox);
 		}
 
@@ -52,7 +52,7 @@ namespace VisualMusic
 
 		private void StereoscopicCb_CheckedChanged(object sender, EventArgs e)
 		{
-			Options.Stereo = StereoscopicCb.Checked;
+			Options.SphericalStereo = StereoscopicCb.Checked;
 			updateResoItems();
 		}
 
@@ -62,18 +62,24 @@ namespace VisualMusic
 			resoComboBox.Items.Clear();
 			if (Options.Sphere)
 			{
-				if (Options.Stereo)
-					resoComboBox.Items.Add("3060 x 3060");
-
+				if (Options.SphericalStereo)
+				{
+					resoComboBox.Items.Add("8192 x 8192");
+					resoComboBox.Items.Add("4096 x 4096");
+				}
 				else
-					resoComboBox.Items.Add("4320 x 2160");
+				{
+					resoComboBox.Items.Add("8192 x 4096");
+					resoComboBox.Items.Add("4096 x 2048");
+				}
 			}
 			else
 			{
+				resoComboBox.Items.Add("7680 x 4320");
 				resoComboBox.Items.Add("3840 x 2160");
 				resoComboBox.Items.Add("1920 x 1080");
 			}
-			resoComboBox.SelectedIndex = Options.resoIndex;
+			resoComboBox.SelectedIndex = Options.ResoIndex;
 		}
 
 		bool parseReso(ComboBox resoBox)
@@ -130,10 +136,10 @@ namespace VisualMusic
 			Options = options;
 			sphereCb.Checked = options.Sphere;
 			sphericalMetadataCb.Checked = options.SphericalMetadata;
-			StereoscopicCb.Checked = options.Stereo;
+			StereoscopicCb.Checked = options.SphericalStereo;
 			fpsTb.Text = options.Fps.ToString();
-			resoComboBox.SelectedIndex = options.resoIndex;
-			ssFactorComboBox.SelectedIndex = options.ssaaIndex;
+			resoComboBox.SelectedIndex = options.ResoIndex;
+			ssFactorComboBox.SelectedIndex = options.SsaaIndex;
 		}
 
 		private void fpsTb_TextChanged(object sender, EventArgs e)
@@ -189,12 +195,12 @@ namespace VisualMusic
 				updateSSAAReso();
 			}
 		}
-		public bool EnableSSAA => ssaaFactor > 1;
+		public bool SSAAEnabled => ssaaFactor > 1;
 		public bool Sphere;
-		public bool Stereo;
+		public bool SphericalStereo;
 		public bool SphericalMetadata;
 		public float Fps = 60;
-		internal int resoIndex
+		public int ResoIndex
 		{
 			get => Sphere ? sphereResoIndex : nonSphereResoIndex;
 			set
@@ -205,13 +211,13 @@ namespace VisualMusic
 					nonSphereResoIndex = value;
 			}
 		}
-		internal int sphereResoIndex;
-		internal int nonSphereResoIndex;
-		internal int ssaaIndex => (int)Math.Log(ssaaFactor, 2);
+		int sphereResoIndex = 1;
+		int nonSphereResoIndex = 1;
+		public int SsaaIndex => (int)Math.Log(ssaaFactor, 2);
 
 		public VideoExportOptions()
 		{
-
+			
 		}
 
 		public VideoExportOptions(SerializationInfo info, StreamingContext context)
@@ -223,7 +229,7 @@ namespace VisualMusic
 				else if (entry.Name == "vrMeta")
 					SphericalMetadata = (bool)entry.Value;
 				else if (entry.Name == "vrStereo")
-					Stereo = (bool)entry.Value;
+					SphericalStereo = (bool)entry.Value;
 				else if (entry.Name == "sphereResoIndex")
 					sphereResoIndex = (int)entry.Value;
 				else if (entry.Name == "nonSphereResoIndex")
@@ -238,7 +244,7 @@ namespace VisualMusic
 		{
 			info.AddValue("sphere", Form1.VidExpForm.Options.Sphere);
 			info.AddValue("vrMeta", Form1.VidExpForm.Options.SphericalMetadata);
-			info.AddValue("vrStereo", Form1.VidExpForm.Options.Stereo);
+			info.AddValue("vrStereo", Form1.VidExpForm.Options.SphericalStereo);
 			info.AddValue("sphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.sphereResoIndex));
 			info.AddValue("nonSphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.nonSphereResoIndex));
 			info.AddValue("ssaaFactor", Form1.VidExpForm.Options.SSAAFactor);

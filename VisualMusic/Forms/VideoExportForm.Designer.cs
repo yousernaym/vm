@@ -30,7 +30,7 @@
 		{
 			this.sphereCb = new System.Windows.Forms.CheckBox();
 			this.StereoscopicCb = new System.Windows.Forms.CheckBox();
-			this.vrMetadataCb = new System.Windows.Forms.CheckBox();
+			this.sphericalMetadataCb = new System.Windows.Forms.CheckBox();
 			this.resoComboBox = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.ssFactorComboBox = new System.Windows.Forms.ComboBox();
@@ -65,23 +65,23 @@
 			this.StereoscopicCb.AutoSize = true;
 			this.StereoscopicCb.Location = new System.Drawing.Point(12, 35);
 			this.StereoscopicCb.Name = "StereoscopicCb";
-			this.StereoscopicCb.Size = new System.Drawing.Size(88, 17);
+			this.StereoscopicCb.Size = new System.Drawing.Size(156, 17);
 			this.StereoscopicCb.TabIndex = 30;
-			this.StereoscopicCb.Text = "Stereoscopic";
+			this.StereoscopicCb.Text = "Stereoscopic (experimental)";
 			this.StereoscopicCb.UseVisualStyleBackColor = true;
 			this.StereoscopicCb.CheckedChanged += new System.EventHandler(this.StereoscopicCb_CheckedChanged);
 			// 
-			// vrMetadataCb
+			// sphericalMetadataCb
 			// 
-			this.vrMetadataCb.AutoSize = true;
-			this.vrMetadataCb.Enabled = false;
-			this.vrMetadataCb.Location = new System.Drawing.Point(103, 12);
-			this.vrMetadataCb.Name = "vrMetadataCb";
-			this.vrMetadataCb.Size = new System.Drawing.Size(99, 17);
-			this.vrMetadataCb.TabIndex = 20;
-			this.vrMetadataCb.Text = "Inject metadata";
-			this.vrMetadataCb.UseVisualStyleBackColor = true;
-			this.vrMetadataCb.CheckedChanged += new System.EventHandler(this.vrMetadataCb_CheckedChanged);
+			this.sphericalMetadataCb.AutoSize = true;
+			this.sphericalMetadataCb.Enabled = false;
+			this.sphericalMetadataCb.Location = new System.Drawing.Point(103, 12);
+			this.sphericalMetadataCb.Name = "sphericalMetadataCb";
+			this.sphericalMetadataCb.Size = new System.Drawing.Size(137, 17);
+			this.sphericalMetadataCb.TabIndex = 20;
+			this.sphericalMetadataCb.Text = "Add spherical metadata";
+			this.sphericalMetadataCb.UseVisualStyleBackColor = true;
+			this.sphericalMetadataCb.CheckedChanged += new System.EventHandler(this.vrMetadataCb_CheckedChanged);
 			// 
 			// resoComboBox
 			// 
@@ -153,7 +153,7 @@
 			this.Controls.Add(this.ssFactorComboBox);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.resoComboBox);
-			this.Controls.Add(this.vrMetadataCb);
+			this.Controls.Add(this.sphericalMetadataCb);
 			this.Controls.Add(this.StereoscopicCb);
 			this.Controls.Add(this.sphereCb);
 			this.Name = "VideoExportForm";
@@ -162,7 +162,7 @@
 			this.Controls.SetChildIndex(this.cancelBtn, 0);
 			this.Controls.SetChildIndex(this.sphereCb, 0);
 			this.Controls.SetChildIndex(this.StereoscopicCb, 0);
-			this.Controls.SetChildIndex(this.vrMetadataCb, 0);
+			this.Controls.SetChildIndex(this.sphericalMetadataCb, 0);
 			this.Controls.SetChildIndex(this.resoComboBox, 0);
 			this.Controls.SetChildIndex(this.label1, 0);
 			this.Controls.SetChildIndex(this.ssFactorComboBox, 0);
@@ -177,7 +177,7 @@
 		#endregion
 		public System.Windows.Forms.CheckBox StereoscopicCb;
 		private System.Windows.Forms.CheckBox sphereCb;
-		public System.Windows.Forms.CheckBox vrMetadataCb;
+		public System.Windows.Forms.CheckBox sphericalMetadataCb;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
 		public System.Windows.Forms.ComboBox resoComboBox;
