@@ -195,7 +195,7 @@ namespace VisualMusic
 				updateSSAAReso();
 			}
 		}
-		public bool SSAAEnabled => ssaaFactor > 1;
+		public bool SSAAEnabled => ssaaFactor > 1 && SSAAWidth > Width && SSAAHeight > Height;
 		public bool Sphere;
 		public bool SphericalStereo;
 		public bool SphericalMetadata;
@@ -255,7 +255,7 @@ namespace VisualMusic
 		{
 			SSAAWidth = Width * ssaaFactor;
 			SSAAHeight = Height * ssaaFactor;
-			while (SSAAWidth > 16384 || SSAAHeight > 16384)
+			while ((SSAAWidth > 16384 || SSAAHeight > 16384))
 			{
 				SSAAWidth /= 2;
 				SSAAHeight /= 2;
