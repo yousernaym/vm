@@ -2,8 +2,12 @@
 
 A Windows app that visualizes note-based music files, inspired by Stephen Malinovski's [MAM videos](https://www.youtube.com/user/smalin).  
 Supports midi, tracker and sid files. Can produce accompanying audio automatically or you can supply your own mixed-down audio file.  
-Can export mkv video files with lossless H264 video compression and uncompressed audio. Support for 360-degree videos.  
+Can export mkv video files with support for 360-degree videos.  
 [Example video](https://www.youtube.com/watch?v=I5NhREgxhDw)
+
+## Installation
+
+[Windows installer](https://github.com/yousernaym/vm/releases/download/v1.0.0-beta/Visual.Music.setup-x64.exe)
 
 ## Building the source
 
@@ -17,7 +21,7 @@ Can export mkv video files with lossless H264 video compression and uncompressed
     bootstrap-vcpkg.bat
     vcpkg integrate install
     vcpkg install fluidsynth:x64-windows
-    vcpkg install ffmpeg[h264,vpx]:windows-x64
+    vcpkg install ffmpeg[x264,vpx]:x64-windows
     ```
 * Download this repo including submodules:
 ```
@@ -31,9 +35,9 @@ Can export mkv video files with lossless H264 video compression and uncompressed
 ## Basic usage
 
 ### Import a song from the web
-1. Press F2, F3 or F4 to go to one of the song browsers.
-2. Click on a song download link (**not** a playback link).
-3. When returned to the playback screen, press CTRL-Space to start playback.
+1. Press F2, F3 or F4 to go to one of the song browsers
+2. Click on a song download link (not a playback link)
+3. When returned to the playback screen, press CTRL-Space to start playing
 
 ### Camera control
 Keyboard keys: wasdqexc  
@@ -41,7 +45,7 @@ Hold Caps Lock and move mouse and/or click mouse buttons.
 
 ### Key frames (WIP)
 Press CTRL-K to insert a key frame at the current playback position.  
-Changes to supported properties will be stored in the currently highlighted key frame. Only Viewport widht and Camera is supported atm.
+Changes to supported properties will be stored in the currently highlighted key frame. Currently only Viewport widht and Camera is supported.
 
 ### XMPlay
 For optimal module playback, import XmPlay: `File -> Third-party integration.. -> Import XmPlay`.
@@ -52,7 +56,7 @@ For optimal module playback, import XmPlay: `File -> Third-party integration.. -
 Mod import, based on [libmikmod](http://mikmod.sourceforge.net/).  
 Sid import, based on [libsidplayfp](https://sourceforge.net/projects/sidplay-residfp/).
 #### [Midilib](https://github.com/yousernaym/midilib) (C# class library)  
-Midi import.
+Midi import/export.
 #### [MidMix](https://github.com/yousernaym/midmix) (C++ dll)
 General Midi audio, based on [Fluidsynth](http://www.fluidsynth.org/).  
 #### [Media](https://github.com/yousernaym/media) (C++ dll)  
