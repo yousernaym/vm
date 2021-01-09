@@ -22,7 +22,7 @@ DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=.
-OutputBaseFilename={#MyAppName} setup
+OutputBaseFilename={#MyAppName} setup-x64
 Compression=lzma
 SolidCompression=yes
 VersionInfoVersion={#MyAppVersion}
@@ -50,22 +50,20 @@ Name: "docsFolder"; Description: "Create folder '<user>\Documents\Visual Music'"
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-Source: "..\VisualMusic\bin\anycpu\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "Files\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\anycpu\Release\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\anycpu\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\anycpu\Release\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\anycpu\Release\midilib.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Monogame
 Source: "..\VisualMusic\bin\anycpu\Release\MonoGame.Framework.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\SharpDX.Direct3D11.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\SharpDX.DXGI.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
+
+;Midilib
+Source: "..\VisualMusic\bin\anycpu\Release\midilib.dll"; DestDir: "{app}"; Flags: ignoreversion
+
+;Remuxer
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\*.dll"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\Remuxer.exe"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\roms\*"; DestDir: "{app}\Remuxer\Roms"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\anycpu\Release\minjector.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\VisualMusic\xmplay.ini"; DestDir: "{#MyAppDataDir}\tparty\xmplay"; Flags: ignoreversion
 
 ;Cefsharp
 Source: "..\VisualMusic\bin\anycpu\Release\x64\cef.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
@@ -98,11 +96,26 @@ Source: "..\VisualMusic\bin\AnyCPU\Release\MidMix.dll"; DestDir: "{app}"; Flags:
 Source: "..\VisualMusic\bin\AnyCPU\Release\libfluidsynth-2.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\AnyCPU\Release\glib-2.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\AnyCPU\Release\libcharset.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\AnyCPU\Release\libcharset.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\iconv-2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\intl-8.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\AnyCPU\Release\pcre.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\AnyCPU\Release\libiconv.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\AnyCPU\Release\libintl.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Files\soundfont.sf2"; DestDir: "{app}"; Flags: ignoreversion
+
+;Media + Ffmpeg
+Source: "..\VisualMusic\bin\anycpu\Release\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\avcodec-58.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\avformat-58.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\avutil-56.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\libx264-157.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\swresample-3.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\AnyCPU\Release\swscale-5.dll"; DestDir: "{app}"; Flags: ignoreversion
+
+;Misc
+Source: "..\VisualMusic\bin\anycpu\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Files\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
+Source: "..\VisualMusic\xmplay.ini"; DestDir: "{#MyAppDataDir}\tparty\xmplay"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\VisualMusic\bin\anycpu\Release\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
