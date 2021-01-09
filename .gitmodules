@@ -18,7 +18,3 @@
 	path = Dependencies/MonoGame
 	url = https://github.com/yousernaym/MonoGame.git
 	branch = My_branch
-[submodule "Dependencies/spatial-media"]
-	path = Dependencies/spatial-media
-	url = https://github.com/yousernaym/spatial-media.git
-	branch = master
