@@ -42,7 +42,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
-Name: "docsFolder"; Description: "Create folder '<user>\Documents\Visual Music'"
+Name: "docsFolder"; Description: "Create folder '<user-documents>\Visual Music'"
 ;Name: "associateVms"; Description: "Associate with .vms files";
 ;Name: "associateMod"; Description: "Associate with module files";
 ;Name: "associateMod\mod"; Description: ".mod";
@@ -138,3 +138,8 @@ Root: HKCR; SubKey: "{#SongFileType}"; ValueType: string; ValueName: ""; ValueDa
 Root: HKCR; Subkey: "{#SongFileType}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
 Root: HKCR; SubKey: "{#SongFileType}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 ;Root: HKCU;  Subkey: "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.vms\UserChoice"; ValueData: "{#SongFileType}";  ValueType: string;  ValueName: "Progid"; Tasks: associateVms
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{#MyAppDataDir}"
+Type: dirifempty; Name: "{#UserFiles}"
+Type: dirifempty; Name: "{app}"
