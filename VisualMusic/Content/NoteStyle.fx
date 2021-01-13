@@ -1,10 +1,10 @@
 ﻿float SongFade;
+float4x4 WorldMat;
 float4x4 VpMat;
 float2 ViewportSize;
 texture Texture;
 bool UseTexture;
 bool TexColBlend;
-float2 ProjScale;
 float SongPos;
 float2 TexScrollOffset;
 float VertWidthScale;
@@ -89,10 +89,8 @@ void fillModEntryStruct(out ModEntry entry, int index)
 	entry.Power = Power[index];
 	entry.DiscardAfterStop = DiscardAfterStop[index];
 	entry.Invert = Invert[index];
-	
 }
 
-//bool bla[4][3];
 int ActiveModEntries;
 //##define ModSource_TopLeft 0
 //##define Center 1
@@ -101,6 +99,20 @@ int ActiveModEntries;
 #define CombineXY_Length 1
 #define CombineXY_Max 2
 #define CombineXY_Min 3
+
+//World pos is returned to parameter vertPos
+//Projection pos is returned as normal return value
+float4 wvpTransform(inout float4 vertPos, float widthScale)
+{
+	//Transform to world space
+	vertPos.xyz += PosOffset;
+	vertPos.x *= widthScale;
+	vertPos.x -= SongPos;
+	vertPos = mul(vertPos, WorldMat);
+	
+	//Transform from world to projection space
+	return mul(vertPos, VpMat);
+}
 
 float4 blurEdges(float4 color, float normPosY)
 {

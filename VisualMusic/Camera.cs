@@ -67,7 +67,6 @@ namespace VisualMusic
 		const float rotSpeed = 0.5f;
 		const float moveSpeed = 0.5f;
 
-		
 		public Matrix RotMat
 		{
 			get
@@ -163,8 +162,8 @@ namespace VisualMusic
 		}
 
 		public Matrix VpMat => ViewMat * ProjMat;
-		static public SongPanel SongPanel => Form1.SongPanel;
-
+		public bool RenderingToCubemap => CubeMapFace >= 0;
+		public static SongPanel SongPanel => Form1.SongPanel;
 		public static bool MouseRot { get; set; } = false;
 
 		//Methods/////////////////////////////////

@@ -319,17 +319,7 @@ namespace VisualMusic
 					}
 					int frames = 0;
 					double songPosS = 0;
-
-					if (options.Sphere)
-					{
-						//Project.ViewWidthQn /= 3;
-						//int pitchChange = (int)((Project.MaxPitch - Project.MinPitch) / 5.0f);
-						//Project.MaxPitch -= (int)(pitchChange / 1.3f);
-						//Project.MinPitch += (int)(pitchChange * 1.3f); //Stretch downwards. It's easier for the neck to look down than up with vr glasses
-						//Project.createOcTrees();
-					}
-					//Camera.InvertY = !options.Sphere;
-
+					Camera.InvertY = options.Sphere;
 					Project.setSongPosS(0, false);
 					ssFx = Content.Load<Effect>("ss");
 					while (Project.NormSongPos < 1 && !progressForm.Cancel)

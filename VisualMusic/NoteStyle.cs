@@ -278,8 +278,6 @@ namespace VisualMusic
 			fx.Parameters["SongPos"].SetValue(songPosP);
 			fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Props.Camera.ViewportSize.X, Project.Props.Camera.ViewportSize.Y));
 			fx.Parameters["VpMat"].SetValue(Project.Props.Camera.VpMat);
-			fx.Parameters["ProjScale"].SetValue(new Vector2(Project.Props.Camera.ProjMat.M11, Project.Props.Camera.ProjMat.M22));
-
 			fx.Parameters["VertWidthScale"].SetValue(Project.FxViewWidthQnScale);
 			//fx.Parameters["TexWidthScale"].SetValue(texMaterial.TexProps.UAnchor == TexAnchorEnum.Screen ? VertWidthScale : 1);
 
@@ -326,8 +324,7 @@ namespace VisualMusic
 			//Material
 			GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
 			GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
-//			GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true,
-//																			CullMode = CullMode.None };
+//			GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true, CullMode = CullMode.None };
 			//GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 			//GraphicsDevice.RasterizerState.MultiSampleAntiAlias = true;
 			Texture2D texture;
@@ -355,7 +352,10 @@ namespace VisualMusic
 
 			//Spatial props
 			fx.Parameters["PosOffset"].SetValue(Project.getSpatialNormPosOffset(trackProps)); ;
-
+			//Scale world space if rendering to cubemap to make non-360 and 360 videos look the same
+			Matrix worldMat = Matrix.CreateScale(Project.Props.Camera.RenderingToCubemap ? 5f/3 : 1);
+			fx.Parameters["WorldMat"].SetValue(worldMat);
+			
 			fx.Parameters["CamPos"].SetValue(Project.Props.Camera.Pos);
 
 			//Texture scrolling including adjustment for screen anchoring
@@ -391,7 +391,6 @@ namespace VisualMusic
 			ModEntries.Add(new NoteStyleMod(name));
 			if (selectItem)
 				SelectedModEntryIndex = ModEntries.Count - 1;
-
 		}
 
 		public void deleteModEntry(int entry = -1)

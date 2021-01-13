@@ -35,16 +35,10 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.center = IN.center;
 	OUT.rawPos = IN.pos.xyz;
 	OUT.normPos = IN.normPos;
-	//OUT.worldSize = IN.WorldSize;
-	
-	//IN.texCoords.x *= TexWidthScale;
-	OUT.texCoords = IN.texCoords - TexScrollOffset;
-	
 	OUT.pos = float4(IN.pos.xy, 0, 1);
-	OUT.pos.xyz += PosOffset;
 	OUT.pos.x *= VertWidthScale;
-	OUT.pos.x -= SongPos;
-	OUT.pos = mul(OUT.pos, VpMat);
+	OUT.pos = wvpTransform(OUT.pos, VertWidthScale);
+	OUT.texCoords = IN.texCoords - TexScrollOffset;
 }
 
 float4 PS(in VSOutput IN) : COLOR0
@@ -104,9 +98,7 @@ void HlVS(in HlVSInput IN, out HlVSOutput OUT)
 {
 	OUT.rawPos = IN.pos.xyz;
 	OUT.pos = float4(IN.pos.xy, 0, 1);
-	OUT.pos.xyz += PosOffset;
-	OUT.pos.x -= SongPos;
-	OUT.pos = mul(OUT.pos, VpMat);
+	OUT.pos = wvpTransform(OUT.pos, 1);
     OUT.color = HslaToRgba(Color);
     OUT.hlColor = HslaToRgba(HlColor);
 }

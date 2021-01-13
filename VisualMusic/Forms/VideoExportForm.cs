@@ -211,7 +211,7 @@ namespace VisualMusic
 					nonSphereResoIndex = value;
 			}
 		}
-		int sphereResoIndex = 1;
+		int sphereResoIndex = 0;
 		int nonSphereResoIndex = 1;
 		public int SsaaIndex => (int)Math.Log(ssaaFactor, 2);
 

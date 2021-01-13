@@ -1168,9 +1168,9 @@ namespace VisualMusic
 					tempProject = (Project)dcs.ReadObject(stream);
 				}
 			}
-			catch (SerializationException)
+			catch (SerializationException e)
 			{
-				showErrorMsgBox("Invalid project file.");
+				showErrorMsgBox("Invalid project file.\n" + e.Message);
 				return;
 			}
 			do
