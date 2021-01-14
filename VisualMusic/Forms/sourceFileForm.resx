@@ -304,7 +304,7 @@
     <value>157, 17</value>
   </metadata>
   <data name="openAudioFileDlg.Filter" xml:space="preserve">
-    <value>Audio files (*.mp3; *.wma; *.wav)|*.mp3; *.wma; *.wav|All files|*.*</value>
+    <value>Audio files (*.wav)|*.wav|All files|*.*</value>
   </data>
   <data name="openAudioFileDlg.Title" xml:space="preserve">
     <value>Open audio file</value>
