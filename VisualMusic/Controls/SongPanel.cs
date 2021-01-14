@@ -275,6 +275,7 @@ namespace VisualMusic
 					return;
 				}
 				
+				Project.pausePlayback();
 				isRenderingVideo = true;
 				RenderTarget2D[] renderTarget2d32bit = new RenderTarget2D[2];
 				RenderTargetCube renderTargetCube = null;
