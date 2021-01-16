@@ -42,11 +42,6 @@ namespace VisualMusic
 					e.Cancel = Visible = true;
 					MessageBox.Show(null, "Invalid resolution.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
-				if (!parseFps())
-				{
-					e.Cancel = Visible = true;
-					MessageBox.Show(null, "Invalid FPS setting.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				}
 			}
 		}
 
@@ -137,24 +132,14 @@ namespace VisualMusic
 			sphereCb.Checked = options.Sphere;
 			sphericalMetadataCb.Checked = options.SphericalMetadata;
 			StereoscopicCb.Checked = options.SphericalStereo;
-			fpsTb.Text = options.Fps.ToString();
+			fpsUd.Value = (decimal)options.Fps;
 			resoComboBox.SelectedIndex = options.ResoIndex;
 			ssFactorComboBox.SelectedIndex = options.SsaaIndex;
 		}
 
-		private void fpsTb_TextChanged(object sender, EventArgs e)
+		private void fpsUd_ValueChanged(object sender, EventArgs e)
 		{
-			parseFps();
-		}
-
-		bool parseFps()
-		{
-			bool b = float.TryParse(fpsTb.Text, out Options.Fps);
-			if (b)
-				fpsTb.ForeColor = System.Drawing.Color.Black;
-			else
-				fpsTb.ForeColor = System.Drawing.Color.Red;
-			return b;
+			Options.Fps = (float)fpsUd.Value;
 		}
 	}
 
