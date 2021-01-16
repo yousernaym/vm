@@ -714,13 +714,6 @@ namespace VisualMusic
 		{
 			base.OnKeyDown(e);
 		
-			//-----------------------------------
-
-			//Project.Camera.toggleMouseControl(e.KeyCode, true))
-
-			if (ModifierKeys != 0)
-				return;
-
 			//Control camera
 			var keyFrame = Project.getKeyFrameAtSongPos();
 			if (keyFrame == null)

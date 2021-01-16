@@ -15,14 +15,13 @@ using System.Runtime.CompilerServices;
 
 namespace VisualMusic
 {
-	//using XnaCubeMapFace = Microsoft.Xna.Framework.Graphics.CubeMapFace;
 	[Serializable]
 	public class Camera : ISerializable
 	{
 		float controlScale = 0;
 		public BoundingFrustum Frustum => new BoundingFrustum(VpMat);
 		public int Eye { get; set; } = 0;   //Stereoscopic rendering: -1 = left, 0 = center(monoscopic), 1 = right
-		public float EyeOffset { get; set; } = 0.02f;   //1 = 100% of viewport width, ie. 0.5 will put the center at the edge of an eye's view.
+		public float EyeOffset { get; set; } = 0.01f;   //1 = 100% of viewport width, ie. 0.5 will put the center at the edge of an eye's view.
 		public static bool InvertY { get; set; } = false;
 		public int CubeMapFace { get; set; } = -1; //-1 = normal rendering
 		public float Fov { get; set; } = (float)Math.PI / 4.0f;
@@ -221,90 +220,95 @@ namespace VisualMusic
 				OnUserUpdating?.Invoke();
 		}
 
+		bool shiftPressed = false;
 		public bool control(WinKeys key, bool keyDown)
 		{
-			if (controlScale == 0 && !keyDown) 
-				return false;
+			if (key == WinKeys.ShiftKey)
+			{
+				shiftPressed = keyDown;
+				//MouseRot = keyDown;
+				//if (keyDown)
+				//{
+				//	SongPanel.NormMouseX = SongPanel.NormMouseY = 0;
+				//	Cursor.Position = SongPanel.PointToScreen(new GdiPoint(SongPanel.ClientRectangle.Width / 2, SongPanel.ClientRectangle.Height / 2));
+				//}
+				//else
+				//	OnUserUpdated?.Invoke();
+			}
+
 			controlScale = keyDown ? 1 : 0;
 			bool keyMatch = false;
-			if (key == WinKeys.Q)
-			{
-				rotVel.Y = rotSpeed * controlScale;
-				keyMatch = true;
-			}
-			if (key == WinKeys.E)
-			{
-				rotVel.Y = -rotSpeed * controlScale;
-				keyMatch = true;
-			}
-			if (key == WinKeys.W)
-			{
-				moveVel = Vector3.Forward * moveSpeed * controlScale;
-				keyMatch = true;
-			}
-			if (key == WinKeys.S)
-			{
-				moveVel = -Vector3.Forward * moveSpeed * controlScale;
-				keyMatch = true;
-			}
-			if (key == WinKeys.A)
-			{
-				moveVel = Vector3.Left * moveSpeed * controlScale;
-				keyMatch = true;
-			}
-			if (key == WinKeys.D)
-			{
-				moveVel = -Vector3.Left * moveSpeed * controlScale;
-				keyMatch = true;
-			}
-			if (key == WinKeys.R)
-			{
-				moveVel = Vector3.Up * moveSpeed * controlScale;
-				keyMatch = true;
-			}
-			if (key == WinKeys.F)
-			{
-				moveVel = -Vector3.Up * moveSpeed * controlScale;
-				keyMatch = true;
-			}
+			float scaledRotSpeed = rotSpeed * controlScale;
+			float scaledMoveSpeed = moveSpeed * controlScale;
 
-			if (key == WinKeys.X)
+			if (shiftPressed)
 			{
-				rotVel.Z = rotSpeed * controlScale;
-				keyMatch = true;
-			}
-			if (key == WinKeys.C)
-			{
-				rotVel.Z = -rotSpeed * controlScale;
-				keyMatch = true;
-			}
-
-			/*if (key == WinKeys.ShiftKey)
-				shiftPressed = isKeyDown;
-			if (key == WinKeys.ControlKey)
-				ctrlPressed = isKeyDown;*/
-
-			//Use mouse movement and mouse buttons to rotate the camera while caps lock is active and pressed down.
-			//When released, send a caps lock press to deactivate.
-			//Make sure the caps lock is off When the app starts
-			if (key == WinKeys.CapsLock)
-			{
-				if (Control.IsKeyLocked(WinKeys.CapsLock))
+				if (key == WinKeys.A)
 				{
-					if (keyDown)
-					{
-						SongPanel.Project.pausePlayback();
-						SongPanel.NormMouseX = SongPanel.NormMouseY = 0;
-						Cursor.Position = SongPanel.PointToScreen(new GdiPoint(SongPanel.ClientRectangle.Width / 2, SongPanel.ClientRectangle.Height / 2));
-					}
-					else if (MouseRot)
-						OnUserUpdated?.Invoke();
-					MouseRot = keyDown;
-					if (!keyDown)
-						Form1.pressCapsLock(); //If releasing caps lock, turn it off
+					rotVel.Y = scaledRotSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.D)
+				{
+					rotVel.Y = -scaledRotSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.W)
+				{
+					rotVel.X = -scaledRotSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.S)
+				{
+					rotVel.X = scaledRotSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.Q)
+				{
+					rotVel.Z = scaledRotSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.E)
+				{
+					rotVel.Z = -scaledRotSpeed;
+					keyMatch = true;
 				}
 			}
-			if (keyMatch)
+			else
+			{
+				if (key == WinKeys.W)
+				{
+					moveVel.Z = -scaledMoveSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.S)
+				{
+					moveVel.Z = scaledMoveSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.A)
+				{
+					moveVel.X = -scaledMoveSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.D)
+				{
+					moveVel.X = scaledMoveSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.R)
+				{
+					moveVel.Y = scaledMoveSpeed;
+					keyMatch = true;
+				}
+				if (key == WinKeys.F)
+				{
+					moveVel.Y = -scaledMoveSpeed;
+					keyMatch = true;
+				}
+			}
+
+			if (keyMatch || shiftPressed)
 			{
 				OnUserUpdating?.Invoke();
 				if (!keyDown)
@@ -328,16 +332,5 @@ namespace VisualMusic
 			Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(-x, -y, 0);
 			OnUserUpdating?.Invoke();
 		}
-
-		//public void reset()
-		//{
-		//	Pos = new Vector3(0, 0, 0);
-		//	Angles = new Vector3(0, 0, 0);
-		//	Fov = (float)Math.PI / 4.0f;
-		//}
-		//public bool intersectsFrustum(BoundingSphere sphere)
-		//{
-		//	return new BoundingFrustum(VpMat).Intersects(sphere);
-		//}
 	}
 }

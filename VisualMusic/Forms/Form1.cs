@@ -538,11 +538,10 @@ namespace VisualMusic
 			if (Project == null || Project.Notes == null)
 				return;
 			
-			//Project.Camera.toggleMouseControl(e.KeyCode, true))
 			var keyFrame = Project.getKeyFrameAtSongPos();
 			if (keyFrame != null)
 				keyFrame.Camera.control(e.KeyCode, false);
-			//Project.Camera.control(e.KeyCode, false);
+			
 			if (e.KeyCode == Keys.Z)
 			{
 				SongPanel.ForceDefaultNoteStyle = false;
