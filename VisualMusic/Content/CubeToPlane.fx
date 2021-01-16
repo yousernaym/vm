@@ -1,10 +1,4 @@
-﻿/*float3x3 SampleWeights = { 0.5 , 0.75, 0.5 ,
-						   0.75, 1   , 0.75,
-						   0.5 , 0.75, 0.5 };*/
-float3x3 SampleWeights = { 0.75, 0.5, 0.75,
-						   0.5 ,  1, 0.5 ,
-						   0.75, 0.5, 0.75 };
-float PI = 3.1415926535f;
+﻿float PI = 3.1415926535f;
 float2 ViewportSize;
 float2 PrevFrameScaleOffset;
 float FrameSamples = 1;
@@ -15,13 +9,10 @@ float FovLimit; //Cos of FOV angle. Clip if dot(lookat_dir, cubemap_lookup_vecto
 texture CubeMap;
 samplerCUBE  CubeMapSampler = sampler_state
 {
-	/*MinFilter = ANISOTROPIC;
+	MinFilter = ANISOTROPIC;
 	MagFilter = ANISOTROPIC;
-	MipFilter = ANISOTROPIC;*/
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	MipFilter = LINEAR;
-	//MaxAnisotropy = 8;
+	MipFilter = ANISOTROPIC;
+	MaxAnisotropy = 8;
 	texture = <CubeMap>;
 };
 
@@ -67,18 +58,24 @@ float4 getColor(float2 planeCoords)
 
 float4 PS(VSOutput IN) : COLOR0
 {
+	//return getColor(IN.planeCoords);
 	float4 cmSample = float4(0,0,0,0);
-	float2 sampleOffsetStep = 0.5f / ViewportSize;
-	//return cmSample = getColor(IN.planeCoords);
-	for (int j = -1; j <= 1; j++)
-	{
-		for (int i = -1; i <= 1; i++)
-		{
-			float2 currentOffset = sampleOffsetStep * float2(i, j);
-			cmSample += getColor(IN.planeCoords + currentOffset) * SampleWeights[i+1][j+1];
-		}
-	}	
-	cmSample /= 6 * FrameSamples;
+	float sampleOffsetStep = 0.5f / ViewportSize; //Somple points are halfway to next pixel
+	float cornerWeight = 0.5f;
+	float straightWeight = 0.5f;
+	float centerWeight = 1;
+	cmSample += getColor(IN.planeCoords + float2(-1, -1) * sampleOffsetStep) * cornerWeight;
+	cmSample += getColor(IN.planeCoords + float2(-1, 1) * sampleOffsetStep) * cornerWeight;
+	cmSample += getColor(IN.planeCoords + float2(1, -1) * sampleOffsetStep) * cornerWeight;
+	cmSample += getColor(IN.planeCoords + float2(1, 1) * sampleOffsetStep) * cornerWeight;
+	cmSample += getColor(IN.planeCoords + float2(0, 0) * sampleOffsetStep) * centerWeight;
+	cmSample += getColor(IN.planeCoords + float2(-1, 0) * sampleOffsetStep) * straightWeight;
+	cmSample += getColor(IN.planeCoords + float2(1, 0) * sampleOffsetStep) * straightWeight;
+	cmSample += getColor(IN.planeCoords + float2(0, -1) * sampleOffsetStep) * straightWeight;
+	cmSample += getColor(IN.planeCoords + float2(0, 1) * sampleOffsetStep) * straightWeight;
+
+	float totalWeights = cornerWeight * 4 + centerWeight + straightWeight * 4;
+	cmSample /=  totalWeights * FrameSamples;
 	if (!IsFirstFrame)
 		cmSample += tex2D(PrevFrameSampler, IN.planeCoords * float2(0.5f, 0.5f * PrevFrameScaleOffset.x) + float2(0.5f, 0.5 + PrevFrameScaleOffset.y));
 	return cmSample;
