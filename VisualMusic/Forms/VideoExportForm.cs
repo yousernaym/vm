@@ -11,6 +11,8 @@ namespace VisualMusic
 {
 	public partial class VideoExportForm : BaseDialog
 	{
+		readonly System.Drawing.Color validColor = System.Drawing.Color.Black;
+		readonly System.Drawing.Color errorColor = System.Drawing.Color.Red;
 		public VideoExportOptions Options { get; set; } = new VideoExportOptions();
 		public VideoExportForm()
 		{
@@ -34,15 +36,15 @@ namespace VisualMusic
 
 		private void resoComboBox_TextChanged(object sender, EventArgs e)
 		{
-			Options.ResoIndex = resoComboBox.SelectedIndex;
-			parseReso(resoComboBox);
+			Options.ResoIndex = resoCombo.SelectedIndex;
+			updateResoTextColor();
 		}
 
 		private void VideoExportForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
 			if (DialogResult == DialogResult.OK)
 			{
-				if (!parseReso(resoComboBox))
+				if (!parseReso())
 				{
 					e.Cancel = Visible = true;
 					MessageBox.Show(null, "Invalid resolution.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -59,34 +61,32 @@ namespace VisualMusic
 		void updateResoItems()
 		{
 			//Video reso
-			resoComboBox.Items.Clear();
+			resoCombo.Items.Clear();
 			if (Options.Sphere)
 			{
 				if (Options.SphericalStereo)
 				{
-					resoComboBox.Items.Add("4096 x 4096");
-					resoComboBox.Items.Add("8192 x 8192");
+					resoCombo.Items.Add("4096 x 4096");
+					resoCombo.Items.Add("8192 x 8192");
 				}
 				else
 				{
-					resoComboBox.Items.Add("4096 x 2048");
-					resoComboBox.Items.Add("8192 x 4096");
+					resoCombo.Items.Add("4096 x 2048");
+					resoCombo.Items.Add("8192 x 4096");
 				}
 			}
 			else
 			{
-				resoComboBox.Items.Add("1920 x 1080");
-				resoComboBox.Items.Add("3840 x 2160");
-				resoComboBox.Items.Add("7680 x 4320");
+				resoCombo.Items.Add("1920 x 1080");
+				resoCombo.Items.Add("3840 x 2160");
+				resoCombo.Items.Add("7680 x 4320");
 			}
-			resoComboBox.SelectedIndex = Options.ResoIndex;
+			resoCombo.SelectedIndex = Options.ResoIndex;
 		}
 
-		bool parseReso(ComboBox resoBox)
+		bool parseReso()
 		{
-			resoBox.ForeColor = System.Drawing.Color.Red;
-
-			string[] xy = resoBox.Text.Split('x', 'X');
+			string[] xy = resoCombo.Text.Split('x', 'X');
 			if (xy.Length != 2)
 				return false;
 
@@ -103,8 +103,12 @@ namespace VisualMusic
 			if (Options.Width <= 0 || Options.Height <= 0)
 				return false;
 
-			resoBox.ForeColor = System.Drawing.Color.Black;
 			return true;
+		}
+
+		void updateResoTextColor()
+		{
+			resoCombo.ForeColor = parseReso() ? validColor : errorColor;
 		}
 
 		private void vrMetadataCb_CheckedChanged(object sender, EventArgs e)
@@ -137,7 +141,7 @@ namespace VisualMusic
 			sphereCb.Checked = options.Sphere;
 			sphericalMetadataCb.Checked = options.SphericalMetadata;
 			stereoscopicCb.Checked = options.SphericalStereo;
-			resoComboBox.SelectedIndex = options.ResoIndex;
+			resoCombo.SelectedIndex = options.ResoIndex;
 			ssFactorComboBox.SelectedIndex = options.SsaaIndex;
 			videoQualityLossCombo.SelectedIndex = options.VideoQualityLoss;
 			if (options.VideoCodec == AVCodecID.AV_CODEC_ID_H264)
@@ -164,6 +168,16 @@ namespace VisualMusic
 					Options.VideoCodec = AVCodecID.AV_CODEC_ID_H264;
 			else
 				Options.VideoCodec = AVCodecID.AV_CODEC_ID_VP9;
+		}
+
+		private void resoComboBox_DropDown(object sender, EventArgs e)
+		{
+			resoCombo.ForeColor = validColor;
+		}
+
+		private void resoCombo_DropDownClosed(object sender, EventArgs e)
+		{
+			updateResoTextColor();
 		}
 	}
 

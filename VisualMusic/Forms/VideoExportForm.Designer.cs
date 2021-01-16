@@ -31,7 +31,7 @@
 			this.sphereCb = new System.Windows.Forms.CheckBox();
 			this.stereoscopicCb = new System.Windows.Forms.CheckBox();
 			this.sphericalMetadataCb = new System.Windows.Forms.CheckBox();
-			this.resoComboBox = new System.Windows.Forms.ComboBox();
+			this.resoCombo = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.ssFactorComboBox = new System.Windows.Forms.ComboBox();
 			this.label2 = new System.Windows.Forms.Label();
@@ -88,14 +88,16 @@
 			this.sphericalMetadataCb.UseVisualStyleBackColor = true;
 			this.sphericalMetadataCb.CheckedChanged += new System.EventHandler(this.vrMetadataCb_CheckedChanged);
 			// 
-			// resoComboBox
+			// resoCombo
 			// 
-			this.resoComboBox.FormattingEnabled = true;
-			this.resoComboBox.Location = new System.Drawing.Point(104, 65);
-			this.resoComboBox.Name = "resoComboBox";
-			this.resoComboBox.Size = new System.Drawing.Size(112, 21);
-			this.resoComboBox.TabIndex = 40;
-			this.resoComboBox.TextChanged += new System.EventHandler(this.resoComboBox_TextChanged);
+			this.resoCombo.FormattingEnabled = true;
+			this.resoCombo.Location = new System.Drawing.Point(104, 65);
+			this.resoCombo.Name = "resoCombo";
+			this.resoCombo.Size = new System.Drawing.Size(112, 21);
+			this.resoCombo.TabIndex = 40;
+			this.resoCombo.DropDown += new System.EventHandler(this.resoComboBox_DropDown);
+			this.resoCombo.DropDownClosed += new System.EventHandler(this.resoCombo_DropDownClosed);
+			this.resoCombo.TextChanged += new System.EventHandler(this.resoComboBox_TextChanged);
 			// 
 			// label1
 			// 
@@ -202,7 +204,7 @@
 			this.Controls.Add(this.videoQualityLossCombo);
 			this.Controls.Add(this.ssFactorComboBox);
 			this.Controls.Add(this.label1);
-			this.Controls.Add(this.resoComboBox);
+			this.Controls.Add(this.resoCombo);
 			this.Controls.Add(this.sphericalMetadataCb);
 			this.Controls.Add(this.stereoscopicCb);
 			this.Controls.Add(this.sphereCb);
@@ -213,7 +215,7 @@
 			this.Controls.SetChildIndex(this.sphereCb, 0);
 			this.Controls.SetChildIndex(this.stereoscopicCb, 0);
 			this.Controls.SetChildIndex(this.sphericalMetadataCb, 0);
-			this.Controls.SetChildIndex(this.resoComboBox, 0);
+			this.Controls.SetChildIndex(this.resoCombo, 0);
 			this.Controls.SetChildIndex(this.label1, 0);
 			this.Controls.SetChildIndex(this.ssFactorComboBox, 0);
 			this.Controls.SetChildIndex(this.videoQualityLossCombo, 0);
@@ -235,7 +237,7 @@
 		public System.Windows.Forms.CheckBox sphericalMetadataCb;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
-		public System.Windows.Forms.ComboBox resoComboBox;
+		public System.Windows.Forms.ComboBox resoCombo;
 		public System.Windows.Forms.ComboBox ssFactorComboBox;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.NumericUpDown fpsUd;
