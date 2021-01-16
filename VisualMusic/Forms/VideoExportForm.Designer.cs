@@ -29,7 +29,7 @@
 		private void InitializeComponent()
 		{
 			this.sphereCb = new System.Windows.Forms.CheckBox();
-			this.StereoscopicCb = new System.Windows.Forms.CheckBox();
+			this.stereoscopicCb = new System.Windows.Forms.CheckBox();
 			this.sphericalMetadataCb = new System.Windows.Forms.CheckBox();
 			this.resoComboBox = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -37,17 +37,19 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.fpsUd = new System.Windows.Forms.NumericUpDown();
+			this.label4 = new System.Windows.Forms.Label();
+			this.videoQualityLossCombo = new System.Windows.Forms.ComboBox();
 			((System.ComponentModel.ISupportInitialize)(this.fpsUd)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// okBtn
 			// 
-			this.okBtn.Location = new System.Drawing.Point(87, 173);
+			this.okBtn.Location = new System.Drawing.Point(87, 186);
 			this.okBtn.TabIndex = 60;
 			// 
 			// cancelBtn
 			// 
-			this.cancelBtn.Location = new System.Drawing.Point(168, 173);
+			this.cancelBtn.Location = new System.Drawing.Point(168, 186);
 			this.cancelBtn.TabIndex = 70;
 			// 
 			// sphereCb
@@ -61,16 +63,16 @@
 			this.sphereCb.UseVisualStyleBackColor = true;
 			this.sphereCb.CheckedChanged += new System.EventHandler(this.sphereCb_CheckedChanged);
 			// 
-			// StereoscopicCb
+			// stereoscopicCb
 			// 
-			this.StereoscopicCb.AutoSize = true;
-			this.StereoscopicCb.Location = new System.Drawing.Point(12, 35);
-			this.StereoscopicCb.Name = "StereoscopicCb";
-			this.StereoscopicCb.Size = new System.Drawing.Size(156, 17);
-			this.StereoscopicCb.TabIndex = 30;
-			this.StereoscopicCb.Text = "Stereoscopic (experimental)";
-			this.StereoscopicCb.UseVisualStyleBackColor = true;
-			this.StereoscopicCb.CheckedChanged += new System.EventHandler(this.StereoscopicCb_CheckedChanged);
+			this.stereoscopicCb.AutoSize = true;
+			this.stereoscopicCb.Location = new System.Drawing.Point(12, 35);
+			this.stereoscopicCb.Name = "stereoscopicCb";
+			this.stereoscopicCb.Size = new System.Drawing.Size(156, 17);
+			this.stereoscopicCb.TabIndex = 30;
+			this.stereoscopicCb.Text = "Stereoscopic (experimental)";
+			this.stereoscopicCb.UseVisualStyleBackColor = true;
+			this.stereoscopicCb.CheckedChanged += new System.EventHandler(this.StereoscopicCb_CheckedChanged);
 			// 
 			// sphericalMetadataCb
 			// 
@@ -87,7 +89,7 @@
 			// resoComboBox
 			// 
 			this.resoComboBox.FormattingEnabled = true;
-			this.resoComboBox.Location = new System.Drawing.Point(75, 65);
+			this.resoComboBox.Location = new System.Drawing.Point(104, 65);
 			this.resoComboBox.Name = "resoComboBox";
 			this.resoComboBox.Size = new System.Drawing.Size(101, 21);
 			this.resoComboBox.TabIndex = 40;
@@ -96,7 +98,7 @@
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(12, 68);
+			this.label1.Location = new System.Drawing.Point(41, 68);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(57, 13);
 			this.label1.TabIndex = 62;
@@ -111,7 +113,7 @@
             "2x",
             "4x",
             "8x"});
-			this.ssFactorComboBox.Location = new System.Drawing.Point(74, 92);
+			this.ssFactorComboBox.Location = new System.Drawing.Point(104, 92);
 			this.ssFactorComboBox.Name = "ssFactorComboBox";
 			this.ssFactorComboBox.Size = new System.Drawing.Size(102, 21);
 			this.ssFactorComboBox.TabIndex = 50;
@@ -120,7 +122,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(33, 95);
+			this.label2.Location = new System.Drawing.Point(63, 95);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(35, 13);
 			this.label2.TabIndex = 62;
@@ -129,7 +131,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(42, 122);
+			this.label3.Location = new System.Drawing.Point(71, 148);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(27, 13);
 			this.label3.TabIndex = 62;
@@ -138,37 +140,60 @@
 			// fpsUd
 			// 
 			this.fpsUd.DecimalPlaces = 2;
-			this.fpsUd.Location = new System.Drawing.Point(75, 120);
+			this.fpsUd.Location = new System.Drawing.Point(104, 146);
 			this.fpsUd.Name = "fpsUd";
 			this.fpsUd.Size = new System.Drawing.Size(62, 20);
 			this.fpsUd.TabIndex = 71;
 			this.fpsUd.ValueChanged += new System.EventHandler(this.fpsUd_ValueChanged);
 			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(10, 122);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(88, 13);
+			this.label4.TabIndex = 62;
+			this.label4.Text = "Video quality loss";
+			// 
+			// videoQualityLossCombo
+			// 
+			this.videoQualityLossCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.videoQualityLossCombo.FormattingEnabled = true;
+			this.videoQualityLossCombo.Location = new System.Drawing.Point(104, 119);
+			this.videoQualityLossCombo.Name = "videoQualityLossCombo";
+			this.videoQualityLossCombo.Size = new System.Drawing.Size(102, 21);
+			this.videoQualityLossCombo.TabIndex = 50;
+			this.videoQualityLossCombo.SelectedIndexChanged += new System.EventHandler(this.videoQualityLossCombo_SelectedIndexChanged);
+			// 
 			// VideoExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(255, 208);
+			this.ClientSize = new System.Drawing.Size(255, 221);
 			this.Controls.Add(this.fpsUd);
+			this.Controls.Add(this.label4);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
+			this.Controls.Add(this.videoQualityLossCombo);
 			this.Controls.Add(this.ssFactorComboBox);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.resoComboBox);
 			this.Controls.Add(this.sphericalMetadataCb);
-			this.Controls.Add(this.StereoscopicCb);
+			this.Controls.Add(this.stereoscopicCb);
 			this.Controls.Add(this.sphereCb);
 			this.Name = "VideoExportForm";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.VideoExportForm_FormClosing);
 			this.Controls.SetChildIndex(this.okBtn, 0);
 			this.Controls.SetChildIndex(this.cancelBtn, 0);
 			this.Controls.SetChildIndex(this.sphereCb, 0);
-			this.Controls.SetChildIndex(this.StereoscopicCb, 0);
+			this.Controls.SetChildIndex(this.stereoscopicCb, 0);
 			this.Controls.SetChildIndex(this.sphericalMetadataCb, 0);
 			this.Controls.SetChildIndex(this.resoComboBox, 0);
 			this.Controls.SetChildIndex(this.label1, 0);
 			this.Controls.SetChildIndex(this.ssFactorComboBox, 0);
+			this.Controls.SetChildIndex(this.videoQualityLossCombo, 0);
 			this.Controls.SetChildIndex(this.label2, 0);
 			this.Controls.SetChildIndex(this.label3, 0);
+			this.Controls.SetChildIndex(this.label4, 0);
 			this.Controls.SetChildIndex(this.fpsUd, 0);
 			((System.ComponentModel.ISupportInitialize)(this.fpsUd)).EndInit();
 			this.ResumeLayout(false);
@@ -177,7 +202,7 @@
 		}
 
 		#endregion
-		public System.Windows.Forms.CheckBox StereoscopicCb;
+		public System.Windows.Forms.CheckBox stereoscopicCb;
 		private System.Windows.Forms.CheckBox sphereCb;
 		public System.Windows.Forms.CheckBox sphericalMetadataCb;
 		private System.Windows.Forms.Label label1;
@@ -186,5 +211,7 @@
 		public System.Windows.Forms.ComboBox ssFactorComboBox;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.NumericUpDown fpsUd;
+		private System.Windows.Forms.Label label4;
+		public System.Windows.Forms.ComboBox videoQualityLossCombo;
 	}
 }

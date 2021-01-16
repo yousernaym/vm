@@ -39,7 +39,7 @@ namespace VisualMusic
 
 		//Encoding
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool beginVideoEnc(string outputFile, string audioFile, VideoFormat vidFmt, double audioOffsetSeconds, bool spherical, bool sphericalStereo, AVCodecID videoCodec);
+		public static extern bool beginVideoEnc(string outputFile, string audioFile, VideoFormat vidFmt, double audioOffsetSeconds, bool spherical, bool sphericalStereo, AVCodecID videoCodec, string crf);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool writeFrame(UInt32[] videoFrameBuffer);
 		[DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
