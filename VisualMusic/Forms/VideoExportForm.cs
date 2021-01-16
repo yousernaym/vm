@@ -16,10 +16,12 @@ namespace VisualMusic
 		{
 			InitializeComponent();
 			updateResoItems();
+			
 			videoQualityLossCombo.Items.Add("0 - lossless");
 			for (int i = 1; i < 10; i++)
 				videoQualityLossCombo.Items.Add(i);
 			videoQualityLossCombo.Items.Add("10 - smallest file");
+
 			setOptions(Options);
 		}
 
@@ -135,10 +137,15 @@ namespace VisualMusic
 			sphereCb.Checked = options.Sphere;
 			sphericalMetadataCb.Checked = options.SphericalMetadata;
 			stereoscopicCb.Checked = options.SphericalStereo;
-			videoQualityLossCombo.SelectedIndex = options.VideoQualityLoss;
-			fpsUd.Value = (decimal)options.Fps;
 			resoComboBox.SelectedIndex = options.ResoIndex;
 			ssFactorComboBox.SelectedIndex = options.SsaaIndex;
+			videoQualityLossCombo.SelectedIndex = options.VideoQualityLoss;
+			if (options.VideoCodec == AVCodecID.AV_CODEC_ID_H264)
+				videoCodecCombo.SelectedIndex = 0;
+			else 
+				videoCodecCombo.SelectedIndex = 1;
+			fpsUd.Value = (decimal)options.Fps;
+			
 		}
 
 		private void fpsUd_ValueChanged(object sender, EventArgs e)
@@ -149,6 +156,14 @@ namespace VisualMusic
 		private void videoQualityLossCombo_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			Options.VideoQualityLoss = videoQualityLossCombo.SelectedIndex;
+		}
+
+		private void videoCodecCombo_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (videoCodecCombo.SelectedIndex == 0)
+					Options.VideoCodec = AVCodecID.AV_CODEC_ID_H264;
+			else
+				Options.VideoCodec = AVCodecID.AV_CODEC_ID_VP9;
 		}
 	}
 
@@ -194,6 +209,8 @@ namespace VisualMusic
 		public bool SphericalStereo;
 		public bool SphericalMetadata;
 		public int VideoQualityLoss = 1;
+		public string VideoCrf => VideoQualityLoss <= 1 ? VideoQualityLoss.ToString() : (VideoQualityLoss * 2).ToString(); //Maximum crf of 20
+		public AVCodecID VideoCodec = AVCodecID.AV_CODEC_ID_H264;
 		public float Fps = 60;
 		public int ResoIndex
 		{
@@ -209,7 +226,6 @@ namespace VisualMusic
 		int sphereResoIndex = 0;
 		int nonSphereResoIndex = 1;
 		public int SsaaIndex => (int)Math.Log(ssaaFactor, 2);
-		public string VideoCrf => (VideoQualityLoss * 2).ToString(); //Maximum crf of 20
 
 		public VideoExportOptions()
 		{
@@ -234,6 +250,8 @@ namespace VisualMusic
 					SSAAFactor = (int)entry.Value;
 				else if (entry.Name == "videoQualityLoss")
 					VideoQualityLoss = (int)entry.Value;
+				else if (entry.Name == "videoCodec")
+					VideoCodec = (AVCodecID)entry.Value;
 				else if (entry.Name == "fps")
 					Fps = (float)entry.Value;
 			}
@@ -247,6 +265,7 @@ namespace VisualMusic
 			info.AddValue("nonSphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.nonSphereResoIndex));
 			info.AddValue("ssaaFactor", Form1.VidExpForm.Options.SSAAFactor);
 			info.AddValue("videoQualityLoss", VideoQualityLoss);
+			info.AddValue("videoCodec", VideoCodec);
 			info.AddValue("fps", Fps);
 		}
 

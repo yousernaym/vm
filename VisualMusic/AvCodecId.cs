@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VisualMusic
 {
-	enum AVCodecID
+	public enum AVCodecID
 	{
 		AV_CODEC_ID_NONE,
 

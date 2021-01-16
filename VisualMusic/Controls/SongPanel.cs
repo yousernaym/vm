@@ -267,7 +267,7 @@ namespace VisualMusic
 			{
 				VideoFormat videoFormat = new VideoFormat((uint)options.Width, (uint)options.Height);
 				videoFormat.fps = options.Fps;
-				if (!Media.beginVideoEnc(videoFilePath, Project.AudioFilePath, videoFormat, Project.Props.AudioOffset + Project.Props.PlaybackOffsetS, options.Sphere && options.SphericalMetadata, options.SphericalStereo, AVCodecID.AV_CODEC_ID_H264, options.VideoCrf))
+				if (!Media.beginVideoEnc(videoFilePath, Project.AudioFilePath, videoFormat, Project.Props.AudioOffset + Project.Props.PlaybackOffsetS, options.Sphere && options.SphericalMetadata, options.SphericalStereo, options.VideoCodec, options.VideoCrf))
 				{
 					lock (progressForm.cancelLock)
 						progressForm.Cancel = true;

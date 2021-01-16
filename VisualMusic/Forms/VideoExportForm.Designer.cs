@@ -39,17 +39,19 @@
 			this.fpsUd = new System.Windows.Forms.NumericUpDown();
 			this.label4 = new System.Windows.Forms.Label();
 			this.videoQualityLossCombo = new System.Windows.Forms.ComboBox();
+			this.videoCodecCombo = new System.Windows.Forms.ComboBox();
+			this.label5 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.fpsUd)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// okBtn
 			// 
-			this.okBtn.Location = new System.Drawing.Point(87, 186);
+			this.okBtn.Location = new System.Drawing.Point(87, 218);
 			this.okBtn.TabIndex = 60;
 			// 
 			// cancelBtn
 			// 
-			this.cancelBtn.Location = new System.Drawing.Point(168, 186);
+			this.cancelBtn.Location = new System.Drawing.Point(168, 218);
 			this.cancelBtn.TabIndex = 70;
 			// 
 			// sphereCb
@@ -91,7 +93,7 @@
 			this.resoComboBox.FormattingEnabled = true;
 			this.resoComboBox.Location = new System.Drawing.Point(104, 65);
 			this.resoComboBox.Name = "resoComboBox";
-			this.resoComboBox.Size = new System.Drawing.Size(101, 21);
+			this.resoComboBox.Size = new System.Drawing.Size(112, 21);
 			this.resoComboBox.TabIndex = 40;
 			this.resoComboBox.TextChanged += new System.EventHandler(this.resoComboBox_TextChanged);
 			// 
@@ -115,7 +117,7 @@
             "8x"});
 			this.ssFactorComboBox.Location = new System.Drawing.Point(104, 92);
 			this.ssFactorComboBox.Name = "ssFactorComboBox";
-			this.ssFactorComboBox.Size = new System.Drawing.Size(102, 21);
+			this.ssFactorComboBox.Size = new System.Drawing.Size(112, 21);
 			this.ssFactorComboBox.TabIndex = 50;
 			this.ssFactorComboBox.TextChanged += new System.EventHandler(this.ssFactorComboBox_TextChanged);
 			// 
@@ -131,7 +133,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(71, 148);
+			this.label3.Location = new System.Drawing.Point(71, 175);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(27, 13);
 			this.label3.TabIndex = 62;
@@ -140,7 +142,7 @@
 			// fpsUd
 			// 
 			this.fpsUd.DecimalPlaces = 2;
-			this.fpsUd.Location = new System.Drawing.Point(104, 146);
+			this.fpsUd.Location = new System.Drawing.Point(104, 173);
 			this.fpsUd.Name = "fpsUd";
 			this.fpsUd.Size = new System.Drawing.Size(62, 20);
 			this.fpsUd.TabIndex = 71;
@@ -161,18 +163,42 @@
 			this.videoQualityLossCombo.FormattingEnabled = true;
 			this.videoQualityLossCombo.Location = new System.Drawing.Point(104, 119);
 			this.videoQualityLossCombo.Name = "videoQualityLossCombo";
-			this.videoQualityLossCombo.Size = new System.Drawing.Size(102, 21);
+			this.videoQualityLossCombo.Size = new System.Drawing.Size(112, 21);
 			this.videoQualityLossCombo.TabIndex = 50;
 			this.videoQualityLossCombo.SelectedIndexChanged += new System.EventHandler(this.videoQualityLossCombo_SelectedIndexChanged);
+			// 
+			// videoCodecCombo
+			// 
+			this.videoCodecCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.videoCodecCombo.FormattingEnabled = true;
+			this.videoCodecCombo.Items.AddRange(new object[] {
+            "H264 (fast, large)",
+            "VP9 (slow, small)"});
+			this.videoCodecCombo.Location = new System.Drawing.Point(104, 146);
+			this.videoCodecCombo.Name = "videoCodecCombo";
+			this.videoCodecCombo.Size = new System.Drawing.Size(112, 21);
+			this.videoCodecCombo.TabIndex = 50;
+			this.videoCodecCombo.SelectedIndexChanged += new System.EventHandler(this.videoCodecCombo_SelectedIndexChanged);
+			// 
+			// label5
+			// 
+			this.label5.AutoSize = true;
+			this.label5.Location = new System.Drawing.Point(22, 149);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(67, 13);
+			this.label5.TabIndex = 62;
+			this.label5.Text = "Video codec";
 			// 
 			// VideoExportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.ClientSize = new System.Drawing.Size(255, 221);
+			this.ClientSize = new System.Drawing.Size(255, 253);
 			this.Controls.Add(this.fpsUd);
+			this.Controls.Add(this.label5);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
+			this.Controls.Add(this.videoCodecCombo);
 			this.Controls.Add(this.videoQualityLossCombo);
 			this.Controls.Add(this.ssFactorComboBox);
 			this.Controls.Add(this.label1);
@@ -191,9 +217,11 @@
 			this.Controls.SetChildIndex(this.label1, 0);
 			this.Controls.SetChildIndex(this.ssFactorComboBox, 0);
 			this.Controls.SetChildIndex(this.videoQualityLossCombo, 0);
+			this.Controls.SetChildIndex(this.videoCodecCombo, 0);
 			this.Controls.SetChildIndex(this.label2, 0);
 			this.Controls.SetChildIndex(this.label3, 0);
 			this.Controls.SetChildIndex(this.label4, 0);
+			this.Controls.SetChildIndex(this.label5, 0);
 			this.Controls.SetChildIndex(this.fpsUd, 0);
 			((System.ComponentModel.ISupportInitialize)(this.fpsUd)).EndInit();
 			this.ResumeLayout(false);
@@ -213,5 +241,7 @@
 		private System.Windows.Forms.NumericUpDown fpsUd;
 		private System.Windows.Forms.Label label4;
 		public System.Windows.Forms.ComboBox videoQualityLossCombo;
+		public System.Windows.Forms.ComboBox videoCodecCombo;
+		private System.Windows.Forms.Label label5;
 	}
 }

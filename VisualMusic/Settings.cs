@@ -13,7 +13,7 @@ namespace VisualMusic
 	{
 		enum Keys { MidiNoteFolder, ModNoteFolder, SidNoteFolder, MidiAudioFolder, ModAudioFolder, SidAudioFolder, VideoFolder, TextureFolder, ProjectFolder, ModTpartyApp, ModTpartyArgs, ModTpartyOutput, SidTpartyApp, SidTpartyArgs, SidTpartyOutput, TpartyModuleMixdown, TpartySidMixdown, SongLengthsUrl, DefaultInsTrack}
 		public static readonly string FilePath = Path.Combine(Program.AppDataDir, "settings.xml");
-		public static Type[] Types = { typeof(string), typeof(bool), typeof(VideoExportOptions) };
+		public static Type[] Types = { typeof(string), typeof(bool), typeof(VideoExportOptions), typeof(AVCodecID) };
 
 		//public bool DefaultInsTrack { get; set; } = true; //preserve latest import form setting instead
 
