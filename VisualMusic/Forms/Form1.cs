@@ -371,7 +371,7 @@ namespace VisualMusic
 			saveSongAsToolStripMenuItem.Enabled = loaded;
 			exportVideoToolStripMenuItem.Enabled = loaded;
 			playbackToolStripMenuItem.Enabled = AudioLoaded;
-			actionsToolStripMenuItem.Enabled = loaded;
+			editToolStripMenuItem.Enabled = loaded;
 			loadCamToolStripMenuItem.Enabled = loaded;
 			saveCamToolStripMenuItem.Enabled = loaded;
 			insertLyricsHereToolStripMenuItem.Enabled = loaded;
@@ -870,7 +870,6 @@ namespace VisualMusic
 
 				//Texture
 				TrackPropsTex texProps = getActiveTexProps(mergedTrackProps);
-				texPathTb.Text = texProps.Path;
 				loadMtrlTexInPb();
 				disableTextureCh.CheckState = toCheckState(texProps.DisableTexture);
 				pointSmpCb.CheckState = toCheckState(texProps.PointSmp);
@@ -1090,7 +1089,6 @@ namespace VisualMusic
 			if (openTextureDlg.ShowDialog(this) == DialogResult.OK)
 			{
 				openTextureDlg.InitialDirectory = Path.GetDirectoryName(openTextureDlg.FileName);
-				texPathTb.Text = openTextureDlg.FileName;
 				saveSettings();
 			}
 		}
@@ -1461,21 +1459,6 @@ namespace VisualMusic
 			defaultPropertiesToolStripMenuItem1.PerformClick();
 		}
 
-		private void startStopToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Project.togglePlayback();
-		}
-
-		private void beginningToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Project.stopPlayback();
-		}
-		private void endToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Project.stopPlayback();
-			songScrollBar.Value = songScrollBar.Maximum;
-		}
-
 		private void defaultStyleBtn_Click(object sender, EventArgs e)
 		{
 			for (int i = 0; i < trackList.SelectedIndices.Count; i++)
@@ -1785,6 +1768,20 @@ namespace VisualMusic
 			resetCameras(true);
 		}
 
+		private void startStopToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Project.togglePlayback();
+		}
+
+		private void beginningToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Project.stopPlayback();
+		}
+		private void endToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Project.stopPlayback();
+			songScrollBar.Value = songScrollBar.Maximum;
+		}
 		private void nudgeBackwardsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			songScrollBar.Value = Math.Max(songScrollBar.Minimum, songScrollBar.Value - songScrollBar.SmallChange);
@@ -2536,6 +2533,11 @@ namespace VisualMusic
 				showErrorMsgBox(ex.Message);
 				e.Cancel = true;
 			}
+		}
+
+		private void playbackToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

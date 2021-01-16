@@ -46,15 +46,10 @@
 			this.exportVideoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tpartyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-			this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.viewSongTSMI = new System.Windows.Forms.ToolStripMenuItem();
-			this.viewModBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
-			this.viewSidBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
-			this.viewMidiBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
-			this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.songToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.cameraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.resetCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.loadCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,6 +57,8 @@
 			this.defaultPropertiesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.loadPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.savePropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.insertLyricsHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.insertKeyFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.playbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.startStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.beginningToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,16 +67,15 @@
 			this.nudgeForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.jumpBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.jumpForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.insertLyricsHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.insertKeyFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewSongTSMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewModBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewSidBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewMidiBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.trackPropsPanel = new System.Windows.Forms.Panel();
-			this.trackList = new VisualMusic.ListViewNF();
-			this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.normalColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.hilitedColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.trackListCM = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.invertSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,8 +85,6 @@
 			this.saveTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.selectedTrackPropsPanel = new System.Windows.Forms.TabControl();
 			this.style = new System.Windows.Forms.TabPage();
-			this.lineStyleControl = new VisualMusic.LineStyleControl();
-			this.barStyleControl = new VisualMusic.BarStyleControl();
 			this.defaultStyleBtn = new System.Windows.Forms.Button();
 			this.styleList = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -150,10 +144,6 @@
 			this.light = new System.Windows.Forms.TabPage();
 			this.defaultLightBtn = new System.Windows.Forms.Button();
 			this.lightPanel = new System.Windows.Forms.Panel();
-			this.masterLightHsBtn = new VisualMusic.HueSatButton();
-			this.specHsBtn = new VisualMusic.HueSatButton();
-			this.diffuseHsBtn = new VisualMusic.HueSatButton();
-			this.ambientHsBtn = new VisualMusic.HueSatButton();
 			this.specPowUd = new System.Windows.Forms.NumericUpDown();
 			this.ambientAmountUd = new System.Windows.Forms.NumericUpDown();
 			this.diffuseAmountUd = new System.Windows.Forms.NumericUpDown();
@@ -181,11 +171,7 @@
 			this.zoffsetUd = new System.Windows.Forms.NumericUpDown();
 			this.yoffsetUd = new System.Windows.Forms.NumericUpDown();
 			this.xoffsetUd = new System.Windows.Forms.NumericUpDown();
-			this.textureBrowseBtn = new System.Windows.Forms.Button();
-			this.texPathTb = new System.Windows.Forms.TextBox();
-			this.label4 = new System.Windows.Forms.Label();
 			this.resetDefaultBtn = new System.Windows.Forms.Button();
-			this.setDefaultBtn = new System.Windows.Forms.Button();
 			this.openTextureDlg = new System.Windows.Forms.OpenFileDialog();
 			this.songPropsPanel = new System.Windows.Forms.Panel();
 			this.camLabel = new System.Windows.Forms.Label();
@@ -204,7 +190,6 @@
 			this.fadeOutUd = new System.Windows.Forms.NumericUpDown();
 			this.fadeInUd = new System.Windows.Forms.NumericUpDown();
 			this.playbackOffsetUd = new System.Windows.Forms.NumericUpDown();
-			this.upDownVpWidth = new VisualMusic.TbSlider();
 			this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
 			this.saveMidiDialog = new System.Windows.Forms.SaveFileDialog();
@@ -225,6 +210,17 @@
 			this.songPropsCb = new System.Windows.Forms.CheckBox();
 			this.trackPropsCb = new System.Windows.Forms.CheckBox();
 			this.debugLabel = new System.Windows.Forms.Label();
+			this.upDownVpWidth = new VisualMusic.TbSlider();
+			this.trackList = new VisualMusic.ListViewNF();
+			this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.normalColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.hilitedColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.lineStyleControl = new VisualMusic.LineStyleControl();
+			this.barStyleControl = new VisualMusic.BarStyleControl();
+			this.masterLightHsBtn = new VisualMusic.HueSatButton();
+			this.specHsBtn = new VisualMusic.HueSatButton();
+			this.diffuseHsBtn = new VisualMusic.HueSatButton();
+			this.ambientHsBtn = new VisualMusic.HueSatButton();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -402,71 +398,28 @@
 			this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.viewToolStripMenuItem,
-            this.actionsToolStripMenuItem});
+            this.editToolStripMenuItem,
+            this.playbackToolStripMenuItem,
+            this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1043, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1060, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
-			// viewToolStripMenuItem
+			// editToolStripMenuItem
 			// 
-			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.viewSongTSMI,
-            this.viewModBrowserTSMI,
-            this.viewSidBrowserTSMI,
-            this.viewMidiBrowserTSMI});
-			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-			this.viewToolStripMenuItem.Text = "View";
-			// 
-			// viewSongTSMI
-			// 
-			this.viewSongTSMI.Name = "viewSongTSMI";
-			this.viewSongTSMI.ShortcutKeys = System.Windows.Forms.Keys.F1;
-			this.viewSongTSMI.Size = new System.Drawing.Size(163, 22);
-			this.viewSongTSMI.Text = "Song";
-			this.viewSongTSMI.Click += new System.EventHandler(this.viewSongTSMI_Click);
-			// 
-			// viewModBrowserTSMI
-			// 
-			this.viewModBrowserTSMI.Name = "viewModBrowserTSMI";
-			this.viewModBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F2;
-			this.viewModBrowserTSMI.Size = new System.Drawing.Size(163, 22);
-			this.viewModBrowserTSMI.Text = "Mod browser";
-			this.viewModBrowserTSMI.Click += new System.EventHandler(this.viewModBrowserTSMI_Click);
-			// 
-			// viewSidBrowserTSMI
-			// 
-			this.viewSidBrowserTSMI.Name = "viewSidBrowserTSMI";
-			this.viewSidBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F3;
-			this.viewSidBrowserTSMI.Size = new System.Drawing.Size(163, 22);
-			this.viewSidBrowserTSMI.Text = "Sid browser";
-			this.viewSidBrowserTSMI.Click += new System.EventHandler(this.viewSidBrowserTSMI_Click);
-			// 
-			// viewMidiBrowserTSMI
-			// 
-			this.viewMidiBrowserTSMI.Name = "viewMidiBrowserTSMI";
-			this.viewMidiBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F4;
-			this.viewMidiBrowserTSMI.Size = new System.Drawing.Size(163, 22);
-			this.viewMidiBrowserTSMI.Text = "Midi browser";
-			this.viewMidiBrowserTSMI.Click += new System.EventHandler(this.viewMidiBrowserTSMI_Click);
-			// 
-			// actionsToolStripMenuItem
-			// 
-			this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.undoToolStripMenuItem,
             this.redoToolStripMenuItem,
-            this.songToolStripMenuItem,
+            this.cameraToolStripMenuItem,
             this.tracksToolStripMenuItem,
-            this.playbackToolStripMenuItem,
             this.insertLyricsHereToolStripMenuItem,
             this.insertKeyFrameToolStripMenuItem});
-			this.actionsToolStripMenuItem.Enabled = false;
-			this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
-			this.actionsToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
-			this.actionsToolStripMenuItem.Text = "Actions";
+			this.editToolStripMenuItem.Enabled = false;
+			this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+			this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+			this.editToolStripMenuItem.Text = "Edit";
 			// 
 			// undoToolStripMenuItem
 			// 
@@ -487,15 +440,15 @@
 			this.redoToolStripMenuItem.Text = "Redo";
 			this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
 			// 
-			// songToolStripMenuItem
+			// cameraToolStripMenuItem
 			// 
-			this.songToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.cameraToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.resetCamToolStripMenuItem,
             this.loadCamToolStripMenuItem,
             this.saveCamToolStripMenuItem});
-			this.songToolStripMenuItem.Name = "songToolStripMenuItem";
-			this.songToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-			this.songToolStripMenuItem.Text = "Camera";
+			this.cameraToolStripMenuItem.Name = "cameraToolStripMenuItem";
+			this.cameraToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+			this.cameraToolStripMenuItem.Text = "Camera";
 			// 
 			// resetCamToolStripMenuItem
 			// 
@@ -566,6 +519,26 @@
 			this.savePropertiesToolStripMenuItem.Text = "Save properties...";
 			this.savePropertiesToolStripMenuItem.Click += new System.EventHandler(this.savePropertiesToolStripMenuItem_Click);
 			// 
+			// insertLyricsHereToolStripMenuItem
+			// 
+			this.insertLyricsHereToolStripMenuItem.Enabled = false;
+			this.insertLyricsHereToolStripMenuItem.Name = "insertLyricsHereToolStripMenuItem";
+			this.insertLyricsHereToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
+			this.insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+			this.insertLyricsHereToolStripMenuItem.Tag = "Insert Lyrics";
+			this.insertLyricsHereToolStripMenuItem.Text = "Insert Lyrics";
+			this.insertLyricsHereToolStripMenuItem.Click += new System.EventHandler(this.insertLyricsHereToolStripMenuItem_Click);
+			// 
+			// insertKeyFrameToolStripMenuItem
+			// 
+			this.insertKeyFrameToolStripMenuItem.Enabled = false;
+			this.insertKeyFrameToolStripMenuItem.Name = "insertKeyFrameToolStripMenuItem";
+			this.insertKeyFrameToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K)));
+			this.insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+			this.insertKeyFrameToolStripMenuItem.Tag = "";
+			this.insertKeyFrameToolStripMenuItem.Text = "Insert Key Frame";
+			this.insertKeyFrameToolStripMenuItem.Click += new System.EventHandler(this.insertKeyFrameToolStripMenuItem_Click);
+			// 
 			// playbackToolStripMenuItem
 			// 
 			this.playbackToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -576,8 +549,9 @@
             this.nudgeForwardToolStripMenuItem,
             this.jumpBackwardsToolStripMenuItem,
             this.jumpForwardToolStripMenuItem});
+			this.playbackToolStripMenuItem.Enabled = false;
 			this.playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
-			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+			this.playbackToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
 			this.playbackToolStripMenuItem.Text = "Playback";
 			// 
 			// startStopToolStripMenuItem
@@ -593,7 +567,7 @@
 			this.beginningToolStripMenuItem.Name = "beginningToolStripMenuItem";
 			this.beginningToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Home)));
 			this.beginningToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.beginningToolStripMenuItem.Text = "Beginning";
+			this.beginningToolStripMenuItem.Text = "Go to beginning";
 			this.beginningToolStripMenuItem.Click += new System.EventHandler(this.beginningToolStripMenuItem_Click);
 			// 
 			// endToolStripMenuItem
@@ -601,7 +575,7 @@
 			this.endToolStripMenuItem.Name = "endToolStripMenuItem";
 			this.endToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End)));
 			this.endToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-			this.endToolStripMenuItem.Text = "End";
+			this.endToolStripMenuItem.Text = "Go to end";
 			this.endToolStripMenuItem.Click += new System.EventHandler(this.endToolStripMenuItem_Click);
 			// 
 			// nudgeBackwardsToolStripMenuItem
@@ -638,25 +612,48 @@
 			this.jumpForwardToolStripMenuItem.Text = "Jump forward";
 			this.jumpForwardToolStripMenuItem.Click += new System.EventHandler(this.jumpForwardToolStripMenuItem_Click);
 			// 
-			// insertLyricsHereToolStripMenuItem
+			// viewToolStripMenuItem
 			// 
-			this.insertLyricsHereToolStripMenuItem.Enabled = false;
-			this.insertLyricsHereToolStripMenuItem.Name = "insertLyricsHereToolStripMenuItem";
-			this.insertLyricsHereToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-			this.insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-			this.insertLyricsHereToolStripMenuItem.Tag = "Insert Lyrics";
-			this.insertLyricsHereToolStripMenuItem.Text = "Insert Lyrics";
-			this.insertLyricsHereToolStripMenuItem.Click += new System.EventHandler(this.insertLyricsHereToolStripMenuItem_Click);
+			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.viewSongTSMI,
+            this.viewModBrowserTSMI,
+            this.viewSidBrowserTSMI,
+            this.viewMidiBrowserTSMI});
+			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+			this.viewToolStripMenuItem.Text = "View";
 			// 
-			// insertKeyFrameToolStripMenuItem
+			// viewSongTSMI
 			// 
-			this.insertKeyFrameToolStripMenuItem.Enabled = false;
-			this.insertKeyFrameToolStripMenuItem.Name = "insertKeyFrameToolStripMenuItem";
-			this.insertKeyFrameToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K)));
-			this.insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-			this.insertKeyFrameToolStripMenuItem.Tag = "";
-			this.insertKeyFrameToolStripMenuItem.Text = "Insert Key Frame";
-			this.insertKeyFrameToolStripMenuItem.Click += new System.EventHandler(this.insertKeyFrameToolStripMenuItem_Click);
+			this.viewSongTSMI.Name = "viewSongTSMI";
+			this.viewSongTSMI.ShortcutKeys = System.Windows.Forms.Keys.F1;
+			this.viewSongTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewSongTSMI.Text = "Song";
+			this.viewSongTSMI.Click += new System.EventHandler(this.viewSongTSMI_Click);
+			// 
+			// viewModBrowserTSMI
+			// 
+			this.viewModBrowserTSMI.Name = "viewModBrowserTSMI";
+			this.viewModBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F2;
+			this.viewModBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewModBrowserTSMI.Text = "Mod browser";
+			this.viewModBrowserTSMI.Click += new System.EventHandler(this.viewModBrowserTSMI_Click);
+			// 
+			// viewSidBrowserTSMI
+			// 
+			this.viewSidBrowserTSMI.Name = "viewSidBrowserTSMI";
+			this.viewSidBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F3;
+			this.viewSidBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewSidBrowserTSMI.Text = "Sid browser";
+			this.viewSidBrowserTSMI.Click += new System.EventHandler(this.viewSidBrowserTSMI_Click);
+			// 
+			// viewMidiBrowserTSMI
+			// 
+			this.viewMidiBrowserTSMI.Name = "viewMidiBrowserTSMI";
+			this.viewMidiBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F4;
+			this.viewMidiBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+			this.viewMidiBrowserTSMI.Text = "Midi browser";
+			this.viewMidiBrowserTSMI.Click += new System.EventHandler(this.viewMidiBrowserTSMI_Click);
 			// 
 			// label7
 			// 
@@ -690,54 +687,12 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(648, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(665, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
-			this.trackPropsPanel.Size = new System.Drawing.Size(395, 22045);
+			this.trackPropsPanel.Size = new System.Drawing.Size(395, 460);
 			this.trackPropsPanel.TabIndex = 3;
 			this.trackPropsPanel.Visible = false;
 			this.trackPropsPanel.VisibleChanged += new System.EventHandler(this.trackPropsPanel_VisibleChanged);
-			// 
-			// trackList
-			// 
-			this.trackList.AllowDrop = true;
-			this.trackList.BackColor = System.Drawing.Color.Black;
-			this.trackList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.trackColumn,
-            this.normalColumn,
-            this.hilitedColumn});
-			this.trackList.ContextMenuStrip = this.trackListCM;
-			this.trackList.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackList.ForeColor = System.Drawing.Color.White;
-			this.trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-			this.trackList.HideSelection = false;
-			this.trackList.Location = new System.Drawing.Point(1, 0);
-			this.trackList.Name = "trackList";
-			this.trackList.Size = new System.Drawing.Size(186, 22045);
-			this.trackList.TabIndex = 0;
-			this.trackList.UseCompatibleStateImageBehavior = false;
-			this.trackList.View = System.Windows.Forms.View.Details;
-			this.trackList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.trackList_ItemDrag);
-			this.trackList.SelectedIndexChanged += new System.EventHandler(this.trackList_SelectedIndexChanged);
-			this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
-			this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
-			this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
-			// 
-			// trackColumn
-			// 
-			this.trackColumn.Text = "Track";
-			this.trackColumn.Width = 112;
-			// 
-			// normalColumn
-			// 
-			this.normalColumn.Text = "N";
-			this.normalColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			this.normalColumn.Width = 35;
-			// 
-			// hilitedColumn
-			// 
-			this.hilitedColumn.Text = "H";
-			this.hilitedColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			this.hilitedColumn.Width = 35;
 			// 
 			// trackListCM
 			// 
@@ -805,7 +760,7 @@
 			this.selectedTrackPropsPanel.Location = new System.Drawing.Point(187, 0);
 			this.selectedTrackPropsPanel.Name = "selectedTrackPropsPanel";
 			this.selectedTrackPropsPanel.SelectedIndex = 0;
-			this.selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 22045);
+			this.selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 460);
 			this.selectedTrackPropsPanel.TabIndex = 14;
 			// 
 			// style
@@ -819,30 +774,9 @@
 			this.style.Controls.Add(this.label1);
 			this.style.Location = new System.Drawing.Point(4, 22);
 			this.style.Name = "style";
-			this.style.Size = new System.Drawing.Size(200, 22019);
+			this.style.Size = new System.Drawing.Size(200, 434);
 			this.style.TabIndex = 2;
 			this.style.Text = "Style";
-			// 
-			// lineStyleControl
-			// 
-			this.lineStyleControl.AutoSize = true;
-			this.lineStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
-			this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
-			this.lineStyleControl.Name = "lineStyleControl";
-			this.lineStyleControl.Size = new System.Drawing.Size(184, 378);
-			this.lineStyleControl.TabIndex = 2;
-			this.lineStyleControl.Visible = false;
-			// 
-			// barStyleControl
-			// 
-			this.barStyleControl.AutoSize = true;
-			this.barStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.barStyleControl.Location = new System.Drawing.Point(3, 72);
-			this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-			this.barStyleControl.Name = "barStyleControl";
-			this.barStyleControl.Size = new System.Drawing.Size(180, 55);
-			this.barStyleControl.TabIndex = 2;
 			// 
 			// defaultStyleBtn
 			// 
@@ -894,7 +828,7 @@
 			this.material.Location = new System.Drawing.Point(4, 22);
 			this.material.Name = "material";
 			this.material.Padding = new System.Windows.Forms.Padding(3);
-			this.material.Size = new System.Drawing.Size(200, 22019);
+			this.material.Size = new System.Drawing.Size(200, 434);
 			this.material.TabIndex = 0;
 			this.material.Text = "Material";
 			// 
@@ -1603,7 +1537,7 @@
 			this.light.Location = new System.Drawing.Point(4, 22);
 			this.light.Name = "light";
 			this.light.Padding = new System.Windows.Forms.Padding(3);
-			this.light.Size = new System.Drawing.Size(200, 22019);
+			this.light.Size = new System.Drawing.Size(200, 434);
 			this.light.TabIndex = 1;
 			this.light.Text = "Light";
 			// 
@@ -1647,62 +1581,6 @@
 			this.lightPanel.Name = "lightPanel";
 			this.lightPanel.Size = new System.Drawing.Size(179, 223);
 			this.lightPanel.TabIndex = 30;
-			// 
-			// masterLightHsBtn
-			// 
-			this.masterLightHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.masterLightHsBtn.Hue = 0F;
-			this.masterLightHsBtn.Location = new System.Drawing.Point(116, 182);
-			this.masterLightHsBtn.Name = "masterLightHsBtn";
-			this.masterLightHsBtn.Saturation = 0F;
-			this.masterLightHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.masterLightHsBtn.Size = new System.Drawing.Size(53, 20);
-			this.masterLightHsBtn.TabIndex = 59;
-			this.masterLightHsBtn.Tag = "Edit Master color";
-			this.masterLightHsBtn.UseVisualStyleBackColor = true;
-			this.masterLightHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.masterLightHsBtn_ColorChanged);
-			// 
-			// specHsBtn
-			// 
-			this.specHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.specHsBtn.Hue = 0F;
-			this.specHsBtn.Location = new System.Drawing.Point(116, 130);
-			this.specHsBtn.Name = "specHsBtn";
-			this.specHsBtn.Saturation = 0F;
-			this.specHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.specHsBtn.Size = new System.Drawing.Size(53, 20);
-			this.specHsBtn.TabIndex = 59;
-			this.specHsBtn.Tag = "Edit Specular color";
-			this.specHsBtn.UseVisualStyleBackColor = true;
-			this.specHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.specHsBtn_ColorChanged);
-			// 
-			// diffuseHsBtn
-			// 
-			this.diffuseHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.diffuseHsBtn.Hue = 0F;
-			this.diffuseHsBtn.Location = new System.Drawing.Point(116, 104);
-			this.diffuseHsBtn.Name = "diffuseHsBtn";
-			this.diffuseHsBtn.Saturation = 0F;
-			this.diffuseHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.diffuseHsBtn.Size = new System.Drawing.Size(53, 20);
-			this.diffuseHsBtn.TabIndex = 59;
-			this.diffuseHsBtn.Tag = "Edit Diffuse  color";
-			this.diffuseHsBtn.UseVisualStyleBackColor = true;
-			this.diffuseHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.diffuseHsBtn_ColorChanged);
-			// 
-			// ambientHsBtn
-			// 
-			this.ambientHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.ambientHsBtn.Hue = 0F;
-			this.ambientHsBtn.Location = new System.Drawing.Point(116, 78);
-			this.ambientHsBtn.Name = "ambientHsBtn";
-			this.ambientHsBtn.Saturation = 0F;
-			this.ambientHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-			this.ambientHsBtn.Size = new System.Drawing.Size(53, 20);
-			this.ambientHsBtn.TabIndex = 59;
-			this.ambientHsBtn.Tag = "Edit Ambient color";
-			this.ambientHsBtn.UseVisualStyleBackColor = true;
-			this.ambientHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.ambientHsBtn_ColorChanged);
 			// 
 			// specPowUd
 			// 
@@ -1974,7 +1852,7 @@
 			this.spatial.Location = new System.Drawing.Point(4, 22);
 			this.spatial.Name = "spatial";
 			this.spatial.Padding = new System.Windows.Forms.Padding(3);
-			this.spatial.Size = new System.Drawing.Size(200, 22019);
+			this.spatial.Size = new System.Drawing.Size(200, 434);
 			this.spatial.TabIndex = 3;
 			this.spatial.Text = "Spatial";
 			this.spatial.UseVisualStyleBackColor = true;
@@ -2083,59 +1961,16 @@
 			this.xoffsetUd.Tag = "Edit X Offset";
 			this.xoffsetUd.ValueChanged += new System.EventHandler(this.xoffsetUd_ValueChanged);
 			// 
-			// textureBrowseBtn
-			// 
-			this.textureBrowseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textureBrowseBtn.Location = new System.Drawing.Point(-11236, 21998);
-			this.textureBrowseBtn.Name = "textureBrowseBtn";
-			this.textureBrowseBtn.Size = new System.Drawing.Size(26, 20);
-			this.textureBrowseBtn.TabIndex = 11;
-			this.textureBrowseBtn.Text = "...";
-			this.textureBrowseBtn.UseVisualStyleBackColor = true;
-			this.textureBrowseBtn.Visible = false;
-			this.textureBrowseBtn.Click += new System.EventHandler(this.textureBrowseBtn_Click);
-			// 
-			// texPathTb
-			// 
-			this.texPathTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.texPathTb.Location = new System.Drawing.Point(-11348, 21999);
-			this.texPathTb.Name = "texPathTb";
-			this.texPathTb.Size = new System.Drawing.Size(123, 20);
-			this.texPathTb.TabIndex = 10;
-			this.texPathTb.Visible = false;
-			// 
-			// label4
-			// 
-			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(-11350, 21983);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(43, 13);
-			this.label4.TabIndex = 9;
-			this.label4.Text = "Texture";
-			this.label4.Visible = false;
-			// 
 			// resetDefaultBtn
 			// 
 			this.resetDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.resetDefaultBtn.Location = new System.Drawing.Point(336, 32767);
+			this.resetDefaultBtn.Location = new System.Drawing.Point(336, 11182);
 			this.resetDefaultBtn.Name = "resetDefaultBtn";
 			this.resetDefaultBtn.Size = new System.Drawing.Size(170, 23);
 			this.resetDefaultBtn.TabIndex = 13;
 			this.resetDefaultBtn.Text = "Reset defaults to default";
 			this.resetDefaultBtn.UseVisualStyleBackColor = true;
 			this.resetDefaultBtn.Visible = false;
-			// 
-			// setDefaultBtn
-			// 
-			this.setDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.setDefaultBtn.Location = new System.Drawing.Point(334, 32767);
-			this.setDefaultBtn.Name = "setDefaultBtn";
-			this.setDefaultBtn.Size = new System.Drawing.Size(170, 23);
-			this.setDefaultBtn.TabIndex = 12;
-			this.setDefaultBtn.Text = "Set as default";
-			this.setDefaultBtn.UseVisualStyleBackColor = true;
-			this.setDefaultBtn.Visible = false;
 			// 
 			// openTextureDlg
 			// 
@@ -2167,7 +2002,7 @@
 			this.songPropsPanel.Dock = System.Windows.Forms.DockStyle.Left;
 			this.songPropsPanel.Location = new System.Drawing.Point(0, 24);
 			this.songPropsPanel.Name = "songPropsPanel";
-			this.songPropsPanel.Size = new System.Drawing.Size(197, 22045);
+			this.songPropsPanel.Size = new System.Drawing.Size(197, 460);
 			this.songPropsPanel.TabIndex = 17;
 			this.songPropsPanel.Visible = false;
 			this.songPropsPanel.VisibleChanged += new System.EventHandler(this.songPropsPanel_VisibleChanged);
@@ -2388,26 +2223,6 @@
 			this.playbackOffsetUd.Tag = "Edit Playback Offset";
 			this.playbackOffsetUd.ValueChanged += new System.EventHandler(this.playbackOffsetUd_ValueChanged);
 			// 
-			// upDownVpWidth
-			// 
-			this.upDownVpWidth.AutoSize = true;
-			this.upDownVpWidth.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.upDownVpWidth.Decimals = 3;
-			this.upDownVpWidth.Decimals2 = 2;
-			this.upDownVpWidth.ExpBase = 2D;
-			this.upDownVpWidth.Location = new System.Drawing.Point(12, 28);
-			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
-			this.upDownVpWidth.Max = 10D;
-			this.upDownVpWidth.Min = 0D;
-			this.upDownVpWidth.Name = "upDownVpWidth";
-			this.upDownVpWidth.Size = new System.Drawing.Size(180, 48);
-			this.upDownVpWidth.TabIndex = 0;
-			this.upDownVpWidth.TbWidth = 50;
-			this.upDownVpWidth.TickFreq = 1D;
-			this.upDownVpWidth.Value = 16D;
-			this.upDownVpWidth.ValueChanged += new System.EventHandler(this.upDownVpWidth_ValueChanged);
-			this.upDownVpWidth.CommitChanges += new System.EventHandler(this.upDownVpWidth_CommitChanges);
-			// 
 			// saveMixdownDialog
 			// 
 			this.saveMixdownDialog.Filter = "Wav files (*.wav)|*.wav|All files (*.*)|*.*";
@@ -2453,9 +2268,9 @@
             this.TimeColumn,
             this.LyricsColumn});
 			this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.lyricsGridView.Location = new System.Drawing.Point(197, 22019);
+			this.lyricsGridView.Location = new System.Drawing.Point(197, 434);
 			this.lyricsGridView.Name = "lyricsGridView";
-			this.lyricsGridView.Size = new System.Drawing.Size(451, 50);
+			this.lyricsGridView.Size = new System.Drawing.Size(468, 50);
 			this.lyricsGridView.TabIndex = 0;
 			this.lyricsGridView.Tag = "Edit Lyrics";
 			this.lyricsGridView.Visible = false;
@@ -2493,7 +2308,7 @@
 			this.keyFramesDGV.Dock = System.Windows.Forms.DockStyle.Left;
 			this.keyFramesDGV.Location = new System.Drawing.Point(197, 24);
 			this.keyFramesDGV.Name = "keyFramesDGV";
-			this.keyFramesDGV.Size = new System.Drawing.Size(210, 21995);
+			this.keyFramesDGV.Size = new System.Drawing.Size(210, 410);
 			this.keyFramesDGV.TabIndex = 23;
 			this.keyFramesDGV.Tag = "Edit Key Frames";
 			this.keyFramesDGV.Visible = false;
@@ -2531,7 +2346,7 @@
 			this.propsTogglePanel.Controls.Add(this.songPropsCb);
 			this.propsTogglePanel.Controls.Add(this.trackPropsCb);
 			this.propsTogglePanel.Enabled = false;
-			this.propsTogglePanel.Location = new System.Drawing.Point(159, 0);
+			this.propsTogglePanel.Location = new System.Drawing.Point(276, 0);
 			this.propsTogglePanel.Name = "propsTogglePanel";
 			this.propsTogglePanel.Size = new System.Drawing.Size(207, 24);
 			this.propsTogglePanel.TabIndex = 24;
@@ -2540,11 +2355,11 @@
 			// 
 			this.songPropsCb.Appearance = System.Windows.Forms.Appearance.Button;
 			this.songPropsCb.AutoSize = true;
-			this.songPropsCb.Location = new System.Drawing.Point(3, 0);
+			this.songPropsCb.Location = new System.Drawing.Point(3, 1);
 			this.songPropsCb.Name = "songPropsCb";
 			this.songPropsCb.Size = new System.Drawing.Size(99, 23);
 			this.songPropsCb.TabIndex = 0;
-			this.songPropsCb.Text = "&Project properties";
+			this.songPropsCb.Text = "Pr&oject properties";
 			this.songPropsCb.UseVisualStyleBackColor = true;
 			this.songPropsCb.CheckedChanged += new System.EventHandler(this.songPropsCb_CheckedChanged);
 			// 
@@ -2553,7 +2368,7 @@
 			this.trackPropsCb.Appearance = System.Windows.Forms.Appearance.Button;
 			this.trackPropsCb.AutoSize = true;
 			this.trackPropsCb.FlatAppearance.CheckedBackColor = System.Drawing.Color.White;
-			this.trackPropsCb.Location = new System.Drawing.Point(108, 1);
+			this.trackPropsCb.Location = new System.Drawing.Point(108, 2);
 			this.trackPropsCb.Name = "trackPropsCb";
 			this.trackPropsCb.Size = new System.Drawing.Size(94, 23);
 			this.trackPropsCb.TabIndex = 1;
@@ -2571,13 +2386,152 @@
 			this.debugLabel.Text = "label16";
 			this.debugLabel.Visible = false;
 			// 
+			// upDownVpWidth
+			// 
+			this.upDownVpWidth.AutoSize = true;
+			this.upDownVpWidth.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.upDownVpWidth.Decimals = 3;
+			this.upDownVpWidth.Decimals2 = 2;
+			this.upDownVpWidth.ExpBase = 2D;
+			this.upDownVpWidth.Location = new System.Drawing.Point(12, 28);
+			this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
+			this.upDownVpWidth.Max = 10D;
+			this.upDownVpWidth.Min = 0D;
+			this.upDownVpWidth.Name = "upDownVpWidth";
+			this.upDownVpWidth.Size = new System.Drawing.Size(180, 48);
+			this.upDownVpWidth.TabIndex = 0;
+			this.upDownVpWidth.TbWidth = 50;
+			this.upDownVpWidth.TickFreq = 1D;
+			this.upDownVpWidth.Value = 16D;
+			this.upDownVpWidth.ValueChanged += new System.EventHandler(this.upDownVpWidth_ValueChanged);
+			this.upDownVpWidth.CommitChanges += new System.EventHandler(this.upDownVpWidth_CommitChanges);
+			// 
+			// trackList
+			// 
+			this.trackList.AllowDrop = true;
+			this.trackList.BackColor = System.Drawing.Color.Black;
+			this.trackList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.trackColumn,
+            this.normalColumn,
+            this.hilitedColumn});
+			this.trackList.ContextMenuStrip = this.trackListCM;
+			this.trackList.Dock = System.Windows.Forms.DockStyle.Right;
+			this.trackList.ForeColor = System.Drawing.Color.White;
+			this.trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.trackList.HideSelection = false;
+			this.trackList.Location = new System.Drawing.Point(1, 0);
+			this.trackList.Name = "trackList";
+			this.trackList.Size = new System.Drawing.Size(186, 460);
+			this.trackList.TabIndex = 0;
+			this.trackList.UseCompatibleStateImageBehavior = false;
+			this.trackList.View = System.Windows.Forms.View.Details;
+			this.trackList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.trackList_ItemDrag);
+			this.trackList.SelectedIndexChanged += new System.EventHandler(this.trackList_SelectedIndexChanged);
+			this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
+			this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
+			this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
+			// 
+			// trackColumn
+			// 
+			this.trackColumn.Text = "Track";
+			this.trackColumn.Width = 112;
+			// 
+			// normalColumn
+			// 
+			this.normalColumn.Text = "N";
+			this.normalColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			this.normalColumn.Width = 35;
+			// 
+			// hilitedColumn
+			// 
+			this.hilitedColumn.Text = "H";
+			this.hilitedColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			this.hilitedColumn.Width = 35;
+			// 
+			// lineStyleControl
+			// 
+			this.lineStyleControl.AutoSize = true;
+			this.lineStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
+			this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+			this.lineStyleControl.Name = "lineStyleControl";
+			this.lineStyleControl.Size = new System.Drawing.Size(184, 378);
+			this.lineStyleControl.TabIndex = 2;
+			this.lineStyleControl.Visible = false;
+			// 
+			// barStyleControl
+			// 
+			this.barStyleControl.AutoSize = true;
+			this.barStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.barStyleControl.Location = new System.Drawing.Point(3, 72);
+			this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			this.barStyleControl.Name = "barStyleControl";
+			this.barStyleControl.Size = new System.Drawing.Size(180, 55);
+			this.barStyleControl.TabIndex = 2;
+			// 
+			// masterLightHsBtn
+			// 
+			this.masterLightHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.masterLightHsBtn.Hue = 0F;
+			this.masterLightHsBtn.Location = new System.Drawing.Point(116, 182);
+			this.masterLightHsBtn.Name = "masterLightHsBtn";
+			this.masterLightHsBtn.Saturation = 0F;
+			this.masterLightHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.masterLightHsBtn.Size = new System.Drawing.Size(53, 20);
+			this.masterLightHsBtn.TabIndex = 59;
+			this.masterLightHsBtn.Tag = "Edit Master color";
+			this.masterLightHsBtn.UseVisualStyleBackColor = true;
+			this.masterLightHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.masterLightHsBtn_ColorChanged);
+			// 
+			// specHsBtn
+			// 
+			this.specHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.specHsBtn.Hue = 0F;
+			this.specHsBtn.Location = new System.Drawing.Point(116, 130);
+			this.specHsBtn.Name = "specHsBtn";
+			this.specHsBtn.Saturation = 0F;
+			this.specHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.specHsBtn.Size = new System.Drawing.Size(53, 20);
+			this.specHsBtn.TabIndex = 59;
+			this.specHsBtn.Tag = "Edit Specular color";
+			this.specHsBtn.UseVisualStyleBackColor = true;
+			this.specHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.specHsBtn_ColorChanged);
+			// 
+			// diffuseHsBtn
+			// 
+			this.diffuseHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.diffuseHsBtn.Hue = 0F;
+			this.diffuseHsBtn.Location = new System.Drawing.Point(116, 104);
+			this.diffuseHsBtn.Name = "diffuseHsBtn";
+			this.diffuseHsBtn.Saturation = 0F;
+			this.diffuseHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.diffuseHsBtn.Size = new System.Drawing.Size(53, 20);
+			this.diffuseHsBtn.TabIndex = 59;
+			this.diffuseHsBtn.Tag = "Edit Diffuse  color";
+			this.diffuseHsBtn.UseVisualStyleBackColor = true;
+			this.diffuseHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.diffuseHsBtn_ColorChanged);
+			// 
+			// ambientHsBtn
+			// 
+			this.ambientHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.ambientHsBtn.Hue = 0F;
+			this.ambientHsBtn.Location = new System.Drawing.Point(116, 78);
+			this.ambientHsBtn.Name = "ambientHsBtn";
+			this.ambientHsBtn.Saturation = 0F;
+			this.ambientHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+			this.ambientHsBtn.Size = new System.Drawing.Size(53, 20);
+			this.ambientHsBtn.TabIndex = 59;
+			this.ambientHsBtn.Tag = "Edit Ambient color";
+			this.ambientHsBtn.UseVisualStyleBackColor = true;
+			this.ambientHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.ambientHsBtn_ColorChanged);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1060, 378);
+			this.ClientSize = new System.Drawing.Size(1060, 484);
 			this.Controls.Add(this.debugLabel);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.keyFramesDGV);
@@ -2585,10 +2539,6 @@
 			this.Controls.Add(this.songPropsPanel);
 			this.Controls.Add(this.resetDefaultBtn);
 			this.Controls.Add(this.trackPropsPanel);
-			this.Controls.Add(this.textureBrowseBtn);
-			this.Controls.Add(this.setDefaultBtn);
-			this.Controls.Add(this.texPathTb);
-			this.Controls.Add(this.label4);
 			this.Controls.Add(this.menuStrip1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.KeyPreview = true;
@@ -2699,15 +2649,11 @@
 		private System.Windows.Forms.TrackBar hiliteSatSlider;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Button resetDefaultBtn;
-		private System.Windows.Forms.Button setDefaultBtn;
 		private System.Windows.Forms.Button defaultMtrlBtn;
 		private ListViewNF trackList;
 		private System.Windows.Forms.ColumnHeader trackColumn;
 		private System.Windows.Forms.ColumnHeader normalColumn;
 		private System.Windows.Forms.ColumnHeader hilitedColumn;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.Button textureBrowseBtn;
-		private System.Windows.Forms.TextBox texPathTb;
 		private System.Windows.Forms.Button unloadTexBtn;
 		private System.Windows.Forms.Button loadTexBtn;
 		private System.Windows.Forms.ToolStripMenuItem openSongToolStripMenuItem;
@@ -2825,8 +2771,8 @@
 		private System.Windows.Forms.ContextMenuStrip trackPropsTabCM;
 		private System.Windows.Forms.ToolStripMenuItem loadTrackPropsTypeToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem saveTrackPtopsTypeToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem actionsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem songToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem cameraToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem resetCamToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem loadCamToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem saveCamToolStripMenuItem;
@@ -2834,14 +2780,6 @@
 		private System.Windows.Forms.ToolStripMenuItem defaultPropertiesToolStripMenuItem1;
 		private System.Windows.Forms.ToolStripMenuItem loadPropertiesToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem savePropertiesToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem playbackToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem startStopToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem beginningToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem endToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem nudgeBackwardsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem nudgeForwardToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem jumpBackwardsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem jumpForwardToolStripMenuItem;
 		private System.Windows.Forms.OpenFileDialog openCamFileDialog;
 		private System.Windows.Forms.SaveFileDialog saveCamFileDialog;
 		private System.Windows.Forms.DataGridView lyricsGridView;
@@ -2860,6 +2798,14 @@
 		private System.Windows.Forms.CheckBox trackPropsCb;
 		public System.Windows.Forms.Label debugLabel;
 		private System.Windows.Forms.NumericUpDown masterLightAmountUd;
+		private System.Windows.Forms.ToolStripMenuItem playbackToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem startStopToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem beginningToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem endToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem nudgeBackwardsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem nudgeForwardToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem jumpBackwardsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem jumpForwardToolStripMenuItem;
 	}
 }
 
