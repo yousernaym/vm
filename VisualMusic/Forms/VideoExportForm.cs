@@ -64,20 +64,20 @@ namespace VisualMusic
 			{
 				if (Options.SphericalStereo)
 				{
-					resoComboBox.Items.Add("8192 x 8192");
 					resoComboBox.Items.Add("4096 x 4096");
+					resoComboBox.Items.Add("8192 x 8192");
 				}
 				else
 				{
-					resoComboBox.Items.Add("8192 x 4096");
 					resoComboBox.Items.Add("4096 x 2048");
+					resoComboBox.Items.Add("8192 x 4096");
 				}
 			}
 			else
 			{
-				resoComboBox.Items.Add("7680 x 4320");
-				resoComboBox.Items.Add("3840 x 2160");
 				resoComboBox.Items.Add("1920 x 1080");
+				resoComboBox.Items.Add("3840 x 2160");
+				resoComboBox.Items.Add("7680 x 4320");
 			}
 			resoComboBox.SelectedIndex = Options.ResoIndex;
 		}
@@ -223,7 +223,7 @@ namespace VisualMusic
 					nonSphereResoIndex = value;
 			}
 		}
-		int sphereResoIndex = 0;
+		int sphereResoIndex = 1;
 		int nonSphereResoIndex = 1;
 		public int SsaaIndex => (int)Math.Log(ssaaFactor, 2);
 
