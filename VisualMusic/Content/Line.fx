@@ -36,7 +36,6 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.rawPos = IN.pos.xyz;
 	OUT.normPos = IN.normPos;
 	OUT.pos = float4(IN.pos.xy, 0, 1);
-	OUT.pos.x *= VertWidthScale;
 	OUT.pos = wvpTransform(OUT.pos, VertWidthScale);
 	OUT.texCoords = IN.texCoords - TexScrollOffset;
 }
