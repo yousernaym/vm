@@ -222,8 +222,8 @@ namespace VisualMusic
 
 		public bool control(WinKeys key, bool keyDown, WinKeys modifiers)
 		{
-			bool shiftPressed = modifiers == WinKeys.Shift;
-			if (modifiers != 0 && !shiftPressed)
+			bool shifting = modifiers == WinKeys.Shift;
+			if (modifiers != 0 && !shifting)
 				return false;
 			if (key == WinKeys.ShiftKey)
 			{
@@ -243,8 +243,8 @@ namespace VisualMusic
 			float scaledRotSpeed = rotSpeed * controlScale;
 			float scaledMoveSpeed = moveSpeed * controlScale;
 
-			if (shiftPressed)
-			{
+			if (shifting || !keyDown)
+			{ 
 				if (key == WinKeys.A)
 				{
 					rotVel.Y = scaledRotSpeed;
@@ -276,7 +276,7 @@ namespace VisualMusic
 					keyMatch = true;
 				}
 			}
-			else
+			if (!shifting || !keyDown)
 			{
 				if (key == WinKeys.W)
 				{
