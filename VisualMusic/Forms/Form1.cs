@@ -1180,12 +1180,7 @@ namespace VisualMusic
 					Project = tempProject;
 					break;
 				}
-				catch (IOException e)
-				{
-					showErrorMsgBox(e.Message);
-					SongPanel.Project = Project;
-					return;
-				}
+			
 				catch (Exception ex) when (ex is FormatException || ex is FileNotFoundException)
 				{
 					DialogResult dlgResult = DialogResult.OK;
@@ -1204,6 +1199,12 @@ namespace VisualMusic
 						SongPanel.Project = Project;
 						return;
 					}
+				}
+				catch (IOException e)
+				{
+					showErrorMsgBox(e.Message);
+					SongPanel.Project = Project;
+					return;
 				}
 				finally
 				{
