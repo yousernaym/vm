@@ -220,12 +220,14 @@ namespace VisualMusic
 				OnUserUpdating?.Invoke();
 		}
 
-		bool shiftPressed = false;
-		public bool control(WinKeys key, bool keyDown)
+		public bool control(WinKeys key, bool keyDown, WinKeys modifiers)
 		{
+			bool shiftPressed = modifiers == WinKeys.Shift;
+			if (modifiers != 0 && !shiftPressed)
+				return false;
 			if (key == WinKeys.ShiftKey)
 			{
-				shiftPressed = keyDown;
+				//shiftPressed = keyDown;
 				//MouseRot = keyDown;
 				//if (keyDown)
 				//{
@@ -308,7 +310,7 @@ namespace VisualMusic
 				}
 			}
 
-			if (keyMatch || shiftPressed)
+			if (keyMatch)
 			{
 				OnUserUpdating?.Invoke();
 				if (!keyDown)

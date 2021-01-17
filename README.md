@@ -40,8 +40,8 @@ Can export mkv video files with support for 360-degree videos.
 3. When returned to the playback screen, press CTRL-Space to start playing
 
 ### Camera control
-Keyboard keys: wasdqexc  
-Hold Caps Lock and move mouse and/or click mouse buttons.
+Move: wasdrf  
+Rotate: Shift + wasdqe
 
 ### Key frames (WIP)
 Press CTRL-K to insert a key frame at the current playback position.  

@@ -718,7 +718,7 @@ namespace VisualMusic
 			var keyFrame = Project.getKeyFrameAtSongPos();
 			if (keyFrame == null)
 				return;
-			if (keyFrame.Camera.control(e.KeyCode, true))
+			if (keyFrame.Camera.control(e.KeyCode, true, ModifierKeys))
 				e.SuppressKeyPress = true;
 			
 			//Start/stop playback

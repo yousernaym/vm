@@ -540,7 +540,7 @@ namespace VisualMusic
 			
 			var keyFrame = Project.getKeyFrameAtSongPos();
 			if (keyFrame != null)
-				keyFrame.Camera.control(e.KeyCode, false);
+				keyFrame.Camera.control(e.KeyCode, false, Form1.ModifierKeys);
 			
 			if (e.KeyCode == Keys.Z)
 			{
