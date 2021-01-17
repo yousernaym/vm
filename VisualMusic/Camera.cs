@@ -243,6 +243,7 @@ namespace VisualMusic
 			float scaledRotSpeed = rotSpeed * controlScale;
 			float scaledMoveSpeed = moveSpeed * controlScale;
 
+			//Rotation, requiring shifting
 			if (shifting || !keyDown)
 			{ 
 				if (key == WinKeys.A)
@@ -265,17 +266,9 @@ namespace VisualMusic
 					rotVel.X = scaledRotSpeed;
 					keyMatch = true;
 				}
-				if (key == WinKeys.Q)
-				{
-					rotVel.Z = scaledRotSpeed;
-					keyMatch = true;
-				}
-				if (key == WinKeys.E)
-				{
-					rotVel.Z = -scaledRotSpeed;
-					keyMatch = true;
-				}
 			}
+
+			//Movement, requiring not shifting
 			if (!shifting || !keyDown)
 			{
 				if (key == WinKeys.W)
@@ -298,16 +291,28 @@ namespace VisualMusic
 					moveVel.X = scaledMoveSpeed;
 					keyMatch = true;
 				}
-				if (key == WinKeys.R)
-				{
-					moveVel.Y = scaledMoveSpeed;
-					keyMatch = true;
-				}
-				if (key == WinKeys.F)
-				{
-					moveVel.Y = -scaledMoveSpeed;
-					keyMatch = true;
-				}
+			}
+
+			//Keys exclusively for either movement or rotation, shifting optional
+			if (key == WinKeys.R)
+			{
+				moveVel.Y = scaledMoveSpeed;
+				keyMatch = true;
+			}
+			if (key == WinKeys.F)
+			{
+				moveVel.Y = -scaledMoveSpeed;
+				keyMatch = true;
+			}
+			if (key == WinKeys.Q)
+			{
+				rotVel.Z = scaledRotSpeed;
+				keyMatch = true;
+			}
+			if (key == WinKeys.E)
+			{
+				rotVel.Z = -scaledRotSpeed;
+				keyMatch = true;
 			}
 
 			if (keyMatch)
