@@ -78,21 +78,21 @@ namespace VisualMusic
 				float rot90 = (float)Math.PI / 2.0f;
 				switch (CubeMapFace)
 				{
-					case 1:
+					case 1: //Back
 						angleOffsets.Y = 2 * rot90;
 						break;
-					case 2:
-						angleOffsets.X = rot90;
-						angleOffsets.Z = -rot90;
-						break;
-					case 3:
+					case 2: //Down
 						angleOffsets.X = -rot90;
 						angleOffsets.Z = rot90;
 						break;
-					case 4:
+					case 3: //Up
+						angleOffsets.X = rot90;
+						angleOffsets.Z = -rot90;
+						break;
+					case 4:	//Left
 						angleOffsets.Y = rot90;
 						break;
-					case 5:
+					case 5: //Right
 						angleOffsets.Y = -rot90;
 						break;
 				}

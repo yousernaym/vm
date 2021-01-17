@@ -431,7 +431,7 @@ namespace VisualMusic
 				GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
 				Project.Props.Camera.CubeMapFace = i;
 				GraphicsDevice.Clear(Color.Transparent);
-				//GraphicsDevice.Clear(new Color((uint)i * 1000));
+				//GraphicsDevice.Clear(new Color((uint)i * 40));
 				Project.drawSong();
 			}
 			Project.Props.Camera.CubeMapFace = -1;
