@@ -21,7 +21,7 @@ Can export mkv video files with support for 360-degree videos.
     bootstrap-vcpkg.bat
     vcpkg integrate install
     vcpkg install fluidsynth:x64-windows
-    vcpkg install ffmpeg[x264,vpx]:x64-windows
+    vcpkg install ffmpeg[x264]:x64-windows
     ```
 * Download this repo including submodules:
 ```
@@ -56,7 +56,7 @@ For optimal module playback, import XmPlay: `File -> Third-party integration.. -
 Mod import, based on [libmikmod](http://mikmod.sourceforge.net/).  
 Sid import, based on [libsidplayfp](https://sourceforge.net/projects/sidplay-residfp/).
 #### [Midilib](https://github.com/yousernaym/midilib) (C# class library)  
-Midi import/export.
+Midi import.
 #### [MidMix](https://github.com/yousernaym/midmix) (C++ dll)
 General Midi audio, based on [Fluidsynth](http://www.fluidsynth.org/).  
 #### [Media](https://github.com/yousernaym/media) (C++ dll)  

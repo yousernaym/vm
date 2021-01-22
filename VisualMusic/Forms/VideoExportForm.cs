@@ -144,10 +144,10 @@ namespace VisualMusic
 			resoCombo.SelectedIndex = options.ResoIndex;
 			ssFactorComboBox.SelectedIndex = options.SsaaIndex;
 			videoQualityLossCombo.SelectedIndex = options.VideoQualityLoss;
-			if (options.VideoCodec == AVCodecID.AV_CODEC_ID_H264)
-				videoCodecCombo.SelectedIndex = 0;
-			else 
-				videoCodecCombo.SelectedIndex = 1;
+			//if (options.VideoCodec == AVCodecID.AV_CODEC_ID_H264)
+			//	videoCodecCombo.SelectedIndex = 0;
+			//else 
+			//	videoCodecCombo.SelectedIndex = 1;
 			fpsUd.Value = (decimal)options.Fps;
 			
 		}
@@ -162,13 +162,13 @@ namespace VisualMusic
 			Options.VideoQualityLoss = videoQualityLossCombo.SelectedIndex;
 		}
 
-		private void videoCodecCombo_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (videoCodecCombo.SelectedIndex == 0)
-					Options.VideoCodec = AVCodecID.AV_CODEC_ID_H264;
-			else
-				Options.VideoCodec = AVCodecID.AV_CODEC_ID_VP9;
-		}
+		//private void videoCodecCombo_SelectedIndexChanged(object sender, EventArgs e)
+		//{
+		//	if (videoCodecCombo.SelectedIndex == 0)
+		//		Options.VideoCodec = AVCodecID.AV_CODEC_ID_H264;
+		//	else
+		//		Options.VideoCodec = AVCodecID.AV_CODEC_ID_VP9;
+		//}
 
 		private void resoComboBox_DropDown(object sender, EventArgs e)
 		{
@@ -264,8 +264,8 @@ namespace VisualMusic
 					SSAAFactor = (int)entry.Value;
 				else if (entry.Name == "videoQualityLoss")
 					VideoQualityLoss = (int)entry.Value;
-				else if (entry.Name == "videoCodec")
-					VideoCodec = (AVCodecID)entry.Value;
+				//else if (entry.Name == "videoCodec")
+				//	VideoCodec = (AVCodecID)entry.Value;
 				else if (entry.Name == "fps")
 					Fps = (float)entry.Value;
 			}
@@ -279,7 +279,7 @@ namespace VisualMusic
 			info.AddValue("nonSphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.nonSphereResoIndex));
 			info.AddValue("ssaaFactor", Form1.VidExpForm.Options.SSAAFactor);
 			info.AddValue("videoQualityLoss", VideoQualityLoss);
-			info.AddValue("videoCodec", VideoCodec);
+			//info.AddValue("videoCodec", VideoCodec);
 			info.AddValue("fps", Fps);
 		}
 
