@@ -67,10 +67,7 @@ namespace VisualMusic
             browser.AddressChanged += OnBrowserAddressChanged;
 			
 			var bitness = Environment.Is64BitProcess ? "x64" : "x86";
-            var version = String.Format("Chromium: {0}, CEF: {1}, CefSharp: {2}, Environment: {3}", Cef.ChromiumVersion, Cef.CefVersion, Cef.CefSharpVersion, bitness);
-            DisplayOutput(version);
-
-			Url = urlString;
+            Url = urlString;
         }
 
 		private void OnBeforeDownload(object sender, DownloadItem e)
@@ -95,7 +92,7 @@ namespace VisualMusic
 		
 		private void OnBrowserConsoleMessage(object sender, ConsoleMessageEventArgs args)
         {
-            DisplayOutput(string.Format("Line: {0}, Source: {1}, Message: {2}", args.Line, args.Source, args.Message));
+            //DisplayOutput(string.Format("Line: {0}, Source: {1}, Message: {2}", args.Line, args.Source, args.Message));
         }
 
         private void OnBrowserStatusMessage(object sender, StatusMessageEventArgs args)

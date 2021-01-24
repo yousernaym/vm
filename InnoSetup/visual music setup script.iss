@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Visual Music"
-#define MyAppVersion "0.1.0"
+#define MyAppVersion "0.2.0"
 #define MyAppPublisher "Mikesoft"
 #define MyAppExeName "VM.exe"
 #define MyAppDataDir "{userappdata}\" + MyAppName
@@ -19,7 +19,7 @@ AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={pf}\{#MyAppName}
-DefaultGroupName={#MyAppName}
+DefaultGroupName={#MyAppName} 
 AllowNoIcons=yes
 OutputDir=.
 OutputBaseFilename={#MyAppName} setup-x64
