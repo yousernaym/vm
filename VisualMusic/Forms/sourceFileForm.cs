@@ -155,13 +155,14 @@ namespace VisualMusic
 			Ok.Focus();
 		}
 
-		protected void createFormatFilter(string description, string[] formatList)
+		protected void createNoteFormatFilter(string description, string[] formatList)
 		{
 			string formatString = "";
 			foreach (string format in formatList)
 				formatString += $"*.{format}; ";
 			formatString.Substring(0, formatString.Length - 3);
-			openNoteFileDlg.Filter = $"{description} ({formatString})|{formatString}";
+			openNoteFileDlg.Filter = $"{description} ({formatString})|{formatString}" +
+				$"|All files (*.*)|*.*";
 		}
 	}
 

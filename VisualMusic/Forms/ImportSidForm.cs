@@ -59,7 +59,7 @@ namespace VisualMusic
 
 		private void ImportSidForm_Load(object sender, EventArgs e)
 		{
-			createFormatFilter("Sid files", Formats);
+			createNoteFormatFilter("Sid files", Formats);
 		}
 	}
 

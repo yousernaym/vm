@@ -21,17 +21,11 @@ namespace VisualMusic
 			//customInit();
 		}
 
-        public ImportModForm(Form1 _parent) : base(_parent)
-        {
-            InitializeComponent();
-            //customInit();
-        }
-        public void customInit()
-        {
-			//string supportedFiles = "*.669; *.AMF; *.APUN; *.DSM; *.FAR; *.GDM; *.IT; *.IMF; *.MOD; *.MED; *.MTM; *.OKT; *.S3M; *.STM; *.STX; *.ULT; *.UNI; *.XM;";
-			//openNoteFileDlg.Filter = "Module files (" + supportedFiles + ") | " + supportedFiles + " | All files(*.*) | *.*";
+		public ImportModForm(Form1 _parent) : base(_parent)
+		{
+			InitializeComponent();
 		}
-        
+		
 		private void Ok_Click(object sender, EventArgs e)
         {
 			importFiles();
@@ -44,7 +38,7 @@ namespace VisualMusic
 
 		private void ImportModForm_Load(object sender, EventArgs e)
 		{
-			createFormatFilter("Mod files", Formats);
+			createNoteFormatFilter("Mod files", Formats);
 		}
 	}
 

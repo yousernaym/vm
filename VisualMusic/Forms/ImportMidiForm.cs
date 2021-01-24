@@ -33,7 +33,7 @@ namespace VisualMusic
 
 		private void ImportMidiForm_Load(object sender, EventArgs e)
 		{
-			createFormatFilter("Midi files", Formats);
+			createNoteFormatFilter("Midi files", Formats);
 		}
 	}
 
