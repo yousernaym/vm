@@ -9,6 +9,8 @@ using System.Runtime.CompilerServices;
 using CefSharp;
 using System.Reflection;
 using CefSharp.WinForms;
+using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace VisualMusic
 {
@@ -26,14 +28,50 @@ namespace VisualMusic
 		static public readonly string TempDir = Path.Combine(TempDirRoot, Path.GetRandomFileName()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
 		static public readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
 		static FileStream dirLock = null;
-		
+		static string appGuid = ((GuidAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), true)[0]).Value;
 		[STAThread]
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
 		static void Main(string[] args)
 		{
+			using (Mutex mutex = new Mutex(false, "Global\\" + appGuid))
+			{
+				if (!mutex.WaitOne(0, false))
+				{
+					MessageBox.Show("Visual Music already running");
+					return;
+				}
+
+				try
+				{
+					init();
+					form1 = new Form1(args);
+					Application.Run(form1);
+				}
+				finally
+				{
+					close();
+				}
+			}			
+		}
+
+		static void init()
+		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
+			MidMix.init();
+			if (!Media.initMF())
+			{
+				Form1.showErrorMsgBox(null, "Couldn't initialize Media library.");
+				return;
+			}
+			Directory.CreateDirectory(TempDir);
+			dirLock = File.Create(Path.Combine(TempDir, "dontdeletefolder"));
+			initCefSharp();
+		}
+
+		static void initCefSharp()
+		{
 			//In case the program crashed previously, kill the cefsharp processes that stayed open. Otherwise multiple crashes will cause the number of processes to build up and hog the cpu. This has the drawback of killing cefsharp processes created by other programs, but it's very convenient when debugging a crash.
 			Process[] cefSharpProcesses = Process.GetProcessesByName("CefSharp.BrowserSubProcess");
 			foreach (var process in cefSharpProcesses)
@@ -41,57 +79,23 @@ namespace VisualMusic
 
 			Cef.EnableHighDPISupport();
 			var settings = new CefSettings();
-
-			// Make sure you set performDependencyCheck false
 			Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
+		}
 
-			//var browser = new BrowserForm();
-			//Application.Run(browser);
-
+		static void close()
+		{
+			MidMix.close();
+			Media.closeMF();
+			dirLock.Close();
+			dirLock = null;
 			try
 			{
-				MidMix.init();
-				if (!Media.initMF())
-				{
-					Form1.showErrorMsgBox(null, "Couldn't initialize Media Foundation.");
-					return;
-				}
-				Directory.CreateDirectory(TempDir);
-				dirLock = File.Create(Path.Combine(TempDir, "dontdeletefolder"));
-				//Midi.Song.initLib(TempDir, Path.GetFileName(MixdownPath));
-				form1 = new Form1(args);
-				Application.Run(form1);
+				Directory.Delete(TempDirRoot, true);
 			}
-			finally
+			catch
 			{
-				MidMix.close();
-				Media.closeMF();
-				//Midi.Song.exitLib();
-				dirLock.Close();
-				dirLock = null;
-				try
-				{
-					//if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1) //no other instances running?
-					Directory.Delete(TempDirRoot, true);
-				}
-				catch
-				{
-					//If a file can't be deleted for any reason just leave it. All will be deleted next time.
-				}
+				//If a file can't be deleted for any reason just leave it. All will be deleted next time.
 			}
-		}
-
-		static void exceptionHandler(object sender, UnhandledExceptionEventArgs args)
-		{
-			Exception e = (Exception)args.ExceptionObject;
-			MessageBox.Show(e.Message);
-			//Console.WriteLine("MyHandler caught : " + e.Message);
-			//Console.WriteLine("Runtime terminating: {0}", args.IsTerminating);
-		}
-		public static void clean(this DirectoryInfo directory)
-		{
-			foreach (FileInfo file in directory.GetFiles()) file.Delete();
-			foreach (DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
 		}
 	}
 }
