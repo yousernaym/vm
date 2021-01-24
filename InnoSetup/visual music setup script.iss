@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Visual Music"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "0.1.0"
 #define MyAppPublisher "Mikesoft"
 #define MyAppExeName "VM.exe"
 #define MyAppDataDir "{userappdata}\" + MyAppName
@@ -63,7 +63,7 @@ Source: "..\VisualMusic\bin\anycpu\Release\midilib.dll"; DestDir: "{app}"; Flags
 ;Remuxer
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\*.dll"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\Remuxer.exe"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
-Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\roms\*"; DestDir: "{app}\Remuxer\Roms"; Flags: ignoreversion
+Source: "..\Dependencies\Remuxer\libRemuxer\roms\*"; DestDir: "{app}\Remuxer\Roms"; Flags: ignoreversion
 
 ;Cefsharp
 Source: "..\VisualMusic\bin\anycpu\Release\x64\cef.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion

@@ -414,9 +414,10 @@
     <PostBuildEvent>set platform=x64
 xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\*.dll" "$(TargetDir)" /D /Y
 xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\*.pdb" "$(TargetDir)" /D /Y
-xcopy "$(SolutionDir)Dependencies\spatial-media\dist\minjector.exe" "$(TargetDir)" /D /Y
-xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\remuxer" "$(TargetDir)remuxer" /D /E /Y /S /I
-xcopy "$(TargetDir)%25platform%25" "$(TargetDir)cefsharp\%25platform%25" /D /Y /S /I</PostBuildEvent>
+xcopy "$(SolutionDir)%25platform%25\$(ConfigurationName)\remuxer" "$(TargetDir)remuxer" /D /Y /S /I
+xcopy "$(SolutionDir)Dependencies\Remuxer\libRemuxer\roms" "$(TargetDir)remuxer\roms" /D /Y /S /I
+xcopy "$(TargetDir)%25platform%25" "$(TargetDir)cefsharp\%25platform%25" /D /Y /S /I
+</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

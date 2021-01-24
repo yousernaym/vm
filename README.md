@@ -47,13 +47,10 @@ Rotate: Shift + wasdqe
 Press CTRL-K to insert a key frame at the current playback position.  
 Changes to supported properties will be stored in the currently highlighted key frame. Currently only Viewport widht and Camera is supported.
 
-### XMPlay
-For optimal module playback, import XmPlay: `File -> Third-party integration.. -> Import XmPlay`.
-
 ## Sub projects
 
 #### [Remuxer](https://github.com/yousernaym/remuxer) (command-line tool)  
-Mod import, based on [libmikmod](http://mikmod.sourceforge.net/).  
+Mod import, based on [libmikmod](http://mikmod.sourceforge.net/) and [libopenmpt](https://lib.openmpt.org/libopenmpt/).  
 Sid import, based on [libsidplayfp](https://sourceforge.net/projects/sidplay-residfp/).
 #### [Midilib](https://github.com/yousernaym/midilib) (C# class library)  
 Midi import.
