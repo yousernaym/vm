@@ -50,6 +50,7 @@ Name: "docsFolder"; Description: "Create folder '<user-documents>\Visual Music'"
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+
 ;Monogame
 Source: "..\VisualMusic\bin\anycpu\Release\MonoGame.Framework.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\SharpDX.Direct3D11.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -64,6 +65,7 @@ Source: "..\VisualMusic\bin\anycpu\Release\midilib.dll"; DestDir: "{app}"; Flags
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\*.dll"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "..\VisualMusic\bin\anycpu\Release\Remuxer\Remuxer.exe"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "..\Dependencies\Remuxer\libRemuxer\roms\*"; DestDir: "{app}\Remuxer\Roms"; Flags: ignoreversion
+Source: "..\Dependencies\Remuxer\Remuxer\songlenghts.md5"; DestDir: "{#MyAppDataDir}\tparty\hvsc"; Flags: ignoreversion
 
 ;Cefsharp
 Source: "..\VisualMusic\bin\anycpu\Release\x64\cef.pak"; DestDir: "{app}\cefsharp\x64\"; Flags: ignoreversion
