@@ -7,7 +7,7 @@ Can export mkv video files with support for 360-degree videos.
 
 ## Installation
 
-[Windows installer](https://github.com/yousernaym/vm/releases/download/v1.0.0-beta/Visual.Music.setup-x64.exe)
+Run a [Windows installer](https://github.com/yousernaym/vm/releases)
 
 ## Building the source
 
