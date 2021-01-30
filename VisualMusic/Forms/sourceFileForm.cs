@@ -109,23 +109,10 @@ namespace VisualMusic
 
 		protected void importFiles(ImportOptions options)
         {
-			if (options.MixdownType == Midi.MixdownType.None && !string.IsNullOrWhiteSpace(options.AudioPath))
+			try 
 			{
-				//Audio file was specified. Make sure the path is correct and the file is a valid audio file, otherwise abort import and let user try again.
-				if (!File.Exists(options.AudioPath))
-				{
-					//Audio file not found
-					Form1.showErrorMsgBox("Couldn't find audio file.");
-					return;
-				}
-				if (!Media.openAudioFile(options.AudioPath))
-				{
-					//Not a valid audio file
-					Form1.showErrorMsgBox("Couldn't read audio file.");
-					return;
-				}
+				options.checkSourceFile(); 
 			}
-			try { options.checkNoteFile(); }
 			catch (Exception ex) when (ex is FileNotFoundException || ex is ArgumentException) 
 			{
 				Form1.showErrorMsgBox(ex.Message);
@@ -306,12 +293,19 @@ namespace VisualMusic
 			}
 		}
 
-		public void checkNoteFile()
+		public void checkSourceFile()
 		{
 			if (string.IsNullOrWhiteSpace(NotePath))
 				throw (new ArgumentException("Note file path is empty."));
 			else if (!File.Exists(NotePath))
 				throw new FileNotFoundException("Couldn't find note file.", NotePath);
+			else if (!string.IsNullOrWhiteSpace(AudioPath))
+			{ 
+				if (!File.Exists(AudioPath))
+					throw new FileNotFoundException("Couldn't find audio file.", AudioPath);
+				else if (!Media.openAudioFile(AudioPath))
+					throw new FileFormatException(new Uri(AudioPath), "Couldn't read audio file.");
+			}
 		}
 
 		public void setNotePath()

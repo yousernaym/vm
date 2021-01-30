@@ -233,7 +233,7 @@ namespace VisualMusic
 				}
 				else if (ext == ".vms" && !bImportFiles)
 				{
-					openSongFile(arg);
+					openProjectFile(arg);
 					bSongFile = true;
 					break;
 				}
@@ -1152,15 +1152,15 @@ namespace VisualMusic
 			ProjectFolder = Path.GetDirectoryName(openProjDialog.FileName);
 			saveSettings();
 			changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
-			openSongFile(openProjDialog.FileName);
+			openProjectFile(openProjDialog.FileName);
 		}
-		void openSongFile(string fileName)
+		void openProjectFile(string projectFileName)
 		{
 			Project tempProject;
 			DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
 			try
 			{
-				using (FileStream stream = File.Open(fileName, FileMode.Open))
+				using (FileStream stream = File.Open(projectFileName, FileMode.Open))
 				{
 					tempProject = (Project)dcs.ReadObject(stream);
 				}
@@ -1181,22 +1181,49 @@ namespace VisualMusic
 					break;
 				}
 			
-				catch (Exception ex) when (ex is FormatException || ex is FileNotFoundException)
+				catch (Exception ex) when (ex is FileFormatException || ex is FileNotFoundException)
 				{
 					DialogResult dlgResult = DialogResult.OK;
 					var locateFileDlg = new LocateFile();
+					string problemFileName;
+					LocateFile.Reason reason;
 					if (ex is FileNotFoundException)
 					{
-						dlgResult = locateFileDlg.ShowDialog(((FileNotFoundException)ex).FileName, LocateFile.Reason.Missing, true);
-						if (dlgResult == DialogResult.OK)
-							tempProject.ImportOptions.RawNotePath = locateFileDlg.Path;
+						problemFileName = ((FileNotFoundException)ex).FileName;
+						reason = LocateFile.Reason.Missing;
 					}
-					else if (ex is FileFormatException)
-						dlgResult = locateFileDlg.ShowDialog(((FileFormatException)ex).SourceUri.LocalPath, LocateFile.Reason.Corrupt, true, ex.Message);
-
-					if (dlgResult == DialogResult.Cancel)
+					else
 					{
-						SongPanel.Project = Project;
+						problemFileName = ((FileFormatException)ex).SourceUri.LocalPath;
+						reason = LocateFile.Reason.Corrupt;
+					}
+					bool audioFileProblem = Path.GetExtension(problemFileName) == ".wav";
+					bool criticalError = !tempProject.ImportOptions.SavedMidi && !audioFileProblem;
+					dlgResult = locateFileDlg.ShowDialog(problemFileName, Path.GetDirectoryName(projectFileName), reason, criticalError);
+
+					if (dlgResult == DialogResult.OK)
+					{
+						if (audioFileProblem)
+							tempProject.ImportOptions.AudioPath = locateFileDlg.FilePath;
+						else if (tempProject.ImportOptions.SavedMidi)
+							tempProject.ImportOptions.MidiOutputPath = locateFileDlg.FilePath;
+						else
+							tempProject.ImportOptions.RawNotePath = locateFileDlg.FilePath;
+					}
+					else  //Cancel / Ignore
+					{
+						if (audioFileProblem)
+						{
+							tempProject.ImportOptions.AudioPath = "";
+							continue;
+						}
+						else if (tempProject.ImportOptions.SavedMidi)
+						{
+							tempProject.ImportOptions.SavedMidi = false;
+							continue;
+						}
+						if (criticalError)
+							SongPanel.Project = Project;
 						return;
 					}
 				}
@@ -1215,7 +1242,7 @@ namespace VisualMusic
 				Project.KeyFrames = new KeyFrames();
 
 			Project.ImportOptions.updateImportForm();
-			currentProjPath = fileName;
+			currentProjPath = projectFileName;
 			songLoaded(currentProjPath);
 			updateFormTitle(currentProjPath);
 			Project.DefaultFileName = Path.GetFileName(currentProjPath);

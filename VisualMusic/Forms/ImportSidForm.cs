@@ -34,7 +34,7 @@ namespace VisualMusic
 		public override void importFiles()
 		{
 			var options = new SidImportOptions();
-			options.checkNoteFile();
+			options.checkSourceFile();
 			subSongForm.init(options.NotePath);
 			if (subSongForm.NumSongs == 1 || subSongForm.NumSongs > 1 && subSongForm.ShowDialog() == DialogResult.OK)
 			{

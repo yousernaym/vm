@@ -134,8 +134,6 @@ namespace VisualMusic
 			if (ImportOptions == null)
 				return true;
 
-			//if audio path is present in project file this means no mixdown will take place. If the specified audio file is missing, show a warning and continue import
-
 			ImportOptions.setNotePath();
 			ImportOptions.EraseCurrent = false;
 			return importSong(ImportOptions);
@@ -203,7 +201,7 @@ namespace VisualMusic
 
 		public bool importSong(ImportOptions options)
 		{ //<Open project> and <import files> meet here
-			options.checkNoteFile();
+			options.checkSourceFile();
 			//Convert mod/sid files to mid/wav
 			if (options.NoteFileType != Midi.FileType.Midi)
 			{
@@ -316,25 +314,15 @@ namespace VisualMusic
 			if (options.MixdownType == Midi.MixdownType.Tparty)
 				file = ImportNotesWithAudioForm.runTpartyProcess(options);
 
-			if (file == null) //If file is null then appropriate warnings should have been displayed in runTpartyProcess.
+			if (string.IsNullOrWhiteSpace(file))
 				return;
-			
-			//Check if audio file exists and is valid. Otherwise just show warning. These wasnings should only show if loading a project file. If importing through an import form these checks have already been made in SourceFileForm.importFiles, and would have aborted the import if failed
-			if (!File.Exists(file))
-			{
-				if (!string.IsNullOrWhiteSpace(file))
-					Form1.showWarningMsgBox("Audio file not found: " + file);
-				return;
-			}
+
 			if (!Media.openAudioFile(file))
-			{
-				Form1.showWarningMsgBox("Couldn't open audio file: " + file);
-				return;
-			}
+				throw new IOException("Unexpected error while opening audio file:\r\n" + file);
+			
 			if (notes != null)
 				notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + Props.AudioOffset));
 			AudioFilePath = file;
-
 		}
 
 		public void resetPitchLimits()
