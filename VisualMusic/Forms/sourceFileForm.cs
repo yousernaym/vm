@@ -302,7 +302,7 @@ namespace VisualMusic
 
 		public void checkSourceFile()
 		{
-			if (string.IsNullOrEmpty(MidiOutputPath))
+			if (!SavedMidi)
 			{
 				if (string.IsNullOrWhiteSpace(NotePath))
 					throw (new ArgumentException("Note file missing"));
@@ -322,7 +322,7 @@ namespace VisualMusic
 
 		public void setNotePath()
 		{
-			if (!string.IsNullOrEmpty(MidiOutputPath))
+			if (SavedMidi)
 				return;
 			if (rawNotePath.IsUrl())
 			{

@@ -1306,12 +1306,17 @@ namespace VisualMusic
 
 			//Save midi "mixdown"
 			saveMidiDialog.FileName = Path.ChangeExtension(saveProjDialog.FileName, "mid");
-			if (!Project.ImportOptions.SavedMidi && Project.ImportOptions.NoteFileType != Midi.FileType.Midi && saveMidiDialog.ShowDialog() == DialogResult.OK)
+			if (!Project.ImportOptions.SavedMidi && Project.ImportOptions.NoteFileType != Midi.FileType.Midi)
 			{
-				File.Copy(Project.ImportOptions.MidiOutputPath, saveMidiDialog.FileName, true);
-				Project.ImportOptions.MidiOutputPath = saveMidiDialog.FileName;
-				Project.ImportOptions.SavedMidi = true;
-				Project.ImportOptions.updateImportForm(); //To update audio file path
+				if (saveMidiDialog.ShowDialog() == DialogResult.OK)
+				{
+					File.Copy(Project.ImportOptions.MidiOutputPath, saveMidiDialog.FileName, true);
+					Project.ImportOptions.MidiOutputPath = saveMidiDialog.FileName;
+					Project.ImportOptions.SavedMidi = true;
+					Project.ImportOptions.updateImportForm(); //To update audio file path
+				}
+				else
+					Project.ImportOptions.MidiOutputPath = "";
 			}
 
 			currentProjPath = saveProjDialog.FileName;
