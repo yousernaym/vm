@@ -211,7 +211,7 @@ namespace VisualMusic
 				//Should midi file be created?
 				if (!options.SavedMidi)
 				{
-					midiPath = Path.Combine(Program.TempDir, noteFile) + "mid";
+					midiPath = Path.Combine(Program.TempDir, noteFile) + ".mid";
 					midiArg = $"-m\"{midiPath}\"";
 					File.Delete(midiPath);
 				}

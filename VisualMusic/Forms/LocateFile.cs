@@ -50,8 +50,8 @@ namespace VisualMusic
 		private void findFileBtn_Click(object sender, EventArgs e)
 		{
 			var fileDialog = new OpenFileDialog();
-			fileDialog.InitialDirectory = FilePath;
-			fileDialog.FileName = FilePath;
+			fileDialog.InitialDirectory = Path.GetDirectoryName(FilePath);
+			fileDialog.FileName = Path.GetFileName(FilePath);
 			if (fileDialog.ShowDialog() == DialogResult.OK)
 			{
 				FilePath = fileDialog.FileName;

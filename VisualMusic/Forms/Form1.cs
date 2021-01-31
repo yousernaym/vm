@@ -1220,6 +1220,7 @@ namespace VisualMusic
 						else if (tempProject.ImportOptions.SavedMidi)
 						{
 							tempProject.ImportOptions.SavedMidi = false;
+							tempProject.ImportOptions.MidiOutputPath = "";
 							continue;
 						}
 						if (criticalError)

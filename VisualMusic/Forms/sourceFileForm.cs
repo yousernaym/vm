@@ -295,12 +295,17 @@ namespace VisualMusic
 
 		public void checkSourceFile()
 		{
-			if (string.IsNullOrWhiteSpace(NotePath))
-				throw (new ArgumentException("Note file path is empty."));
-			else if (!File.Exists(NotePath))
-				throw new FileNotFoundException("Couldn't find note file.", NotePath);
-			else if (!string.IsNullOrWhiteSpace(AudioPath))
-			{ 
+			if (string.IsNullOrEmpty(MidiOutputPath))
+			{
+				if (string.IsNullOrWhiteSpace(NotePath))
+					throw (new ArgumentException("Note file path is empty."));
+				else if (!File.Exists(NotePath))
+					throw new FileNotFoundException("Couldn't find note file.", NotePath);
+			}
+			else if (!File.Exists(MidiOutputPath))
+				throw new FileNotFoundException("Couldn't find note file.", MidiOutputPath);
+			if (!string.IsNullOrWhiteSpace(AudioPath))
+			{
 				if (!File.Exists(AudioPath))
 					throw new FileNotFoundException("Couldn't find audio file.", AudioPath);
 				else if (!Media.openAudioFile(AudioPath))
@@ -310,6 +315,8 @@ namespace VisualMusic
 
 		public void setNotePath()
 		{
+			if (!string.IsNullOrEmpty(MidiOutputPath))
+				return;
 			if (rawNotePath.IsUrl())
 				NotePath = rawNotePath.downloadFile();
 			else
