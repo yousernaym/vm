@@ -29,13 +29,11 @@ namespace VisualMusic
 			if (reason == Reason.Missing)
 			{
 				msg = "File missing: ";
-				findFileBtn.Text = "Find file";
 				findInFolderBtn.Visible = true;
 			}
 			else
 			{
 				msg = "Invalid file format: ";
-				findFileBtn.Text = "Select different file";
 				findInFolderBtn.Visible = false; 
 			}
 			cancelBtn.Text = criticalError ? "Cancel" : "Ignore";
@@ -78,6 +76,12 @@ namespace VisualMusic
 				else
 					MessageBox.Show("File not found");
 			}
+		}
+
+		private void retryBtn_Click(object sender, EventArgs e)
+		{
+			DialogResult = DialogResult.OK;
+			Close();
 		}
 	}
 }

@@ -206,7 +206,14 @@ namespace VisualMusic
 		{
 			NoteFileType = noteFileType;
 			RawNotePath = ImportForm.NoteFilePath;
-			setNotePath();
+			try
+			{
+				setNotePath();
+			}
+			catch (FileNotFoundException)
+			{
+
+			}
 			AudioPath = ImportForm.AudioFilePath;
 			EraseCurrent = ImportForm.EraseCurrent;
 			InsTrack = ImportForm.InsTrack;
@@ -298,18 +305,18 @@ namespace VisualMusic
 			if (string.IsNullOrEmpty(MidiOutputPath))
 			{
 				if (string.IsNullOrWhiteSpace(NotePath))
-					throw (new ArgumentException("Note file path is empty."));
+					throw (new ArgumentException("Note file missing"));
 				else if (!File.Exists(NotePath))
-					throw new FileNotFoundException("Couldn't find note file.", NotePath);
+					throw new FileNotFoundException("Couldn't find note file", NotePath);
 			}
 			else if (!File.Exists(MidiOutputPath))
-				throw new FileNotFoundException("Couldn't find note file.", MidiOutputPath);
+				throw new FileNotFoundException("Couldn't find note file", MidiOutputPath);
 			if (!string.IsNullOrWhiteSpace(AudioPath))
 			{
 				if (!File.Exists(AudioPath))
-					throw new FileNotFoundException("Couldn't find audio file.", AudioPath);
+					throw new FileNotFoundException("Couldn't find audio file", AudioPath);
 				else if (!Media.openAudioFile(AudioPath))
-					throw new FileFormatException(new Uri(AudioPath), "Couldn't read audio file.");
+					throw new FileFormatException(new Uri(AudioPath), "Couldn't read audio file");
 			}
 		}
 
@@ -318,7 +325,11 @@ namespace VisualMusic
 			if (!string.IsNullOrEmpty(MidiOutputPath))
 				return;
 			if (rawNotePath.IsUrl())
+			{
 				NotePath = rawNotePath.downloadFile();
+				if (string.IsNullOrEmpty(NotePath))
+					throw new FileNotFoundException("", rawNotePath);
+			}
 			else
 				NotePath = rawNotePath;
 		}

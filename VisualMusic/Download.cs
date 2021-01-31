@@ -102,7 +102,7 @@ namespace VisualMusic
 				progressForm.InvokeOnUiThreadIfRequired(delegate ()
 				{
 					progressForm.DialogResult = DialogResult.OK;
-					progressForm.Close();
+					progressForm.Hide();
 				});
 				Active = false;
 			}
