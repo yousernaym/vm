@@ -44,7 +44,7 @@
 			this.findFileBtn.TabIndex = 0;
 			this.findFileBtn.Text = "Select file";
 			this.findFileBtn.UseVisualStyleBackColor = true;
-			this.findFileBtn.Click += new System.EventHandler(this.findFileBtn_Click);
+			this.findFileBtn.Click += new System.EventHandler(this.selectFileBtn_Click);
 			// 
 			// cancelBtn
 			// 

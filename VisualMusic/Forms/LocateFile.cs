@@ -17,6 +17,9 @@ namespace VisualMusic
 		public enum Reason { Missing, Corrupt };
 		public string FilePath { get; private set; }
 		string searchDir;
+		CommonOpenFileDialog folderDialog = new CommonOpenFileDialog();
+		OpenFileDialog fileDialog = new OpenFileDialog();
+		private bool isUrl;
 
 		public LocateFile()
 		{
@@ -25,17 +28,17 @@ namespace VisualMusic
 
  		public DialogResult ShowDialog(string filePath, string searchDir, Reason reason, bool criticalError, string optionalMsg = "")
 		{
+			isUrl = filePath.ToLower().StartsWith("http");
+			findInFolderBtn.Visible = !isUrl;
+			folderDialog.InitialDirectory = searchDir;
+			folderDialog.IsFolderPicker = true;
 			string msg;
+			
 			if (reason == Reason.Missing)
-			{
 				msg = "File missing: ";
-				findInFolderBtn.Visible = true;
-			}
 			else
-			{
 				msg = "Invalid file format: ";
-				findInFolderBtn.Visible = false; 
-			}
+
 			cancelBtn.Text = criticalError ? "Cancel" : "Ignore";
 			msg += "\r\n" + filePath;
 			msg += "\r\n\r\n" + optionalMsg;
@@ -45,24 +48,28 @@ namespace VisualMusic
 			return base.ShowDialog();
 		}
 
-		private void findFileBtn_Click(object sender, EventArgs e)
+		private void selectFileBtn_Click(object sender, EventArgs e)
 		{
-			var fileDialog = new OpenFileDialog();
-			fileDialog.InitialDirectory = Path.GetDirectoryName(FilePath);
-			fileDialog.FileName = Path.GetFileName(FilePath);
+			if (isUrl)
+			{
+				fileDialog.InitialDirectory = searchDir;
+				fileDialog.FileName = "";
+			}
+			else
+			{
+				fileDialog.InitialDirectory = Path.GetDirectoryName(FilePath);
+				fileDialog.FileName = Path.GetFileName(FilePath);
+			}
 			if (fileDialog.ShowDialog() == DialogResult.OK)
 			{
 				FilePath = fileDialog.FileName;
 				DialogResult = DialogResult.OK;
-				Close();
+				Hide();
 			}
 		}
 
 		private void findInFolderBtn_Click(object sender, EventArgs e)
 		{
-			var folderDialog = new CommonOpenFileDialog();
-			folderDialog.InitialDirectory = searchDir;
-			folderDialog.IsFolderPicker = true;
 			if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
 			{
 				searchDir = folderDialog.FileName;
@@ -71,7 +78,7 @@ namespace VisualMusic
 				{
 					FilePath = filePaths[0];
 					DialogResult = DialogResult.OK;
-					Close();
+					Hide();
 				}
 				else
 					MessageBox.Show("File not found");

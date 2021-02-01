@@ -1154,13 +1154,13 @@ namespace VisualMusic
 			changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
 			openProjectFile(openProjDialog.FileName);
 		}
-		void openProjectFile(string projectFileName)
+		void openProjectFile(string projectPath)
 		{
 			Project tempProject;
 			DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
 			try
 			{
-				using (FileStream stream = File.Open(projectFileName, FileMode.Open))
+				using (FileStream stream = File.Open(projectPath, FileMode.Open))
 				{
 					tempProject = (Project)dcs.ReadObject(stream);
 				}
@@ -1185,21 +1185,21 @@ namespace VisualMusic
 				{
 					DialogResult dlgResult = DialogResult.OK;
 					var locateFileDlg = new LocateFile();
-					string problemFileName;
+					string problemFilePath;
 					LocateFile.Reason reason;
 					if (ex is FileNotFoundException)
 					{
-						problemFileName = ((FileNotFoundException)ex).FileName;
+						problemFilePath = ((FileNotFoundException)ex).FileName;
 						reason = LocateFile.Reason.Missing;
 					}
 					else
 					{
-						problemFileName = ((FileFormatException)ex).SourceUri.LocalPath;
+						problemFilePath = ((FileFormatException)ex).SourceUri.LocalPath;
 						reason = LocateFile.Reason.Corrupt;
 					}
-					bool audioFileProblem = Path.GetExtension(problemFileName) == ".wav";
+					bool audioFileProblem = Path.GetExtension(problemFilePath) == ".wav";
 					bool criticalError = !tempProject.ImportOptions.SavedMidi && !audioFileProblem;
-					dlgResult = locateFileDlg.ShowDialog(problemFileName, Path.GetDirectoryName(projectFileName), reason, criticalError);
+					dlgResult = locateFileDlg.ShowDialog(problemFilePath, Path.GetDirectoryName(projectPath), reason, criticalError);
 
 					if (dlgResult == DialogResult.OK)
 					{
@@ -1243,7 +1243,7 @@ namespace VisualMusic
 				Project.KeyFrames = new KeyFrames();
 
 			Project.ImportOptions.updateImportForm();
-			currentProjPath = projectFileName;
+			currentProjPath = projectPath;
 			songLoaded(currentProjPath);
 			updateFormTitle(currentProjPath);
 			Project.DefaultFileName = Path.GetFileName(currentProjPath);
