@@ -2,12 +2,14 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Visual Music"
-#define MyAppVersion "0.2.0"
+#define MyAppVersion "0.2.1"
 #define MyAppPublisher "Mikesoft"
 #define MyAppExeName "VM.exe"
 #define MyAppDataDir "{userappdata}\" + MyAppName
-#define SongFileType "VisualMusicSong"
 #define UserFiles "{userdocs}\" + MyAppName
+#define MyAppAssocName MyAppName + "ProjectFile"
+#define MyAppAssocExt ".vms"
+#define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -32,21 +34,14 @@ ArchitecturesAllowed = x64
 ChangesAssociations=True
 UninstallDisplayName={#MyAppName}
 ShowTasksTreeLines=False
+WizardStyle=modern
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
-[Components]
-;Name: "associateSidFiles"; Description: "SID files"
-;Name: "associateSidfiles\Sid"; Description: ".sid"; Types: full
-
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
 Name: "docsFolder"; Description: "Create folder '<user-documents>\Visual Music'"
-;Name: "associateVms"; Description: "Associate with .vms files";
-;Name: "associateMod"; Description: "Associate with module files";
-;Name: "associateMod\mod"; Description: ".mod";
-;Name: "associateMod\xm"; Description: ".xm";
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
@@ -125,7 +120,7 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{tmp}\VC_redist.x64.exe"; Parameters:  "/quiet /norestart";  StatusMsg: "Installing Visual C++ Redistributable";
+Filename: "{tmp}\VC_redist.x64.exe"; Parameters:  "/quiet /norestart";  StatusMsg: "Installing Visual C++ Redistributable"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: postinstall skipifsilent
 
 [Dirs]
@@ -135,11 +130,11 @@ Name: "{#UserFiles}\Projects"; Flags: uninsalwaysuninstall; Tasks: docsFolder
 Name: "{#UserFiles}\Videos"; Flags: uninsalwaysuninstall; Tasks: docsFolder
 
 [Registry]
-Root: HKCR; SubKey: ".vms"; ValueType: string; ValueName: ""; ValueData: "VisualMusicSong"
-Root: HKCR; SubKey: "{#SongFileType}"; ValueType: string; ValueName: ""; ValueData: "Visual Music song"; Flags: uninsdeletekey
-Root: HKCR; Subkey: "{#SongFileType}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
-Root: HKCR; SubKey: "{#SongFileType}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
-;Root: HKCU;  Subkey: "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.vms\UserChoice"; ValueData: "{#SongFileType}";  ValueType: string;  ValueName: "Progid"; Tasks: associateVms
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocExt}\OpenWithProgids"; ValueType: string; ValueName: "{#MyAppAssocKey}"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppAssocName}"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+Root: HKA; Subkey: "Software\Classes\Applications\{#MyAppExeName}\SupportedTypes"; ValueType: string; ValueName: {#MyAppAssocExt}; ValueData: ""
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{#MyAppDataDir}"
