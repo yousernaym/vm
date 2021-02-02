@@ -113,7 +113,12 @@ namespace VisualMusic
 			{
 				options.checkSourceFile(); 
 			}
-			catch (Exception ex) when (ex is FileNotFoundException || ex is ArgumentException) 
+			catch (FileNotFoundException ex)
+			{
+				Form1.showErrorMsgBox(ex.Message + "\r\n" + ex.FileName);
+				return;
+			}
+			catch (ArgumentException ex)
 			{
 				Form1.showErrorMsgBox(ex.Message);
 				return;
@@ -125,7 +130,7 @@ namespace VisualMusic
 			}
 			catch (FileFormatException ex)
 			{
-				Form1.showErrorMsgBox("Couldn't read note file.\n" + ex.Message);
+				Form1.showErrorMsgBox("Couldn't read note file.\r\n" + ex.Message);
 				return;
 			}
 			DialogResult = DialogResult.OK;

@@ -33,13 +33,13 @@ namespace VisualMusic
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
 		static void Main(string[] args)
 		{
-			using (Mutex mutex = new Mutex(false, "Global\\" + appGuid))
-			{
-				if (!mutex.WaitOne(0, false))
-				{
-					MessageBox.Show("Visual Music already running");
-					return;
-				}
+			//using (Mutex mutex = new Mutex(false, "Global\\" + appGuid))
+			//{
+			//	if (!mutex.WaitOne(0, false))
+			//	{
+			//		MessageBox.Show("Visual Music already running");
+			//		return;
+			//	}
 
 				try
 				{
@@ -51,14 +51,14 @@ namespace VisualMusic
 				{
 					close();
 				}
-			}			
+			//}			
 		}
 
 		static void init()
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-
+			Directory.SetCurrentDirectory(Dir);
 			MidMix.init();
 			if (!Media.initMF())
 			{
@@ -72,11 +72,6 @@ namespace VisualMusic
 
 		static void initCefSharp()
 		{
-			//In case the program crashed previously, kill the cefsharp processes that stayed open. Otherwise multiple crashes will cause the number of processes to build up and hog the cpu. This has the drawback of killing cefsharp processes created by other programs, but it's very convenient when debugging a crash.
-			Process[] cefSharpProcesses = Process.GetProcessesByName("CefSharp.BrowserSubProcess");
-			foreach (var process in cefSharpProcesses)
-				process.Kill();
-
 			Cef.EnableHighDPISupport();
 			var settings = new CefSettings();
 			Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
@@ -84,6 +79,7 @@ namespace VisualMusic
 
 		static void close()
 		{
+			Cef.Shutdown();
 			MidMix.close();
 			Media.closeMF();
 			dirLock.Close();

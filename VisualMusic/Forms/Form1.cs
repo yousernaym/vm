@@ -201,61 +201,69 @@ namespace VisualMusic
 			bool bSidFile = false;
 			bool bImportFiles = false;
 			string audioFile = null;
-			//startupArgs = new string[] { @"cmd\" };
-
+			
 			foreach (string arg in startupArgs)
 			{
-				//MessageBox.Show(arg);
 				string ext = arg.Split('.').Last().ToLower();
-
+				string inputFilePath = Path.GetFullPath(arg);
+				
 				//If no previous note file has been encountered, check if this extension is a note file
 				if (!bImportFiles)
 				{
 					if (ImportMidiForm.Formats.Contains(ext))
 					{
-						ImportMidiForm.NoteFilePath = arg;
+						ImportMidiForm.NoteFilePath = inputFilePath;
 						bMidiFile = bImportFiles = true;
 					}
 					else if (ImportModForm.Formats.Contains(ext))
 					{
-						ImportModForm.NoteFilePath = arg;
+						ImportModForm.NoteFilePath = inputFilePath;
 						bModFile = bImportFiles = true;
 					}
 					else if (ImportSidForm.Formats.Contains(ext))
 					{
-						ImportSidForm.NoteFilePath = arg;
+						ImportSidForm.NoteFilePath = inputFilePath;
 						bSidFile = bImportFiles = true;
 					}
 				}
-				if (audioFile == null && (ext == ".wav" || ext == ".mp3"))
+				if (audioFile == null && ext == "wav")
 				{
-					audioFile = arg;
+					audioFile = inputFilePath;
 				}
-				else if (ext == ".vms" && !bImportFiles)
+				else if (ext == "vms" && !bImportFiles)
 				{
-					openProjectFile(arg);
+					openProjectFile(inputFilePath);
 					bSongFile = true;
 					break;
 				}
 			}
 			if (!bSongFile && bImportFiles)
 			{
-				if (bMidiFile)
+				try
 				{
-					ImportMidiForm.AudioFilePath = audioFile;
-					//importMidiToolStripMenuItem.PerformClick();
-					ImportMidiForm.importFiles();
+					if (bMidiFile)
+					{
+						ImportMidiForm.AudioFilePath = audioFile;
+						ImportMidiForm.importFiles();
+					}
+					if (bModFile)
+					{
+						ImportModForm.AudioFilePath = audioFile;
+						ImportModForm.importFiles();
+					}
+					else if (bSidFile)
+					{
+						ImportSidForm.AudioFilePath = audioFile;
+						ImportSidForm.importFiles();
+					}
 				}
-				if (bModFile)
+				catch (FileNotFoundException ex)
 				{
-					ImportModForm.AudioFilePath = audioFile;
-					ImportModForm.importFiles();
+					showErrorMsgBox(ex.Message + "\r\n" + ex.FileName);
 				}
-				else if (bSidFile)
+				catch (FileFormatException ex)
 				{
-					ImportSidForm.AudioFilePath = audioFile;
-					//importSidSongToolStripMenuItem.PerformClick();
-					ImportSidForm.importFiles();
+					showErrorMsgBox(ex.Message + "\r\n" + ex.SourceUri.LocalPath);
 				}
 			}
 		}

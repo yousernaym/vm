@@ -60,12 +60,14 @@ namespace VisualMusic
 
 		public static UndoItems operator++(UndoItems obj)
 		{
-			obj.currentItem = obj.currentItem.Next;
+			if (obj.currentItem != null)
+				obj.currentItem = obj.currentItem.Next;
 			return obj;
 		}
 		public static UndoItems operator--(UndoItems obj)
 		{
-			obj.currentItem = obj.currentItem.Previous;
+			if (obj.currentItem != null)
+				obj.currentItem = obj.currentItem.Previous;
 			return obj;
 		}
 	}
