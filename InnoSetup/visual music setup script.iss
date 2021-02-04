@@ -7,8 +7,8 @@
 #define MyAppExeName "VM.exe"
 #define MyAppDataDir "{userappdata}\" + MyAppName
 #define UserFiles "{userdocs}\" + MyAppName
-#define MyAppAssocName MyAppName + "ProjectFile"
-#define MyAppAssocExt ".vms"
+#define MyAppAssocName MyAppName + "Project"
+#define MyAppAssocExt ".vmp"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
 
 [Setup]
@@ -27,12 +27,11 @@ OutputDir=.
 OutputBaseFilename={#MyAppName} setup-win64
 Compression=lzma
 SolidCompression=yes
-VersionInfoVersion={#MyAppVersion}
-VersionInfoCompany={#MyAppPublisher}
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed = x64
 ChangesAssociations=True
 UninstallDisplayName={#MyAppName}
+UninstallDisplayIcon={app}\{#MyAppExeName}
 ShowTasksTreeLines=False
 WizardStyle=modern
 
@@ -42,6 +41,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
 Name: "docsFolder"; Description: "Create folder '<user-documents>\Visual Music'"
+Name: "associateVmp"; Description: "Associate with .vmp files"
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
@@ -130,11 +130,11 @@ Name: "{#UserFiles}\Projects"; Flags: uninsalwaysuninstall; Tasks: docsFolder
 Name: "{#UserFiles}\Videos"; Flags: uninsalwaysuninstall; Tasks: docsFolder
 
 [Registry]
-Root: HKA; Subkey: "Software\Classes\{#MyAppAssocExt}\OpenWithProgids"; ValueType: string; ValueName: "{#MyAppAssocKey}"; ValueData: ""; Flags: uninsdeletevalue
-Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppAssocName}"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
-Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
-Root: HKA; Subkey: "Software\Classes\Applications\{#MyAppExeName}\SupportedTypes"; ValueType: string; ValueName: {#MyAppAssocExt}; ValueData: ""
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocExt}\OpenWithProgids"; ValueType: string; ValueName: "{#MyAppAssocKey}"; ValueData: ""; Flags: uninsdeletevalue; Tasks: associateVmp
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppAssocName}"; Flags: uninsdeletekey; Tasks: associateVmp
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Tasks: associateVmp
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: associateVmp
+Root: HKA; Subkey: "Software\Classes\Applications\{#MyAppExeName}\SupportedTypes"; ValueType: string; ValueName: {#MyAppAssocExt}; ValueData: ""; Tasks: associateVmp
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{#MyAppDataDir}"

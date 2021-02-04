@@ -230,7 +230,7 @@ namespace VisualMusic
 				{
 					audioFile = inputFilePath;
 				}
-				else if (ext == "vms" && !bImportFiles)
+				else if (ext == "vmp" && !bImportFiles)
 				{
 					openProjectFile(inputFilePath);
 					bSongFile = true;
@@ -2475,6 +2475,16 @@ namespace VisualMusic
 			{
 				DialogResult dr = MessageBox.Show("Do you want to save unsaved changes before exiting?", "", MessageBoxButtons.YesNoCancel);
 				e.Cancel = dr == DialogResult.Yes && !saveSong() || dr == DialogResult.Cancel;
+			}
+
+			if (!e.Cancel)
+			{
+				//Under special circumstances Cef needs to shut down in order for Application.Run to return
+				//Reproducing involves starting the application by double-clicking a vmp file (not through "Open with")
+				//AND having Windows Magnify open.
+				//So call Program.close (which calls Cef.Shutdown) here, not just in finally block in Program.cs
+				//Another way to solve it is to show a message box here, which will magically un-jinx it. Makes perfect sense.
+				Program.close();
 			}
 		}
 

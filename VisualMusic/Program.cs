@@ -77,13 +77,16 @@ namespace VisualMusic
 			Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
 		}
 
-		static void close()
+		public static void close()
 		{
 			Cef.Shutdown();
 			MidMix.close();
 			Media.closeMF();
-			dirLock.Close();
-			dirLock = null;
+			if (dirLock != null)
+			{
+				dirLock.Close();
+				dirLock = null;
+			}
 			try
 			{
 				Directory.Delete(TempDirRoot, true);
