@@ -275,7 +275,7 @@
 			// 
 			// saveProjDialog
 			// 
-			this.saveProjDialog.Filter = "Visual Music songs|*.vms|All files|*.*";
+			this.saveProjDialog.Filter = "Visual Music projects|*.vmp|All files|*.*";
 			// 
 			// saveVideoDlg
 			// 
