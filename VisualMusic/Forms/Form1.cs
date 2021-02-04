@@ -169,8 +169,8 @@ namespace VisualMusic
 			saveVideoDlg.InitialDirectory = Path.Combine(Program.DefaultUserFilesDir, "Videos");
 			openTrackPropsFileDialog.Filter = saveTrackPropsFileDialog.Filter = "Track property files|*.tp|All files|*.*";
 			openCamFileDialog.Filter = saveCamFileDialog.Filter = "Camera files|*.cam|All files|*.*";
-
-			
+			openProjDialog.Filter = $"Visual Music projects |*.{Project.DefaultFileExt}|All files|*.*";
+			saveProjDialog.Filter = $"Visual Music projects |*.{Project.DefaultFileExt}|All files|*.*";
 		}
 
 		static public void pressCapsLock()
@@ -230,7 +230,7 @@ namespace VisualMusic
 				{
 					audioFile = inputFilePath;
 				}
-				else if (ext == "vmp" && !bImportFiles)
+				else if (ext == Project.DefaultFileExt && !bImportFiles)
 				{
 					openProjectFile(inputFilePath);
 					bSongFile = true;

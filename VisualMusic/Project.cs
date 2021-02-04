@@ -260,7 +260,7 @@ namespace VisualMusic
 			ImportOptions = options;
 			if (options.EraseCurrent)
 			{
-				DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + DefaultFileExt;
+				DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + "." + DefaultFileExt;
 				Props.ViewWidthQn = vertViewWidthQn = ProjProps.DefaultViewWidthQn;
 			}
 			createTrackViews(notes.Tracks.Count, options.EraseCurrent);
@@ -758,7 +758,7 @@ namespace VisualMusic
 		public string DefaultFileName { get; set; }
 		public string AudioFilePath { get; private set; }
 
-		public const string DefaultFileExt = ".vms";
+		public const string DefaultFileExt = "vmp";
 
 		public float getCurveScreenY(float x, Curve curve)
 		{
