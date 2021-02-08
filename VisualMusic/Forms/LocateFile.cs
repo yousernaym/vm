@@ -24,14 +24,15 @@ namespace VisualMusic
 		public LocateFile()
 		{
 			InitializeComponent();
+			folderDialog.IsFolderPicker = true;
+
 		}
 
- 		public DialogResult ShowDialog(string filePath, string searchDir, Reason reason, bool criticalError, string optionalMsg = "")
+		public DialogResult ShowDialog(string filePath, string searchDir, Reason reason, bool criticalError, string optionalMsg = "")
 		{
 			isUrl = filePath.ToLower().StartsWith("http");
 			findInFolderBtn.Visible = !isUrl;
 			folderDialog.InitialDirectory = searchDir;
-			folderDialog.IsFolderPicker = true;
 			string msg;
 			
 			if (reason == Reason.Missing)
@@ -58,7 +59,7 @@ namespace VisualMusic
 			else
 			{
 				fileDialog.InitialDirectory = Path.GetDirectoryName(FilePath);
-				fileDialog.FileName = Path.GetFileName(FilePath);
+				fileDialog.FileName = FilePath;
 			}
 			if (fileDialog.ShowDialog() == DialogResult.OK)
 			{
