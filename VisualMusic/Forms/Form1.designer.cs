@@ -220,7 +220,7 @@
 			this.propsTogglePanel = new System.Windows.Forms.Panel();
 			this.songPropsCb = new System.Windows.Forms.CheckBox();
 			this.trackPropsCb = new System.Windows.Forms.CheckBox();
-			this.debugLabel = new System.Windows.Forms.Label();
+			this.label4 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.trackPropsPanel.SuspendLayout();
@@ -402,7 +402,7 @@
             this.viewToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1060, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(1094, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -686,9 +686,9 @@
 			this.trackPropsPanel.Controls.Add(this.trackList);
 			this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
 			this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.trackPropsPanel.Location = new System.Drawing.Point(665, 24);
+			this.trackPropsPanel.Location = new System.Drawing.Point(699, 24);
 			this.trackPropsPanel.Name = "trackPropsPanel";
-			this.trackPropsPanel.Size = new System.Drawing.Size(395, 460);
+			this.trackPropsPanel.Size = new System.Drawing.Size(395, 4359);
 			this.trackPropsPanel.TabIndex = 3;
 			this.trackPropsPanel.Visible = false;
 			this.trackPropsPanel.VisibleChanged += new System.EventHandler(this.trackPropsPanel_VisibleChanged);
@@ -708,7 +708,7 @@
 			this.trackList.HideSelection = false;
 			this.trackList.Location = new System.Drawing.Point(1, 0);
 			this.trackList.Name = "trackList";
-			this.trackList.Size = new System.Drawing.Size(186, 460);
+			this.trackList.Size = new System.Drawing.Size(186, 4359);
 			this.trackList.TabIndex = 0;
 			this.trackList.UseCompatibleStateImageBehavior = false;
 			this.trackList.View = System.Windows.Forms.View.Details;
@@ -717,6 +717,7 @@
 			this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
 			this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
 			this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
+			this.trackList.DragLeave += new System.EventHandler(this.trackList_DragLeave);
 			// 
 			// trackColumn
 			// 
@@ -801,7 +802,7 @@
 			this.selectedTrackPropsPanel.Location = new System.Drawing.Point(187, 0);
 			this.selectedTrackPropsPanel.Name = "selectedTrackPropsPanel";
 			this.selectedTrackPropsPanel.SelectedIndex = 0;
-			this.selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 460);
+			this.selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 4359);
 			this.selectedTrackPropsPanel.TabIndex = 14;
 			// 
 			// style
@@ -815,7 +816,7 @@
 			this.style.Controls.Add(this.label1);
 			this.style.Location = new System.Drawing.Point(4, 22);
 			this.style.Name = "style";
-			this.style.Size = new System.Drawing.Size(200, 434);
+			this.style.Size = new System.Drawing.Size(200, 4333);
 			this.style.TabIndex = 2;
 			this.style.Text = "Style";
 			// 
@@ -890,7 +891,7 @@
 			this.material.Location = new System.Drawing.Point(4, 22);
 			this.material.Name = "material";
 			this.material.Padding = new System.Windows.Forms.Padding(3);
-			this.material.Size = new System.Drawing.Size(200, 434);
+			this.material.Size = new System.Drawing.Size(200, 4333);
 			this.material.TabIndex = 0;
 			this.material.Text = "Material";
 			// 
@@ -1599,7 +1600,7 @@
 			this.light.Location = new System.Drawing.Point(4, 22);
 			this.light.Name = "light";
 			this.light.Padding = new System.Windows.Forms.Padding(3);
-			this.light.Size = new System.Drawing.Size(200, 434);
+			this.light.Size = new System.Drawing.Size(200, 4333);
 			this.light.TabIndex = 1;
 			this.light.Text = "Light";
 			// 
@@ -1970,7 +1971,7 @@
 			this.spatial.Location = new System.Drawing.Point(4, 22);
 			this.spatial.Name = "spatial";
 			this.spatial.Padding = new System.Windows.Forms.Padding(3);
-			this.spatial.Size = new System.Drawing.Size(200, 434);
+			this.spatial.Size = new System.Drawing.Size(200, 4333);
 			this.spatial.TabIndex = 3;
 			this.spatial.Text = "Spatial";
 			this.spatial.UseVisualStyleBackColor = true;
@@ -2082,7 +2083,7 @@
 			// resetDefaultBtn
 			// 
 			this.resetDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.resetDefaultBtn.Location = new System.Drawing.Point(336, 11182);
+			this.resetDefaultBtn.Location = new System.Drawing.Point(336, 32767);
 			this.resetDefaultBtn.Name = "resetDefaultBtn";
 			this.resetDefaultBtn.Size = new System.Drawing.Size(170, 23);
 			this.resetDefaultBtn.TabIndex = 13;
@@ -2120,7 +2121,7 @@
 			this.songPropsPanel.Dock = System.Windows.Forms.DockStyle.Left;
 			this.songPropsPanel.Location = new System.Drawing.Point(0, 24);
 			this.songPropsPanel.Name = "songPropsPanel";
-			this.songPropsPanel.Size = new System.Drawing.Size(197, 460);
+			this.songPropsPanel.Size = new System.Drawing.Size(197, 4359);
 			this.songPropsPanel.TabIndex = 17;
 			this.songPropsPanel.Visible = false;
 			this.songPropsPanel.VisibleChanged += new System.EventHandler(this.songPropsPanel_VisibleChanged);
@@ -2406,9 +2407,9 @@
             this.TimeColumn,
             this.LyricsColumn});
 			this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.lyricsGridView.Location = new System.Drawing.Point(197, 434);
+			this.lyricsGridView.Location = new System.Drawing.Point(197, 4333);
 			this.lyricsGridView.Name = "lyricsGridView";
-			this.lyricsGridView.Size = new System.Drawing.Size(468, 50);
+			this.lyricsGridView.Size = new System.Drawing.Size(502, 50);
 			this.lyricsGridView.TabIndex = 0;
 			this.lyricsGridView.Tag = "Edit Lyrics";
 			this.lyricsGridView.Visible = false;
@@ -2446,7 +2447,7 @@
 			this.keyFramesDGV.Dock = System.Windows.Forms.DockStyle.Left;
 			this.keyFramesDGV.Location = new System.Drawing.Point(197, 24);
 			this.keyFramesDGV.Name = "keyFramesDGV";
-			this.keyFramesDGV.Size = new System.Drawing.Size(210, 410);
+			this.keyFramesDGV.Size = new System.Drawing.Size(210, 4309);
 			this.keyFramesDGV.TabIndex = 23;
 			this.keyFramesDGV.Tag = "Edit Key Frames";
 			this.keyFramesDGV.Visible = false;
@@ -2514,15 +2515,15 @@
 			this.trackPropsCb.UseVisualStyleBackColor = true;
 			this.trackPropsCb.CheckedChanged += new System.EventHandler(this.trackPropsCb_CheckedChanged);
 			// 
-			// debugLabel
+			// label4
 			// 
-			this.debugLabel.AutoSize = true;
-			this.debugLabel.Location = new System.Drawing.Point(442, 0);
-			this.debugLabel.Name = "debugLabel";
-			this.debugLabel.Size = new System.Drawing.Size(41, 13);
-			this.debugLabel.TabIndex = 25;
-			this.debugLabel.Text = "label16";
-			this.debugLabel.Visible = false;
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(542, 4320);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(35, 13);
+			this.label4.TabIndex = 25;
+			this.label4.Text = "label4";
+			this.label4.Visible = false;
 			// 
 			// Form1
 			// 
@@ -2530,8 +2531,8 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1060, 484);
-			this.Controls.Add(this.debugLabel);
+			this.ClientSize = new System.Drawing.Size(1111, 421);
+			this.Controls.Add(this.label4);
 			this.Controls.Add(this.propsTogglePanel);
 			this.Controls.Add(this.keyFramesDGV);
 			this.Controls.Add(this.lyricsGridView);
@@ -2795,7 +2796,6 @@
 		private System.Windows.Forms.Panel propsTogglePanel;
 		private System.Windows.Forms.CheckBox songPropsCb;
 		private System.Windows.Forms.CheckBox trackPropsCb;
-		public System.Windows.Forms.Label debugLabel;
 		private System.Windows.Forms.NumericUpDown masterLightAmountUd;
 		private System.Windows.Forms.ToolStripMenuItem playbackToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem startStopToolStripMenuItem;
@@ -2805,6 +2805,7 @@
 		private System.Windows.Forms.ToolStripMenuItem nudgeForwardToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem jumpBackwardsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem jumpForwardToolStripMenuItem;
+		private System.Windows.Forms.Label label4;
 	}
 }
 
