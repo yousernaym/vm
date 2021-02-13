@@ -582,7 +582,7 @@ namespace VisualMusic
 		public System.Drawing.Color getSysColor(bool bhilited, MaterialProps globalMaterial)
 		{
 			Vector4 hsla = getColor(bhilited, globalMaterial);
-			hsla.Z *= 0.5f;
+			//hsla.Z *= 0.5f;
 			Color rgba = SongPanel.HSLA2RGBA(hsla);
 			return System.Drawing.Color.FromArgb(rgba.R, rgba.G, rgba.B);
 		}
@@ -608,15 +608,15 @@ namespace VisualMusic
 			h = (float)(Hue + globalMaterial.Hue);
 			if (h >= 1)
 				h -= 1;
-			else if
-				(h < 0) h += 1;
+			else if (h < 0)
+				h += 1;
 			s = (float)(tp2.Sat * globalTp2.Sat);
 			l = (float)(tp2.Lum * globalTp2.Lum);
 			//if (s > 1)
 			//	s = 1;
 			//if (l > 1)
 			//	l = 1;
-
+			l *= 0.5f;
 			return new Vector4(h, s, l, (float)(Transp * globalMaterial.Transp));
 		}
 

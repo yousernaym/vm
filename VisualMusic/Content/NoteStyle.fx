@@ -137,14 +137,14 @@ float4 blurEdges(float4 color, float normPosY)
 
 float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 {
-	//float lum = clamp(dot(LightDir, normal), AmbientLum, 1);
+	normal = normalize(normal);
 	color *= saturate(dot(LightDir, normal)) * DiffuseColor + AmbientColor;
 	float3 lightReflection = -reflect(LightDir, normal);
 	float3 viewVec = normalize(CamPos - worldPos);
 	//if (any(color))
 		color += pow(saturate(dot(lightReflection, viewVec)), SpecPower) * SpecColor;
     color *= LightFilter;
-    return color * SongFade;
+	return saturate(color) * SongFade;
 }
 
 float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out float3 destNormalDir, out bool discardFade)
@@ -330,7 +330,7 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 		destNormal = sourceNormal;
     float4 finalCol = result * sourceColor;
 	if (any(result))
-		finalCol.rgb = calcLighting(finalCol.rgb, normalize(destNormal), worldPos);
+		finalCol.rgb = calcLighting(finalCol.rgb, destNormal, worldPos);
     return finalCol;
 }
 
@@ -428,27 +428,26 @@ float4 RgbaToHsla(float4 rgba)
 
 float4 getPixelColor(float4 color, float2 texCoords)
 {
-    float4 texColor = !TexColBlend ? float4(0, 1, 0.5f, 1) : float4(0.5f, 0.5f, 0.5f, 1); //"Identity" HSL color, equivalent to modulating with RGBA = 1,1,1,1
-    if (UseTexture)
-    {
-        texColor = tex2D(TextureSampler, texCoords);
-        if (!TexColBlend)
-            texColor = RgbaToHsla(texColor);
-    }
-    if (TexColBlend)
-    {
-        color = HslaToRgba(color) * texColor;
-        color = saturate(color);
+	if (UseTexture)
+	{
+		float4 texColor = tex2D(TextureSampler, texCoords);
+		if (TexColBlend)
+		{
+			color = HslaToRgba(color) * texColor;
+		}
+		else
+		{
+			texColor = RgbaToHsla(texColor);
+			color.x += texColor.x;
+			if (color.x >= 1)
+				color.x -= (int)color.x;
+			color.y *= texColor.y;
+			color.z *= texColor.z;
+			color = saturate(color);
+			color = HslaToRgba(color);
+		}
 	}
-    else
-    {
-        color.x += texColor.x;
-        if (color.x >= 1)
-            color.x -= (int) color.x;
-        color.y *= texColor.y;
-        color.z *= texColor.z;
-        color = saturate(color);
-        color = HslaToRgba(color);
-    }
+	else
+		color = HslaToRgba(color);
     return color;
 }
