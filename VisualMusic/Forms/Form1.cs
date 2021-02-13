@@ -966,7 +966,6 @@ namespace VisualMusic
 		}
 		private void trackList_DragDrop(object sender, DragEventArgs e)
 		{
-			
 			ListViewItem dragToItem = getListViewItem(trackList, e);
 			int dropIndex = dragToItem.Index;
 			ListViewItem[] selectedItems = new ListViewItem[trackList.SelectedIndices.Count];
@@ -1045,7 +1044,6 @@ namespace VisualMusic
 				e.Effect = DragDropEffects.None;
 				return;
 			}
-
 			trackList.RedrawItems(0, trackList.Items.Count - 1, false);
 			System.Drawing.Rectangle bounds = dragToItem.GetBounds(ItemBoundsPortion.Entire);
 			bounds.Offset(0, -1);
@@ -2589,6 +2587,11 @@ namespace VisualMusic
 		private void playbackToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
 
+		}
+
+		private void trackList_DragLeave(object sender, EventArgs e)
+		{
+			trackList.RedrawItems(0, trackList.Items.Count - 1, false);
 		}
 	}
 }
