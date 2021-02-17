@@ -40,18 +40,6 @@ namespace VisualMusic
 			updateResoTextColor();
 		}
 
-		private void VideoExportForm_FormClosing(object sender, FormClosingEventArgs e)
-		{
-			if (DialogResult == DialogResult.OK)
-			{
-				if (!parseReso())
-				{
-					e.Cancel = Visible = true;
-					MessageBox.Show(null, "Invalid resolution.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				}
-			}
-		}
-
 		private void StereoscopicCb_CheckedChanged(object sender, EventArgs e)
 		{
 			Options.SphericalStereo = stereoscopicCb.Checked;
@@ -178,6 +166,16 @@ namespace VisualMusic
 		private void resoCombo_DropDownClosed(object sender, EventArgs e)
 		{
 			updateResoTextColor();
+		}
+
+		private void okBtn_Click(object sender, EventArgs e)
+		{
+			if (!parseReso())
+				MessageBox.Show(null, "Invalid resolution format", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			else if (Options.Width % 2 != 0 || Options.Height % 2 != 0)
+				MessageBox.Show(null, "Resolution width and height must be even numbers", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			else
+				DialogResult = DialogResult.OK;
 		}
 	}
 

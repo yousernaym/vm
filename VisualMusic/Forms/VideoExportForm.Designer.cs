@@ -46,6 +46,7 @@
 			// 
 			this.okBtn.Location = new System.Drawing.Point(87, 188);
 			this.okBtn.TabIndex = 60;
+			this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
 			// 
 			// cancelBtn
 			// 
@@ -183,7 +184,6 @@
 			this.Controls.Add(this.stereoscopicCb);
 			this.Controls.Add(this.sphereCb);
 			this.Name = "VideoExportForm";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.VideoExportForm_FormClosing);
 			this.Controls.SetChildIndex(this.okBtn, 0);
 			this.Controls.SetChildIndex(this.cancelBtn, 0);
 			this.Controls.SetChildIndex(this.sphereCb, 0);

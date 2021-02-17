@@ -19,12 +19,6 @@ namespace VisualMusic
 			InitializeComponent();
 		}
 
-		private void okBtn_Click(object sender, EventArgs e)
-		{
-			DialogResult = DialogResult.OK;
-			Hide();
-		}
-
 		private void BaseDialog_Load(object sender, EventArgs e)
 		{
 			okBtn.Focus();
