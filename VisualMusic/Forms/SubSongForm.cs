@@ -118,6 +118,7 @@ namespace VisualMusic.Forms
 		private void okBtn_Click(object sender, EventArgs e)
 		{
 			SelectedSong = subSongsLB.SelectedIndex + 1;
+			DialogResult = DialogResult.OK;
 		}
 
 		private void subSongsLB_Resize(object sender, EventArgs e)
