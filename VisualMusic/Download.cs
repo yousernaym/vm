@@ -128,8 +128,8 @@ namespace VisualMusic
 				}
 				Active = false;
 			}
-			if (dlgRes == DialogResult.Abort)
-				throw new IOException("Unexpected error while downloading from url: " + url);
+			//if (dlgRes == DialogResult.Abort)
+				//throw new IOException("Unexpected error while downloading from url: " + url);
 
 			return savePath;
 		}

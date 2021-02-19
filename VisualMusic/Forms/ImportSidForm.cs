@@ -34,18 +34,23 @@ namespace VisualMusic
 		public override void importFiles()
 		{
 			var options = new SidImportOptions();
-			options.checkSourceFile();
-			subSongForm.init(options.NotePath);
-			if (subSongForm.NumSongs == 1 || subSongForm.NumSongs > 1 && subSongForm.ShowDialog() == DialogResult.OK)
+
+			//If sid file exists, extract info about sub songs
+			if (File.Exists(options.NotePath))
 			{
-				options.SubSong = subSongForm.SelectedSong;
-				options.SongLengthS = subSongForm.SongLengthS;
-				string mixdownPath = Path.Combine(TpartyIntegrationForm.MixdownOutputDir, Path.GetFileName(options.NotePath)) + ".wav";
-				//options.MixdownAppArgs = $"\"{options.NotePath}\" -w\"{mixdownPath}\" -o{options.SubSong} -s -t{options.SongLengthS} -rr";
-				//options.MixdownAppPath = TpartyIntegrationForm.XmPlayPath;
-				//options.MixdownAppArgs = "\"" + options.NotePath + "\" -boost";
-				importFiles(options);
+				subSongForm.init(options.NotePath);
+				if (subSongForm.NumSongs == 1 || subSongForm.NumSongs > 1 && subSongForm.ShowDialog() == DialogResult.OK)
+				{
+					options.SubSong = subSongForm.SelectedSong;
+					options.SongLengthS = subSongForm.SongLengthS;
+					string mixdownPath = Path.Combine(TpartyIntegrationForm.MixdownOutputDir, Path.GetFileName(options.NotePath)) + ".wav";
+				}
+				else
+					return;
 			}
+
+			//If sid file didn't exist, call importFiles anyway to get error message box
+			importFiles(options);
 		}
 
 		private void ImportSidForm_Shown(object sender, EventArgs e)
