@@ -37,7 +37,7 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
 ### Import a song from the web
 1. Press F2, F3 or F4 to go to one of the song browsers
 2. Click on a song download link (not a playback link)
-3. When returned to the playback screen, press CTRL-Space to start playing
+3. When returned to the visualization screen, press CTRL-Space or your keyboard's play button to start playback
 
 ### Camera control
 Move: wasdrf  
