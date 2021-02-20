@@ -73,7 +73,7 @@ namespace VisualMusic
 			if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
 			{
 				searchDir = folderDialog.FileName;
-				var filePaths = Directory.GetFiles(Path.GetDirectoryName(folderDialog.FileName), Path.GetFileName(FilePath), SearchOption.AllDirectories);
+				var filePaths = Directory.GetFiles(searchDir, Path.GetFileName(FilePath), SearchOption.AllDirectories);
 				if (filePaths.Length > 0)
 				{
 					FilePath = filePaths[0];
