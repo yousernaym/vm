@@ -234,11 +234,14 @@ namespace VisualMusic
 					string insTrackFlag = options.InsTrack ? "-i" : "";
 					string songLengthsFlag = $"-l{options.SongLengthS.ToString()}";
 					string subSongFlag = $"-s{options.SubSong.ToString()}";
-					string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag}";
+					string supressErrorFlag = "-e";
+					string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag} {supressErrorFlag}";
 					var startInfo = new ProcessStartInfo("remuxer.exe", cmdLine);
 					startInfo.WorkingDirectory = Path.Combine(Program.Dir, "remuxer");
 					var process = Process.Start(startInfo);
 					process.WaitForExit();
+					if (process.ExitCode != 0)
+						throw new FileImportException(null, ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
 					Program.form1.Activate();
 
 					if (!File.Exists(midiPath) && !File.Exists(audioPath))
