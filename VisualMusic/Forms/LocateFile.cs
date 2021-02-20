@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -18,7 +19,8 @@ namespace VisualMusic
 		public string FilePath { get; private set; }
 		CommonOpenFileDialog folderDialog = new CommonOpenFileDialog();
 		OpenFileDialog fileDialog = new OpenFileDialog();
-		
+		WaitForTaskForm waitForTaskForm = new WaitForTaskForm();
+
 		public LocateFile()
 		{
 			InitializeComponent();
@@ -71,23 +73,24 @@ namespace VisualMusic
 			{
 				string searchDir = folderDialog.FileName;
 				folderDialog.InitialDirectory = searchDir;
-				//var filePaths = Directory.GetFiles(searchDir, Path.GetFileName(FilePath), SearchOption.AllDirectories);
-				var filePath = findFile(searchDir, Path.GetFileName(FilePath));
+				var dlgRes = waitForTaskForm.ShowDialog(() => findFile(searchDir, Path.GetFileName(FilePath)));
+				string filePath = (string)waitForTaskForm.Result;
 				if (filePath != null)
 				{
 					FilePath = filePath;
 					DialogResult = DialogResult.OK;
 				}
-				else
+				else if (dlgRes != DialogResult.Cancel)
 					MessageBox.Show("File not found");
 			}
 		}
 
 		//Search dir recursively
 		//Return path to file if found, otherwise null
-		string findFile(string searchDir, string fileName)
+		 string findFile(string searchDir, string fileName)
 		{
 			// Exclude some directories according to their attributes
+			WaitForTaskForm.CancellationToken.ThrowIfCancellationRequested();
 			string[] files = null;
 			string skipReason = null;
 			var dirInfo = new DirectoryInfo(searchDir);
