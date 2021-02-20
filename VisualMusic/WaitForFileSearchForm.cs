@@ -28,54 +28,48 @@ namespace VisualMusic
 		//Return path to file if found, otherwise null
 		string findFile(string searchDir, string fileName)
 		{
-			// Exclude some directories according to their attributes
 			WaitForTaskForm.CancellationToken.ThrowIfCancellationRequested();
-			string[] files = null;
-			string skipReason = null;
+			string[] paths = null;
+
+			// Exclude some directories according to their attributes
 			var dirInfo = new DirectoryInfo(searchDir);
 			var isroot = dirInfo.Root.FullName.Equals(dirInfo.FullName);
 
 			// as root dirs (e.g. "C:\") apparently have the system + hidden flags set, we must check whether it's a root dir, if it is, we do NOT skip it even though those attributes are present
 			// We must not access such folders/files, or this crashes with UnauthorizedAccessException on folders like $RECYCLE.BIN
-			if (dirInfo.Attributes.HasFlag(FileAttributes.System) && !isroot)
-			{
-				skipReason = "system file/folder, no access";
-			}
-
-			if (null == skipReason)
+			if (!dirInfo.Attributes.HasFlag(FileAttributes.System) || isroot)
 			{
 				try
 				{
-					files = Directory.GetFiles(searchDir);
+					paths = Directory.GetFiles(searchDir);
 				}
 				catch (UnauthorizedAccessException ex)
 				{
-					skipReason = ex.Message;
+					return null;
 				}
 				catch (PathTooLongException ex)
 				{
-					skipReason = ex.Message;
+					return null;
 				}
 			}
+			else
+				return null;
 
-			if (null != skipReason)
-			{
-				return null; // we skip this directory
-			}
-
-			foreach (var path in files)
+			//Check if there is a match in current dir
+			foreach (var path in paths)
 			{
 				var attr = File.GetAttributes(path);
 				if ((attr & FileAttributes.Directory) != FileAttributes.Directory && Path.GetFileName(path) == fileName)
 					return path;
 			}
 
+			//Check all sub directories
 			try
 			{
 				var dirs = Directory.GetDirectories(searchDir);
-				foreach (var d in dirs)
+				foreach (var dir in dirs)
 				{
-					var path = findFile(d, fileName); // recursive call
+					var path = findFile(dir, fileName); // recursive call
 					if (path != null)
 						return path;
 				}
