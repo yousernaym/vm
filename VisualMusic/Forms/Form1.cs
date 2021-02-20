@@ -77,6 +77,7 @@ namespace VisualMusic
 		static TpartyIntegrationForm tpartyIntegrationForm;
 		public static TpartyIntegrationForm TpartyIntegrationForm => tpartyIntegrationForm;
 		public static VideoExportForm VidExpForm;
+		LocateFile locateFileDlg;
 
 		static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment), typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps) };
 		static public SongPanel SongPanel { get; private set; } = new SongPanel();
@@ -126,6 +127,7 @@ namespace VisualMusic
 			ImportSidForm = new ImportSidForm(this);
 			tpartyIntegrationForm = new TpartyIntegrationForm();
 			VidExpForm = new VideoExportForm();
+			locateFileDlg = new LocateFile();
 			ResizeRedraw = true;
 
 			songScrollBar.Dock = DockStyle.Bottom;
@@ -1190,7 +1192,6 @@ namespace VisualMusic
 				catch (Exception ex) when (ex is FileFormatException || ex is FileNotFoundException)
 				{
 					DialogResult dlgResult = DialogResult.OK;
-					var locateFileDlg = new LocateFile();
 					string problemFilePath;
 					LocateFile.Reason reason;
 					if (ex is FileNotFoundException)
