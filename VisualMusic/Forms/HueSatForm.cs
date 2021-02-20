@@ -32,5 +32,10 @@ namespace VisualMusic
 		{
 			SelectionChanged?.Invoke(sender, e);
 		}
+
+		private void okBtn_Click(object sender, EventArgs e)
+		{
+			DialogResult = DialogResult.OK;
+		}
 	}
 }

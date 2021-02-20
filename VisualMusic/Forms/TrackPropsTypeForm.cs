@@ -42,5 +42,10 @@ namespace VisualMusic
 			if (!Visible)
 				Close();
 		}
+
+		private void okBtn_Click(object sender, EventArgs e)
+		{
+			DialogResult = DialogResult.OK;
+		}
 	}
 }

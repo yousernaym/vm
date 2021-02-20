@@ -212,7 +212,7 @@
     <Compile Include="Forms\TrackPropsTypeForm.Designer.cs">
       <DependentUpon>TrackPropsTypeForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\UndoItems.cs" />
+    <Compile Include="UndoItems.cs" />
     <Compile Include="Forms\VideoExportForm.cs">
       <SubType>Form</SubType>
     </Compile>

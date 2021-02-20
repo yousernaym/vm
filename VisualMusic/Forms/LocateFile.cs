@@ -65,7 +65,6 @@ namespace VisualMusic
 			{
 				FilePath = fileDialog.FileName;
 				DialogResult = DialogResult.OK;
-				Hide();
 			}
 		}
 
@@ -79,7 +78,6 @@ namespace VisualMusic
 				{
 					FilePath = filePaths[0];
 					DialogResult = DialogResult.OK;
-					Hide();
 				}
 				else
 					MessageBox.Show("File not found");
@@ -89,7 +87,6 @@ namespace VisualMusic
 		private void retryBtn_Click(object sender, EventArgs e)
 		{
 			DialogResult = DialogResult.OK;
-			Close();
 		}
 	}
 }
