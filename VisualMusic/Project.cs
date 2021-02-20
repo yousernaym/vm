@@ -277,11 +277,23 @@ namespace VisualMusic
 
 			Midi.Song newNotes = new Midi.Song();
 			string path = options.MidiOutputPath;
+			string errorPath = path;
 			if (path == null)
+			{
 				path = options.NotePath;
-			newNotes.openFile(path);
+				errorPath = options.RawNotePath;
+			}
+			
+			try
+			{
+				newNotes.openFile(path);
+			}
+			catch (FileFormatException ex)
+			{
+				throw new FileImportException(ex.Message, ImportError.Corrupt, ImportFileType.Note, errorPath);
+			}
 			if (newNotes.Tracks == null || newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
-				throw new FileFormatException(new Uri(options.RawNotePath), "No notes found.");
+				throw new FileImportException("No notes found.", ImportError.Corrupt, ImportFileType.Note, errorPath);
 
 			notes = newNotes;
 			notes.createNoteBsp();

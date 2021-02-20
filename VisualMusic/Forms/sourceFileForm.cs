@@ -113,14 +113,9 @@ namespace VisualMusic
 			{
 				options.checkSourceFile(); 
 			}
-			catch (FileNotFoundException ex)
+			catch (FileImportException ex)
 			{
 				Form1.showErrorMsgBox(ex.Message + "\r\n" + ex.FileName);
-				return;
-			}
-			catch (ArgumentException ex)
-			{
-				Form1.showErrorMsgBox(ex.Message);
 				return;
 			}
 			try
@@ -128,7 +123,7 @@ namespace VisualMusic
 				if (!parent.openSourceFiles(options))
 					return;
 			}
-			catch (FileFormatException ex)
+			catch (FileImportException ex)
 			{
 				Form1.showErrorMsgBox("Couldn't read note file.\r\n" + ex.Message);
 				return;
@@ -215,7 +210,7 @@ namespace VisualMusic
 			{
 				setNotePath();
 			}
-			catch (FileNotFoundException)
+			catch (FileImportException)
 			{
 
 			}
@@ -309,19 +304,17 @@ namespace VisualMusic
 		{
 			if (!SavedMidi)
 			{
-				if (string.IsNullOrWhiteSpace(NotePath))
-					throw (new ArgumentException("Note file missing"));
-				else if (!File.Exists(NotePath))
-					throw new FileNotFoundException("Couldn't find note file", NotePath);
+				if (string.IsNullOrWhiteSpace(NotePath) || !File.Exists(NotePath))
+					throw new FileImportException("Note file not found", ImportError.Missing, ImportFileType.Note, NotePath);
 			}
 			else if (!File.Exists(MidiOutputPath))
-				throw new FileNotFoundException("Couldn't find note file", MidiOutputPath);
+				throw new FileImportException("Note file not found", ImportError.Missing, ImportFileType.Note, MidiOutputPath);
 			if (!string.IsNullOrWhiteSpace(AudioPath))
 			{
 				if (!File.Exists(AudioPath))
-					throw new FileNotFoundException("Couldn't find audio file", AudioPath);
+					throw new FileImportException("Audio file not found", ImportError.Missing, ImportFileType.Audio, AudioPath);
 				else if (!Media.openAudioFile(AudioPath))
-					throw new FileFormatException(new Uri(AudioPath), "Couldn't read audio file");
+					throw new FileImportException("Couldn't read audio file", ImportError.Corrupt, ImportFileType.Audio, AudioPath);
 			}
 		}
 
@@ -333,7 +326,7 @@ namespace VisualMusic
 			{
 				NotePath = rawNotePath.downloadFile();
 				if (string.IsNullOrEmpty(NotePath))
-					throw new FileNotFoundException("", rawNotePath);
+					throw new FileImportException("", ImportError.Missing, ImportFileType.Note, rawNotePath);
 			}
 			else
 				NotePath = rawNotePath;

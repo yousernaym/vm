@@ -43,11 +43,11 @@ namespace VisualMusic
 				{
 					paths = Directory.GetFiles(searchDir);
 				}
-				catch (UnauthorizedAccessException ex)
+				catch (UnauthorizedAccessException)
 				{
 					return null;
 				}
-				catch (PathTooLongException ex)
+				catch (PathTooLongException)
 				{
 					return null;
 				}

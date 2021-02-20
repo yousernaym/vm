@@ -259,13 +259,9 @@ namespace VisualMusic
 						ImportSidForm.importFiles();
 					}
 				}
-				catch (FileNotFoundException ex)
+				catch (FileImportException ex)
 				{
 					showErrorMsgBox(ex.Message + "\r\n" + ex.FileName);
-				}
-				catch (FileFormatException ex)
-				{
-					showErrorMsgBox(ex.Message + "\r\n" + ex.SourceUri.LocalPath);
 				}
 			}
 		}
@@ -1189,24 +1185,12 @@ namespace VisualMusic
 					break;
 				}
 			
-				catch (Exception ex) when (ex is FileFormatException || ex is FileNotFoundException)
+				catch (FileImportException ex)
 				{
-					DialogResult dlgResult = DialogResult.OK;
-					string problemFilePath;
-					LocateFile.Reason reason;
-					if (ex is FileNotFoundException)
-					{
-						problemFilePath = ((FileNotFoundException)ex).FileName;
-						reason = LocateFile.Reason.Missing;
-					}
-					else
-					{
-						problemFilePath = ((FileFormatException)ex).SourceUri.LocalPath;
-						reason = LocateFile.Reason.Corrupt;
-					}
-					bool audioFileProblem = Path.GetExtension(problemFilePath) == ".wav";
+					string problemFilePath = ex.FileName;
+					bool audioFileProblem = ex.FileType == ImportFileType.Audio;
 					bool criticalError = !tempProject.ImportOptions.SavedMidi && !audioFileProblem;
-					dlgResult = locateFileDlg.ShowDialog(problemFilePath, Path.GetDirectoryName(projectPath), reason, criticalError);
+					DialogResult dlgResult = locateFileDlg.ShowDialog(problemFilePath, Path.GetDirectoryName(projectPath), ex.Error, criticalError);
 
 					if (dlgResult == DialogResult.OK)
 					{
@@ -1235,9 +1219,9 @@ namespace VisualMusic
 						return;
 					}
 				}
-				catch (IOException e)
+				catch (IOException ex)
 				{
-					showErrorMsgBox(e.Message);
+					showErrorMsgBox(ex.Message);
 					SongPanel.Project = Project;
 					return;
 				}

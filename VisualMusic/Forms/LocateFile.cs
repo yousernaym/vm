@@ -15,7 +15,6 @@ namespace VisualMusic
 {
 	public partial class LocateFile : Form
 	{
-		public enum Reason { Missing, Corrupt };
 		public string FilePath { get; private set; }
 		CommonOpenFileDialog folderDialog = new CommonOpenFileDialog();
 		OpenFileDialog fileDialog = new OpenFileDialog();
@@ -27,14 +26,14 @@ namespace VisualMusic
 			folderDialog.IsFolderPicker = true;
 		}
 
-		public DialogResult ShowDialog(string filePath, string searchDir, Reason reason, bool criticalError, string optionalMsg = "")
+		public DialogResult ShowDialog(string filePath, string searchDir, ImportError reason, bool criticalError, string optionalMsg = "")
 		{
 			bool isUrl = filePath.ToLower().StartsWith("http");
 			findInFolderBtn.Visible = !isUrl;
 			folderDialog.InitialDirectory = searchDir;
 			string msg;
 			
-			if (reason == Reason.Missing)
+			if (reason == ImportError.Missing)
 				msg = "File missing: ";
 			else
 				msg = "Invalid file format: ";
