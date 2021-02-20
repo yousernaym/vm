@@ -103,7 +103,10 @@
 			this.Controls.Add(this.cancelBtn);
 			this.Controls.Add(this.findInFolderBtn);
 			this.Controls.Add(this.findFileBtn);
+			this.MaximizeBox = false;
 			this.Name = "LocateFile";
+			this.ShowIcon = false;
+			this.ShowInTaskbar = false;
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

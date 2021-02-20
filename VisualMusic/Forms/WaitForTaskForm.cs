@@ -21,8 +21,9 @@ namespace VisualMusic
 			InitializeComponent();
 		}
 
-		public DialogResult ShowDialog(Func<object> func)
+		public DialogResult ShowDialog(Func<object> func, string message)
 		{
+			messageLabel.Text = message;
 			Result = null;
 			cancellationTokenSource = new CancellationTokenSource();
 			CancellationToken = cancellationTokenSource.Token;
@@ -40,6 +41,7 @@ namespace VisualMusic
 				DialogResult = DialogResult.OK;
 				return result;
 			}, CancellationToken);
+
 			DialogResult = base.ShowDialog();
 			Result = task.Result;
 			cancellationTokenSource.Dispose();
@@ -53,8 +55,12 @@ namespace VisualMusic
 
 		private void cancelBtn_Click(object sender, EventArgs e)
 		{
-			cancellationTokenSource.Cancel();
 			DialogResult = DialogResult.Cancel;
+		}
+
+		private void WaitForTaskForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			cancellationTokenSource.Cancel();
 		}
 	}
 }

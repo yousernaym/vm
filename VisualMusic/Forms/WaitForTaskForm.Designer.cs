@@ -30,14 +30,15 @@ namespace VisualMusic
 		private void InitializeComponent()
 		{
 			this.cancelBtn = new System.Windows.Forms.Button();
-			this.label1 = new System.Windows.Forms.Label();
+			this.messageLabel = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// cancelBtn
 			// 
 			this.cancelBtn.AccessibleRole = System.Windows.Forms.AccessibleRole.SplitButton;
 			this.cancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.cancelBtn.Location = new System.Drawing.Point(154, 57);
+			this.cancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.cancelBtn.Location = new System.Drawing.Point(154, 10);
 			this.cancelBtn.Name = "cancelBtn";
 			this.cancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.cancelBtn.TabIndex = 0;
@@ -45,24 +46,28 @@ namespace VisualMusic
 			this.cancelBtn.UseVisualStyleBackColor = true;
 			this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
 			// 
-			// label1
+			// messageLabel
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(12, 9);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(35, 13);
-			this.label1.TabIndex = 1;
-			this.label1.Text = "label1";
+			this.messageLabel.AutoSize = true;
+			this.messageLabel.Location = new System.Drawing.Point(12, 15);
+			this.messageLabel.Name = "messageLabel";
+			this.messageLabel.Size = new System.Drawing.Size(35, 13);
+			this.messageLabel.TabIndex = 1;
+			this.messageLabel.Text = "label1";
 			// 
 			// WaitForTaskForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(241, 92);
-			this.Controls.Add(this.label1);
+			this.CancelButton = this.cancelBtn;
+			this.ClientSize = new System.Drawing.Size(241, 45);
+			this.Controls.Add(this.messageLabel);
 			this.Controls.Add(this.cancelBtn);
+			this.MaximizeBox = false;
 			this.Name = "WaitForTaskForm";
-			this.Text = "WaitForTaskForm";
+			this.ShowIcon = false;
+			this.ShowInTaskbar = false;
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.WaitForTaskForm_FormClosing);
 			this.Load += new System.EventHandler(this.WaitForTaskForm_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -70,8 +75,7 @@ namespace VisualMusic
 		}
 
 		#endregion
-
-		private System.Windows.Forms.Button cancelBtn;
-		private System.Windows.Forms.Label label1;
+		protected System.Windows.Forms.Label messageLabel;
+		protected System.Windows.Forms.Button cancelBtn;
 	}
 }
