@@ -26,22 +26,20 @@ namespace VisualMusic
 			folderDialog.IsFolderPicker = true;
 		}
 
-		public DialogResult ShowDialog(string filePath, string searchDir, ImportError error, ImportFileType fileType, bool criticalError, string optionalMsg = "")
+		public DialogResult ShowDialog(string filePath, string searchDir, ImportError error, ImportFileType fileType, bool criticalError)
 		{
 			bool isUrl = filePath.ToLower().StartsWith("http");
 			findInFolderBtn.Visible = !isUrl;
 			folderDialog.InitialDirectory = searchDir;
-			string msg;
+			
 			string fileTypeString = fileType == ImportFileType.Note ? "Note" : "Audio";
 			if (error == ImportError.Missing)
-				msg = $"{fileTypeString} file missing: ";
+				errorLabel.Text = $"{fileTypeString} file missing: ";
 			else
-				msg = $"Invalid {fileTypeString.ToLower()} file format: ";
+				errorLabel.Text = $"Invalid {fileTypeString.ToLower()} file format: ";
 
 			cancelBtn.Text = criticalError ? "Cancel" : "Ignore";
-			msg += "\r\n" + filePath;
-			msg += "\r\n\r\n" + optionalMsg;
-			messageTb.Text = msg;
+			filePathTb.Text = filePath;
 			FilePath = filePath;
 			
 			if (isUrl)
