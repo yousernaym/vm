@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Visual Music"
-#define MyAppVersion "0.2.1"
+#define MyAppVersion "0.3.2"
 #define MyAppPublisher "Mikesoft"
 #define MyAppExeName "VM.exe"
 #define MyAppDataDir "{userappdata}\" + MyAppName
