@@ -38,10 +38,10 @@
 			// findFileBtn
 			// 
 			this.findFileBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.findFileBtn.Location = new System.Drawing.Point(268, 93);
+			this.findFileBtn.Location = new System.Drawing.Point(268, 79);
 			this.findFileBtn.Name = "findFileBtn";
 			this.findFileBtn.Size = new System.Drawing.Size(67, 23);
-			this.findFileBtn.TabIndex = 0;
+			this.findFileBtn.TabIndex = 4;
 			this.findFileBtn.Text = "Select file";
 			this.findFileBtn.UseVisualStyleBackColor = true;
 			this.findFileBtn.Click += new System.EventHandler(this.selectFileBtn_Click);
@@ -50,10 +50,10 @@
 			// 
 			this.cancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.cancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.cancelBtn.Location = new System.Drawing.Point(341, 93);
+			this.cancelBtn.Location = new System.Drawing.Point(341, 79);
 			this.cancelBtn.Name = "cancelBtn";
 			this.cancelBtn.Size = new System.Drawing.Size(75, 23);
-			this.cancelBtn.TabIndex = 0;
+			this.cancelBtn.TabIndex = 5;
 			this.cancelBtn.Text = "Ignore";
 			this.cancelBtn.UseVisualStyleBackColor = true;
 			// 
@@ -67,24 +67,25 @@
 			this.messageTb.Multiline = true;
 			this.messageTb.Name = "messageTb";
 			this.messageTb.ReadOnly = true;
-			this.messageTb.Size = new System.Drawing.Size(404, 70);
+			this.messageTb.Size = new System.Drawing.Size(404, 61);
 			this.messageTb.TabIndex = 1;
 			this.messageTb.TabStop = false;
 			// 
 			// findInFolderBtn
 			// 
 			this.findInFolderBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.findInFolderBtn.Location = new System.Drawing.Point(141, 93);
+			this.findInFolderBtn.Location = new System.Drawing.Point(141, 79);
 			this.findInFolderBtn.Name = "findInFolderBtn";
 			this.findInFolderBtn.Size = new System.Drawing.Size(121, 23);
-			this.findInFolderBtn.TabIndex = 0;
+			this.findInFolderBtn.TabIndex = 3;
 			this.findInFolderBtn.Text = "Find filename in folder";
 			this.findInFolderBtn.UseVisualStyleBackColor = true;
 			this.findInFolderBtn.Click += new System.EventHandler(this.findInFolderBtn_Click);
 			// 
 			// retryBtn
 			// 
-			this.retryBtn.Location = new System.Drawing.Point(12, 93);
+			this.retryBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.retryBtn.Location = new System.Drawing.Point(12, 79);
 			this.retryBtn.Name = "retryBtn";
 			this.retryBtn.Size = new System.Drawing.Size(64, 23);
 			this.retryBtn.TabIndex = 2;
@@ -97,7 +98,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.cancelBtn;
-			this.ClientSize = new System.Drawing.Size(428, 128);
+			this.ClientSize = new System.Drawing.Size(428, 114);
 			this.Controls.Add(this.retryBtn);
 			this.Controls.Add(this.messageTb);
 			this.Controls.Add(this.cancelBtn);

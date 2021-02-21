@@ -1190,7 +1190,7 @@ namespace VisualMusic
 					string problemFilePath = ex.FileName;
 					bool audioFileProblem = ex.FileType == ImportFileType.Audio;
 					bool criticalError = !tempProject.ImportOptions.SavedMidi && !audioFileProblem;
-					DialogResult dlgResult = locateFileDlg.ShowDialog(problemFilePath, Path.GetDirectoryName(projectPath), ex.Error, criticalError);
+					DialogResult dlgResult = locateFileDlg.ShowDialog(problemFilePath, Path.GetDirectoryName(projectPath), ex.Error, ex.FileType, criticalError);
 
 					if (dlgResult == DialogResult.OK)
 					{
