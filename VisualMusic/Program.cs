@@ -33,13 +33,15 @@ namespace VisualMusic
 		[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
 		static void Main(string[] args)
 		{
-			//using (Mutex mutex = new Mutex(false, "Global\\" + appGuid))
-			//{
-			//	if (!mutex.WaitOne(0, false))
-			//	{
-			//		MessageBox.Show("Visual Music already running");
-			//		return;
-			//	}
+			const int semaphoreMaxCount = 10;
+			Semaphore semaphore = null;
+			try
+			{
+				semaphore = new Semaphore(semaphoreMaxCount, semaphoreMaxCount, "Global\\" + appGuid);
+				if (!semaphore.WaitOne(0, false))
+				{
+					return;
+				}
 
 				try
 				{
@@ -51,7 +53,15 @@ namespace VisualMusic
 				{
 					close();
 				}
-			//}			
+			}
+			finally
+			{
+				if (semaphore != null)
+				{
+					if (semaphore.Release() == semaphoreMaxCount - 1)
+						deleteTempDirs();
+				}
+			}
 		}
 
 		static void init()
@@ -82,6 +92,10 @@ namespace VisualMusic
 			Cef.Shutdown();
 			MidMix.close();
 			Media.closeMF();
+		}
+
+		static void deleteTempDirs()
+		{
 			if (dirLock != null)
 			{
 				dirLock.Close();
