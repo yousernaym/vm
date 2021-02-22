@@ -534,8 +534,7 @@
 			this.combineXYCombo.Items.AddRange(new object[] {
             "x + y",
             "x^2 + y^2",
-            "Max (x, y) ",
-            "Min (x, y)"});
+            "Max (x, y) "});
 			this.combineXYCombo.Location = new System.Drawing.Point(56, 68);
 			this.combineXYCombo.Name = "combineXYCombo";
 			this.combineXYCombo.Size = new System.Drawing.Size(92, 21);

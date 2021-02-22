@@ -98,7 +98,6 @@ int ActiveModEntries;
 #define CombineXY_Add 0
 #define CombineXY_Length 1
 #define CombineXY_Max 2
-#define CombineXY_Min 3
 
 //World pos is returned to parameter vertPos
 //Projection pos is returned as normal return value
@@ -195,14 +194,6 @@ float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out flo
 			else
 				destNormalDir.y = transformedNormPos.y;
 			interpolant = max(normDistFromOrigin.x, normDistFromOrigin.y);
-		}
-		else if (modEntry.CombineXY == CombineXY_Min)
-		{
-			if (normDistFromOrigin.x < normDistFromOrigin.y)
-				destNormalDir.x = transformedNormPos.x;
-			else
-				destNormalDir.y = transformedNormPos.y;
-			interpolant = min(normDistFromOrigin.x, normDistFromOrigin.y);
 		}
 		else //Both x and y is used
 		{
