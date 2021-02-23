@@ -1188,6 +1188,11 @@ namespace VisualMusic
 				catch (FileImportException ex)
 				{
 					string problemFilePath = ex.FileName;
+					if (problemFilePath.Contains(Program.TempDir))
+					{
+						showErrorMsgBox("An unknown error occurred");
+						return;
+					}
 					bool audioFileProblem = ex.FileType == ImportFileType.Audio;
 					bool criticalError = !tempProject.ImportOptions.SavedMidi && !audioFileProblem;
 					DialogResult dlgResult = locateFileDlg.ShowDialog(problemFilePath, Path.GetDirectoryName(projectPath), ex.Error, ex.FileType, criticalError);
@@ -1214,25 +1219,24 @@ namespace VisualMusic
 							tempProject.ImportOptions.MidiOutputPath = "";
 							continue;
 						}
-						if (criticalError)
-							SongPanel.Project = Project;
-						return;
+						else //critical error
+							return;
 					}
 				}
 				catch (IOException ex)
 				{
-					showErrorMsgBox(ex.Message);
-					SongPanel.Project = Project;
+					showErrorMsgBox("Unexpected error: " + ex.Message);
 					return;
 				}
 				finally
 				{
+					SongPanel.Project = Project; //If loading was cancelled, Project was not updated, so SongPanel's reference will be reset to old project
 					SongPanel.ResumePaint();
 				}
 			} while (true);
+			
 			if (Project.KeyFrames == null) //Old project file format
 				Project.KeyFrames = new KeyFrames();
-
 			Project.ImportOptions.updateImportForm();
 			currentProjPath = projectPath;
 			songLoaded(currentProjPath);
