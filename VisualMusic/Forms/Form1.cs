@@ -440,14 +440,14 @@ namespace VisualMusic
 		}
 
 		//Called only when iomporting note and audio files.
-		public bool openSourceFiles(ImportOptions options)
+		async public Task<bool> openSourceFiles(ImportOptions options)
 		{
 			saveSettings();
 			changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
 			try
 			{
 				SongPanel.SuspendPaint();
-				if (!Project.importSong(options))
+				if (! await Project.importSong(options))
 					return false;
 				if (options.EraseCurrent)
 				{
@@ -1158,7 +1158,7 @@ namespace VisualMusic
 			changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
 			openProjectFile(openProjDialog.FileName);
 		}
-		void openProjectFile(string projectPath)
+		async void openProjectFile(string projectPath)
 		{
 			Project tempProject;
 			DataContractSerializer dcs = new DataContractSerializer(typeof(Project), projectSerializationTypes);
@@ -1180,7 +1180,7 @@ namespace VisualMusic
 				{
 					SongPanel.SuspendPaint();
 					SongPanel.Project = tempProject;
-					tempProject.loadContent();
+					await tempProject.loadContent();
 					Project = tempProject;
 					break;
 				}

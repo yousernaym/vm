@@ -129,14 +129,14 @@ namespace VisualMusic
 		}
 
 
-		public bool loadContent()
+		async public Task<bool> loadContent()
 		{
 			if (ImportOptions == null)
 				return true;
 
 			ImportOptions.setNotePath();
 			ImportOptions.EraseCurrent = false;
-			return importSong(ImportOptions);
+			return await importSong(ImportOptions);
 		}
 
 		public Project(SerializationInfo info, StreamingContext ctxt) : this()
@@ -199,7 +199,7 @@ namespace VisualMusic
 			info.AddValue("vertWidthQn", vertViewWidthQn);
 		}
 
-		public bool importSong(ImportOptions options)
+		async public Task<bool> importSong(ImportOptions options)
 		{ //<Open project> and <import files> meet here
 			options.checkSourceFile();
 			//Convert mod/sid files to mid/wav
@@ -239,10 +239,18 @@ namespace VisualMusic
 					var startInfo = new ProcessStartInfo("remuxer.exe", cmdLine);
 					startInfo.WorkingDirectory = Path.Combine(Program.Dir, "remuxer");
 					var process = Process.Start(startInfo);
-					process.WaitForExit();
+					Program.form1.Enabled = false;
+					try
+					{
+						await Task.Run(() => process.WaitForExit());
+					}
+					finally
+					{
+						Program.form1.Enabled = true;
+						Program.form1.Activate();
+					}
 					if (process.ExitCode != 0)
 						throw new FileImportException(null, ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
-					Program.form1.Activate();
 
 					if (!File.Exists(midiPath) && !File.Exists(audioPath))
 						return false;

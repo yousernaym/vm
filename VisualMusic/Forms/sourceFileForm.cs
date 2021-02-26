@@ -107,7 +107,7 @@ namespace VisualMusic
 			throw new NotImplementedException();
 		}
 
-		protected void importFiles(ImportOptions options)
+		async protected void importFiles(ImportOptions options)
         {
 			try 
 			{
@@ -120,7 +120,7 @@ namespace VisualMusic
 			}
 			try
 			{
-				if (!parent.openSourceFiles(options))
+				if (!await parent.openSourceFiles(options))
 					return;
 			}
 			catch (FileImportException ex)
