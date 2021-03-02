@@ -12,8 +12,9 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
 ## Building the source
 
 * Install [Visual Studio](https://visualstudio.microsoft.com/) with the following workloads:
-	* .NET desktop development
-	* Desktop development with C++  
+  * .NET desktop development
+  * Desktop development with C++  
+  * MSVC *version_numbers* C++ x64/x86 Spectre-mitigated libs (*version_number*)  
 * Install Vcpkg, Fluidsynth and Ffmpeg:
     ```
     git clone https://github.com/microsoft/vcpkg.git
@@ -25,11 +26,9 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
     ```
 * Download this repo including submodules:
 ```
-    git clone https://github.com/yousernaym/vm.git
-    cd vm
-    git submodule update --init --recursive
+    git clone --recurse-submodules https://github.com/yousernaym/vm.git
 ``` 
-* Open VisualMusic.sln in Visual Studio and build
+* Open VisualMusic.sln in Visual Studio and build (if compilation of Content.mgcb fails, restart Visual Studio)
 * (Optional) To get General Midi audio, place a [soundfont file](https://musescore.org/en/node/109371) named `soundfont.sf2` in the exe folder
 
 ## Basic usage
@@ -49,19 +48,19 @@ Changes to supported properties will be stored in the currently highlighted key 
 
 ## Sub projects
 
-#### [Remuxer](https://github.com/yousernaym/remuxer) (command-line tool)  
-Mod import, based on [libmikmod](http://mikmod.sourceforge.net/) and [libopenmpt](https://lib.openmpt.org/libopenmpt/).  
-Sid import, based on [libsidplayfp](https://sourceforge.net/projects/sidplay-residfp/).
-#### [Midilib](https://github.com/yousernaym/midilib) (C# class library)  
-Midi import.
-#### [MidMix](https://github.com/yousernaym/midmix) (C++ dll)
-General Midi audio, based on [Fluidsynth](http://www.fluidsynth.org/).  
-#### [Media](https://github.com/yousernaym/media) (C++ dll)  
-Video export, based on [Ffmpeg]().  
-Audio playback, based on [Media Foundation](https://docs.microsoft.com/en-us/windows/win32/medfound/microsoft-media-foundation-sdk).
-#### [MonoGame fork](https://github.com/yousernaym/monogame)  
-Graphics.  
-The fork contains a ConstantBuffer fix and Curve optimization necessary for Visual Music to function properly.
+#### [Remuxer](https://github.com/yousernaym/remuxer)  
+* Mod import, based on [libmikmod](http://mikmod.sourceforge.net/) and [libopenmpt](https://lib.openmpt.org/libopenmpt/)
+* Sid import, based on [libsidplayfp](https://sourceforge.net/projects/sidplay-residfp/)
+#### [Midilib](https://github.com/yousernaym/midilib)
+* Midi import
+#### [MidMix](https://github.com/yousernaym/midmix)
+* General Midi audio, based on [Fluidsynth](http://www.fluidsynth.org/)
+#### [Media](https://github.com/yousernaym/media)
+* Video export, based on [Ffmpeg]()
+* Audio playback, based on [Media Foundation](https://docs.microsoft.com/en-us/windows/win32/medfound/microsoft-media-foundation-sdk)
+#### [MonoGame fork](https://github.com/yousernaym/monogame)
+* Graphics
+* The fork contains a ConstantBuffer fix and a Curve optimization, both necessary for Visual Music to function properly
 
 ## Third-party projects
 * [CefSharp](https://github.com/cefsharp/CefSharp) - Web browser (Nuget packages)

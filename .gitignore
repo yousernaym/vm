@@ -32,7 +32,6 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 
-/VisualMusic/grafik/
 *.wav
 *.mod
 *.xm
@@ -44,3 +43,4 @@ packages/
 *.jpeg
 *.jpg
 *.sf2
+*.rtf
