@@ -120,7 +120,7 @@ namespace VisualMusic
 			}
 			try
 			{
-				if (!await parent.openSourceFiles(options))
+				if (!await parent.openSourceFiles(options, this))
 					return;
 			}
 			catch (FileImportException ex)

@@ -96,6 +96,7 @@ namespace VisualMusic
 		bool unsavedChanges = false;
         bool viewWidthQnChangedWithCtrl = false;
 		bool focusChanged = false;
+		static public Process RemuxerProcess;
 
 		[DllImport("user32.dll")]
 		static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
@@ -440,14 +441,14 @@ namespace VisualMusic
 		}
 
 		//Called only when iomporting note and audio files.
-		async public Task<bool> openSourceFiles(ImportOptions options)
+		async public Task<bool> openSourceFiles(ImportOptions options, Form parentForm)
 		{
 			saveSettings();
 			changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
 			try
 			{
 				SongPanel.SuspendPaint();
-				if (! await Project.importSong(options))
+				if (! await Project.importSong(options, parentForm))
 					return false;
 				if (options.EraseCurrent)
 				{
@@ -1180,7 +1181,7 @@ namespace VisualMusic
 				{
 					SongPanel.SuspendPaint();
 					SongPanel.Project = tempProject;
-					await tempProject.loadContent();
+					await tempProject.loadContent(this);
 					Project = tempProject;
 					break;
 				}
@@ -2208,6 +2209,8 @@ namespace VisualMusic
 			addUndoItem("Load Track Properties");
 			updateTrackListColors();
 			updateTrackPropsControls();
+			if ((typeFlags & (int)TrackPropsType.TPT_Style) != 0)
+				Project.createOcTrees();
 		}
 		void saveTrackProps(int typeFlags)
 		{
@@ -2573,14 +2576,32 @@ namespace VisualMusic
 			}
 		}
 
-		private void playbackToolStripMenuItem1_Click(object sender, EventArgs e)
-		{
-
-		}
-
 		private void trackList_DragLeave(object sender, EventArgs e)
 		{
 			trackList.RedrawItems(0, trackList.Items.Count - 1, false);
+		}
+
+		private void Form1_Activated(object sender, EventArgs e)
+		{
+			regainFocus(RemuxerProcess);
+		}
+
+		// required to use WINAPI for RegainFocus();
+		[System.Runtime.InteropServices.DllImport("user32.dll")]
+		private static extern int SetForegroundWindow(IntPtr hwnd);
+		[System.Runtime.InteropServices.DllImport("user32.dll")]
+		private static extern IntPtr SetActiveWindow(IntPtr hwnd);
+		[System.Runtime.InteropServices.DllImport("user32.dll")]
+		private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+		static private void regainFocus(Process process)
+		{
+			if (process == null || process.HasExited)
+				return;
+			// SW_RESTORE = 9
+			ShowWindow(process.MainWindowHandle, 9);
+			SetForegroundWindow(process.MainWindowHandle);
+			SetActiveWindow(process.MainWindowHandle);
 		}
 	}
 }
