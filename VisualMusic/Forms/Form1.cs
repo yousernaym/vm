@@ -2594,7 +2594,7 @@ namespace VisualMusic
 		[System.Runtime.InteropServices.DllImport("user32.dll")]
 		private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-		static private void regainFocus(Process process)
+		static public void regainFocus(Process process)
 		{
 			if (process == null || process.HasExited)
 				return;

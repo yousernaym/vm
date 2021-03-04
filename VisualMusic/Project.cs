@@ -13,6 +13,8 @@ using System.Runtime.Serialization;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace VisualMusic
 {
@@ -243,7 +245,25 @@ namespace VisualMusic
 					parentForm.Enabled = false;
 					try
 					{
-						await Task.Run(() => process.WaitForExit());
+						FormWindowState initialWindowState = parentForm.WindowState;
+						await Task.Run(() =>
+						{
+							//Minimize parent form when process form is minimized,
+							//and restore parent form when process form is restored
+							//Process form also needs to be restored if parent form is restored, which is done in Form1.Form1_Activated event handler
+							while (!process.HasExited)
+							{
+								bool minimized = IsIconic(process.MainWindowHandle);
+								if (minimized)
+									parentForm.Invoke(new Action(() => parentForm.WindowState = FormWindowState.Minimized));
+								else
+								{
+									parentForm.Invoke(new Action(() => parentForm.WindowState = initialWindowState));
+									Form1.regainFocus(process); //Prevent parentForm to steal focus from process when its initial window state is restored
+								}
+								Thread.Sleep(200); //Free cpu cycles
+							}
+						});
 					}
 					finally
 					{
@@ -278,6 +298,10 @@ namespace VisualMusic
 			createTrackViews(notes.Tracks.Count, options.EraseCurrent);
 			return true;
 		}
+
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		static extern bool IsIconic(IntPtr hWnd);
 
 		public bool openNoteFile(ImportOptions options)
 		{
