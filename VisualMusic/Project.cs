@@ -245,7 +245,7 @@ namespace VisualMusic
 					parentForm.Enabled = false;
 					try
 					{
-						FormWindowState initialWindowState = parentForm.WindowState;
+						FormWindowState initialWindowState = Program.form1.WindowState;
 						await Task.Run(() =>
 						{
 							//Minimize parent form when process form is minimized,
@@ -256,10 +256,10 @@ namespace VisualMusic
 							{
 								bool isMinimized = IsIconic(process.MainWindowHandle);
 								if (isMinimized && !wasMinimized)
-									parentForm.Invoke(new Action(() => parentForm.WindowState = FormWindowState.Minimized));
+									Program.form1.Invoke(new Action(() => Program.form1.WindowState = FormWindowState.Minimized));
 								else if (!isMinimized && wasMinimized)
 								{
-									parentForm.Invoke(new Action(() => parentForm.WindowState = initialWindowState));
+									Program.form1.Invoke(new Action(() => Program.form1.WindowState = initialWindowState));
 									Form1.regainFocus(process); //Prevent parentForm to steal focus from process when its initial window state is restored
 								}
 								wasMinimized = isMinimized;
@@ -270,7 +270,7 @@ namespace VisualMusic
 					finally
 					{
 						parentForm.Enabled = true;
-						parentForm.Activate();
+						Program.form1.Activate();
 					}
 					if (process.ExitCode != 0)
 						throw new FileImportException(null, ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
