@@ -448,6 +448,8 @@ namespace VisualMusic
 			try
 			{
 				SongPanel.SuspendPaint();
+				if (!parentForm.Visible)
+					parentForm = this;
 				if (! await Project.importSong(options, parentForm))
 					return false;
 				if (options.EraseCurrent)
