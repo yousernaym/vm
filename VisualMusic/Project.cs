@@ -251,16 +251,18 @@ namespace VisualMusic
 							//Minimize parent form when process form is minimized,
 							//and restore parent form when process form is restored
 							//Process form also needs to be restored if parent form is restored, which is done in Form1.Form1_Activated event handler
+							bool wasMinimized = false;
 							while (!process.HasExited)
 							{
-								bool minimized = IsIconic(process.MainWindowHandle);
-								if (minimized)
+								bool isMinimized = IsIconic(process.MainWindowHandle);
+								if (isMinimized && !wasMinimized)
 									parentForm.Invoke(new Action(() => parentForm.WindowState = FormWindowState.Minimized));
-								else
+								else if (!isMinimized && wasMinimized)
 								{
 									parentForm.Invoke(new Action(() => parentForm.WindowState = initialWindowState));
 									Form1.regainFocus(process); //Prevent parentForm to steal focus from process when its initial window state is restored
 								}
+								wasMinimized = isMinimized;
 								Thread.Sleep(200); //Free cpu cycles
 							}
 						});
