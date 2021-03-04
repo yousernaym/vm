@@ -2583,11 +2583,6 @@ namespace VisualMusic
 			trackList.RedrawItems(0, trackList.Items.Count - 1, false);
 		}
 
-		private void Form1_Activated(object sender, EventArgs e)
-		{
-			regainFocus(RemuxerProcess);
-		}
-
 		// required to use WINAPI for RegainFocus();
 		[System.Runtime.InteropServices.DllImport("user32.dll")]
 		private static extern int SetForegroundWindow(IntPtr hwnd);
@@ -2600,10 +2595,18 @@ namespace VisualMusic
 		{
 			if (process == null || process.HasExited)
 				return;
-			// SW_RESTORE = 9
-			ShowWindow(process.MainWindowHandle, 9);
+			const int SW_RESTORE = 9;
+			ShowWindow(process.MainWindowHandle, SW_RESTORE);
 			SetForegroundWindow(process.MainWindowHandle);
 			SetActiveWindow(process.MainWindowHandle);
+		}
+
+		private void Form1_Resize(object sender, EventArgs e)
+		{
+			if (WindowState == FormWindowState.Maximized)
+			{
+				regainFocus(RemuxerProcess);
+			}
 		}
 	}
 }
