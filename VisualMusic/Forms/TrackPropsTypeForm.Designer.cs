@@ -92,6 +92,8 @@
 			this.Controls.Add(this.spatialCb);
 			this.Controls.Add(this.materialCb);
 			this.Controls.Add(this.styleCb);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+			this.MinimizeBox = true;
 			this.Name = "TrackPropsTypeForm";
 			this.VisibleChanged += new System.EventHandler(this.TrackPropsTypeForm_VisibleChanged);
 			this.Controls.SetChildIndex(this.okBtn, 0);

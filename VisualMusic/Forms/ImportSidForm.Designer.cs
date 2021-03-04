@@ -43,11 +43,6 @@
 			// 
 			this.eraseCurrent.Location = new System.Drawing.Point(12, 217);
 			// 
-			// openNoteFileDlg
-			// 
-			this.openNoteFileDlg.Filter = "Sid files (*.sid; *.psid; *.dat; *.rsid; *.mus)|*.sid; *.psid; *.dat; *.rsid; *.m" +
-    "us|All files|*.*";
-			// 
 			// Ok
 			// 
 			this.Ok.Location = new System.Drawing.Point(243, 257);
@@ -61,10 +56,16 @@
 			// 
 			this.chTrackBtn.Location = new System.Drawing.Point(12, 263);
 			// 
+			// openNoteFileDlg
+			// 
+			this.openNoteFileDlg.Filter = "Sid files (*.sid; *.psid; *.dat; *.rsid; *.mus)|*.sid; *.psid; *.dat; *.rsid; *.m" +
+    "us|All files|*.*";
+			// 
 			// ImportSidForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.ClientSize = new System.Drawing.Size(411, 292);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Name = "ImportSidForm";
 			this.Load += new System.EventHandler(this.ImportSidForm_Load);
 			this.Shown += new System.EventHandler(this.ImportSidForm_Shown);

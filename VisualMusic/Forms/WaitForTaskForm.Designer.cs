@@ -63,6 +63,7 @@ namespace VisualMusic
 			this.ClientSize = new System.Drawing.Size(241, 45);
 			this.Controls.Add(this.messageLabel);
 			this.Controls.Add(this.cancelBtn);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.Name = "WaitForTaskForm";
 			this.ShowIcon = false;

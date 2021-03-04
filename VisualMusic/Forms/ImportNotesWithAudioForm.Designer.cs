@@ -123,10 +123,10 @@
 			this.label3.TabIndex = 13;
 			this.label3.Text = "Output folder";
 			// 
-			// tpartyAudioTb
+			// tpartyOutputTb
 			// 
 			this.tpartyOutputTb.Location = new System.Drawing.Point(85, 51);
-			this.tpartyOutputTb.Name = "tpartyAudioTb";
+			this.tpartyOutputTb.Name = "tpartyOutputTb";
 			this.tpartyOutputTb.Size = new System.Drawing.Size(249, 20);
 			this.tpartyOutputTb.TabIndex = 9;
 			// 
@@ -207,8 +207,10 @@
 			this.ClientSize = new System.Drawing.Size(415, 282);
 			this.Controls.Add(this.tPartyMixdownPnl);
 			this.Controls.Add(this.panel1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Name = "ImportNotesWithAudioForm";
-			//this.Controls.SetChildIndex(this.noteFilePath, 0);
+			this.Controls.SetChildIndex(this.chTrackBtn, 0);
+			this.Controls.SetChildIndex(this.insTrackBtn, 0);
 			this.Controls.SetChildIndex(this.panel1, 0);
 			this.Controls.SetChildIndex(this.tPartyMixdownPnl, 0);
 			this.Controls.SetChildIndex(this.BrowseAudioBtn, 0);

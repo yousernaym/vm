@@ -47,11 +47,6 @@
 			// 
 			this.eraseCurrent.Location = new System.Drawing.Point(12, 240);
 			// 
-			// openNoteFileDlg
-			// 
-			this.openNoteFileDlg.Filter = "Midi files (*.mid)|*.mid|All files (*.*)|*.*";
-			this.openNoteFileDlg.Title = "Open midi file";
-			// 
 			// Ok
 			// 
 			this.Ok.Location = new System.Drawing.Point(227, 234);
@@ -67,10 +62,16 @@
 			this.chTrackBtn.Location = new System.Drawing.Point(90, 240);
 			this.chTrackBtn.Visible = false;
 			// 
+			// openNoteFileDlg
+			// 
+			this.openNoteFileDlg.Filter = "Midi files (*.mid)|*.mid|All files (*.*)|*.*";
+			this.openNoteFileDlg.Title = "Open midi file";
+			// 
 			// ImportMidiForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.ClientSize = new System.Drawing.Size(400, 269);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Name = "ImportMidiForm";
 			this.Load += new System.EventHandler(this.ImportMidiForm_Load);
 			this.ResumeLayout(false);

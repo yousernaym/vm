@@ -88,6 +88,7 @@
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.yesBtn);
 			this.Controls.Add(this.noBtn);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "StopRenderingMb";

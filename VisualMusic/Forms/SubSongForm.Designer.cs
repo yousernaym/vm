@@ -59,9 +59,9 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(269, 104);
 			this.Controls.Add(this.subSongsLB);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Margin = new System.Windows.Forms.Padding(4);
-			this.MaximizeBox = false;
-			this.MinimizeBox = false;
+			this.MinimizeBox = true;
 			this.Name = "SubSongForm";
 			this.Text = "Select sub song";
 			this.Controls.SetChildIndex(this.okBtn, 0);

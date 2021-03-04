@@ -54,12 +54,6 @@
 			// 
 			this.eraseCurrent.Location = new System.Drawing.Point(12, 227);
 			// 
-			// openNoteFileDlg
-			// 
-			this.openNoteFileDlg.Filter = "Module files (*.xm; *.mod; *.it; *.s3m; *.stm) | *.xm; *.mod; *.it; *.s3m; *.stm " +
-    "| All files (*.*)| *.*";
-			this.openNoteFileDlg.Title = "Open module file";
-			// 
 			// Ok
 			// 
 			this.Ok.Location = new System.Drawing.Point(227, 267);
@@ -73,10 +67,17 @@
 			// 
 			this.chTrackBtn.Location = new System.Drawing.Point(12, 273);
 			// 
+			// openNoteFileDlg
+			// 
+			this.openNoteFileDlg.Filter = "Module files (*.xm; *.mod; *.it; *.s3m; *.stm) | *.xm; *.mod; *.it; *.s3m; *.stm " +
+    "| All files (*.*)| *.*";
+			this.openNoteFileDlg.Title = "Open module file";
+			// 
 			// ImportModForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.ClientSize = new System.Drawing.Size(400, 302);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Name = "ImportModForm";
 			this.Load += new System.EventHandler(this.ImportModForm_Load);
 			this.ResumeLayout(false);

@@ -143,9 +143,10 @@
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.BrowseAudioBtn);
 			this.Controls.Add(this.browseNoteBtn);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.Name = "SourceFileForm";
+			this.ShowInTaskbar = false;
 			this.Load += new System.EventHandler(this.SourceFileForm_Load);
 			this.VisibleChanged += new System.EventHandler(this.SourceFileForm_VisibleChanged);
 			this.ResumeLayout(false);

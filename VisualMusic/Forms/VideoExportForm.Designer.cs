@@ -183,6 +183,7 @@
 			this.Controls.Add(this.sphericalMetadataCb);
 			this.Controls.Add(this.stereoscopicCb);
 			this.Controls.Add(this.sphereCb);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Name = "VideoExportForm";
 			this.Controls.SetChildIndex(this.okBtn, 0);
 			this.Controls.SetChildIndex(this.cancelBtn, 0);

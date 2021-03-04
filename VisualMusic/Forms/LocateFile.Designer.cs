@@ -114,6 +114,7 @@
 			this.Controls.Add(this.cancelBtn);
 			this.Controls.Add(this.findInFolderBtn);
 			this.Controls.Add(this.findFileBtn);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.Name = "LocateFile";
 			this.ShowIcon = false;

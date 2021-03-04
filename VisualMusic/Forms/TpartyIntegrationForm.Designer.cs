@@ -133,8 +133,8 @@
 			this.Controls.Add(this.modulesCb);
 			this.Controls.Add(this.xmPlayLink);
 			this.Controls.Add(this.importXmPlayBtn);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
-			this.MinimizeBox = false;
 			this.Name = "TpartyIntegrationForm";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;

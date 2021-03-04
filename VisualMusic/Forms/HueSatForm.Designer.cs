@@ -61,6 +61,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(280, 282);
 			this.Controls.Add(this.twoDHueSat1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Name = "HueSatForm";
 			this.Text = "Hue/Saturation picker";
 			this.Controls.SetChildIndex(this.okBtn, 0);
