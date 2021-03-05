@@ -2593,8 +2593,6 @@ namespace VisualMusic
 
 		static public void regainFocus(Process process)
 		{
-			if (process == null || process.HasExited)
-				return;
 			const int SW_RESTORE = 9;
 			ShowWindow(process.MainWindowHandle, SW_RESTORE);
 			SetForegroundWindow(process.MainWindowHandle);
@@ -2603,10 +2601,15 @@ namespace VisualMusic
 
 		private void Form1_Resize(object sender, EventArgs e)
 		{
-			if (WindowState == FormWindowState.Maximized)
+			if (RemuxerProcess == null || RemuxerProcess.HasExited)
+				return;
+			if (WindowState == FormWindowState.Minimized)
 			{
-				regainFocus(RemuxerProcess);
+				const int SW_MINIMIZE = 6;
+				ShowWindow(RemuxerProcess.MainWindowHandle, SW_MINIMIZE);
 			}
+			else
+				regainFocus(RemuxerProcess);
 		}
 	}
 }
