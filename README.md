@@ -13,8 +13,8 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
 
 * Install [Visual Studio](https://visualstudio.microsoft.com/) with the following workloads:
   * .NET desktop development
-  * Desktop development with C++  
-  * MSVC *version_numbers* C++ x64/x86 Spectre-mitigated libs (*version_number*)  
+  * Desktop development with C++
+  * Individual components -> MSVC <version> C++ x64/x86 Spectre-mitigated libs (Latest)
 * Install Vcpkg, Fluidsynth and Ffmpeg:
     ```
     git clone https://github.com/microsoft/vcpkg.git
@@ -24,11 +24,11 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
     vcpkg install fluidsynth:x64-windows
     vcpkg install ffmpeg[x264]:x64-windows
     ```
-* Download this repo including submodules:
+* Clone repo with submodules:
 ```
     git clone --recurse-submodules https://github.com/yousernaym/vm.git
 ``` 
-* Open VisualMusic.sln in Visual Studio and build (if compilation of Content.mgcb fails, restart Visual Studio)
+* Build vm\VisualMusic.sln
 * (Optional) To get General Midi audio, place a [soundfont file](https://musescore.org/en/node/109371) named `soundfont.sf2` in the exe folder
 
 ## Basic usage
@@ -49,8 +49,8 @@ Changes to supported properties will be stored in the currently highlighted key 
 ## Sub projects
 
 #### [Remuxer](https://github.com/yousernaym/remuxer)  
-* Mod import, based on [libmikmod](http://mikmod.sourceforge.net/) and [libopenmpt](https://lib.openmpt.org/libopenmpt/)
-* Sid import, based on [libsidplayfp](https://sourceforge.net/projects/sidplay-residfp/)
+* Mod import, based on [libmikmod](https://github.com/sezero/mikmod) and [libopenmpt](https://lib.openmpt.org/libopenmpt/)
+* Sid import, based on [libsidplayfp](https://github.com/libsidplayfp/sidplayfp)
 #### [Midilib](https://github.com/yousernaym/midilib)
 * Midi import
 #### [MidMix](https://github.com/yousernaym/midmix)
