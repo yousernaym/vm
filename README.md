@@ -11,14 +11,17 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
 
 ## Building the source
 
-* Install [Visual Studio](https://visualstudio.microsoft.com/) with the following workloads:
+* Install [Visual Studio](https://visualstudio.microsoft.com/) with the following components:
+* Workloads
   * .NET desktop development
   * Desktop development with C++
-  * Individual components -> MSVC <version> C++ x64/x86 Spectre-mitigated libs (Latest)
+* Individual components
+  * MSVC <version> C++ x64/x86 Spectre-mitigated libs (Latest)
 * Install Vcpkg, Fluidsynth and Ffmpeg:
     ```
     git clone https://github.com/microsoft/vcpkg.git
     cd vcpkg
+    git checkout aebb363eaa0b658beb19cbefdd5aa2f9cbc14f1e
     bootstrap-vcpkg.bat
     vcpkg integrate install
     vcpkg install fluidsynth:x64-windows

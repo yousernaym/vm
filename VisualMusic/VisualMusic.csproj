@@ -336,9 +336,7 @@
     <None Include="Resources\MidiFormats.txt" />
     <None Include="Resources\SidFormats.txt" />
     <Content Include="todo.txt" />
-    <None Include="xmplay.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="xmplay.ini" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
