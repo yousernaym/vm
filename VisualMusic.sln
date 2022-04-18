@@ -17,7 +17,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36B4ABDD-6238-44FB-8EF4-119823880343}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		README.md = README.md
 		InnoSetup\visual music setup script.iss = InnoSetup\visual music setup script.iss
 	EndProjectSection
 EndProject
@@ -59,6 +58,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.WindowsDX", "Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj", "{1A830217-9137-4208-AC8C-C0512BE4E082}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Remuxer folder", "Remuxer folder", "{BEDBDAFB-EA4C-408A-8885-43C13C49A43F}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		Dependencies\Remuxer\README.md = Dependencies\Remuxer\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libRemuxer sub projects", "libRemuxer sub projects", "{72FFC588-33D1-47EA-980B-183B73954F38}"
 EndProject

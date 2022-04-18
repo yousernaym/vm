@@ -1,4 +1,4 @@
-# Visual Music
+ Visual Music
 
 A Windows app that visualizes note-based music files, inspired by Stephen Malinovski's [MAM videos](https://www.youtube.com/user/smalin).  
 Supports midi, tracker and sid files. Can produce accompanying audio automatically or you can supply your own mixed-down audio file.  
@@ -11,12 +11,12 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
 
 ## Building the source
 
-* Install [Visual Studio](https://visualstudio.microsoft.com/) with the following components:
-* Workloads
-  * .NET desktop development
-  * Desktop development with C++
-* Individual components
-  * MSVC <version> C++ x64/x86 Spectre-mitigated libs (Latest)
+* Install [Visual Studio 2022](https://visualstudio.microsoft.com/) with the following components:
+  * Workloads
+    * .NET desktop development
+    * Desktop development with C++
+  * Individual components
+    * MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest)
 * Install Vcpkg, Fluidsynth and Ffmpeg:
     ```
     git clone https://github.com/microsoft/vcpkg.git
@@ -32,7 +32,7 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
     git clone --recurse-submodules https://github.com/yousernaym/vm.git
 ``` 
 * Build vm\VisualMusic.sln
-* (Optional) To get General Midi audio, place a [soundfont file](https://musescore.org/en/node/109371) named `soundfont.sf2` in the exe folder
+* (Optional) To get audio from midi files, place a [soundfont file](https://musescore.org/en/node/109371) named `soundfont.sf2` in the exe folder
 
 ## Basic usage
 
@@ -51,24 +51,14 @@ Changes to supported properties will be stored in the currently highlighted key 
 
 ## Sub projects
 
-#### [Remuxer](https://github.com/yousernaym/remuxer)  
-* Mod import, based on [libmikmod](https://github.com/sezero/mikmod) and [libopenmpt](https://lib.openmpt.org/libopenmpt/)
-* Sid import, based on [libsidplayfp](https://github.com/libsidplayfp/sidplayfp)
-#### [Midilib](https://github.com/yousernaym/midilib)
-* Midi import
-#### [MidMix](https://github.com/yousernaym/midmix)
-* General Midi audio, based on [Fluidsynth](http://www.fluidsynth.org/)
-#### [Media](https://github.com/yousernaym/media)
-* Video export, based on [Ffmpeg]()
-* Audio playback, based on [Media Foundation](https://docs.microsoft.com/en-us/windows/win32/medfound/microsoft-media-foundation-sdk)
-#### [MonoGame fork](https://github.com/yousernaym/monogame)
-* Graphics
-* The fork contains a ConstantBuffer fix and a Curve optimization, both necessary for Visual Music to function properly
+* [Remuxer](https://github.com/yousernaym/remuxer) (command-line tool) - Converts tracker and sid files to midi/wav. Based on libRemuxer which is based on the third-party libraries libsidplayfp, libmikmod and libopenmpt. libRemuxer should ideally have been linked directly to Visual Music but was not, because of a conflict between the Monogame and libsidplayfp licenses.
+* [Midilib](https://github.com/yousernaym/midilib) (C# library) - Midi parser
+* [MidMix](https://github.com/yousernaym/midmix) (C++ library) - Audio mixdown for midi files, based on [Fluidsynth](http://www.fluidsynth.org/)
+* [Media](https://github.com/yousernaym/media) (C++ library)
+  * Video export, based on [Ffmpeg](https://ffmpeg.org/doxygen/trunk/index.html)
+  * Audio playback, based on [Media Foundation](https://docs.microsoft.com/en-us/windows/win32/medfound/microsoft-media-foundation-sdk)
 
 ## Third-party projects
-* [CefSharp](https://github.com/cefsharp/CefSharp) - Web browser (Nuget packages)
-* [XNA for WinForms](https://github.com/SimonDarksideJ/XNAGameStudio/wiki/WinForms-Series-1-Graphics-Device) - Integration of MonoGame with Winforms (C# code)
-
-## Author
-
-[Michael Hällström](mailto:mickehapps@outlook.com)
+* [MonoGame](https://github.com/yousernaym/monogame) (C# library) - Graphics (with a few forked changes necessary for Visual Music to function properly)
+* [CefSharp](https://github.com/cefsharp/CefSharp) (C# library) - Web browser
+* [XNA for WinForms](https://github.com/SimonDarksideJ/XNAGameStudio/wiki/WinForms-Series-1-Graphics-Device) (C# code) - Integration of MonoGame with Winforms
