@@ -8,9 +8,9 @@
 #endregion
 
 #region Using Statements
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Threading;
-using Microsoft.Xna.Framework.Graphics;
 #endregion
 
 // The IGraphicsDeviceService interface requires a DeviceCreated event, but we
@@ -58,13 +58,13 @@ namespace WinFormsGraphicsDevice
             parameters.BackBufferFormat = SurfaceFormat.Color;
             parameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
             parameters.DeviceWindowHandle = windowHandle;
-			//parameters.PresentationInterval = PresentInterval.Immediate;
-			parameters.PresentationInterval = PresentInterval.One;
-			parameters.IsFullScreen = false;
-			parameters.MultiSampleCount = 8;
-			
-			graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.HiDef, parameters);
-		}
+            //parameters.PresentationInterval = PresentInterval.Immediate;
+            parameters.PresentationInterval = PresentInterval.One;
+            parameters.IsFullScreen = false;
+            parameters.MultiSampleCount = 8;
+
+            graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.HiDef, parameters);
+        }
 
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace WinFormsGraphicsDevice
             }
         }
 
-        
+
         /// <summary>
         /// Resets the graphics device to whichever is bigger out of the specified
         /// resolution or its current size. This behavior means the device will
@@ -128,7 +128,7 @@ namespace WinFormsGraphicsDevice
                 DeviceReset(this, EventArgs.Empty);
         }
 
-        
+
         /// <summary>
         /// Gets the current graphics device.
         /// </summary>

@@ -2,95 +2,92 @@
 //
 // Use of this source code is governed by a BSD-style license that can be found in the LICENSE file.
 
+using CefSharp;
+using CefSharp.Example;
+using CefSharp.WinForms;
+using CefSharp.WinForms.Example.Handlers;
 using System;
 using System.Windows.Forms;
-using CefSharp;
-using CefSharp.WinForms;
-using System.Net;
-using System.IO;
-using System.Linq;
-using CefSharp.WinForms.Example.Handlers;
-using CefSharp.Example;
 
 namespace VisualMusic
 {
     public partial class SongWebBrowser : UserControl
     {
-		readonly ChromiumWebBrowser browser;
-		readonly Form1 mainForm;
+        readonly ChromiumWebBrowser browser;
+        readonly Form1 mainForm;
 
-		public string[] SongFormats { get; set; }
-		public string Url
-		{
-			get => urlTextBox.Text;
-			set
-			{
-				string prefix = "";
-				if (!value.Contains(@"://"))
-					prefix = "https://";
-				urlTextBox.Text = prefix + value;
-				try
-				{
-					if (Uri.IsWellFormedUriString(urlTextBox.Text, UriKind.RelativeOrAbsolute))
-					{
-						browser.Load(urlTextBox.Text);
-					}
-				}
-				catch (FormatException)
-				{
+        public string[] SongFormats { get; set; }
+        public string Url
+        {
+            get => urlTextBox.Text;
+            set
+            {
+                string prefix = "";
+                if (!value.Contains(@"://"))
+                    prefix = "https://";
+                urlTextBox.Text = prefix + value;
+                try
+                {
+                    if (Uri.IsWellFormedUriString(urlTextBox.Text, UriKind.RelativeOrAbsolute))
+                    {
+                        browser.Load(urlTextBox.Text);
+                    }
+                }
+                catch (FormatException)
+                {
 
-				}
-			}
-		}
+                }
+            }
+        }
 
-		public SongWebBrowser(Form1 form1, string urlString = "")
+        public SongWebBrowser(Form1 form1, string urlString = "")
         {
             InitializeComponent();
 
-			mainForm = form1;
-			browser = new ChromiumWebBrowser("")
+            mainForm = form1;
+            browser = new ChromiumWebBrowser("")
             {
                 Dock = DockStyle.Fill,
-				KeyboardHandler = new KeyboardHandler(mainForm)
-			};
+                KeyboardHandler = new KeyboardHandler(mainForm)
+            };
 
-			DownloadHandler downloadHandler = new DownloadHandler();
-			downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
-			downloadHandler.ShowDialog = false;
-			browser.DownloadHandler = downloadHandler;
-			toolStripContainer.ContentPanel.Controls.Add(browser);
+            DownloadHandler downloadHandler = new DownloadHandler();
+            downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
+            downloadHandler.ShowDialog = false;
+            browser.DownloadHandler = downloadHandler;
+            toolStripContainer.ContentPanel.Controls.Add(browser);
 
-			browser.LoadingStateChanged += OnLoadingStateChanged;
+            browser.LoadingStateChanged += OnLoadingStateChanged;
             browser.ConsoleMessage += OnBrowserConsoleMessage;
             browser.StatusMessage += OnBrowserStatusMessage;
             browser.TitleChanged += OnBrowserTitleChanged;
             browser.AddressChanged += OnBrowserAddressChanged;
-			
-			var bitness = Environment.Is64BitProcess ? "x64" : "x86";
+
+            var bitness = Environment.Is64BitProcess ? "x64" : "x86";
             Url = urlString;
         }
 
-		private void OnBeforeDownload(object sender, DownloadItem e)
-		{
-			e.IsCancelled = true;
-			string fileName = e.SuggestedFileName;
+        private void OnBeforeDownload(object sender, DownloadItem e)
+        {
+            e.IsCancelled = true;
+            string fileName = e.SuggestedFileName;
 
-			SourceFileForm importForm = mainForm.getImportFormFromFileType(fileName);
-			if (importForm != null)
-			{
-				string url = string.Copy(e.Url);
-				this.InvokeOnUiThreadIfRequired(delegate
-				{
-					importForm.NoteFilePath = url;
-					importForm.AudioFilePath = "";
-					importForm.EraseCurrent = true;
-					//importForm.ShowDialog();
-					importForm.importFiles();
-				});
-			}
-		}
-		
-		private void OnBrowserConsoleMessage(object sender, ConsoleMessageEventArgs args)
+            SourceFileForm importForm = mainForm.getImportFormFromFileType(fileName);
+            if (importForm != null)
+            {
+                string url = string.Copy(e.Url);
+                this.InvokeOnUiThreadIfRequired(delegate
+                {
+                    importForm.NoteFilePath = url;
+                    importForm.AudioFilePath = "";
+                    importForm.EraseCurrent = true;
+                    //importForm.ShowDialog();
+                    importForm.importFiles();
+                });
+            }
+        }
+
+        private void OnBrowserConsoleMessage(object sender, ConsoleMessageEventArgs args)
         {
             //DisplayOutput(string.Format("Line: {0}, Source: {1}, Message: {2}", args.Line, args.Source, args.Message));
         }
@@ -104,12 +101,12 @@ namespace VisualMusic
         {
             SetCanGoBack(args.CanGoBack);
             SetCanGoForward(args.CanGoForward);
-			this.InvokeOnUiThreadIfRequired(delegate
-			{
-				SetIsLoading(!args.CanReload);
-				Focus();
-			});
-		}
+            this.InvokeOnUiThreadIfRequired(delegate
+            {
+                SetIsLoading(!args.CanReload);
+                Focus();
+            });
+        }
 
         private void OnBrowserTitleChanged(object sender, TitleChangedEventArgs args)
         {
@@ -174,9 +171,9 @@ namespace VisualMusic
         private void BackButtonClick(object sender, EventArgs e)
         {
             browser.Back();
-			//browser.Load("http://www.prg.dtu.dk/HVSC/HVSC_68-all-of-them.zip");
+            //browser.Load("http://www.prg.dtu.dk/HVSC/HVSC_68-all-of-them.zip");
 
-		}
+        }
 
         private void ForwardButtonClick(object sender, EventArgs e)
         {
@@ -201,29 +198,29 @@ namespace VisualMusic
             }
         }
 
-		private void toolStripContainer_ContentPanel_Enter(object sender, EventArgs e)
-		{
-			urlTextBox.Focus();
-		}
-	}
+        private void toolStripContainer_ContentPanel_Enter(object sender, EventArgs e)
+        {
+            urlTextBox.Focus();
+        }
+    }
 
-	static class ControlExtensions
-	{
-		/// <summary>
-		/// Executes the Action asynchronously on the UI thread, does not block execution on the calling thread.
-		/// </summary>
-		/// <param name="control">the control for which the update is required</param>
-		/// <param name="action">action to be performed on the control</param>
-		public static void InvokeOnUiThreadIfRequired(this Control control, Action action)
-		{
-			if (control.InvokeRequired)
-			{
-				control.BeginInvoke(action);
-			}
-			else
-			{
-				action.Invoke();
-			}
-		}
-	}
+    static class ControlExtensions
+    {
+        /// <summary>
+        /// Executes the Action asynchronously on the UI thread, does not block execution on the calling thread.
+        /// </summary>
+        /// <param name="control">the control for which the update is required</param>
+        /// <param name="action">action to be performed on the control</param>
+        public static void InvokeOnUiThreadIfRequired(this Control control, Action action)
+        {
+            if (control.InvokeRequired)
+            {
+                control.BeginInvoke(action);
+            }
+            else
+            {
+                action.Invoke();
+            }
+        }
+    }
 }

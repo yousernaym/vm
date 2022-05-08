@@ -7,25 +7,25 @@ namespace CefSharp.WinForms.Example.Handlers
 {
     public class KeyboardHandler : IKeyboardHandler
     {
-		Form1 form1;
-		public KeyboardHandler(Form1 form)
-		{
-			form1 = form;
-		}
-		/// <inheritdoc/>>
-		public bool OnPreKeyEvent(IWebBrowser browserControl, IBrowser browser, KeyType type, int windowsKeyCode, int nativeKeyCode, CefEventFlags modifiers, bool isSystemKey, ref bool isKeyboardShortcut)
+        Form1 form1;
+        public KeyboardHandler(Form1 form)
         {
-			if (windowsKeyCode == 179) //Play/pause
-			{
-				form1.BeginInvoke(new Action(() => form1.Project.togglePlayback()));
-				return true;
-			}
-			//if (!(modifiers == CefEventFlags.ControlDown || modifiers == CefEventFlags.ShiftDown || modifiers == CefEventFlags.AltDown))
-			//{
-			//	if (windowsKeyCode < 112 || windowsKeyCode > 123 || nativeKeyCode == 0)
-			//		return false;
-			//}
-			const int WM_SYSKEYDOWN = 0x104;
+            form1 = form;
+        }
+        /// <inheritdoc/>>
+        public bool OnPreKeyEvent(IWebBrowser browserControl, IBrowser browser, KeyType type, int windowsKeyCode, int nativeKeyCode, CefEventFlags modifiers, bool isSystemKey, ref bool isKeyboardShortcut)
+        {
+            if (windowsKeyCode == 179) //Play/pause
+            {
+                form1.BeginInvoke(new Action(() => form1.Project.togglePlayback()));
+                return true;
+            }
+            //if (!(modifiers == CefEventFlags.ControlDown || modifiers == CefEventFlags.ShiftDown || modifiers == CefEventFlags.AltDown))
+            //{
+            //	if (windowsKeyCode < 112 || windowsKeyCode > 123 || nativeKeyCode == 0)
+            //		return false;
+            //}
+            const int WM_SYSKEYDOWN = 0x104;
             const int WM_KEYDOWN = 0x100;
             const int WM_KEYUP = 0x101;
             const int WM_SYSKEYUP = 0x105;
@@ -39,10 +39,10 @@ namespace CefSharp.WinForms.Example.Handlers
 
             isKeyboardShortcut = false;
 
-			// Don't deal with TABs by default:
-			// TODO: Are there any additional ones we need to be careful of?
-			// i.e. Escape, Return, etc...?
-			if (windowsKeyCode == VK_TAB || windowsKeyCode == VK_LEFT || windowsKeyCode == VK_UP || windowsKeyCode == VK_DOWN || windowsKeyCode == VK_RIGHT)
+            // Don't deal with TABs by default:
+            // TODO: Are there any additional ones we need to be careful of?
+            // i.e. Escape, Return, etc...?
+            if (windowsKeyCode == VK_TAB || windowsKeyCode == VK_LEFT || windowsKeyCode == VK_UP || windowsKeyCode == VK_DOWN || windowsKeyCode == VK_RIGHT)
             {
                 return false;
             }
@@ -53,39 +53,39 @@ namespace CefSharp.WinForms.Example.Handlers
             var msgType = 0;
             switch (type)
             {
-            case KeyType.RawKeyDown:
-                if (isSystemKey)
-                {
-                    msgType = WM_SYSKEYDOWN;
-                }
-                else
-                {
-                    msgType = WM_KEYDOWN;
-                }
-                break;
-            case KeyType.KeyUp:
-                if (isSystemKey)
-                {
-                    msgType = WM_SYSKEYUP;
-                }
-                else
-                {
-                    msgType = WM_KEYUP;
-                }
-                break;
-            case KeyType.Char:
-                if (isSystemKey)
-                {
-                    msgType = WM_SYSCHAR;
-                }
-                else
-                {
-                    msgType = WM_CHAR;
-                }
-                break;
-            default:
-                Trace.Assert(false);
-                break;
+                case KeyType.RawKeyDown:
+                    if (isSystemKey)
+                    {
+                        msgType = WM_SYSKEYDOWN;
+                    }
+                    else
+                    {
+                        msgType = WM_KEYDOWN;
+                    }
+                    break;
+                case KeyType.KeyUp:
+                    if (isSystemKey)
+                    {
+                        msgType = WM_SYSKEYUP;
+                    }
+                    else
+                    {
+                        msgType = WM_KEYUP;
+                    }
+                    break;
+                case KeyType.Char:
+                    if (isSystemKey)
+                    {
+                        msgType = WM_SYSCHAR;
+                    }
+                    else
+                    {
+                        msgType = WM_CHAR;
+                    }
+                    break;
+                default:
+                    Trace.Assert(false);
+                    break;
             }
             // We have to adapt from CEF's UI thread message loop to our fronting WinForm control here.
             // So, we have to make some calls that Application.Run usually ends up handling for us:
@@ -112,11 +112,11 @@ namespace CefSharp.WinForms.Example.Handlers
                 }
                 else
                 {
-					// Next we see if our control (or one of its parents)
-					// wants first crack at the message via several possible Control methods.
-					// This includes things like Mnemonics/Accelerators/Menu Shortcuts/etc...
-					if (nativeKeyCode != 0)
-						state = control.PreProcessControlMessage(ref msg);
+                    // Next we see if our control (or one of its parents)
+                    // wants first crack at the message via several possible Control methods.
+                    // This includes things like Mnemonics/Accelerators/Menu Shortcuts/etc...
+                    if (nativeKeyCode != 0)
+                        state = control.PreProcessControlMessage(ref msg);
                 }
             }));
 
@@ -127,13 +127,13 @@ namespace CefSharp.WinForms.Example.Handlers
             }
             else if (state == PreProcessControlState.MessageProcessed)
             {
-				// Most of the interesting cases get processed by PreProcessControlMessage.
-				result = true;
+                // Most of the interesting cases get processed by PreProcessControlMessage.
+                result = true;
             }
-			
-			Debug.WriteLine("OnPreKeyEvent: KeyType: {0} 0x{1:X} Modifiers: {2}", type, windowsKeyCode, modifiers);
+
+            Debug.WriteLine("OnPreKeyEvent: KeyType: {0} 0x{1:X} Modifiers: {2}", type, windowsKeyCode, modifiers);
             Debug.WriteLine("OnPreKeyEvent PreProcessControlState: {0}", state);
-	        return result;
+            return result;
         }
 
         /// <inheritdoc/>>

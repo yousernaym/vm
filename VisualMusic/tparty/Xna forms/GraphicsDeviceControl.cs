@@ -8,11 +8,11 @@
 #endregion
 
 #region Using Statements
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Drawing;
-using System.Windows.Forms;
-using Microsoft.Xna.Framework.Graphics;
 using System.Threading;
+using System.Windows.Forms;
 #endregion
 
 namespace WinFormsGraphicsDevice
@@ -30,12 +30,12 @@ namespace WinFormsGraphicsDevice
     /// </summary>
     abstract public class GraphicsDeviceControl : Control
     {
-		#region Fields
-		protected readonly object renderLock = new object();
+        #region Fields
+        protected readonly object renderLock = new object();
 
-		// However many GraphicsDeviceControl instances you have, they all share
-		// the same underlying GraphicsDevice, managed by this helper service.
-		GraphicsDeviceService graphicsDeviceService;
+        // However many GraphicsDeviceControl instances you have, they all share
+        // the same underlying GraphicsDevice, managed by this helper service.
+        GraphicsDeviceService graphicsDeviceService;
 
 
         #endregion
@@ -64,15 +64,15 @@ namespace WinFormsGraphicsDevice
 
         ServiceContainer services = new ServiceContainer();
 
-		#endregion
+        #endregion
 
-		#region Initialization
+        #region Initialization
 
 
-		/// <summary>
-		/// Initializes the control.
-		/// </summary>
-		protected override void OnCreateControl()
+        /// <summary>
+        /// Initializes the control.
+        /// </summary>
+        protected override void OnCreateControl()
         {
             // Don't initialize the graphics device if we are running in the designer.
             if (!DesignMode)
@@ -117,34 +117,34 @@ namespace WinFormsGraphicsDevice
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
-			bool locked = false;
-			try
-			{
-				if (!Monitor.TryEnter(renderLock, 0))
-					return;
+            bool locked = false;
+            try
+            {
+                if (!Monitor.TryEnter(renderLock, 0))
+                    return;
 
-				locked = true;
-				string beginDrawError = BeginDraw();
+                locked = true;
+                string beginDrawError = BeginDraw();
 
-				if (string.IsNullOrEmpty(beginDrawError))
-				{
-					// Draw the control using the GraphicsDevice.
-					Draw();
-					EndDraw();
-				}
-				else
-				{
-					// If BeginDraw failed, show an error message using System.Drawing.
-					PaintUsingSystemDrawing(e.Graphics, beginDrawError);
-				}
+                if (string.IsNullOrEmpty(beginDrawError))
+                {
+                    // Draw the control using the GraphicsDevice.
+                    Draw();
+                    EndDraw();
+                }
+                else
+                {
+                    // If BeginDraw failed, show an error message using System.Drawing.
+                    PaintUsingSystemDrawing(e.Graphics, beginDrawError);
+                }
 
-			}
-			finally
-			{
-				if (locked)
-					Monitor.Exit(renderLock);
-			}
-			
+            }
+            finally
+            {
+                if (locked)
+                    Monitor.Exit(renderLock);
+            }
+
         }
 
 
@@ -183,7 +183,7 @@ namespace WinFormsGraphicsDevice
             //viewport.Height = ClientSize.Height;
             viewport.Width = GraphicsDevice.PresentationParameters.BackBufferWidth;
             viewport.Height = GraphicsDevice.PresentationParameters.BackBufferHeight;
-            
+
             viewport.MinDepth = 0;
             viewport.MaxDepth = 1;
 
