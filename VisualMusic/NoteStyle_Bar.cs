@@ -96,7 +96,7 @@ namespace VisualMusic
 
 				//Create inctance data
 				Vector2 topLeft_world = new Vector2(noteStart.X, noteStart.Y - halfNoteHeight);
-				Vector2 size_world = new Vector2(noteEnd.X - noteStart.X + 0.001f, halfNoteHeight * 2 - 0.001f);
+				Vector2 size_world = new Vector2(noteEnd.X - noteStart.X, halfNoteHeight * 2 - 0.001f);
 				Vector2 topLeft_tex = topLeft_world;
 				Vector2 size_tex = size_world;
 

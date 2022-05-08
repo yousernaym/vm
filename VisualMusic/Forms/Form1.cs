@@ -395,8 +395,7 @@ namespace VisualMusic
 			undoItems.add("", Project);
 			updateUndoRedoDesc();
 			//project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
-			songScrollBar.SmallChange = Project.SmallScrollStepT;
-			songScrollBar.LargeChange = Project.LargeScrollStepT;
+			UpdateScrollBarChange();
 			changeToScreen(SongPanel);
 		}
 
@@ -574,19 +573,24 @@ namespace VisualMusic
 		}
 
 		private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
-		{
-			songScrollBar.SmallChange = Project.SmallScrollStepT;
-			songScrollBar.LargeChange = Project.LargeScrollStepT;
-			if (updatingControls)
-				return;
-			foreach (var keyFrame in Project.KeyFrames.Values)
-			{
-				if (keyFrame.Selected)
-					keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
-			}
-		}
+        {
+            UpdateScrollBarChange();
+            if (updatingControls)
+                return;
+            foreach (var keyFrame in Project.KeyFrames.Values)
+            {
+                if (keyFrame.Selected)
+                    keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
+            }
+        }
 
-		private void audioOffsetS_ValueChanged(object sender, EventArgs e)
+        private void UpdateScrollBarChange()
+        {
+            songScrollBar.SmallChange = Math.Max(Project.SmallScrollStepT, 0);
+            songScrollBar.LargeChange = Math.Max(Project.LargeScrollStepT, 0);
+        }
+
+        private void audioOffsetS_ValueChanged(object sender, EventArgs e)
 		{
 			Project.Props.AudioOffset = (float)audioOffsetS.Value;
 		}

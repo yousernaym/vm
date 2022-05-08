@@ -1,6 +1,7 @@
 ﻿Todo:
-- Fix interpolation of viewport width. Re-tesselate using hardware tesselation (when Monogame supports it)
+- Fix viewport width change for lines
 - Keyframe interpolation of all/most properties
+- Use hardware tesselation for lines (when Monogame supports it)
 - Individual world matrices  for different tracks
 - Normal/parallax mapping.
 - Increase minimum width for ribbons.

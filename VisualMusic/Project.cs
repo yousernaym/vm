@@ -779,10 +779,10 @@ namespace VisualMusic
 			NormSongPos = 0;
 		}
 
-		public Vector2 getScreenPos(int timeS, int pitch)
+		public Vector2 getScreenPos(int timeT, int pitch)
 		{
 			Vector2 p = new Vector2();
-			p.X = getScreenPosX(timeS);
+			p.X = getScreenPosX(timeT);
 			p.Y = getScreenPosY((float)pitch);
 			return p;
 		}

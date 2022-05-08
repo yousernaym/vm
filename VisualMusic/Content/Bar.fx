@@ -21,15 +21,19 @@ VSOutput VS(VSInput IN)
 {
 	VSOutput OUT;
 	OUT.worldPos = float4(IN.rect.xy + IN.normPos * IN.rect.zw, 0, 1); //top-left + 0|1 * size
+	if (IN.normPos.x == 1)
+		OUT.worldPos.x += 0.001f / VertWidthScale;
 	OUT.pos = wvpTransform(OUT.worldPos, VertWidthScale);
-    OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw - TexScrollOffset;
-    float4 scaledRect = IN.rect * VertWidthScale;
+	TexScrollOffset.x /= VertWidthScale;
+	OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw - TexScrollOffset;
+	OUT.texCoords.x *= VertWidthScale;
+	float4 scaledRect = IN.rect * VertWidthScale;
     if (scaledRect.x < SongPos && scaledRect.x + scaledRect.z > SongPos)
 		OUT.color = HlColor;
 	else
 		OUT.color = Color;
 	OUT.normPos = IN.normPos;// *2 - 1;
-    OUT.worldSize = scaledRect.zw;
+    OUT.worldSize.x = scaledRect.z;
     return OUT;
 }
 

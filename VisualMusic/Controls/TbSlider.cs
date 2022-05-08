@@ -69,12 +69,15 @@ namespace VisualMusic
 		    {
 		        max = value;
 		        trackBar1.Maximum = (int)((max - min) * decimalScale);
-
 		    }
 		}
 		public double Value
 		{
-			set { textBox1.Text = value.ToString("f" + (expBase >=0 ? decimals2 : decimals)); }
+			set 
+			{
+				if (value != Value)
+					textBox1.Text = value.ToString("f" + (expBase >=0 ? decimals2 : decimals)); 
+			}
 			get 
 			{
 				try
