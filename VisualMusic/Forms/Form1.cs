@@ -386,11 +386,8 @@ namespace VisualMusic
 			saveTrackPropsToolStripMenuItem.Enabled = loaded;
 			insertKeyFrameToolStripMenuItem.Enabled = loaded;
 
-			//if (loaded)
-			//{
 			createTrackList();
 			updateTrackPropsControls();
-			//}
 			updateProjPropsControls();
 
 			undoItems.clear();
@@ -398,7 +395,8 @@ namespace VisualMusic
 			undoItems.add("", Project);
 			updateUndoRedoDesc();
 			//project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
-			//upDownVpWidth_ValueChanged(upDownVpWidth, EventArgs.Empty);
+			songScrollBar.SmallChange = Project.SmallScrollStepT;
+			songScrollBar.LargeChange = Project.LargeScrollStepT;
 			changeToScreen(SongPanel);
 		}
 
