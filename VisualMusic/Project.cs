@@ -38,7 +38,7 @@ namespace VisualMusic
         double pbStartSongTimeS;
         public float ViewWidthT => notes == null ? 0 : Props.ViewWidthQn * notes.TicksPerBeat; //Number of ticks that fits on screen
         float vertViewWidthQn;
-        public float FxViewWidthQnScale => vertViewWidthQn / Props.ViewWidthQn;
+        public float ViewWidthQnScale => vertViewWidthQn / Props.ViewWidthQn;
 
         public ImportOptions ImportOptions { get; set; }
 

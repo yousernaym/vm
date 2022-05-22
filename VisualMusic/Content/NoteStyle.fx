@@ -104,8 +104,8 @@ int ActiveModEntries;
 float4 wvpTransform(inout float4 vertPos, float widthScale)
 {
 	//Transform to world space
-	vertPos.xyz += PosOffset;
 	vertPos.x *= widthScale;
+	vertPos.xyz += PosOffset;
 	vertPos.x -= SongPos;
 	vertPos = mul(vertPos, WorldMat);
 	

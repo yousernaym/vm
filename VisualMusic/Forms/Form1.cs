@@ -557,7 +557,7 @@ namespace VisualMusic
 
         private void commitViewWidthQnChange()
         {
-            if (Project.FxViewWidthQnScale == 1)
+            if (Project.ViewWidthQnScale == 1)
                 return;
             Project.createOcTrees();
             SongPanel.Invalidate();

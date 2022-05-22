@@ -270,7 +270,7 @@ namespace VisualMusic
             fx.Parameters["SongPos"].SetValue(songPosP);
             fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Props.Camera.ViewportSize.X, Project.Props.Camera.ViewportSize.Y));
             fx.Parameters["VpMat"].SetValue(Project.Props.Camera.VpMat);
-            fx.Parameters["VertWidthScale"].SetValue(Project.FxViewWidthQnScale);
+            fx.Parameters["VertWidthScale"].SetValue(Project.ViewWidthQnScale);
             //fx.Parameters["TexWidthScale"].SetValue(texMaterial.TexProps.UAnchor == TexAnchorEnum.Screen ? VertWidthScale : 1);
 
             //Common notestyle props
@@ -603,6 +603,15 @@ namespace VisualMusic
             for (int i = 0; i < 8; i++)
                 _corners[i] += offset;
             //_center += offset;
+        }
+
+        public void scale(Vector3 scale)
+        {
+            _aabb.Min *= scale;
+            _aabb.Max *= scale;
+
+            for (int i = 0; i < 8; i++)
+                _corners[i] *= scale;
         }
 
         // aCorn and bCorn are arrays containing all corners (vertices) of the two OBBs

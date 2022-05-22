@@ -141,9 +141,12 @@ namespace VisualMusic
             foreach (var bbox in _geo.bboxes)
             {
                 BoundingBoxEx bb = bbox.clone();
+                bb.scale(new Vector3(project.ViewWidthQnScale, 1, 1));
+
                 Vector3 posOffset = project.getSpatialNormPosOffset(trackProps);
                 posOffset.X -= songPos;
                 bb.translate(posOffset);
+
                 if (bb.intersects(frustum))
                     return true;
             }
