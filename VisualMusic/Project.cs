@@ -234,8 +234,9 @@ namespace VisualMusic
                     string subSongFlag = $"-s{options.SubSong.ToString()}";
                     string supressErrorFlag = "-e";
                     string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag} {supressErrorFlag}";
-                    var startInfo = new ProcessStartInfo("remuxer.exe", cmdLine);
-                    startInfo.WorkingDirectory = Path.Combine(Program.Dir, "remuxer");
+                    var workingDir = Path.Combine(Program.Dir, "remuxer");
+                    var startInfo = new ProcessStartInfo(Path.Combine(workingDir, "remuxer.exe"), cmdLine);
+                    startInfo.WorkingDirectory = workingDir;
                     var process = Process.Start(startInfo);
                     Form1.RemuxerProcess = process;
                     parentForm.Enabled = false;
