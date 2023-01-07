@@ -36,5 +36,10 @@ namespace CefSharp.Example
             if (downloadItem.IsCancelled)
                 callback.Cancel();
         }
+
+        bool IDownloadHandler.CanDownload(IWebBrowser chromiumWebBrowser, IBrowser browser, string url, string requestMethod)
+        {
+            return true;
+        }
     }
 }

@@ -76,21 +76,12 @@
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.trackPropsPanel = new System.Windows.Forms.Panel();
-            this.trackList = new VisualMusic.ListViewNF();
-            this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.normalColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.hilitedColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.trackListCM = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.invertSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.defaultPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.trackList = new System.Windows.Forms.ListView();
+            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
             this.selectedTrackPropsPanel = new System.Windows.Forms.TabControl();
             this.style = new System.Windows.Forms.TabPage();
-            this.lineStyleControl = new VisualMusic.LineStyleControl();
-            this.barStyleControl = new VisualMusic.BarStyleControl();
             this.defaultStyleBtn = new System.Windows.Forms.Button();
             this.styleList = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -150,10 +141,6 @@
             this.light = new System.Windows.Forms.TabPage();
             this.defaultLightBtn = new System.Windows.Forms.Button();
             this.lightPanel = new System.Windows.Forms.Panel();
-            this.masterLightHsBtn = new VisualMusic.HueSatButton();
-            this.specHsBtn = new VisualMusic.HueSatButton();
-            this.diffuseHsBtn = new VisualMusic.HueSatButton();
-            this.ambientHsBtn = new VisualMusic.HueSatButton();
             this.specPowUd = new System.Windows.Forms.NumericUpDown();
             this.ambientAmountUd = new System.Windows.Forms.NumericUpDown();
             this.diffuseAmountUd = new System.Windows.Forms.NumericUpDown();
@@ -181,6 +168,16 @@
             this.zoffsetUd = new System.Windows.Forms.NumericUpDown();
             this.yoffsetUd = new System.Windows.Forms.NumericUpDown();
             this.xoffsetUd = new System.Windows.Forms.NumericUpDown();
+            this.trackColumn = new System.Windows.Forms.ColumnHeader();
+            this.normalColumn = new System.Windows.Forms.ColumnHeader();
+            this.hilitedColumn = new System.Windows.Forms.ColumnHeader();
+            this.trackListCM = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.invertSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.defaultPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetDefaultBtn = new System.Windows.Forms.Button();
             this.openTextureDlg = new System.Windows.Forms.OpenFileDialog();
             this.songPropsPanel = new System.Windows.Forms.Panel();
@@ -200,7 +197,6 @@
             this.fadeOutUd = new System.Windows.Forms.NumericUpDown();
             this.fadeInUd = new System.Windows.Forms.NumericUpDown();
             this.playbackOffsetUd = new System.Windows.Forms.NumericUpDown();
-            this.upDownVpWidth = new VisualMusic.TbSlider();
             this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.saveMidiDialog = new System.Windows.Forms.SaveFileDialog();
@@ -224,7 +220,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.trackPropsPanel.SuspendLayout();
-            this.trackListCM.SuspendLayout();
             this.selectedTrackPropsPanel.SuspendLayout();
             this.style.SuspendLayout();
             this.material.SuspendLayout();
@@ -257,6 +252,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).BeginInit();
+            this.trackListCM.SuspendLayout();
             this.songPropsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).BeginInit();
@@ -302,7 +298,7 @@
             0,
             -2147483648});
             this.audioOffsetS.Name = "audioOffsetS";
-            this.audioOffsetS.Size = new System.Drawing.Size(52, 20);
+            this.audioOffsetS.Size = new System.Drawing.Size(52, 23);
             this.audioOffsetS.TabIndex = 1;
             this.audioOffsetS.Tag = "Edit Audio Offset";
             this.audioOffsetS.ValueChanged += new System.EventHandler(this.audioOffsetS_ValueChanged);
@@ -659,7 +655,7 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(12, 12);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(76, 13);
+            this.label7.Size = new System.Drawing.Size(87, 15);
             this.label7.TabIndex = 3;
             this.label7.Text = "Viewport width";
             // 
@@ -668,7 +664,7 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(12, 75);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(63, 13);
+            this.label9.Size = new System.Drawing.Size(72, 15);
             this.label9.TabIndex = 3;
             this.label9.Text = "Audio offset";
             // 
@@ -677,7 +673,7 @@
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(156, 75);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(12, 13);
+            this.label10.Size = new System.Drawing.Size(12, 15);
             this.label10.TabIndex = 3;
             this.label10.Text = "s";
             // 
@@ -688,36 +684,1235 @@
             this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
             this.trackPropsPanel.Location = new System.Drawing.Point(767, 24);
             this.trackPropsPanel.Name = "trackPropsPanel";
-            this.trackPropsPanel.Size = new System.Drawing.Size(395, 4359);
+            this.trackPropsPanel.Size = new System.Drawing.Size(395, 4361);
             this.trackPropsPanel.TabIndex = 3;
             this.trackPropsPanel.Visible = false;
             this.trackPropsPanel.VisibleChanged += new System.EventHandler(this.trackPropsPanel_VisibleChanged);
             // 
             // trackList
             // 
-            this.trackList.AllowDrop = true;
             this.trackList.BackColor = System.Drawing.Color.Black;
             this.trackList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.trackColumn,
-            this.normalColumn,
-            this.hilitedColumn});
-            this.trackList.ContextMenuStrip = this.trackListCM;
-            this.trackList.Dock = System.Windows.Forms.DockStyle.Right;
-            this.trackList.ForeColor = System.Drawing.Color.White;
-            this.trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.trackList.HideSelection = false;
-            this.trackList.Location = new System.Drawing.Point(1, 0);
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3});
+            this.trackList.Location = new System.Drawing.Point(55, 80);
             this.trackList.Name = "trackList";
-            this.trackList.Size = new System.Drawing.Size(186, 4359);
-            this.trackList.TabIndex = 0;
+            this.trackList.Size = new System.Drawing.Size(121, 97);
+            this.trackList.TabIndex = 15;
             this.trackList.UseCompatibleStateImageBehavior = false;
             this.trackList.View = System.Windows.Forms.View.Details;
-            this.trackList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.trackList_ItemDrag);
-            this.trackList.SelectedIndexChanged += new System.EventHandler(this.trackList_SelectedIndexChanged);
-            this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
-            this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
-            this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
-            this.trackList.DragLeave += new System.EventHandler(this.trackList_DragLeave);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Track";
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "N";
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "C";
+            // 
+            // selectedTrackPropsPanel
+            // 
+            this.selectedTrackPropsPanel.Controls.Add(this.style);
+            this.selectedTrackPropsPanel.Controls.Add(this.material);
+            this.selectedTrackPropsPanel.Controls.Add(this.light);
+            this.selectedTrackPropsPanel.Controls.Add(this.spatial);
+            this.selectedTrackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.selectedTrackPropsPanel.Location = new System.Drawing.Point(187, 0);
+            this.selectedTrackPropsPanel.Name = "selectedTrackPropsPanel";
+            this.selectedTrackPropsPanel.SelectedIndex = 0;
+            this.selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 4361);
+            this.selectedTrackPropsPanel.TabIndex = 14;
+            // 
+            // style
+            // 
+            this.style.AutoScroll = true;
+            this.style.BackColor = System.Drawing.SystemColors.Control;
+            this.style.Controls.Add(this.defaultStyleBtn);
+            this.style.Controls.Add(this.styleList);
+            this.style.Controls.Add(this.label1);
+            this.style.Location = new System.Drawing.Point(4, 24);
+            this.style.Name = "style";
+            this.style.Size = new System.Drawing.Size(200, 4333);
+            this.style.TabIndex = 2;
+            this.style.Text = "Style";
+            // 
+            // defaultStyleBtn
+            // 
+            this.defaultStyleBtn.Location = new System.Drawing.Point(1, 1);
+            this.defaultStyleBtn.Name = "defaultStyleBtn";
+            this.defaultStyleBtn.Size = new System.Drawing.Size(179, 23);
+            this.defaultStyleBtn.TabIndex = 0;
+            this.defaultStyleBtn.Tag = "Default Style";
+            this.defaultStyleBtn.Text = "Default Style";
+            this.defaultStyleBtn.UseVisualStyleBackColor = true;
+            this.defaultStyleBtn.Click += new System.EventHandler(this.defaultStyleBtn_Click);
+            // 
+            // styleList
+            // 
+            this.styleList.DisplayMember = "Name";
+            this.styleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.styleList.FormattingEnabled = true;
+            this.styleList.Location = new System.Drawing.Point(4, 45);
+            this.styleList.Name = "styleList";
+            this.styleList.Size = new System.Drawing.Size(113, 23);
+            this.styleList.TabIndex = 1;
+            this.styleList.Tag = "Change Note Style";
+            this.styleList.ValueMember = "Value";
+            this.styleList.SelectedIndexChanged += new System.EventHandler(this.styleList_SelectedIndexChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(1, 29);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(60, 15);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Note style";
+            // 
+            // material
+            // 
+            this.material.AutoScroll = true;
+            this.material.BackColor = System.Drawing.Color.Transparent;
+            this.material.Controls.Add(this.groupBox4);
+            this.material.Controls.Add(this.defaultMtrlBtn);
+            this.material.Controls.Add(this.alphaLbl);
+            this.material.Controls.Add(this.transpSlider);
+            this.material.Controls.Add(this.hueTb);
+            this.material.Controls.Add(this.groupBox1);
+            this.material.Controls.Add(this.hueSlider);
+            this.material.Controls.Add(this.label2);
+            this.material.Controls.Add(this.groupBox2);
+            this.material.Controls.Add(this.transpTb);
+            this.material.Location = new System.Drawing.Point(4, 24);
+            this.material.Name = "material";
+            this.material.Padding = new System.Windows.Forms.Padding(3);
+            this.material.Size = new System.Drawing.Size(200, 4333);
+            this.material.TabIndex = 0;
+            this.material.Text = "Material";
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.label37);
+            this.groupBox4.Controls.Add(this.label34);
+            this.groupBox4.Controls.Add(this.label35);
+            this.groupBox4.Controls.Add(this.texVScrollUD);
+            this.groupBox4.Controls.Add(this.label33);
+            this.groupBox4.Controls.Add(this.texUScrollUD);
+            this.groupBox4.Controls.Add(this.tableLayoutPanel1);
+            this.groupBox4.Controls.Add(this.texVTileCb);
+            this.groupBox4.Controls.Add(this.texUTileCb);
+            this.groupBox4.Controls.Add(this.texKeepAspectCb);
+            this.groupBox4.Controls.Add(this.tileTexCb);
+            this.groupBox4.Controls.Add(this.loadTexBtn);
+            this.groupBox4.Controls.Add(this.unloadTexBtn);
+            this.groupBox4.Controls.Add(this.disableTextureCh);
+            this.groupBox4.Controls.Add(this.texColBlendCb);
+            this.groupBox4.Controls.Add(this.pointSmpCb);
+            this.groupBox4.Controls.Add(this.trackTexPb);
+            this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.groupBox4.Location = new System.Drawing.Point(1, 485);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(2);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(2);
+            this.groupBox4.Size = new System.Drawing.Size(182, 422);
+            this.groupBox4.TabIndex = 60;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Texture";
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label37.Location = new System.Drawing.Point(113, 400);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(68, 13);
+            this.label37.TabIndex = 19;
+            this.label37.Text = "repeats/beat";
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label34.Location = new System.Drawing.Point(113, 380);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(68, 13);
+            this.label34.TabIndex = 19;
+            this.label34.Text = "repeats/beat";
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label35.Location = new System.Drawing.Point(3, 400);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(43, 13);
+            this.label35.TabIndex = 19;
+            this.label35.Text = "Scroll V";
+            // 
+            // texVScrollUD
+            // 
+            this.texVScrollUD.DecimalPlaces = 3;
+            this.texVScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.texVScrollUD.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.texVScrollUD.Location = new System.Drawing.Point(52, 398);
+            this.texVScrollUD.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.texVScrollUD.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            -2147483648});
+            this.texVScrollUD.Name = "texVScrollUD";
+            this.texVScrollUD.Size = new System.Drawing.Size(55, 20);
+            this.texVScrollUD.TabIndex = 51;
+            this.texVScrollUD.Tag = "Edit Scroll V";
+            this.texVScrollUD.ValueChanged += new System.EventHandler(this.texVScrollUD_ValueChanged);
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label33.Location = new System.Drawing.Point(2, 380);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(44, 13);
+            this.label33.TabIndex = 19;
+            this.label33.Text = "Scroll U";
+            // 
+            // texUScrollUD
+            // 
+            this.texUScrollUD.DecimalPlaces = 3;
+            this.texUScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.texUScrollUD.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.texUScrollUD.Location = new System.Drawing.Point(52, 378);
+            this.texUScrollUD.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.texUScrollUD.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            -2147483648});
+            this.texUScrollUD.Name = "texUScrollUD";
+            this.texUScrollUD.Size = new System.Drawing.Size(55, 20);
+            this.texUScrollUD.TabIndex = 50;
+            this.texUScrollUD.Tag = "Edit Scroll U";
+            this.texUScrollUD.ValueChanged += new System.EventHandler(this.texUScrollUD_ValueChanged);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.InsetDouble;
+            this.tableLayoutPanel1.ColumnCount = 3;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel1.Controls.Add(this.label31, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label32, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label36, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.songAnchorLabel, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.noteAnchorLabel, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.panel2, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.screenAnchorLabel, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 2, 1);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 279);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(112, 93);
+            this.tableLayoutPanel1.TabIndex = 40;
+            // 
+            // label31
+            // 
+            this.label31.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label31.AutoSize = true;
+            this.label31.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label31.Location = new System.Drawing.Point(92, 6);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(14, 13);
+            this.label31.TabIndex = 17;
+            this.label31.Text = "V";
+            // 
+            // label32
+            // 
+            this.label32.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label32.AutoSize = true;
+            this.label32.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label32.Location = new System.Drawing.Point(69, 6);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(14, 13);
+            this.label32.TabIndex = 17;
+            this.label32.Text = "U";
+            // 
+            // label36
+            // 
+            this.label36.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label36.AutoSize = true;
+            this.label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label36.Location = new System.Drawing.Point(12, 6);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(41, 13);
+            this.label36.TabIndex = 17;
+            this.label36.Text = "Anchor";
+            // 
+            // songAnchorLabel
+            // 
+            this.songAnchorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.songAnchorLabel.AutoSize = true;
+            this.songAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.songAnchorLabel.Location = new System.Drawing.Point(6, 69);
+            this.songAnchorLabel.Name = "songAnchorLabel";
+            this.songAnchorLabel.Size = new System.Drawing.Size(54, 21);
+            this.songAnchorLabel.TabIndex = 17;
+            this.songAnchorLabel.Tag = "Song anchor";
+            this.songAnchorLabel.Text = "Song start";
+            this.songAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.songAnchorLabel.Click += new System.EventHandler(this.songAnchorLabel_Click);
+            // 
+            // noteAnchorLabel
+            // 
+            this.noteAnchorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.noteAnchorLabel.AutoSize = true;
+            this.noteAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.noteAnchorLabel.Location = new System.Drawing.Point(6, 25);
+            this.noteAnchorLabel.Name = "noteAnchorLabel";
+            this.noteAnchorLabel.Size = new System.Drawing.Size(54, 19);
+            this.noteAnchorLabel.TabIndex = 1;
+            this.noteAnchorLabel.Tag = "Note anchor";
+            this.noteAnchorLabel.Text = "Note";
+            this.noteAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.noteAnchorLabel.Click += new System.EventHandler(this.noteAnchorLabel_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.BackColor = System.Drawing.Color.Transparent;
+            this.panel2.Controls.Add(this.songAnchorRb);
+            this.panel2.Controls.Add(this.screenUAnchorRb);
+            this.panel2.Controls.Add(this.noteUAnchorRb);
+            this.panel2.Location = new System.Drawing.Point(66, 25);
+            this.panel2.Margin = new System.Windows.Forms.Padding(0);
+            this.panel2.Name = "panel2";
+            this.tableLayoutPanel1.SetRowSpan(this.panel2, 3);
+            this.panel2.Size = new System.Drawing.Size(20, 65);
+            this.panel2.TabIndex = 20;
+            // 
+            // songAnchorRb
+            // 
+            this.songAnchorRb.AutoSize = true;
+            this.songAnchorRb.Location = new System.Drawing.Point(3, 48);
+            this.songAnchorRb.Name = "songAnchorRb";
+            this.songAnchorRb.Size = new System.Drawing.Size(14, 13);
+            this.songAnchorRb.TabIndex = 24;
+            this.songAnchorRb.TabStop = true;
+            this.songAnchorRb.Tag = "Song anchor";
+            this.songAnchorRb.UseVisualStyleBackColor = true;
+            this.songAnchorRb.Click += new System.EventHandler(this.songAnchorRb_Click);
+            // 
+            // screenUAnchorRb
+            // 
+            this.screenUAnchorRb.AutoSize = true;
+            this.screenUAnchorRb.Location = new System.Drawing.Point(3, 25);
+            this.screenUAnchorRb.Name = "screenUAnchorRb";
+            this.screenUAnchorRb.Size = new System.Drawing.Size(14, 13);
+            this.screenUAnchorRb.TabIndex = 22;
+            this.screenUAnchorRb.TabStop = true;
+            this.screenUAnchorRb.Tag = "Screen U anchor";
+            this.screenUAnchorRb.UseVisualStyleBackColor = true;
+            this.screenUAnchorRb.Click += new System.EventHandler(this.screenUAnchorRb_Click);
+            // 
+            // noteUAnchorRb
+            // 
+            this.noteUAnchorRb.AutoSize = true;
+            this.noteUAnchorRb.Location = new System.Drawing.Point(3, 3);
+            this.noteUAnchorRb.Name = "noteUAnchorRb";
+            this.noteUAnchorRb.Size = new System.Drawing.Size(14, 13);
+            this.noteUAnchorRb.TabIndex = 20;
+            this.noteUAnchorRb.TabStop = true;
+            this.noteUAnchorRb.Tag = "Note U anchor";
+            this.noteUAnchorRb.UseVisualStyleBackColor = true;
+            this.noteUAnchorRb.Click += new System.EventHandler(this.noteUAnchorRb_Click);
+            // 
+            // screenAnchorLabel
+            // 
+            this.screenAnchorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.screenAnchorLabel.AutoSize = true;
+            this.screenAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.screenAnchorLabel.Location = new System.Drawing.Point(6, 47);
+            this.screenAnchorLabel.Name = "screenAnchorLabel";
+            this.screenAnchorLabel.Size = new System.Drawing.Size(54, 19);
+            this.screenAnchorLabel.TabIndex = 17;
+            this.screenAnchorLabel.Tag = "Screen anchor";
+            this.screenAnchorLabel.Text = "Screen";
+            this.screenAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.screenAnchorLabel.Click += new System.EventHandler(this.screenAnchorLabel_Click);
+            // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.BackColor = System.Drawing.Color.Transparent;
+            this.panel1.Controls.Add(this.screenVAnchorRb);
+            this.panel1.Controls.Add(this.noteVAnchorRb);
+            this.panel1.Location = new System.Drawing.Point(89, 25);
+            this.panel1.Margin = new System.Windows.Forms.Padding(0);
+            this.panel1.Name = "panel1";
+            this.tableLayoutPanel1.SetRowSpan(this.panel1, 3);
+            this.panel1.Size = new System.Drawing.Size(20, 65);
+            this.panel1.TabIndex = 21;
+            // 
+            // screenVAnchorRb
+            // 
+            this.screenVAnchorRb.AutoSize = true;
+            this.screenVAnchorRb.Location = new System.Drawing.Point(3, 25);
+            this.screenVAnchorRb.Name = "screenVAnchorRb";
+            this.screenVAnchorRb.Size = new System.Drawing.Size(14, 13);
+            this.screenVAnchorRb.TabIndex = 23;
+            this.screenVAnchorRb.TabStop = true;
+            this.screenVAnchorRb.Tag = "Screen V anchor";
+            this.screenVAnchorRb.UseVisualStyleBackColor = true;
+            this.screenVAnchorRb.Click += new System.EventHandler(this.screenVAnchorRb_Click);
+            // 
+            // noteVAnchorRb
+            // 
+            this.noteVAnchorRb.AutoSize = true;
+            this.noteVAnchorRb.Location = new System.Drawing.Point(3, 3);
+            this.noteVAnchorRb.Name = "noteVAnchorRb";
+            this.noteVAnchorRb.Size = new System.Drawing.Size(14, 13);
+            this.noteVAnchorRb.TabIndex = 21;
+            this.noteVAnchorRb.TabStop = true;
+            this.noteVAnchorRb.Tag = "Note V anchor";
+            this.noteVAnchorRb.UseVisualStyleBackColor = true;
+            this.noteVAnchorRb.Click += new System.EventHandler(this.noteVAnchorRb_Click);
+            // 
+            // texVTileCb
+            // 
+            this.texVTileCb.AutoSize = true;
+            this.texVTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.texVTileCb.Location = new System.Drawing.Point(91, 236);
+            this.texVTileCb.Name = "texVTileCb";
+            this.texVTileCb.Size = new System.Drawing.Size(33, 17);
+            this.texVTileCb.TabIndex = 32;
+            this.texVTileCb.Tag = "V";
+            this.texVTileCb.Text = "V";
+            this.texVTileCb.UseVisualStyleBackColor = true;
+            this.texVTileCb.CheckedChanged += new System.EventHandler(this.texVTileCb_CheckedChanged);
+            // 
+            // texUTileCb
+            // 
+            this.texUTileCb.AutoSize = true;
+            this.texUTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.texUTileCb.Location = new System.Drawing.Point(52, 236);
+            this.texUTileCb.Name = "texUTileCb";
+            this.texUTileCb.Size = new System.Drawing.Size(34, 17);
+            this.texUTileCb.TabIndex = 31;
+            this.texUTileCb.Tag = "U";
+            this.texUTileCb.Text = "U";
+            this.texUTileCb.UseVisualStyleBackColor = true;
+            this.texUTileCb.CheckedChanged += new System.EventHandler(this.texUTileCb_CheckedChanged);
+            // 
+            // texKeepAspectCb
+            // 
+            this.texKeepAspectCb.AutoSize = true;
+            this.texKeepAspectCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.texKeepAspectCb.Location = new System.Drawing.Point(3, 257);
+            this.texKeepAspectCb.Margin = new System.Windows.Forms.Padding(2);
+            this.texKeepAspectCb.Name = "texKeepAspectCb";
+            this.texKeepAspectCb.Size = new System.Drawing.Size(109, 17);
+            this.texKeepAspectCb.TabIndex = 33;
+            this.texKeepAspectCb.Tag = "Keep aspect ratio";
+            this.texKeepAspectCb.Text = "Keep aspect ratio";
+            this.texKeepAspectCb.UseVisualStyleBackColor = true;
+            this.texKeepAspectCb.CheckedChanged += new System.EventHandler(this.texKeepAspect_CheckedChanged);
+            // 
+            // tileTexCb
+            // 
+            this.tileTexCb.AutoSize = true;
+            this.tileTexCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.tileTexCb.Location = new System.Drawing.Point(4, 236);
+            this.tileTexCb.Margin = new System.Windows.Forms.Padding(2);
+            this.tileTexCb.Name = "tileTexCb";
+            this.tileTexCb.Size = new System.Drawing.Size(43, 17);
+            this.tileTexCb.TabIndex = 30;
+            this.tileTexCb.Tag = "Tile";
+            this.tileTexCb.Text = "Tile";
+            this.tileTexCb.UseVisualStyleBackColor = true;
+            this.tileTexCb.CheckedChanged += new System.EventHandler(this.tileTexCb_CheckedChanged);
+            // 
+            // loadTexBtn
+            // 
+            this.loadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.loadTexBtn.Location = new System.Drawing.Point(5, 18);
+            this.loadTexBtn.Name = "loadTexBtn";
+            this.loadTexBtn.Size = new System.Drawing.Size(75, 23);
+            this.loadTexBtn.TabIndex = 10;
+            this.loadTexBtn.Tag = "Load texture";
+            this.loadTexBtn.Text = "&Load texture";
+            this.loadTexBtn.UseVisualStyleBackColor = true;
+            this.loadTexBtn.Click += new System.EventHandler(this.textureLoadBtn_Click);
+            // 
+            // unloadTexBtn
+            // 
+            this.unloadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.unloadTexBtn.Location = new System.Drawing.Point(92, 18);
+            this.unloadTexBtn.Name = "unloadTexBtn";
+            this.unloadTexBtn.Size = new System.Drawing.Size(86, 23);
+            this.unloadTexBtn.TabIndex = 15;
+            this.unloadTexBtn.Tag = "Unload texture";
+            this.unloadTexBtn.Text = "&Unload texture";
+            this.unloadTexBtn.UseVisualStyleBackColor = true;
+            this.unloadTexBtn.Click += new System.EventHandler(this.unloadTexBtn_Click);
+            // 
+            // disableTextureCh
+            // 
+            this.disableTextureCh.AutoSize = true;
+            this.disableTextureCh.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.disableTextureCh.Location = new System.Drawing.Point(6, 173);
+            this.disableTextureCh.Margin = new System.Windows.Forms.Padding(2);
+            this.disableTextureCh.Name = "disableTextureCh";
+            this.disableTextureCh.Size = new System.Drawing.Size(96, 17);
+            this.disableTextureCh.TabIndex = 20;
+            this.disableTextureCh.Tag = "Disable texture";
+            this.disableTextureCh.Text = "Disable texture";
+            this.disableTextureCh.UseVisualStyleBackColor = true;
+            this.disableTextureCh.CheckedChanged += new System.EventHandler(this.disableTextureCb_CheckedChanged);
+            // 
+            // texColBlendCb
+            // 
+            this.texColBlendCb.AutoSize = true;
+            this.texColBlendCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.texColBlendCb.Location = new System.Drawing.Point(4, 215);
+            this.texColBlendCb.Margin = new System.Windows.Forms.Padding(2);
+            this.texColBlendCb.Name = "texColBlendCb";
+            this.texColBlendCb.Size = new System.Drawing.Size(149, 17);
+            this.texColBlendCb.TabIndex = 20;
+            this.texColBlendCb.Tag = "Blend hue with track color";
+            this.texColBlendCb.Text = "Blend hue with track color";
+            this.texColBlendCb.UseVisualStyleBackColor = true;
+            this.texColBlendCb.CheckedChanged += new System.EventHandler(this.texColBlendCb_CheckedChanged);
+            // 
+            // pointSmpCb
+            // 
+            this.pointSmpCb.AutoSize = true;
+            this.pointSmpCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.pointSmpCb.Location = new System.Drawing.Point(6, 194);
+            this.pointSmpCb.Margin = new System.Windows.Forms.Padding(2);
+            this.pointSmpCb.Name = "pointSmpCb";
+            this.pointSmpCb.Size = new System.Drawing.Size(94, 17);
+            this.pointSmpCb.TabIndex = 20;
+            this.pointSmpCb.Tag = "Point sampling";
+            this.pointSmpCb.Text = "Point sampling";
+            this.pointSmpCb.UseVisualStyleBackColor = true;
+            this.pointSmpCb.CheckedChanged += new System.EventHandler(this.pointSmpCb_CheckedChanged);
+            // 
+            // trackTexPb
+            // 
+            this.trackTexPb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.trackTexPb.Location = new System.Drawing.Point(5, 47);
+            this.trackTexPb.Name = "trackTexPb";
+            this.trackTexPb.Size = new System.Drawing.Size(173, 121);
+            this.trackTexPb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.trackTexPb.TabIndex = 13;
+            this.trackTexPb.TabStop = false;
+            // 
+            // defaultMtrlBtn
+            // 
+            this.defaultMtrlBtn.Location = new System.Drawing.Point(1, 1);
+            this.defaultMtrlBtn.Name = "defaultMtrlBtn";
+            this.defaultMtrlBtn.Size = new System.Drawing.Size(179, 23);
+            this.defaultMtrlBtn.TabIndex = 10;
+            this.defaultMtrlBtn.Tag = "Default Material";
+            this.defaultMtrlBtn.Text = "Default Material";
+            this.defaultMtrlBtn.UseVisualStyleBackColor = true;
+            this.defaultMtrlBtn.Click += new System.EventHandler(this.defaultMaterial_Click);
+            // 
+            // alphaLbl
+            // 
+            this.alphaLbl.AutoSize = true;
+            this.alphaLbl.Location = new System.Drawing.Point(5, 32);
+            this.alphaLbl.Name = "alphaLbl";
+            this.alphaLbl.Size = new System.Drawing.Size(48, 15);
+            this.alphaLbl.TabIndex = 7;
+            this.alphaLbl.Text = "Opacity";
+            // 
+            // transpSlider
+            // 
+            this.transpSlider.BackColor = System.Drawing.SystemColors.Control;
+            this.transpSlider.LargeChange = 10;
+            this.transpSlider.Location = new System.Drawing.Point(5, 49);
+            this.transpSlider.Maximum = 200;
+            this.transpSlider.Name = "transpSlider";
+            this.transpSlider.Size = new System.Drawing.Size(129, 45);
+            this.transpSlider.TabIndex = 20;
+            this.transpSlider.TickFrequency = 10;
+            this.transpSlider.Value = 50;
+            this.transpSlider.Scroll += new System.EventHandler(this.transpSlider_Scroll);
+            // 
+            // hueTb
+            // 
+            this.hueTb.Location = new System.Drawing.Point(137, 113);
+            this.hueTb.Name = "hueTb";
+            this.hueTb.Size = new System.Drawing.Size(38, 23);
+            this.hueTb.TabIndex = 31;
+            this.hueTb.Tag = "Edit Hue";
+            this.hueTb.Text = "notset";
+            this.hueTb.TextChanged += new System.EventHandler(this.hueTb_TextChanged);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox1.Controls.Add(this.normalLumTb);
+            this.groupBox1.Controls.Add(this.normalLumSlider);
+            this.groupBox1.Controls.Add(this.label);
+            this.groupBox1.Controls.Add(this.normalSatTb);
+            this.groupBox1.Controls.Add(this.normalSatSlider);
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.groupBox1.Location = new System.Drawing.Point(-1, 164);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(182, 154);
+            this.groupBox1.TabIndex = 40;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Normal notes";
+            // 
+            // normalLumTb
+            // 
+            this.normalLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.normalLumTb.Location = new System.Drawing.Point(141, 105);
+            this.normalLumTb.Name = "normalLumTb";
+            this.normalLumTb.Size = new System.Drawing.Size(38, 20);
+            this.normalLumTb.TabIndex = 21;
+            this.normalLumTb.Tag = "Edit Normal Brightness";
+            this.normalLumTb.Text = "notset";
+            this.normalLumTb.TextChanged += new System.EventHandler(this.normalLumTb_TextChanged);
+            // 
+            // normalLumSlider
+            // 
+            this.normalLumSlider.LargeChange = 10;
+            this.normalLumSlider.Location = new System.Drawing.Point(6, 105);
+            this.normalLumSlider.Maximum = 200;
+            this.normalLumSlider.Name = "normalLumSlider";
+            this.normalLumSlider.Size = new System.Drawing.Size(129, 45);
+            this.normalLumSlider.TabIndex = 20;
+            this.normalLumSlider.TickFrequency = 10;
+            this.normalLumSlider.Value = 50;
+            this.normalLumSlider.Scroll += new System.EventHandler(this.normalLumSlider_Scroll);
+            // 
+            // label
+            // 
+            this.label.AutoSize = true;
+            this.label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label.Location = new System.Drawing.Point(6, 89);
+            this.label.Name = "label";
+            this.label.Size = new System.Drawing.Size(56, 13);
+            this.label.TabIndex = 13;
+            this.label.Text = "Brightness";
+            // 
+            // normalSatTb
+            // 
+            this.normalSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.normalSatTb.Location = new System.Drawing.Point(141, 41);
+            this.normalSatTb.Name = "normalSatTb";
+            this.normalSatTb.Size = new System.Drawing.Size(38, 20);
+            this.normalSatTb.TabIndex = 11;
+            this.normalSatTb.Tag = "Edit Normal Saturation";
+            this.normalSatTb.Text = "notset";
+            this.normalSatTb.TextChanged += new System.EventHandler(this.normalSatTb_TextChanged);
+            // 
+            // normalSatSlider
+            // 
+            this.normalSatSlider.LargeChange = 10;
+            this.normalSatSlider.Location = new System.Drawing.Point(6, 41);
+            this.normalSatSlider.Maximum = 200;
+            this.normalSatSlider.Name = "normalSatSlider";
+            this.normalSatSlider.Size = new System.Drawing.Size(129, 45);
+            this.normalSatSlider.TabIndex = 10;
+            this.normalSatSlider.TickFrequency = 10;
+            this.normalSatSlider.Value = 50;
+            this.normalSatSlider.Scroll += new System.EventHandler(this.normalSatSlider_Scroll);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label3.Location = new System.Drawing.Point(6, 25);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(55, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Saturation";
+            // 
+            // hueSlider
+            // 
+            this.hueSlider.BackColor = System.Drawing.SystemColors.Control;
+            this.hueSlider.LargeChange = 10;
+            this.hueSlider.Location = new System.Drawing.Point(5, 112);
+            this.hueSlider.Maximum = 100;
+            this.hueSlider.Name = "hueSlider";
+            this.hueSlider.Size = new System.Drawing.Size(129, 45);
+            this.hueSlider.TabIndex = 30;
+            this.hueSlider.TickFrequency = 10;
+            this.hueSlider.Value = 50;
+            this.hueSlider.Scroll += new System.EventHandler(this.hueSlider_Scroll);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(5, 96);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(29, 15);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "Hue";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox2.Controls.Add(this.hiliteLumTb);
+            this.groupBox2.Controls.Add(this.hiliteLumSlider);
+            this.groupBox2.Controls.Add(this.label5);
+            this.groupBox2.Controls.Add(this.hiliteSatTb);
+            this.groupBox2.Controls.Add(this.hiliteSatSlider);
+            this.groupBox2.Controls.Add(this.label6);
+            this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.groupBox2.Location = new System.Drawing.Point(-1, 325);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(182, 155);
+            this.groupBox2.TabIndex = 50;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Highlighted notes";
+            // 
+            // hiliteLumTb
+            // 
+            this.hiliteLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.hiliteLumTb.Location = new System.Drawing.Point(141, 105);
+            this.hiliteLumTb.Name = "hiliteLumTb";
+            this.hiliteLumTb.Size = new System.Drawing.Size(38, 20);
+            this.hiliteLumTb.TabIndex = 21;
+            this.hiliteLumTb.Tag = "Edit Highlight Brightness";
+            this.hiliteLumTb.Text = "notset";
+            this.hiliteLumTb.TextChanged += new System.EventHandler(this.hiliteLumTb_TextChanged);
+            // 
+            // hiliteLumSlider
+            // 
+            this.hiliteLumSlider.LargeChange = 10;
+            this.hiliteLumSlider.Location = new System.Drawing.Point(6, 105);
+            this.hiliteLumSlider.Maximum = 200;
+            this.hiliteLumSlider.Name = "hiliteLumSlider";
+            this.hiliteLumSlider.Size = new System.Drawing.Size(129, 45);
+            this.hiliteLumSlider.TabIndex = 20;
+            this.hiliteLumSlider.TickFrequency = 10;
+            this.hiliteLumSlider.Value = 50;
+            this.hiliteLumSlider.Scroll += new System.EventHandler(this.hiliteLumSlider_Scroll);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label5.Location = new System.Drawing.Point(6, 89);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(56, 13);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "Brightness";
+            // 
+            // hiliteSatTb
+            // 
+            this.hiliteSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.hiliteSatTb.Location = new System.Drawing.Point(141, 41);
+            this.hiliteSatTb.Name = "hiliteSatTb";
+            this.hiliteSatTb.Size = new System.Drawing.Size(38, 20);
+            this.hiliteSatTb.TabIndex = 11;
+            this.hiliteSatTb.Tag = "Edit Highlight Saturation";
+            this.hiliteSatTb.Text = "notset";
+            this.hiliteSatTb.TextChanged += new System.EventHandler(this.hiliteSatTb_TextChanged);
+            // 
+            // hiliteSatSlider
+            // 
+            this.hiliteSatSlider.LargeChange = 10;
+            this.hiliteSatSlider.Location = new System.Drawing.Point(6, 41);
+            this.hiliteSatSlider.Maximum = 200;
+            this.hiliteSatSlider.Name = "hiliteSatSlider";
+            this.hiliteSatSlider.Size = new System.Drawing.Size(129, 45);
+            this.hiliteSatSlider.TabIndex = 10;
+            this.hiliteSatSlider.TickFrequency = 10;
+            this.hiliteSatSlider.Value = 50;
+            this.hiliteSatSlider.Scroll += new System.EventHandler(this.hiliteSatSlider_Scroll);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label6.Location = new System.Drawing.Point(6, 25);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(55, 13);
+            this.label6.TabIndex = 10;
+            this.label6.Text = "Saturation";
+            // 
+            // transpTb
+            // 
+            this.transpTb.Location = new System.Drawing.Point(137, 49);
+            this.transpTb.Name = "transpTb";
+            this.transpTb.Size = new System.Drawing.Size(38, 23);
+            this.transpTb.TabIndex = 21;
+            this.transpTb.Tag = "Edit Opacity";
+            this.transpTb.Text = "notset";
+            this.transpTb.TextChanged += new System.EventHandler(this.transpTb_TextChanged);
+            // 
+            // light
+            // 
+            this.light.AutoScroll = true;
+            this.light.BackColor = System.Drawing.SystemColors.Control;
+            this.light.Controls.Add(this.defaultLightBtn);
+            this.light.Controls.Add(this.lightPanel);
+            this.light.Controls.Add(this.globalLightCb);
+            this.light.Location = new System.Drawing.Point(4, 24);
+            this.light.Name = "light";
+            this.light.Padding = new System.Windows.Forms.Padding(3);
+            this.light.Size = new System.Drawing.Size(200, 4333);
+            this.light.TabIndex = 1;
+            this.light.Text = "Light";
+            // 
+            // defaultLightBtn
+            // 
+            this.defaultLightBtn.Location = new System.Drawing.Point(1, 1);
+            this.defaultLightBtn.Name = "defaultLightBtn";
+            this.defaultLightBtn.Size = new System.Drawing.Size(179, 23);
+            this.defaultLightBtn.TabIndex = 10;
+            this.defaultLightBtn.Tag = "Default Light";
+            this.defaultLightBtn.Text = "Default Light";
+            this.defaultLightBtn.UseVisualStyleBackColor = true;
+            this.defaultLightBtn.Click += new System.EventHandler(this.defaultLightBtn_Click);
+            // 
+            // lightPanel
+            // 
+            this.lightPanel.AutoSize = true;
+            this.lightPanel.Controls.Add(this.specPowUd);
+            this.lightPanel.Controls.Add(this.ambientAmountUd);
+            this.lightPanel.Controls.Add(this.diffuseAmountUd);
+            this.lightPanel.Controls.Add(this.label24);
+            this.lightPanel.Controls.Add(this.masterLightAmountUd);
+            this.lightPanel.Controls.Add(this.specAmountUd);
+            this.lightPanel.Controls.Add(this.label15);
+            this.lightPanel.Controls.Add(this.label14);
+            this.lightPanel.Controls.Add(this.label16);
+            this.lightPanel.Controls.Add(this.label22);
+            this.lightPanel.Controls.Add(this.label23);
+            this.lightPanel.Controls.Add(this.lightDirXUd);
+            this.lightPanel.Controls.Add(this.label11);
+            this.lightPanel.Controls.Add(this.lightDirYUd);
+            this.lightPanel.Controls.Add(this.lightDirZUd);
+            this.lightPanel.Controls.Add(this.label12);
+            this.lightPanel.Controls.Add(this.label13);
+            this.lightPanel.Enabled = false;
+            this.lightPanel.Location = new System.Drawing.Point(2, 51);
+            this.lightPanel.Name = "lightPanel";
+            this.lightPanel.Size = new System.Drawing.Size(179, 223);
+            this.lightPanel.TabIndex = 30;
+            // 
+            // specPowUd
+            // 
+            this.specPowUd.Location = new System.Drawing.Point(59, 156);
+            this.specPowUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.specPowUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+            this.specPowUd.Name = "specPowUd";
+            this.specPowUd.Size = new System.Drawing.Size(51, 23);
+            this.specPowUd.TabIndex = 56;
+            this.specPowUd.Tag = "Edit Specular power";
+            this.specPowUd.ValueChanged += new System.EventHandler(this.specPowUd_ValueChanged);
+            // 
+            // ambientAmountUd
+            // 
+            this.ambientAmountUd.DecimalPlaces = 2;
+            this.ambientAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.ambientAmountUd.Location = new System.Drawing.Point(59, 78);
+            this.ambientAmountUd.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+            this.ambientAmountUd.Name = "ambientAmountUd";
+            this.ambientAmountUd.Size = new System.Drawing.Size(51, 23);
+            this.ambientAmountUd.TabIndex = 53;
+            this.ambientAmountUd.Tag = "Edit Ambient amount";
+            this.ambientAmountUd.ValueChanged += new System.EventHandler(this.ambientAmountUd_ValueChanged);
+            // 
+            // diffuseAmountUd
+            // 
+            this.diffuseAmountUd.DecimalPlaces = 2;
+            this.diffuseAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.diffuseAmountUd.Location = new System.Drawing.Point(59, 104);
+            this.diffuseAmountUd.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+            this.diffuseAmountUd.Name = "diffuseAmountUd";
+            this.diffuseAmountUd.Size = new System.Drawing.Size(51, 23);
+            this.diffuseAmountUd.TabIndex = 54;
+            this.diffuseAmountUd.Tag = "Edit Diffuse amount";
+            this.diffuseAmountUd.ValueChanged += new System.EventHandler(this.diffuseAmountUd_ValueChanged);
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(4, 14);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(55, 15);
+            this.label24.TabIndex = 2;
+            this.label24.Text = "Direction";
+            // 
+            // masterLightAmountUd
+            // 
+            this.masterLightAmountUd.DecimalPlaces = 2;
+            this.masterLightAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.masterLightAmountUd.Location = new System.Drawing.Point(59, 182);
+            this.masterLightAmountUd.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+            this.masterLightAmountUd.Name = "masterLightAmountUd";
+            this.masterLightAmountUd.Size = new System.Drawing.Size(51, 23);
+            this.masterLightAmountUd.TabIndex = 55;
+            this.masterLightAmountUd.Tag = "Edit Master brightness";
+            this.masterLightAmountUd.ValueChanged += new System.EventHandler(this.MasterLightAmountUD_ValueChanged);
+            // 
+            // specAmountUd
+            // 
+            this.specAmountUd.DecimalPlaces = 2;
+            this.specAmountUd.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.specAmountUd.Location = new System.Drawing.Point(59, 130);
+            this.specAmountUd.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
+            this.specAmountUd.Name = "specAmountUd";
+            this.specAmountUd.Size = new System.Drawing.Size(51, 23);
+            this.specAmountUd.TabIndex = 55;
+            this.specAmountUd.Tag = "Edit Specular amount";
+            this.specAmountUd.ValueChanged += new System.EventHandler(this.specAmountUd_ValueChanged);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(8, 80);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(53, 15);
+            this.label15.TabIndex = 49;
+            this.label15.Text = "Ambient";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(13, 108);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(44, 15);
+            this.label14.TabIndex = 50;
+            this.label14.Text = "Diffuse";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(14, 184);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(43, 15);
+            this.label16.TabIndex = 52;
+            this.label16.Text = "Master";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(7, 158);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(49, 15);
+            this.label22.TabIndex = 52;
+            this.label22.Text = "S power";
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(4, 132);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(52, 15);
+            this.label23.TabIndex = 51;
+            this.label23.Text = "Specular";
+            // 
+            // lightDirXUd
+            // 
+            this.lightDirXUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lightDirXUd.Location = new System.Drawing.Point(0, 30);
+            this.lightDirXUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.lightDirXUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+            this.lightDirXUd.Name = "lightDirXUd";
+            this.lightDirXUd.Size = new System.Drawing.Size(57, 23);
+            this.lightDirXUd.TabIndex = 34;
+            this.lightDirXUd.Tag = "Edit Light X Direction";
+            this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
+            // 
+            // label11
+            // 
+            this.label11.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(139, 53);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(14, 15);
+            this.label11.TabIndex = 31;
+            this.label11.Text = "Z";
+            // 
+            // lightDirYUd
+            // 
+            this.lightDirYUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lightDirYUd.Location = new System.Drawing.Point(60, 30);
+            this.lightDirYUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.lightDirYUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+            this.lightDirYUd.Name = "lightDirYUd";
+            this.lightDirYUd.Size = new System.Drawing.Size(57, 23);
+            this.lightDirYUd.TabIndex = 35;
+            this.lightDirYUd.Tag = "Edit Light Y Direction";
+            this.lightDirYUd.ValueChanged += new System.EventHandler(this.lightDirYUd_ValueChanged);
+            // 
+            // lightDirZUd
+            // 
+            this.lightDirZUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lightDirZUd.Location = new System.Drawing.Point(120, 30);
+            this.lightDirZUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.lightDirZUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+            this.lightDirZUd.Name = "lightDirZUd";
+            this.lightDirZUd.Size = new System.Drawing.Size(57, 23);
+            this.lightDirZUd.TabIndex = 36;
+            this.lightDirZUd.Tag = "Edit Light Z Direction";
+            this.lightDirZUd.ValueChanged += new System.EventHandler(this.lightDirZUd_ValueChanged);
+            // 
+            // label12
+            // 
+            this.label12.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(82, 53);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(14, 15);
+            this.label12.TabIndex = 32;
+            this.label12.Text = "Y";
+            // 
+            // label13
+            // 
+            this.label13.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(17, 53);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(14, 15);
+            this.label13.TabIndex = 33;
+            this.label13.Text = "X";
+            // 
+            // globalLightCb
+            // 
+            this.globalLightCb.AutoSize = true;
+            this.globalLightCb.Checked = true;
+            this.globalLightCb.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.globalLightCb.Location = new System.Drawing.Point(3, 30);
+            this.globalLightCb.Name = "globalLightCb";
+            this.globalLightCb.Size = new System.Drawing.Size(81, 19);
+            this.globalLightCb.TabIndex = 20;
+            this.globalLightCb.Tag = "Use global";
+            this.globalLightCb.Text = "Use global";
+            this.globalLightCb.UseVisualStyleBackColor = true;
+            this.globalLightCb.CheckedChanged += new System.EventHandler(this.globalLightCb_CheckedChanged);
+            // 
+            // spatial
+            // 
+            this.spatial.Controls.Add(this.defaultSpatialBtn);
+            this.spatial.Controls.Add(this.label41);
+            this.spatial.Controls.Add(this.label40);
+            this.spatial.Controls.Add(this.label39);
+            this.spatial.Controls.Add(this.label20);
+            this.spatial.Controls.Add(this.zoffsetUd);
+            this.spatial.Controls.Add(this.yoffsetUd);
+            this.spatial.Controls.Add(this.xoffsetUd);
+            this.spatial.Location = new System.Drawing.Point(4, 24);
+            this.spatial.Name = "spatial";
+            this.spatial.Padding = new System.Windows.Forms.Padding(3);
+            this.spatial.Size = new System.Drawing.Size(200, 4333);
+            this.spatial.TabIndex = 3;
+            this.spatial.Text = "Spatial";
+            this.spatial.UseVisualStyleBackColor = true;
+            // 
+            // defaultSpatialBtn
+            // 
+            this.defaultSpatialBtn.Location = new System.Drawing.Point(1, 1);
+            this.defaultSpatialBtn.Name = "defaultSpatialBtn";
+            this.defaultSpatialBtn.Size = new System.Drawing.Size(179, 23);
+            this.defaultSpatialBtn.TabIndex = 10;
+            this.defaultSpatialBtn.Tag = "Default Spatial";
+            this.defaultSpatialBtn.Text = "Default Spatial";
+            this.defaultSpatialBtn.UseVisualStyleBackColor = true;
+            this.defaultSpatialBtn.Click += new System.EventHandler(this.defaultSpatialBtn_Click);
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(151, 80);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(14, 15);
+            this.label41.TabIndex = 1;
+            this.label41.Text = "Z";
+            // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(87, 80);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(14, 15);
+            this.label40.TabIndex = 1;
+            this.label40.Text = "Y";
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(24, 80);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(14, 15);
+            this.label39.TabIndex = 1;
+            this.label39.Text = "X";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(-2, 41);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(83, 15);
+            this.label20.TabIndex = 1;
+            this.label20.Text = "Position offset";
+            // 
+            // zoffsetUd
+            // 
+            this.zoffsetUd.Location = new System.Drawing.Point(121, 57);
+            this.zoffsetUd.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.zoffsetUd.Minimum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            -2147483648});
+            this.zoffsetUd.Name = "zoffsetUd";
+            this.zoffsetUd.Size = new System.Drawing.Size(57, 23);
+            this.zoffsetUd.TabIndex = 40;
+            this.zoffsetUd.Tag = "Edit Z Offset";
+            this.zoffsetUd.ValueChanged += new System.EventHandler(this.zoffsetUd_ValueChanged);
+            // 
+            // yoffsetUd
+            // 
+            this.yoffsetUd.Location = new System.Drawing.Point(61, 57);
+            this.yoffsetUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.yoffsetUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+            this.yoffsetUd.Name = "yoffsetUd";
+            this.yoffsetUd.Size = new System.Drawing.Size(57, 23);
+            this.yoffsetUd.TabIndex = 30;
+            this.yoffsetUd.Tag = "Edit Y Offset";
+            this.yoffsetUd.ValueChanged += new System.EventHandler(this.yoffsetUd_ValueChanged);
+            // 
+            // xoffsetUd
+            // 
+            this.xoffsetUd.Location = new System.Drawing.Point(1, 57);
+            this.xoffsetUd.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.xoffsetUd.Minimum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            -2147483648});
+            this.xoffsetUd.Name = "xoffsetUd";
+            this.xoffsetUd.Size = new System.Drawing.Size(57, 23);
+            this.xoffsetUd.TabIndex = 20;
+            this.xoffsetUd.Tag = "Edit X Offset";
+            this.xoffsetUd.ValueChanged += new System.EventHandler(this.xoffsetUd_ValueChanged);
             // 
             // trackColumn
             // 
@@ -792,1294 +1987,6 @@
             this.saveTrackPropsToolStripMenuItem.Text = "Save Properties";
             this.saveTrackPropsToolStripMenuItem.Click += new System.EventHandler(this.saveTrackPropsToolStripMenuItem_Click);
             // 
-            // selectedTrackPropsPanel
-            // 
-            this.selectedTrackPropsPanel.Controls.Add(this.style);
-            this.selectedTrackPropsPanel.Controls.Add(this.material);
-            this.selectedTrackPropsPanel.Controls.Add(this.light);
-            this.selectedTrackPropsPanel.Controls.Add(this.spatial);
-            this.selectedTrackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.selectedTrackPropsPanel.Location = new System.Drawing.Point(187, 0);
-            this.selectedTrackPropsPanel.Name = "selectedTrackPropsPanel";
-            this.selectedTrackPropsPanel.SelectedIndex = 0;
-            this.selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 4359);
-            this.selectedTrackPropsPanel.TabIndex = 14;
-            // 
-            // style
-            // 
-            this.style.AutoScroll = true;
-            this.style.BackColor = System.Drawing.SystemColors.Control;
-            this.style.Controls.Add(this.lineStyleControl);
-            this.style.Controls.Add(this.barStyleControl);
-            this.style.Controls.Add(this.defaultStyleBtn);
-            this.style.Controls.Add(this.styleList);
-            this.style.Controls.Add(this.label1);
-            this.style.Location = new System.Drawing.Point(4, 22);
-            this.style.Name = "style";
-            this.style.Size = new System.Drawing.Size(200, 4333);
-            this.style.TabIndex = 2;
-            this.style.Text = "Style";
-            // 
-            // lineStyleControl
-            // 
-            this.lineStyleControl.AutoSize = true;
-            this.lineStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
-            this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
-            this.lineStyleControl.Name = "lineStyleControl";
-            this.lineStyleControl.Size = new System.Drawing.Size(184, 378);
-            this.lineStyleControl.TabIndex = 2;
-            this.lineStyleControl.Visible = false;
-            // 
-            // barStyleControl
-            // 
-            this.barStyleControl.AutoSize = true;
-            this.barStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.barStyleControl.Location = new System.Drawing.Point(3, 72);
-            this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.barStyleControl.Name = "barStyleControl";
-            this.barStyleControl.Size = new System.Drawing.Size(180, 55);
-            this.barStyleControl.TabIndex = 2;
-            // 
-            // defaultStyleBtn
-            // 
-            this.defaultStyleBtn.Location = new System.Drawing.Point(1, 1);
-            this.defaultStyleBtn.Name = "defaultStyleBtn";
-            this.defaultStyleBtn.Size = new System.Drawing.Size(179, 23);
-            this.defaultStyleBtn.TabIndex = 0;
-            this.defaultStyleBtn.Tag = "Default Style";
-            this.defaultStyleBtn.Text = "Default Style";
-            this.defaultStyleBtn.UseVisualStyleBackColor = true;
-            this.defaultStyleBtn.Click += new System.EventHandler(this.defaultStyleBtn_Click);
-            // 
-            // styleList
-            // 
-            this.styleList.DisplayMember = "Name";
-            this.styleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.styleList.FormattingEnabled = true;
-            this.styleList.Location = new System.Drawing.Point(4, 45);
-            this.styleList.Name = "styleList";
-            this.styleList.Size = new System.Drawing.Size(113, 21);
-            this.styleList.TabIndex = 1;
-            this.styleList.Tag = "Change Note Style";
-            this.styleList.ValueMember = "Value";
-            this.styleList.SelectedIndexChanged += new System.EventHandler(this.styleList_SelectedIndexChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1, 29);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(54, 13);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "Note style";
-            // 
-            // material
-            // 
-            this.material.AutoScroll = true;
-            this.material.BackColor = System.Drawing.Color.Transparent;
-            this.material.Controls.Add(this.groupBox4);
-            this.material.Controls.Add(this.defaultMtrlBtn);
-            this.material.Controls.Add(this.alphaLbl);
-            this.material.Controls.Add(this.transpSlider);
-            this.material.Controls.Add(this.hueTb);
-            this.material.Controls.Add(this.groupBox1);
-            this.material.Controls.Add(this.hueSlider);
-            this.material.Controls.Add(this.label2);
-            this.material.Controls.Add(this.groupBox2);
-            this.material.Controls.Add(this.transpTb);
-            this.material.Location = new System.Drawing.Point(4, 22);
-            this.material.Name = "material";
-            this.material.Padding = new System.Windows.Forms.Padding(3);
-            this.material.Size = new System.Drawing.Size(200, 4333);
-            this.material.TabIndex = 0;
-            this.material.Text = "Material";
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.label37);
-            this.groupBox4.Controls.Add(this.label34);
-            this.groupBox4.Controls.Add(this.label35);
-            this.groupBox4.Controls.Add(this.texVScrollUD);
-            this.groupBox4.Controls.Add(this.label33);
-            this.groupBox4.Controls.Add(this.texUScrollUD);
-            this.groupBox4.Controls.Add(this.tableLayoutPanel1);
-            this.groupBox4.Controls.Add(this.texVTileCb);
-            this.groupBox4.Controls.Add(this.texUTileCb);
-            this.groupBox4.Controls.Add(this.texKeepAspectCb);
-            this.groupBox4.Controls.Add(this.tileTexCb);
-            this.groupBox4.Controls.Add(this.loadTexBtn);
-            this.groupBox4.Controls.Add(this.unloadTexBtn);
-            this.groupBox4.Controls.Add(this.disableTextureCh);
-            this.groupBox4.Controls.Add(this.texColBlendCb);
-            this.groupBox4.Controls.Add(this.pointSmpCb);
-            this.groupBox4.Controls.Add(this.trackTexPb);
-            this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox4.Location = new System.Drawing.Point(1, 485);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(2);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox4.Size = new System.Drawing.Size(182, 422);
-            this.groupBox4.TabIndex = 60;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Texture";
-            // 
-            // label37
-            // 
-            this.label37.AutoSize = true;
-            this.label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label37.Location = new System.Drawing.Point(113, 400);
-            this.label37.Name = "label37";
-            this.label37.Size = new System.Drawing.Size(68, 13);
-            this.label37.TabIndex = 19;
-            this.label37.Text = "repeats/beat";
-            // 
-            // label34
-            // 
-            this.label34.AutoSize = true;
-            this.label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label34.Location = new System.Drawing.Point(113, 380);
-            this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(68, 13);
-            this.label34.TabIndex = 19;
-            this.label34.Text = "repeats/beat";
-            // 
-            // label35
-            // 
-            this.label35.AutoSize = true;
-            this.label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label35.Location = new System.Drawing.Point(3, 400);
-            this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(43, 13);
-            this.label35.TabIndex = 19;
-            this.label35.Text = "Scroll V";
-            // 
-            // texVScrollUD
-            // 
-            this.texVScrollUD.DecimalPlaces = 3;
-            this.texVScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texVScrollUD.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.texVScrollUD.Location = new System.Drawing.Point(52, 398);
-            this.texVScrollUD.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.texVScrollUD.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            -2147483648});
-            this.texVScrollUD.Name = "texVScrollUD";
-            this.texVScrollUD.Size = new System.Drawing.Size(55, 20);
-            this.texVScrollUD.TabIndex = 51;
-            this.texVScrollUD.Tag = "Edit Scroll V";
-            this.texVScrollUD.ValueChanged += new System.EventHandler(this.texVScrollUD_ValueChanged);
-            // 
-            // label33
-            // 
-            this.label33.AutoSize = true;
-            this.label33.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label33.Location = new System.Drawing.Point(2, 380);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(44, 13);
-            this.label33.TabIndex = 19;
-            this.label33.Text = "Scroll U";
-            // 
-            // texUScrollUD
-            // 
-            this.texUScrollUD.DecimalPlaces = 3;
-            this.texUScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texUScrollUD.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.texUScrollUD.Location = new System.Drawing.Point(52, 378);
-            this.texUScrollUD.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.texUScrollUD.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            -2147483648});
-            this.texUScrollUD.Name = "texUScrollUD";
-            this.texUScrollUD.Size = new System.Drawing.Size(55, 20);
-            this.texUScrollUD.TabIndex = 50;
-            this.texUScrollUD.Tag = "Edit Scroll U";
-            this.texUScrollUD.ValueChanged += new System.EventHandler(this.texUScrollUD_ValueChanged);
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.InsetDouble;
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel1.Controls.Add(this.label31, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label32, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label36, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.songAnchorLabel, 0, 3);
-            this.tableLayoutPanel1.Controls.Add(this.noteAnchorLabel, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.panel2, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.screenAnchorLabel, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.panel1, 2, 1);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 279);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 4;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(112, 93);
-            this.tableLayoutPanel1.TabIndex = 40;
-            // 
-            // label31
-            // 
-            this.label31.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label31.AutoSize = true;
-            this.label31.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label31.Location = new System.Drawing.Point(92, 6);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(14, 13);
-            this.label31.TabIndex = 17;
-            this.label31.Text = "V";
-            // 
-            // label32
-            // 
-            this.label32.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label32.AutoSize = true;
-            this.label32.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label32.Location = new System.Drawing.Point(69, 6);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(14, 13);
-            this.label32.TabIndex = 17;
-            this.label32.Text = "U";
-            // 
-            // label36
-            // 
-            this.label36.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label36.AutoSize = true;
-            this.label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label36.Location = new System.Drawing.Point(12, 6);
-            this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(41, 13);
-            this.label36.TabIndex = 17;
-            this.label36.Text = "Anchor";
-            // 
-            // songAnchorLabel
-            // 
-            this.songAnchorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.songAnchorLabel.AutoSize = true;
-            this.songAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.songAnchorLabel.Location = new System.Drawing.Point(6, 69);
-            this.songAnchorLabel.Name = "songAnchorLabel";
-            this.songAnchorLabel.Size = new System.Drawing.Size(54, 21);
-            this.songAnchorLabel.TabIndex = 17;
-            this.songAnchorLabel.Tag = "Song anchor";
-            this.songAnchorLabel.Text = "Song start";
-            this.songAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.songAnchorLabel.Click += new System.EventHandler(this.songAnchorLabel_Click);
-            // 
-            // noteAnchorLabel
-            // 
-            this.noteAnchorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.noteAnchorLabel.AutoSize = true;
-            this.noteAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.noteAnchorLabel.Location = new System.Drawing.Point(6, 25);
-            this.noteAnchorLabel.Name = "noteAnchorLabel";
-            this.noteAnchorLabel.Size = new System.Drawing.Size(54, 19);
-            this.noteAnchorLabel.TabIndex = 1;
-            this.noteAnchorLabel.Tag = "Note anchor";
-            this.noteAnchorLabel.Text = "Note";
-            this.noteAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.noteAnchorLabel.Click += new System.EventHandler(this.noteAnchorLabel_Click);
-            // 
-            // panel2
-            // 
-            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel2.BackColor = System.Drawing.Color.Transparent;
-            this.panel2.Controls.Add(this.songAnchorRb);
-            this.panel2.Controls.Add(this.screenUAnchorRb);
-            this.panel2.Controls.Add(this.noteUAnchorRb);
-            this.panel2.Location = new System.Drawing.Point(66, 25);
-            this.panel2.Margin = new System.Windows.Forms.Padding(0);
-            this.panel2.Name = "panel2";
-            this.tableLayoutPanel1.SetRowSpan(this.panel2, 3);
-            this.panel2.Size = new System.Drawing.Size(20, 65);
-            this.panel2.TabIndex = 20;
-            // 
-            // songAnchorRb
-            // 
-            this.songAnchorRb.AutoSize = true;
-            this.songAnchorRb.Location = new System.Drawing.Point(3, 48);
-            this.songAnchorRb.Name = "songAnchorRb";
-            this.songAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.songAnchorRb.TabIndex = 24;
-            this.songAnchorRb.TabStop = true;
-            this.songAnchorRb.Tag = "Song anchor";
-            this.songAnchorRb.UseVisualStyleBackColor = true;
-            this.songAnchorRb.Click += new System.EventHandler(this.songAnchorRb_Click);
-            // 
-            // screenUAnchorRb
-            // 
-            this.screenUAnchorRb.AutoSize = true;
-            this.screenUAnchorRb.Location = new System.Drawing.Point(3, 25);
-            this.screenUAnchorRb.Name = "screenUAnchorRb";
-            this.screenUAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.screenUAnchorRb.TabIndex = 22;
-            this.screenUAnchorRb.TabStop = true;
-            this.screenUAnchorRb.Tag = "Screen U anchor";
-            this.screenUAnchorRb.UseVisualStyleBackColor = true;
-            this.screenUAnchorRb.Click += new System.EventHandler(this.screenUAnchorRb_Click);
-            // 
-            // noteUAnchorRb
-            // 
-            this.noteUAnchorRb.AutoSize = true;
-            this.noteUAnchorRb.Location = new System.Drawing.Point(3, 3);
-            this.noteUAnchorRb.Name = "noteUAnchorRb";
-            this.noteUAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.noteUAnchorRb.TabIndex = 20;
-            this.noteUAnchorRb.TabStop = true;
-            this.noteUAnchorRb.Tag = "Note U anchor";
-            this.noteUAnchorRb.UseVisualStyleBackColor = true;
-            this.noteUAnchorRb.Click += new System.EventHandler(this.noteUAnchorRb_Click);
-            // 
-            // screenAnchorLabel
-            // 
-            this.screenAnchorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.screenAnchorLabel.AutoSize = true;
-            this.screenAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.screenAnchorLabel.Location = new System.Drawing.Point(6, 47);
-            this.screenAnchorLabel.Name = "screenAnchorLabel";
-            this.screenAnchorLabel.Size = new System.Drawing.Size(54, 19);
-            this.screenAnchorLabel.TabIndex = 17;
-            this.screenAnchorLabel.Tag = "Screen anchor";
-            this.screenAnchorLabel.Text = "Screen";
-            this.screenAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.screenAnchorLabel.Click += new System.EventHandler(this.screenAnchorLabel_Click);
-            // 
-            // panel1
-            // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.BackColor = System.Drawing.Color.Transparent;
-            this.panel1.Controls.Add(this.screenVAnchorRb);
-            this.panel1.Controls.Add(this.noteVAnchorRb);
-            this.panel1.Location = new System.Drawing.Point(89, 25);
-            this.panel1.Margin = new System.Windows.Forms.Padding(0);
-            this.panel1.Name = "panel1";
-            this.tableLayoutPanel1.SetRowSpan(this.panel1, 3);
-            this.panel1.Size = new System.Drawing.Size(20, 65);
-            this.panel1.TabIndex = 21;
-            // 
-            // screenVAnchorRb
-            // 
-            this.screenVAnchorRb.AutoSize = true;
-            this.screenVAnchorRb.Location = new System.Drawing.Point(3, 25);
-            this.screenVAnchorRb.Name = "screenVAnchorRb";
-            this.screenVAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.screenVAnchorRb.TabIndex = 23;
-            this.screenVAnchorRb.TabStop = true;
-            this.screenVAnchorRb.Tag = "Screen V anchor";
-            this.screenVAnchorRb.UseVisualStyleBackColor = true;
-            this.screenVAnchorRb.Click += new System.EventHandler(this.screenVAnchorRb_Click);
-            // 
-            // noteVAnchorRb
-            // 
-            this.noteVAnchorRb.AutoSize = true;
-            this.noteVAnchorRb.Location = new System.Drawing.Point(3, 3);
-            this.noteVAnchorRb.Name = "noteVAnchorRb";
-            this.noteVAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.noteVAnchorRb.TabIndex = 21;
-            this.noteVAnchorRb.TabStop = true;
-            this.noteVAnchorRb.Tag = "Note V anchor";
-            this.noteVAnchorRb.UseVisualStyleBackColor = true;
-            this.noteVAnchorRb.Click += new System.EventHandler(this.noteVAnchorRb_Click);
-            // 
-            // texVTileCb
-            // 
-            this.texVTileCb.AutoSize = true;
-            this.texVTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texVTileCb.Location = new System.Drawing.Point(91, 236);
-            this.texVTileCb.Name = "texVTileCb";
-            this.texVTileCb.Size = new System.Drawing.Size(33, 17);
-            this.texVTileCb.TabIndex = 32;
-            this.texVTileCb.Tag = "V";
-            this.texVTileCb.Text = "V";
-            this.texVTileCb.UseVisualStyleBackColor = true;
-            this.texVTileCb.CheckedChanged += new System.EventHandler(this.texVTileCb_CheckedChanged);
-            // 
-            // texUTileCb
-            // 
-            this.texUTileCb.AutoSize = true;
-            this.texUTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texUTileCb.Location = new System.Drawing.Point(52, 236);
-            this.texUTileCb.Name = "texUTileCb";
-            this.texUTileCb.Size = new System.Drawing.Size(34, 17);
-            this.texUTileCb.TabIndex = 31;
-            this.texUTileCb.Tag = "U";
-            this.texUTileCb.Text = "U";
-            this.texUTileCb.UseVisualStyleBackColor = true;
-            this.texUTileCb.CheckedChanged += new System.EventHandler(this.texUTileCb_CheckedChanged);
-            // 
-            // texKeepAspectCb
-            // 
-            this.texKeepAspectCb.AutoSize = true;
-            this.texKeepAspectCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texKeepAspectCb.Location = new System.Drawing.Point(3, 257);
-            this.texKeepAspectCb.Margin = new System.Windows.Forms.Padding(2);
-            this.texKeepAspectCb.Name = "texKeepAspectCb";
-            this.texKeepAspectCb.Size = new System.Drawing.Size(109, 17);
-            this.texKeepAspectCb.TabIndex = 33;
-            this.texKeepAspectCb.Tag = "Keep aspect ratio";
-            this.texKeepAspectCb.Text = "Keep aspect ratio";
-            this.texKeepAspectCb.UseVisualStyleBackColor = true;
-            this.texKeepAspectCb.CheckedChanged += new System.EventHandler(this.texKeepAspect_CheckedChanged);
-            // 
-            // tileTexCb
-            // 
-            this.tileTexCb.AutoSize = true;
-            this.tileTexCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tileTexCb.Location = new System.Drawing.Point(4, 236);
-            this.tileTexCb.Margin = new System.Windows.Forms.Padding(2);
-            this.tileTexCb.Name = "tileTexCb";
-            this.tileTexCb.Size = new System.Drawing.Size(43, 17);
-            this.tileTexCb.TabIndex = 30;
-            this.tileTexCb.Tag = "Tile";
-            this.tileTexCb.Text = "Tile";
-            this.tileTexCb.UseVisualStyleBackColor = true;
-            this.tileTexCb.CheckedChanged += new System.EventHandler(this.tileTexCb_CheckedChanged);
-            // 
-            // loadTexBtn
-            // 
-            this.loadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.loadTexBtn.Location = new System.Drawing.Point(5, 18);
-            this.loadTexBtn.Name = "loadTexBtn";
-            this.loadTexBtn.Size = new System.Drawing.Size(75, 23);
-            this.loadTexBtn.TabIndex = 10;
-            this.loadTexBtn.Tag = "Load texture";
-            this.loadTexBtn.Text = "&Load texture";
-            this.loadTexBtn.UseVisualStyleBackColor = true;
-            this.loadTexBtn.Click += new System.EventHandler(this.textureLoadBtn_Click);
-            // 
-            // unloadTexBtn
-            // 
-            this.unloadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.unloadTexBtn.Location = new System.Drawing.Point(92, 18);
-            this.unloadTexBtn.Name = "unloadTexBtn";
-            this.unloadTexBtn.Size = new System.Drawing.Size(86, 23);
-            this.unloadTexBtn.TabIndex = 15;
-            this.unloadTexBtn.Tag = "Unload texture";
-            this.unloadTexBtn.Text = "&Unload texture";
-            this.unloadTexBtn.UseVisualStyleBackColor = true;
-            this.unloadTexBtn.Click += new System.EventHandler(this.unloadTexBtn_Click);
-            // 
-            // disableTextureCh
-            // 
-            this.disableTextureCh.AutoSize = true;
-            this.disableTextureCh.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.disableTextureCh.Location = new System.Drawing.Point(6, 173);
-            this.disableTextureCh.Margin = new System.Windows.Forms.Padding(2);
-            this.disableTextureCh.Name = "disableTextureCh";
-            this.disableTextureCh.Size = new System.Drawing.Size(96, 17);
-            this.disableTextureCh.TabIndex = 20;
-            this.disableTextureCh.Tag = "Disable texture";
-            this.disableTextureCh.Text = "Disable texture";
-            this.disableTextureCh.UseVisualStyleBackColor = true;
-            this.disableTextureCh.CheckedChanged += new System.EventHandler(this.disableTextureCb_CheckedChanged);
-            // 
-            // texColBlendCb
-            // 
-            this.texColBlendCb.AutoSize = true;
-            this.texColBlendCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texColBlendCb.Location = new System.Drawing.Point(4, 215);
-            this.texColBlendCb.Margin = new System.Windows.Forms.Padding(2);
-            this.texColBlendCb.Name = "texColBlendCb";
-            this.texColBlendCb.Size = new System.Drawing.Size(149, 17);
-            this.texColBlendCb.TabIndex = 20;
-            this.texColBlendCb.Tag = "Blend hue with track color";
-            this.texColBlendCb.Text = "Blend hue with track color";
-            this.texColBlendCb.UseVisualStyleBackColor = true;
-            this.texColBlendCb.CheckedChanged += new System.EventHandler(this.texColBlendCb_CheckedChanged);
-            // 
-            // pointSmpCb
-            // 
-            this.pointSmpCb.AutoSize = true;
-            this.pointSmpCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pointSmpCb.Location = new System.Drawing.Point(6, 194);
-            this.pointSmpCb.Margin = new System.Windows.Forms.Padding(2);
-            this.pointSmpCb.Name = "pointSmpCb";
-            this.pointSmpCb.Size = new System.Drawing.Size(94, 17);
-            this.pointSmpCb.TabIndex = 20;
-            this.pointSmpCb.Tag = "Point sampling";
-            this.pointSmpCb.Text = "Point sampling";
-            this.pointSmpCb.UseVisualStyleBackColor = true;
-            this.pointSmpCb.CheckedChanged += new System.EventHandler(this.pointSmpCb_CheckedChanged);
-            // 
-            // trackTexPb
-            // 
-            this.trackTexPb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.trackTexPb.Location = new System.Drawing.Point(5, 47);
-            this.trackTexPb.Name = "trackTexPb";
-            this.trackTexPb.Size = new System.Drawing.Size(173, 121);
-            this.trackTexPb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.trackTexPb.TabIndex = 13;
-            this.trackTexPb.TabStop = false;
-            // 
-            // defaultMtrlBtn
-            // 
-            this.defaultMtrlBtn.Location = new System.Drawing.Point(1, 1);
-            this.defaultMtrlBtn.Name = "defaultMtrlBtn";
-            this.defaultMtrlBtn.Size = new System.Drawing.Size(179, 23);
-            this.defaultMtrlBtn.TabIndex = 10;
-            this.defaultMtrlBtn.Tag = "Default Material";
-            this.defaultMtrlBtn.Text = "Default Material";
-            this.defaultMtrlBtn.UseVisualStyleBackColor = true;
-            this.defaultMtrlBtn.Click += new System.EventHandler(this.defaultMaterial_Click);
-            // 
-            // alphaLbl
-            // 
-            this.alphaLbl.AutoSize = true;
-            this.alphaLbl.Location = new System.Drawing.Point(5, 32);
-            this.alphaLbl.Name = "alphaLbl";
-            this.alphaLbl.Size = new System.Drawing.Size(43, 13);
-            this.alphaLbl.TabIndex = 7;
-            this.alphaLbl.Text = "Opacity";
-            // 
-            // transpSlider
-            // 
-            this.transpSlider.BackColor = System.Drawing.SystemColors.Control;
-            this.transpSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.transpSlider.LargeChange = 10;
-            this.transpSlider.Location = new System.Drawing.Point(5, 49);
-            this.transpSlider.Maximum = 200;
-            this.transpSlider.Name = "transpSlider";
-            this.transpSlider.Size = new System.Drawing.Size(129, 45);
-            this.transpSlider.TabIndex = 20;
-            this.transpSlider.TickFrequency = 10;
-            this.transpSlider.Value = 50;
-            this.transpSlider.Scroll += new System.EventHandler(this.transpSlider_Scroll);
-            // 
-            // hueTb
-            // 
-            this.hueTb.Location = new System.Drawing.Point(137, 113);
-            this.hueTb.Name = "hueTb";
-            this.hueTb.Size = new System.Drawing.Size(38, 20);
-            this.hueTb.TabIndex = 31;
-            this.hueTb.Tag = "Edit Hue";
-            this.hueTb.Text = "notset";
-            this.hueTb.TextChanged += new System.EventHandler(this.hueTb_TextChanged);
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.BackColor = System.Drawing.Color.Transparent;
-            this.groupBox1.Controls.Add(this.normalLumTb);
-            this.groupBox1.Controls.Add(this.normalLumSlider);
-            this.groupBox1.Controls.Add(this.label);
-            this.groupBox1.Controls.Add(this.normalSatTb);
-            this.groupBox1.Controls.Add(this.normalSatSlider);
-            this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(-1, 164);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(182, 154);
-            this.groupBox1.TabIndex = 40;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Normal notes";
-            // 
-            // normalLumTb
-            // 
-            this.normalLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.normalLumTb.Location = new System.Drawing.Point(141, 105);
-            this.normalLumTb.Name = "normalLumTb";
-            this.normalLumTb.Size = new System.Drawing.Size(38, 20);
-            this.normalLumTb.TabIndex = 21;
-            this.normalLumTb.Tag = "Edit Normal Brightness";
-            this.normalLumTb.Text = "notset";
-            this.normalLumTb.TextChanged += new System.EventHandler(this.normalLumTb_TextChanged);
-            // 
-            // normalLumSlider
-            // 
-            this.normalLumSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.normalLumSlider.LargeChange = 10;
-            this.normalLumSlider.Location = new System.Drawing.Point(6, 105);
-            this.normalLumSlider.Maximum = 200;
-            this.normalLumSlider.Name = "normalLumSlider";
-            this.normalLumSlider.Size = new System.Drawing.Size(129, 45);
-            this.normalLumSlider.TabIndex = 20;
-            this.normalLumSlider.TickFrequency = 10;
-            this.normalLumSlider.Value = 50;
-            this.normalLumSlider.Scroll += new System.EventHandler(this.normalLumSlider_Scroll);
-            // 
-            // label
-            // 
-            this.label.AutoSize = true;
-            this.label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label.Location = new System.Drawing.Point(6, 89);
-            this.label.Name = "label";
-            this.label.Size = new System.Drawing.Size(56, 13);
-            this.label.TabIndex = 13;
-            this.label.Text = "Brightness";
-            // 
-            // normalSatTb
-            // 
-            this.normalSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.normalSatTb.Location = new System.Drawing.Point(141, 41);
-            this.normalSatTb.Name = "normalSatTb";
-            this.normalSatTb.Size = new System.Drawing.Size(38, 20);
-            this.normalSatTb.TabIndex = 11;
-            this.normalSatTb.Tag = "Edit Normal Saturation";
-            this.normalSatTb.Text = "notset";
-            this.normalSatTb.TextChanged += new System.EventHandler(this.normalSatTb_TextChanged);
-            // 
-            // normalSatSlider
-            // 
-            this.normalSatSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.normalSatSlider.LargeChange = 10;
-            this.normalSatSlider.Location = new System.Drawing.Point(6, 41);
-            this.normalSatSlider.Maximum = 200;
-            this.normalSatSlider.Name = "normalSatSlider";
-            this.normalSatSlider.Size = new System.Drawing.Size(129, 45);
-            this.normalSatSlider.TabIndex = 10;
-            this.normalSatSlider.TickFrequency = 10;
-            this.normalSatSlider.Value = 50;
-            this.normalSatSlider.Scroll += new System.EventHandler(this.normalSatSlider_Scroll);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(6, 25);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(55, 13);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "Saturation";
-            // 
-            // hueSlider
-            // 
-            this.hueSlider.BackColor = System.Drawing.SystemColors.Control;
-            this.hueSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.hueSlider.LargeChange = 10;
-            this.hueSlider.Location = new System.Drawing.Point(5, 112);
-            this.hueSlider.Maximum = 100;
-            this.hueSlider.Name = "hueSlider";
-            this.hueSlider.Size = new System.Drawing.Size(129, 45);
-            this.hueSlider.TabIndex = 30;
-            this.hueSlider.TickFrequency = 10;
-            this.hueSlider.Value = 50;
-            this.hueSlider.Scroll += new System.EventHandler(this.hueSlider_Scroll);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(5, 96);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(27, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "Hue";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.BackColor = System.Drawing.Color.Transparent;
-            this.groupBox2.Controls.Add(this.hiliteLumTb);
-            this.groupBox2.Controls.Add(this.hiliteLumSlider);
-            this.groupBox2.Controls.Add(this.label5);
-            this.groupBox2.Controls.Add(this.hiliteSatTb);
-            this.groupBox2.Controls.Add(this.hiliteSatSlider);
-            this.groupBox2.Controls.Add(this.label6);
-            this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox2.Location = new System.Drawing.Point(-1, 325);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(182, 155);
-            this.groupBox2.TabIndex = 50;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Highlighted notes";
-            // 
-            // hiliteLumTb
-            // 
-            this.hiliteLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.hiliteLumTb.Location = new System.Drawing.Point(141, 105);
-            this.hiliteLumTb.Name = "hiliteLumTb";
-            this.hiliteLumTb.Size = new System.Drawing.Size(38, 20);
-            this.hiliteLumTb.TabIndex = 21;
-            this.hiliteLumTb.Tag = "Edit Highlight Brightness";
-            this.hiliteLumTb.Text = "notset";
-            this.hiliteLumTb.TextChanged += new System.EventHandler(this.hiliteLumTb_TextChanged);
-            // 
-            // hiliteLumSlider
-            // 
-            this.hiliteLumSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.hiliteLumSlider.LargeChange = 10;
-            this.hiliteLumSlider.Location = new System.Drawing.Point(6, 105);
-            this.hiliteLumSlider.Maximum = 200;
-            this.hiliteLumSlider.Name = "hiliteLumSlider";
-            this.hiliteLumSlider.Size = new System.Drawing.Size(129, 45);
-            this.hiliteLumSlider.TabIndex = 20;
-            this.hiliteLumSlider.TickFrequency = 10;
-            this.hiliteLumSlider.Value = 50;
-            this.hiliteLumSlider.Scroll += new System.EventHandler(this.hiliteLumSlider_Scroll);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(6, 89);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(56, 13);
-            this.label5.TabIndex = 13;
-            this.label5.Text = "Brightness";
-            // 
-            // hiliteSatTb
-            // 
-            this.hiliteSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.hiliteSatTb.Location = new System.Drawing.Point(141, 41);
-            this.hiliteSatTb.Name = "hiliteSatTb";
-            this.hiliteSatTb.Size = new System.Drawing.Size(38, 20);
-            this.hiliteSatTb.TabIndex = 11;
-            this.hiliteSatTb.Tag = "Edit Highlight Saturation";
-            this.hiliteSatTb.Text = "notset";
-            this.hiliteSatTb.TextChanged += new System.EventHandler(this.hiliteSatTb_TextChanged);
-            // 
-            // hiliteSatSlider
-            // 
-            this.hiliteSatSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.hiliteSatSlider.LargeChange = 10;
-            this.hiliteSatSlider.Location = new System.Drawing.Point(6, 41);
-            this.hiliteSatSlider.Maximum = 200;
-            this.hiliteSatSlider.Name = "hiliteSatSlider";
-            this.hiliteSatSlider.Size = new System.Drawing.Size(129, 45);
-            this.hiliteSatSlider.TabIndex = 10;
-            this.hiliteSatSlider.TickFrequency = 10;
-            this.hiliteSatSlider.Value = 50;
-            this.hiliteSatSlider.Scroll += new System.EventHandler(this.hiliteSatSlider_Scroll);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(6, 25);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(55, 13);
-            this.label6.TabIndex = 10;
-            this.label6.Text = "Saturation";
-            // 
-            // transpTb
-            // 
-            this.transpTb.Location = new System.Drawing.Point(137, 49);
-            this.transpTb.Name = "transpTb";
-            this.transpTb.Size = new System.Drawing.Size(38, 20);
-            this.transpTb.TabIndex = 21;
-            this.transpTb.Tag = "Edit Opacity";
-            this.transpTb.Text = "notset";
-            this.transpTb.TextChanged += new System.EventHandler(this.transpTb_TextChanged);
-            // 
-            // light
-            // 
-            this.light.AutoScroll = true;
-            this.light.BackColor = System.Drawing.SystemColors.Control;
-            this.light.Controls.Add(this.defaultLightBtn);
-            this.light.Controls.Add(this.lightPanel);
-            this.light.Controls.Add(this.globalLightCb);
-            this.light.Location = new System.Drawing.Point(4, 22);
-            this.light.Name = "light";
-            this.light.Padding = new System.Windows.Forms.Padding(3);
-            this.light.Size = new System.Drawing.Size(200, 4333);
-            this.light.TabIndex = 1;
-            this.light.Text = "Light";
-            // 
-            // defaultLightBtn
-            // 
-            this.defaultLightBtn.Location = new System.Drawing.Point(1, 1);
-            this.defaultLightBtn.Name = "defaultLightBtn";
-            this.defaultLightBtn.Size = new System.Drawing.Size(179, 23);
-            this.defaultLightBtn.TabIndex = 10;
-            this.defaultLightBtn.Tag = "Default Light";
-            this.defaultLightBtn.Text = "Default Light";
-            this.defaultLightBtn.UseVisualStyleBackColor = true;
-            this.defaultLightBtn.Click += new System.EventHandler(this.defaultLightBtn_Click);
-            // 
-            // lightPanel
-            // 
-            this.lightPanel.AutoSize = true;
-            this.lightPanel.Controls.Add(this.masterLightHsBtn);
-            this.lightPanel.Controls.Add(this.specHsBtn);
-            this.lightPanel.Controls.Add(this.diffuseHsBtn);
-            this.lightPanel.Controls.Add(this.ambientHsBtn);
-            this.lightPanel.Controls.Add(this.specPowUd);
-            this.lightPanel.Controls.Add(this.ambientAmountUd);
-            this.lightPanel.Controls.Add(this.diffuseAmountUd);
-            this.lightPanel.Controls.Add(this.label24);
-            this.lightPanel.Controls.Add(this.masterLightAmountUd);
-            this.lightPanel.Controls.Add(this.specAmountUd);
-            this.lightPanel.Controls.Add(this.label15);
-            this.lightPanel.Controls.Add(this.label14);
-            this.lightPanel.Controls.Add(this.label16);
-            this.lightPanel.Controls.Add(this.label22);
-            this.lightPanel.Controls.Add(this.label23);
-            this.lightPanel.Controls.Add(this.lightDirXUd);
-            this.lightPanel.Controls.Add(this.label11);
-            this.lightPanel.Controls.Add(this.lightDirYUd);
-            this.lightPanel.Controls.Add(this.lightDirZUd);
-            this.lightPanel.Controls.Add(this.label12);
-            this.lightPanel.Controls.Add(this.label13);
-            this.lightPanel.Enabled = false;
-            this.lightPanel.Location = new System.Drawing.Point(2, 51);
-            this.lightPanel.Name = "lightPanel";
-            this.lightPanel.Size = new System.Drawing.Size(179, 223);
-            this.lightPanel.TabIndex = 30;
-            // 
-            // masterLightHsBtn
-            // 
-            this.masterLightHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.masterLightHsBtn.Hue = 0F;
-            this.masterLightHsBtn.Location = new System.Drawing.Point(116, 182);
-            this.masterLightHsBtn.Name = "masterLightHsBtn";
-            this.masterLightHsBtn.Saturation = 0F;
-            this.masterLightHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.masterLightHsBtn.Size = new System.Drawing.Size(53, 20);
-            this.masterLightHsBtn.TabIndex = 59;
-            this.masterLightHsBtn.Tag = "Edit Master color";
-            this.masterLightHsBtn.UseVisualStyleBackColor = true;
-            this.masterLightHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.masterLightHsBtn_ColorChanged);
-            // 
-            // specHsBtn
-            // 
-            this.specHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.specHsBtn.Hue = 0F;
-            this.specHsBtn.Location = new System.Drawing.Point(116, 130);
-            this.specHsBtn.Name = "specHsBtn";
-            this.specHsBtn.Saturation = 0F;
-            this.specHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.specHsBtn.Size = new System.Drawing.Size(53, 20);
-            this.specHsBtn.TabIndex = 59;
-            this.specHsBtn.Tag = "Edit Specular color";
-            this.specHsBtn.UseVisualStyleBackColor = true;
-            this.specHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.specHsBtn_ColorChanged);
-            // 
-            // diffuseHsBtn
-            // 
-            this.diffuseHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.diffuseHsBtn.Hue = 0F;
-            this.diffuseHsBtn.Location = new System.Drawing.Point(116, 104);
-            this.diffuseHsBtn.Name = "diffuseHsBtn";
-            this.diffuseHsBtn.Saturation = 0F;
-            this.diffuseHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.diffuseHsBtn.Size = new System.Drawing.Size(53, 20);
-            this.diffuseHsBtn.TabIndex = 59;
-            this.diffuseHsBtn.Tag = "Edit Diffuse  color";
-            this.diffuseHsBtn.UseVisualStyleBackColor = true;
-            this.diffuseHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.diffuseHsBtn_ColorChanged);
-            // 
-            // ambientHsBtn
-            // 
-            this.ambientHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.ambientHsBtn.Hue = 0F;
-            this.ambientHsBtn.Location = new System.Drawing.Point(116, 78);
-            this.ambientHsBtn.Name = "ambientHsBtn";
-            this.ambientHsBtn.Saturation = 0F;
-            this.ambientHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.ambientHsBtn.Size = new System.Drawing.Size(53, 20);
-            this.ambientHsBtn.TabIndex = 59;
-            this.ambientHsBtn.Tag = "Edit Ambient color";
-            this.ambientHsBtn.UseVisualStyleBackColor = true;
-            this.ambientHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.ambientHsBtn_ColorChanged);
-            // 
-            // specPowUd
-            // 
-            this.specPowUd.Location = new System.Drawing.Point(59, 156);
-            this.specPowUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.specPowUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.specPowUd.Name = "specPowUd";
-            this.specPowUd.Size = new System.Drawing.Size(51, 20);
-            this.specPowUd.TabIndex = 56;
-            this.specPowUd.Tag = "Edit Specular power";
-            this.specPowUd.ValueChanged += new System.EventHandler(this.specPowUd_ValueChanged);
-            // 
-            // ambientAmountUd
-            // 
-            this.ambientAmountUd.DecimalPlaces = 2;
-            this.ambientAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.ambientAmountUd.Location = new System.Drawing.Point(59, 78);
-            this.ambientAmountUd.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            -2147483648});
-            this.ambientAmountUd.Name = "ambientAmountUd";
-            this.ambientAmountUd.Size = new System.Drawing.Size(51, 20);
-            this.ambientAmountUd.TabIndex = 53;
-            this.ambientAmountUd.Tag = "Edit Ambient amount";
-            this.ambientAmountUd.ValueChanged += new System.EventHandler(this.ambientAmountUd_ValueChanged);
-            // 
-            // diffuseAmountUd
-            // 
-            this.diffuseAmountUd.DecimalPlaces = 2;
-            this.diffuseAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.diffuseAmountUd.Location = new System.Drawing.Point(59, 104);
-            this.diffuseAmountUd.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            -2147483648});
-            this.diffuseAmountUd.Name = "diffuseAmountUd";
-            this.diffuseAmountUd.Size = new System.Drawing.Size(51, 20);
-            this.diffuseAmountUd.TabIndex = 54;
-            this.diffuseAmountUd.Tag = "Edit Diffuse amount";
-            this.diffuseAmountUd.ValueChanged += new System.EventHandler(this.diffuseAmountUd_ValueChanged);
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(4, 14);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(49, 13);
-            this.label24.TabIndex = 2;
-            this.label24.Text = "Direction";
-            // 
-            // masterLightAmountUd
-            // 
-            this.masterLightAmountUd.DecimalPlaces = 2;
-            this.masterLightAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.masterLightAmountUd.Location = new System.Drawing.Point(59, 182);
-            this.masterLightAmountUd.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            -2147483648});
-            this.masterLightAmountUd.Name = "masterLightAmountUd";
-            this.masterLightAmountUd.Size = new System.Drawing.Size(51, 20);
-            this.masterLightAmountUd.TabIndex = 55;
-            this.masterLightAmountUd.Tag = "Edit Master brightness";
-            this.masterLightAmountUd.ValueChanged += new System.EventHandler(this.MasterLightAmountUD_ValueChanged);
-            // 
-            // specAmountUd
-            // 
-            this.specAmountUd.DecimalPlaces = 2;
-            this.specAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.specAmountUd.Location = new System.Drawing.Point(59, 130);
-            this.specAmountUd.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            -2147483648});
-            this.specAmountUd.Name = "specAmountUd";
-            this.specAmountUd.Size = new System.Drawing.Size(51, 20);
-            this.specAmountUd.TabIndex = 55;
-            this.specAmountUd.Tag = "Edit Specular amount";
-            this.specAmountUd.ValueChanged += new System.EventHandler(this.specAmountUd_ValueChanged);
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(8, 80);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(45, 13);
-            this.label15.TabIndex = 49;
-            this.label15.Text = "Ambient";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(13, 108);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(40, 13);
-            this.label14.TabIndex = 50;
-            this.label14.Text = "Diffuse";
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(14, 184);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(39, 13);
-            this.label16.TabIndex = 52;
-            this.label16.Text = "Master";
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(7, 158);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(46, 13);
-            this.label22.TabIndex = 52;
-            this.label22.Text = "S power";
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(4, 132);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(49, 13);
-            this.label23.TabIndex = 51;
-            this.label23.Text = "Specular";
-            // 
-            // lightDirXUd
-            // 
-            this.lightDirXUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lightDirXUd.Location = new System.Drawing.Point(0, 30);
-            this.lightDirXUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.lightDirXUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.lightDirXUd.Name = "lightDirXUd";
-            this.lightDirXUd.Size = new System.Drawing.Size(57, 20);
-            this.lightDirXUd.TabIndex = 34;
-            this.lightDirXUd.Tag = "Edit Light X Direction";
-            this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
-            // 
-            // label11
-            // 
-            this.label11.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(139, 53);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(14, 13);
-            this.label11.TabIndex = 31;
-            this.label11.Text = "Z";
-            // 
-            // lightDirYUd
-            // 
-            this.lightDirYUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lightDirYUd.Location = new System.Drawing.Point(60, 30);
-            this.lightDirYUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.lightDirYUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.lightDirYUd.Name = "lightDirYUd";
-            this.lightDirYUd.Size = new System.Drawing.Size(57, 20);
-            this.lightDirYUd.TabIndex = 35;
-            this.lightDirYUd.Tag = "Edit Light Y Direction";
-            this.lightDirYUd.ValueChanged += new System.EventHandler(this.lightDirYUd_ValueChanged);
-            // 
-            // lightDirZUd
-            // 
-            this.lightDirZUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lightDirZUd.Location = new System.Drawing.Point(120, 30);
-            this.lightDirZUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.lightDirZUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.lightDirZUd.Name = "lightDirZUd";
-            this.lightDirZUd.Size = new System.Drawing.Size(57, 20);
-            this.lightDirZUd.TabIndex = 36;
-            this.lightDirZUd.Tag = "Edit Light Z Direction";
-            this.lightDirZUd.ValueChanged += new System.EventHandler(this.lightDirZUd_ValueChanged);
-            // 
-            // label12
-            // 
-            this.label12.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(82, 53);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(14, 13);
-            this.label12.TabIndex = 32;
-            this.label12.Text = "Y";
-            // 
-            // label13
-            // 
-            this.label13.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(17, 53);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(14, 13);
-            this.label13.TabIndex = 33;
-            this.label13.Text = "X";
-            // 
-            // globalLightCb
-            // 
-            this.globalLightCb.AutoSize = true;
-            this.globalLightCb.Checked = true;
-            this.globalLightCb.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.globalLightCb.Location = new System.Drawing.Point(3, 30);
-            this.globalLightCb.Name = "globalLightCb";
-            this.globalLightCb.Size = new System.Drawing.Size(76, 17);
-            this.globalLightCb.TabIndex = 20;
-            this.globalLightCb.Tag = "Use global";
-            this.globalLightCb.Text = "Use global";
-            this.globalLightCb.UseVisualStyleBackColor = true;
-            this.globalLightCb.CheckedChanged += new System.EventHandler(this.globalLightCb_CheckedChanged);
-            // 
-            // spatial
-            // 
-            this.spatial.Controls.Add(this.defaultSpatialBtn);
-            this.spatial.Controls.Add(this.label41);
-            this.spatial.Controls.Add(this.label40);
-            this.spatial.Controls.Add(this.label39);
-            this.spatial.Controls.Add(this.label20);
-            this.spatial.Controls.Add(this.zoffsetUd);
-            this.spatial.Controls.Add(this.yoffsetUd);
-            this.spatial.Controls.Add(this.xoffsetUd);
-            this.spatial.Location = new System.Drawing.Point(4, 22);
-            this.spatial.Name = "spatial";
-            this.spatial.Padding = new System.Windows.Forms.Padding(3);
-            this.spatial.Size = new System.Drawing.Size(200, 4333);
-            this.spatial.TabIndex = 3;
-            this.spatial.Text = "Spatial";
-            this.spatial.UseVisualStyleBackColor = true;
-            // 
-            // defaultSpatialBtn
-            // 
-            this.defaultSpatialBtn.Location = new System.Drawing.Point(1, 1);
-            this.defaultSpatialBtn.Name = "defaultSpatialBtn";
-            this.defaultSpatialBtn.Size = new System.Drawing.Size(179, 23);
-            this.defaultSpatialBtn.TabIndex = 10;
-            this.defaultSpatialBtn.Tag = "Default Spatial";
-            this.defaultSpatialBtn.Text = "Default Spatial";
-            this.defaultSpatialBtn.UseVisualStyleBackColor = true;
-            this.defaultSpatialBtn.Click += new System.EventHandler(this.defaultSpatialBtn_Click);
-            // 
-            // label41
-            // 
-            this.label41.AutoSize = true;
-            this.label41.Location = new System.Drawing.Point(151, 80);
-            this.label41.Name = "label41";
-            this.label41.Size = new System.Drawing.Size(14, 13);
-            this.label41.TabIndex = 1;
-            this.label41.Text = "Z";
-            // 
-            // label40
-            // 
-            this.label40.AutoSize = true;
-            this.label40.Location = new System.Drawing.Point(87, 80);
-            this.label40.Name = "label40";
-            this.label40.Size = new System.Drawing.Size(14, 13);
-            this.label40.TabIndex = 1;
-            this.label40.Text = "Y";
-            // 
-            // label39
-            // 
-            this.label39.AutoSize = true;
-            this.label39.Location = new System.Drawing.Point(24, 80);
-            this.label39.Name = "label39";
-            this.label39.Size = new System.Drawing.Size(14, 13);
-            this.label39.TabIndex = 1;
-            this.label39.Text = "X";
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(-2, 41);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(73, 13);
-            this.label20.TabIndex = 1;
-            this.label20.Text = "Position offset";
-            // 
-            // zoffsetUd
-            // 
-            this.zoffsetUd.Location = new System.Drawing.Point(121, 57);
-            this.zoffsetUd.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.zoffsetUd.Minimum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            -2147483648});
-            this.zoffsetUd.Name = "zoffsetUd";
-            this.zoffsetUd.Size = new System.Drawing.Size(57, 20);
-            this.zoffsetUd.TabIndex = 40;
-            this.zoffsetUd.Tag = "Edit Z Offset";
-            this.zoffsetUd.ValueChanged += new System.EventHandler(this.zoffsetUd_ValueChanged);
-            // 
-            // yoffsetUd
-            // 
-            this.yoffsetUd.Location = new System.Drawing.Point(61, 57);
-            this.yoffsetUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.yoffsetUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.yoffsetUd.Name = "yoffsetUd";
-            this.yoffsetUd.Size = new System.Drawing.Size(57, 20);
-            this.yoffsetUd.TabIndex = 30;
-            this.yoffsetUd.Tag = "Edit Y Offset";
-            this.yoffsetUd.ValueChanged += new System.EventHandler(this.yoffsetUd_ValueChanged);
-            // 
-            // xoffsetUd
-            // 
-            this.xoffsetUd.Location = new System.Drawing.Point(1, 57);
-            this.xoffsetUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.xoffsetUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.xoffsetUd.Name = "xoffsetUd";
-            this.xoffsetUd.Size = new System.Drawing.Size(57, 20);
-            this.xoffsetUd.TabIndex = 20;
-            this.xoffsetUd.Tag = "Edit X Offset";
-            this.xoffsetUd.ValueChanged += new System.EventHandler(this.xoffsetUd_ValueChanged);
-            // 
             // resetDefaultBtn
             // 
             this.resetDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -2116,12 +2023,11 @@
             this.songPropsPanel.Controls.Add(this.label9);
             this.songPropsPanel.Controls.Add(this.playbackOffsetUd);
             this.songPropsPanel.Controls.Add(this.audioOffsetS);
-            this.songPropsPanel.Controls.Add(this.upDownVpWidth);
             this.songPropsPanel.Controls.Add(this.label7);
             this.songPropsPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.songPropsPanel.Location = new System.Drawing.Point(0, 24);
             this.songPropsPanel.Name = "songPropsPanel";
-            this.songPropsPanel.Size = new System.Drawing.Size(197, 4359);
+            this.songPropsPanel.Size = new System.Drawing.Size(197, 4361);
             this.songPropsPanel.TabIndex = 17;
             this.songPropsPanel.Visible = false;
             this.songPropsPanel.VisibleChanged += new System.EventHandler(this.songPropsPanel_VisibleChanged);
@@ -2131,7 +2037,7 @@
             this.camLabel.AutoSize = true;
             this.camLabel.Location = new System.Drawing.Point(12, 320);
             this.camLabel.Name = "camLabel";
-            this.camLabel.Size = new System.Drawing.Size(43, 13);
+            this.camLabel.Size = new System.Drawing.Size(48, 15);
             this.camLabel.TabIndex = 7;
             this.camLabel.Text = "Camera";
             // 
@@ -2170,7 +2076,7 @@
             0,
             -2147483648});
             this.minPitchUd.Name = "minPitchUd";
-            this.minPitchUd.Size = new System.Drawing.Size(52, 20);
+            this.minPitchUd.Size = new System.Drawing.Size(52, 23);
             this.minPitchUd.TabIndex = 3;
             this.minPitchUd.Tag = "Edit Min Pitch";
             this.minPitchUd.ValueChanged += new System.EventHandler(this.minPitchUd_ValueChanged);
@@ -2189,7 +2095,7 @@
             0,
             -2147483648});
             this.maxPitchUd.Name = "maxPitchUd";
-            this.maxPitchUd.Size = new System.Drawing.Size(52, 20);
+            this.maxPitchUd.Size = new System.Drawing.Size(52, 23);
             this.maxPitchUd.TabIndex = 2;
             this.maxPitchUd.Tag = "Edit Max Pitch";
             this.maxPitchUd.ValueChanged += new System.EventHandler(this.maxPitchUd_ValueChanged);
@@ -2199,7 +2105,7 @@
             this.label26.AutoSize = true;
             this.label26.Location = new System.Drawing.Point(156, 153);
             this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(12, 13);
+            this.label26.Size = new System.Drawing.Size(12, 15);
             this.label26.TabIndex = 3;
             this.label26.Text = "s";
             // 
@@ -2208,7 +2114,7 @@
             this.label21.AutoSize = true;
             this.label21.Location = new System.Drawing.Point(156, 127);
             this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(12, 13);
+            this.label21.Size = new System.Drawing.Size(12, 15);
             this.label21.TabIndex = 3;
             this.label21.Text = "s";
             // 
@@ -2217,7 +2123,7 @@
             this.label18.AutoSize = true;
             this.label18.Location = new System.Drawing.Point(156, 101);
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(12, 13);
+            this.label18.Size = new System.Drawing.Size(12, 15);
             this.label18.TabIndex = 3;
             this.label18.Text = "s";
             // 
@@ -2226,7 +2132,7 @@
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(15, 231);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(50, 13);
+            this.label8.Size = new System.Drawing.Size(58, 15);
             this.label8.TabIndex = 3;
             this.label8.Text = "Min pitch";
             // 
@@ -2236,7 +2142,7 @@
             this.hnotelabel.Location = new System.Drawing.Point(12, 205);
             this.hnotelabel.Name = "hnotelabel";
             this.hnotelabel.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.hnotelabel.Size = new System.Drawing.Size(53, 13);
+            this.hnotelabel.Size = new System.Drawing.Size(60, 15);
             this.hnotelabel.TabIndex = 3;
             this.hnotelabel.Text = "Max pitch";
             // 
@@ -2245,7 +2151,7 @@
             this.label25.AutoSize = true;
             this.label25.Location = new System.Drawing.Point(12, 153);
             this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(49, 13);
+            this.label25.Size = new System.Drawing.Size(53, 15);
             this.label25.TabIndex = 3;
             this.label25.Text = "Fade out";
             // 
@@ -2254,7 +2160,7 @@
             this.label19.AutoSize = true;
             this.label19.Location = new System.Drawing.Point(12, 127);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(42, 13);
+            this.label19.Size = new System.Drawing.Size(45, 15);
             this.label19.TabIndex = 3;
             this.label19.Text = "Fade in";
             // 
@@ -2263,7 +2169,7 @@
             this.label17.AutoSize = true;
             this.label17.Location = new System.Drawing.Point(12, 101);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(80, 13);
+            this.label17.Size = new System.Drawing.Size(87, 15);
             this.label17.TabIndex = 3;
             this.label17.Text = "Playback offset";
             // 
@@ -2287,7 +2193,7 @@
             0,
             -2147483648});
             this.fadeOutUd.Name = "fadeOutUd";
-            this.fadeOutUd.Size = new System.Drawing.Size(52, 20);
+            this.fadeOutUd.Size = new System.Drawing.Size(52, 23);
             this.fadeOutUd.TabIndex = 1;
             this.fadeOutUd.Tag = "Edit Fade Out";
             this.fadeOutUd.ValueChanged += new System.EventHandler(this.fadeOutUd_ValueChanged);
@@ -2312,7 +2218,7 @@
             0,
             -2147483648});
             this.fadeInUd.Name = "fadeInUd";
-            this.fadeInUd.Size = new System.Drawing.Size(52, 20);
+            this.fadeInUd.Size = new System.Drawing.Size(52, 23);
             this.fadeInUd.TabIndex = 1;
             this.fadeInUd.Tag = "Edit Fade In";
             this.fadeInUd.ValueChanged += new System.EventHandler(this.fadeInUd_ValueChanged);
@@ -2337,30 +2243,10 @@
             0,
             -2147483648});
             this.playbackOffsetUd.Name = "playbackOffsetUd";
-            this.playbackOffsetUd.Size = new System.Drawing.Size(52, 20);
+            this.playbackOffsetUd.Size = new System.Drawing.Size(52, 23);
             this.playbackOffsetUd.TabIndex = 1;
             this.playbackOffsetUd.Tag = "Edit Playback Offset";
             this.playbackOffsetUd.ValueChanged += new System.EventHandler(this.playbackOffsetUd_ValueChanged);
-            // 
-            // upDownVpWidth
-            // 
-            this.upDownVpWidth.AutoSize = true;
-            this.upDownVpWidth.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.upDownVpWidth.Decimals = 3;
-            this.upDownVpWidth.Decimals2 = 2;
-            this.upDownVpWidth.ExpBase = 2D;
-            this.upDownVpWidth.Location = new System.Drawing.Point(12, 28);
-            this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
-            this.upDownVpWidth.Max = 10D;
-            this.upDownVpWidth.Min = 0D;
-            this.upDownVpWidth.Name = "upDownVpWidth";
-            this.upDownVpWidth.Size = new System.Drawing.Size(180, 48);
-            this.upDownVpWidth.TabIndex = 0;
-            this.upDownVpWidth.TbWidth = 50;
-            this.upDownVpWidth.TickFreq = 1D;
-            this.upDownVpWidth.Value = 16D;
-            this.upDownVpWidth.ValueChanged += new System.EventHandler(this.upDownVpWidth_ValueChanged);
-            this.upDownVpWidth.CommitChanges += new System.EventHandler(this.upDownVpWidth_CommitChanges);
             // 
             // saveMixdownDialog
             // 
@@ -2407,7 +2293,7 @@
             this.TimeColumn,
             this.LyricsColumn});
             this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lyricsGridView.Location = new System.Drawing.Point(197, 4333);
+            this.lyricsGridView.Location = new System.Drawing.Point(197, 4335);
             this.lyricsGridView.Name = "lyricsGridView";
             this.lyricsGridView.Size = new System.Drawing.Size(570, 50);
             this.lyricsGridView.TabIndex = 0;
@@ -2447,7 +2333,7 @@
             this.keyFramesDGV.Dock = System.Windows.Forms.DockStyle.Left;
             this.keyFramesDGV.Location = new System.Drawing.Point(197, 24);
             this.keyFramesDGV.Name = "keyFramesDGV";
-            this.keyFramesDGV.Size = new System.Drawing.Size(210, 4309);
+            this.keyFramesDGV.Size = new System.Drawing.Size(210, 4311);
             this.keyFramesDGV.TabIndex = 23;
             this.keyFramesDGV.Tag = "Edit Key Frames";
             this.keyFramesDGV.Visible = false;
@@ -2496,7 +2382,7 @@
             this.songPropsCb.AutoSize = true;
             this.songPropsCb.Location = new System.Drawing.Point(3, 1);
             this.songPropsCb.Name = "songPropsCb";
-            this.songPropsCb.Size = new System.Drawing.Size(99, 23);
+            this.songPropsCb.Size = new System.Drawing.Size(110, 25);
             this.songPropsCb.TabIndex = 0;
             this.songPropsCb.Text = "Pr&oject properties";
             this.songPropsCb.UseVisualStyleBackColor = true;
@@ -2509,7 +2395,7 @@
             this.trackPropsCb.FlatAppearance.CheckedBackColor = System.Drawing.Color.White;
             this.trackPropsCb.Location = new System.Drawing.Point(108, 2);
             this.trackPropsCb.Name = "trackPropsCb";
-            this.trackPropsCb.Size = new System.Drawing.Size(94, 23);
+            this.trackPropsCb.Size = new System.Drawing.Size(100, 25);
             this.trackPropsCb.TabIndex = 1;
             this.trackPropsCb.Text = "&Track properties";
             this.trackPropsCb.UseVisualStyleBackColor = true;
@@ -2520,7 +2406,7 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(542, 4320);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(35, 13);
+            this.label4.Size = new System.Drawing.Size(38, 15);
             this.label4.TabIndex = 25;
             this.label4.Text = "label4";
             this.label4.Visible = false;
@@ -2555,7 +2441,6 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.trackPropsPanel.ResumeLayout(false);
-            this.trackListCM.ResumeLayout(false);
             this.selectedTrackPropsPanel.ResumeLayout(false);
             this.style.ResumeLayout(false);
             this.style.PerformLayout();
@@ -2599,6 +2484,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).EndInit();
+            this.trackListCM.ResumeLayout(false);
             this.songPropsPanel.ResumeLayout(false);
             this.songPropsPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).EndInit();
@@ -2651,7 +2537,6 @@
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Button resetDefaultBtn;
 		private System.Windows.Forms.Button defaultMtrlBtn;
-		private ListViewNF trackList;
 		private System.Windows.Forms.ColumnHeader trackColumn;
 		private System.Windows.Forms.ColumnHeader normalColumn;
 		private System.Windows.Forms.ColumnHeader hilitedColumn;
@@ -2807,6 +2692,10 @@
 		private System.Windows.Forms.ToolStripMenuItem jumpBackwardsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem jumpForwardToolStripMenuItem;
 		private System.Windows.Forms.Label label4;
-	}
+        private System.Windows.Forms.ListView trackList;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+    }
 }
 

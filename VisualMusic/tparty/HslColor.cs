@@ -7,7 +7,7 @@ namespace ColorSpaces
     {
         // Private data members below are on scale 0-1
         // They are scaled for use externally based on scale
-        private double hue = 1.0;
+        private double hue = 1.0; 
         private double saturation = 1.0;
         private double luminosity = 1.0;
 

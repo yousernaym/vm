@@ -55,11 +55,12 @@ namespace VisualMusic
         bool AudioLoaded { get { return Media.getAudioLength() > 0; } }// !isEmpty(importMidiForm.AudioFilePath) || !isEmpty(importModForm.AudioFilePath) || !isEmpty(importSidForm.AudioFilePath); } }
 
         Graphics trackListGfxObj;
-        Pen trackListPen = new Pen(System.Drawing.Color.White);
+        private static readonly Pen pen = new(GdiColor.White);
+        readonly Pen trackListPen = pen;
         bool updatingControls = false;
         bool updatingCamControls = false;
         public bool UpdatingControls => updatingControls;
-        public ListViewNF TrackList => trackList;
+        public ListView TrackList => trackList;
 
         TrackProps mergedTrackProps;
         const string trackPropsBtnText = "&Track Properties";
@@ -97,6 +98,7 @@ namespace VisualMusic
         {
             InitializeComponent();
 
+            
             //Turn off caps lock
             if (Control.IsKeyLocked(Keys.CapsLock))
             {

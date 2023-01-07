@@ -28,130 +28,134 @@
         /// </summary>
         private void InitializeComponent()
         {
-			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
-			this.statusLabel = new System.Windows.Forms.Label();
-			this.outputLabel = new System.Windows.Forms.Label();
-			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-			this.backButton = new System.Windows.Forms.ToolStripButton();
-			this.forwardButton = new System.Windows.Forms.ToolStripButton();
-			this.urlTextBox = new System.Windows.Forms.ToolStripTextBox();
-			this.goButton = new System.Windows.Forms.ToolStripButton();
-			this.toolStripContainer.ContentPanel.SuspendLayout();
-			this.toolStripContainer.TopToolStripPanel.SuspendLayout();
-			this.toolStripContainer.SuspendLayout();
-			this.toolStrip1.SuspendLayout();
-			this.SuspendLayout();
-			// 
-			// toolStripContainer
-			// 
-			// 
-			// toolStripContainer.ContentPanel
-			// 
-			this.toolStripContainer.ContentPanel.Controls.Add(this.statusLabel);
-			this.toolStripContainer.ContentPanel.Controls.Add(this.outputLabel);
-			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(730, 465);
-			this.toolStripContainer.ContentPanel.Enter += new System.EventHandler(this.toolStripContainer_ContentPanel_Enter);
-			this.toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.toolStripContainer.LeftToolStripPanelVisible = false;
-			this.toolStripContainer.Location = new System.Drawing.Point(0, 0);
-			this.toolStripContainer.Name = "toolStripContainer";
-			this.toolStripContainer.RightToolStripPanelVisible = false;
-			this.toolStripContainer.Size = new System.Drawing.Size(730, 490);
-			this.toolStripContainer.TabIndex = 0;
-			this.toolStripContainer.Text = "toolStripContainer1";
-			// 
-			// toolStripContainer.TopToolStripPanel
-			// 
-			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.toolStrip1);
-			// 
-			// statusLabel
-			// 
-			this.statusLabel.AutoSize = true;
-			this.statusLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.statusLabel.Location = new System.Drawing.Point(0, 439);
-			this.statusLabel.Name = "statusLabel";
-			this.statusLabel.Size = new System.Drawing.Size(0, 13);
-			this.statusLabel.TabIndex = 1;
-			// 
-			// outputLabel
-			// 
-			this.outputLabel.AutoSize = true;
-			this.outputLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.outputLabel.Location = new System.Drawing.Point(0, 452);
-			this.outputLabel.Name = "outputLabel";
-			this.outputLabel.Size = new System.Drawing.Size(0, 13);
-			this.outputLabel.TabIndex = 0;
-			// 
-			// toolStrip1
-			// 
-			this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
-			this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
+            this.statusLabel = new System.Windows.Forms.Label();
+            this.outputLabel = new System.Windows.Forms.Label();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.backButton = new System.Windows.Forms.ToolStripButton();
+            this.forwardButton = new System.Windows.Forms.ToolStripButton();
+            this.urlTextBox = new System.Windows.Forms.ToolStripTextBox();
+            this.goButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripContainer.ContentPanel.SuspendLayout();
+            this.toolStripContainer.TopToolStripPanel.SuspendLayout();
+            this.toolStripContainer.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // toolStripContainer
+            // 
+            // 
+            // toolStripContainer.ContentPanel
+            // 
+            this.toolStripContainer.ContentPanel.Controls.Add(this.statusLabel);
+            this.toolStripContainer.ContentPanel.Controls.Add(this.outputLabel);
+            this.toolStripContainer.ContentPanel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(852, 540);
+            this.toolStripContainer.ContentPanel.Enter += new System.EventHandler(this.toolStripContainer_ContentPanel_Enter);
+            this.toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.toolStripContainer.LeftToolStripPanelVisible = false;
+            this.toolStripContainer.Location = new System.Drawing.Point(0, 0);
+            this.toolStripContainer.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.toolStripContainer.Name = "toolStripContainer";
+            this.toolStripContainer.RightToolStripPanelVisible = false;
+            this.toolStripContainer.Size = new System.Drawing.Size(852, 565);
+            this.toolStripContainer.TabIndex = 0;
+            this.toolStripContainer.Text = "toolStripContainer1";
+            // 
+            // toolStripContainer.TopToolStripPanel
+            // 
+            this.toolStripContainer.TopToolStripPanel.Controls.Add(this.toolStrip1);
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.AutoSize = true;
+            this.statusLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.statusLabel.Location = new System.Drawing.Point(0, 510);
+            this.statusLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(0, 15);
+            this.statusLabel.TabIndex = 1;
+            // 
+            // outputLabel
+            // 
+            this.outputLabel.AutoSize = true;
+            this.outputLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.outputLabel.Location = new System.Drawing.Point(0, 525);
+            this.outputLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.outputLabel.Name = "outputLabel";
+            this.outputLabel.Size = new System.Drawing.Size(0, 15);
+            this.outputLabel.TabIndex = 0;
+            // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.backButton,
             this.forwardButton,
             this.urlTextBox,
             this.goButton});
-			this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-			this.toolStrip1.Name = "toolStrip1";
-			this.toolStrip1.Padding = new System.Windows.Forms.Padding(0);
-			this.toolStrip1.Size = new System.Drawing.Size(730, 25);
-			this.toolStrip1.Stretch = true;
-			this.toolStrip1.TabIndex = 0;
-			this.toolStrip1.Layout += new System.Windows.Forms.LayoutEventHandler(this.HandleToolStripLayout);
-			// 
-			// backButton
-			// 
-			this.backButton.Enabled = false;
-			this.backButton.Image = global::VisualMusic.Properties.Resources.nav_left_green;
-			this.backButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.backButton.Name = "backButton";
-			this.backButton.Size = new System.Drawing.Size(52, 22);
-			this.backButton.Text = "Back";
-			this.backButton.Click += new System.EventHandler(this.BackButtonClick);
-			// 
-			// forwardButton
-			// 
-			this.forwardButton.Enabled = false;
-			this.forwardButton.Image = global::VisualMusic.Properties.Resources.nav_right_green;
-			this.forwardButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.forwardButton.Name = "forwardButton";
-			this.forwardButton.Size = new System.Drawing.Size(70, 22);
-			this.forwardButton.Text = "Forward";
-			this.forwardButton.Click += new System.EventHandler(this.ForwardButtonClick);
-			// 
-			// urlTextBox
-			// 
-			this.urlTextBox.AutoSize = false;
-			this.urlTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-			this.urlTextBox.Name = "urlTextBox";
-			this.urlTextBox.Size = new System.Drawing.Size(500, 25);
-			this.urlTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UrlTextBoxKeyUp);
-			// 
-			// goButton
-			// 
-			this.goButton.Image = global::VisualMusic.Properties.Resources.nav_plain_green;
-			this.goButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.goButton.Name = "goButton";
-			this.goButton.Size = new System.Drawing.Size(42, 22);
-			this.goButton.Text = "Go";
-			this.goButton.Click += new System.EventHandler(this.GoButtonClick);
-			// 
-			// SongWebBrowser
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.toolStripContainer);
-			this.Name = "SongWebBrowser";
-			this.Size = new System.Drawing.Size(730, 490);
-			this.toolStripContainer.ContentPanel.ResumeLayout(false);
-			this.toolStripContainer.ContentPanel.PerformLayout();
-			this.toolStripContainer.TopToolStripPanel.ResumeLayout(false);
-			this.toolStripContainer.TopToolStripPanel.PerformLayout();
-			this.toolStripContainer.ResumeLayout(false);
-			this.toolStripContainer.PerformLayout();
-			this.toolStrip1.ResumeLayout(false);
-			this.toolStrip1.PerformLayout();
-			this.ResumeLayout(false);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Padding = new System.Windows.Forms.Padding(0);
+            this.toolStrip1.Size = new System.Drawing.Size(852, 25);
+            this.toolStrip1.Stretch = true;
+            this.toolStrip1.TabIndex = 0;
+            this.toolStrip1.Layout += new System.Windows.Forms.LayoutEventHandler(this.HandleToolStripLayout);
+            // 
+            // backButton
+            // 
+            this.backButton.Enabled = false;
+            this.backButton.Image = global::VisualMusic.Properties.Resources.nav_left_green;
+            this.backButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.backButton.Name = "backButton";
+            this.backButton.Size = new System.Drawing.Size(52, 22);
+            this.backButton.Text = "Back";
+            this.backButton.Click += new System.EventHandler(this.BackButtonClick);
+            // 
+            // forwardButton
+            // 
+            this.forwardButton.Enabled = false;
+            this.forwardButton.Image = global::VisualMusic.Properties.Resources.nav_right_green;
+            this.forwardButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.forwardButton.Name = "forwardButton";
+            this.forwardButton.Size = new System.Drawing.Size(70, 22);
+            this.forwardButton.Text = "Forward";
+            this.forwardButton.Click += new System.EventHandler(this.ForwardButtonClick);
+            // 
+            // urlTextBox
+            // 
+            this.urlTextBox.AutoSize = false;
+            this.urlTextBox.Name = "urlTextBox";
+            this.urlTextBox.Size = new System.Drawing.Size(500, 25);
+            this.urlTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UrlTextBoxKeyUp);
+            // 
+            // goButton
+            // 
+            this.goButton.Image = global::VisualMusic.Properties.Resources.nav_plain_green;
+            this.goButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.goButton.Name = "goButton";
+            this.goButton.Size = new System.Drawing.Size(42, 22);
+            this.goButton.Text = "Go";
+            this.goButton.Click += new System.EventHandler(this.GoButtonClick);
+            // 
+            // SongWebBrowser
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.toolStripContainer);
+            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.Name = "SongWebBrowser";
+            this.Size = new System.Drawing.Size(852, 565);
+            this.toolStripContainer.ContentPanel.ResumeLayout(false);
+            this.toolStripContainer.ContentPanel.PerformLayout();
+            this.toolStripContainer.TopToolStripPanel.ResumeLayout(false);
+            this.toolStripContainer.TopToolStripPanel.PerformLayout();
+            this.toolStripContainer.ResumeLayout(false);
+            this.toolStripContainer.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
+            this.ResumeLayout(false);
 
         }
 

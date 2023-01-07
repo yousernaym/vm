@@ -8,7 +8,7 @@ namespace VisualMusic
     {
         new protected Form1 ParentForm => (Form1)base.ParentForm;
         protected bool UpdatingControls => ParentForm == null ? true : ParentForm.UpdatingControls;
-        protected ListViewNF TrackList => ParentForm.TrackList;
+        protected ListView TrackList => ParentForm.TrackList;
         protected SongPanel SongPanel => Form1.SongPanel;
         protected List<TrackView> TrackViews => ParentForm.Project.TrackViews;
         //protected TrackProps SelectedTrackProps => SongPanel.TrackProps_MergedSelection;
