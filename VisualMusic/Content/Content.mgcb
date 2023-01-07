@@ -19,23 +19,11 @@
 /processorParam:DebugMode=Auto
 /build:Bar.fx
 
-#begin Line.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Line.fx
-
 #begin CubeToPlane.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:CubeToPlane.fx
-
-#begin ss.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:ss.fx
 
 #begin Font.spritefont
 /importer:FontDescriptionImporter
@@ -43,4 +31,16 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Font.spritefont
+
+#begin Line.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Line.fx
+
+#begin ss.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:ss.fx
 
