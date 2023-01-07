@@ -4,7 +4,7 @@
     <RootNamespace>VisualMusic</RootNamespace>
     <AssemblyName>VM</AssemblyName>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <StartupObject>VisualMusic.Program</StartupObject>
@@ -35,7 +35,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /D /Y&#xD;&#xA;xcopy &quot;$(SolutionaoeiDir)x6aoei4\$(ConfigurationName)\*.pdb&quot; &quot;$(TargetDir)&quot; /D /Y&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\remuxer&quot; &quot;$(TargetDir)remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)Dependencies\Remuxer\libRemuxer\roms&quot; &quot;$(TargetDir)remuxer\roms&quot; /D /Y /S /I&#xD;&#xA;dotnet mgcb /quiet /@:&quot;$(ProjectDir)Content\Content.mgcb&quot; /outputDir:&quot;$(TargetDir)Content&quot; /intermediateDir:&quot;$(ProjectDir)Content\obj\DesktopGL\net6.0-windows\Content&quot; /workingDir:&quot;$(ProjectDir)Content&quot;&#xD;&#xA;" />
+    <Exec Command="xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /D /Y&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.pdb&quot; &quot;$(TargetDir)&quot; /D /Y&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\remuxer&quot; &quot;$(TargetDir)remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)Dependencies\Remuxer\libRemuxer\roms&quot; &quot;$(TargetDir)remuxer\roms&quot; /D /Y /S /I&#xD;&#xA;dotnet mgcb /quiet /@:&quot;$(ProjectDir)Content\Content.mgcb&quot; /outputDir:&quot;$(TargetDir)Content&quot; /intermediateDir:&quot;$(ProjectDir)Content\obj\DesktopGL\net6.0-windows\Content&quot; /workingDir:&quot;$(ProjectDir)Content&quot;&#xD;&#xA;" />
   </Target>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High" />
