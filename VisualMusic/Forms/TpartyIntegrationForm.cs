@@ -24,11 +24,10 @@ namespace VisualMusic
 
         const string DefaultSongLengthsUrl = "https://www.hvsc.c64.org/download/C64Music/DOCUMENTS/Songlengths.md5";
         public readonly string SongLengthsPath = Path.Combine(TpartyDir, "hvsc", "songlenghts.md5");
-        string songLengthsUrl;
         public string SongLengthsUrl
         {
-            get => songLengthsUrl;
-            set => songLengthsUrl = songLengthsUrlTb.Text = value;
+            get => songLengthsUrlTb.Text;
+            set => songLengthsUrlTb.Text = value;
         }
 
         ProgressForm songLengthsDownloadForm;
@@ -233,6 +232,7 @@ namespace VisualMusic
         {
             if (silent && File.Exists(SongLengthsPath))
             {
+                UpdateLastUpdatedLabel();
                 var fi = new FileInfo(SongLengthsPath);
                 var daysSinceDownload = (DateTime.Now - fi.LastWriteTime).TotalDays;
                 if (daysSinceDownload < 30)
@@ -245,7 +245,7 @@ namespace VisualMusic
                 webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
             try
             {
-                webClient.DownloadFileAsync(new Uri(songLengthsUrlTb.Text), tempSongLengthDownloadPath);
+                webClient.DownloadFileAsync(new Uri(SongLengthsUrl), tempSongLengthDownloadPath);
             }
             catch (UriFormatException)
             {
@@ -270,7 +270,7 @@ namespace VisualMusic
         private void WebClient_SongLengthsDownloadCompleted(object sender, AsyncCompletedEventArgs e)
         {
             if (!silentSongLengthsDownload)
-                songLengthsDownloadForm.Close();
+                songLengthsDownloadForm.DialogResult = DialogResult.OK;
             if (e.Cancelled)
             {
                 File.Delete(tempSongLengthDownloadPath);
@@ -288,7 +288,13 @@ namespace VisualMusic
 
             File.Delete(SongLengthsPath);
             File.Move(tempSongLengthDownloadPath, SongLengthsPath);
-            SongLengthsUrl = songLengthsUrlTb.Text;
+            UpdateLastUpdatedLabel();
+        }
+
+        private void UpdateLastUpdatedLabel()
+        {
+            var fi = new FileInfo(SongLengthsPath);
+            lastUpdatedLabel.Text = "Last updated: " + fi.LastWriteTime.ToString();
         }
 
         private void defaultSongLengthsBtn_Click(object sender, EventArgs e)
