@@ -1,10 +1,10 @@
 ﻿using CefSharp;
 using CefSharp.WinForms;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -23,10 +23,12 @@ namespace VisualMusic
         static public readonly string TempDirRoot = Path.Combine(Path.GetTempPath(), AppName).ToLower();
         static public readonly string TempDir = Path.Combine(TempDirRoot, Path.GetRandomFileName()); //If more instances of the program is running simultaneously, every instance will have its own temp dir
         static public readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
+        static public string FileVersion => FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileVersion;
+
         static FileStream dirLock = null;
         static string appGuid = ((GuidAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), true)[0]).Value;
+
         [STAThread]
-        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
         static void Main(string[] args)
         {
             const int semaphoreMaxCount = 10;

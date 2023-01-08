@@ -40,7 +40,7 @@ namespace CefSharp.Example.RequestEventHandler
         public event EventHandler<GetResourceResponseFilterEventArgs> GetResourceResponseFilterEvent;
         public event EventHandler<OnResourceLoadCompleteEventArgs> OnResourceLoadCompleteEvent;
 
-      
+
 
         bool IRequestHandler.OnOpenUrlFromTab(IWebBrowser browserControl, IBrowser browser, IFrame frame, string targetUrl, WindowOpenDisposition targetDisposition, bool userGesture)
         {
@@ -95,25 +95,25 @@ namespace CefSharp.Example.RequestEventHandler
             OnRenderProcessTerminatedEvent?.Invoke(this, args);
         }
 
-  //      bool IRequestHandler.CanGetCookies(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request)
-		//{
-		//	var args = new CanGetCookiesEventArg(browserControl, browser, frame, request);
+        //      bool IRequestHandler.CanGetCookies(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request)
+        //{
+        //	var args = new CanGetCookiesEventArg(browserControl, browser, frame, request);
 
-		//	CanGetCookiesEvent?.Invoke(this, args);
+        //	CanGetCookiesEvent?.Invoke(this, args);
 
-		//	return args.GetCookies;
-		//}
+        //	return args.GetCookies;
+        //}
 
-		//bool IRequestHandler.CanSetCookie(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, Cookie cookie)
-		//{
-		//	var args = new CanSetCookieEventArg(browserControl, browser, frame, request, cookie);
+        //bool IRequestHandler.CanSetCookie(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, Cookie cookie)
+        //{
+        //	var args = new CanSetCookieEventArg(browserControl, browser, frame, request, cookie);
 
-		//	CanSetCookieEvent?.Invoke(this, args);
+        //	CanSetCookieEvent?.Invoke(this, args);
 
-		//	return args.SetCookie;
-		//}
+        //	return args.SetCookie;
+        //}
 
-		bool IRequestHandler.OnQuotaRequest(IWebBrowser browserControl, IBrowser browser, string originUrl, long newSize, IRequestCallback callback)
+        bool IRequestHandler.OnQuotaRequest(IWebBrowser browserControl, IBrowser browser, string originUrl, long newSize, IRequestCallback callback)
         {
             var args = new OnQuotaRequestEventArgs(browserControl, browser, originUrl, newSize, callback);
             OnQuotaRequestEvent?.Invoke(this, args);
@@ -188,14 +188,14 @@ namespace CefSharp.Example.RequestEventHandler
             }
         }
 
-		bool IRequestHandler.OnBeforeBrowse(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, bool userGesture, bool isRedirect)
-		{
-			var args = new OnBeforeBrowseEventArgs(browserControl, browser, frame, request, isRedirect);
+        bool IRequestHandler.OnBeforeBrowse(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, bool userGesture, bool isRedirect)
+        {
+            var args = new OnBeforeBrowseEventArgs(browserControl, browser, frame, request, isRedirect);
 
-			OnBeforeBrowseEvent?.Invoke(this, args);
+            OnBeforeBrowseEvent?.Invoke(this, args);
 
-			return args.CancelNavigation;
-		}
+            return args.CancelNavigation;
+        }
 
         public void OnDocumentAvailableInMainFrame(IWebBrowser chromiumWebBrowser, IBrowser browser)
         {

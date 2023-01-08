@@ -98,7 +98,8 @@ namespace VisualMusic
         {
             InitializeComponent();
 
-            
+            updateFormTitle("");
+
             //Turn off caps lock
             if (Control.IsKeyLocked(Keys.CapsLock))
             {
@@ -1246,7 +1247,7 @@ namespace VisualMusic
 
         void updateFormTitle(string path)
         {
-            Text = "Visual Music";
+            Text = "Visual Music " + Program.FileVersion;
             if (!string.IsNullOrEmpty(path))
                 Text += " - " + Path.GetFileName(path);
         }

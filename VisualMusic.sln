@@ -75,7 +75,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ogg", "Dependencies\Remuxer
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vorbis", "Dependencies\Remuxer\libRemuxer\openmpt\build\vs2022win10\ext\vorbis.vcxproj", "{B544DCB7-16E5-41BC-B51B-7EAD8CFDFA05}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.DesktopGL", "Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj", "{A12499B8-8EA5-4181-83FB-17B2674496AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.WindowsDX", "Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj", "{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -327,26 +327,26 @@ Global
 		{B544DCB7-16E5-41BC-B51B-7EAD8CFDFA05}.Release|x64.Build.0 = Release|x64
 		{B544DCB7-16E5-41BC-B51B-7EAD8CFDFA05}.Release|x86.ActiveCfg = Release|Win32
 		{B544DCB7-16E5-41BC-B51B-7EAD8CFDFA05}.Release|x86.Build.0 = Release|Win32
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|ARM.Build.0 = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|ARM64.ActiveCfg = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|x64.Build.0 = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Debug|x86.Build.0 = Debug|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|ARM.ActiveCfg = Release|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|ARM.Build.0 = Release|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|ARM64.ActiveCfg = Release|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|ARM64.Build.0 = Release|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|x64.ActiveCfg = Release|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|x64.Build.0 = Release|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|x86.ActiveCfg = Release|Any CPU
-		{A12499B8-8EA5-4181-83FB-17B2674496AF}.Release|x86.Build.0 = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|ARM.Build.0 = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|x64.Build.0 = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Debug|x86.Build.0 = Debug|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|ARM.Build.0 = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|ARM64.Build.0 = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|x64.ActiveCfg = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|x64.Build.0 = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|x86.ActiveCfg = Release|Any CPU
+		{F1CBEDBF-6A58-4448-92F2-5427E8C75C77}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

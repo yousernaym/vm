@@ -2,16 +2,16 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Visual Music"
-#define MyAppVersion "0.3.5"
+#define BinFolder "..\VisualMusic\bin\Release\net7.0-windows"
 #define MyAppPublisher "Mikesoft"
 #define MyAppAssemblyName "VM"
-#define MyAppExeName "VM.exe"
+#define MyAppExeName MyAppAssemblyName + ".exe"
+#define MyAppVersion GetFileVersion(BinFolder + "\" + MyAppExeName)
 #define MyAppDataDir "{userappdata}\" + MyAppName
 #define UserFiles "{userdocs}\" + MyAppName
 #define MyAppAssocName MyAppName + "Project"
 #define MyAppAssocExt ".vmp"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
-#define BinFolder "..\VisualMusic\bin\Release\net6.0-windows"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.

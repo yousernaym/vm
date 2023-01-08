@@ -7,7 +7,7 @@ using WinKeys = System.Windows.Forms.Keys;
 
 namespace VisualMusic
 {
-    [Serializable] 
+    [Serializable]
     public class Camera : ISerializable
     {
         float controlScale = 0;
