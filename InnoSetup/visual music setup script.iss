@@ -90,7 +90,7 @@ Source: "{#BinFolder}\swscale-5.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 ;Runtimes
 Source: "Files\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
-Source: "Files\windowsdesktop-runtime-7.0.1-win-x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
+Source: "Files\windowsdesktop-runtime-7.0.4-win-x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
 
 ;Misc
 Source: "{#BinFolder}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
@@ -101,7 +101,7 @@ Source: "{#BinFolder}\{#MyAppAssemblyName}.deps.json"; DestDir: "{app}"; Flags: 
 Source: "..\VisualMusic\xmplay.ini"; DestDir: "{#MyAppDataDir}\tparty\xmplay"; Flags: ignoreversion
 Source: "{#BinFolder}\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinFolder}\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "Files\songlenghts.md5"; DestDir: "{#MyAppDataDir}\tparty\hvsc"; Flags: ignoreversion
+Source: "Files\songlengths.md5"; DestDir: "{#MyAppDataDir}\tparty\hvsc"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -110,7 +110,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; Parameters:  "/quiet /norestart";  StatusMsg: "Installing Visual C++ Redistributable"
-Filename: "{tmp}\windowsdesktop-runtime-7.0.1-win-x64.exe"; Parameters:  "/quiet";  StatusMsg: "Installing .NET 7 Windows desktop runtime"
+Filename: "{tmp}\windowsdesktop-runtime-7.0.4-win-x64.exe"; Parameters:  "/quiet";  StatusMsg: "Installing .NET 7 Windows desktop runtime"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: postinstall skipifsilent
 
 [Dirs]

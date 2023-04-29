@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace VisualMusic
@@ -31,8 +32,7 @@ namespace VisualMusic
             InitializeComponent();
             songPanel = _songPanel;
             Cancel = false;
-            Delegate_renderVideo delegate_renderVideo = new Delegate_renderVideo(songPanel.renderVideo);
-            IAsyncResult result = delegate_renderVideo.BeginInvoke(file, this, options, renderingFinished, delegate_renderVideo);
+            Task.Run(() => songPanel.renderVideo(file, this, options)).ContinueWith(renderingFinished);
             ProgressText = "Render progress";
         }
 
@@ -40,7 +40,6 @@ namespace VisualMusic
         {
             finished = true;
             Delegate_renderVideo rv = (Delegate_renderVideo)result.AsyncState;
-            rv.EndInvoke(result);
             Invoke(new Delegate_void_noparams(closeForm));
         }
 
