@@ -95,50 +95,6 @@ namespace CefSharp.Example.RequestEventHandler
             OnRenderProcessTerminatedEvent?.Invoke(this, args);
         }
 
-        //      bool IRequestHandler.CanGetCookies(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request)
-        //{
-        //	var args = new CanGetCookiesEventArg(browserControl, browser, frame, request);
-
-        //	CanGetCookiesEvent?.Invoke(this, args);
-
-        //	return args.GetCookies;
-        //}
-
-        //bool IRequestHandler.CanSetCookie(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, Cookie cookie)
-        //{
-        //	var args = new CanSetCookieEventArg(browserControl, browser, frame, request, cookie);
-
-        //	CanSetCookieEvent?.Invoke(this, args);
-
-        //	return args.SetCookie;
-        //}
-
-        bool IRequestHandler.OnQuotaRequest(IWebBrowser browserControl, IBrowser browser, string originUrl, long newSize, IRequestCallback callback)
-        {
-            var args = new OnQuotaRequestEventArgs(browserControl, browser, originUrl, newSize, callback);
-            OnQuotaRequestEvent?.Invoke(this, args);
-
-            EnsureCallbackDisposal(callback);
-            return args.ContinueAsync;
-        }
-
-        //void IRequestHandler.OnResourceRedirect(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, IResponse response, ref string newUrl)
-        //{
-        //    var args = new OnResourceRedirectEventArgs(browserControl, browser, frame, request, response, newUrl);
-        //    OnResourceRedirectEvent?.Invoke(this, args);
-        //    if (!Equals(newUrl, args.NewUrl))
-        //    {
-        //        newUrl = args.NewUrl;
-        //    }
-        //}
-
-        //bool IRequestHandler.OnProtocolExecution(IWebBrowser browserControl, IBrowser browser, string url)
-        //{
-        //    var args = new OnProtocolExecutionEventArgs(browserControl, browser, url);
-        //    OnProtocolExecutionEvent?.Invoke(this, args);
-        //    return args.AttemptExecution;
-        //}
-
         void IRequestHandler.OnRenderViewReady(IWebBrowser browserControl, IBrowser browser)
         {
             var args = new OnRenderViewReadyEventArgs(browserControl, browser);

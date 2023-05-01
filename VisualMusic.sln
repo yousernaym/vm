@@ -17,6 +17,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36B4ABDD-6238-44FB-8EF4-119823880343}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		README.md = README.md
 		InnoSetup\visual music setup script.iss = InnoSetup\visual music setup script.iss
 	EndProjectSection
 EndProject
@@ -57,7 +58,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remuxer", "Dependencies\Rem
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Remuxer folder", "Remuxer folder", "{BEDBDAFB-EA4C-408A-8885-43C13C49A43F}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
 		Dependencies\Remuxer\README.md = Dependencies\Remuxer\README.md
 	EndProjectSection
 EndProject

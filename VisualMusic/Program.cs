@@ -80,7 +80,6 @@ namespace VisualMusic
 
         static void initCefSharp()
         {
-            Cef.EnableHighDPISupport();
             var settings = new CefSettings();
             Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
         }

@@ -21,7 +21,7 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
     ```
     git clone https://github.com/microsoft/vcpkg.git
     cd vcpkg
-    git checkout aebb363eaa0b658beb19cbefdd5aa2f9cbc14f1e
+    git checkout cb1301e9977b5f10b49f7988f68b808f7a558970
     bootstrap-vcpkg.bat
     vcpkg integrate install
     vcpkg install fluidsynth:x64-windows

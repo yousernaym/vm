@@ -12,10 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="cef.redist.x64" Version="112.3.0" />
-    <PackageReference Include="cef.redist.x86" Version="112.3.0" />
-    <PackageReference Include="CefSharp.Common.NETCore" Version="112.3.0" />
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="112.3.0" />
+    <PackageReference Include="cef.redist.x64" Version="108.4.13" />
+    <PackageReference Include="cef.redist.x86" Version="108.4.13" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="108.4.130" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="108.4.130" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core-6.0" Version="1.1.5" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell-6.0" Version="1.1.5" />
   </ItemGroup>
@@ -40,20 +40,11 @@
     </None>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(SolutionDir)Dependencies\Remuxer\Remuxer\bin\$(ConfigurationName)\&quot; &quot;$(TargetDir)Remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /Y /D&#xD;&#xA;dotnet mgcb /quiet /@:&quot;$(ProjectDir)Content\Content.mgcb&quot; /outputDir:&quot;$(TargetDir)Content&quot; /intermediateDir:&quot;$(ProjectDir)Content\obj\DesktopGL\net6.0-windows\Content&quot; /workingDir:&quot;$(ProjectDir)Content&quot;&#xD;&#xA;&#xD;&#xA;" />
+    <Exec Command="xcopy &quot;$(SolutionDir)Dependencies\Remuxer\Remuxer\bin\$(ConfigurationName)\&quot; &quot;$(TargetDir)Remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /Y /D&#xD;&#xA;dotnet mgcb /quiet /@:&quot;$(ProjectDir)Content\Content.mgcb&quot; /outputDir:&quot;$(TargetDir)Content&quot; /intermediateDir:&quot;$(ProjectDir)Content\obj\DesktopGL\net6.0-windows\Content&quot; /workingDir:&quot;$(ProjectDir)Content&quot;&#xD;&#xA;" />
   </Target>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High" />
         <Exec Command="dotnet tool restore" />
     </Target>
-    <ItemGroup>
-      <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="112.3.0" />
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="112.3.0" />
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="112.3.0" />
-    </ItemGroup>
 
 </Project>
