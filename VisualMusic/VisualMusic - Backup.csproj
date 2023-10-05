@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>VisualMusic</RootNamespace>
@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="cef.redist.x64" Version="108.4.13" />
     <PackageReference Include="cef.redist.x86" Version="108.4.13" />
-    <PackageReference Include="CefSharp.Common.NETCore" Version="108.4.130" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="117.2.20" />
     <PackageReference Include="CefSharp.WinForms.NETCore" Version="108.4.130" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core-6.0" Version="1.1.5" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell-6.0" Version="1.1.5" />
