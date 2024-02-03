@@ -149,10 +149,12 @@ namespace VisualMusic
         }
         protected override void Draw()
         {
-            GraphicsDevice.Clear(Color.Transparent);
+            GraphicsDevice.BlendState = blendState;
+
+            GraphicsDevice.Clear(Color.Black);
             SpriteBatch.Begin();
             if (backgroundTexture != null)
-                SpriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
+                SpriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), new Color(Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity));
             if (selectingRegion && selectedScreenRegion.Width != 0 && selectedScreenRegion.Height != 0)
             {
                 Rectangle normRect = normalizeRect(selectedScreenRegion);
@@ -162,7 +164,6 @@ namespace VisualMusic
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
             }
             SpriteBatch.End();
-            GraphicsDevice.BlendState = blendState;
             GraphicsDevice.RasterizerState = rastState;
             Project.drawSong();
         }
@@ -719,6 +720,14 @@ namespace VisualMusic
                 return;
             if (keyFrame.ProjProps.Camera.control(e.KeyCode, true, ModifierKeys))
                 e.SuppressKeyPress = true;
+            foreach (var otherKeyFrame in Project.KeyFrames.Values)
+            {
+                if (keyFrame != otherKeyFrame && otherKeyFrame.Selected)
+                {
+                    otherKeyFrame.ProjProps.Camera.Pos = keyFrame.ProjProps.Camera.Pos;
+                    otherKeyFrame.ProjProps.Camera.Orientation = keyFrame.ProjProps.Camera.Orientation;
+                }
+            }
 
             //Start/stop playback
             if (e.KeyCode == WinKeys.Space)

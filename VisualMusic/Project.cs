@@ -347,9 +347,9 @@ namespace VisualMusic
         public void interpolateFrames()
         {
             var interpolatedFrame = KeyFrames.createInterpolatedFrame((int)SongPosT);
-            Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
-            //interpolatedFrame.Camera.SongPanel= Camera.SongPanel;
-            Props.Camera = interpolatedFrame.ProjProps.Camera;
+            //Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
+            //Props.Camera = interpolatedFrame.ProjProps.Camera;
+            Props = interpolatedFrame.ProjProps;
         }
 
         public void openAudioFile(ImportOptions options)

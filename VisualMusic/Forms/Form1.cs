@@ -410,6 +410,7 @@ namespace VisualMusic
             buildKeyFramesDGV();
             updateCamControls();
             lyricsGridView.DataSource = Project.Props.LyricsSegments;
+            bkgOpacityUd.Value = (decimal)Project.Props.BackgroundImageOpacity;
             updatingControls = false;
         }
 
@@ -1243,6 +1244,7 @@ namespace VisualMusic
             updateFormTitle(currentProjPath);
             Project.DefaultFileName = Path.GetFileName(currentProjPath);
             unsavedChanges = false;
+            SongPanel.LoadBackgroundImage(Project.Props.BackgroundImagePath);
         }
 
         void updateFormTitle(string path)
@@ -1333,6 +1335,7 @@ namespace VisualMusic
                 if (Project.SongPosT <= songScrollBar.Maximum && Project.SongPosT >= songScrollBar.Minimum)
                     songScrollBar.Value = (int)Project.SongPosT;
                 upDownVpWidth.Value = Project.Props.ViewWidthQn;
+                bkgOpacityUd.Value = (decimal)Project.Props.BackgroundImageOpacity;
 
                 if (keyFramesDGV.Rows.Count == 0) //App is closing
                     return;
@@ -2107,12 +2110,6 @@ namespace VisualMusic
                         break;
                     case 2:
                         pos.Z = element;
-                        //project.Camera.Pos = pos;
-                        foreach (var keyFrame in Project.KeyFrames.Values)
-                        {
-                            if (keyFrame.Selected)
-                                keyFrame.ProjProps.Camera.Pos = pos;
-                        }
                         break;
                     case 3:
                         orient.X = element;
@@ -2125,15 +2122,17 @@ namespace VisualMusic
                         break;
                     case 6:
                         orient.W = element;
-                        //project.Camera.Orientation = orient;
-                        foreach (var keyFrame in Project.KeyFrames.Values)
-                        {
-                            if (keyFrame.Selected)
-                                keyFrame.ProjProps.Camera.Orientation = orient;
-                        }
                         break;
                 }
                 elementIndex++;
+            }
+            foreach (var keyFrame in Project.KeyFrames.Values)
+            {
+                if (keyFrame.Selected)
+                {
+                    keyFrame.ProjProps.Camera.Orientation = orient;
+                    keyFrame.ProjProps.Camera.Pos = pos;
+                }
             }
         }
 
@@ -2629,6 +2628,17 @@ namespace VisualMusic
         {
             Project.Props.BackgroundImagePath = "";
             SongPanel.UnloadBackgroundImage();
+        }
+
+        private void bkgOpacityUd_ValueChanged(object sender, EventArgs e)
+        {
+            if (updatingControls)
+                return;
+            foreach (var keyFrame in Project.KeyFrames.Values)
+            {
+                if (keyFrame.Selected)
+                    keyFrame.ProjProps.BackgroundImageOpacity = (float)bkgOpacityUd.Value;
+            }
         }
     }
 }

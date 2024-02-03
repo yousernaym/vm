@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpDX.Direct2D1.Effects;
+using System;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
@@ -9,6 +10,7 @@ namespace VisualMusic
     {
         public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen with default camera
         public BindingList<LyricsSegment> LyricsSegments { get; private set; } = new BindingList<LyricsSegment>();
+        [KeyframeLogInterpolation]
         public float ViewWidthQn { get; set; }
 
         public double AudioOffset { get; set; }
@@ -67,6 +69,10 @@ namespace VisualMusic
                     Camera = (Camera)entry.Value;
                 else if (entry.Name == "userViewWidth")
                     UserViewWidth = (float)entry.Value;
+                else if (entry.Name == "backgroundImagePath")
+                    BackgroundImagePath = (string)entry.Value;
+                else if (entry.Name == "backgroundImageOpacity")
+                    BackgroundImageOpacity = (float)entry.Value;
             }
         }
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -81,6 +87,8 @@ namespace VisualMusic
             info.AddValue("lyrics", LyricsSegments);
             info.AddValue("camera", Camera);
             info.AddValue("userViewWidth", UserViewWidth);
+            info.AddValue("backgroundImagePath", BackgroundImagePath);
+            info.AddValue("backgroundImageOpacity", BackgroundImageOpacity);
         }
 
         //internal void readOldProjectFile(SerializationEntry entry)

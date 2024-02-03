@@ -185,7 +185,7 @@
             openTextureDlg = new System.Windows.Forms.OpenFileDialog();
             songPropsPanel = new System.Windows.Forms.Panel();
             label27 = new System.Windows.Forms.Label();
-            numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            bkgOpacityUd = new System.Windows.Forms.NumericUpDown();
             unloadBkgBtn = new System.Windows.Forms.Button();
             loadBkgBtn = new System.Windows.Forms.Button();
             camLabel = new System.Windows.Forms.Label();
@@ -263,7 +263,7 @@
             ((System.ComponentModel.ISupportInitialize)yoffsetUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)xoffsetUd).BeginInit();
             songPropsPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)bkgOpacityUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)minPitchUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)maxPitchUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)fadeOutUd).BeginInit();
@@ -1911,7 +1911,7 @@
             // songPropsPanel
             // 
             songPropsPanel.Controls.Add(label27);
-            songPropsPanel.Controls.Add(numericUpDown1);
+            songPropsPanel.Controls.Add(bkgOpacityUd);
             songPropsPanel.Controls.Add(unloadBkgBtn);
             songPropsPanel.Controls.Add(loadBkgBtn);
             songPropsPanel.Controls.Add(camLabel);
@@ -1952,19 +1952,23 @@
             label27.TabIndex = 10;
             label27.Text = "Background opacity";
             // 
-            // numericUpDown1
+            // bkgOpacityUd
             // 
-            numericUpDown1.Location = new System.Drawing.Point(131, 491);
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new System.Drawing.Size(54, 23);
-            numericUpDown1.TabIndex = 9;
+            bkgOpacityUd.Cursor = System.Windows.Forms.Cursors.No;
+            bkgOpacityUd.DecimalPlaces = 2;
+            bkgOpacityUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            bkgOpacityUd.Location = new System.Drawing.Point(131, 491);
+            bkgOpacityUd.Name = "bkgOpacityUd";
+            bkgOpacityUd.Size = new System.Drawing.Size(54, 23);
+            bkgOpacityUd.TabIndex = 10;
+            bkgOpacityUd.ValueChanged += bkgOpacityUd_ValueChanged;
             // 
             // unloadBkgBtn
             // 
             unloadBkgBtn.Location = new System.Drawing.Point(131, 462);
             unloadBkgBtn.Name = "unloadBkgBtn";
             unloadBkgBtn.Size = new System.Drawing.Size(67, 23);
-            unloadBkgBtn.TabIndex = 8;
+            unloadBkgBtn.TabIndex = 9;
             unloadBkgBtn.Text = "Unload";
             unloadBkgBtn.UseVisualStyleBackColor = true;
             unloadBkgBtn.Click += unloadBkgBtn_Click;
@@ -2400,7 +2404,7 @@
             ((System.ComponentModel.ISupportInitialize)xoffsetUd).EndInit();
             songPropsPanel.ResumeLayout(false);
             songPropsPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)bkgOpacityUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)minPitchUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)maxPitchUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)fadeOutUd).EndInit();
@@ -2607,7 +2611,7 @@
         private System.Windows.Forms.Label label4;
         private LineStyleControl lineStyleControl;
         private System.Windows.Forms.Label label27;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown bkgOpacityUd;
         private System.Windows.Forms.Button loadBkgBtn;
         private System.Windows.Forms.Button unloadBkgBtn;
         private System.Windows.Forms.OpenFileDialog openBkgDialog;

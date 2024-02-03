@@ -1,8 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using SharpDX.Direct3D11;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
+using System.Reflection;
 using System.Runtime.Serialization;
+using System.Windows.Media.Animation;
 
 namespace VisualMusic
 {
@@ -73,11 +77,41 @@ namespace VisualMusic
             KeyFrame outFrame = frame1.clone();
             float interpolant = (float)(songPosT - frameList.Keys[index1]) / (frameList.Keys[index1 + 1] - frameList.Keys[index1]);
             interpolant = (float)(1 - Math.Cos(interpolant * Math.PI)) / 2f;
-            outFrame.ProjProps.ViewWidthQn = (float)Math.Pow(2, interpolate((float)Math.Log(frame1.ProjProps.ViewWidthQn, 2), (float)Math.Log(frame2.ProjProps.ViewWidthQn, 2), interpolant));
+            foreach (var prop in outFrame.ProjProps.GetType().GetProperties())
+                interpolateProperty(prop, frame1, frame2, outFrame, interpolant);
             outFrame.ProjProps.Camera.Pos = interpolate(frame1.ProjProps.Camera.Pos, frame2.ProjProps.Camera.Pos, interpolant);
             outFrame.ProjProps.Camera.Orientation = interpolate(frame1.ProjProps.Camera.Orientation, frame2.ProjProps.Camera.Orientation, interpolant);
 
             return outFrame;
+        }
+
+        private void interpolateProperty(PropertyInfo prop, object object1, object object2, object outObject, float interpolant)
+        {
+            var value1 = prop.GetValue(object1);
+            var value2 = prop.GetValue(object2);
+
+            if (prop.GetCustomAttribute<KeyframeLogInterpolation>() != null)
+                outObject = (float)Math.Pow(2, interpolate((float)Math.Log((float)object1, 2), (float)Math.Log((float)object2, 2), interpolant));
+            else if (HasProperties(prop.PropertyType))
+                interpolateProperty(prop, value1, value2, prop.get);
+            else if (prop.PropertyType == typeof(float) || prop.PropertyType == typeof(int))
+            {
+                var value = interpolate((float)value1, (float)value2, interpolant);
+                if (prop.PropertyType == typeof(float))
+                    prop.SetValue(outValue, value);
+                else
+                    prop.SetValue(outValue, (int)value);
+            }
+        }
+
+        static bool HasProperties(Type type)
+        {
+            if (type == typeof(string))
+                return false;
+
+            if (type.IsClass || (type.IsInterface && !type.IsPrimitive))
+                return type.GetProperties().Length > 0;
+            return false;
         }
 
         //Returns keyframe that matches current song position if there's a match, otherwise null
@@ -179,6 +213,19 @@ namespace VisualMusic
                     ProjProps = (ProjProps)entry.Value;
                 else if (entry.Name == "trackProps")
                     TrackProps = (List<TrackProps>)entry.Value;
+                //The following are for legacy file format
+                else if (entry.Name == "qn_viewWidth")
+                {
+                    if (ProjProps == null)
+                        ProjProps = new ProjProps();
+                    ProjProps.ViewWidthQn = (float)entry.Value;
+                }
+                else if (entry.Name == "camera")
+                {
+                    if (ProjProps == null)
+                        ProjProps = new ProjProps();
+                    ProjProps.Camera = (Camera)entry.Value;
+                }
             }
         }
 
@@ -189,5 +236,9 @@ namespace VisualMusic
             info.AddValue("projProps", ProjProps);
             info.AddValue("trackProps", TrackProps);
         }
+    }
+
+    public class KeyframeLogInterpolation : Attribute
+    {
     }
 }
