@@ -184,6 +184,10 @@
             resetDefaultBtn = new System.Windows.Forms.Button();
             openTextureDlg = new System.Windows.Forms.OpenFileDialog();
             songPropsPanel = new System.Windows.Forms.Panel();
+            label27 = new System.Windows.Forms.Label();
+            numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            unloadBkgBtn = new System.Windows.Forms.Button();
+            loadBkgBtn = new System.Windows.Forms.Button();
             camLabel = new System.Windows.Forms.Label();
             camTb = new System.Windows.Forms.TextBox();
             defaultPitchesBtn = new System.Windows.Forms.Button();
@@ -221,6 +225,7 @@
             songPropsCb = new System.Windows.Forms.CheckBox();
             trackPropsCb = new System.Windows.Forms.CheckBox();
             label4 = new System.Windows.Forms.Label();
+            openBkgDialog = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)audioOffsetS).BeginInit();
             menuStrip1.SuspendLayout();
             trackPropsPanel.SuspendLayout();
@@ -258,6 +263,7 @@
             ((System.ComponentModel.ISupportInitialize)yoffsetUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)xoffsetUd).BeginInit();
             songPropsPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)minPitchUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)maxPitchUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)fadeOutUd).BeginInit();
@@ -1904,6 +1910,10 @@
             // 
             // songPropsPanel
             // 
+            songPropsPanel.Controls.Add(label27);
+            songPropsPanel.Controls.Add(numericUpDown1);
+            songPropsPanel.Controls.Add(unloadBkgBtn);
+            songPropsPanel.Controls.Add(loadBkgBtn);
             songPropsPanel.Controls.Add(camLabel);
             songPropsPanel.Controls.Add(camTb);
             songPropsPanel.Controls.Add(defaultPitchesBtn);
@@ -1928,10 +1938,46 @@
             songPropsPanel.Dock = System.Windows.Forms.DockStyle.Left;
             songPropsPanel.Location = new System.Drawing.Point(0, 24);
             songPropsPanel.Name = "songPropsPanel";
-            songPropsPanel.Size = new System.Drawing.Size(197, 4361);
+            songPropsPanel.Size = new System.Drawing.Size(216, 4361);
             songPropsPanel.TabIndex = 17;
             songPropsPanel.Visible = false;
             songPropsPanel.VisibleChanged += songPropsPanel_VisibleChanged;
+            // 
+            // label27
+            // 
+            label27.AutoSize = true;
+            label27.Location = new System.Drawing.Point(12, 493);
+            label27.Name = "label27";
+            label27.Size = new System.Drawing.Size(113, 15);
+            label27.TabIndex = 10;
+            label27.Text = "Background opacity";
+            // 
+            // numericUpDown1
+            // 
+            numericUpDown1.Location = new System.Drawing.Point(131, 491);
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new System.Drawing.Size(54, 23);
+            numericUpDown1.TabIndex = 9;
+            // 
+            // unloadBkgBtn
+            // 
+            unloadBkgBtn.Location = new System.Drawing.Point(131, 462);
+            unloadBkgBtn.Name = "unloadBkgBtn";
+            unloadBkgBtn.Size = new System.Drawing.Size(67, 23);
+            unloadBkgBtn.TabIndex = 8;
+            unloadBkgBtn.Text = "Unload";
+            unloadBkgBtn.UseVisualStyleBackColor = true;
+            unloadBkgBtn.Click += unloadBkgBtn_Click;
+            // 
+            // loadBkgBtn
+            // 
+            loadBkgBtn.Location = new System.Drawing.Point(12, 462);
+            loadBkgBtn.Name = "loadBkgBtn";
+            loadBkgBtn.Size = new System.Drawing.Size(111, 23);
+            loadBkgBtn.TabIndex = 8;
+            loadBkgBtn.Text = "Load background";
+            loadBkgBtn.UseVisualStyleBackColor = true;
+            loadBkgBtn.Click += loadBkgBtn_Click;
             // 
             // camLabel
             // 
@@ -2158,9 +2204,9 @@
             lyricsGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             lyricsGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { TimeColumn, LyricsColumn });
             lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
-            lyricsGridView.Location = new System.Drawing.Point(197, 4335);
+            lyricsGridView.Location = new System.Drawing.Point(216, 4335);
             lyricsGridView.Name = "lyricsGridView";
-            lyricsGridView.Size = new System.Drawing.Size(587, 50);
+            lyricsGridView.Size = new System.Drawing.Size(568, 50);
             lyricsGridView.TabIndex = 0;
             lyricsGridView.Tag = "Edit Lyrics";
             lyricsGridView.Visible = false;
@@ -2194,7 +2240,7 @@
             keyFramesDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             keyFramesDGV.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { Time, Description });
             keyFramesDGV.Dock = System.Windows.Forms.DockStyle.Left;
-            keyFramesDGV.Location = new System.Drawing.Point(197, 24);
+            keyFramesDGV.Location = new System.Drawing.Point(216, 24);
             keyFramesDGV.Name = "keyFramesDGV";
             keyFramesDGV.Size = new System.Drawing.Size(210, 4311);
             keyFramesDGV.TabIndex = 23;
@@ -2274,13 +2320,17 @@
             label4.Text = "label4";
             label4.Visible = false;
             // 
+            // openBkgDialog
+            // 
+            openBkgDialog.FileName = "openFileDialog1";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             AutoScroll = true;
             AutoSize = true;
-            ClientSize = new System.Drawing.Size(1196, 421);
+            ClientSize = new System.Drawing.Size(1196, 569);
             Controls.Add(label4);
             Controls.Add(propsTogglePanel);
             Controls.Add(keyFramesDGV);
@@ -2350,6 +2400,7 @@
             ((System.ComponentModel.ISupportInitialize)xoffsetUd).EndInit();
             songPropsPanel.ResumeLayout(false);
             songPropsPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             ((System.ComponentModel.ISupportInitialize)minPitchUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)maxPitchUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)fadeOutUd).EndInit();
@@ -2555,6 +2606,11 @@
         private System.Windows.Forms.ToolStripMenuItem jumpForwardToolStripMenuItem;
         private System.Windows.Forms.Label label4;
         private LineStyleControl lineStyleControl;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Button loadBkgBtn;
+        private System.Windows.Forms.Button unloadBkgBtn;
+        private System.Windows.Forms.OpenFileDialog openBkgDialog;
     }
 }
 

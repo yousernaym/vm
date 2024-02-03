@@ -36,6 +36,8 @@ namespace VisualMusic
         public float PitchMargin => NormPitchMargin * Camera.ViewportSize.Y;
         public float NoteHeight => (Camera.ViewportSize.Y - PitchMargin * 2) / NumPitches;
         public Camera Camera { get; set; } = new Camera();
+        public string BackgroundImagePath { get; set; } = "";
+        public float BackgroundImageOpacity { get; set; } = 1.0f;
 
         public ProjProps()
         {

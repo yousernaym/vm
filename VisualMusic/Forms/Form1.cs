@@ -2608,5 +2608,27 @@ namespace VisualMusic
             else
                 regainFocus(RemuxerProcess);
         }
+
+        private void label27_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void loadBkgBtn_Click(object sender, EventArgs e)
+        {
+            var dlgResult = openBkgDialog.ShowDialog();
+            if (dlgResult == DialogResult.OK)
+            {
+                Project.Props.BackgroundImagePath = openBkgDialog.FileName;
+                SongPanel.LoadBackgroundImage(Project.Props.BackgroundImagePath);
+            }
+
+        }
+
+        private void unloadBkgBtn_Click(object sender, EventArgs e)
+        {
+            Project.Props.BackgroundImagePath = "";
+            SongPanel.UnloadBackgroundImage();
+        }
     }
 }

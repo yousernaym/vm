@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 //using Microsoft.Xna.Framework.GamerServices;
 //using Microsoft.Xna.Framework.Input;
@@ -44,6 +45,7 @@ namespace VisualMusic
         }
 
         Texture2D regionSelectTexture;
+        Texture2D backgroundTexture =  null;
 
         TimeSpan oldTime = new TimeSpan(0);
         Stopwatch stopwatch = new Stopwatch();
@@ -91,13 +93,13 @@ namespace VisualMusic
                 CullMode = CullMode.None
             };
 
-            //BlendState.AlphaDestinationBlend = Blend.DestinationAlpha;
-            //BlendState.AlphaSourceBlend = Blend.InverseDestinationAlpha;
-            //BlendState.ColorDestinationBlend = Blend.DestinationAlpha;
-            //BlendState.ColorSourceBlend = Blend.InverseDestinationAlpha;
-            //BlendState.ColorWriteChannels = ColorWriteChannels.All;
-            //BlendState.AlphaBlendFunction = BlendFunction.Add;
-            //BlendState.ColorBlendFunction = BlendFunction.Add;
+            //blendState.AlphaDestinationBlend = Blend.DestinationAlpha;
+            //blendState.AlphaSourceBlend = Blend.InverseDestinationAlpha;
+            //blendState.ColorDestinationBlend = Blend.DestinationAlpha;
+            //blendState.ColorSourceBlend = Blend.InverseDestinationAlpha;
+            //blendState.ColorWriteChannels = ColorWriteChannels.All;
+            //blendState.AlphaBlendFunction = BlendFunction.Add;
+            //blendState.ColorBlendFunction = BlendFunction.Add;
 
             //BlendState = BlendState.AlphaBlend;
             content = new ContentManager(Services, "Content");
@@ -148,16 +150,18 @@ namespace VisualMusic
         protected override void Draw()
         {
             GraphicsDevice.Clear(Color.Transparent);
+            SpriteBatch.Begin();
+            if (backgroundTexture != null)
+                SpriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
             if (selectingRegion && selectedScreenRegion.Width != 0 && selectedScreenRegion.Height != 0)
             {
-                SpriteBatch.Begin();
                 Rectangle normRect = normalizeRect(selectedScreenRegion);
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
-                SpriteBatch.End();
             }
+            SpriteBatch.End();
             GraphicsDevice.BlendState = blendState;
             GraphicsDevice.RasterizerState = rastState;
             Project.drawSong();
@@ -740,6 +744,20 @@ namespace VisualMusic
             }
         }
 
+        public void LoadBackgroundImage(string path)
+        {
+            UnloadBackgroundImage();
+            backgroundTexture = Texture2D.FromFile(GraphicsDevice, path);
+        }
+
+        public void UnloadBackgroundImage()
+        {
+            if (backgroundTexture != null)
+            {
+                backgroundTexture.Dispose();
+                backgroundTexture = null;
+            }
+        }
     }
 }
 
