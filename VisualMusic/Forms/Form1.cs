@@ -72,7 +72,7 @@ namespace VisualMusic
         public static VideoExportForm VidExpForm;
         LocateFile locateFileDlg;
 
-        static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment), typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps) };
+        static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment), typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps), typeof(List<TrackProps>) };
         static public SongPanel SongPanel { get; private set; } = new SongPanel();
         SongWebBrowser modWebBrowser;
         SongWebBrowser sidWebBrowser;
@@ -397,7 +397,7 @@ namespace VisualMusic
         private void updateProjPropsControls()
         {
             updatingControls = true;
-            upDownVpWidth.Value = Project.KeyFrames[0].ViewWidthQn;
+            upDownVpWidth.Value = Project.KeyFrames[0].ProjProps.ViewWidthQn;
             audioOffsetS.Value = (decimal)Project.Props.AudioOffset;
             Project.Props.PlaybackOffsetS = Project.Props.PlaybackOffsetS;
             playbackOffsetUd.Value = (decimal)Project.Props.PlaybackOffsetS;
@@ -541,7 +541,7 @@ namespace VisualMusic
 
             var keyFrame = Project.getKeyFrameAtSongPos();
             if (keyFrame != null)
-                keyFrame.Camera.control(e.KeyCode, false, Form1.ModifierKeys);
+                keyFrame.ProjProps.Camera.control(e.KeyCode, false, Form1.ModifierKeys);
 
             if (e.KeyCode == Keys.Z)
             {
@@ -575,7 +575,7 @@ namespace VisualMusic
             foreach (var keyFrame in Project.KeyFrames.Values)
             {
                 if (keyFrame.Selected)
-                    keyFrame.ViewWidthQn = (float)((TbSlider)sender).Value;
+                    keyFrame.ProjProps.ViewWidthQn = (float)((TbSlider)sender).Value;
             }
         }
 
@@ -1785,7 +1785,7 @@ namespace VisualMusic
             {
                 if (keyFrame.Selected || !onlySelected)
                 {
-                    keyFrame.Camera = newCam ?? new Camera();
+                    keyFrame.ProjProps.Camera = newCam ?? new Camera();
                 }
             }
             Project.interpolateFrames();
@@ -2111,7 +2111,7 @@ namespace VisualMusic
                         foreach (var keyFrame in Project.KeyFrames.Values)
                         {
                             if (keyFrame.Selected)
-                                keyFrame.Camera.Pos = pos;
+                                keyFrame.ProjProps.Camera.Pos = pos;
                         }
                         break;
                     case 3:
@@ -2129,7 +2129,7 @@ namespace VisualMusic
                         foreach (var keyFrame in Project.KeyFrames.Values)
                         {
                             if (keyFrame.Selected)
-                                keyFrame.Camera.Orientation = orient;
+                                keyFrame.ProjProps.Camera.Orientation = orient;
                         }
                         break;
                 }
@@ -2439,7 +2439,7 @@ namespace VisualMusic
             {
                 Project.goToKeyFrame(keyFramesDGV.CurrentRow.Index);
                 updatingControls = true;
-                upDownVpWidth.Value = Project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].ViewWidthQn;
+                upDownVpWidth.Value = Project.KeyFrames.Values[keyFramesDGV.CurrentRow.Index].ProjProps.ViewWidthQn;
                 updatingControls = false;
 
             }

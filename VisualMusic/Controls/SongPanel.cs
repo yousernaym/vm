@@ -701,7 +701,7 @@ namespace VisualMusic
                 NormMouseX = (float)(clientP.X - middleX) * 2 / screenHeight;
                 NormMouseY = (float)(clientP.Y - middleY) * 2 / screenHeight;
                 Cursor.Position = PointToScreen(new GdiPoint(middleX, middleY));
-                Project.getKeyFrameAtSongPos()?.Camera.ApplyMouseRot(NormMouseX, NormMouseY);
+                Project.getKeyFrameAtSongPos()?.ProjProps.Camera.ApplyMouseRot(NormMouseX, NormMouseY);
             }
         }
 
@@ -713,7 +713,7 @@ namespace VisualMusic
             var keyFrame = Project.getKeyFrameAtSongPos();
             if (keyFrame == null)
                 return;
-            if (keyFrame.Camera.control(e.KeyCode, true, ModifierKeys))
+            if (keyFrame.ProjProps.Camera.control(e.KeyCode, true, ModifierKeys))
                 e.SuppressKeyPress = true;
 
             //Start/stop playback

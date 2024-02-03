@@ -122,7 +122,7 @@ namespace VisualMusic
         public Project()
         {
             KeyFrames = new KeyFrames();
-            Props.ViewWidthQn = KeyFrames[0].ViewWidthQn;
+            Props.ViewWidthQn = KeyFrames[0].ProjProps.ViewWidthQn;
             Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
         }
 
@@ -181,7 +181,7 @@ namespace VisualMusic
                 else if (entry.Name == "minPitch")
                     Props.MinPitch = (int)entry.Value;
                 else if (entry.Name == "camera")
-                    KeyFrames[0].Camera = (Camera)entry.Value;
+                    KeyFrames[0].ProjProps.Camera = (Camera)entry.Value;
                 else if (entry.Name == "userViewWidth")
                     Props.UserViewWidth = (float)entry.Value;
             }
@@ -347,9 +347,9 @@ namespace VisualMusic
         public void interpolateFrames()
         {
             var interpolatedFrame = KeyFrames.createInterpolatedFrame((int)SongPosT);
-            Props.ViewWidthQn = interpolatedFrame.ViewWidthQn;
+            Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
             //interpolatedFrame.Camera.SongPanel= Camera.SongPanel;
-            Props.Camera = interpolatedFrame.Camera;
+            Props.Camera = interpolatedFrame.ProjProps.Camera;
         }
 
         public void openAudioFile(ImportOptions options)
@@ -689,7 +689,7 @@ namespace VisualMusic
             foreach (var keyFrame in KeyFrames.Values)
             {
                 if (keyFrame.Selected)
-                    keyFrame.Camera.update(deltaTimeS);
+                    keyFrame.ProjProps.Camera.update(deltaTimeS);
             }
             interpolateFrames();
 
@@ -909,26 +909,26 @@ namespace VisualMusic
             SongLengthS = normSongPosToSeconds(1);
         }
 
-        public Project clone()
-        {
-            Project dest = Cloning.clone(this);
+        //public Project clone()
+        //{
+        //    Project dest = Cloning.clone(this);
 
-            for (int i = 0; i < trackViews.Count; i++)
-            {
-                //dest.trackViews[i] = trackViews[i].clone();
-                //dest.TrackViews[i].TrackProps.GlobalProps = dest.TrackViews[0].TrackProps;
-                dest.trackViews[i].MidiTrack = trackViews[i].MidiTrack;
-                dest.trackViews[i].OcTree = trackViews[i].OcTree;
-                dest.trackViews[i].Curve = trackViews[i].Curve;
-            }
+        //    for (int i = 0; i < trackViews.Count; i++)
+        //    {
+        //        //dest.trackViews[i] = trackViews[i].clone();
+        //        //dest.TrackViews[i].TrackProps.GlobalProps = dest.TrackViews[0].TrackProps;
+        //        dest.trackViews[i].MidiTrack = trackViews[i].MidiTrack;
+        //        dest.trackViews[i].OcTree = trackViews[i].OcTree;
+        //        dest.trackViews[i].Curve = trackViews[i].Curve;
+        //    }
 
-            dest.notes = notes;
-            //dest.Props = Props.clone();
-            //dest.vertViewWidthQn = vertViewWidthQn;
-            dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
-            dest.Props.OnPlaybackOffsetSChanged();
-            return dest;
-        }
+        //    dest.notes = notes;
+        //    //dest.Props = Props.clone();
+        //    //dest.vertViewWidthQn = vertViewWidthQn;
+        //    dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
+        //    dest.Props.OnPlaybackOffsetSChanged();
+        //    return dest;
+        //}
 
         public void Dispose()
         {

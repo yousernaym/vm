@@ -28,2592 +28,2340 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.openProjDialog = new System.Windows.Forms.OpenFileDialog();
-            this.saveProjDialog = new System.Windows.Forms.SaveFileDialog();
-            this.saveVideoDlg = new System.Windows.Forms.SaveFileDialog();
-            this.audioOffsetS = new System.Windows.Forms.NumericUpDown();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importMidiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importModuleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importSidSongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openSongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveSongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveSongAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportVideoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tpartyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cameraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resetCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.defaultPropertiesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.savePropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.insertLyricsHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.insertKeyFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.playbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.startStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.beginningToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.endToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nudgeBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nudgeForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.jumpBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.jumpForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewSongTSMI = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewModBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewSidBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewMidiBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.trackPropsPanel = new System.Windows.Forms.Panel();
-            this.trackList = new VisualMusic.ListViewNF();
-            this.trackColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.normalColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.hilitedColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.trackListCM = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.invertSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.defaultPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.selectedTrackPropsPanel = new System.Windows.Forms.TabControl();
-            this.style = new System.Windows.Forms.TabPage();
-            this.barStyleControl = new VisualMusic.BarStyleControl();
-            this.defaultStyleBtn = new System.Windows.Forms.Button();
-            this.styleList = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.material = new System.Windows.Forms.TabPage();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.label37 = new System.Windows.Forms.Label();
-            this.label34 = new System.Windows.Forms.Label();
-            this.label35 = new System.Windows.Forms.Label();
-            this.texVScrollUD = new System.Windows.Forms.NumericUpDown();
-            this.label33 = new System.Windows.Forms.Label();
-            this.texUScrollUD = new System.Windows.Forms.NumericUpDown();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.label31 = new System.Windows.Forms.Label();
-            this.label32 = new System.Windows.Forms.Label();
-            this.label36 = new System.Windows.Forms.Label();
-            this.songAnchorLabel = new System.Windows.Forms.Label();
-            this.noteAnchorLabel = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.songAnchorRb = new System.Windows.Forms.RadioButton();
-            this.screenUAnchorRb = new System.Windows.Forms.RadioButton();
-            this.noteUAnchorRb = new System.Windows.Forms.RadioButton();
-            this.screenAnchorLabel = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.screenVAnchorRb = new System.Windows.Forms.RadioButton();
-            this.noteVAnchorRb = new System.Windows.Forms.RadioButton();
-            this.texVTileCb = new System.Windows.Forms.CheckBox();
-            this.texUTileCb = new System.Windows.Forms.CheckBox();
-            this.texKeepAspectCb = new System.Windows.Forms.CheckBox();
-            this.tileTexCb = new System.Windows.Forms.CheckBox();
-            this.loadTexBtn = new System.Windows.Forms.Button();
-            this.unloadTexBtn = new System.Windows.Forms.Button();
-            this.disableTextureCh = new System.Windows.Forms.CheckBox();
-            this.texColBlendCb = new System.Windows.Forms.CheckBox();
-            this.pointSmpCb = new System.Windows.Forms.CheckBox();
-            this.trackTexPb = new System.Windows.Forms.PictureBox();
-            this.defaultMtrlBtn = new System.Windows.Forms.Button();
-            this.alphaLbl = new System.Windows.Forms.Label();
-            this.transpSlider = new System.Windows.Forms.TrackBar();
-            this.hueTb = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.normalLumTb = new System.Windows.Forms.TextBox();
-            this.normalLumSlider = new System.Windows.Forms.TrackBar();
-            this.label = new System.Windows.Forms.Label();
-            this.normalSatTb = new System.Windows.Forms.TextBox();
-            this.normalSatSlider = new System.Windows.Forms.TrackBar();
-            this.label3 = new System.Windows.Forms.Label();
-            this.hueSlider = new System.Windows.Forms.TrackBar();
-            this.label2 = new System.Windows.Forms.Label();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.hiliteLumTb = new System.Windows.Forms.TextBox();
-            this.hiliteLumSlider = new System.Windows.Forms.TrackBar();
-            this.label5 = new System.Windows.Forms.Label();
-            this.hiliteSatTb = new System.Windows.Forms.TextBox();
-            this.hiliteSatSlider = new System.Windows.Forms.TrackBar();
-            this.label6 = new System.Windows.Forms.Label();
-            this.transpTb = new System.Windows.Forms.TextBox();
-            this.light = new System.Windows.Forms.TabPage();
-            this.defaultLightBtn = new System.Windows.Forms.Button();
-            this.lightPanel = new System.Windows.Forms.Panel();
-            this.masterLightHsBtn = new VisualMusic.HueSatButton();
-            this.specHsBtn = new VisualMusic.HueSatButton();
-            this.diffuseHsBtn = new VisualMusic.HueSatButton();
-            this.ambientHsBtn = new VisualMusic.HueSatButton();
-            this.specPowUd = new System.Windows.Forms.NumericUpDown();
-            this.ambientAmountUd = new System.Windows.Forms.NumericUpDown();
-            this.diffuseAmountUd = new System.Windows.Forms.NumericUpDown();
-            this.label24 = new System.Windows.Forms.Label();
-            this.masterLightAmountUd = new System.Windows.Forms.NumericUpDown();
-            this.specAmountUd = new System.Windows.Forms.NumericUpDown();
-            this.label15 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label16 = new System.Windows.Forms.Label();
-            this.label22 = new System.Windows.Forms.Label();
-            this.label23 = new System.Windows.Forms.Label();
-            this.lightDirXUd = new System.Windows.Forms.NumericUpDown();
-            this.label11 = new System.Windows.Forms.Label();
-            this.lightDirYUd = new System.Windows.Forms.NumericUpDown();
-            this.lightDirZUd = new System.Windows.Forms.NumericUpDown();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.globalLightCb = new System.Windows.Forms.CheckBox();
-            this.spatial = new System.Windows.Forms.TabPage();
-            this.defaultSpatialBtn = new System.Windows.Forms.Button();
-            this.label41 = new System.Windows.Forms.Label();
-            this.label40 = new System.Windows.Forms.Label();
-            this.label39 = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
-            this.zoffsetUd = new System.Windows.Forms.NumericUpDown();
-            this.yoffsetUd = new System.Windows.Forms.NumericUpDown();
-            this.xoffsetUd = new System.Windows.Forms.NumericUpDown();
-            this.resetDefaultBtn = new System.Windows.Forms.Button();
-            this.openTextureDlg = new System.Windows.Forms.OpenFileDialog();
-            this.songPropsPanel = new System.Windows.Forms.Panel();
-            this.camLabel = new System.Windows.Forms.Label();
-            this.camTb = new System.Windows.Forms.TextBox();
-            this.defaultPitchesBtn = new System.Windows.Forms.Button();
-            this.minPitchUd = new System.Windows.Forms.NumericUpDown();
-            this.maxPitchUd = new System.Windows.Forms.NumericUpDown();
-            this.label26 = new System.Windows.Forms.Label();
-            this.label21 = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.hnotelabel = new System.Windows.Forms.Label();
-            this.label25 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
-            this.label17 = new System.Windows.Forms.Label();
-            this.fadeOutUd = new System.Windows.Forms.NumericUpDown();
-            this.fadeInUd = new System.Windows.Forms.NumericUpDown();
-            this.playbackOffsetUd = new System.Windows.Forms.NumericUpDown();
-            this.upDownVpWidth = new VisualMusic.TbSlider();
-            this.saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
-            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.saveMidiDialog = new System.Windows.Forms.SaveFileDialog();
-            this.openTrackPropsFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.saveTrackPropsFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.trackPropsTabCM = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.loadTrackPropsTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveTrackPtopsTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openCamFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.saveCamFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.lyricsGridView = new System.Windows.Forms.DataGridView();
-            this.TimeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.LyricsColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.keyFramesDGV = new System.Windows.Forms.DataGridView();
-            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Description = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.propsTogglePanel = new System.Windows.Forms.Panel();
-            this.songPropsCb = new System.Windows.Forms.CheckBox();
-            this.trackPropsCb = new System.Windows.Forms.CheckBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.lineStyleControl = new VisualMusic.LineStyleControl();
-            ((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).BeginInit();
-            this.menuStrip1.SuspendLayout();
-            this.trackPropsPanel.SuspendLayout();
-            this.trackListCM.SuspendLayout();
-            this.selectedTrackPropsPanel.SuspendLayout();
-            this.style.SuspendLayout();
-            this.material.SuspendLayout();
-            this.groupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.texVScrollUD)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.texUScrollUD)).BeginInit();
-            this.tableLayoutPanel1.SuspendLayout();
-            this.panel2.SuspendLayout();
-            this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackTexPb)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.transpSlider)).BeginInit();
-            this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.normalLumSlider)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.normalSatSlider)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.hueSlider)).BeginInit();
-            this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.hiliteLumSlider)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.hiliteSatSlider)).BeginInit();
-            this.light.SuspendLayout();
-            this.lightPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.specPowUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ambientAmountUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.diffuseAmountUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.masterLightAmountUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).BeginInit();
-            this.spatial.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).BeginInit();
-            this.songPropsPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).BeginInit();
-            this.trackPropsTabCM.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.lyricsGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.keyFramesDGV)).BeginInit();
-            this.propsTogglePanel.SuspendLayout();
-            this.SuspendLayout();
+            openProjDialog = new System.Windows.Forms.OpenFileDialog();
+            saveProjDialog = new System.Windows.Forms.SaveFileDialog();
+            saveVideoDlg = new System.Windows.Forms.SaveFileDialog();
+            audioOffsetS = new System.Windows.Forms.NumericUpDown();
+            fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            importMidiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            importModuleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            importSidSongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            openSongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            saveSongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            saveSongAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exportVideoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            tpartyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            menuStrip1 = new System.Windows.Forms.MenuStrip();
+            editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            cameraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            resetCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            loadCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            saveCamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            tracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            defaultPropertiesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            loadPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            savePropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            insertLyricsHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            insertKeyFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            playbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            startStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            beginningToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            endToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            nudgeBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            nudgeForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            jumpBackwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            jumpForwardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            viewSongTSMI = new System.Windows.Forms.ToolStripMenuItem();
+            viewModBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
+            viewSidBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
+            viewMidiBrowserTSMI = new System.Windows.Forms.ToolStripMenuItem();
+            label7 = new System.Windows.Forms.Label();
+            label9 = new System.Windows.Forms.Label();
+            label10 = new System.Windows.Forms.Label();
+            trackPropsPanel = new System.Windows.Forms.Panel();
+            trackList = new ListViewNF();
+            trackColumn = new System.Windows.Forms.ColumnHeader();
+            normalColumn = new System.Windows.Forms.ColumnHeader();
+            hilitedColumn = new System.Windows.Forms.ColumnHeader();
+            trackListCM = new System.Windows.Forms.ContextMenuStrip(components);
+            selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            invertSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            defaultPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            loadTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            saveTrackPropsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            selectedTrackPropsPanel = new System.Windows.Forms.TabControl();
+            style = new System.Windows.Forms.TabPage();
+            lineStyleControl = new LineStyleControl();
+            barStyleControl = new BarStyleControl();
+            defaultStyleBtn = new System.Windows.Forms.Button();
+            styleList = new System.Windows.Forms.ComboBox();
+            label1 = new System.Windows.Forms.Label();
+            material = new System.Windows.Forms.TabPage();
+            groupBox4 = new System.Windows.Forms.GroupBox();
+            label37 = new System.Windows.Forms.Label();
+            label34 = new System.Windows.Forms.Label();
+            label35 = new System.Windows.Forms.Label();
+            texVScrollUD = new System.Windows.Forms.NumericUpDown();
+            label33 = new System.Windows.Forms.Label();
+            texUScrollUD = new System.Windows.Forms.NumericUpDown();
+            tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            label31 = new System.Windows.Forms.Label();
+            label32 = new System.Windows.Forms.Label();
+            label36 = new System.Windows.Forms.Label();
+            songAnchorLabel = new System.Windows.Forms.Label();
+            noteAnchorLabel = new System.Windows.Forms.Label();
+            panel2 = new System.Windows.Forms.Panel();
+            songAnchorRb = new System.Windows.Forms.RadioButton();
+            screenUAnchorRb = new System.Windows.Forms.RadioButton();
+            noteUAnchorRb = new System.Windows.Forms.RadioButton();
+            screenAnchorLabel = new System.Windows.Forms.Label();
+            panel1 = new System.Windows.Forms.Panel();
+            screenVAnchorRb = new System.Windows.Forms.RadioButton();
+            noteVAnchorRb = new System.Windows.Forms.RadioButton();
+            texVTileCb = new System.Windows.Forms.CheckBox();
+            texUTileCb = new System.Windows.Forms.CheckBox();
+            texKeepAspectCb = new System.Windows.Forms.CheckBox();
+            tileTexCb = new System.Windows.Forms.CheckBox();
+            loadTexBtn = new System.Windows.Forms.Button();
+            unloadTexBtn = new System.Windows.Forms.Button();
+            disableTextureCh = new System.Windows.Forms.CheckBox();
+            texColBlendCb = new System.Windows.Forms.CheckBox();
+            pointSmpCb = new System.Windows.Forms.CheckBox();
+            trackTexPb = new System.Windows.Forms.PictureBox();
+            defaultMtrlBtn = new System.Windows.Forms.Button();
+            alphaLbl = new System.Windows.Forms.Label();
+            transpSlider = new System.Windows.Forms.TrackBar();
+            hueTb = new System.Windows.Forms.TextBox();
+            groupBox1 = new System.Windows.Forms.GroupBox();
+            normalLumTb = new System.Windows.Forms.TextBox();
+            normalLumSlider = new System.Windows.Forms.TrackBar();
+            label = new System.Windows.Forms.Label();
+            normalSatTb = new System.Windows.Forms.TextBox();
+            normalSatSlider = new System.Windows.Forms.TrackBar();
+            label3 = new System.Windows.Forms.Label();
+            hueSlider = new System.Windows.Forms.TrackBar();
+            label2 = new System.Windows.Forms.Label();
+            groupBox2 = new System.Windows.Forms.GroupBox();
+            hiliteLumTb = new System.Windows.Forms.TextBox();
+            hiliteLumSlider = new System.Windows.Forms.TrackBar();
+            label5 = new System.Windows.Forms.Label();
+            hiliteSatTb = new System.Windows.Forms.TextBox();
+            hiliteSatSlider = new System.Windows.Forms.TrackBar();
+            label6 = new System.Windows.Forms.Label();
+            transpTb = new System.Windows.Forms.TextBox();
+            light = new System.Windows.Forms.TabPage();
+            defaultLightBtn = new System.Windows.Forms.Button();
+            lightPanel = new System.Windows.Forms.Panel();
+            masterLightHsBtn = new HueSatButton();
+            specHsBtn = new HueSatButton();
+            diffuseHsBtn = new HueSatButton();
+            ambientHsBtn = new HueSatButton();
+            specPowUd = new System.Windows.Forms.NumericUpDown();
+            ambientAmountUd = new System.Windows.Forms.NumericUpDown();
+            diffuseAmountUd = new System.Windows.Forms.NumericUpDown();
+            label24 = new System.Windows.Forms.Label();
+            masterLightAmountUd = new System.Windows.Forms.NumericUpDown();
+            specAmountUd = new System.Windows.Forms.NumericUpDown();
+            label15 = new System.Windows.Forms.Label();
+            label14 = new System.Windows.Forms.Label();
+            label16 = new System.Windows.Forms.Label();
+            label22 = new System.Windows.Forms.Label();
+            label23 = new System.Windows.Forms.Label();
+            lightDirXUd = new System.Windows.Forms.NumericUpDown();
+            label11 = new System.Windows.Forms.Label();
+            lightDirYUd = new System.Windows.Forms.NumericUpDown();
+            lightDirZUd = new System.Windows.Forms.NumericUpDown();
+            label12 = new System.Windows.Forms.Label();
+            label13 = new System.Windows.Forms.Label();
+            globalLightCb = new System.Windows.Forms.CheckBox();
+            spatial = new System.Windows.Forms.TabPage();
+            defaultSpatialBtn = new System.Windows.Forms.Button();
+            label41 = new System.Windows.Forms.Label();
+            label40 = new System.Windows.Forms.Label();
+            label39 = new System.Windows.Forms.Label();
+            label20 = new System.Windows.Forms.Label();
+            zoffsetUd = new System.Windows.Forms.NumericUpDown();
+            yoffsetUd = new System.Windows.Forms.NumericUpDown();
+            xoffsetUd = new System.Windows.Forms.NumericUpDown();
+            resetDefaultBtn = new System.Windows.Forms.Button();
+            openTextureDlg = new System.Windows.Forms.OpenFileDialog();
+            songPropsPanel = new System.Windows.Forms.Panel();
+            camLabel = new System.Windows.Forms.Label();
+            camTb = new System.Windows.Forms.TextBox();
+            defaultPitchesBtn = new System.Windows.Forms.Button();
+            minPitchUd = new System.Windows.Forms.NumericUpDown();
+            maxPitchUd = new System.Windows.Forms.NumericUpDown();
+            label26 = new System.Windows.Forms.Label();
+            label21 = new System.Windows.Forms.Label();
+            label18 = new System.Windows.Forms.Label();
+            label8 = new System.Windows.Forms.Label();
+            hnotelabel = new System.Windows.Forms.Label();
+            label25 = new System.Windows.Forms.Label();
+            label19 = new System.Windows.Forms.Label();
+            label17 = new System.Windows.Forms.Label();
+            fadeOutUd = new System.Windows.Forms.NumericUpDown();
+            fadeInUd = new System.Windows.Forms.NumericUpDown();
+            playbackOffsetUd = new System.Windows.Forms.NumericUpDown();
+            upDownVpWidth = new TbSlider();
+            saveMixdownDialog = new System.Windows.Forms.SaveFileDialog();
+            colorDialog1 = new System.Windows.Forms.ColorDialog();
+            saveMidiDialog = new System.Windows.Forms.SaveFileDialog();
+            openTrackPropsFileDialog = new System.Windows.Forms.OpenFileDialog();
+            saveTrackPropsFileDialog = new System.Windows.Forms.SaveFileDialog();
+            trackPropsTabCM = new System.Windows.Forms.ContextMenuStrip(components);
+            loadTrackPropsTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            saveTrackPtopsTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            openCamFileDialog = new System.Windows.Forms.OpenFileDialog();
+            saveCamFileDialog = new System.Windows.Forms.SaveFileDialog();
+            lyricsGridView = new System.Windows.Forms.DataGridView();
+            TimeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            LyricsColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            keyFramesDGV = new System.Windows.Forms.DataGridView();
+            Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            Description = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            propsTogglePanel = new System.Windows.Forms.Panel();
+            songPropsCb = new System.Windows.Forms.CheckBox();
+            trackPropsCb = new System.Windows.Forms.CheckBox();
+            label4 = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)audioOffsetS).BeginInit();
+            menuStrip1.SuspendLayout();
+            trackPropsPanel.SuspendLayout();
+            trackListCM.SuspendLayout();
+            selectedTrackPropsPanel.SuspendLayout();
+            style.SuspendLayout();
+            material.SuspendLayout();
+            groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)texVScrollUD).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)texUScrollUD).BeginInit();
+            tableLayoutPanel1.SuspendLayout();
+            panel2.SuspendLayout();
+            panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)trackTexPb).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)transpSlider).BeginInit();
+            groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)normalLumSlider).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)normalSatSlider).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)hueSlider).BeginInit();
+            groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)hiliteLumSlider).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)hiliteSatSlider).BeginInit();
+            light.SuspendLayout();
+            lightPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)specPowUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)ambientAmountUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)diffuseAmountUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)masterLightAmountUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)specAmountUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)lightDirXUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)lightDirYUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)lightDirZUd).BeginInit();
+            spatial.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)zoffsetUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)yoffsetUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)xoffsetUd).BeginInit();
+            songPropsPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)minPitchUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)maxPitchUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)fadeOutUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)fadeInUd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)playbackOffsetUd).BeginInit();
+            trackPropsTabCM.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)lyricsGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)keyFramesDGV).BeginInit();
+            propsTogglePanel.SuspendLayout();
+            SuspendLayout();
             // 
             // openProjDialog
             // 
-            this.openProjDialog.Filter = "Visual Music projects|*.vmp|All files|*.*";
+            openProjDialog.Filter = "Visual Music projects|*.vmp|All files|*.*";
             // 
             // saveProjDialog
             // 
-            this.saveProjDialog.Filter = "Visual Music projects|*.vmp|All files|*.*";
+            saveProjDialog.Filter = "Visual Music projects|*.vmp|All files|*.*";
             // 
             // saveVideoDlg
             // 
-            this.saveVideoDlg.Filter = "Mkv files (*.mkv)|*.mkv";
-            this.saveVideoDlg.Title = "Save video file";
+            saveVideoDlg.Filter = "Mkv files (*.mkv)|*.mkv";
+            saveVideoDlg.Title = "Save video file";
             // 
             // audioOffsetS
             // 
-            this.audioOffsetS.DecimalPlaces = 2;
-            this.audioOffsetS.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.audioOffsetS.Location = new System.Drawing.Point(98, 73);
-            this.audioOffsetS.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this.audioOffsetS.Minimum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            -2147483648});
-            this.audioOffsetS.Name = "audioOffsetS";
-            this.audioOffsetS.Size = new System.Drawing.Size(52, 20);
-            this.audioOffsetS.TabIndex = 1;
-            this.audioOffsetS.Tag = "Edit Audio Offset";
-            this.audioOffsetS.ValueChanged += new System.EventHandler(this.audioOffsetS_ValueChanged);
+            audioOffsetS.DecimalPlaces = 2;
+            audioOffsetS.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            audioOffsetS.Location = new System.Drawing.Point(98, 73);
+            audioOffsetS.Maximum = new decimal(new int[] { 99, 0, 0, 0 });
+            audioOffsetS.Minimum = new decimal(new int[] { 99, 0, 0, int.MinValue });
+            audioOffsetS.Name = "audioOffsetS";
+            audioOffsetS.Size = new System.Drawing.Size(52, 23);
+            audioOffsetS.TabIndex = 1;
+            audioOffsetS.Tag = "Edit Audio Offset";
+            audioOffsetS.ValueChanged += audioOffsetS_ValueChanged;
             // 
             // fileToolStripMenuItem
             // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importMidiToolStripMenuItem,
-            this.importModuleToolStripMenuItem,
-            this.importSidSongToolStripMenuItem,
-            this.openSongToolStripMenuItem,
-            this.saveSongToolStripMenuItem,
-            this.saveSongAsToolStripMenuItem,
-            this.exportVideoToolStripMenuItem,
-            this.tpartyToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
+            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importMidiToolStripMenuItem, importModuleToolStripMenuItem, importSidSongToolStripMenuItem, openSongToolStripMenuItem, saveSongToolStripMenuItem, saveSongAsToolStripMenuItem, exportVideoToolStripMenuItem, tpartyToolStripMenuItem });
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            fileToolStripMenuItem.Text = "File";
             // 
             // importMidiToolStripMenuItem
             // 
-            this.importMidiToolStripMenuItem.Name = "importMidiToolStripMenuItem";
-            this.importMidiToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
-            this.importMidiToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.importMidiToolStripMenuItem.Text = "Import midi song...";
-            this.importMidiToolStripMenuItem.Click += new System.EventHandler(this.importMidiSongToolStripMenuItem_Click);
+            importMidiToolStripMenuItem.Name = "importMidiToolStripMenuItem";
+            importMidiToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M;
+            importMidiToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            importMidiToolStripMenuItem.Text = "Import midi song...";
+            importMidiToolStripMenuItem.Click += importMidiSongToolStripMenuItem_Click;
             // 
             // importModuleToolStripMenuItem
             // 
-            this.importModuleToolStripMenuItem.Name = "importModuleToolStripMenuItem";
-            this.importModuleToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-            | System.Windows.Forms.Keys.M)));
-            this.importModuleToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.importModuleToolStripMenuItem.Text = "Import module...";
-            this.importModuleToolStripMenuItem.Click += new System.EventHandler(this.importModuleToolStripMenuItem_Click);
+            importModuleToolStripMenuItem.Name = "importModuleToolStripMenuItem";
+            importModuleToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.M;
+            importModuleToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            importModuleToolStripMenuItem.Text = "Import module...";
+            importModuleToolStripMenuItem.Click += importModuleToolStripMenuItem_Click;
             // 
             // importSidSongToolStripMenuItem
             // 
-            this.importSidSongToolStripMenuItem.Name = "importSidSongToolStripMenuItem";
-            this.importSidSongToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-            | System.Windows.Forms.Keys.S)));
-            this.importSidSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.importSidSongToolStripMenuItem.Text = "Import sid song...";
-            this.importSidSongToolStripMenuItem.Click += new System.EventHandler(this.importSidSongToolStripMenuItem_Click);
+            importSidSongToolStripMenuItem.Name = "importSidSongToolStripMenuItem";
+            importSidSongToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.S;
+            importSidSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            importSidSongToolStripMenuItem.Text = "Import sid song...";
+            importSidSongToolStripMenuItem.Click += importSidSongToolStripMenuItem_Click;
             // 
             // openSongToolStripMenuItem
             // 
-            this.openSongToolStripMenuItem.Name = "openSongToolStripMenuItem";
-            this.openSongToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.openSongToolStripMenuItem.Text = "Open project...";
-            this.openSongToolStripMenuItem.Click += new System.EventHandler(this.openSongToolStripMenuItem_Click);
+            openSongToolStripMenuItem.Name = "openSongToolStripMenuItem";
+            openSongToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O;
+            openSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            openSongToolStripMenuItem.Text = "Open project...";
+            openSongToolStripMenuItem.Click += openSongToolStripMenuItem_Click;
             // 
             // saveSongToolStripMenuItem
             // 
-            this.saveSongToolStripMenuItem.Enabled = false;
-            this.saveSongToolStripMenuItem.Name = "saveSongToolStripMenuItem";
-            this.saveSongToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.saveSongToolStripMenuItem.Text = "Save project";
-            this.saveSongToolStripMenuItem.Click += new System.EventHandler(this.saveSongToolStripMenuItem_Click);
+            saveSongToolStripMenuItem.Enabled = false;
+            saveSongToolStripMenuItem.Name = "saveSongToolStripMenuItem";
+            saveSongToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
+            saveSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            saveSongToolStripMenuItem.Text = "Save project";
+            saveSongToolStripMenuItem.Click += saveSongToolStripMenuItem_Click;
             // 
             // saveSongAsToolStripMenuItem
             // 
-            this.saveSongAsToolStripMenuItem.Enabled = false;
-            this.saveSongAsToolStripMenuItem.Name = "saveSongAsToolStripMenuItem";
-            this.saveSongAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Shift)
-            | System.Windows.Forms.Keys.S)));
-            this.saveSongAsToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.saveSongAsToolStripMenuItem.Text = "Save project as...";
-            this.saveSongAsToolStripMenuItem.Click += new System.EventHandler(this.saveSongAsToolStripMenuItem_Click);
+            saveSongAsToolStripMenuItem.Enabled = false;
+            saveSongAsToolStripMenuItem.Name = "saveSongAsToolStripMenuItem";
+            saveSongAsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.S;
+            saveSongAsToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            saveSongAsToolStripMenuItem.Text = "Save project as...";
+            saveSongAsToolStripMenuItem.Click += saveSongAsToolStripMenuItem_Click;
             // 
             // exportVideoToolStripMenuItem
             // 
-            this.exportVideoToolStripMenuItem.Enabled = false;
-            this.exportVideoToolStripMenuItem.Name = "exportVideoToolStripMenuItem";
-            this.exportVideoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
-            this.exportVideoToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.exportVideoToolStripMenuItem.Text = "Export video...";
-            this.exportVideoToolStripMenuItem.Click += new System.EventHandler(this.exportVideoToolStripMenuItem_Click);
+            exportVideoToolStripMenuItem.Enabled = false;
+            exportVideoToolStripMenuItem.Name = "exportVideoToolStripMenuItem";
+            exportVideoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E;
+            exportVideoToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            exportVideoToolStripMenuItem.Text = "Export video...";
+            exportVideoToolStripMenuItem.Click += exportVideoToolStripMenuItem_Click;
             // 
             // tpartyToolStripMenuItem
             // 
-            this.tpartyToolStripMenuItem.Name = "tpartyToolStripMenuItem";
-            this.tpartyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
-            this.tpartyToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.tpartyToolStripMenuItem.Text = "Third-party integration...";
-            this.tpartyToolStripMenuItem.Click += new System.EventHandler(this.tpartyToolStripMenuItem_Click);
+            tpartyToolStripMenuItem.Name = "tpartyToolStripMenuItem";
+            tpartyToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T;
+            tpartyToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            tpartyToolStripMenuItem.Text = "Third-party integration...";
+            tpartyToolStripMenuItem.Click += tpartyToolStripMenuItem_Click;
             // 
             // menuStrip1
             // 
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.editToolStripMenuItem,
-            this.playbackToolStripMenuItem,
-            this.viewToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1179, 24);
-            this.menuStrip1.TabIndex = 0;
-            this.menuStrip1.Text = "menuStrip1";
+            menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
+            menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, playbackToolStripMenuItem, viewToolStripMenuItem });
+            menuStrip1.Location = new System.Drawing.Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new System.Drawing.Size(1179, 24);
+            menuStrip1.TabIndex = 0;
+            menuStrip1.Text = "menuStrip1";
             // 
             // editToolStripMenuItem
             // 
-            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.undoToolStripMenuItem,
-            this.redoToolStripMenuItem,
-            this.cameraToolStripMenuItem,
-            this.tracksToolStripMenuItem,
-            this.insertLyricsHereToolStripMenuItem,
-            this.insertKeyFrameToolStripMenuItem});
-            this.editToolStripMenuItem.Enabled = false;
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
-            this.editToolStripMenuItem.Text = "Edit";
+            editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, cameraToolStripMenuItem, tracksToolStripMenuItem, insertLyricsHereToolStripMenuItem, insertKeyFrameToolStripMenuItem });
+            editToolStripMenuItem.Enabled = false;
+            editToolStripMenuItem.Name = "editToolStripMenuItem";
+            editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            editToolStripMenuItem.Text = "Edit";
             // 
             // undoToolStripMenuItem
             // 
-            this.undoToolStripMenuItem.Enabled = false;
-            this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-            this.undoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.undoToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.undoToolStripMenuItem.Text = "Undo";
-            this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
+            undoToolStripMenuItem.Enabled = false;
+            undoToolStripMenuItem.Name = "undoToolStripMenuItem";
+            undoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z;
+            undoToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            undoToolStripMenuItem.Text = "Undo";
+            undoToolStripMenuItem.Click += undoToolStripMenuItem_Click;
             // 
             // redoToolStripMenuItem
             // 
-            this.redoToolStripMenuItem.Enabled = false;
-            this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-            this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-            | System.Windows.Forms.Keys.Z)));
-            this.redoToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.redoToolStripMenuItem.Text = "Redo";
-            this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
+            redoToolStripMenuItem.Enabled = false;
+            redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+            redoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Z;
+            redoToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            redoToolStripMenuItem.Text = "Redo";
+            redoToolStripMenuItem.Click += redoToolStripMenuItem_Click;
             // 
             // cameraToolStripMenuItem
             // 
-            this.cameraToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.resetCamToolStripMenuItem,
-            this.loadCamToolStripMenuItem,
-            this.saveCamToolStripMenuItem});
-            this.cameraToolStripMenuItem.Name = "cameraToolStripMenuItem";
-            this.cameraToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.cameraToolStripMenuItem.Text = "Camera";
+            cameraToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { resetCamToolStripMenuItem, loadCamToolStripMenuItem, saveCamToolStripMenuItem });
+            cameraToolStripMenuItem.Name = "cameraToolStripMenuItem";
+            cameraToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            cameraToolStripMenuItem.Text = "Camera";
             // 
             // resetCamToolStripMenuItem
             // 
-            this.resetCamToolStripMenuItem.Name = "resetCamToolStripMenuItem";
-            this.resetCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.resetCamToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.resetCamToolStripMenuItem.Tag = "Reset Camera";
-            this.resetCamToolStripMenuItem.Text = "Reset";
-            this.resetCamToolStripMenuItem.Click += new System.EventHandler(this.resetCamToolStripMenuItem_Click);
+            resetCamToolStripMenuItem.Name = "resetCamToolStripMenuItem";
+            resetCamToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R;
+            resetCamToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            resetCamToolStripMenuItem.Tag = "Reset Camera";
+            resetCamToolStripMenuItem.Text = "Reset";
+            resetCamToolStripMenuItem.Click += resetCamToolStripMenuItem_Click;
             // 
             // loadCamToolStripMenuItem
             // 
-            this.loadCamToolStripMenuItem.Enabled = false;
-            this.loadCamToolStripMenuItem.Name = "loadCamToolStripMenuItem";
-            this.loadCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
-            this.loadCamToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.loadCamToolStripMenuItem.Tag = "";
-            this.loadCamToolStripMenuItem.Text = "Load...";
-            this.loadCamToolStripMenuItem.Click += new System.EventHandler(this.loadCamToolStripMenuItem_Click);
+            loadCamToolStripMenuItem.Enabled = false;
+            loadCamToolStripMenuItem.Name = "loadCamToolStripMenuItem";
+            loadCamToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M;
+            loadCamToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            loadCamToolStripMenuItem.Tag = "";
+            loadCamToolStripMenuItem.Text = "Load...";
+            loadCamToolStripMenuItem.Click += loadCamToolStripMenuItem_Click;
             // 
             // saveCamToolStripMenuItem
             // 
-            this.saveCamToolStripMenuItem.Enabled = false;
-            this.saveCamToolStripMenuItem.Name = "saveCamToolStripMenuItem";
-            this.saveCamToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-            | System.Windows.Forms.Keys.M)));
-            this.saveCamToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.saveCamToolStripMenuItem.Text = "Save...";
-            this.saveCamToolStripMenuItem.Click += new System.EventHandler(this.saveCamToolStripMenuItem_Click);
+            saveCamToolStripMenuItem.Enabled = false;
+            saveCamToolStripMenuItem.Name = "saveCamToolStripMenuItem";
+            saveCamToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.M;
+            saveCamToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            saveCamToolStripMenuItem.Text = "Save...";
+            saveCamToolStripMenuItem.Click += saveCamToolStripMenuItem_Click;
             // 
             // tracksToolStripMenuItem
             // 
-            this.tracksToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.defaultPropertiesToolStripMenuItem1,
-            this.loadPropertiesToolStripMenuItem,
-            this.savePropertiesToolStripMenuItem});
-            this.tracksToolStripMenuItem.Name = "tracksToolStripMenuItem";
-            this.tracksToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.tracksToolStripMenuItem.Text = "Tracks";
-            this.tracksToolStripMenuItem.EnabledChanged += new System.EventHandler(this.tracksToolStripMenuItem_EnabledChanged);
+            tracksToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { defaultPropertiesToolStripMenuItem1, loadPropertiesToolStripMenuItem, savePropertiesToolStripMenuItem });
+            tracksToolStripMenuItem.Name = "tracksToolStripMenuItem";
+            tracksToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            tracksToolStripMenuItem.Text = "Tracks";
+            tracksToolStripMenuItem.EnabledChanged += tracksToolStripMenuItem_EnabledChanged;
             // 
             // defaultPropertiesToolStripMenuItem1
             // 
-            this.defaultPropertiesToolStripMenuItem1.Name = "defaultPropertiesToolStripMenuItem1";
-            this.defaultPropertiesToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.defaultPropertiesToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
-            this.defaultPropertiesToolStripMenuItem1.Tag = "Default Track Properties";
-            this.defaultPropertiesToolStripMenuItem1.Text = "Default Properties";
-            this.defaultPropertiesToolStripMenuItem1.Click += new System.EventHandler(this.defaultPropertiesToolStripMenuItem1_Click);
+            defaultPropertiesToolStripMenuItem1.Name = "defaultPropertiesToolStripMenuItem1";
+            defaultPropertiesToolStripMenuItem1.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D;
+            defaultPropertiesToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
+            defaultPropertiesToolStripMenuItem1.Tag = "Default Track Properties";
+            defaultPropertiesToolStripMenuItem1.Text = "Default Properties";
+            defaultPropertiesToolStripMenuItem1.Click += defaultPropertiesToolStripMenuItem1_Click;
             // 
             // loadPropertiesToolStripMenuItem
             // 
-            this.loadPropertiesToolStripMenuItem.Enabled = false;
-            this.loadPropertiesToolStripMenuItem.Name = "loadPropertiesToolStripMenuItem";
-            this.loadPropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-            this.loadPropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
-            this.loadPropertiesToolStripMenuItem.Tag = "";
-            this.loadPropertiesToolStripMenuItem.Text = "Load properties...";
-            this.loadPropertiesToolStripMenuItem.Click += new System.EventHandler(this.loadPropertiesToolStripMenuItem_Click);
+            loadPropertiesToolStripMenuItem.Enabled = false;
+            loadPropertiesToolStripMenuItem.Name = "loadPropertiesToolStripMenuItem";
+            loadPropertiesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P;
+            loadPropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+            loadPropertiesToolStripMenuItem.Tag = "";
+            loadPropertiesToolStripMenuItem.Text = "Load properties...";
+            loadPropertiesToolStripMenuItem.Click += loadPropertiesToolStripMenuItem_Click;
             // 
             // savePropertiesToolStripMenuItem
             // 
-            this.savePropertiesToolStripMenuItem.Enabled = false;
-            this.savePropertiesToolStripMenuItem.Name = "savePropertiesToolStripMenuItem";
-            this.savePropertiesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-            | System.Windows.Forms.Keys.P)));
-            this.savePropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
-            this.savePropertiesToolStripMenuItem.Text = "Save properties...";
-            this.savePropertiesToolStripMenuItem.Click += new System.EventHandler(this.savePropertiesToolStripMenuItem_Click);
+            savePropertiesToolStripMenuItem.Enabled = false;
+            savePropertiesToolStripMenuItem.Name = "savePropertiesToolStripMenuItem";
+            savePropertiesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.P;
+            savePropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+            savePropertiesToolStripMenuItem.Text = "Save properties...";
+            savePropertiesToolStripMenuItem.Click += savePropertiesToolStripMenuItem_Click;
             // 
             // insertLyricsHereToolStripMenuItem
             // 
-            this.insertLyricsHereToolStripMenuItem.Enabled = false;
-            this.insertLyricsHereToolStripMenuItem.Name = "insertLyricsHereToolStripMenuItem";
-            this.insertLyricsHereToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-            this.insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.insertLyricsHereToolStripMenuItem.Tag = "Insert Lyrics";
-            this.insertLyricsHereToolStripMenuItem.Text = "Insert Lyrics";
-            this.insertLyricsHereToolStripMenuItem.Click += new System.EventHandler(this.insertLyricsHereToolStripMenuItem_Click);
+            insertLyricsHereToolStripMenuItem.Enabled = false;
+            insertLyricsHereToolStripMenuItem.Name = "insertLyricsHereToolStripMenuItem";
+            insertLyricsHereToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L;
+            insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            insertLyricsHereToolStripMenuItem.Tag = "Insert Lyrics";
+            insertLyricsHereToolStripMenuItem.Text = "Insert Lyrics";
+            insertLyricsHereToolStripMenuItem.Click += insertLyricsHereToolStripMenuItem_Click;
             // 
             // insertKeyFrameToolStripMenuItem
             // 
-            this.insertKeyFrameToolStripMenuItem.Enabled = false;
-            this.insertKeyFrameToolStripMenuItem.Name = "insertKeyFrameToolStripMenuItem";
-            this.insertKeyFrameToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K)));
-            this.insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.insertKeyFrameToolStripMenuItem.Tag = "";
-            this.insertKeyFrameToolStripMenuItem.Text = "Insert Key Frame";
-            this.insertKeyFrameToolStripMenuItem.Click += new System.EventHandler(this.insertKeyFrameToolStripMenuItem_Click);
+            insertKeyFrameToolStripMenuItem.Enabled = false;
+            insertKeyFrameToolStripMenuItem.Name = "insertKeyFrameToolStripMenuItem";
+            insertKeyFrameToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K;
+            insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            insertKeyFrameToolStripMenuItem.Tag = "";
+            insertKeyFrameToolStripMenuItem.Text = "Insert Key Frame";
+            insertKeyFrameToolStripMenuItem.Click += insertKeyFrameToolStripMenuItem_Click;
             // 
             // playbackToolStripMenuItem
             // 
-            this.playbackToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.startStopToolStripMenuItem,
-            this.beginningToolStripMenuItem,
-            this.endToolStripMenuItem,
-            this.nudgeBackwardsToolStripMenuItem,
-            this.nudgeForwardToolStripMenuItem,
-            this.jumpBackwardsToolStripMenuItem,
-            this.jumpForwardToolStripMenuItem});
-            this.playbackToolStripMenuItem.Enabled = false;
-            this.playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
-            this.playbackToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
-            this.playbackToolStripMenuItem.Text = "Playback";
+            playbackToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { startStopToolStripMenuItem, beginningToolStripMenuItem, endToolStripMenuItem, nudgeBackwardsToolStripMenuItem, nudgeForwardToolStripMenuItem, jumpBackwardsToolStripMenuItem, jumpForwardToolStripMenuItem });
+            playbackToolStripMenuItem.Enabled = false;
+            playbackToolStripMenuItem.Name = "playbackToolStripMenuItem";
+            playbackToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
+            playbackToolStripMenuItem.Text = "Playback";
             // 
             // startStopToolStripMenuItem
             // 
-            this.startStopToolStripMenuItem.Name = "startStopToolStripMenuItem";
-            this.startStopToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Space)));
-            this.startStopToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-            this.startStopToolStripMenuItem.Text = "Start/Stop";
-            this.startStopToolStripMenuItem.Click += new System.EventHandler(this.startStopToolStripMenuItem_Click);
+            startStopToolStripMenuItem.Name = "startStopToolStripMenuItem";
+            startStopToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Space;
+            startStopToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+            startStopToolStripMenuItem.Text = "Start/Stop";
+            startStopToolStripMenuItem.Click += startStopToolStripMenuItem_Click;
             // 
             // beginningToolStripMenuItem
             // 
-            this.beginningToolStripMenuItem.Name = "beginningToolStripMenuItem";
-            this.beginningToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Home)));
-            this.beginningToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-            this.beginningToolStripMenuItem.Text = "Go to beginning";
-            this.beginningToolStripMenuItem.Click += new System.EventHandler(this.beginningToolStripMenuItem_Click);
+            beginningToolStripMenuItem.Name = "beginningToolStripMenuItem";
+            beginningToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Home;
+            beginningToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+            beginningToolStripMenuItem.Text = "Go to beginning";
+            beginningToolStripMenuItem.Click += beginningToolStripMenuItem_Click;
             // 
             // endToolStripMenuItem
             // 
-            this.endToolStripMenuItem.Name = "endToolStripMenuItem";
-            this.endToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End)));
-            this.endToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-            this.endToolStripMenuItem.Text = "Go to end";
-            this.endToolStripMenuItem.Click += new System.EventHandler(this.endToolStripMenuItem_Click);
+            endToolStripMenuItem.Name = "endToolStripMenuItem";
+            endToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End;
+            endToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+            endToolStripMenuItem.Text = "Go to end";
+            endToolStripMenuItem.Click += endToolStripMenuItem_Click;
             // 
             // nudgeBackwardsToolStripMenuItem
             // 
-            this.nudgeBackwardsToolStripMenuItem.Name = "nudgeBackwardsToolStripMenuItem";
-            this.nudgeBackwardsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Left)));
-            this.nudgeBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-            this.nudgeBackwardsToolStripMenuItem.Text = "Nudge backwards";
-            this.nudgeBackwardsToolStripMenuItem.Click += new System.EventHandler(this.nudgeBackwardsToolStripMenuItem_Click);
+            nudgeBackwardsToolStripMenuItem.Name = "nudgeBackwardsToolStripMenuItem";
+            nudgeBackwardsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Left;
+            nudgeBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+            nudgeBackwardsToolStripMenuItem.Text = "Nudge backwards";
+            nudgeBackwardsToolStripMenuItem.Click += nudgeBackwardsToolStripMenuItem_Click;
             // 
             // nudgeForwardToolStripMenuItem
             // 
-            this.nudgeForwardToolStripMenuItem.Name = "nudgeForwardToolStripMenuItem";
-            this.nudgeForwardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Right)));
-            this.nudgeForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-            this.nudgeForwardToolStripMenuItem.Text = "Nudge forward";
-            this.nudgeForwardToolStripMenuItem.Click += new System.EventHandler(this.nudgeForwardToolStripMenuItem_Click);
+            nudgeForwardToolStripMenuItem.Name = "nudgeForwardToolStripMenuItem";
+            nudgeForwardToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Right;
+            nudgeForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+            nudgeForwardToolStripMenuItem.Text = "Nudge forward";
+            nudgeForwardToolStripMenuItem.Click += nudgeForwardToolStripMenuItem_Click;
             // 
             // jumpBackwardsToolStripMenuItem
             // 
-            this.jumpBackwardsToolStripMenuItem.Name = "jumpBackwardsToolStripMenuItem";
-            this.jumpBackwardsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-            | System.Windows.Forms.Keys.Left)));
-            this.jumpBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-            this.jumpBackwardsToolStripMenuItem.Text = "Jump backwards";
-            this.jumpBackwardsToolStripMenuItem.Click += new System.EventHandler(this.jumpBackwardsToolStripMenuItem_Click);
+            jumpBackwardsToolStripMenuItem.Name = "jumpBackwardsToolStripMenuItem";
+            jumpBackwardsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Left;
+            jumpBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+            jumpBackwardsToolStripMenuItem.Text = "Jump backwards";
+            jumpBackwardsToolStripMenuItem.Click += jumpBackwardsToolStripMenuItem_Click;
             // 
             // jumpForwardToolStripMenuItem
             // 
-            this.jumpForwardToolStripMenuItem.Name = "jumpForwardToolStripMenuItem";
-            this.jumpForwardToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-            | System.Windows.Forms.Keys.Right)));
-            this.jumpForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
-            this.jumpForwardToolStripMenuItem.Text = "Jump forward";
-            this.jumpForwardToolStripMenuItem.Click += new System.EventHandler(this.jumpForwardToolStripMenuItem_Click);
+            jumpForwardToolStripMenuItem.Name = "jumpForwardToolStripMenuItem";
+            jumpForwardToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Right;
+            jumpForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+            jumpForwardToolStripMenuItem.Text = "Jump forward";
+            jumpForwardToolStripMenuItem.Click += jumpForwardToolStripMenuItem_Click;
             // 
             // viewToolStripMenuItem
             // 
-            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.viewSongTSMI,
-            this.viewModBrowserTSMI,
-            this.viewSidBrowserTSMI,
-            this.viewMidiBrowserTSMI});
-            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.viewToolStripMenuItem.Text = "View";
+            viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { viewSongTSMI, viewModBrowserTSMI, viewSidBrowserTSMI, viewMidiBrowserTSMI });
+            viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+            viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            viewToolStripMenuItem.Text = "View";
             // 
             // viewSongTSMI
             // 
-            this.viewSongTSMI.Name = "viewSongTSMI";
-            this.viewSongTSMI.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.viewSongTSMI.Size = new System.Drawing.Size(163, 22);
-            this.viewSongTSMI.Text = "Song";
-            this.viewSongTSMI.Click += new System.EventHandler(this.viewSongTSMI_Click);
+            viewSongTSMI.Name = "viewSongTSMI";
+            viewSongTSMI.ShortcutKeys = System.Windows.Forms.Keys.F1;
+            viewSongTSMI.Size = new System.Drawing.Size(163, 22);
+            viewSongTSMI.Text = "Song";
+            viewSongTSMI.Click += viewSongTSMI_Click;
             // 
             // viewModBrowserTSMI
             // 
-            this.viewModBrowserTSMI.Name = "viewModBrowserTSMI";
-            this.viewModBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F2;
-            this.viewModBrowserTSMI.Size = new System.Drawing.Size(163, 22);
-            this.viewModBrowserTSMI.Text = "Mod browser";
-            this.viewModBrowserTSMI.Click += new System.EventHandler(this.viewModBrowserTSMI_Click);
+            viewModBrowserTSMI.Name = "viewModBrowserTSMI";
+            viewModBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F2;
+            viewModBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+            viewModBrowserTSMI.Text = "Mod browser";
+            viewModBrowserTSMI.Click += viewModBrowserTSMI_Click;
             // 
             // viewSidBrowserTSMI
             // 
-            this.viewSidBrowserTSMI.Name = "viewSidBrowserTSMI";
-            this.viewSidBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F3;
-            this.viewSidBrowserTSMI.Size = new System.Drawing.Size(163, 22);
-            this.viewSidBrowserTSMI.Text = "Sid browser";
-            this.viewSidBrowserTSMI.Click += new System.EventHandler(this.viewSidBrowserTSMI_Click);
+            viewSidBrowserTSMI.Name = "viewSidBrowserTSMI";
+            viewSidBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F3;
+            viewSidBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+            viewSidBrowserTSMI.Text = "Sid browser";
+            viewSidBrowserTSMI.Click += viewSidBrowserTSMI_Click;
             // 
             // viewMidiBrowserTSMI
             // 
-            this.viewMidiBrowserTSMI.Name = "viewMidiBrowserTSMI";
-            this.viewMidiBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.viewMidiBrowserTSMI.Size = new System.Drawing.Size(163, 22);
-            this.viewMidiBrowserTSMI.Text = "Midi browser";
-            this.viewMidiBrowserTSMI.Click += new System.EventHandler(this.viewMidiBrowserTSMI_Click);
+            viewMidiBrowserTSMI.Name = "viewMidiBrowserTSMI";
+            viewMidiBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F4;
+            viewMidiBrowserTSMI.Size = new System.Drawing.Size(163, 22);
+            viewMidiBrowserTSMI.Text = "Midi browser";
+            viewMidiBrowserTSMI.Click += viewMidiBrowserTSMI_Click;
             // 
             // label7
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(12, 12);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(76, 13);
-            this.label7.TabIndex = 3;
-            this.label7.Text = "Viewport width";
+            label7.AutoSize = true;
+            label7.Location = new System.Drawing.Point(12, 12);
+            label7.Name = "label7";
+            label7.Size = new System.Drawing.Size(87, 15);
+            label7.TabIndex = 3;
+            label7.Text = "Viewport width";
             // 
             // label9
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(12, 75);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(63, 13);
-            this.label9.TabIndex = 3;
-            this.label9.Text = "Audio offset";
+            label9.AutoSize = true;
+            label9.Location = new System.Drawing.Point(12, 75);
+            label9.Name = "label9";
+            label9.Size = new System.Drawing.Size(72, 15);
+            label9.TabIndex = 3;
+            label9.Text = "Audio offset";
             // 
             // label10
             // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(156, 75);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(12, 13);
-            this.label10.TabIndex = 3;
-            this.label10.Text = "s";
+            label10.AutoSize = true;
+            label10.Location = new System.Drawing.Point(156, 75);
+            label10.Name = "label10";
+            label10.Size = new System.Drawing.Size(12, 15);
+            label10.TabIndex = 3;
+            label10.Text = "s";
             // 
             // trackPropsPanel
             // 
-            this.trackPropsPanel.Controls.Add(this.trackList);
-            this.trackPropsPanel.Controls.Add(this.selectedTrackPropsPanel);
-            this.trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.trackPropsPanel.Location = new System.Drawing.Point(784, 24);
-            this.trackPropsPanel.Name = "trackPropsPanel";
-            this.trackPropsPanel.Size = new System.Drawing.Size(395, 4359);
-            this.trackPropsPanel.TabIndex = 3;
-            this.trackPropsPanel.Visible = false;
-            this.trackPropsPanel.VisibleChanged += new System.EventHandler(this.trackPropsPanel_VisibleChanged);
+            trackPropsPanel.Controls.Add(trackList);
+            trackPropsPanel.Controls.Add(selectedTrackPropsPanel);
+            trackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            trackPropsPanel.Location = new System.Drawing.Point(784, 24);
+            trackPropsPanel.Name = "trackPropsPanel";
+            trackPropsPanel.Size = new System.Drawing.Size(395, 4361);
+            trackPropsPanel.TabIndex = 3;
+            trackPropsPanel.Visible = false;
+            trackPropsPanel.VisibleChanged += trackPropsPanel_VisibleChanged;
             // 
             // trackList
             // 
-            this.trackList.AllowDrop = true;
-            this.trackList.BackColor = System.Drawing.Color.Black;
-            this.trackList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.trackColumn,
-            this.normalColumn,
-            this.hilitedColumn});
-            this.trackList.ContextMenuStrip = this.trackListCM;
-            this.trackList.Dock = System.Windows.Forms.DockStyle.Right;
-            this.trackList.ForeColor = System.Drawing.Color.White;
-            this.trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.trackList.HideSelection = false;
-            this.trackList.Location = new System.Drawing.Point(1, 0);
-            this.trackList.Name = "trackList";
-            this.trackList.Size = new System.Drawing.Size(186, 4359);
-            this.trackList.TabIndex = 0;
-            this.trackList.UseCompatibleStateImageBehavior = false;
-            this.trackList.View = System.Windows.Forms.View.Details;
-            this.trackList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.trackList_ItemDrag);
-            this.trackList.SelectedIndexChanged += new System.EventHandler(this.trackList_SelectedIndexChanged);
-            this.trackList.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackList_DragDrop);
-            this.trackList.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackList_DragEnter);
-            this.trackList.DragOver += new System.Windows.Forms.DragEventHandler(this.trackList_DragOver);
-            this.trackList.DragLeave += new System.EventHandler(this.trackList_DragLeave);
+            trackList.AllowDrop = true;
+            trackList.BackColor = System.Drawing.Color.Black;
+            trackList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { trackColumn, normalColumn, hilitedColumn });
+            trackList.ContextMenuStrip = trackListCM;
+            trackList.Dock = System.Windows.Forms.DockStyle.Right;
+            trackList.ForeColor = System.Drawing.Color.White;
+            trackList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            trackList.Location = new System.Drawing.Point(1, 0);
+            trackList.Name = "trackList";
+            trackList.Size = new System.Drawing.Size(186, 4361);
+            trackList.TabIndex = 0;
+            trackList.UseCompatibleStateImageBehavior = false;
+            trackList.View = System.Windows.Forms.View.Details;
+            trackList.ItemDrag += trackList_ItemDrag;
+            trackList.SelectedIndexChanged += trackList_SelectedIndexChanged;
+            trackList.DragDrop += trackList_DragDrop;
+            trackList.DragEnter += trackList_DragEnter;
+            trackList.DragOver += trackList_DragOver;
+            trackList.DragLeave += trackList_DragLeave;
             // 
             // trackColumn
             // 
-            this.trackColumn.Text = "Track";
-            this.trackColumn.Width = 112;
+            trackColumn.Text = "Track";
+            trackColumn.Width = 112;
             // 
             // normalColumn
             // 
-            this.normalColumn.Text = "N";
-            this.normalColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.normalColumn.Width = 35;
+            normalColumn.Text = "N";
+            normalColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            normalColumn.Width = 35;
             // 
             // hilitedColumn
             // 
-            this.hilitedColumn.Text = "H";
-            this.hilitedColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.hilitedColumn.Width = 35;
+            hilitedColumn.Text = "H";
+            hilitedColumn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            hilitedColumn.Width = 35;
             // 
             // trackListCM
             // 
-            this.trackListCM.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.trackListCM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectAllToolStripMenuItem,
-            this.invertSelectionToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.defaultPropertiesToolStripMenuItem,
-            this.loadTrackPropsToolStripMenuItem,
-            this.saveTrackPropsToolStripMenuItem});
-            this.trackListCM.Name = "trackListContextMenu";
-            this.trackListCM.Size = new System.Drawing.Size(193, 120);
-            this.trackListCM.Opening += new System.ComponentModel.CancelEventHandler(this.trackListCM_Opening);
+            trackListCM.ImageScalingSize = new System.Drawing.Size(24, 24);
+            trackListCM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { selectAllToolStripMenuItem, invertSelectionToolStripMenuItem, toolStripSeparator1, defaultPropertiesToolStripMenuItem, loadTrackPropsToolStripMenuItem, saveTrackPropsToolStripMenuItem });
+            trackListCM.Name = "trackListContextMenu";
+            trackListCM.Size = new System.Drawing.Size(193, 120);
+            trackListCM.Opening += trackListCM_Opening;
             // 
             // selectAllToolStripMenuItem
             // 
-            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.selectAllToolStripMenuItem.Text = "Select All";
-            this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
+            selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+            selectAllToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A;
+            selectAllToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            selectAllToolStripMenuItem.Text = "Select All";
+            selectAllToolStripMenuItem.Click += selectAllToolStripMenuItem_Click;
             // 
             // invertSelectionToolStripMenuItem
             // 
-            this.invertSelectionToolStripMenuItem.Name = "invertSelectionToolStripMenuItem";
-            this.invertSelectionToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.invertSelectionToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.invertSelectionToolStripMenuItem.Text = "Invert Selection";
-            this.invertSelectionToolStripMenuItem.Click += new System.EventHandler(this.invertSelectionToolStripMenuItem_Click);
+            invertSelectionToolStripMenuItem.Name = "invertSelectionToolStripMenuItem";
+            invertSelectionToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I;
+            invertSelectionToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            invertSelectionToolStripMenuItem.Text = "Invert Selection";
+            invertSelectionToolStripMenuItem.Click += invertSelectionToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(189, 6);
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new System.Drawing.Size(189, 6);
             // 
             // defaultPropertiesToolStripMenuItem
             // 
-            this.defaultPropertiesToolStripMenuItem.Name = "defaultPropertiesToolStripMenuItem";
-            this.defaultPropertiesToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.defaultPropertiesToolStripMenuItem.Text = "Default Properties";
-            this.defaultPropertiesToolStripMenuItem.Click += new System.EventHandler(this.defaultPropertiesToolStripMenuItem_Click);
+            defaultPropertiesToolStripMenuItem.Name = "defaultPropertiesToolStripMenuItem";
+            defaultPropertiesToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            defaultPropertiesToolStripMenuItem.Text = "Default Properties";
+            defaultPropertiesToolStripMenuItem.Click += defaultPropertiesToolStripMenuItem_Click;
             // 
             // loadTrackPropsToolStripMenuItem
             // 
-            this.loadTrackPropsToolStripMenuItem.Name = "loadTrackPropsToolStripMenuItem";
-            this.loadTrackPropsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.loadTrackPropsToolStripMenuItem.Text = "Load Properties";
-            this.loadTrackPropsToolStripMenuItem.Click += new System.EventHandler(this.loadTrackPropsToolStripMenuItem_Click);
+            loadTrackPropsToolStripMenuItem.Name = "loadTrackPropsToolStripMenuItem";
+            loadTrackPropsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            loadTrackPropsToolStripMenuItem.Text = "Load Properties";
+            loadTrackPropsToolStripMenuItem.Click += loadTrackPropsToolStripMenuItem_Click;
             // 
             // saveTrackPropsToolStripMenuItem
             // 
-            this.saveTrackPropsToolStripMenuItem.Name = "saveTrackPropsToolStripMenuItem";
-            this.saveTrackPropsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.saveTrackPropsToolStripMenuItem.Text = "Save Properties";
-            this.saveTrackPropsToolStripMenuItem.Click += new System.EventHandler(this.saveTrackPropsToolStripMenuItem_Click);
+            saveTrackPropsToolStripMenuItem.Name = "saveTrackPropsToolStripMenuItem";
+            saveTrackPropsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            saveTrackPropsToolStripMenuItem.Text = "Save Properties";
+            saveTrackPropsToolStripMenuItem.Click += saveTrackPropsToolStripMenuItem_Click;
             // 
             // selectedTrackPropsPanel
             // 
-            this.selectedTrackPropsPanel.Controls.Add(this.style);
-            this.selectedTrackPropsPanel.Controls.Add(this.material);
-            this.selectedTrackPropsPanel.Controls.Add(this.light);
-            this.selectedTrackPropsPanel.Controls.Add(this.spatial);
-            this.selectedTrackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.selectedTrackPropsPanel.Location = new System.Drawing.Point(187, 0);
-            this.selectedTrackPropsPanel.Name = "selectedTrackPropsPanel";
-            this.selectedTrackPropsPanel.SelectedIndex = 0;
-            this.selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 4359);
-            this.selectedTrackPropsPanel.TabIndex = 14;
+            selectedTrackPropsPanel.Controls.Add(style);
+            selectedTrackPropsPanel.Controls.Add(material);
+            selectedTrackPropsPanel.Controls.Add(light);
+            selectedTrackPropsPanel.Controls.Add(spatial);
+            selectedTrackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            selectedTrackPropsPanel.Location = new System.Drawing.Point(187, 0);
+            selectedTrackPropsPanel.Name = "selectedTrackPropsPanel";
+            selectedTrackPropsPanel.SelectedIndex = 0;
+            selectedTrackPropsPanel.Size = new System.Drawing.Size(208, 4361);
+            selectedTrackPropsPanel.TabIndex = 14;
             // 
             // style
             // 
-            this.style.AutoScroll = true;
-            this.style.BackColor = System.Drawing.SystemColors.Control;
-            this.style.Controls.Add(this.lineStyleControl);
-            this.style.Controls.Add(this.barStyleControl);
-            this.style.Controls.Add(this.defaultStyleBtn);
-            this.style.Controls.Add(this.styleList);
-            this.style.Controls.Add(this.label1);
-            this.style.Location = new System.Drawing.Point(4, 22);
-            this.style.Name = "style";
-            this.style.Size = new System.Drawing.Size(200, 4333);
-            this.style.TabIndex = 2;
-            this.style.Text = "Style";
-            // 
-            // barStyleControl
-            // 
-            this.barStyleControl.AutoSize = true;
-            this.barStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.barStyleControl.Location = new System.Drawing.Point(3, 72);
-            this.barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.barStyleControl.Name = "barStyleControl";
-            this.barStyleControl.Size = new System.Drawing.Size(180, 55);
-            this.barStyleControl.TabIndex = 2;
-            // 
-            // defaultStyleBtn
-            // 
-            this.defaultStyleBtn.Location = new System.Drawing.Point(1, 1);
-            this.defaultStyleBtn.Name = "defaultStyleBtn";
-            this.defaultStyleBtn.Size = new System.Drawing.Size(179, 23);
-            this.defaultStyleBtn.TabIndex = 0;
-            this.defaultStyleBtn.Tag = "Default Style";
-            this.defaultStyleBtn.Text = "Default Style";
-            this.defaultStyleBtn.UseVisualStyleBackColor = true;
-            this.defaultStyleBtn.Click += new System.EventHandler(this.defaultStyleBtn_Click);
-            // 
-            // styleList
-            // 
-            this.styleList.DisplayMember = "Name";
-            this.styleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.styleList.FormattingEnabled = true;
-            this.styleList.Location = new System.Drawing.Point(4, 45);
-            this.styleList.Name = "styleList";
-            this.styleList.Size = new System.Drawing.Size(113, 21);
-            this.styleList.TabIndex = 1;
-            this.styleList.Tag = "Change Note Style";
-            this.styleList.ValueMember = "Value";
-            this.styleList.SelectedIndexChanged += new System.EventHandler(this.styleList_SelectedIndexChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1, 29);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(54, 13);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "Note style";
-            // 
-            // material
-            // 
-            this.material.AutoScroll = true;
-            this.material.BackColor = System.Drawing.Color.Transparent;
-            this.material.Controls.Add(this.groupBox4);
-            this.material.Controls.Add(this.defaultMtrlBtn);
-            this.material.Controls.Add(this.alphaLbl);
-            this.material.Controls.Add(this.transpSlider);
-            this.material.Controls.Add(this.hueTb);
-            this.material.Controls.Add(this.groupBox1);
-            this.material.Controls.Add(this.hueSlider);
-            this.material.Controls.Add(this.label2);
-            this.material.Controls.Add(this.groupBox2);
-            this.material.Controls.Add(this.transpTb);
-            this.material.Location = new System.Drawing.Point(4, 22);
-            this.material.Name = "material";
-            this.material.Padding = new System.Windows.Forms.Padding(3);
-            this.material.Size = new System.Drawing.Size(200, 4333);
-            this.material.TabIndex = 0;
-            this.material.Text = "Material";
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.label37);
-            this.groupBox4.Controls.Add(this.label34);
-            this.groupBox4.Controls.Add(this.label35);
-            this.groupBox4.Controls.Add(this.texVScrollUD);
-            this.groupBox4.Controls.Add(this.label33);
-            this.groupBox4.Controls.Add(this.texUScrollUD);
-            this.groupBox4.Controls.Add(this.tableLayoutPanel1);
-            this.groupBox4.Controls.Add(this.texVTileCb);
-            this.groupBox4.Controls.Add(this.texUTileCb);
-            this.groupBox4.Controls.Add(this.texKeepAspectCb);
-            this.groupBox4.Controls.Add(this.tileTexCb);
-            this.groupBox4.Controls.Add(this.loadTexBtn);
-            this.groupBox4.Controls.Add(this.unloadTexBtn);
-            this.groupBox4.Controls.Add(this.disableTextureCh);
-            this.groupBox4.Controls.Add(this.texColBlendCb);
-            this.groupBox4.Controls.Add(this.pointSmpCb);
-            this.groupBox4.Controls.Add(this.trackTexPb);
-            this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox4.Location = new System.Drawing.Point(1, 485);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(2);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox4.Size = new System.Drawing.Size(182, 422);
-            this.groupBox4.TabIndex = 60;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Texture";
-            // 
-            // label37
-            // 
-            this.label37.AutoSize = true;
-            this.label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label37.Location = new System.Drawing.Point(113, 400);
-            this.label37.Name = "label37";
-            this.label37.Size = new System.Drawing.Size(68, 13);
-            this.label37.TabIndex = 19;
-            this.label37.Text = "repeats/beat";
-            // 
-            // label34
-            // 
-            this.label34.AutoSize = true;
-            this.label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label34.Location = new System.Drawing.Point(113, 380);
-            this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(68, 13);
-            this.label34.TabIndex = 19;
-            this.label34.Text = "repeats/beat";
-            // 
-            // label35
-            // 
-            this.label35.AutoSize = true;
-            this.label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label35.Location = new System.Drawing.Point(3, 400);
-            this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(43, 13);
-            this.label35.TabIndex = 19;
-            this.label35.Text = "Scroll V";
-            // 
-            // texVScrollUD
-            // 
-            this.texVScrollUD.DecimalPlaces = 3;
-            this.texVScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texVScrollUD.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.texVScrollUD.Location = new System.Drawing.Point(52, 398);
-            this.texVScrollUD.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.texVScrollUD.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            -2147483648});
-            this.texVScrollUD.Name = "texVScrollUD";
-            this.texVScrollUD.Size = new System.Drawing.Size(55, 20);
-            this.texVScrollUD.TabIndex = 51;
-            this.texVScrollUD.Tag = "Edit Scroll V";
-            this.texVScrollUD.ValueChanged += new System.EventHandler(this.texVScrollUD_ValueChanged);
-            // 
-            // label33
-            // 
-            this.label33.AutoSize = true;
-            this.label33.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label33.Location = new System.Drawing.Point(2, 380);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(44, 13);
-            this.label33.TabIndex = 19;
-            this.label33.Text = "Scroll U";
-            // 
-            // texUScrollUD
-            // 
-            this.texUScrollUD.DecimalPlaces = 3;
-            this.texUScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texUScrollUD.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.texUScrollUD.Location = new System.Drawing.Point(52, 378);
-            this.texUScrollUD.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.texUScrollUD.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            -2147483648});
-            this.texUScrollUD.Name = "texUScrollUD";
-            this.texUScrollUD.Size = new System.Drawing.Size(55, 20);
-            this.texUScrollUD.TabIndex = 50;
-            this.texUScrollUD.Tag = "Edit Scroll U";
-            this.texUScrollUD.ValueChanged += new System.EventHandler(this.texUScrollUD_ValueChanged);
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.InsetDouble;
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel1.Controls.Add(this.label31, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label32, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label36, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.songAnchorLabel, 0, 3);
-            this.tableLayoutPanel1.Controls.Add(this.noteAnchorLabel, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.panel2, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.screenAnchorLabel, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.panel1, 2, 1);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 279);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 4;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(112, 93);
-            this.tableLayoutPanel1.TabIndex = 40;
-            // 
-            // label31
-            // 
-            this.label31.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label31.AutoSize = true;
-            this.label31.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label31.Location = new System.Drawing.Point(92, 6);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(14, 13);
-            this.label31.TabIndex = 17;
-            this.label31.Text = "V";
-            // 
-            // label32
-            // 
-            this.label32.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label32.AutoSize = true;
-            this.label32.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label32.Location = new System.Drawing.Point(69, 6);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(14, 13);
-            this.label32.TabIndex = 17;
-            this.label32.Text = "U";
-            // 
-            // label36
-            // 
-            this.label36.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label36.AutoSize = true;
-            this.label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label36.Location = new System.Drawing.Point(12, 6);
-            this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(41, 13);
-            this.label36.TabIndex = 17;
-            this.label36.Text = "Anchor";
-            // 
-            // songAnchorLabel
-            // 
-            this.songAnchorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.songAnchorLabel.AutoSize = true;
-            this.songAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.songAnchorLabel.Location = new System.Drawing.Point(6, 69);
-            this.songAnchorLabel.Name = "songAnchorLabel";
-            this.songAnchorLabel.Size = new System.Drawing.Size(54, 21);
-            this.songAnchorLabel.TabIndex = 17;
-            this.songAnchorLabel.Tag = "Song anchor";
-            this.songAnchorLabel.Text = "Song start";
-            this.songAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.songAnchorLabel.Click += new System.EventHandler(this.songAnchorLabel_Click);
-            // 
-            // noteAnchorLabel
-            // 
-            this.noteAnchorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.noteAnchorLabel.AutoSize = true;
-            this.noteAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.noteAnchorLabel.Location = new System.Drawing.Point(6, 25);
-            this.noteAnchorLabel.Name = "noteAnchorLabel";
-            this.noteAnchorLabel.Size = new System.Drawing.Size(54, 19);
-            this.noteAnchorLabel.TabIndex = 1;
-            this.noteAnchorLabel.Tag = "Note anchor";
-            this.noteAnchorLabel.Text = "Note";
-            this.noteAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.noteAnchorLabel.Click += new System.EventHandler(this.noteAnchorLabel_Click);
-            // 
-            // panel2
-            // 
-            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel2.BackColor = System.Drawing.Color.Transparent;
-            this.panel2.Controls.Add(this.songAnchorRb);
-            this.panel2.Controls.Add(this.screenUAnchorRb);
-            this.panel2.Controls.Add(this.noteUAnchorRb);
-            this.panel2.Location = new System.Drawing.Point(66, 25);
-            this.panel2.Margin = new System.Windows.Forms.Padding(0);
-            this.panel2.Name = "panel2";
-            this.tableLayoutPanel1.SetRowSpan(this.panel2, 3);
-            this.panel2.Size = new System.Drawing.Size(20, 65);
-            this.panel2.TabIndex = 20;
-            // 
-            // songAnchorRb
-            // 
-            this.songAnchorRb.AutoSize = true;
-            this.songAnchorRb.Location = new System.Drawing.Point(3, 48);
-            this.songAnchorRb.Name = "songAnchorRb";
-            this.songAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.songAnchorRb.TabIndex = 24;
-            this.songAnchorRb.TabStop = true;
-            this.songAnchorRb.Tag = "Song anchor";
-            this.songAnchorRb.UseVisualStyleBackColor = true;
-            this.songAnchorRb.Click += new System.EventHandler(this.songAnchorRb_Click);
-            // 
-            // screenUAnchorRb
-            // 
-            this.screenUAnchorRb.AutoSize = true;
-            this.screenUAnchorRb.Location = new System.Drawing.Point(3, 25);
-            this.screenUAnchorRb.Name = "screenUAnchorRb";
-            this.screenUAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.screenUAnchorRb.TabIndex = 22;
-            this.screenUAnchorRb.TabStop = true;
-            this.screenUAnchorRb.Tag = "Screen U anchor";
-            this.screenUAnchorRb.UseVisualStyleBackColor = true;
-            this.screenUAnchorRb.Click += new System.EventHandler(this.screenUAnchorRb_Click);
-            // 
-            // noteUAnchorRb
-            // 
-            this.noteUAnchorRb.AutoSize = true;
-            this.noteUAnchorRb.Location = new System.Drawing.Point(3, 3);
-            this.noteUAnchorRb.Name = "noteUAnchorRb";
-            this.noteUAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.noteUAnchorRb.TabIndex = 20;
-            this.noteUAnchorRb.TabStop = true;
-            this.noteUAnchorRb.Tag = "Note U anchor";
-            this.noteUAnchorRb.UseVisualStyleBackColor = true;
-            this.noteUAnchorRb.Click += new System.EventHandler(this.noteUAnchorRb_Click);
-            // 
-            // screenAnchorLabel
-            // 
-            this.screenAnchorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.screenAnchorLabel.AutoSize = true;
-            this.screenAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.screenAnchorLabel.Location = new System.Drawing.Point(6, 47);
-            this.screenAnchorLabel.Name = "screenAnchorLabel";
-            this.screenAnchorLabel.Size = new System.Drawing.Size(54, 19);
-            this.screenAnchorLabel.TabIndex = 17;
-            this.screenAnchorLabel.Tag = "Screen anchor";
-            this.screenAnchorLabel.Text = "Screen";
-            this.screenAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.screenAnchorLabel.Click += new System.EventHandler(this.screenAnchorLabel_Click);
-            // 
-            // panel1
-            // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.BackColor = System.Drawing.Color.Transparent;
-            this.panel1.Controls.Add(this.screenVAnchorRb);
-            this.panel1.Controls.Add(this.noteVAnchorRb);
-            this.panel1.Location = new System.Drawing.Point(89, 25);
-            this.panel1.Margin = new System.Windows.Forms.Padding(0);
-            this.panel1.Name = "panel1";
-            this.tableLayoutPanel1.SetRowSpan(this.panel1, 3);
-            this.panel1.Size = new System.Drawing.Size(20, 65);
-            this.panel1.TabIndex = 21;
-            // 
-            // screenVAnchorRb
-            // 
-            this.screenVAnchorRb.AutoSize = true;
-            this.screenVAnchorRb.Location = new System.Drawing.Point(3, 25);
-            this.screenVAnchorRb.Name = "screenVAnchorRb";
-            this.screenVAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.screenVAnchorRb.TabIndex = 23;
-            this.screenVAnchorRb.TabStop = true;
-            this.screenVAnchorRb.Tag = "Screen V anchor";
-            this.screenVAnchorRb.UseVisualStyleBackColor = true;
-            this.screenVAnchorRb.Click += new System.EventHandler(this.screenVAnchorRb_Click);
-            // 
-            // noteVAnchorRb
-            // 
-            this.noteVAnchorRb.AutoSize = true;
-            this.noteVAnchorRb.Location = new System.Drawing.Point(3, 3);
-            this.noteVAnchorRb.Name = "noteVAnchorRb";
-            this.noteVAnchorRb.Size = new System.Drawing.Size(14, 13);
-            this.noteVAnchorRb.TabIndex = 21;
-            this.noteVAnchorRb.TabStop = true;
-            this.noteVAnchorRb.Tag = "Note V anchor";
-            this.noteVAnchorRb.UseVisualStyleBackColor = true;
-            this.noteVAnchorRb.Click += new System.EventHandler(this.noteVAnchorRb_Click);
-            // 
-            // texVTileCb
-            // 
-            this.texVTileCb.AutoSize = true;
-            this.texVTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texVTileCb.Location = new System.Drawing.Point(91, 236);
-            this.texVTileCb.Name = "texVTileCb";
-            this.texVTileCb.Size = new System.Drawing.Size(33, 17);
-            this.texVTileCb.TabIndex = 32;
-            this.texVTileCb.Tag = "V";
-            this.texVTileCb.Text = "V";
-            this.texVTileCb.UseVisualStyleBackColor = true;
-            this.texVTileCb.CheckedChanged += new System.EventHandler(this.texVTileCb_CheckedChanged);
-            // 
-            // texUTileCb
-            // 
-            this.texUTileCb.AutoSize = true;
-            this.texUTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texUTileCb.Location = new System.Drawing.Point(52, 236);
-            this.texUTileCb.Name = "texUTileCb";
-            this.texUTileCb.Size = new System.Drawing.Size(34, 17);
-            this.texUTileCb.TabIndex = 31;
-            this.texUTileCb.Tag = "U";
-            this.texUTileCb.Text = "U";
-            this.texUTileCb.UseVisualStyleBackColor = true;
-            this.texUTileCb.CheckedChanged += new System.EventHandler(this.texUTileCb_CheckedChanged);
-            // 
-            // texKeepAspectCb
-            // 
-            this.texKeepAspectCb.AutoSize = true;
-            this.texKeepAspectCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texKeepAspectCb.Location = new System.Drawing.Point(3, 257);
-            this.texKeepAspectCb.Margin = new System.Windows.Forms.Padding(2);
-            this.texKeepAspectCb.Name = "texKeepAspectCb";
-            this.texKeepAspectCb.Size = new System.Drawing.Size(109, 17);
-            this.texKeepAspectCb.TabIndex = 33;
-            this.texKeepAspectCb.Tag = "Keep aspect ratio";
-            this.texKeepAspectCb.Text = "Keep aspect ratio";
-            this.texKeepAspectCb.UseVisualStyleBackColor = true;
-            this.texKeepAspectCb.CheckedChanged += new System.EventHandler(this.texKeepAspect_CheckedChanged);
-            // 
-            // tileTexCb
-            // 
-            this.tileTexCb.AutoSize = true;
-            this.tileTexCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tileTexCb.Location = new System.Drawing.Point(4, 236);
-            this.tileTexCb.Margin = new System.Windows.Forms.Padding(2);
-            this.tileTexCb.Name = "tileTexCb";
-            this.tileTexCb.Size = new System.Drawing.Size(43, 17);
-            this.tileTexCb.TabIndex = 30;
-            this.tileTexCb.Tag = "Tile";
-            this.tileTexCb.Text = "Tile";
-            this.tileTexCb.UseVisualStyleBackColor = true;
-            this.tileTexCb.CheckedChanged += new System.EventHandler(this.tileTexCb_CheckedChanged);
-            // 
-            // loadTexBtn
-            // 
-            this.loadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.loadTexBtn.Location = new System.Drawing.Point(5, 18);
-            this.loadTexBtn.Name = "loadTexBtn";
-            this.loadTexBtn.Size = new System.Drawing.Size(75, 23);
-            this.loadTexBtn.TabIndex = 10;
-            this.loadTexBtn.Tag = "Load texture";
-            this.loadTexBtn.Text = "&Load texture";
-            this.loadTexBtn.UseVisualStyleBackColor = true;
-            this.loadTexBtn.Click += new System.EventHandler(this.textureLoadBtn_Click);
-            // 
-            // unloadTexBtn
-            // 
-            this.unloadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.unloadTexBtn.Location = new System.Drawing.Point(92, 18);
-            this.unloadTexBtn.Name = "unloadTexBtn";
-            this.unloadTexBtn.Size = new System.Drawing.Size(86, 23);
-            this.unloadTexBtn.TabIndex = 15;
-            this.unloadTexBtn.Tag = "Unload texture";
-            this.unloadTexBtn.Text = "&Unload texture";
-            this.unloadTexBtn.UseVisualStyleBackColor = true;
-            this.unloadTexBtn.Click += new System.EventHandler(this.unloadTexBtn_Click);
-            // 
-            // disableTextureCh
-            // 
-            this.disableTextureCh.AutoSize = true;
-            this.disableTextureCh.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.disableTextureCh.Location = new System.Drawing.Point(6, 173);
-            this.disableTextureCh.Margin = new System.Windows.Forms.Padding(2);
-            this.disableTextureCh.Name = "disableTextureCh";
-            this.disableTextureCh.Size = new System.Drawing.Size(96, 17);
-            this.disableTextureCh.TabIndex = 20;
-            this.disableTextureCh.Tag = "Disable texture";
-            this.disableTextureCh.Text = "Disable texture";
-            this.disableTextureCh.UseVisualStyleBackColor = true;
-            this.disableTextureCh.CheckedChanged += new System.EventHandler(this.disableTextureCb_CheckedChanged);
-            // 
-            // texColBlendCb
-            // 
-            this.texColBlendCb.AutoSize = true;
-            this.texColBlendCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.texColBlendCb.Location = new System.Drawing.Point(4, 215);
-            this.texColBlendCb.Margin = new System.Windows.Forms.Padding(2);
-            this.texColBlendCb.Name = "texColBlendCb";
-            this.texColBlendCb.Size = new System.Drawing.Size(149, 17);
-            this.texColBlendCb.TabIndex = 20;
-            this.texColBlendCb.Tag = "Blend hue with track color";
-            this.texColBlendCb.Text = "Blend hue with track color";
-            this.texColBlendCb.UseVisualStyleBackColor = true;
-            this.texColBlendCb.CheckedChanged += new System.EventHandler(this.texColBlendCb_CheckedChanged);
-            // 
-            // pointSmpCb
-            // 
-            this.pointSmpCb.AutoSize = true;
-            this.pointSmpCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pointSmpCb.Location = new System.Drawing.Point(6, 194);
-            this.pointSmpCb.Margin = new System.Windows.Forms.Padding(2);
-            this.pointSmpCb.Name = "pointSmpCb";
-            this.pointSmpCb.Size = new System.Drawing.Size(94, 17);
-            this.pointSmpCb.TabIndex = 20;
-            this.pointSmpCb.Tag = "Point sampling";
-            this.pointSmpCb.Text = "Point sampling";
-            this.pointSmpCb.UseVisualStyleBackColor = true;
-            this.pointSmpCb.CheckedChanged += new System.EventHandler(this.pointSmpCb_CheckedChanged);
-            // 
-            // trackTexPb
-            // 
-            this.trackTexPb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.trackTexPb.Location = new System.Drawing.Point(5, 47);
-            this.trackTexPb.Name = "trackTexPb";
-            this.trackTexPb.Size = new System.Drawing.Size(173, 121);
-            this.trackTexPb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.trackTexPb.TabIndex = 13;
-            this.trackTexPb.TabStop = false;
-            // 
-            // defaultMtrlBtn
-            // 
-            this.defaultMtrlBtn.Location = new System.Drawing.Point(1, 1);
-            this.defaultMtrlBtn.Name = "defaultMtrlBtn";
-            this.defaultMtrlBtn.Size = new System.Drawing.Size(179, 23);
-            this.defaultMtrlBtn.TabIndex = 10;
-            this.defaultMtrlBtn.Tag = "Default Material";
-            this.defaultMtrlBtn.Text = "Default Material";
-            this.defaultMtrlBtn.UseVisualStyleBackColor = true;
-            this.defaultMtrlBtn.Click += new System.EventHandler(this.defaultMaterial_Click);
-            // 
-            // alphaLbl
-            // 
-            this.alphaLbl.AutoSize = true;
-            this.alphaLbl.Location = new System.Drawing.Point(5, 32);
-            this.alphaLbl.Name = "alphaLbl";
-            this.alphaLbl.Size = new System.Drawing.Size(43, 13);
-            this.alphaLbl.TabIndex = 7;
-            this.alphaLbl.Text = "Opacity";
-            // 
-            // transpSlider
-            // 
-            this.transpSlider.BackColor = System.Drawing.SystemColors.Control;
-            this.transpSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.transpSlider.LargeChange = 10;
-            this.transpSlider.Location = new System.Drawing.Point(5, 49);
-            this.transpSlider.Maximum = 200;
-            this.transpSlider.Name = "transpSlider";
-            this.transpSlider.Size = new System.Drawing.Size(129, 45);
-            this.transpSlider.TabIndex = 20;
-            this.transpSlider.TickFrequency = 10;
-            this.transpSlider.Value = 50;
-            this.transpSlider.Scroll += new System.EventHandler(this.transpSlider_Scroll);
-            // 
-            // hueTb
-            // 
-            this.hueTb.Location = new System.Drawing.Point(137, 113);
-            this.hueTb.Name = "hueTb";
-            this.hueTb.Size = new System.Drawing.Size(38, 20);
-            this.hueTb.TabIndex = 31;
-            this.hueTb.Tag = "Edit Hue";
-            this.hueTb.Text = "notset";
-            this.hueTb.TextChanged += new System.EventHandler(this.hueTb_TextChanged);
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.BackColor = System.Drawing.Color.Transparent;
-            this.groupBox1.Controls.Add(this.normalLumTb);
-            this.groupBox1.Controls.Add(this.normalLumSlider);
-            this.groupBox1.Controls.Add(this.label);
-            this.groupBox1.Controls.Add(this.normalSatTb);
-            this.groupBox1.Controls.Add(this.normalSatSlider);
-            this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(-1, 164);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(182, 154);
-            this.groupBox1.TabIndex = 40;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Normal notes";
-            // 
-            // normalLumTb
-            // 
-            this.normalLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.normalLumTb.Location = new System.Drawing.Point(141, 105);
-            this.normalLumTb.Name = "normalLumTb";
-            this.normalLumTb.Size = new System.Drawing.Size(38, 20);
-            this.normalLumTb.TabIndex = 21;
-            this.normalLumTb.Tag = "Edit Normal Brightness";
-            this.normalLumTb.Text = "notset";
-            this.normalLumTb.TextChanged += new System.EventHandler(this.normalLumTb_TextChanged);
-            // 
-            // normalLumSlider
-            // 
-            this.normalLumSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.normalLumSlider.LargeChange = 10;
-            this.normalLumSlider.Location = new System.Drawing.Point(6, 105);
-            this.normalLumSlider.Maximum = 200;
-            this.normalLumSlider.Name = "normalLumSlider";
-            this.normalLumSlider.Size = new System.Drawing.Size(129, 45);
-            this.normalLumSlider.TabIndex = 20;
-            this.normalLumSlider.TickFrequency = 10;
-            this.normalLumSlider.Value = 50;
-            this.normalLumSlider.Scroll += new System.EventHandler(this.normalLumSlider_Scroll);
-            // 
-            // label
-            // 
-            this.label.AutoSize = true;
-            this.label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label.Location = new System.Drawing.Point(6, 89);
-            this.label.Name = "label";
-            this.label.Size = new System.Drawing.Size(56, 13);
-            this.label.TabIndex = 13;
-            this.label.Text = "Brightness";
-            // 
-            // normalSatTb
-            // 
-            this.normalSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.normalSatTb.Location = new System.Drawing.Point(141, 41);
-            this.normalSatTb.Name = "normalSatTb";
-            this.normalSatTb.Size = new System.Drawing.Size(38, 20);
-            this.normalSatTb.TabIndex = 11;
-            this.normalSatTb.Tag = "Edit Normal Saturation";
-            this.normalSatTb.Text = "notset";
-            this.normalSatTb.TextChanged += new System.EventHandler(this.normalSatTb_TextChanged);
-            // 
-            // normalSatSlider
-            // 
-            this.normalSatSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.normalSatSlider.LargeChange = 10;
-            this.normalSatSlider.Location = new System.Drawing.Point(6, 41);
-            this.normalSatSlider.Maximum = 200;
-            this.normalSatSlider.Name = "normalSatSlider";
-            this.normalSatSlider.Size = new System.Drawing.Size(129, 45);
-            this.normalSatSlider.TabIndex = 10;
-            this.normalSatSlider.TickFrequency = 10;
-            this.normalSatSlider.Value = 50;
-            this.normalSatSlider.Scroll += new System.EventHandler(this.normalSatSlider_Scroll);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(6, 25);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(55, 13);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "Saturation";
-            // 
-            // hueSlider
-            // 
-            this.hueSlider.BackColor = System.Drawing.SystemColors.Control;
-            this.hueSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.hueSlider.LargeChange = 10;
-            this.hueSlider.Location = new System.Drawing.Point(5, 112);
-            this.hueSlider.Maximum = 100;
-            this.hueSlider.Name = "hueSlider";
-            this.hueSlider.Size = new System.Drawing.Size(129, 45);
-            this.hueSlider.TabIndex = 30;
-            this.hueSlider.TickFrequency = 10;
-            this.hueSlider.Value = 50;
-            this.hueSlider.Scroll += new System.EventHandler(this.hueSlider_Scroll);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(5, 96);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(27, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "Hue";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.BackColor = System.Drawing.Color.Transparent;
-            this.groupBox2.Controls.Add(this.hiliteLumTb);
-            this.groupBox2.Controls.Add(this.hiliteLumSlider);
-            this.groupBox2.Controls.Add(this.label5);
-            this.groupBox2.Controls.Add(this.hiliteSatTb);
-            this.groupBox2.Controls.Add(this.hiliteSatSlider);
-            this.groupBox2.Controls.Add(this.label6);
-            this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox2.Location = new System.Drawing.Point(-1, 325);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(182, 155);
-            this.groupBox2.TabIndex = 50;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Highlighted notes";
-            // 
-            // hiliteLumTb
-            // 
-            this.hiliteLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.hiliteLumTb.Location = new System.Drawing.Point(141, 105);
-            this.hiliteLumTb.Name = "hiliteLumTb";
-            this.hiliteLumTb.Size = new System.Drawing.Size(38, 20);
-            this.hiliteLumTb.TabIndex = 21;
-            this.hiliteLumTb.Tag = "Edit Highlight Brightness";
-            this.hiliteLumTb.Text = "notset";
-            this.hiliteLumTb.TextChanged += new System.EventHandler(this.hiliteLumTb_TextChanged);
-            // 
-            // hiliteLumSlider
-            // 
-            this.hiliteLumSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.hiliteLumSlider.LargeChange = 10;
-            this.hiliteLumSlider.Location = new System.Drawing.Point(6, 105);
-            this.hiliteLumSlider.Maximum = 200;
-            this.hiliteLumSlider.Name = "hiliteLumSlider";
-            this.hiliteLumSlider.Size = new System.Drawing.Size(129, 45);
-            this.hiliteLumSlider.TabIndex = 20;
-            this.hiliteLumSlider.TickFrequency = 10;
-            this.hiliteLumSlider.Value = 50;
-            this.hiliteLumSlider.Scroll += new System.EventHandler(this.hiliteLumSlider_Scroll);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(6, 89);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(56, 13);
-            this.label5.TabIndex = 13;
-            this.label5.Text = "Brightness";
-            // 
-            // hiliteSatTb
-            // 
-            this.hiliteSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.hiliteSatTb.Location = new System.Drawing.Point(141, 41);
-            this.hiliteSatTb.Name = "hiliteSatTb";
-            this.hiliteSatTb.Size = new System.Drawing.Size(38, 20);
-            this.hiliteSatTb.TabIndex = 11;
-            this.hiliteSatTb.Tag = "Edit Highlight Saturation";
-            this.hiliteSatTb.Text = "notset";
-            this.hiliteSatTb.TextChanged += new System.EventHandler(this.hiliteSatTb_TextChanged);
-            // 
-            // hiliteSatSlider
-            // 
-            this.hiliteSatSlider.Cursor = System.Windows.Forms.Cursors.Default;
-            this.hiliteSatSlider.LargeChange = 10;
-            this.hiliteSatSlider.Location = new System.Drawing.Point(6, 41);
-            this.hiliteSatSlider.Maximum = 200;
-            this.hiliteSatSlider.Name = "hiliteSatSlider";
-            this.hiliteSatSlider.Size = new System.Drawing.Size(129, 45);
-            this.hiliteSatSlider.TabIndex = 10;
-            this.hiliteSatSlider.TickFrequency = 10;
-            this.hiliteSatSlider.Value = 50;
-            this.hiliteSatSlider.Scroll += new System.EventHandler(this.hiliteSatSlider_Scroll);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(6, 25);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(55, 13);
-            this.label6.TabIndex = 10;
-            this.label6.Text = "Saturation";
-            // 
-            // transpTb
-            // 
-            this.transpTb.Location = new System.Drawing.Point(137, 49);
-            this.transpTb.Name = "transpTb";
-            this.transpTb.Size = new System.Drawing.Size(38, 20);
-            this.transpTb.TabIndex = 21;
-            this.transpTb.Tag = "Edit Opacity";
-            this.transpTb.Text = "notset";
-            this.transpTb.TextChanged += new System.EventHandler(this.transpTb_TextChanged);
-            // 
-            // light
-            // 
-            this.light.AutoScroll = true;
-            this.light.BackColor = System.Drawing.SystemColors.Control;
-            this.light.Controls.Add(this.defaultLightBtn);
-            this.light.Controls.Add(this.lightPanel);
-            this.light.Controls.Add(this.globalLightCb);
-            this.light.Location = new System.Drawing.Point(4, 22);
-            this.light.Name = "light";
-            this.light.Padding = new System.Windows.Forms.Padding(3);
-            this.light.Size = new System.Drawing.Size(200, 4333);
-            this.light.TabIndex = 1;
-            this.light.Text = "Light";
-            // 
-            // defaultLightBtn
-            // 
-            this.defaultLightBtn.Location = new System.Drawing.Point(1, 1);
-            this.defaultLightBtn.Name = "defaultLightBtn";
-            this.defaultLightBtn.Size = new System.Drawing.Size(179, 23);
-            this.defaultLightBtn.TabIndex = 10;
-            this.defaultLightBtn.Tag = "Default Light";
-            this.defaultLightBtn.Text = "Default Light";
-            this.defaultLightBtn.UseVisualStyleBackColor = true;
-            this.defaultLightBtn.Click += new System.EventHandler(this.defaultLightBtn_Click);
-            // 
-            // lightPanel
-            // 
-            this.lightPanel.AutoSize = true;
-            this.lightPanel.Controls.Add(this.masterLightHsBtn);
-            this.lightPanel.Controls.Add(this.specHsBtn);
-            this.lightPanel.Controls.Add(this.diffuseHsBtn);
-            this.lightPanel.Controls.Add(this.ambientHsBtn);
-            this.lightPanel.Controls.Add(this.specPowUd);
-            this.lightPanel.Controls.Add(this.ambientAmountUd);
-            this.lightPanel.Controls.Add(this.diffuseAmountUd);
-            this.lightPanel.Controls.Add(this.label24);
-            this.lightPanel.Controls.Add(this.masterLightAmountUd);
-            this.lightPanel.Controls.Add(this.specAmountUd);
-            this.lightPanel.Controls.Add(this.label15);
-            this.lightPanel.Controls.Add(this.label14);
-            this.lightPanel.Controls.Add(this.label16);
-            this.lightPanel.Controls.Add(this.label22);
-            this.lightPanel.Controls.Add(this.label23);
-            this.lightPanel.Controls.Add(this.lightDirXUd);
-            this.lightPanel.Controls.Add(this.label11);
-            this.lightPanel.Controls.Add(this.lightDirYUd);
-            this.lightPanel.Controls.Add(this.lightDirZUd);
-            this.lightPanel.Controls.Add(this.label12);
-            this.lightPanel.Controls.Add(this.label13);
-            this.lightPanel.Enabled = false;
-            this.lightPanel.Location = new System.Drawing.Point(2, 51);
-            this.lightPanel.Name = "lightPanel";
-            this.lightPanel.Size = new System.Drawing.Size(179, 223);
-            this.lightPanel.TabIndex = 30;
-            // 
-            // masterLightHsBtn
-            // 
-            this.masterLightHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.masterLightHsBtn.Hue = 0F;
-            this.masterLightHsBtn.Location = new System.Drawing.Point(116, 182);
-            this.masterLightHsBtn.Name = "masterLightHsBtn";
-            this.masterLightHsBtn.Saturation = 0F;
-            this.masterLightHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.masterLightHsBtn.Size = new System.Drawing.Size(53, 20);
-            this.masterLightHsBtn.TabIndex = 59;
-            this.masterLightHsBtn.Tag = "Edit Master color";
-            this.masterLightHsBtn.UseVisualStyleBackColor = true;
-            this.masterLightHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.masterLightHsBtn_ColorChanged);
-            // 
-            // specHsBtn
-            // 
-            this.specHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.specHsBtn.Hue = 0F;
-            this.specHsBtn.Location = new System.Drawing.Point(116, 130);
-            this.specHsBtn.Name = "specHsBtn";
-            this.specHsBtn.Saturation = 0F;
-            this.specHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.specHsBtn.Size = new System.Drawing.Size(53, 20);
-            this.specHsBtn.TabIndex = 59;
-            this.specHsBtn.Tag = "Edit Specular color";
-            this.specHsBtn.UseVisualStyleBackColor = true;
-            this.specHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.specHsBtn_ColorChanged);
-            // 
-            // diffuseHsBtn
-            // 
-            this.diffuseHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.diffuseHsBtn.Hue = 0F;
-            this.diffuseHsBtn.Location = new System.Drawing.Point(116, 104);
-            this.diffuseHsBtn.Name = "diffuseHsBtn";
-            this.diffuseHsBtn.Saturation = 0F;
-            this.diffuseHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.diffuseHsBtn.Size = new System.Drawing.Size(53, 20);
-            this.diffuseHsBtn.TabIndex = 59;
-            this.diffuseHsBtn.Tag = "Edit Diffuse  color";
-            this.diffuseHsBtn.UseVisualStyleBackColor = true;
-            this.diffuseHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.diffuseHsBtn_ColorChanged);
-            // 
-            // ambientHsBtn
-            // 
-            this.ambientHsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.ambientHsBtn.Hue = 0F;
-            this.ambientHsBtn.Location = new System.Drawing.Point(116, 78);
-            this.ambientHsBtn.Name = "ambientHsBtn";
-            this.ambientHsBtn.Saturation = 0F;
-            this.ambientHsBtn.SelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.ambientHsBtn.Size = new System.Drawing.Size(53, 20);
-            this.ambientHsBtn.TabIndex = 59;
-            this.ambientHsBtn.Tag = "Edit Ambient color";
-            this.ambientHsBtn.UseVisualStyleBackColor = true;
-            this.ambientHsBtn.ColorChanged += new System.EventHandler<VisualMusic.ColorChangedTventArgs>(this.ambientHsBtn_ColorChanged);
-            // 
-            // specPowUd
-            // 
-            this.specPowUd.Location = new System.Drawing.Point(59, 156);
-            this.specPowUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.specPowUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.specPowUd.Name = "specPowUd";
-            this.specPowUd.Size = new System.Drawing.Size(51, 20);
-            this.specPowUd.TabIndex = 56;
-            this.specPowUd.Tag = "Edit Specular power";
-            this.specPowUd.ValueChanged += new System.EventHandler(this.specPowUd_ValueChanged);
-            // 
-            // ambientAmountUd
-            // 
-            this.ambientAmountUd.DecimalPlaces = 2;
-            this.ambientAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.ambientAmountUd.Location = new System.Drawing.Point(59, 78);
-            this.ambientAmountUd.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            -2147483648});
-            this.ambientAmountUd.Name = "ambientAmountUd";
-            this.ambientAmountUd.Size = new System.Drawing.Size(51, 20);
-            this.ambientAmountUd.TabIndex = 53;
-            this.ambientAmountUd.Tag = "Edit Ambient amount";
-            this.ambientAmountUd.ValueChanged += new System.EventHandler(this.ambientAmountUd_ValueChanged);
-            // 
-            // diffuseAmountUd
-            // 
-            this.diffuseAmountUd.DecimalPlaces = 2;
-            this.diffuseAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.diffuseAmountUd.Location = new System.Drawing.Point(59, 104);
-            this.diffuseAmountUd.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            -2147483648});
-            this.diffuseAmountUd.Name = "diffuseAmountUd";
-            this.diffuseAmountUd.Size = new System.Drawing.Size(51, 20);
-            this.diffuseAmountUd.TabIndex = 54;
-            this.diffuseAmountUd.Tag = "Edit Diffuse amount";
-            this.diffuseAmountUd.ValueChanged += new System.EventHandler(this.diffuseAmountUd_ValueChanged);
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(4, 14);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(49, 13);
-            this.label24.TabIndex = 2;
-            this.label24.Text = "Direction";
-            // 
-            // masterLightAmountUd
-            // 
-            this.masterLightAmountUd.DecimalPlaces = 2;
-            this.masterLightAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.masterLightAmountUd.Location = new System.Drawing.Point(59, 182);
-            this.masterLightAmountUd.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            -2147483648});
-            this.masterLightAmountUd.Name = "masterLightAmountUd";
-            this.masterLightAmountUd.Size = new System.Drawing.Size(51, 20);
-            this.masterLightAmountUd.TabIndex = 55;
-            this.masterLightAmountUd.Tag = "Edit Master brightness";
-            this.masterLightAmountUd.ValueChanged += new System.EventHandler(this.MasterLightAmountUD_ValueChanged);
-            // 
-            // specAmountUd
-            // 
-            this.specAmountUd.DecimalPlaces = 2;
-            this.specAmountUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.specAmountUd.Location = new System.Drawing.Point(59, 130);
-            this.specAmountUd.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            -2147483648});
-            this.specAmountUd.Name = "specAmountUd";
-            this.specAmountUd.Size = new System.Drawing.Size(51, 20);
-            this.specAmountUd.TabIndex = 55;
-            this.specAmountUd.Tag = "Edit Specular amount";
-            this.specAmountUd.ValueChanged += new System.EventHandler(this.specAmountUd_ValueChanged);
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(8, 80);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(45, 13);
-            this.label15.TabIndex = 49;
-            this.label15.Text = "Ambient";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(13, 108);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(40, 13);
-            this.label14.TabIndex = 50;
-            this.label14.Text = "Diffuse";
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(14, 184);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(39, 13);
-            this.label16.TabIndex = 52;
-            this.label16.Text = "Master";
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(7, 158);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(46, 13);
-            this.label22.TabIndex = 52;
-            this.label22.Text = "S power";
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(4, 132);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(49, 13);
-            this.label23.TabIndex = 51;
-            this.label23.Text = "Specular";
-            // 
-            // lightDirXUd
-            // 
-            this.lightDirXUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lightDirXUd.Location = new System.Drawing.Point(0, 30);
-            this.lightDirXUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.lightDirXUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.lightDirXUd.Name = "lightDirXUd";
-            this.lightDirXUd.Size = new System.Drawing.Size(57, 20);
-            this.lightDirXUd.TabIndex = 34;
-            this.lightDirXUd.Tag = "Edit Light X Direction";
-            this.lightDirXUd.ValueChanged += new System.EventHandler(this.lightDirXUd_ValueChanged);
-            // 
-            // label11
-            // 
-            this.label11.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(139, 53);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(14, 13);
-            this.label11.TabIndex = 31;
-            this.label11.Text = "Z";
-            // 
-            // lightDirYUd
-            // 
-            this.lightDirYUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lightDirYUd.Location = new System.Drawing.Point(60, 30);
-            this.lightDirYUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.lightDirYUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.lightDirYUd.Name = "lightDirYUd";
-            this.lightDirYUd.Size = new System.Drawing.Size(57, 20);
-            this.lightDirYUd.TabIndex = 35;
-            this.lightDirYUd.Tag = "Edit Light Y Direction";
-            this.lightDirYUd.ValueChanged += new System.EventHandler(this.lightDirYUd_ValueChanged);
-            // 
-            // lightDirZUd
-            // 
-            this.lightDirZUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lightDirZUd.Location = new System.Drawing.Point(120, 30);
-            this.lightDirZUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.lightDirZUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.lightDirZUd.Name = "lightDirZUd";
-            this.lightDirZUd.Size = new System.Drawing.Size(57, 20);
-            this.lightDirZUd.TabIndex = 36;
-            this.lightDirZUd.Tag = "Edit Light Z Direction";
-            this.lightDirZUd.ValueChanged += new System.EventHandler(this.lightDirZUd_ValueChanged);
-            // 
-            // label12
-            // 
-            this.label12.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(82, 53);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(14, 13);
-            this.label12.TabIndex = 32;
-            this.label12.Text = "Y";
-            // 
-            // label13
-            // 
-            this.label13.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(17, 53);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(14, 13);
-            this.label13.TabIndex = 33;
-            this.label13.Text = "X";
-            // 
-            // globalLightCb
-            // 
-            this.globalLightCb.AutoSize = true;
-            this.globalLightCb.Checked = true;
-            this.globalLightCb.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.globalLightCb.Location = new System.Drawing.Point(3, 30);
-            this.globalLightCb.Name = "globalLightCb";
-            this.globalLightCb.Size = new System.Drawing.Size(76, 17);
-            this.globalLightCb.TabIndex = 20;
-            this.globalLightCb.Tag = "Use global";
-            this.globalLightCb.Text = "Use global";
-            this.globalLightCb.UseVisualStyleBackColor = true;
-            this.globalLightCb.CheckedChanged += new System.EventHandler(this.globalLightCb_CheckedChanged);
-            // 
-            // spatial
-            // 
-            this.spatial.Controls.Add(this.defaultSpatialBtn);
-            this.spatial.Controls.Add(this.label41);
-            this.spatial.Controls.Add(this.label40);
-            this.spatial.Controls.Add(this.label39);
-            this.spatial.Controls.Add(this.label20);
-            this.spatial.Controls.Add(this.zoffsetUd);
-            this.spatial.Controls.Add(this.yoffsetUd);
-            this.spatial.Controls.Add(this.xoffsetUd);
-            this.spatial.Location = new System.Drawing.Point(4, 22);
-            this.spatial.Name = "spatial";
-            this.spatial.Padding = new System.Windows.Forms.Padding(3);
-            this.spatial.Size = new System.Drawing.Size(200, 4333);
-            this.spatial.TabIndex = 3;
-            this.spatial.Text = "Spatial";
-            this.spatial.UseVisualStyleBackColor = true;
-            // 
-            // defaultSpatialBtn
-            // 
-            this.defaultSpatialBtn.Location = new System.Drawing.Point(1, 1);
-            this.defaultSpatialBtn.Name = "defaultSpatialBtn";
-            this.defaultSpatialBtn.Size = new System.Drawing.Size(179, 23);
-            this.defaultSpatialBtn.TabIndex = 10;
-            this.defaultSpatialBtn.Tag = "Default Spatial";
-            this.defaultSpatialBtn.Text = "Default Spatial";
-            this.defaultSpatialBtn.UseVisualStyleBackColor = true;
-            this.defaultSpatialBtn.Click += new System.EventHandler(this.defaultSpatialBtn_Click);
-            // 
-            // label41
-            // 
-            this.label41.AutoSize = true;
-            this.label41.Location = new System.Drawing.Point(151, 80);
-            this.label41.Name = "label41";
-            this.label41.Size = new System.Drawing.Size(14, 13);
-            this.label41.TabIndex = 1;
-            this.label41.Text = "Z";
-            // 
-            // label40
-            // 
-            this.label40.AutoSize = true;
-            this.label40.Location = new System.Drawing.Point(87, 80);
-            this.label40.Name = "label40";
-            this.label40.Size = new System.Drawing.Size(14, 13);
-            this.label40.TabIndex = 1;
-            this.label40.Text = "Y";
-            // 
-            // label39
-            // 
-            this.label39.AutoSize = true;
-            this.label39.Location = new System.Drawing.Point(24, 80);
-            this.label39.Name = "label39";
-            this.label39.Size = new System.Drawing.Size(14, 13);
-            this.label39.TabIndex = 1;
-            this.label39.Text = "X";
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(-2, 41);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(73, 13);
-            this.label20.TabIndex = 1;
-            this.label20.Text = "Position offset";
-            // 
-            // zoffsetUd
-            // 
-            this.zoffsetUd.Location = new System.Drawing.Point(121, 57);
-            this.zoffsetUd.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.zoffsetUd.Minimum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            -2147483648});
-            this.zoffsetUd.Name = "zoffsetUd";
-            this.zoffsetUd.Size = new System.Drawing.Size(57, 20);
-            this.zoffsetUd.TabIndex = 40;
-            this.zoffsetUd.Tag = "Edit Z Offset";
-            this.zoffsetUd.ValueChanged += new System.EventHandler(this.zoffsetUd_ValueChanged);
-            // 
-            // yoffsetUd
-            // 
-            this.yoffsetUd.Location = new System.Drawing.Point(61, 57);
-            this.yoffsetUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.yoffsetUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.yoffsetUd.Name = "yoffsetUd";
-            this.yoffsetUd.Size = new System.Drawing.Size(57, 20);
-            this.yoffsetUd.TabIndex = 30;
-            this.yoffsetUd.Tag = "Edit Y Offset";
-            this.yoffsetUd.ValueChanged += new System.EventHandler(this.yoffsetUd_ValueChanged);
-            // 
-            // xoffsetUd
-            // 
-            this.xoffsetUd.Location = new System.Drawing.Point(1, 57);
-            this.xoffsetUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.xoffsetUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.xoffsetUd.Name = "xoffsetUd";
-            this.xoffsetUd.Size = new System.Drawing.Size(57, 20);
-            this.xoffsetUd.TabIndex = 20;
-            this.xoffsetUd.Tag = "Edit X Offset";
-            this.xoffsetUd.ValueChanged += new System.EventHandler(this.xoffsetUd_ValueChanged);
-            // 
-            // resetDefaultBtn
-            // 
-            this.resetDefaultBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.resetDefaultBtn.Location = new System.Drawing.Point(336, 32767);
-            this.resetDefaultBtn.Name = "resetDefaultBtn";
-            this.resetDefaultBtn.Size = new System.Drawing.Size(170, 23);
-            this.resetDefaultBtn.TabIndex = 13;
-            this.resetDefaultBtn.Text = "Reset defaults to default";
-            this.resetDefaultBtn.UseVisualStyleBackColor = true;
-            this.resetDefaultBtn.Visible = false;
-            // 
-            // openTextureDlg
-            // 
-            this.openTextureDlg.Filter = "Textures|*.jpg;*.png;*.gif";
-            // 
-            // songPropsPanel
-            // 
-            this.songPropsPanel.Controls.Add(this.camLabel);
-            this.songPropsPanel.Controls.Add(this.camTb);
-            this.songPropsPanel.Controls.Add(this.defaultPitchesBtn);
-            this.songPropsPanel.Controls.Add(this.minPitchUd);
-            this.songPropsPanel.Controls.Add(this.maxPitchUd);
-            this.songPropsPanel.Controls.Add(this.label26);
-            this.songPropsPanel.Controls.Add(this.label21);
-            this.songPropsPanel.Controls.Add(this.label18);
-            this.songPropsPanel.Controls.Add(this.label10);
-            this.songPropsPanel.Controls.Add(this.label8);
-            this.songPropsPanel.Controls.Add(this.hnotelabel);
-            this.songPropsPanel.Controls.Add(this.label25);
-            this.songPropsPanel.Controls.Add(this.label19);
-            this.songPropsPanel.Controls.Add(this.label17);
-            this.songPropsPanel.Controls.Add(this.fadeOutUd);
-            this.songPropsPanel.Controls.Add(this.fadeInUd);
-            this.songPropsPanel.Controls.Add(this.label9);
-            this.songPropsPanel.Controls.Add(this.playbackOffsetUd);
-            this.songPropsPanel.Controls.Add(this.audioOffsetS);
-            this.songPropsPanel.Controls.Add(this.upDownVpWidth);
-            this.songPropsPanel.Controls.Add(this.label7);
-            this.songPropsPanel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.songPropsPanel.Location = new System.Drawing.Point(0, 24);
-            this.songPropsPanel.Name = "songPropsPanel";
-            this.songPropsPanel.Size = new System.Drawing.Size(197, 4359);
-            this.songPropsPanel.TabIndex = 17;
-            this.songPropsPanel.Visible = false;
-            this.songPropsPanel.VisibleChanged += new System.EventHandler(this.songPropsPanel_VisibleChanged);
-            // 
-            // camLabel
-            // 
-            this.camLabel.AutoSize = true;
-            this.camLabel.Location = new System.Drawing.Point(12, 320);
-            this.camLabel.Name = "camLabel";
-            this.camLabel.Size = new System.Drawing.Size(43, 13);
-            this.camLabel.TabIndex = 7;
-            this.camLabel.Text = "Camera";
-            // 
-            // camTb
-            // 
-            this.camTb.Location = new System.Drawing.Point(12, 336);
-            this.camTb.Multiline = true;
-            this.camTb.Name = "camTb";
-            this.camTb.Size = new System.Drawing.Size(111, 120);
-            this.camTb.TabIndex = 6;
-            this.camTb.Tag = "Edit Camera";
-            this.camTb.TextChanged += new System.EventHandler(this.camTb_TextChanged);
-            // 
-            // defaultPitchesBtn
-            // 
-            this.defaultPitchesBtn.Location = new System.Drawing.Point(12, 272);
-            this.defaultPitchesBtn.Name = "defaultPitchesBtn";
-            this.defaultPitchesBtn.Size = new System.Drawing.Size(111, 23);
-            this.defaultPitchesBtn.TabIndex = 4;
-            this.defaultPitchesBtn.Tag = "Reset Pitches";
-            this.defaultPitchesBtn.Text = "Reset pitches";
-            this.defaultPitchesBtn.UseVisualStyleBackColor = true;
-            this.defaultPitchesBtn.Click += new System.EventHandler(this.defaultPitchesBtn_Click);
-            // 
-            // minPitchUd
-            // 
-            this.minPitchUd.Location = new System.Drawing.Point(71, 229);
-            this.minPitchUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.minPitchUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.minPitchUd.Name = "minPitchUd";
-            this.minPitchUd.Size = new System.Drawing.Size(52, 20);
-            this.minPitchUd.TabIndex = 3;
-            this.minPitchUd.Tag = "Edit Min Pitch";
-            this.minPitchUd.ValueChanged += new System.EventHandler(this.minPitchUd_ValueChanged);
-            // 
-            // maxPitchUd
-            // 
-            this.maxPitchUd.Location = new System.Drawing.Point(71, 203);
-            this.maxPitchUd.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.maxPitchUd.Minimum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            -2147483648});
-            this.maxPitchUd.Name = "maxPitchUd";
-            this.maxPitchUd.Size = new System.Drawing.Size(52, 20);
-            this.maxPitchUd.TabIndex = 2;
-            this.maxPitchUd.Tag = "Edit Max Pitch";
-            this.maxPitchUd.ValueChanged += new System.EventHandler(this.maxPitchUd_ValueChanged);
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(156, 153);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(12, 13);
-            this.label26.TabIndex = 3;
-            this.label26.Text = "s";
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(156, 127);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(12, 13);
-            this.label21.TabIndex = 3;
-            this.label21.Text = "s";
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(156, 101);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(12, 13);
-            this.label18.TabIndex = 3;
-            this.label18.Text = "s";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(15, 231);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(50, 13);
-            this.label8.TabIndex = 3;
-            this.label8.Text = "Min pitch";
-            // 
-            // hnotelabel
-            // 
-            this.hnotelabel.AutoSize = true;
-            this.hnotelabel.Location = new System.Drawing.Point(12, 205);
-            this.hnotelabel.Name = "hnotelabel";
-            this.hnotelabel.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.hnotelabel.Size = new System.Drawing.Size(53, 13);
-            this.hnotelabel.TabIndex = 3;
-            this.hnotelabel.Text = "Max pitch";
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(12, 153);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(49, 13);
-            this.label25.TabIndex = 3;
-            this.label25.Text = "Fade out";
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(12, 127);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(42, 13);
-            this.label19.TabIndex = 3;
-            this.label19.Text = "Fade in";
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(12, 101);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(80, 13);
-            this.label17.TabIndex = 3;
-            this.label17.Text = "Playback offset";
-            // 
-            // fadeOutUd
-            // 
-            this.fadeOutUd.DecimalPlaces = 2;
-            this.fadeOutUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.fadeOutUd.Location = new System.Drawing.Point(98, 151);
-            this.fadeOutUd.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this.fadeOutUd.Minimum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            -2147483648});
-            this.fadeOutUd.Name = "fadeOutUd";
-            this.fadeOutUd.Size = new System.Drawing.Size(52, 20);
-            this.fadeOutUd.TabIndex = 1;
-            this.fadeOutUd.Tag = "Edit Fade Out";
-            this.fadeOutUd.ValueChanged += new System.EventHandler(this.fadeOutUd_ValueChanged);
-            // 
-            // fadeInUd
-            // 
-            this.fadeInUd.DecimalPlaces = 2;
-            this.fadeInUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.fadeInUd.Location = new System.Drawing.Point(98, 125);
-            this.fadeInUd.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this.fadeInUd.Minimum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            -2147483648});
-            this.fadeInUd.Name = "fadeInUd";
-            this.fadeInUd.Size = new System.Drawing.Size(52, 20);
-            this.fadeInUd.TabIndex = 1;
-            this.fadeInUd.Tag = "Edit Fade In";
-            this.fadeInUd.ValueChanged += new System.EventHandler(this.fadeInUd_ValueChanged);
-            // 
-            // playbackOffsetUd
-            // 
-            this.playbackOffsetUd.DecimalPlaces = 2;
-            this.playbackOffsetUd.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.playbackOffsetUd.Location = new System.Drawing.Point(98, 99);
-            this.playbackOffsetUd.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this.playbackOffsetUd.Minimum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            -2147483648});
-            this.playbackOffsetUd.Name = "playbackOffsetUd";
-            this.playbackOffsetUd.Size = new System.Drawing.Size(52, 20);
-            this.playbackOffsetUd.TabIndex = 1;
-            this.playbackOffsetUd.Tag = "Edit Playback Offset";
-            this.playbackOffsetUd.ValueChanged += new System.EventHandler(this.playbackOffsetUd_ValueChanged);
-            // 
-            // upDownVpWidth
-            // 
-            this.upDownVpWidth.AutoSize = true;
-            this.upDownVpWidth.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.upDownVpWidth.Decimals = 3;
-            this.upDownVpWidth.Decimals2 = 2;
-            this.upDownVpWidth.ExpBase = 2D;
-            this.upDownVpWidth.Location = new System.Drawing.Point(12, 28);
-            this.upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
-            this.upDownVpWidth.Max = 10D;
-            this.upDownVpWidth.Min = 0D;
-            this.upDownVpWidth.Name = "upDownVpWidth";
-            this.upDownVpWidth.Size = new System.Drawing.Size(180, 48);
-            this.upDownVpWidth.TabIndex = 0;
-            this.upDownVpWidth.TbWidth = 50;
-            this.upDownVpWidth.TickFreq = 1D;
-            this.upDownVpWidth.Value = 16D;
-            this.upDownVpWidth.ValueChanged += new System.EventHandler(this.upDownVpWidth_ValueChanged);
-            this.upDownVpWidth.CommitChanges += new System.EventHandler(this.upDownVpWidth_CommitChanges);
-            // 
-            // saveMixdownDialog
-            // 
-            this.saveMixdownDialog.Filter = "Wav files (*.wav)|*.wav|All files (*.*)|*.*";
-            this.saveMixdownDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.SaveMixdownDialog_FileOk);
-            // 
-            // colorDialog1
-            // 
-            this.colorDialog1.AnyColor = true;
-            this.colorDialog1.FullOpen = true;
-            this.colorDialog1.SolidColorOnly = true;
-            // 
-            // saveMidiDialog
-            // 
-            this.saveMidiDialog.Filter = "Midi files|*.mid|All files|*.*";
-            // 
-            // trackPropsTabCM
-            // 
-            this.trackPropsTabCM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.loadTrackPropsTypeToolStripMenuItem,
-            this.saveTrackPtopsTypeToolStripMenuItem});
-            this.trackPropsTabCM.Name = "trackPropsTabCM";
-            this.trackPropsTabCM.Size = new System.Drawing.Size(157, 48);
-            // 
-            // loadTrackPropsTypeToolStripMenuItem
-            // 
-            this.loadTrackPropsTypeToolStripMenuItem.Name = "loadTrackPropsTypeToolStripMenuItem";
-            this.loadTrackPropsTypeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.loadTrackPropsTypeToolStripMenuItem.Text = "Load properties";
-            this.loadTrackPropsTypeToolStripMenuItem.Click += new System.EventHandler(this.loadTrackPropsTypeToolStripMenuItem_Click);
-            // 
-            // saveTrackPtopsTypeToolStripMenuItem
-            // 
-            this.saveTrackPtopsTypeToolStripMenuItem.Name = "saveTrackPtopsTypeToolStripMenuItem";
-            this.saveTrackPtopsTypeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.saveTrackPtopsTypeToolStripMenuItem.Text = "Save properties";
-            this.saveTrackPtopsTypeToolStripMenuItem.Click += new System.EventHandler(this.saveTrackPropsTypeToolStripMenuItem_Click);
-            // 
-            // lyricsGridView
-            // 
-            this.lyricsGridView.AllowUserToResizeRows = false;
-            this.lyricsGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.lyricsGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.TimeColumn,
-            this.LyricsColumn});
-            this.lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lyricsGridView.Location = new System.Drawing.Point(197, 4333);
-            this.lyricsGridView.Name = "lyricsGridView";
-            this.lyricsGridView.Size = new System.Drawing.Size(587, 50);
-            this.lyricsGridView.TabIndex = 0;
-            this.lyricsGridView.Tag = "Edit Lyrics";
-            this.lyricsGridView.Visible = false;
-            this.lyricsGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.lyricsGridView_CellEndEdit);
-            this.lyricsGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.lyricsGridView_CellValidating);
-            this.lyricsGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.lyricsGridView_DataError);
-            this.lyricsGridView.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.lyricsGridView_RowsRemoved);
-            this.lyricsGridView.Paint += new System.Windows.Forms.PaintEventHandler(this.lyricsGridView_Paint);
-            // 
-            // TimeColumn
-            // 
-            this.TimeColumn.DataPropertyName = "Time";
-            dataGridViewCellStyle1.Format = "N2";
-            dataGridViewCellStyle1.NullValue = "0";
-            this.TimeColumn.DefaultCellStyle = dataGridViewCellStyle1;
-            this.TimeColumn.HeaderText = "Time";
-            this.TimeColumn.Name = "TimeColumn";
-            this.TimeColumn.Width = 68;
-            // 
-            // LyricsColumn
-            // 
-            this.LyricsColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.LyricsColumn.DataPropertyName = "Lyrics";
-            this.LyricsColumn.HeaderText = "Lyrics";
-            this.LyricsColumn.Name = "LyricsColumn";
-            // 
-            // keyFramesDGV
-            // 
-            this.keyFramesDGV.AllowUserToAddRows = false;
-            this.keyFramesDGV.AllowUserToResizeRows = false;
-            this.keyFramesDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.keyFramesDGV.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Time,
-            this.Description});
-            this.keyFramesDGV.Dock = System.Windows.Forms.DockStyle.Left;
-            this.keyFramesDGV.Location = new System.Drawing.Point(197, 24);
-            this.keyFramesDGV.Name = "keyFramesDGV";
-            this.keyFramesDGV.Size = new System.Drawing.Size(210, 4309);
-            this.keyFramesDGV.TabIndex = 23;
-            this.keyFramesDGV.Tag = "Edit Key Frames";
-            this.keyFramesDGV.Visible = false;
-            this.keyFramesDGV.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.keyFramesDGV_CellEndEdit);
-            this.keyFramesDGV.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.keyFramesDGV_CellValidating);
-            this.keyFramesDGV.CurrentCellChanged += new System.EventHandler(this.keyFramesDGV_CurrentCellChanged);
-            this.keyFramesDGV.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.keyFramesDGV_RowsAdded);
-            this.keyFramesDGV.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.keyFramesDGV_RowsRemoved);
-            this.keyFramesDGV.SelectionChanged += new System.EventHandler(this.keyFramesDGV_SelectionChanged);
-            this.keyFramesDGV.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.keyFramesDGV_UserDeletingRow);
-            this.keyFramesDGV.Paint += new System.Windows.Forms.PaintEventHandler(this.keyFramesDGV_Paint);
-            this.keyFramesDGV.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyFramesDGV_KeyDown);
-            // 
-            // Time
-            // 
-            this.Time.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle2.NullValue = null;
-            this.Time.DefaultCellStyle = dataGridViewCellStyle2;
-            this.Time.FillWeight = 35F;
-            this.Time.HeaderText = "Time";
-            this.Time.Name = "Time";
-            this.Time.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Description
-            // 
-            this.Description.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Description.FillWeight = 65F;
-            this.Description.HeaderText = "Description";
-            this.Description.Name = "Description";
-            this.Description.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // propsTogglePanel
-            // 
-            this.propsTogglePanel.Controls.Add(this.songPropsCb);
-            this.propsTogglePanel.Controls.Add(this.trackPropsCb);
-            this.propsTogglePanel.Enabled = false;
-            this.propsTogglePanel.Location = new System.Drawing.Point(276, 0);
-            this.propsTogglePanel.Name = "propsTogglePanel";
-            this.propsTogglePanel.Size = new System.Drawing.Size(207, 24);
-            this.propsTogglePanel.TabIndex = 24;
-            // 
-            // songPropsCb
-            // 
-            this.songPropsCb.Appearance = System.Windows.Forms.Appearance.Button;
-            this.songPropsCb.AutoSize = true;
-            this.songPropsCb.Location = new System.Drawing.Point(3, 1);
-            this.songPropsCb.Name = "songPropsCb";
-            this.songPropsCb.Size = new System.Drawing.Size(99, 23);
-            this.songPropsCb.TabIndex = 0;
-            this.songPropsCb.Text = "Pr&oject properties";
-            this.songPropsCb.UseVisualStyleBackColor = true;
-            this.songPropsCb.CheckedChanged += new System.EventHandler(this.songPropsCb_CheckedChanged);
-            // 
-            // trackPropsCb
-            // 
-            this.trackPropsCb.Appearance = System.Windows.Forms.Appearance.Button;
-            this.trackPropsCb.AutoSize = true;
-            this.trackPropsCb.FlatAppearance.CheckedBackColor = System.Drawing.Color.White;
-            this.trackPropsCb.Location = new System.Drawing.Point(108, 2);
-            this.trackPropsCb.Name = "trackPropsCb";
-            this.trackPropsCb.Size = new System.Drawing.Size(94, 23);
-            this.trackPropsCb.TabIndex = 1;
-            this.trackPropsCb.Text = "&Track properties";
-            this.trackPropsCb.UseVisualStyleBackColor = true;
-            this.trackPropsCb.CheckedChanged += new System.EventHandler(this.trackPropsCb_CheckedChanged);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(542, 4320);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(35, 13);
-            this.label4.TabIndex = 25;
-            this.label4.Text = "label4";
-            this.label4.Visible = false;
+            style.AutoScroll = true;
+            style.BackColor = System.Drawing.SystemColors.Control;
+            style.Controls.Add(lineStyleControl);
+            style.Controls.Add(barStyleControl);
+            style.Controls.Add(defaultStyleBtn);
+            style.Controls.Add(styleList);
+            style.Controls.Add(label1);
+            style.Location = new System.Drawing.Point(4, 24);
+            style.Name = "style";
+            style.Size = new System.Drawing.Size(200, 4333);
+            style.TabIndex = 2;
+            style.Text = "Style";
             // 
             // lineStyleControl
             // 
-            this.lineStyleControl.AutoSize = true;
-            this.lineStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.lineStyleControl.Location = new System.Drawing.Point(1, 72);
-            this.lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
-            this.lineStyleControl.Name = "lineStyleControl";
-            this.lineStyleControl.Size = new System.Drawing.Size(184, 378);
-            this.lineStyleControl.TabIndex = 2;
-            this.lineStyleControl.Visible = false;
+            lineStyleControl.AutoSize = true;
+            lineStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            lineStyleControl.Location = new System.Drawing.Point(1, 72);
+            lineStyleControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+            lineStyleControl.Name = "lineStyleControl";
+            lineStyleControl.Size = new System.Drawing.Size(216, 442);
+            lineStyleControl.TabIndex = 2;
+            lineStyleControl.Visible = false;
+            // 
+            // barStyleControl
+            // 
+            barStyleControl.AutoSize = true;
+            barStyleControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            barStyleControl.Location = new System.Drawing.Point(3, 72);
+            barStyleControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            barStyleControl.Name = "barStyleControl";
+            barStyleControl.Size = new System.Drawing.Size(211, 69);
+            barStyleControl.TabIndex = 2;
+            // 
+            // defaultStyleBtn
+            // 
+            defaultStyleBtn.Location = new System.Drawing.Point(1, 1);
+            defaultStyleBtn.Name = "defaultStyleBtn";
+            defaultStyleBtn.Size = new System.Drawing.Size(179, 23);
+            defaultStyleBtn.TabIndex = 0;
+            defaultStyleBtn.Tag = "Default Style";
+            defaultStyleBtn.Text = "Default Style";
+            defaultStyleBtn.UseVisualStyleBackColor = true;
+            defaultStyleBtn.Click += defaultStyleBtn_Click;
+            // 
+            // styleList
+            // 
+            styleList.DisplayMember = "Name";
+            styleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            styleList.FormattingEnabled = true;
+            styleList.Location = new System.Drawing.Point(4, 45);
+            styleList.Name = "styleList";
+            styleList.Size = new System.Drawing.Size(113, 23);
+            styleList.TabIndex = 1;
+            styleList.Tag = "Change Note Style";
+            styleList.ValueMember = "Value";
+            styleList.SelectedIndexChanged += styleList_SelectedIndexChanged;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(1, 29);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(60, 15);
+            label1.TabIndex = 9;
+            label1.Text = "Note style";
+            // 
+            // material
+            // 
+            material.AutoScroll = true;
+            material.BackColor = System.Drawing.Color.Transparent;
+            material.Controls.Add(groupBox4);
+            material.Controls.Add(defaultMtrlBtn);
+            material.Controls.Add(alphaLbl);
+            material.Controls.Add(transpSlider);
+            material.Controls.Add(hueTb);
+            material.Controls.Add(groupBox1);
+            material.Controls.Add(hueSlider);
+            material.Controls.Add(label2);
+            material.Controls.Add(groupBox2);
+            material.Controls.Add(transpTb);
+            material.Location = new System.Drawing.Point(4, 24);
+            material.Name = "material";
+            material.Padding = new System.Windows.Forms.Padding(3);
+            material.Size = new System.Drawing.Size(192, 72);
+            material.TabIndex = 0;
+            material.Text = "Material";
+            // 
+            // groupBox4
+            // 
+            groupBox4.Controls.Add(label37);
+            groupBox4.Controls.Add(label34);
+            groupBox4.Controls.Add(label35);
+            groupBox4.Controls.Add(texVScrollUD);
+            groupBox4.Controls.Add(label33);
+            groupBox4.Controls.Add(texUScrollUD);
+            groupBox4.Controls.Add(tableLayoutPanel1);
+            groupBox4.Controls.Add(texVTileCb);
+            groupBox4.Controls.Add(texUTileCb);
+            groupBox4.Controls.Add(texKeepAspectCb);
+            groupBox4.Controls.Add(tileTexCb);
+            groupBox4.Controls.Add(loadTexBtn);
+            groupBox4.Controls.Add(unloadTexBtn);
+            groupBox4.Controls.Add(disableTextureCh);
+            groupBox4.Controls.Add(texColBlendCb);
+            groupBox4.Controls.Add(pointSmpCb);
+            groupBox4.Controls.Add(trackTexPb);
+            groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            groupBox4.Location = new System.Drawing.Point(1, 485);
+            groupBox4.Margin = new System.Windows.Forms.Padding(2);
+            groupBox4.Name = "groupBox4";
+            groupBox4.Padding = new System.Windows.Forms.Padding(2);
+            groupBox4.Size = new System.Drawing.Size(182, 422);
+            groupBox4.TabIndex = 60;
+            groupBox4.TabStop = false;
+            groupBox4.Text = "Texture";
+            // 
+            // label37
+            // 
+            label37.AutoSize = true;
+            label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label37.Location = new System.Drawing.Point(113, 400);
+            label37.Name = "label37";
+            label37.Size = new System.Drawing.Size(68, 13);
+            label37.TabIndex = 19;
+            label37.Text = "repeats/beat";
+            // 
+            // label34
+            // 
+            label34.AutoSize = true;
+            label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label34.Location = new System.Drawing.Point(113, 380);
+            label34.Name = "label34";
+            label34.Size = new System.Drawing.Size(68, 13);
+            label34.TabIndex = 19;
+            label34.Text = "repeats/beat";
+            // 
+            // label35
+            // 
+            label35.AutoSize = true;
+            label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label35.Location = new System.Drawing.Point(3, 400);
+            label35.Name = "label35";
+            label35.Size = new System.Drawing.Size(43, 13);
+            label35.TabIndex = 19;
+            label35.Text = "Scroll V";
+            // 
+            // texVScrollUD
+            // 
+            texVScrollUD.DecimalPlaces = 3;
+            texVScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texVScrollUD.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            texVScrollUD.Location = new System.Drawing.Point(52, 398);
+            texVScrollUD.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            texVScrollUD.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+            texVScrollUD.Name = "texVScrollUD";
+            texVScrollUD.Size = new System.Drawing.Size(55, 20);
+            texVScrollUD.TabIndex = 51;
+            texVScrollUD.Tag = "Edit Scroll V";
+            texVScrollUD.ValueChanged += texVScrollUD_ValueChanged;
+            // 
+            // label33
+            // 
+            label33.AutoSize = true;
+            label33.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label33.Location = new System.Drawing.Point(2, 380);
+            label33.Name = "label33";
+            label33.Size = new System.Drawing.Size(44, 13);
+            label33.TabIndex = 19;
+            label33.Text = "Scroll U";
+            // 
+            // texUScrollUD
+            // 
+            texUScrollUD.DecimalPlaces = 3;
+            texUScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texUScrollUD.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            texUScrollUD.Location = new System.Drawing.Point(52, 378);
+            texUScrollUD.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            texUScrollUD.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+            texUScrollUD.Name = "texUScrollUD";
+            texUScrollUD.Size = new System.Drawing.Size(55, 20);
+            texUScrollUD.TabIndex = 50;
+            texUScrollUD.Tag = "Edit Scroll U";
+            texUScrollUD.ValueChanged += texUScrollUD_ValueChanged;
+            // 
+            // tableLayoutPanel1
+            // 
+            tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.InsetDouble;
+            tableLayoutPanel1.ColumnCount = 3;
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            tableLayoutPanel1.Controls.Add(label31, 2, 0);
+            tableLayoutPanel1.Controls.Add(label32, 1, 0);
+            tableLayoutPanel1.Controls.Add(label36, 0, 0);
+            tableLayoutPanel1.Controls.Add(songAnchorLabel, 0, 3);
+            tableLayoutPanel1.Controls.Add(noteAnchorLabel, 0, 1);
+            tableLayoutPanel1.Controls.Add(panel2, 1, 1);
+            tableLayoutPanel1.Controls.Add(screenAnchorLabel, 0, 2);
+            tableLayoutPanel1.Controls.Add(panel1, 2, 1);
+            tableLayoutPanel1.Location = new System.Drawing.Point(0, 279);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 4;
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            tableLayoutPanel1.Size = new System.Drawing.Size(112, 93);
+            tableLayoutPanel1.TabIndex = 40;
+            // 
+            // label31
+            // 
+            label31.Anchor = System.Windows.Forms.AnchorStyles.None;
+            label31.AutoSize = true;
+            label31.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label31.Location = new System.Drawing.Point(92, 6);
+            label31.Name = "label31";
+            label31.Size = new System.Drawing.Size(14, 13);
+            label31.TabIndex = 17;
+            label31.Text = "V";
+            // 
+            // label32
+            // 
+            label32.Anchor = System.Windows.Forms.AnchorStyles.None;
+            label32.AutoSize = true;
+            label32.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label32.Location = new System.Drawing.Point(69, 6);
+            label32.Name = "label32";
+            label32.Size = new System.Drawing.Size(14, 13);
+            label32.TabIndex = 17;
+            label32.Text = "U";
+            // 
+            // label36
+            // 
+            label36.Anchor = System.Windows.Forms.AnchorStyles.None;
+            label36.AutoSize = true;
+            label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label36.Location = new System.Drawing.Point(12, 6);
+            label36.Name = "label36";
+            label36.Size = new System.Drawing.Size(41, 13);
+            label36.TabIndex = 17;
+            label36.Text = "Anchor";
+            // 
+            // songAnchorLabel
+            // 
+            songAnchorLabel.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            songAnchorLabel.AutoSize = true;
+            songAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            songAnchorLabel.Location = new System.Drawing.Point(6, 69);
+            songAnchorLabel.Name = "songAnchorLabel";
+            songAnchorLabel.Size = new System.Drawing.Size(54, 21);
+            songAnchorLabel.TabIndex = 17;
+            songAnchorLabel.Tag = "Song anchor";
+            songAnchorLabel.Text = "Song start";
+            songAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            songAnchorLabel.Click += songAnchorLabel_Click;
+            // 
+            // noteAnchorLabel
+            // 
+            noteAnchorLabel.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            noteAnchorLabel.AutoSize = true;
+            noteAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            noteAnchorLabel.Location = new System.Drawing.Point(6, 25);
+            noteAnchorLabel.Name = "noteAnchorLabel";
+            noteAnchorLabel.Size = new System.Drawing.Size(54, 19);
+            noteAnchorLabel.TabIndex = 1;
+            noteAnchorLabel.Tag = "Note anchor";
+            noteAnchorLabel.Text = "Note";
+            noteAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            noteAnchorLabel.Click += noteAnchorLabel_Click;
+            // 
+            // panel2
+            // 
+            panel2.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            panel2.BackColor = System.Drawing.Color.Transparent;
+            panel2.Controls.Add(songAnchorRb);
+            panel2.Controls.Add(screenUAnchorRb);
+            panel2.Controls.Add(noteUAnchorRb);
+            panel2.Location = new System.Drawing.Point(66, 25);
+            panel2.Margin = new System.Windows.Forms.Padding(0);
+            panel2.Name = "panel2";
+            tableLayoutPanel1.SetRowSpan(panel2, 3);
+            panel2.Size = new System.Drawing.Size(20, 65);
+            panel2.TabIndex = 20;
+            // 
+            // songAnchorRb
+            // 
+            songAnchorRb.AutoSize = true;
+            songAnchorRb.Location = new System.Drawing.Point(3, 48);
+            songAnchorRb.Name = "songAnchorRb";
+            songAnchorRb.Size = new System.Drawing.Size(14, 13);
+            songAnchorRb.TabIndex = 24;
+            songAnchorRb.TabStop = true;
+            songAnchorRb.Tag = "Song anchor";
+            songAnchorRb.UseVisualStyleBackColor = true;
+            songAnchorRb.Click += songAnchorRb_Click;
+            // 
+            // screenUAnchorRb
+            // 
+            screenUAnchorRb.AutoSize = true;
+            screenUAnchorRb.Location = new System.Drawing.Point(3, 25);
+            screenUAnchorRb.Name = "screenUAnchorRb";
+            screenUAnchorRb.Size = new System.Drawing.Size(14, 13);
+            screenUAnchorRb.TabIndex = 22;
+            screenUAnchorRb.TabStop = true;
+            screenUAnchorRb.Tag = "Screen U anchor";
+            screenUAnchorRb.UseVisualStyleBackColor = true;
+            screenUAnchorRb.Click += screenUAnchorRb_Click;
+            // 
+            // noteUAnchorRb
+            // 
+            noteUAnchorRb.AutoSize = true;
+            noteUAnchorRb.Location = new System.Drawing.Point(3, 3);
+            noteUAnchorRb.Name = "noteUAnchorRb";
+            noteUAnchorRb.Size = new System.Drawing.Size(14, 13);
+            noteUAnchorRb.TabIndex = 20;
+            noteUAnchorRb.TabStop = true;
+            noteUAnchorRb.Tag = "Note U anchor";
+            noteUAnchorRb.UseVisualStyleBackColor = true;
+            noteUAnchorRb.Click += noteUAnchorRb_Click;
+            // 
+            // screenAnchorLabel
+            // 
+            screenAnchorLabel.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            screenAnchorLabel.AutoSize = true;
+            screenAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            screenAnchorLabel.Location = new System.Drawing.Point(6, 47);
+            screenAnchorLabel.Name = "screenAnchorLabel";
+            screenAnchorLabel.Size = new System.Drawing.Size(54, 19);
+            screenAnchorLabel.TabIndex = 17;
+            screenAnchorLabel.Tag = "Screen anchor";
+            screenAnchorLabel.Text = "Screen";
+            screenAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            screenAnchorLabel.Click += screenAnchorLabel_Click;
+            // 
+            // panel1
+            // 
+            panel1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            panel1.BackColor = System.Drawing.Color.Transparent;
+            panel1.Controls.Add(screenVAnchorRb);
+            panel1.Controls.Add(noteVAnchorRb);
+            panel1.Location = new System.Drawing.Point(89, 25);
+            panel1.Margin = new System.Windows.Forms.Padding(0);
+            panel1.Name = "panel1";
+            tableLayoutPanel1.SetRowSpan(panel1, 3);
+            panel1.Size = new System.Drawing.Size(20, 65);
+            panel1.TabIndex = 21;
+            // 
+            // screenVAnchorRb
+            // 
+            screenVAnchorRb.AutoSize = true;
+            screenVAnchorRb.Location = new System.Drawing.Point(3, 25);
+            screenVAnchorRb.Name = "screenVAnchorRb";
+            screenVAnchorRb.Size = new System.Drawing.Size(14, 13);
+            screenVAnchorRb.TabIndex = 23;
+            screenVAnchorRb.TabStop = true;
+            screenVAnchorRb.Tag = "Screen V anchor";
+            screenVAnchorRb.UseVisualStyleBackColor = true;
+            screenVAnchorRb.Click += screenVAnchorRb_Click;
+            // 
+            // noteVAnchorRb
+            // 
+            noteVAnchorRb.AutoSize = true;
+            noteVAnchorRb.Location = new System.Drawing.Point(3, 3);
+            noteVAnchorRb.Name = "noteVAnchorRb";
+            noteVAnchorRb.Size = new System.Drawing.Size(14, 13);
+            noteVAnchorRb.TabIndex = 21;
+            noteVAnchorRb.TabStop = true;
+            noteVAnchorRb.Tag = "Note V anchor";
+            noteVAnchorRb.UseVisualStyleBackColor = true;
+            noteVAnchorRb.Click += noteVAnchorRb_Click;
+            // 
+            // texVTileCb
+            // 
+            texVTileCb.AutoSize = true;
+            texVTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texVTileCb.Location = new System.Drawing.Point(91, 236);
+            texVTileCb.Name = "texVTileCb";
+            texVTileCb.Size = new System.Drawing.Size(33, 17);
+            texVTileCb.TabIndex = 32;
+            texVTileCb.Tag = "V";
+            texVTileCb.Text = "V";
+            texVTileCb.UseVisualStyleBackColor = true;
+            texVTileCb.CheckedChanged += texVTileCb_CheckedChanged;
+            // 
+            // texUTileCb
+            // 
+            texUTileCb.AutoSize = true;
+            texUTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texUTileCb.Location = new System.Drawing.Point(52, 236);
+            texUTileCb.Name = "texUTileCb";
+            texUTileCb.Size = new System.Drawing.Size(34, 17);
+            texUTileCb.TabIndex = 31;
+            texUTileCb.Tag = "U";
+            texUTileCb.Text = "U";
+            texUTileCb.UseVisualStyleBackColor = true;
+            texUTileCb.CheckedChanged += texUTileCb_CheckedChanged;
+            // 
+            // texKeepAspectCb
+            // 
+            texKeepAspectCb.AutoSize = true;
+            texKeepAspectCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texKeepAspectCb.Location = new System.Drawing.Point(3, 257);
+            texKeepAspectCb.Margin = new System.Windows.Forms.Padding(2);
+            texKeepAspectCb.Name = "texKeepAspectCb";
+            texKeepAspectCb.Size = new System.Drawing.Size(109, 17);
+            texKeepAspectCb.TabIndex = 33;
+            texKeepAspectCb.Tag = "Keep aspect ratio";
+            texKeepAspectCb.Text = "Keep aspect ratio";
+            texKeepAspectCb.UseVisualStyleBackColor = true;
+            texKeepAspectCb.CheckedChanged += texKeepAspect_CheckedChanged;
+            // 
+            // tileTexCb
+            // 
+            tileTexCb.AutoSize = true;
+            tileTexCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            tileTexCb.Location = new System.Drawing.Point(4, 236);
+            tileTexCb.Margin = new System.Windows.Forms.Padding(2);
+            tileTexCb.Name = "tileTexCb";
+            tileTexCb.Size = new System.Drawing.Size(43, 17);
+            tileTexCb.TabIndex = 30;
+            tileTexCb.Tag = "Tile";
+            tileTexCb.Text = "Tile";
+            tileTexCb.UseVisualStyleBackColor = true;
+            tileTexCb.CheckedChanged += tileTexCb_CheckedChanged;
+            // 
+            // loadTexBtn
+            // 
+            loadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            loadTexBtn.Location = new System.Drawing.Point(5, 18);
+            loadTexBtn.Name = "loadTexBtn";
+            loadTexBtn.Size = new System.Drawing.Size(75, 23);
+            loadTexBtn.TabIndex = 10;
+            loadTexBtn.Tag = "Load texture";
+            loadTexBtn.Text = "&Load texture";
+            loadTexBtn.UseVisualStyleBackColor = true;
+            loadTexBtn.Click += textureLoadBtn_Click;
+            // 
+            // unloadTexBtn
+            // 
+            unloadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            unloadTexBtn.Location = new System.Drawing.Point(92, 18);
+            unloadTexBtn.Name = "unloadTexBtn";
+            unloadTexBtn.Size = new System.Drawing.Size(86, 23);
+            unloadTexBtn.TabIndex = 15;
+            unloadTexBtn.Tag = "Unload texture";
+            unloadTexBtn.Text = "&Unload texture";
+            unloadTexBtn.UseVisualStyleBackColor = true;
+            unloadTexBtn.Click += unloadTexBtn_Click;
+            // 
+            // disableTextureCh
+            // 
+            disableTextureCh.AutoSize = true;
+            disableTextureCh.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            disableTextureCh.Location = new System.Drawing.Point(6, 173);
+            disableTextureCh.Margin = new System.Windows.Forms.Padding(2);
+            disableTextureCh.Name = "disableTextureCh";
+            disableTextureCh.Size = new System.Drawing.Size(96, 17);
+            disableTextureCh.TabIndex = 20;
+            disableTextureCh.Tag = "Disable texture";
+            disableTextureCh.Text = "Disable texture";
+            disableTextureCh.UseVisualStyleBackColor = true;
+            disableTextureCh.CheckedChanged += disableTextureCb_CheckedChanged;
+            // 
+            // texColBlendCb
+            // 
+            texColBlendCb.AutoSize = true;
+            texColBlendCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texColBlendCb.Location = new System.Drawing.Point(4, 215);
+            texColBlendCb.Margin = new System.Windows.Forms.Padding(2);
+            texColBlendCb.Name = "texColBlendCb";
+            texColBlendCb.Size = new System.Drawing.Size(149, 17);
+            texColBlendCb.TabIndex = 20;
+            texColBlendCb.Tag = "Blend hue with track color";
+            texColBlendCb.Text = "Blend hue with track color";
+            texColBlendCb.UseVisualStyleBackColor = true;
+            texColBlendCb.CheckedChanged += texColBlendCb_CheckedChanged;
+            // 
+            // pointSmpCb
+            // 
+            pointSmpCb.AutoSize = true;
+            pointSmpCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            pointSmpCb.Location = new System.Drawing.Point(6, 194);
+            pointSmpCb.Margin = new System.Windows.Forms.Padding(2);
+            pointSmpCb.Name = "pointSmpCb";
+            pointSmpCb.Size = new System.Drawing.Size(94, 17);
+            pointSmpCb.TabIndex = 20;
+            pointSmpCb.Tag = "Point sampling";
+            pointSmpCb.Text = "Point sampling";
+            pointSmpCb.UseVisualStyleBackColor = true;
+            pointSmpCb.CheckedChanged += pointSmpCb_CheckedChanged;
+            // 
+            // trackTexPb
+            // 
+            trackTexPb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            trackTexPb.Location = new System.Drawing.Point(5, 47);
+            trackTexPb.Name = "trackTexPb";
+            trackTexPb.Size = new System.Drawing.Size(173, 121);
+            trackTexPb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            trackTexPb.TabIndex = 13;
+            trackTexPb.TabStop = false;
+            // 
+            // defaultMtrlBtn
+            // 
+            defaultMtrlBtn.Location = new System.Drawing.Point(1, 1);
+            defaultMtrlBtn.Name = "defaultMtrlBtn";
+            defaultMtrlBtn.Size = new System.Drawing.Size(179, 23);
+            defaultMtrlBtn.TabIndex = 10;
+            defaultMtrlBtn.Tag = "Default Material";
+            defaultMtrlBtn.Text = "Default Material";
+            defaultMtrlBtn.UseVisualStyleBackColor = true;
+            defaultMtrlBtn.Click += defaultMaterial_Click;
+            // 
+            // alphaLbl
+            // 
+            alphaLbl.AutoSize = true;
+            alphaLbl.Location = new System.Drawing.Point(5, 32);
+            alphaLbl.Name = "alphaLbl";
+            alphaLbl.Size = new System.Drawing.Size(48, 15);
+            alphaLbl.TabIndex = 7;
+            alphaLbl.Text = "Opacity";
+            // 
+            // transpSlider
+            // 
+            transpSlider.BackColor = System.Drawing.SystemColors.Control;
+            transpSlider.LargeChange = 10;
+            transpSlider.Location = new System.Drawing.Point(5, 49);
+            transpSlider.Maximum = 200;
+            transpSlider.Name = "transpSlider";
+            transpSlider.Size = new System.Drawing.Size(129, 45);
+            transpSlider.TabIndex = 20;
+            transpSlider.TickFrequency = 10;
+            transpSlider.Value = 50;
+            transpSlider.Scroll += transpSlider_Scroll;
+            // 
+            // hueTb
+            // 
+            hueTb.Location = new System.Drawing.Point(137, 113);
+            hueTb.Name = "hueTb";
+            hueTb.Size = new System.Drawing.Size(38, 23);
+            hueTb.TabIndex = 31;
+            hueTb.Tag = "Edit Hue";
+            hueTb.Text = "notset";
+            hueTb.TextChanged += hueTb_TextChanged;
+            // 
+            // groupBox1
+            // 
+            groupBox1.BackColor = System.Drawing.Color.Transparent;
+            groupBox1.Controls.Add(normalLumTb);
+            groupBox1.Controls.Add(normalLumSlider);
+            groupBox1.Controls.Add(label);
+            groupBox1.Controls.Add(normalSatTb);
+            groupBox1.Controls.Add(normalSatSlider);
+            groupBox1.Controls.Add(label3);
+            groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            groupBox1.Location = new System.Drawing.Point(-1, 164);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new System.Drawing.Size(182, 154);
+            groupBox1.TabIndex = 40;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Normal notes";
+            // 
+            // normalLumTb
+            // 
+            normalLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            normalLumTb.Location = new System.Drawing.Point(141, 105);
+            normalLumTb.Name = "normalLumTb";
+            normalLumTb.Size = new System.Drawing.Size(38, 20);
+            normalLumTb.TabIndex = 21;
+            normalLumTb.Tag = "Edit Normal Brightness";
+            normalLumTb.Text = "notset";
+            normalLumTb.TextChanged += normalLumTb_TextChanged;
+            // 
+            // normalLumSlider
+            // 
+            normalLumSlider.LargeChange = 10;
+            normalLumSlider.Location = new System.Drawing.Point(6, 105);
+            normalLumSlider.Maximum = 200;
+            normalLumSlider.Name = "normalLumSlider";
+            normalLumSlider.Size = new System.Drawing.Size(129, 45);
+            normalLumSlider.TabIndex = 20;
+            normalLumSlider.TickFrequency = 10;
+            normalLumSlider.Value = 50;
+            normalLumSlider.Scroll += normalLumSlider_Scroll;
+            // 
+            // label
+            // 
+            label.AutoSize = true;
+            label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label.Location = new System.Drawing.Point(6, 89);
+            label.Name = "label";
+            label.Size = new System.Drawing.Size(56, 13);
+            label.TabIndex = 13;
+            label.Text = "Brightness";
+            // 
+            // normalSatTb
+            // 
+            normalSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            normalSatTb.Location = new System.Drawing.Point(141, 41);
+            normalSatTb.Name = "normalSatTb";
+            normalSatTb.Size = new System.Drawing.Size(38, 20);
+            normalSatTb.TabIndex = 11;
+            normalSatTb.Tag = "Edit Normal Saturation";
+            normalSatTb.Text = "notset";
+            normalSatTb.TextChanged += normalSatTb_TextChanged;
+            // 
+            // normalSatSlider
+            // 
+            normalSatSlider.LargeChange = 10;
+            normalSatSlider.Location = new System.Drawing.Point(6, 41);
+            normalSatSlider.Maximum = 200;
+            normalSatSlider.Name = "normalSatSlider";
+            normalSatSlider.Size = new System.Drawing.Size(129, 45);
+            normalSatSlider.TabIndex = 10;
+            normalSatSlider.TickFrequency = 10;
+            normalSatSlider.Value = 50;
+            normalSatSlider.Scroll += normalSatSlider_Scroll;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label3.Location = new System.Drawing.Point(6, 25);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(55, 13);
+            label3.TabIndex = 10;
+            label3.Text = "Saturation";
+            // 
+            // hueSlider
+            // 
+            hueSlider.BackColor = System.Drawing.SystemColors.Control;
+            hueSlider.LargeChange = 10;
+            hueSlider.Location = new System.Drawing.Point(5, 112);
+            hueSlider.Maximum = 100;
+            hueSlider.Name = "hueSlider";
+            hueSlider.Size = new System.Drawing.Size(129, 45);
+            hueSlider.TabIndex = 30;
+            hueSlider.TickFrequency = 10;
+            hueSlider.Value = 50;
+            hueSlider.Scroll += hueSlider_Scroll;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(5, 96);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(29, 15);
+            label2.TabIndex = 7;
+            label2.Text = "Hue";
+            // 
+            // groupBox2
+            // 
+            groupBox2.BackColor = System.Drawing.Color.Transparent;
+            groupBox2.Controls.Add(hiliteLumTb);
+            groupBox2.Controls.Add(hiliteLumSlider);
+            groupBox2.Controls.Add(label5);
+            groupBox2.Controls.Add(hiliteSatTb);
+            groupBox2.Controls.Add(hiliteSatSlider);
+            groupBox2.Controls.Add(label6);
+            groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            groupBox2.Location = new System.Drawing.Point(-1, 325);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new System.Drawing.Size(182, 155);
+            groupBox2.TabIndex = 50;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Highlighted notes";
+            // 
+            // hiliteLumTb
+            // 
+            hiliteLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            hiliteLumTb.Location = new System.Drawing.Point(141, 105);
+            hiliteLumTb.Name = "hiliteLumTb";
+            hiliteLumTb.Size = new System.Drawing.Size(38, 20);
+            hiliteLumTb.TabIndex = 21;
+            hiliteLumTb.Tag = "Edit Highlight Brightness";
+            hiliteLumTb.Text = "notset";
+            hiliteLumTb.TextChanged += hiliteLumTb_TextChanged;
+            // 
+            // hiliteLumSlider
+            // 
+            hiliteLumSlider.LargeChange = 10;
+            hiliteLumSlider.Location = new System.Drawing.Point(6, 105);
+            hiliteLumSlider.Maximum = 200;
+            hiliteLumSlider.Name = "hiliteLumSlider";
+            hiliteLumSlider.Size = new System.Drawing.Size(129, 45);
+            hiliteLumSlider.TabIndex = 20;
+            hiliteLumSlider.TickFrequency = 10;
+            hiliteLumSlider.Value = 50;
+            hiliteLumSlider.Scroll += hiliteLumSlider_Scroll;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label5.Location = new System.Drawing.Point(6, 89);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(56, 13);
+            label5.TabIndex = 13;
+            label5.Text = "Brightness";
+            // 
+            // hiliteSatTb
+            // 
+            hiliteSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            hiliteSatTb.Location = new System.Drawing.Point(141, 41);
+            hiliteSatTb.Name = "hiliteSatTb";
+            hiliteSatTb.Size = new System.Drawing.Size(38, 20);
+            hiliteSatTb.TabIndex = 11;
+            hiliteSatTb.Tag = "Edit Highlight Saturation";
+            hiliteSatTb.Text = "notset";
+            hiliteSatTb.TextChanged += hiliteSatTb_TextChanged;
+            // 
+            // hiliteSatSlider
+            // 
+            hiliteSatSlider.LargeChange = 10;
+            hiliteSatSlider.Location = new System.Drawing.Point(6, 41);
+            hiliteSatSlider.Maximum = 200;
+            hiliteSatSlider.Name = "hiliteSatSlider";
+            hiliteSatSlider.Size = new System.Drawing.Size(129, 45);
+            hiliteSatSlider.TabIndex = 10;
+            hiliteSatSlider.TickFrequency = 10;
+            hiliteSatSlider.Value = 50;
+            hiliteSatSlider.Scroll += hiliteSatSlider_Scroll;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label6.Location = new System.Drawing.Point(6, 25);
+            label6.Name = "label6";
+            label6.Size = new System.Drawing.Size(55, 13);
+            label6.TabIndex = 10;
+            label6.Text = "Saturation";
+            // 
+            // transpTb
+            // 
+            transpTb.Location = new System.Drawing.Point(137, 49);
+            transpTb.Name = "transpTb";
+            transpTb.Size = new System.Drawing.Size(38, 23);
+            transpTb.TabIndex = 21;
+            transpTb.Tag = "Edit Opacity";
+            transpTb.Text = "notset";
+            transpTb.TextChanged += transpTb_TextChanged;
+            // 
+            // light
+            // 
+            light.AutoScroll = true;
+            light.BackColor = System.Drawing.SystemColors.Control;
+            light.Controls.Add(defaultLightBtn);
+            light.Controls.Add(lightPanel);
+            light.Controls.Add(globalLightCb);
+            light.Location = new System.Drawing.Point(4, 24);
+            light.Name = "light";
+            light.Padding = new System.Windows.Forms.Padding(3);
+            light.Size = new System.Drawing.Size(192, 72);
+            light.TabIndex = 1;
+            light.Text = "Light";
+            // 
+            // defaultLightBtn
+            // 
+            defaultLightBtn.Location = new System.Drawing.Point(1, 1);
+            defaultLightBtn.Name = "defaultLightBtn";
+            defaultLightBtn.Size = new System.Drawing.Size(179, 23);
+            defaultLightBtn.TabIndex = 10;
+            defaultLightBtn.Tag = "Default Light";
+            defaultLightBtn.Text = "Default Light";
+            defaultLightBtn.UseVisualStyleBackColor = true;
+            defaultLightBtn.Click += defaultLightBtn_Click;
+            // 
+            // lightPanel
+            // 
+            lightPanel.AutoSize = true;
+            lightPanel.Controls.Add(masterLightHsBtn);
+            lightPanel.Controls.Add(specHsBtn);
+            lightPanel.Controls.Add(diffuseHsBtn);
+            lightPanel.Controls.Add(ambientHsBtn);
+            lightPanel.Controls.Add(specPowUd);
+            lightPanel.Controls.Add(ambientAmountUd);
+            lightPanel.Controls.Add(diffuseAmountUd);
+            lightPanel.Controls.Add(label24);
+            lightPanel.Controls.Add(masterLightAmountUd);
+            lightPanel.Controls.Add(specAmountUd);
+            lightPanel.Controls.Add(label15);
+            lightPanel.Controls.Add(label14);
+            lightPanel.Controls.Add(label16);
+            lightPanel.Controls.Add(label22);
+            lightPanel.Controls.Add(label23);
+            lightPanel.Controls.Add(lightDirXUd);
+            lightPanel.Controls.Add(label11);
+            lightPanel.Controls.Add(lightDirYUd);
+            lightPanel.Controls.Add(lightDirZUd);
+            lightPanel.Controls.Add(label12);
+            lightPanel.Controls.Add(label13);
+            lightPanel.Enabled = false;
+            lightPanel.Location = new System.Drawing.Point(2, 51);
+            lightPanel.Name = "lightPanel";
+            lightPanel.Size = new System.Drawing.Size(179, 223);
+            lightPanel.TabIndex = 30;
+            // 
+            // masterLightHsBtn
+            // 
+            masterLightHsBtn.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            masterLightHsBtn.Hue = 0F;
+            masterLightHsBtn.Location = new System.Drawing.Point(116, 182);
+            masterLightHsBtn.Name = "masterLightHsBtn";
+            masterLightHsBtn.Saturation = 0F;
+            masterLightHsBtn.SelectedColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            masterLightHsBtn.Size = new System.Drawing.Size(53, 20);
+            masterLightHsBtn.TabIndex = 59;
+            masterLightHsBtn.Tag = "Edit Master color";
+            masterLightHsBtn.UseVisualStyleBackColor = true;
+            masterLightHsBtn.ColorChanged += masterLightHsBtn_ColorChanged;
+            // 
+            // specHsBtn
+            // 
+            specHsBtn.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            specHsBtn.Hue = 0F;
+            specHsBtn.Location = new System.Drawing.Point(116, 130);
+            specHsBtn.Name = "specHsBtn";
+            specHsBtn.Saturation = 0F;
+            specHsBtn.SelectedColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            specHsBtn.Size = new System.Drawing.Size(53, 20);
+            specHsBtn.TabIndex = 59;
+            specHsBtn.Tag = "Edit Specular color";
+            specHsBtn.UseVisualStyleBackColor = true;
+            specHsBtn.ColorChanged += specHsBtn_ColorChanged;
+            // 
+            // diffuseHsBtn
+            // 
+            diffuseHsBtn.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            diffuseHsBtn.Hue = 0F;
+            diffuseHsBtn.Location = new System.Drawing.Point(116, 104);
+            diffuseHsBtn.Name = "diffuseHsBtn";
+            diffuseHsBtn.Saturation = 0F;
+            diffuseHsBtn.SelectedColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            diffuseHsBtn.Size = new System.Drawing.Size(53, 20);
+            diffuseHsBtn.TabIndex = 59;
+            diffuseHsBtn.Tag = "Edit Diffuse  color";
+            diffuseHsBtn.UseVisualStyleBackColor = true;
+            diffuseHsBtn.ColorChanged += diffuseHsBtn_ColorChanged;
+            // 
+            // ambientHsBtn
+            // 
+            ambientHsBtn.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            ambientHsBtn.Hue = 0F;
+            ambientHsBtn.Location = new System.Drawing.Point(116, 78);
+            ambientHsBtn.Name = "ambientHsBtn";
+            ambientHsBtn.Saturation = 0F;
+            ambientHsBtn.SelectedColor = System.Drawing.Color.FromArgb(255, 255, 255);
+            ambientHsBtn.Size = new System.Drawing.Size(53, 20);
+            ambientHsBtn.TabIndex = 59;
+            ambientHsBtn.Tag = "Edit Ambient color";
+            ambientHsBtn.UseVisualStyleBackColor = true;
+            ambientHsBtn.ColorChanged += ambientHsBtn_ColorChanged;
+            // 
+            // specPowUd
+            // 
+            specPowUd.Location = new System.Drawing.Point(59, 156);
+            specPowUd.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            specPowUd.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
+            specPowUd.Name = "specPowUd";
+            specPowUd.Size = new System.Drawing.Size(51, 23);
+            specPowUd.TabIndex = 56;
+            specPowUd.Tag = "Edit Specular power";
+            specPowUd.ValueChanged += specPowUd_ValueChanged;
+            // 
+            // ambientAmountUd
+            // 
+            ambientAmountUd.DecimalPlaces = 2;
+            ambientAmountUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            ambientAmountUd.Location = new System.Drawing.Point(59, 78);
+            ambientAmountUd.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
+            ambientAmountUd.Name = "ambientAmountUd";
+            ambientAmountUd.Size = new System.Drawing.Size(51, 23);
+            ambientAmountUd.TabIndex = 53;
+            ambientAmountUd.Tag = "Edit Ambient amount";
+            ambientAmountUd.ValueChanged += ambientAmountUd_ValueChanged;
+            // 
+            // diffuseAmountUd
+            // 
+            diffuseAmountUd.DecimalPlaces = 2;
+            diffuseAmountUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            diffuseAmountUd.Location = new System.Drawing.Point(59, 104);
+            diffuseAmountUd.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
+            diffuseAmountUd.Name = "diffuseAmountUd";
+            diffuseAmountUd.Size = new System.Drawing.Size(51, 23);
+            diffuseAmountUd.TabIndex = 54;
+            diffuseAmountUd.Tag = "Edit Diffuse amount";
+            diffuseAmountUd.ValueChanged += diffuseAmountUd_ValueChanged;
+            // 
+            // label24
+            // 
+            label24.AutoSize = true;
+            label24.Location = new System.Drawing.Point(4, 14);
+            label24.Name = "label24";
+            label24.Size = new System.Drawing.Size(55, 15);
+            label24.TabIndex = 2;
+            label24.Text = "Direction";
+            // 
+            // masterLightAmountUd
+            // 
+            masterLightAmountUd.DecimalPlaces = 2;
+            masterLightAmountUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            masterLightAmountUd.Location = new System.Drawing.Point(59, 182);
+            masterLightAmountUd.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
+            masterLightAmountUd.Name = "masterLightAmountUd";
+            masterLightAmountUd.Size = new System.Drawing.Size(51, 23);
+            masterLightAmountUd.TabIndex = 55;
+            masterLightAmountUd.Tag = "Edit Master brightness";
+            masterLightAmountUd.ValueChanged += MasterLightAmountUD_ValueChanged;
+            // 
+            // specAmountUd
+            // 
+            specAmountUd.DecimalPlaces = 2;
+            specAmountUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            specAmountUd.Location = new System.Drawing.Point(59, 130);
+            specAmountUd.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
+            specAmountUd.Name = "specAmountUd";
+            specAmountUd.Size = new System.Drawing.Size(51, 23);
+            specAmountUd.TabIndex = 55;
+            specAmountUd.Tag = "Edit Specular amount";
+            specAmountUd.ValueChanged += specAmountUd_ValueChanged;
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new System.Drawing.Point(8, 80);
+            label15.Name = "label15";
+            label15.Size = new System.Drawing.Size(53, 15);
+            label15.TabIndex = 49;
+            label15.Text = "Ambient";
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Location = new System.Drawing.Point(13, 108);
+            label14.Name = "label14";
+            label14.Size = new System.Drawing.Size(44, 15);
+            label14.TabIndex = 50;
+            label14.Text = "Diffuse";
+            // 
+            // label16
+            // 
+            label16.AutoSize = true;
+            label16.Location = new System.Drawing.Point(14, 184);
+            label16.Name = "label16";
+            label16.Size = new System.Drawing.Size(43, 15);
+            label16.TabIndex = 52;
+            label16.Text = "Master";
+            // 
+            // label22
+            // 
+            label22.AutoSize = true;
+            label22.Location = new System.Drawing.Point(7, 158);
+            label22.Name = "label22";
+            label22.Size = new System.Drawing.Size(49, 15);
+            label22.TabIndex = 52;
+            label22.Text = "S power";
+            // 
+            // label23
+            // 
+            label23.AutoSize = true;
+            label23.Location = new System.Drawing.Point(4, 132);
+            label23.Name = "label23";
+            label23.Size = new System.Drawing.Size(52, 15);
+            label23.TabIndex = 51;
+            label23.Text = "Specular";
+            // 
+            // lightDirXUd
+            // 
+            lightDirXUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            lightDirXUd.Location = new System.Drawing.Point(0, 30);
+            lightDirXUd.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            lightDirXUd.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
+            lightDirXUd.Name = "lightDirXUd";
+            lightDirXUd.Size = new System.Drawing.Size(57, 23);
+            lightDirXUd.TabIndex = 34;
+            lightDirXUd.Tag = "Edit Light X Direction";
+            lightDirXUd.ValueChanged += lightDirXUd_ValueChanged;
+            // 
+            // label11
+            // 
+            label11.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            label11.AutoSize = true;
+            label11.Location = new System.Drawing.Point(139, 53);
+            label11.Name = "label11";
+            label11.Size = new System.Drawing.Size(14, 15);
+            label11.TabIndex = 31;
+            label11.Text = "Z";
+            // 
+            // lightDirYUd
+            // 
+            lightDirYUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            lightDirYUd.Location = new System.Drawing.Point(60, 30);
+            lightDirYUd.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            lightDirYUd.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
+            lightDirYUd.Name = "lightDirYUd";
+            lightDirYUd.Size = new System.Drawing.Size(57, 23);
+            lightDirYUd.TabIndex = 35;
+            lightDirYUd.Tag = "Edit Light Y Direction";
+            lightDirYUd.ValueChanged += lightDirYUd_ValueChanged;
+            // 
+            // lightDirZUd
+            // 
+            lightDirZUd.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            lightDirZUd.Location = new System.Drawing.Point(120, 30);
+            lightDirZUd.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            lightDirZUd.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
+            lightDirZUd.Name = "lightDirZUd";
+            lightDirZUd.Size = new System.Drawing.Size(57, 23);
+            lightDirZUd.TabIndex = 36;
+            lightDirZUd.Tag = "Edit Light Z Direction";
+            lightDirZUd.ValueChanged += lightDirZUd_ValueChanged;
+            // 
+            // label12
+            // 
+            label12.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            label12.AutoSize = true;
+            label12.Location = new System.Drawing.Point(82, 53);
+            label12.Name = "label12";
+            label12.Size = new System.Drawing.Size(14, 15);
+            label12.TabIndex = 32;
+            label12.Text = "Y";
+            // 
+            // label13
+            // 
+            label13.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            label13.AutoSize = true;
+            label13.Location = new System.Drawing.Point(17, 53);
+            label13.Name = "label13";
+            label13.Size = new System.Drawing.Size(14, 15);
+            label13.TabIndex = 33;
+            label13.Text = "X";
+            // 
+            // globalLightCb
+            // 
+            globalLightCb.AutoSize = true;
+            globalLightCb.Checked = true;
+            globalLightCb.CheckState = System.Windows.Forms.CheckState.Checked;
+            globalLightCb.Location = new System.Drawing.Point(3, 30);
+            globalLightCb.Name = "globalLightCb";
+            globalLightCb.Size = new System.Drawing.Size(81, 19);
+            globalLightCb.TabIndex = 20;
+            globalLightCb.Tag = "Use global";
+            globalLightCb.Text = "Use global";
+            globalLightCb.UseVisualStyleBackColor = true;
+            globalLightCb.CheckedChanged += globalLightCb_CheckedChanged;
+            // 
+            // spatial
+            // 
+            spatial.Controls.Add(defaultSpatialBtn);
+            spatial.Controls.Add(label41);
+            spatial.Controls.Add(label40);
+            spatial.Controls.Add(label39);
+            spatial.Controls.Add(label20);
+            spatial.Controls.Add(zoffsetUd);
+            spatial.Controls.Add(yoffsetUd);
+            spatial.Controls.Add(xoffsetUd);
+            spatial.Location = new System.Drawing.Point(4, 24);
+            spatial.Name = "spatial";
+            spatial.Padding = new System.Windows.Forms.Padding(3);
+            spatial.Size = new System.Drawing.Size(192, 72);
+            spatial.TabIndex = 3;
+            spatial.Text = "Spatial";
+            spatial.UseVisualStyleBackColor = true;
+            // 
+            // defaultSpatialBtn
+            // 
+            defaultSpatialBtn.Location = new System.Drawing.Point(1, 1);
+            defaultSpatialBtn.Name = "defaultSpatialBtn";
+            defaultSpatialBtn.Size = new System.Drawing.Size(179, 23);
+            defaultSpatialBtn.TabIndex = 10;
+            defaultSpatialBtn.Tag = "Default Spatial";
+            defaultSpatialBtn.Text = "Default Spatial";
+            defaultSpatialBtn.UseVisualStyleBackColor = true;
+            defaultSpatialBtn.Click += defaultSpatialBtn_Click;
+            // 
+            // label41
+            // 
+            label41.AutoSize = true;
+            label41.Location = new System.Drawing.Point(151, 80);
+            label41.Name = "label41";
+            label41.Size = new System.Drawing.Size(14, 15);
+            label41.TabIndex = 1;
+            label41.Text = "Z";
+            // 
+            // label40
+            // 
+            label40.AutoSize = true;
+            label40.Location = new System.Drawing.Point(87, 80);
+            label40.Name = "label40";
+            label40.Size = new System.Drawing.Size(14, 15);
+            label40.TabIndex = 1;
+            label40.Text = "Y";
+            // 
+            // label39
+            // 
+            label39.AutoSize = true;
+            label39.Location = new System.Drawing.Point(24, 80);
+            label39.Name = "label39";
+            label39.Size = new System.Drawing.Size(14, 15);
+            label39.TabIndex = 1;
+            label39.Text = "X";
+            // 
+            // label20
+            // 
+            label20.AutoSize = true;
+            label20.Location = new System.Drawing.Point(-2, 41);
+            label20.Name = "label20";
+            label20.Size = new System.Drawing.Size(83, 15);
+            label20.TabIndex = 1;
+            label20.Text = "Position offset";
+            // 
+            // zoffsetUd
+            // 
+            zoffsetUd.Location = new System.Drawing.Point(121, 57);
+            zoffsetUd.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
+            zoffsetUd.Minimum = new decimal(new int[] { 10000, 0, 0, int.MinValue });
+            zoffsetUd.Name = "zoffsetUd";
+            zoffsetUd.Size = new System.Drawing.Size(57, 23);
+            zoffsetUd.TabIndex = 40;
+            zoffsetUd.Tag = "Edit Z Offset";
+            zoffsetUd.ValueChanged += zoffsetUd_ValueChanged;
+            // 
+            // yoffsetUd
+            // 
+            yoffsetUd.Location = new System.Drawing.Point(61, 57);
+            yoffsetUd.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            yoffsetUd.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
+            yoffsetUd.Name = "yoffsetUd";
+            yoffsetUd.Size = new System.Drawing.Size(57, 23);
+            yoffsetUd.TabIndex = 30;
+            yoffsetUd.Tag = "Edit Y Offset";
+            yoffsetUd.ValueChanged += yoffsetUd_ValueChanged;
+            // 
+            // xoffsetUd
+            // 
+            xoffsetUd.Location = new System.Drawing.Point(1, 57);
+            xoffsetUd.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            xoffsetUd.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
+            xoffsetUd.Name = "xoffsetUd";
+            xoffsetUd.Size = new System.Drawing.Size(57, 23);
+            xoffsetUd.TabIndex = 20;
+            xoffsetUd.Tag = "Edit X Offset";
+            xoffsetUd.ValueChanged += xoffsetUd_ValueChanged;
+            // 
+            // resetDefaultBtn
+            // 
+            resetDefaultBtn.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            resetDefaultBtn.Location = new System.Drawing.Point(336, 32767);
+            resetDefaultBtn.Name = "resetDefaultBtn";
+            resetDefaultBtn.Size = new System.Drawing.Size(170, 23);
+            resetDefaultBtn.TabIndex = 13;
+            resetDefaultBtn.Text = "Reset defaults to default";
+            resetDefaultBtn.UseVisualStyleBackColor = true;
+            resetDefaultBtn.Visible = false;
+            // 
+            // openTextureDlg
+            // 
+            openTextureDlg.Filter = "Textures|*.jpg;*.png;*.gif";
+            // 
+            // songPropsPanel
+            // 
+            songPropsPanel.Controls.Add(camLabel);
+            songPropsPanel.Controls.Add(camTb);
+            songPropsPanel.Controls.Add(defaultPitchesBtn);
+            songPropsPanel.Controls.Add(minPitchUd);
+            songPropsPanel.Controls.Add(maxPitchUd);
+            songPropsPanel.Controls.Add(label26);
+            songPropsPanel.Controls.Add(label21);
+            songPropsPanel.Controls.Add(label18);
+            songPropsPanel.Controls.Add(label10);
+            songPropsPanel.Controls.Add(label8);
+            songPropsPanel.Controls.Add(hnotelabel);
+            songPropsPanel.Controls.Add(label25);
+            songPropsPanel.Controls.Add(label19);
+            songPropsPanel.Controls.Add(label17);
+            songPropsPanel.Controls.Add(fadeOutUd);
+            songPropsPanel.Controls.Add(fadeInUd);
+            songPropsPanel.Controls.Add(label9);
+            songPropsPanel.Controls.Add(playbackOffsetUd);
+            songPropsPanel.Controls.Add(audioOffsetS);
+            songPropsPanel.Controls.Add(upDownVpWidth);
+            songPropsPanel.Controls.Add(label7);
+            songPropsPanel.Dock = System.Windows.Forms.DockStyle.Left;
+            songPropsPanel.Location = new System.Drawing.Point(0, 24);
+            songPropsPanel.Name = "songPropsPanel";
+            songPropsPanel.Size = new System.Drawing.Size(197, 4361);
+            songPropsPanel.TabIndex = 17;
+            songPropsPanel.Visible = false;
+            songPropsPanel.VisibleChanged += songPropsPanel_VisibleChanged;
+            // 
+            // camLabel
+            // 
+            camLabel.AutoSize = true;
+            camLabel.Location = new System.Drawing.Point(12, 320);
+            camLabel.Name = "camLabel";
+            camLabel.Size = new System.Drawing.Size(48, 15);
+            camLabel.TabIndex = 7;
+            camLabel.Text = "Camera";
+            // 
+            // camTb
+            // 
+            camTb.Location = new System.Drawing.Point(12, 336);
+            camTb.Multiline = true;
+            camTb.Name = "camTb";
+            camTb.Size = new System.Drawing.Size(111, 120);
+            camTb.TabIndex = 6;
+            camTb.Tag = "Edit Camera";
+            camTb.TextChanged += camTb_TextChanged;
+            // 
+            // defaultPitchesBtn
+            // 
+            defaultPitchesBtn.Location = new System.Drawing.Point(12, 272);
+            defaultPitchesBtn.Name = "defaultPitchesBtn";
+            defaultPitchesBtn.Size = new System.Drawing.Size(111, 23);
+            defaultPitchesBtn.TabIndex = 4;
+            defaultPitchesBtn.Tag = "Reset Pitches";
+            defaultPitchesBtn.Text = "Reset pitches";
+            defaultPitchesBtn.UseVisualStyleBackColor = true;
+            defaultPitchesBtn.Click += defaultPitchesBtn_Click;
+            // 
+            // minPitchUd
+            // 
+            minPitchUd.Location = new System.Drawing.Point(71, 229);
+            minPitchUd.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            minPitchUd.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
+            minPitchUd.Name = "minPitchUd";
+            minPitchUd.Size = new System.Drawing.Size(52, 23);
+            minPitchUd.TabIndex = 3;
+            minPitchUd.Tag = "Edit Min Pitch";
+            minPitchUd.ValueChanged += minPitchUd_ValueChanged;
+            // 
+            // maxPitchUd
+            // 
+            maxPitchUd.Location = new System.Drawing.Point(71, 203);
+            maxPitchUd.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            maxPitchUd.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
+            maxPitchUd.Name = "maxPitchUd";
+            maxPitchUd.Size = new System.Drawing.Size(52, 23);
+            maxPitchUd.TabIndex = 2;
+            maxPitchUd.Tag = "Edit Max Pitch";
+            maxPitchUd.ValueChanged += maxPitchUd_ValueChanged;
+            // 
+            // label26
+            // 
+            label26.AutoSize = true;
+            label26.Location = new System.Drawing.Point(156, 153);
+            label26.Name = "label26";
+            label26.Size = new System.Drawing.Size(12, 15);
+            label26.TabIndex = 3;
+            label26.Text = "s";
+            // 
+            // label21
+            // 
+            label21.AutoSize = true;
+            label21.Location = new System.Drawing.Point(156, 127);
+            label21.Name = "label21";
+            label21.Size = new System.Drawing.Size(12, 15);
+            label21.TabIndex = 3;
+            label21.Text = "s";
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new System.Drawing.Point(156, 101);
+            label18.Name = "label18";
+            label18.Size = new System.Drawing.Size(12, 15);
+            label18.TabIndex = 3;
+            label18.Text = "s";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new System.Drawing.Point(15, 231);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(58, 15);
+            label8.TabIndex = 3;
+            label8.Text = "Min pitch";
+            // 
+            // hnotelabel
+            // 
+            hnotelabel.AutoSize = true;
+            hnotelabel.Location = new System.Drawing.Point(12, 205);
+            hnotelabel.Name = "hnotelabel";
+            hnotelabel.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            hnotelabel.Size = new System.Drawing.Size(60, 15);
+            hnotelabel.TabIndex = 3;
+            hnotelabel.Text = "Max pitch";
+            // 
+            // label25
+            // 
+            label25.AutoSize = true;
+            label25.Location = new System.Drawing.Point(12, 153);
+            label25.Name = "label25";
+            label25.Size = new System.Drawing.Size(53, 15);
+            label25.TabIndex = 3;
+            label25.Text = "Fade out";
+            // 
+            // label19
+            // 
+            label19.AutoSize = true;
+            label19.Location = new System.Drawing.Point(12, 127);
+            label19.Name = "label19";
+            label19.Size = new System.Drawing.Size(45, 15);
+            label19.TabIndex = 3;
+            label19.Text = "Fade in";
+            // 
+            // label17
+            // 
+            label17.AutoSize = true;
+            label17.Location = new System.Drawing.Point(12, 101);
+            label17.Name = "label17";
+            label17.Size = new System.Drawing.Size(87, 15);
+            label17.TabIndex = 3;
+            label17.Text = "Playback offset";
+            // 
+            // fadeOutUd
+            // 
+            fadeOutUd.DecimalPlaces = 2;
+            fadeOutUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            fadeOutUd.Location = new System.Drawing.Point(98, 151);
+            fadeOutUd.Maximum = new decimal(new int[] { 99, 0, 0, 0 });
+            fadeOutUd.Minimum = new decimal(new int[] { 99, 0, 0, int.MinValue });
+            fadeOutUd.Name = "fadeOutUd";
+            fadeOutUd.Size = new System.Drawing.Size(52, 23);
+            fadeOutUd.TabIndex = 1;
+            fadeOutUd.Tag = "Edit Fade Out";
+            fadeOutUd.ValueChanged += fadeOutUd_ValueChanged;
+            // 
+            // fadeInUd
+            // 
+            fadeInUd.DecimalPlaces = 2;
+            fadeInUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            fadeInUd.Location = new System.Drawing.Point(98, 125);
+            fadeInUd.Maximum = new decimal(new int[] { 99, 0, 0, 0 });
+            fadeInUd.Minimum = new decimal(new int[] { 99, 0, 0, int.MinValue });
+            fadeInUd.Name = "fadeInUd";
+            fadeInUd.Size = new System.Drawing.Size(52, 23);
+            fadeInUd.TabIndex = 1;
+            fadeInUd.Tag = "Edit Fade In";
+            fadeInUd.ValueChanged += fadeInUd_ValueChanged;
+            // 
+            // playbackOffsetUd
+            // 
+            playbackOffsetUd.DecimalPlaces = 2;
+            playbackOffsetUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            playbackOffsetUd.Location = new System.Drawing.Point(98, 99);
+            playbackOffsetUd.Maximum = new decimal(new int[] { 99, 0, 0, 0 });
+            playbackOffsetUd.Minimum = new decimal(new int[] { 99, 0, 0, int.MinValue });
+            playbackOffsetUd.Name = "playbackOffsetUd";
+            playbackOffsetUd.Size = new System.Drawing.Size(52, 23);
+            playbackOffsetUd.TabIndex = 1;
+            playbackOffsetUd.Tag = "Edit Playback Offset";
+            playbackOffsetUd.ValueChanged += playbackOffsetUd_ValueChanged;
+            // 
+            // upDownVpWidth
+            // 
+            upDownVpWidth.AutoSize = true;
+            upDownVpWidth.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            upDownVpWidth.Decimals = 3;
+            upDownVpWidth.Decimals2 = 2;
+            upDownVpWidth.ExpBase = 2D;
+            upDownVpWidth.Location = new System.Drawing.Point(12, 28);
+            upDownVpWidth.Margin = new System.Windows.Forms.Padding(4);
+            upDownVpWidth.Max = 10D;
+            upDownVpWidth.Min = 0D;
+            upDownVpWidth.Name = "upDownVpWidth";
+            upDownVpWidth.Size = new System.Drawing.Size(202, 48);
+            upDownVpWidth.TabIndex = 0;
+            upDownVpWidth.TbWidth = 50;
+            upDownVpWidth.TickFreq = 1D;
+            upDownVpWidth.Value = 16D;
+            upDownVpWidth.ValueChanged += upDownVpWidth_ValueChanged;
+            upDownVpWidth.CommitChanges += upDownVpWidth_CommitChanges;
+            // 
+            // saveMixdownDialog
+            // 
+            saveMixdownDialog.Filter = "Wav files (*.wav)|*.wav|All files (*.*)|*.*";
+            saveMixdownDialog.FileOk += SaveMixdownDialog_FileOk;
+            // 
+            // colorDialog1
+            // 
+            colorDialog1.AnyColor = true;
+            colorDialog1.FullOpen = true;
+            colorDialog1.SolidColorOnly = true;
+            // 
+            // saveMidiDialog
+            // 
+            saveMidiDialog.Filter = "Midi files|*.mid|All files|*.*";
+            // 
+            // trackPropsTabCM
+            // 
+            trackPropsTabCM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { loadTrackPropsTypeToolStripMenuItem, saveTrackPtopsTypeToolStripMenuItem });
+            trackPropsTabCM.Name = "trackPropsTabCM";
+            trackPropsTabCM.Size = new System.Drawing.Size(157, 48);
+            // 
+            // loadTrackPropsTypeToolStripMenuItem
+            // 
+            loadTrackPropsTypeToolStripMenuItem.Name = "loadTrackPropsTypeToolStripMenuItem";
+            loadTrackPropsTypeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            loadTrackPropsTypeToolStripMenuItem.Text = "Load properties";
+            loadTrackPropsTypeToolStripMenuItem.Click += loadTrackPropsTypeToolStripMenuItem_Click;
+            // 
+            // saveTrackPtopsTypeToolStripMenuItem
+            // 
+            saveTrackPtopsTypeToolStripMenuItem.Name = "saveTrackPtopsTypeToolStripMenuItem";
+            saveTrackPtopsTypeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            saveTrackPtopsTypeToolStripMenuItem.Text = "Save properties";
+            saveTrackPtopsTypeToolStripMenuItem.Click += saveTrackPropsTypeToolStripMenuItem_Click;
+            // 
+            // lyricsGridView
+            // 
+            lyricsGridView.AllowUserToResizeRows = false;
+            lyricsGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            lyricsGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { TimeColumn, LyricsColumn });
+            lyricsGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
+            lyricsGridView.Location = new System.Drawing.Point(197, 4335);
+            lyricsGridView.Name = "lyricsGridView";
+            lyricsGridView.Size = new System.Drawing.Size(587, 50);
+            lyricsGridView.TabIndex = 0;
+            lyricsGridView.Tag = "Edit Lyrics";
+            lyricsGridView.Visible = false;
+            lyricsGridView.CellEndEdit += lyricsGridView_CellEndEdit;
+            lyricsGridView.CellValidating += lyricsGridView_CellValidating;
+            lyricsGridView.DataError += lyricsGridView_DataError;
+            lyricsGridView.RowsRemoved += lyricsGridView_RowsRemoved;
+            lyricsGridView.Paint += lyricsGridView_Paint;
+            // 
+            // TimeColumn
+            // 
+            TimeColumn.DataPropertyName = "Time";
+            dataGridViewCellStyle1.Format = "N2";
+            dataGridViewCellStyle1.NullValue = "0";
+            TimeColumn.DefaultCellStyle = dataGridViewCellStyle1;
+            TimeColumn.HeaderText = "Time";
+            TimeColumn.Name = "TimeColumn";
+            TimeColumn.Width = 68;
+            // 
+            // LyricsColumn
+            // 
+            LyricsColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            LyricsColumn.DataPropertyName = "Lyrics";
+            LyricsColumn.HeaderText = "Lyrics";
+            LyricsColumn.Name = "LyricsColumn";
+            // 
+            // keyFramesDGV
+            // 
+            keyFramesDGV.AllowUserToAddRows = false;
+            keyFramesDGV.AllowUserToResizeRows = false;
+            keyFramesDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            keyFramesDGV.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { Time, Description });
+            keyFramesDGV.Dock = System.Windows.Forms.DockStyle.Left;
+            keyFramesDGV.Location = new System.Drawing.Point(197, 24);
+            keyFramesDGV.Name = "keyFramesDGV";
+            keyFramesDGV.Size = new System.Drawing.Size(210, 4311);
+            keyFramesDGV.TabIndex = 23;
+            keyFramesDGV.Tag = "Edit Key Frames";
+            keyFramesDGV.Visible = false;
+            keyFramesDGV.CellEndEdit += keyFramesDGV_CellEndEdit;
+            keyFramesDGV.CellValidating += keyFramesDGV_CellValidating;
+            keyFramesDGV.CurrentCellChanged += keyFramesDGV_CurrentCellChanged;
+            keyFramesDGV.RowsAdded += keyFramesDGV_RowsAdded;
+            keyFramesDGV.RowsRemoved += keyFramesDGV_RowsRemoved;
+            keyFramesDGV.SelectionChanged += keyFramesDGV_SelectionChanged;
+            keyFramesDGV.UserDeletingRow += keyFramesDGV_UserDeletingRow;
+            keyFramesDGV.Paint += keyFramesDGV_Paint;
+            keyFramesDGV.KeyDown += keyFramesDGV_KeyDown;
+            // 
+            // Time
+            // 
+            Time.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle2.NullValue = null;
+            Time.DefaultCellStyle = dataGridViewCellStyle2;
+            Time.FillWeight = 35F;
+            Time.HeaderText = "Time";
+            Time.Name = "Time";
+            Time.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Description
+            // 
+            Description.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            Description.FillWeight = 65F;
+            Description.HeaderText = "Description";
+            Description.Name = "Description";
+            Description.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // propsTogglePanel
+            // 
+            propsTogglePanel.Controls.Add(songPropsCb);
+            propsTogglePanel.Controls.Add(trackPropsCb);
+            propsTogglePanel.Enabled = false;
+            propsTogglePanel.Location = new System.Drawing.Point(276, 0);
+            propsTogglePanel.Name = "propsTogglePanel";
+            propsTogglePanel.Size = new System.Drawing.Size(207, 24);
+            propsTogglePanel.TabIndex = 24;
+            // 
+            // songPropsCb
+            // 
+            songPropsCb.Appearance = System.Windows.Forms.Appearance.Button;
+            songPropsCb.AutoSize = true;
+            songPropsCb.Location = new System.Drawing.Point(3, 1);
+            songPropsCb.Name = "songPropsCb";
+            songPropsCb.Size = new System.Drawing.Size(110, 25);
+            songPropsCb.TabIndex = 0;
+            songPropsCb.Text = "Pr&oject properties";
+            songPropsCb.UseVisualStyleBackColor = true;
+            songPropsCb.CheckedChanged += songPropsCb_CheckedChanged;
+            // 
+            // trackPropsCb
+            // 
+            trackPropsCb.Appearance = System.Windows.Forms.Appearance.Button;
+            trackPropsCb.AutoSize = true;
+            trackPropsCb.FlatAppearance.CheckedBackColor = System.Drawing.Color.White;
+            trackPropsCb.Location = new System.Drawing.Point(108, 2);
+            trackPropsCb.Name = "trackPropsCb";
+            trackPropsCb.Size = new System.Drawing.Size(100, 25);
+            trackPropsCb.TabIndex = 1;
+            trackPropsCb.Text = "&Track properties";
+            trackPropsCb.UseVisualStyleBackColor = true;
+            trackPropsCb.CheckedChanged += trackPropsCb_CheckedChanged;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(542, 4320);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(38, 15);
+            label4.TabIndex = 25;
+            label4.Text = "label4";
+            label4.Visible = false;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.AutoScroll = true;
-            this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1196, 421);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.propsTogglePanel);
-            this.Controls.Add(this.keyFramesDGV);
-            this.Controls.Add(this.lyricsGridView);
-            this.Controls.Add(this.songPropsPanel);
-            this.Controls.Add(this.resetDefaultBtn);
-            this.Controls.Add(this.trackPropsPanel);
-            this.Controls.Add(this.menuStrip1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.KeyPreview = true;
-            this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
-            this.Text = "Visual Music";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-            this.Load += new System.EventHandler(this.Form1_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
-            this.Resize += new System.EventHandler(this.Form1_Resize);
-            ((System.ComponentModel.ISupportInitialize)(this.audioOffsetS)).EndInit();
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.trackPropsPanel.ResumeLayout(false);
-            this.trackListCM.ResumeLayout(false);
-            this.selectedTrackPropsPanel.ResumeLayout(false);
-            this.style.ResumeLayout(false);
-            this.style.PerformLayout();
-            this.material.ResumeLayout(false);
-            this.material.PerformLayout();
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.texVScrollUD)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.texUScrollUD)).EndInit();
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackTexPb)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.transpSlider)).EndInit();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.normalLumSlider)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.normalSatSlider)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.hueSlider)).EndInit();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.hiliteLumSlider)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.hiliteSatSlider)).EndInit();
-            this.light.ResumeLayout(false);
-            this.light.PerformLayout();
-            this.lightPanel.ResumeLayout(false);
-            this.lightPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.specPowUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ambientAmountUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.diffuseAmountUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.masterLightAmountUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.specAmountUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lightDirXUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lightDirYUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lightDirZUd)).EndInit();
-            this.spatial.ResumeLayout(false);
-            this.spatial.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.zoffsetUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.yoffsetUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.xoffsetUd)).EndInit();
-            this.songPropsPanel.ResumeLayout(false);
-            this.songPropsPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.minPitchUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.maxPitchUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.fadeOutUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.fadeInUd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.playbackOffsetUd)).EndInit();
-            this.trackPropsTabCM.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.lyricsGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.keyFramesDGV)).EndInit();
-            this.propsTogglePanel.ResumeLayout(false);
-            this.propsTogglePanel.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            AutoScroll = true;
+            AutoSize = true;
+            ClientSize = new System.Drawing.Size(1196, 421);
+            Controls.Add(label4);
+            Controls.Add(propsTogglePanel);
+            Controls.Add(keyFramesDGV);
+            Controls.Add(lyricsGridView);
+            Controls.Add(songPropsPanel);
+            Controls.Add(resetDefaultBtn);
+            Controls.Add(trackPropsPanel);
+            Controls.Add(menuStrip1);
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            KeyPreview = true;
+            MainMenuStrip = menuStrip1;
+            Name = "Form1";
+            Text = "Visual Music";
+            WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            FormClosing += Form1_FormClosing;
+            Load += Form1_Load;
+            KeyDown += Form1_KeyDown;
+            KeyUp += Form1_KeyUp;
+            Resize += Form1_Resize;
+            ((System.ComponentModel.ISupportInitialize)audioOffsetS).EndInit();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
+            trackPropsPanel.ResumeLayout(false);
+            trackListCM.ResumeLayout(false);
+            selectedTrackPropsPanel.ResumeLayout(false);
+            style.ResumeLayout(false);
+            style.PerformLayout();
+            material.ResumeLayout(false);
+            material.PerformLayout();
+            groupBox4.ResumeLayout(false);
+            groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)texVScrollUD).EndInit();
+            ((System.ComponentModel.ISupportInitialize)texUScrollUD).EndInit();
+            tableLayoutPanel1.ResumeLayout(false);
+            tableLayoutPanel1.PerformLayout();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)trackTexPb).EndInit();
+            ((System.ComponentModel.ISupportInitialize)transpSlider).EndInit();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)normalLumSlider).EndInit();
+            ((System.ComponentModel.ISupportInitialize)normalSatSlider).EndInit();
+            ((System.ComponentModel.ISupportInitialize)hueSlider).EndInit();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)hiliteLumSlider).EndInit();
+            ((System.ComponentModel.ISupportInitialize)hiliteSatSlider).EndInit();
+            light.ResumeLayout(false);
+            light.PerformLayout();
+            lightPanel.ResumeLayout(false);
+            lightPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)specPowUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)ambientAmountUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)diffuseAmountUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)masterLightAmountUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)specAmountUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)lightDirXUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)lightDirYUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)lightDirZUd).EndInit();
+            spatial.ResumeLayout(false);
+            spatial.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)zoffsetUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)yoffsetUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)xoffsetUd).EndInit();
+            songPropsPanel.ResumeLayout(false);
+            songPropsPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)minPitchUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)maxPitchUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)fadeOutUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)fadeInUd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)playbackOffsetUd).EndInit();
+            trackPropsTabCM.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)lyricsGridView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)keyFramesDGV).EndInit();
+            propsTogglePanel.ResumeLayout(false);
+            propsTogglePanel.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

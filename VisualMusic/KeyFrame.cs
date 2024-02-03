@@ -73,9 +73,9 @@ namespace VisualMusic
             KeyFrame outFrame = frame1.clone();
             float interpolant = (float)(songPosT - frameList.Keys[index1]) / (frameList.Keys[index1 + 1] - frameList.Keys[index1]);
             interpolant = (float)(1 - Math.Cos(interpolant * Math.PI)) / 2f;
-            outFrame.ViewWidthQn = (float)Math.Pow(2, interpolate((float)Math.Log(frame1.ViewWidthQn, 2), (float)Math.Log(frame2.ViewWidthQn, 2), interpolant));
-            outFrame.Camera.Pos = interpolate(frame1.Camera.Pos, frame2.Camera.Pos, interpolant);
-            outFrame.Camera.Orientation = interpolate(frame1.Camera.Orientation, frame2.Camera.Orientation, interpolant);
+            outFrame.ProjProps.ViewWidthQn = (float)Math.Pow(2, interpolate((float)Math.Log(frame1.ProjProps.ViewWidthQn, 2), (float)Math.Log(frame2.ProjProps.ViewWidthQn, 2), interpolant));
+            outFrame.ProjProps.Camera.Pos = interpolate(frame1.ProjProps.Camera.Pos, frame2.ProjProps.Camera.Pos, interpolant);
+            outFrame.ProjProps.Camera.Orientation = interpolate(frame1.ProjProps.Camera.Orientation, frame2.ProjProps.Camera.Orientation, interpolant);
 
             return outFrame;
         }
@@ -158,13 +158,15 @@ namespace VisualMusic
     {
         public string Desc;
         public bool Selected;
-        public Camera Camera;
-        public float ViewWidthQn;
+        public List<TrackProps> TrackProps { get; set; } = new List<TrackProps>();
+        public ProjProps ProjProps { get; set; } = new ProjProps();
+        //public Camera Camera;
+        //public float ViewWidthQn;
+        //public Dictionary<string, string> Properties { get; set; }
 
         public KeyFrame()
         {
-            ViewWidthQn = ProjProps.DefaultViewWidthQn;
-            Camera = new Camera();
+            ProjProps.ViewWidthQn = ProjProps.DefaultViewWidthQn;
         }
 
         public KeyFrame(SerializationInfo info, StreamingContext ctxt)
@@ -173,18 +175,19 @@ namespace VisualMusic
             {
                 if (entry.Name == "desc")
                     Desc = (string)entry.Value;
-                else if (entry.Name == "qn_viewWidth")
-                    ViewWidthQn = (float)entry.Value;
-                else if (entry.Name == "camera")
-                    Camera = (Camera)entry.Value;
+                else if (entry.Name == "projProps")
+                    ProjProps = (ProjProps)entry.Value;
+                else if (entry.Name == "trackProps")
+                    TrackProps = (List<TrackProps>)entry.Value;
             }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            //base.GetObjectData(info, context);
             info.AddValue("desc", Desc);
-            info.AddValue("qn_viewWidth", ViewWidthQn);
-            info.AddValue("camera", Camera);
+            info.AddValue("projProps", ProjProps);
+            info.AddValue("trackProps", TrackProps);
         }
     }
 }
