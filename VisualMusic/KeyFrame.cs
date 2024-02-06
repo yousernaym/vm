@@ -76,32 +76,18 @@ namespace VisualMusic
 
             KeyFrame outFrame = frame1.clone();
             float interpolant = (float)(songPosT - frameList.Keys[index1]) / (frameList.Keys[index1 + 1] - frameList.Keys[index1]);
-            interpolant = (float)(1 - Math.Cos(interpolant * Math.PI)) / 2f;
-            foreach (var prop in outFrame.ProjProps.GetType().GetProperties())
-                interpolateProperty(prop, frame1, frame2, outFrame, interpolant);
-            outFrame.ProjProps.Camera.Pos = interpolate(frame1.ProjProps.Camera.Pos, frame2.ProjProps.Camera.Pos, interpolant);
-            outFrame.ProjProps.Camera.Orientation = interpolate(frame1.ProjProps.Camera.Orientation, frame2.ProjProps.Camera.Orientation, interpolant);
-
+            interpolateProjProps(outFrame.ProjProps, frame1.ProjProps, frame2.ProjProps, interpolant);
+            
             return outFrame;
         }
 
-        private void interpolateProperty(PropertyInfo prop, object object1, object object2, object outObject, float interpolant)
+        private void interpolateProjProps(ProjProps outProjProps, ProjProps projProps1, ProjProps projProps2, float interpolant)
         {
-            var value1 = prop.GetValue(object1);
-            var value2 = prop.GetValue(object2);
+            outProjProps.ViewWidthQn = (float)Math.Pow(2, interpolate((float)Math.Log(projProps1.ViewWidthQn, 2), (float)Math.Log(projProps2.ViewWidthQn, 2), interpolant));
+            outProjProps.Camera.Pos = interpolate(projProps1.Camera.Pos, projProps2.Camera.Pos, interpolant);
+            outProjProps.Camera.Orientation = interpolate(projProps1.Camera.Orientation, projProps2.Camera.Orientation, interpolant);
+            outProjProps.BackgroundImageOpacity = interpolate(projProps1.BackgroundImageOpacity, projProps2.BackgroundImageOpacity, interpolant);
 
-            if (prop.GetCustomAttribute<KeyframeLogInterpolation>() != null)
-                outObject = (float)Math.Pow(2, interpolate((float)Math.Log((float)object1, 2), (float)Math.Log((float)object2, 2), interpolant));
-            else if (HasProperties(prop.PropertyType))
-                interpolateProperty(prop, value1, value2, prop.get);
-            else if (prop.PropertyType == typeof(float) || prop.PropertyType == typeof(int))
-            {
-                var value = interpolate((float)value1, (float)value2, interpolant);
-                if (prop.PropertyType == typeof(float))
-                    prop.SetValue(outValue, value);
-                else
-                    prop.SetValue(outValue, (int)value);
-            }
         }
 
         static bool HasProperties(Type type)

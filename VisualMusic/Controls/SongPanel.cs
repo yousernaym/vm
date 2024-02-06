@@ -756,7 +756,15 @@ namespace VisualMusic
         public void LoadBackgroundImage(string path)
         {
             UnloadBackgroundImage();
-            backgroundTexture = Texture2D.FromFile(GraphicsDevice, path);
+            if (!string.IsNullOrWhiteSpace(path))
+            try
+            {
+                backgroundTexture = Texture2D.FromFile(GraphicsDevice, path);
+            }
+            catch (Exception ex)
+            {
+                    MessageBox.Show($"Could not load image \"{Path.GetFileName(path)}\". {ex.Message}", "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         public void UnloadBackgroundImage()
