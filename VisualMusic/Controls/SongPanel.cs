@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct2D1.Effects;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -152,18 +153,16 @@ namespace VisualMusic
             GraphicsDevice.BlendState = blendState;
 
             GraphicsDevice.Clear(Color.Black);
-            SpriteBatch.Begin();
-            if (backgroundTexture != null)
-                SpriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), new Color(Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity));
             if (selectingRegion && selectedScreenRegion.Width != 0 && selectedScreenRegion.Height != 0)
             {
+                SpriteBatch.Begin();
                 Rectangle normRect = normalizeRect(selectedScreenRegion);
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
+                SpriteBatch.End();
             }
-            SpriteBatch.End();
             GraphicsDevice.RasterizerState = rastState;
             Project.drawSong();
         }
@@ -774,6 +773,19 @@ namespace VisualMusic
                 backgroundTexture.Dispose();
                 backgroundTexture = null;
             }
+        }
+
+        public void DrawBackground()
+        {
+            SpriteBatch.Begin();
+            if (backgroundTexture != null)
+                SpriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), new Color(Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity));
+            SpriteBatch.End();
+        }
+
+        public void InitFrame()
+        {
+            GraphicsDevice.RasterizerState = rastState;
         }
     }
 }
