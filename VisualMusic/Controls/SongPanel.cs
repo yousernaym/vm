@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct2D1.Effects;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -46,7 +45,7 @@ namespace VisualMusic
         }
 
         Texture2D regionSelectTexture;
-        Texture2D backgroundTexture =  null;
+        Texture2D backgroundTexture = null;
 
         TimeSpan oldTime = new TimeSpan(0);
         Stopwatch stopwatch = new Stopwatch();
@@ -755,13 +754,15 @@ namespace VisualMusic
         {
             UnloadBackgroundImage();
             if (!string.IsNullOrWhiteSpace(path))
-            try
             {
-                backgroundTexture = Texture2D.FromFile(GraphicsDevice, path);
-            }
-            catch (Exception ex)
-            {
+                try
+                {
+                    backgroundTexture = Texture2D.FromFile(GraphicsDevice, path);
+                }
+                catch (Exception ex)
+                {
                     MessageBox.Show($"Could not load image \"{Path.GetFileName(path)}\". {ex.Message}", "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 

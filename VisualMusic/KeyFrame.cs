@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using SharpDX.Direct3D11;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Reflection;
 using System.Runtime.Serialization;
-using System.Windows.Media.Animation;
 
 namespace VisualMusic
 {
@@ -77,7 +73,7 @@ namespace VisualMusic
             KeyFrame outFrame = frame1.clone();
             float interpolant = (float)(songPosT - frameList.Keys[index1]) / (frameList.Keys[index1 + 1] - frameList.Keys[index1]);
             interpolateProjProps(outFrame.ProjProps, frame1.ProjProps, frame2.ProjProps, interpolant);
-            
+
             return outFrame;
         }
 
