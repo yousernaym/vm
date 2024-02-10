@@ -10,6 +10,9 @@
     <StartupObject>VisualMusic.Program</StartupObject>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="cef.redist.x64" Version="112.3.0" />

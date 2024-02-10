@@ -153,6 +153,7 @@ namespace VisualMusic
             GraphicsDevice.BlendState = blendState;
 
             GraphicsDevice.Clear(Color.Black);
+            Project.drawSong();
             if (selectingRegion && selectedScreenRegion.Width != 0 && selectedScreenRegion.Height != 0)
             {
                 SpriteBatch.Begin();
@@ -163,8 +164,6 @@ namespace VisualMusic
                 SpriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
                 SpriteBatch.End();
             }
-            GraphicsDevice.RasterizerState = rastState;
-            Project.drawSong();
         }
 
         void selectRegion()
