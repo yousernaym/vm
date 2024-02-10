@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+ 
   <PropertyGroup>
     <RootNamespace>VisualMusic</RootNamespace>
     <AssemblyName>VM</AssemblyName>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <StartupObject>VisualMusic.Program</StartupObject>
@@ -15,12 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="cef.redist.x64" Version="112.3.0" />
-    <PackageReference Include="cef.redist.x86" Version="112.3.0" />
-    <PackageReference Include="CefSharp.Common.NETCore" Version="112.3.0" />
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="112.3.0" />
-    <PackageReference Include="Microsoft-WindowsAPICodePack-Core-6.0" Version="1.1.5" />
-    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell-6.0" Version="1.1.5" />
+    <PackageReference Include="cef.redist.x64" Version="120.2.7" />
+    <PackageReference Include="cef.redist.x86" Version="120.2.7" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="121.3.70" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="121.3.70" />
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Core-6.0" Version="1.1.6" />
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell-6.0" Version="1.1.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependencies\midilib\midilib.csproj" />
@@ -50,13 +50,13 @@
         <Exec Command="dotnet tool restore" />
     </Target>
     <ItemGroup>
-      <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="112.3.0" />
+      <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="121.3.7" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="112.3.0" />
+      <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="121.3.7" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="112.3.0" />
+      <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="121.3.7" />
     </ItemGroup>
 
 </Project>

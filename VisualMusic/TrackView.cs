@@ -137,8 +137,6 @@ namespace VisualMusic
             Vector3 maxPos = new Vector3(maxPos2d.X, maxPos2d.Y, 0);
             MaterialProps texMaterial = TrackProps.MaterialProps.getTexture(false, null) != null ? TrackProps.MaterialProps : globalTrackProps.MaterialProps;
 
-            //if (ocTree != null)
-            //ocTree.dispose();
             NoteStyle noteStyle = TrackProps.ActiveNoteStyle;
             OcTree = new OcTree<Geo>(minPos, maxPos - minPos, new Vector3(1000, 1000, 1000), noteStyle.createGeoChunk, noteStyle.drawGeoChunk);
             OcTree.createGeo(midiTrack, TrackProps, globalTrackProps, texMaterial);
@@ -151,7 +149,6 @@ namespace VisualMusic
             //dest.TrackProps = TrackProps.clone();
             dest.TrackProps.TrackView = dest;
             dest.midiTrack = midiTrack;
-            //dest.ocTree = ocTree;
             dest.curve = curve;
             return dest;
         }

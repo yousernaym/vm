@@ -21,24 +21,24 @@ namespace CefSharp.Example.RequestEventHandler
         public event EventHandler<OnBeforeBrowseEventArgs> OnBeforeBrowseEvent;
         public event EventHandler<OnOpenUrlFromTabEventArgs> OnOpenUrlFromTabEvent;
         public event EventHandler<OnCertificateErrorEventArgs> OnCertificateErrorEvent;
-        public event EventHandler<OnPluginCrashedEventArgs> OnPluginCrashedEvent;
-        public event EventHandler<OnBeforeResourceLoadEventArgs> OnBeforeResourceLoadEvent;
-        public event EventHandler<GetAuthCredentialsEventArgs> GetAuthCredentialsEvent;
+        //public event EventHandler<OnPluginCrashedEventArgs> OnPluginCrashedEvent;
+        //public event EventHandler<OnBeforeResourceLoadEventArgs> OnBeforeResourceLoadEvent;
+        //public event EventHandler<GetAuthCredentialsEventArgs> GetAuthCredentialsEvent;
         public event EventHandler<OnRenderProcessTerminatedEventArgs> OnRenderProcessTerminatedEvent;
-        public event EventHandler<CanGetCookiesEventArg> CanGetCookiesEvent;
-        public event EventHandler<CanSetCookieEventArg> CanSetCookieEvent;
-        public event EventHandler<OnQuotaRequestEventArgs> OnQuotaRequestEvent;
-        public event EventHandler<OnResourceRedirectEventArgs> OnResourceRedirectEvent;
+        //public event EventHandler<CanGetCookiesEventArg> CanGetCookiesEvent;
+        //public event EventHandler<CanSetCookieEventArg> CanSetCookieEvent;
+        //public event EventHandler<OnQuotaRequestEventArgs> OnQuotaRequestEvent;
+        //public event EventHandler<OnResourceRedirectEventArgs> OnResourceRedirectEvent;
 
         /// <summary>
         ///     SECURITY WARNING: YOU SHOULD USE THIS EVENT TO ENFORCE RESTRICTIONS BASED ON SCHEME, HOST OR OTHER URL ANALYSIS
         ///     BEFORE ALLOWING OS EXECUTION.
         /// </summary>
-        public event EventHandler<OnProtocolExecutionEventArgs> OnProtocolExecutionEvent;
+        //public event EventHandler<OnProtocolExecutionEventArgs> OnProtocolExecutionEvent;
         public event EventHandler<OnRenderViewReadyEventArgs> OnRenderViewReadyEvent;
-        public event EventHandler<OnResourceResponseEventArgs> OnResourceResponseEvent;
-        public event EventHandler<GetResourceResponseFilterEventArgs> GetResourceResponseFilterEvent;
-        public event EventHandler<OnResourceLoadCompleteEventArgs> OnResourceLoadCompleteEvent;
+        //public event EventHandler<OnResourceResponseEventArgs> OnResourceResponseEvent;
+        //public event EventHandler<GetResourceResponseFilterEventArgs> GetResourceResponseFilterEvent;
+        //public event EventHandler<OnResourceLoadCompleteEventArgs> OnResourceLoadCompleteEvent;
 
 
 

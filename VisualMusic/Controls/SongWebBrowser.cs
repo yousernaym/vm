@@ -7,6 +7,7 @@ using CefSharp.Example;
 using CefSharp.WinForms;
 using CefSharp.WinForms.Example.Handlers;
 using System;
+using System.Text;
 using System.Windows.Forms;
 
 namespace VisualMusic
@@ -75,7 +76,7 @@ namespace VisualMusic
             SourceFileForm importForm = mainForm.getImportFormFromFileType(fileName);
             if (importForm != null)
             {
-                string url = string.Copy(e.Url);
+                string url = new StringBuilder(e.Url).ToString(); //Make new instance
                 this.InvokeOnUiThreadIfRequired(delegate
                 {
                     importForm.NoteFilePath = url;
