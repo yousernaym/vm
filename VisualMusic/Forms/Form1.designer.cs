@@ -226,6 +226,8 @@
             trackPropsCb = new System.Windows.Forms.CheckBox();
             label4 = new System.Windows.Forms.Label();
             openBkgDialog = new System.Windows.Forms.OpenFileDialog();
+            bkgSaturationUd = new System.Windows.Forms.NumericUpDown();
+            label28 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)audioOffsetS).BeginInit();
             menuStrip1.SuspendLayout();
             trackPropsPanel.SuspendLayout();
@@ -273,6 +275,7 @@
             ((System.ComponentModel.ISupportInitialize)lyricsGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)keyFramesDGV).BeginInit();
             propsTogglePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)bkgSaturationUd).BeginInit();
             SuspendLayout();
             // 
             // openProjDialog
@@ -855,7 +858,7 @@
             groupBox4.Controls.Add(texColBlendCb);
             groupBox4.Controls.Add(pointSmpCb);
             groupBox4.Controls.Add(trackTexPb);
-            groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             groupBox4.Location = new System.Drawing.Point(1, 485);
             groupBox4.Margin = new System.Windows.Forms.Padding(2);
             groupBox4.Name = "groupBox4";
@@ -868,7 +871,7 @@
             // label37
             // 
             label37.AutoSize = true;
-            label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label37.Location = new System.Drawing.Point(113, 400);
             label37.Name = "label37";
             label37.Size = new System.Drawing.Size(68, 13);
@@ -878,7 +881,7 @@
             // label34
             // 
             label34.AutoSize = true;
-            label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label34.Location = new System.Drawing.Point(113, 380);
             label34.Name = "label34";
             label34.Size = new System.Drawing.Size(68, 13);
@@ -888,7 +891,7 @@
             // label35
             // 
             label35.AutoSize = true;
-            label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label35.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label35.Location = new System.Drawing.Point(3, 400);
             label35.Name = "label35";
             label35.Size = new System.Drawing.Size(43, 13);
@@ -898,7 +901,7 @@
             // texVScrollUD
             // 
             texVScrollUD.DecimalPlaces = 3;
-            texVScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texVScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             texVScrollUD.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
             texVScrollUD.Location = new System.Drawing.Point(52, 398);
             texVScrollUD.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
@@ -912,7 +915,7 @@
             // label33
             // 
             label33.AutoSize = true;
-            label33.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label33.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label33.Location = new System.Drawing.Point(2, 380);
             label33.Name = "label33";
             label33.Size = new System.Drawing.Size(44, 13);
@@ -922,7 +925,7 @@
             // texUScrollUD
             // 
             texUScrollUD.DecimalPlaces = 3;
-            texUScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texUScrollUD.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             texUScrollUD.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
             texUScrollUD.Location = new System.Drawing.Point(52, 378);
             texUScrollUD.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
@@ -962,7 +965,7 @@
             // 
             label31.Anchor = System.Windows.Forms.AnchorStyles.None;
             label31.AutoSize = true;
-            label31.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label31.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label31.Location = new System.Drawing.Point(92, 6);
             label31.Name = "label31";
             label31.Size = new System.Drawing.Size(14, 13);
@@ -973,7 +976,7 @@
             // 
             label32.Anchor = System.Windows.Forms.AnchorStyles.None;
             label32.AutoSize = true;
-            label32.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label32.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label32.Location = new System.Drawing.Point(69, 6);
             label32.Name = "label32";
             label32.Size = new System.Drawing.Size(14, 13);
@@ -984,7 +987,7 @@
             // 
             label36.Anchor = System.Windows.Forms.AnchorStyles.None;
             label36.AutoSize = true;
-            label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label36.Location = new System.Drawing.Point(12, 6);
             label36.Name = "label36";
             label36.Size = new System.Drawing.Size(41, 13);
@@ -995,7 +998,7 @@
             // 
             songAnchorLabel.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             songAnchorLabel.AutoSize = true;
-            songAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            songAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             songAnchorLabel.Location = new System.Drawing.Point(6, 69);
             songAnchorLabel.Name = "songAnchorLabel";
             songAnchorLabel.Size = new System.Drawing.Size(54, 21);
@@ -1009,7 +1012,7 @@
             // 
             noteAnchorLabel.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             noteAnchorLabel.AutoSize = true;
-            noteAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            noteAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             noteAnchorLabel.Location = new System.Drawing.Point(6, 25);
             noteAnchorLabel.Name = "noteAnchorLabel";
             noteAnchorLabel.Size = new System.Drawing.Size(54, 19);
@@ -1073,7 +1076,7 @@
             // 
             screenAnchorLabel.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             screenAnchorLabel.AutoSize = true;
-            screenAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            screenAnchorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             screenAnchorLabel.Location = new System.Drawing.Point(6, 47);
             screenAnchorLabel.Name = "screenAnchorLabel";
             screenAnchorLabel.Size = new System.Drawing.Size(54, 19);
@@ -1123,7 +1126,7 @@
             // texVTileCb
             // 
             texVTileCb.AutoSize = true;
-            texVTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texVTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             texVTileCb.Location = new System.Drawing.Point(91, 236);
             texVTileCb.Name = "texVTileCb";
             texVTileCb.Size = new System.Drawing.Size(33, 17);
@@ -1136,7 +1139,7 @@
             // texUTileCb
             // 
             texUTileCb.AutoSize = true;
-            texUTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texUTileCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             texUTileCb.Location = new System.Drawing.Point(52, 236);
             texUTileCb.Name = "texUTileCb";
             texUTileCb.Size = new System.Drawing.Size(34, 17);
@@ -1149,7 +1152,7 @@
             // texKeepAspectCb
             // 
             texKeepAspectCb.AutoSize = true;
-            texKeepAspectCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texKeepAspectCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             texKeepAspectCb.Location = new System.Drawing.Point(3, 257);
             texKeepAspectCb.Margin = new System.Windows.Forms.Padding(2);
             texKeepAspectCb.Name = "texKeepAspectCb";
@@ -1163,7 +1166,7 @@
             // tileTexCb
             // 
             tileTexCb.AutoSize = true;
-            tileTexCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            tileTexCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             tileTexCb.Location = new System.Drawing.Point(4, 236);
             tileTexCb.Margin = new System.Windows.Forms.Padding(2);
             tileTexCb.Name = "tileTexCb";
@@ -1176,7 +1179,7 @@
             // 
             // loadTexBtn
             // 
-            loadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            loadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             loadTexBtn.Location = new System.Drawing.Point(5, 18);
             loadTexBtn.Name = "loadTexBtn";
             loadTexBtn.Size = new System.Drawing.Size(75, 23);
@@ -1188,7 +1191,7 @@
             // 
             // unloadTexBtn
             // 
-            unloadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            unloadTexBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             unloadTexBtn.Location = new System.Drawing.Point(92, 18);
             unloadTexBtn.Name = "unloadTexBtn";
             unloadTexBtn.Size = new System.Drawing.Size(86, 23);
@@ -1201,7 +1204,7 @@
             // disableTextureCh
             // 
             disableTextureCh.AutoSize = true;
-            disableTextureCh.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            disableTextureCh.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             disableTextureCh.Location = new System.Drawing.Point(6, 173);
             disableTextureCh.Margin = new System.Windows.Forms.Padding(2);
             disableTextureCh.Name = "disableTextureCh";
@@ -1215,7 +1218,7 @@
             // texColBlendCb
             // 
             texColBlendCb.AutoSize = true;
-            texColBlendCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            texColBlendCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             texColBlendCb.Location = new System.Drawing.Point(4, 215);
             texColBlendCb.Margin = new System.Windows.Forms.Padding(2);
             texColBlendCb.Name = "texColBlendCb";
@@ -1229,7 +1232,7 @@
             // pointSmpCb
             // 
             pointSmpCb.AutoSize = true;
-            pointSmpCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            pointSmpCb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             pointSmpCb.Location = new System.Drawing.Point(6, 194);
             pointSmpCb.Margin = new System.Windows.Forms.Padding(2);
             pointSmpCb.Name = "pointSmpCb";
@@ -1302,7 +1305,7 @@
             groupBox1.Controls.Add(normalSatTb);
             groupBox1.Controls.Add(normalSatSlider);
             groupBox1.Controls.Add(label3);
-            groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold);
             groupBox1.Location = new System.Drawing.Point(-1, 164);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new System.Drawing.Size(182, 154);
@@ -1312,7 +1315,7 @@
             // 
             // normalLumTb
             // 
-            normalLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            normalLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             normalLumTb.Location = new System.Drawing.Point(141, 105);
             normalLumTb.Name = "normalLumTb";
             normalLumTb.Size = new System.Drawing.Size(38, 20);
@@ -1336,7 +1339,7 @@
             // label
             // 
             label.AutoSize = true;
-            label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label.Location = new System.Drawing.Point(6, 89);
             label.Name = "label";
             label.Size = new System.Drawing.Size(56, 13);
@@ -1345,7 +1348,7 @@
             // 
             // normalSatTb
             // 
-            normalSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            normalSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             normalSatTb.Location = new System.Drawing.Point(141, 41);
             normalSatTb.Name = "normalSatTb";
             normalSatTb.Size = new System.Drawing.Size(38, 20);
@@ -1369,7 +1372,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label3.Location = new System.Drawing.Point(6, 25);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(55, 13);
@@ -1407,7 +1410,7 @@
             groupBox2.Controls.Add(hiliteSatTb);
             groupBox2.Controls.Add(hiliteSatSlider);
             groupBox2.Controls.Add(label6);
-            groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold);
             groupBox2.Location = new System.Drawing.Point(-1, 325);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new System.Drawing.Size(182, 155);
@@ -1417,7 +1420,7 @@
             // 
             // hiliteLumTb
             // 
-            hiliteLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            hiliteLumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             hiliteLumTb.Location = new System.Drawing.Point(141, 105);
             hiliteLumTb.Name = "hiliteLumTb";
             hiliteLumTb.Size = new System.Drawing.Size(38, 20);
@@ -1441,7 +1444,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label5.Location = new System.Drawing.Point(6, 89);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(56, 13);
@@ -1450,7 +1453,7 @@
             // 
             // hiliteSatTb
             // 
-            hiliteSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            hiliteSatTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             hiliteSatTb.Location = new System.Drawing.Point(141, 41);
             hiliteSatTb.Name = "hiliteSatTb";
             hiliteSatTb.Size = new System.Drawing.Size(38, 20);
@@ -1474,7 +1477,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             label6.Location = new System.Drawing.Point(6, 25);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(55, 13);
@@ -1910,7 +1913,9 @@
             // 
             // songPropsPanel
             // 
+            songPropsPanel.Controls.Add(label28);
             songPropsPanel.Controls.Add(label27);
+            songPropsPanel.Controls.Add(bkgSaturationUd);
             songPropsPanel.Controls.Add(bkgOpacityUd);
             songPropsPanel.Controls.Add(unloadBkgBtn);
             songPropsPanel.Controls.Add(loadBkgBtn);
@@ -1957,7 +1962,7 @@
             bkgOpacityUd.Cursor = System.Windows.Forms.Cursors.No;
             bkgOpacityUd.DecimalPlaces = 2;
             bkgOpacityUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
-            bkgOpacityUd.Location = new System.Drawing.Point(131, 491);
+            bkgOpacityUd.Location = new System.Drawing.Point(148, 491);
             bkgOpacityUd.Name = "bkgOpacityUd";
             bkgOpacityUd.Size = new System.Drawing.Size(54, 23);
             bkgOpacityUd.TabIndex = 10;
@@ -2328,13 +2333,33 @@
             // 
             openBkgDialog.FileName = "openFileDialog1";
             // 
+            // bkgSaturationUd
+            // 
+            bkgSaturationUd.Cursor = System.Windows.Forms.Cursors.No;
+            bkgSaturationUd.DecimalPlaces = 2;
+            bkgSaturationUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            bkgSaturationUd.Location = new System.Drawing.Point(148, 520);
+            bkgSaturationUd.Name = "bkgSaturationUd";
+            bkgSaturationUd.Size = new System.Drawing.Size(54, 23);
+            bkgSaturationUd.TabIndex = 10;
+            bkgSaturationUd.ValueChanged += bkgSaturationUd_ValueChanged;
+            // 
+            // label28
+            // 
+            label28.AutoSize = true;
+            label28.Location = new System.Drawing.Point(15, 522);
+            label28.Name = "label28";
+            label28.Size = new System.Drawing.Size(127, 15);
+            label28.TabIndex = 10;
+            label28.Text = "Background saturation";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             AutoScroll = true;
             AutoSize = true;
-            ClientSize = new System.Drawing.Size(1196, 569);
+            ClientSize = new System.Drawing.Size(1196, 602);
             Controls.Add(label4);
             Controls.Add(propsTogglePanel);
             Controls.Add(keyFramesDGV);
@@ -2415,6 +2440,7 @@
             ((System.ComponentModel.ISupportInitialize)keyFramesDGV).EndInit();
             propsTogglePanel.ResumeLayout(false);
             propsTogglePanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)bkgSaturationUd).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2615,6 +2641,8 @@
         private System.Windows.Forms.Button loadBkgBtn;
         private System.Windows.Forms.Button unloadBkgBtn;
         private System.Windows.Forms.OpenFileDialog openBkgDialog;
+        private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.NumericUpDown bkgSaturationUd;
     }
 }
 

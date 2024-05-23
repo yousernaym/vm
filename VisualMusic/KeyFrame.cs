@@ -83,7 +83,7 @@ namespace VisualMusic
             outProjProps.Camera.Pos = interpolate(projProps1.Camera.Pos, projProps2.Camera.Pos, interpolant);
             outProjProps.Camera.Orientation = interpolate(projProps1.Camera.Orientation, projProps2.Camera.Orientation, interpolant);
             outProjProps.BackgroundImageOpacity = interpolate(projProps1.BackgroundImageOpacity, projProps2.BackgroundImageOpacity, interpolant);
-
+            outProjProps.BackgroundImageSaturation = interpolate(projProps1.BackgroundImageSaturation, projProps2.BackgroundImageSaturation, interpolant);
         }
 
         static bool HasProperties(Type type)

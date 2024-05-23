@@ -162,11 +162,17 @@ void CirclePS(out float4 color : COLOR0, in HlVSOutput IN)
 	}
 	else
 	{
+		float size = HlSize;
+		if (InnerHlSize > 0)
+			size = InnerHlSize;
 		if (distFromCenter < InnerHlSize)
 			color = IN.hlColor;
 		else
 			color = IN.color;
-		lum = 1 - saturate(sgnDistFromEdge / BlurredEdge);
+
+		//lum = 1 - saturate(sgnDistFromEdge / (BlurredEdge));
+		lum = saturate((size - distFromCenter) / size);
+		lum = pow(lum, 0.75f);
 		color *= lum;
 	}
 

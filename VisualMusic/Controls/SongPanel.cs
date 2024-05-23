@@ -77,6 +77,7 @@ namespace VisualMusic
         Point videoSize = new Point(1920, 1080);
         public readonly float SmallScrollStep = 1.0f / 16;
         public readonly float LargeScrollStep = 1.0f;
+        Effect postProcessFx;
 
         public SongPanel()
         {
@@ -116,6 +117,9 @@ namespace VisualMusic
             //timer.SynchronizingObject = this;
             timer.Tick += delegate { update(); };
             timer.Start();
+
+            postProcessFx = Content.Load<Effect>("PostProcess");
+            postProcessFx.CurrentTechnique = postProcessFx.Techniques["Technique1"];
         }
 
         public void update()
@@ -777,7 +781,11 @@ namespace VisualMusic
 
         public void DrawBackground()
         {
-            SpriteBatch.Begin();
+            postProcessFx.Parameters["saturationLevel"].SetValue(Project.Props.BackgroundImageSaturation);
+            //SpriteBatch.Begin();
+            //SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, postProcessFx, null);
+            //postProcessFx.CurrentTechnique.Passes[0].Apply();
             if (backgroundTexture != null)
                 SpriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), new Color(Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity));
             SpriteBatch.End();

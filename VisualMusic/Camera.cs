@@ -52,11 +52,15 @@ namespace VisualMusic
 
         public Vector3 ViewportPos => getViewportPos(pos);
 
-        Vector3 moveVel = new Vector3();
         Vector3 rotVel = new Vector3();
+        Vector3 moveVel = new Vector3();
+        Vector3 rotVelAcc = new Vector3();
+        Vector3 moveVelAcc = new Vector3();
 
-        const float rotSpeed = 0.5f;
+        const float rotSpeed = 0.15f;
         const float moveSpeed = 0.5f;
+        const float rotSpeedAcc = 0.05f;
+        const float moveSpeedAcc = 0.05f;
 
         public Matrix RotMat
         {

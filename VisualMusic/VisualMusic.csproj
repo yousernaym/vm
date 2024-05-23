@@ -13,6 +13,40 @@
   <PropertyGroup>
     <NoWarn>$(NoWarn);CA1416</NoWarn>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Content\Bar.fx" />
+    <None Remove="Content\Content.mgcb" />
+    <None Remove="Content\CubeToPlane.fx" />
+    <None Remove="Content\Font.spritefont" />
+    <None Remove="Content\Line.fx" />
+    <None Remove="Content\NoteStyle.fx" />
+    <None Remove="Content\PostProcess.fx" />
+    <None Remove="Content\ss.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Bar.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Content.mgcb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\CubeToPlane.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Font.spritefont">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Line.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\NoteStyle.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\PostProcess.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\ss.fx" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="cef.redist.x64" Version="120.2.7" />

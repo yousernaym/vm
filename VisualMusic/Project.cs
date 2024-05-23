@@ -350,6 +350,7 @@ namespace VisualMusic
             Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
             Props.Camera = interpolatedFrame.ProjProps.Camera;
             Props.BackgroundImageOpacity = interpolatedFrame.ProjProps.BackgroundImageOpacity;
+            props.BackgroundImageSaturation = interpolatedFrame.ProjProps.BackgroundImageSaturation;
             //Props = interpolatedFrame.ProjProps;
         }
 

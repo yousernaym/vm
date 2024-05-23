@@ -4,7 +4,7 @@ float2 PrevFrameScaleOffset;
 float FrameSamples = 1;
 bool IsFirstFrame;
 float FovLimit; //Cos of FOV angle. Clip if dot(lookat_dir, cubemap_lookup_vector) < FovLimit. FovLimit = -1 means no clipping.
-
+  
 // Input parameters
 texture CubeMap;
 samplerCUBE  CubeMapSampler = sampler_state

@@ -411,6 +411,7 @@ namespace VisualMusic
             updateCamControls();
             lyricsGridView.DataSource = Project.Props.LyricsSegments;
             bkgOpacityUd.Value = (decimal)Project.Props.BackgroundImageOpacity;
+            bkgSaturationUd.Value = (decimal)Project.Props.BackgroundImageSaturation;
             updatingControls = false;
         }
 
@@ -1336,6 +1337,7 @@ namespace VisualMusic
                     songScrollBar.Value = (int)Project.SongPosT;
                 upDownVpWidth.Value = Project.Props.ViewWidthQn;
                 bkgOpacityUd.Value = (decimal)Project.Props.BackgroundImageOpacity;
+                bkgSaturationUd.Value = (decimal)Project.Props.BackgroundImageSaturation;
 
                 if (keyFramesDGV.Rows.Count == 0) //App is closing
                     return;
@@ -2638,6 +2640,17 @@ namespace VisualMusic
             {
                 if (keyFrame.Selected)
                     keyFrame.ProjProps.BackgroundImageOpacity = (float)bkgOpacityUd.Value;
+            }
+        }
+
+        private void bkgSaturationUd_ValueChanged(object sender, EventArgs e)
+        {
+            if (updatingControls)
+                return;
+            foreach (var keyFrame in Project.KeyFrames.Values)
+            {
+                if (keyFrame.Selected)
+                    keyFrame.ProjProps.BackgroundImageSaturation = (float)bkgSaturationUd.Value;
             }
         }
     }

@@ -39,6 +39,7 @@ namespace VisualMusic
         public Camera Camera { get; set; } = new Camera();
         public string BackgroundImagePath { get; set; } = "";
         public float BackgroundImageOpacity { get; set; } = 1.0f;
+        public float BackgroundImageSaturation { get; set; } = 1.0f;
 
         public ProjProps()
         {
@@ -72,6 +73,8 @@ namespace VisualMusic
                     BackgroundImagePath = (string)entry.Value;
                 else if (entry.Name == "backgroundImageOpacity")
                     BackgroundImageOpacity = (float)entry.Value;
+                else if (entry.Name == "backgroundImageSaturation")
+                    BackgroundImageSaturation = (float)entry.Value;
             }
         }
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -88,6 +91,7 @@ namespace VisualMusic
             info.AddValue("userViewWidth", UserViewWidth);
             info.AddValue("backgroundImagePath", BackgroundImagePath);
             info.AddValue("backgroundImageOpacity", BackgroundImageOpacity);
+            info.AddValue("backgroundImageSaturation", BackgroundImageSaturation);
         }
 
         //internal void readOldProjectFile(SerializationEntry entry)
