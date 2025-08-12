@@ -79,6 +79,7 @@ namespace VisualMusic
 
         private void interpolateProjProps(ProjProps outProjProps, ProjProps projProps1, ProjProps projProps2, float interpolant)
         {
+            interpolant = interpolant * interpolant * (3f - 2f * interpolant);
             outProjProps.ViewWidthQn = (float)Math.Pow(2, interpolate((float)Math.Log(projProps1.ViewWidthQn, 2), (float)Math.Log(projProps2.ViewWidthQn, 2), interpolant));
             outProjProps.Camera.Pos = interpolate(projProps1.Camera.Pos, projProps2.Camera.Pos, interpolant);
             outProjProps.Camera.Orientation = interpolate(projProps1.Camera.Orientation, projProps2.Camera.Orientation, interpolant);
