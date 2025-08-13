@@ -51,7 +51,9 @@ namespace VisualMusic
             var wavs = new[]
             {
                 "Content/test.wav",
-                "Content/test2.wav"
+                "Content/test2.wav",
+                "Content/test3.wav",
+                "Content/test4.wav",
         };
 
             _channels = new Channel[wavs.Length];
