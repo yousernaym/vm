@@ -59,7 +59,7 @@ namespace VisualMusic
             {
                 var ch = new Channel(autoReloadOnSettingChanged: false)
                 {
-                    Algorithm = new AutoCorrelationTrigger(),
+                    Algorithm = new PeakSpeedTrigger(),
                     Filename = wavs[i],
                     Side = Channel.Sides.Mix,     // or Left/Right if you want a specific side
                     HighPassFilter = false,       // optional
@@ -70,7 +70,7 @@ namespace VisualMusic
                     SmoothLines = true,
                     RenderIfSilent = true,
                     // How wide the window is in samples (defaults to 1500). You can also set ViewWidthInMilliseconds.
-                    ViewWidthInSamples = 2000
+                    ViewWidthInSamples = 1500
                 };
 
                 // This reads and analyzes the wav via SampleBuffer (NAudio under the hood),
@@ -113,22 +113,14 @@ namespace VisualMusic
 
         internal void Draw(double songPosS)
         {
-            double longestSeconds = 0.0;
-            foreach (var ch in _channels)
-                longestSeconds = Math.Max(longestSeconds, ch.Length.TotalSeconds); // get the max duration. :contentReference[oaicite:6]{index=6}
+            if (_waveTex == null)
+                return;
+            var pixels = _renderer.RenderFrame(songPosS);
+            _waveTex.SetData(pixels);
 
-            float positionFraction = longestSeconds > 0.0
-                ? (float)Math.Clamp(songPosS / longestSeconds, 0.0, 0.9999)
-                : 0f;
-
-            using (var bm = _renderer.RenderFrame(positionFraction)) // single-frame preview path (simple). :contentReference[oaicite:7]{index=7}
-            {
-                BitmapToTexture2D(bm, _waveTex);
-               
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-                _spriteBatch.Draw(_waveTex, _overlayRect, Microsoft.Xna.Framework.Color.White);
-                _spriteBatch.End();
-            }
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
+            _spriteBatch.Draw(_waveTex, _overlayRect, Microsoft.Xna.Framework.Color.White);
+            _spriteBatch.End();
         }
 
         static void BitmapToTexture2D(System.Drawing.Bitmap bitmap, Texture2D texture)

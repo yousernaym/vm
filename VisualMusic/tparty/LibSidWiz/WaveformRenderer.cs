@@ -44,7 +44,7 @@ namespace LibSidWiz
         public void Init()
         {
             Dispose();
-
+            BackgroundColor = System.Drawing.Color.FromArgb(192, 0, 0, 0);
             if (Width <= 0 || Height <= 0) throw new InvalidOperationException("Width/Height must be set");
 
             _frameData = new byte[Width * Height * 4];
