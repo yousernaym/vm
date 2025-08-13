@@ -1,4 +1,5 @@
 #region Using Statements
+using LibSidWiz;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -78,6 +79,7 @@ namespace VisualMusic
         public readonly float SmallScrollStep = 1.0f / 16;
         public readonly float LargeScrollStep = 1.0f;
         Effect postProcessFx;
+        public WaveformPanel WaveformPanel { get; private set; } = new WaveformPanel();
 
         public SongPanel()
         {
@@ -120,6 +122,8 @@ namespace VisualMusic
 
             postProcessFx = Content.Load<Effect>("PostProcess");
             postProcessFx.CurrentTechnique = postProcessFx.Techniques["Technique1"];
+
+            WaveformPanel.Init(GraphicsDevice, SpriteBatch);
         }
 
         public void update()

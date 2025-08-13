@@ -184,7 +184,9 @@
             resetDefaultBtn = new System.Windows.Forms.Button();
             openTextureDlg = new System.Windows.Forms.OpenFileDialog();
             songPropsPanel = new System.Windows.Forms.Panel();
+            label28 = new System.Windows.Forms.Label();
             label27 = new System.Windows.Forms.Label();
+            bkgSaturationUd = new System.Windows.Forms.NumericUpDown();
             bkgOpacityUd = new System.Windows.Forms.NumericUpDown();
             unloadBkgBtn = new System.Windows.Forms.Button();
             loadBkgBtn = new System.Windows.Forms.Button();
@@ -226,8 +228,6 @@
             trackPropsCb = new System.Windows.Forms.CheckBox();
             label4 = new System.Windows.Forms.Label();
             openBkgDialog = new System.Windows.Forms.OpenFileDialog();
-            bkgSaturationUd = new System.Windows.Forms.NumericUpDown();
-            label28 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)audioOffsetS).BeginInit();
             menuStrip1.SuspendLayout();
             trackPropsPanel.SuspendLayout();
@@ -265,6 +265,7 @@
             ((System.ComponentModel.ISupportInitialize)yoffsetUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)xoffsetUd).BeginInit();
             songPropsPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)bkgSaturationUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bkgOpacityUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)minPitchUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)maxPitchUd).BeginInit();
@@ -275,7 +276,6 @@
             ((System.ComponentModel.ISupportInitialize)lyricsGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)keyFramesDGV).BeginInit();
             propsTogglePanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)bkgSaturationUd).BeginInit();
             SuspendLayout();
             // 
             // openProjDialog
@@ -315,7 +315,7 @@
             // 
             importMidiToolStripMenuItem.Name = "importMidiToolStripMenuItem";
             importMidiToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M;
-            importMidiToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            importMidiToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             importMidiToolStripMenuItem.Text = "Import midi song...";
             importMidiToolStripMenuItem.Click += importMidiSongToolStripMenuItem_Click;
             // 
@@ -323,7 +323,7 @@
             // 
             importModuleToolStripMenuItem.Name = "importModuleToolStripMenuItem";
             importModuleToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.M;
-            importModuleToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            importModuleToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             importModuleToolStripMenuItem.Text = "Import module...";
             importModuleToolStripMenuItem.Click += importModuleToolStripMenuItem_Click;
             // 
@@ -331,7 +331,7 @@
             // 
             importSidSongToolStripMenuItem.Name = "importSidSongToolStripMenuItem";
             importSidSongToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.S;
-            importSidSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            importSidSongToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             importSidSongToolStripMenuItem.Text = "Import sid song...";
             importSidSongToolStripMenuItem.Click += importSidSongToolStripMenuItem_Click;
             // 
@@ -339,7 +339,7 @@
             // 
             openSongToolStripMenuItem.Name = "openSongToolStripMenuItem";
             openSongToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O;
-            openSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            openSongToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             openSongToolStripMenuItem.Text = "Open project...";
             openSongToolStripMenuItem.Click += openSongToolStripMenuItem_Click;
             // 
@@ -348,7 +348,7 @@
             saveSongToolStripMenuItem.Enabled = false;
             saveSongToolStripMenuItem.Name = "saveSongToolStripMenuItem";
             saveSongToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
-            saveSongToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            saveSongToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             saveSongToolStripMenuItem.Text = "Save project";
             saveSongToolStripMenuItem.Click += saveSongToolStripMenuItem_Click;
             // 
@@ -357,7 +357,7 @@
             saveSongAsToolStripMenuItem.Enabled = false;
             saveSongAsToolStripMenuItem.Name = "saveSongAsToolStripMenuItem";
             saveSongAsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.S;
-            saveSongAsToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            saveSongAsToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             saveSongAsToolStripMenuItem.Text = "Save project as...";
             saveSongAsToolStripMenuItem.Click += saveSongAsToolStripMenuItem_Click;
             // 
@@ -366,7 +366,7 @@
             exportVideoToolStripMenuItem.Enabled = false;
             exportVideoToolStripMenuItem.Name = "exportVideoToolStripMenuItem";
             exportVideoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E;
-            exportVideoToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            exportVideoToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             exportVideoToolStripMenuItem.Text = "Export video...";
             exportVideoToolStripMenuItem.Click += exportVideoToolStripMenuItem_Click;
             // 
@@ -374,7 +374,7 @@
             // 
             tpartyToolStripMenuItem.Name = "tpartyToolStripMenuItem";
             tpartyToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T;
-            tpartyToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            tpartyToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             tpartyToolStripMenuItem.Text = "Third-party integration...";
             tpartyToolStripMenuItem.Click += tpartyToolStripMenuItem_Click;
             // 
@@ -1948,6 +1948,15 @@
             songPropsPanel.Visible = false;
             songPropsPanel.VisibleChanged += songPropsPanel_VisibleChanged;
             // 
+            // label28
+            // 
+            label28.AutoSize = true;
+            label28.Location = new System.Drawing.Point(15, 522);
+            label28.Name = "label28";
+            label28.Size = new System.Drawing.Size(127, 15);
+            label28.TabIndex = 10;
+            label28.Text = "Background saturation";
+            // 
             // label27
             // 
             label27.AutoSize = true;
@@ -1956,6 +1965,17 @@
             label27.Size = new System.Drawing.Size(113, 15);
             label27.TabIndex = 10;
             label27.Text = "Background opacity";
+            // 
+            // bkgSaturationUd
+            // 
+            bkgSaturationUd.Cursor = System.Windows.Forms.Cursors.No;
+            bkgSaturationUd.DecimalPlaces = 2;
+            bkgSaturationUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            bkgSaturationUd.Location = new System.Drawing.Point(148, 520);
+            bkgSaturationUd.Name = "bkgSaturationUd";
+            bkgSaturationUd.Size = new System.Drawing.Size(54, 23);
+            bkgSaturationUd.TabIndex = 10;
+            bkgSaturationUd.ValueChanged += bkgSaturationUd_ValueChanged;
             // 
             // bkgOpacityUd
             // 
@@ -2082,7 +2102,7 @@
             hnotelabel.Location = new System.Drawing.Point(12, 205);
             hnotelabel.Name = "hnotelabel";
             hnotelabel.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            hnotelabel.Size = new System.Drawing.Size(60, 15);
+            hnotelabel.Size = new System.Drawing.Size(59, 15);
             hnotelabel.TabIndex = 3;
             hnotelabel.Text = "Max pitch";
             // 
@@ -2313,7 +2333,7 @@
             trackPropsCb.FlatAppearance.CheckedBackColor = System.Drawing.Color.White;
             trackPropsCb.Location = new System.Drawing.Point(108, 2);
             trackPropsCb.Name = "trackPropsCb";
-            trackPropsCb.Size = new System.Drawing.Size(100, 25);
+            trackPropsCb.Size = new System.Drawing.Size(101, 25);
             trackPropsCb.TabIndex = 1;
             trackPropsCb.Text = "&Track properties";
             trackPropsCb.UseVisualStyleBackColor = true;
@@ -2332,26 +2352,6 @@
             // openBkgDialog
             // 
             openBkgDialog.FileName = "openFileDialog1";
-            // 
-            // bkgSaturationUd
-            // 
-            bkgSaturationUd.Cursor = System.Windows.Forms.Cursors.No;
-            bkgSaturationUd.DecimalPlaces = 2;
-            bkgSaturationUd.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
-            bkgSaturationUd.Location = new System.Drawing.Point(148, 520);
-            bkgSaturationUd.Name = "bkgSaturationUd";
-            bkgSaturationUd.Size = new System.Drawing.Size(54, 23);
-            bkgSaturationUd.TabIndex = 10;
-            bkgSaturationUd.ValueChanged += bkgSaturationUd_ValueChanged;
-            // 
-            // label28
-            // 
-            label28.AutoSize = true;
-            label28.Location = new System.Drawing.Point(15, 522);
-            label28.Name = "label28";
-            label28.Size = new System.Drawing.Size(127, 15);
-            label28.TabIndex = 10;
-            label28.Text = "Background saturation";
             // 
             // Form1
             // 
@@ -2429,6 +2429,7 @@
             ((System.ComponentModel.ISupportInitialize)xoffsetUd).EndInit();
             songPropsPanel.ResumeLayout(false);
             songPropsPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)bkgSaturationUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)bkgOpacityUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)minPitchUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)maxPitchUd).EndInit();
@@ -2440,7 +2441,6 @@
             ((System.ComponentModel.ISupportInitialize)keyFramesDGV).EndInit();
             propsTogglePanel.ResumeLayout(false);
             propsTogglePanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)bkgSaturationUd).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }

@@ -513,7 +513,9 @@ namespace VisualMusic
                 float textHeight = -SongPanel.LyricsFont.MeasureString(lyricsSegment.Lyrics).Y * scale.Y;
                 SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP + getScreenPosX(secondsToTicks(lyricsSegment.Time) + PlaybackOffsetT), -Props.Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
             }
+
             SongPanel.SpriteBatch.End();
+            SongPanel.WaveformPanel.Draw(SongPosS);
         }
 
         public int screenPosToSongPos(float normScreenPos)

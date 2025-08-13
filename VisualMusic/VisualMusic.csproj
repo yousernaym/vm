@@ -55,6 +55,9 @@
     <PackageReference Include="CefSharp.WinForms.NETCore" Version="121.3.70" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core-6.0" Version="1.1.6" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell-6.0" Version="1.1.6" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="NAudio.Core" Version="2.2.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependencies\midilib\midilib.csproj" />
@@ -91,6 +94,9 @@
     </ItemGroup>
     <ItemGroup>
       <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="121.3.7" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="tparty\LibSidWiz\" />
     </ItemGroup>
 
 </Project>
