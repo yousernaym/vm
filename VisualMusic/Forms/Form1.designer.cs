@@ -233,6 +233,7 @@
             trackPropsCb = new System.Windows.Forms.CheckBox();
             label4 = new System.Windows.Forms.Label();
             openBkgDialog = new System.Windows.Forms.OpenFileDialog();
+            openTrackAudioDlg = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)audioOffsetS).BeginInit();
             menuStrip1.SuspendLayout();
             trackPropsPanel.SuspendLayout();
@@ -1951,6 +1952,7 @@
             browseTrackAudioBtn.TabIndex = 0;
             browseTrackAudioBtn.Text = "...";
             browseTrackAudioBtn.UseVisualStyleBackColor = true;
+            browseTrackAudioBtn.Click += browseTrackAudioBtn_Click;
             // 
             // resetDefaultBtn
             // 
@@ -2409,6 +2411,10 @@
             // 
             openBkgDialog.FileName = "openFileDialog1";
             // 
+            // openTrackAudioDlg
+            // 
+            openTrackAudioDlg.FileName = "openFileDialog1";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -2708,6 +2714,7 @@
         private System.Windows.Forms.Button browseTrackAudioBtn;
         private System.Windows.Forms.Button defaultAudioBtn;
         private System.Windows.Forms.TextBox trackAudioFileTb;
+        private System.Windows.Forms.OpenFileDialog openTrackAudioDlg;
     }
 }
 

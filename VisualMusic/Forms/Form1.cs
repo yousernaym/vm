@@ -45,6 +45,19 @@ namespace VisualMusic
             set => openCamFileDialog.InitialDirectory = saveCamFileDialog.InitialDirectory = value;
         }
 
+        public string BackgroundImageFolder
+        {
+            get => openBkgDialog.InitialDirectory;
+            set => openBkgDialog.InitialDirectory = value;
+        }
+
+        public string TrackAudioFolder
+        {
+            get => openTrackAudioDlg.InitialDirectory;
+            set => openTrackAudioDlg.InitialDirectory = value;
+        }
+
+
         string currentProjPath = "";
 
         public ListView.ListViewItemCollection trackListItems
@@ -2624,6 +2637,8 @@ namespace VisualMusic
             var dlgResult = openBkgDialog.ShowDialog();
             if (dlgResult == DialogResult.OK)
             {
+                openBkgDialog.InitialDirectory = Path.GetDirectoryName(openBkgDialog.FileName);
+                saveSettings();
                 Project.Props.BackgroundImagePath = openBkgDialog.FileName;
                 SongPanel.LoadBackgroundImage(Project.Props.BackgroundImagePath);
             }
@@ -2667,6 +2682,15 @@ namespace VisualMusic
                 Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.AudioProps.Filename = trackAudioFileTb.Text;
                 await Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.AudioProps.LoadAudioAsync();
             }
+        }
+
+        private void browseTrackAudioBtn_Click(object sender, EventArgs e)
+        {
+            if (DialogResult.OK != openTrackAudioDlg.ShowDialog())
+                return;
+            openTrackAudioDlg.InitialDirectory = Path.GetDirectoryName(openTrackAudioDlg.FileName);
+            saveSettings();
+            trackAudioFileTb.Text = openTrackAudioDlg.FileName;
         }
     }
 }

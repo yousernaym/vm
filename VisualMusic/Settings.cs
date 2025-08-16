@@ -71,9 +71,12 @@ namespace VisualMusic
                     Form1.TpartyIntegrationForm.SongLengthsUrl = (string)entry.Value;
                 else if (entry.Name == getKeyName(Keys.TpartyModuleMixdown))
                     Form1.TpartyIntegrationForm.ModuleMixdown = (bool)entry.Value;
-
                 else if (entry.Name == "videoExportOptions")
                     Form1.VidExpForm.setOptions((VideoExportOptions)entry.Value);
+                else if (entry.Name == "backgroundImageFolder")
+                    form.BackgroundImageFolder = (string)entry.Value;
+                else if (entry.Name == "trackAudioFolder")
+                    form.TrackAudioFolder = (string)entry.Value;
             }
             Form1.TpartyIntegrationForm.downloadSonglengths(true);
         }
@@ -100,11 +103,11 @@ namespace VisualMusic
             info.AddValue(getKeyName(Keys.SidTpartyApp), Form1.ImportSidForm.tpartyAppTb.Text);
             info.AddValue(getKeyName(Keys.SidTpartyArgs), Form1.ImportSidForm.tpartyArgsTb.Text);
             info.AddValue(getKeyName(Keys.SidTpartyOutput), Form1.ImportSidForm.tpartyOutputTb.Text);
-
             info.AddValue(getKeyName(Keys.SongLengthsUrl), Form1.TpartyIntegrationForm.SongLengthsUrl);
             info.AddValue(getKeyName(Keys.TpartyModuleMixdown), Form1.TpartyIntegrationForm.ModuleMixdown);
-
             info.AddValue("videoExportOptions", Form1.VidExpForm.Options);
+            info.AddValue("backgroundImageFolder", form.BackgroundImageFolder);
+            info.AddValue("trackAudioFolder", form.TrackAudioFolder);
         }
     }
 }
