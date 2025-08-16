@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using LibSidWiz.Triggers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
@@ -28,6 +30,7 @@ namespace VisualMusic
         public MaterialProps MaterialProps { get; set; }
         public LightProps LightProps { get; set; }
         public SpatialProps SpatialProps { get; set; }
+        public AudioProps AudioProps { get; set; } = new AudioProps();
         public int TypeFlags { get; set; } //Determines which type of properties should be saved or loaded to/from file.
 
         public TrackProps(TrackView view)
@@ -48,6 +51,8 @@ namespace VisualMusic
                     LightProps = (LightProps)entry.Value;
                 else if (entry.Name == "spatial")
                     SpatialProps = (SpatialProps)entry.Value;
+                else if (entry.Name == "audio")
+                    AudioProps = (AudioProps)entry.Value;
                 else if (entry.Name == "typeFlags")
                     TypeFlags = (int)entry.Value;
 
@@ -60,6 +65,7 @@ namespace VisualMusic
             info.AddValue("material", MaterialProps);
             info.AddValue("light", LightProps);
             info.AddValue("spatial", SpatialProps);
+            info.AddValue("audio", AudioProps);
             info.AddValue("typeFlags", TypeFlags);
         }
 
@@ -755,6 +761,69 @@ namespace VisualMusic
         {
             info.AddValue("posOffset", PosOffset);
         }
+    }
 
+
+    [Serializable]
+    public class AudioProps : ISerializable, IDisposable
+    {
+        [IgnoreDataMember]
+        public LibSidWiz.Channel SidWizChannel { get; } = new LibSidWiz.Channel(false)
+        {
+            Algorithm = new PeakSpeedTrigger(),
+            Filename = "",
+            Side = LibSidWiz.Channel.Sides.Mix,     // or Left/Right if you want a specific side
+            HighPassFilter = false,       // optional
+            LineWidth = 2f,
+            ZeroLineColor = System.Drawing.Color.FromArgb(60, 255, 255, 255),
+            ZeroLineWidth = 0,
+            SmoothLines = true,
+            RenderIfSilent = true,
+            ViewWidthInSamples = 1500,
+        };
+        public string Filename
+        {
+            get => SidWizChannel.Filename;
+            set => SidWizChannel.Filename = value;
+        }
+
+        public System.Drawing.Color LineColor { get => SidWizChannel.LineColor; set => SidWizChannel.LineColor = value; }
+
+        public AudioProps()
+        {
+
+        }
+
+        public AudioProps(System.Drawing.Color lineColor)
+        {
+            LineColor = lineColor;
+        }
+
+        public AudioProps(SerializationInfo info, StreamingContext ctxt)
+        {
+            foreach (SerializationEntry entry in info)
+            {
+                if (entry.Name == "audioFile")
+                {
+                    SidWizChannel.Filename = (string)entry.Value;
+                    SidWizChannel.LoadDataAsync();
+                }
+            }
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+        {
+            info.AddValue("audioFile", SidWizChannel.Filename);
+        }
+
+        public async Task LoadAudioAsync()
+        {
+            await SidWizChannel.LoadDataAsync();
+        }
+
+        public void Dispose()
+        {
+            SidWizChannel.Dispose();
+        }
     }
 }

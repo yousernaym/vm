@@ -76,6 +76,8 @@ namespace LibSidWiz
                 try
                 {
                     ErrorMessage = "";
+                    
+                    _samples?.Dispose();
 
                     if (string.IsNullOrEmpty(Filename))
                     {
@@ -155,6 +157,8 @@ namespace LibSidWiz
                 }
                 finally
                 {
+                    if (Renderer != null)
+                        Renderer.SamplingRate = SampleRate;
                     Changed?.Invoke(this, false);
                 }
             }, token);
@@ -279,6 +283,7 @@ namespace LibSidWiz
             set
             {
                 _lineColor = value;
+                Pen.Color = value;
                 Changed?.Invoke(this, false);
             }
         }
@@ -291,6 +296,7 @@ namespace LibSidWiz
             set
             {
                 _lineWidth = value;
+                Pen.Width = value;
                 Changed?.Invoke(this, false);
             }
         }
@@ -573,6 +579,8 @@ namespace LibSidWiz
         [Browsable(false)]
         [JsonIgnore]
         internal Rectangle Bounds { get; set; }
+        public WaveformRenderer Renderer { get; set; }
+        public Pen Pen { get; } = new Pen(Color.White, 2);
 
         internal float GetSample(int sampleIndex, bool forTrigger = true)
         {

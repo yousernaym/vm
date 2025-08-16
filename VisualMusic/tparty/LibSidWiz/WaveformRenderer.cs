@@ -38,6 +38,9 @@ namespace LibSidWiz
         public void AddChannel(Channel channel)
         {
             _channels.Add(channel);
+            channel.Renderer = this;
+            if (channel.SampleRate != 0)
+                SamplingRate = channel.SampleRate;
             _templateDirty = true; 
         }
 
@@ -71,11 +74,10 @@ namespace LibSidWiz
         {
             Dispose();
 
-            if (Width <= 0 || Height <= 0) throw new InvalidOperationException("Width and Height must be set");
+            if (Width <= 0 || Height <= 0)
+                throw new InvalidOperationException("Width and Height must be set");
 
             _lastFrameStartSample = int.MinValue;
-
-            BackgroundColor = System.Drawing.Color.FromArgb(192, 0, 0, 0);
 
             _frameData = new byte[Width * Height * 4];
             _frameHandle = GCHandle.Alloc(_frameData, GCHandleType.Pinned);
@@ -98,12 +100,15 @@ namespace LibSidWiz
 
             _frameBitmap?.Dispose(); _frameBitmap = null;
             if (_frameHandle.IsAllocated) _frameHandle.Free();
-            if (_templateHandle.IsAllocated) _templateHandle.Free();
+            if (_templateHandle.IsAllocated)
+                _templateHandle.Free();
             _frameData = null;
             _templateData = null;
 
-            if (_pens != null) foreach (var p in _pens) p?.Dispose();
-            if (_brushes != null) foreach (var b in _brushes) b?.Dispose();
+            if (_pens != null) 
+                foreach (var p in _pens) p?.Dispose();
+            if (_brushes != null)
+                foreach (var b in _brushes) b?.Dispose();
             _pens = null; _brushes = null; _pointsPerChannel = null; _prevTrigger = null;
         }
 
@@ -130,8 +135,10 @@ namespace LibSidWiz
         /// </summary>
         public byte[] RenderFrame(double posSeconds)
         {
-            if (_frameData == null) Init();
-            if (_channels.Count == 0 || SamplingRate <= 0 || FramesPerSecond <= 0) return _frameData;
+            if (_frameData == null)
+                Init();
+            if (_channels.Count == 0 || SamplingRate <= 0 || FramesPerSecond <= 0)
+                return _frameData;
 
             // === Time → frame/sample math
             var maxSamples = (int)_channels.Max(c => c.SampleCount);
@@ -182,7 +189,7 @@ namespace LibSidWiz
                 foreach (var ch in _visible)
                 {
                     int idx = _channels.IndexOf(ch);
-                    RenderWave(g, ch, triggers[idx], _pens[idx], _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
+                    RenderWave(g, ch, triggers[idx], _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
                 }
             }
 
@@ -261,9 +268,12 @@ namespace LibSidWiz
         /// <summary>Rebuild channel.Bounds layout for the given visible set and repaint the template into _templateData.</summary>
         private void RebuildLayoutAndTemplateForVisible(IReadOnlyList<Channel> visible)
         {
+            if (_frameBitmap == null)
+                return;
             // Determine rendering area
             var rb = RenderingBounds;
-            if (rb.Width == 0 || rb.Height == 0) rb = new Rectangle(0, 0, Width, Height);
+            if (rb.Width == 0 || rb.Height == 0)
+                rb = new Rectangle(0, 0, Width, Height);
 
             // Compute per-channel rectangles (stack vertically regardless of Columns when dynamic)
             int count = visible.Count;
@@ -411,7 +421,7 @@ namespace LibSidWiz
             }
         }
 
-        private void RenderWave(Graphics g, Channel channel, int triggerPoint, Pen pen, Brush brush, PointF[] points, GraphicsPath path, double fillBase)
+        private void RenderWave(Graphics g, Channel channel, int triggerPoint, Brush brush, PointF[] points, GraphicsPath path, double fillBase)
         {
             var leftmostSampleIndex = triggerPoint - channel.ViewWidthInSamples / 2;
 
@@ -435,8 +445,7 @@ namespace LibSidWiz
 
             g.SmoothingMode = channel.SmoothLines ? SmoothingMode.HighQuality : SmoothingMode.None;
 
-            if (pen != null)
-                g.DrawLines(pen, points);
+            g.DrawLines(channel.Pen, points);
 
             if (brush != null)
             {
@@ -447,6 +456,13 @@ namespace LibSidWiz
                 path.AddLine(points[points.Length - 1].X, points[points.Length - 1].Y, points[points.Length - 1].X, baseY);
                 g.FillPath(brush, path);
             }
+        }
+
+        internal void ClearChannels()
+        {
+            if (_channels.Count == 0) 
+                return;
+            _channels.Clear();
         }
     }
 }

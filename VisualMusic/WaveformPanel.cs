@@ -18,7 +18,7 @@ namespace VisualMusic
         private Texture2D _waveTex;
         private Rectangle _overlayRect;
         private WaveformRenderer _renderer;
-        private Channel[] _channels;
+        private List<Channel> _channels = new List<Channel>();
 
         // Reusable CPU buffer when copying from Bitmap to Texture2D
         private byte[] _framePixels;
@@ -31,7 +31,7 @@ namespace VisualMusic
 
         internal async void Init(GraphicsDevice gfxDevice, SpriteBatch spriteBatch)
         {
-            _gfxDevice  = gfxDevice;
+            _gfxDevice = gfxDevice;
             _spriteBatch = spriteBatch;
 
             Resize();
@@ -40,53 +40,12 @@ namespace VisualMusic
             {
                 Width = _overlayRect.Width,
                 Height = _overlayRect.Height,
-                Columns = 1, // stack channels vertically
+                Columns = 1,
                 RenderingBounds = new System.Drawing.Rectangle(0, 0, _overlayRect.Width, _overlayRect.Height),
-                BackgroundColor = System.Drawing.Color.Transparent, // transparent so it blends over your 3D scene
-                FramesPerSecond = UiFps
-            }; // Columns + RenderingBounds are used to compute per-channel boxes. :contentReference[oaicite:0]{index=0}
+                BackgroundColor = System.Drawing.Color.FromArgb(192, 0, 0, 0),
+                FramesPerSecond = UiFps,
+            };
 
-            // --- Load one or more WAV files into Channels ---
-            // Replace these with your real paths:
-            var wavs = new[]
-            {
-                "Content/test.wav",
-                "Content/test2.wav",
-                "Content/test3.wav",
-                "Content/test4.wav",
-        };
-
-            _channels = new Channel[wavs.Length];
-            for (int i = 0; i < wavs.Length; i++)
-            {
-                var ch = new Channel(autoReloadOnSettingChanged: false)
-                {
-                    Algorithm = new PeakSpeedTrigger(),
-                    Filename = wavs[i],
-                    Side = Channel.Sides.Mix,     // or Left/Right if you want a specific side
-                    HighPassFilter = false,       // optional
-                    LineColor = System.Drawing.Color.Lime,
-                    LineWidth = 2f,
-                    ZeroLineColor = System.Drawing.Color.FromArgb(60, 255, 255, 255),
-                    ZeroLineWidth = 1f,
-                    SmoothLines = true,
-                    RenderIfSilent = true,
-                    // How wide the window is in samples (defaults to 1500). You can also set ViewWidthInMilliseconds.
-                    ViewWidthInSamples = 1500
-                };
-
-                // This reads and analyzes the wav via SampleBuffer (NAudio under the hood),
-                // sets SampleRate/Length/Max/SampleCount, and prepares trigger data. :contentReference[oaicite:1]{index=1}
-                await ch.LoadDataAsync();
-
-                _renderer.AddChannel(ch); // keep adding channels to stack vertically (Columns=1). :contentReference[oaicite:2]{index=2}
-                _channels[i] = ch;
-            }
-
-
-            // libSidWiz needs a single SamplingRate for its internal frame/sample math.
-            // Use the first channel’s rate (ideally all WAVs match rates). :contentReference[oaicite:3]{index=3}
-            _renderer.SamplingRate = _channels[0].SampleRate; // set once after loading. :contentReference[oaicite:4]{index=4}
 
             // Create the GPU texture for the overlay
             _waveTex = new Texture2D(gfxDevice, _renderer.Width, _renderer.Height, false, SurfaceFormat.Color);
@@ -125,35 +84,22 @@ namespace VisualMusic
             _spriteBatch.End();
         }
 
-        static void BitmapToTexture2D(System.Drawing.Bitmap bitmap, Texture2D texture)
+        internal void ClearChannels()
         {
-            // Lock the bitmap's bits
-            var rect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
-            var bitmapData = bitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            _renderer.ClearChannels();
+        }
 
-            try
-            {
-                // Copy bitmap data to a byte array
-                int bytes = bitmapData.Stride * bitmap.Height;
-                byte[] pixelData = new byte[bytes];
-                System.Runtime.InteropServices.Marshal.Copy(bitmapData.Scan0, pixelData, 0, bytes);
+        public void AddChannel(Channel channel)
+        {
+            if (_renderer == null)
+                throw new InvalidOperationException("Renderer not initialized. Call Init() first.");
+            _renderer.AddChannel(channel);
+        }
 
-                // MonoGame expects Color format (RGBA), but System.Drawing uses BGRA
-                for (int i = 0; i < pixelData.Length; i += 4)
-                {
-                    byte b = pixelData[i];
-                    byte r = pixelData[i + 2];
-                    pixelData[i] = r;
-                    pixelData[i + 2] = b;
-                }
-
-                // Set data to Texture2D
-                texture.SetData(pixelData);
-            }
-            finally
-            {
-                bitmap.UnlockBits(bitmapData);
-            }
+        public void Dispose()
+        {
+            _renderer?.Dispose();
+            _waveTex.Dispose();
         }
     }
 }

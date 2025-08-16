@@ -181,6 +181,11 @@
             zoffsetUd = new System.Windows.Forms.NumericUpDown();
             yoffsetUd = new System.Windows.Forms.NumericUpDown();
             xoffsetUd = new System.Windows.Forms.NumericUpDown();
+            audio = new System.Windows.Forms.TabPage();
+            trackAudioFileTb = new System.Windows.Forms.TextBox();
+            defaultAudioBtn = new System.Windows.Forms.Button();
+            label29 = new System.Windows.Forms.Label();
+            browseTrackAudioBtn = new System.Windows.Forms.Button();
             resetDefaultBtn = new System.Windows.Forms.Button();
             openTextureDlg = new System.Windows.Forms.OpenFileDialog();
             songPropsPanel = new System.Windows.Forms.Panel();
@@ -264,6 +269,7 @@
             ((System.ComponentModel.ISupportInitialize)zoffsetUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)yoffsetUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)xoffsetUd).BeginInit();
+            audio.SuspendLayout();
             songPropsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)bkgSaturationUd).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bkgOpacityUd).BeginInit();
@@ -742,6 +748,7 @@
             selectedTrackPropsPanel.Controls.Add(material);
             selectedTrackPropsPanel.Controls.Add(light);
             selectedTrackPropsPanel.Controls.Add(spatial);
+            selectedTrackPropsPanel.Controls.Add(audio);
             selectedTrackPropsPanel.Dock = System.Windows.Forms.DockStyle.Right;
             selectedTrackPropsPanel.Location = new System.Drawing.Point(187, 0);
             selectedTrackPropsPanel.Name = "selectedTrackPropsPanel";
@@ -1896,6 +1903,55 @@
             xoffsetUd.Tag = "Edit X Offset";
             xoffsetUd.ValueChanged += xoffsetUd_ValueChanged;
             // 
+            // audio
+            // 
+            audio.Controls.Add(trackAudioFileTb);
+            audio.Controls.Add(defaultAudioBtn);
+            audio.Controls.Add(label29);
+            audio.Controls.Add(browseTrackAudioBtn);
+            audio.Location = new System.Drawing.Point(4, 24);
+            audio.Name = "audio";
+            audio.Padding = new System.Windows.Forms.Padding(3);
+            audio.Size = new System.Drawing.Size(200, 4333);
+            audio.TabIndex = 4;
+            audio.Text = "Audio";
+            audio.UseVisualStyleBackColor = true;
+            // 
+            // trackAudioFileTb
+            // 
+            trackAudioFileTb.Location = new System.Drawing.Point(6, 55);
+            trackAudioFileTb.Name = "trackAudioFileTb";
+            trackAudioFileTb.Size = new System.Drawing.Size(136, 23);
+            trackAudioFileTb.TabIndex = 4;
+            trackAudioFileTb.TextChanged += trackAudioFileTb_TextChanged;
+            // 
+            // defaultAudioBtn
+            // 
+            defaultAudioBtn.Location = new System.Drawing.Point(0, 0);
+            defaultAudioBtn.Name = "defaultAudioBtn";
+            defaultAudioBtn.Size = new System.Drawing.Size(179, 23);
+            defaultAudioBtn.TabIndex = 3;
+            defaultAudioBtn.Text = "Default Audio";
+            defaultAudioBtn.UseVisualStyleBackColor = true;
+            // 
+            // label29
+            // 
+            label29.AutoSize = true;
+            label29.Location = new System.Drawing.Point(6, 37);
+            label29.Name = "label29";
+            label29.Size = new System.Drawing.Size(58, 15);
+            label29.TabIndex = 2;
+            label29.Text = "Audio file";
+            // 
+            // browseTrackAudioBtn
+            // 
+            browseTrackAudioBtn.Location = new System.Drawing.Point(148, 55);
+            browseTrackAudioBtn.Name = "browseTrackAudioBtn";
+            browseTrackAudioBtn.Size = new System.Drawing.Size(31, 23);
+            browseTrackAudioBtn.TabIndex = 0;
+            browseTrackAudioBtn.Text = "...";
+            browseTrackAudioBtn.UseVisualStyleBackColor = true;
+            // 
             // resetDefaultBtn
             // 
             resetDefaultBtn.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
@@ -2427,6 +2483,8 @@
             ((System.ComponentModel.ISupportInitialize)zoffsetUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)yoffsetUd).EndInit();
             ((System.ComponentModel.ISupportInitialize)xoffsetUd).EndInit();
+            audio.ResumeLayout(false);
+            audio.PerformLayout();
             songPropsPanel.ResumeLayout(false);
             songPropsPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)bkgSaturationUd).EndInit();
@@ -2643,6 +2701,13 @@
         private System.Windows.Forms.OpenFileDialog openBkgDialog;
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.NumericUpDown bkgSaturationUd;
+        private System.Windows.Forms.TabPage audio;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button browseTrackAudioBtn;
+        private System.Windows.Forms.Button defaultAudioBtn;
+        private System.Windows.Forms.TextBox trackAudioFileTb;
     }
 }
 

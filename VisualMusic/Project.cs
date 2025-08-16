@@ -150,10 +150,17 @@ namespace VisualMusic
                 {
                     trackViews = (List<TrackView>)entry.Value;
                     TrackView.NumTracks = TrackViews.Count;
-                    foreach (var tv in trackViews)
+                    SongPanel.WaveformPanel.ClearChannels();
+                    for (int i = 0; i < trackViews.Count; i++)
                     {
+                        var tv = trackViews[i];
                         tv.TrackProps.TrackView = tv;
                         tv.TrackProps.GlobalProps = TrackViews[0].TrackProps;
+                        if (i > 0)
+                        {
+                            tv.TrackProps.AudioProps.LineColor = tv.TrackProps.MaterialProps.getSysColor(true, tv.TrackProps.GlobalProps.MaterialProps);
+                            SongPanel.WaveformPanel.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
+                        }
                     }
                 }
 

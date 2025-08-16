@@ -72,7 +72,7 @@ namespace VisualMusic
         public static VideoExportForm VidExpForm;
         LocateFile locateFileDlg;
 
-        static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment), typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps), typeof(List<TrackProps>) };
+        static public Type[] projectSerializationTypes = new Type[] { typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps), typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex), typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4), typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType), typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType), typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType), typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions), typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment), typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps), typeof(List<TrackProps>), typeof(AudioProps) };
         static public SongPanel SongPanel { get; private set; } = new SongPanel();
         SongWebBrowser modWebBrowser;
         SongWebBrowser sidWebBrowser;
@@ -924,6 +924,10 @@ namespace VisualMusic
                 setNumericUdValue(xoffsetUd, mergedTrackProps.SpatialProps.XOffset);
                 setNumericUdValue(yoffsetUd, mergedTrackProps.SpatialProps.YOffset);
                 setNumericUdValue(zoffsetUd, mergedTrackProps.SpatialProps.ZOffset);
+                //-------------------------------
+
+                //Audio--------------------------
+                trackAudioFileTb.Text = mergedTrackProps.AudioProps.Filename;
                 //-------------------------------
             }
             updatingControls = false;
@@ -2651,6 +2655,17 @@ namespace VisualMusic
             {
                 if (keyFrame.Selected)
                     keyFrame.ProjProps.BackgroundImageSaturation = (float)bkgSaturationUd.Value;
+            }
+        }
+
+        private async void trackAudioFileTb_TextChanged(object sender, EventArgs e)
+        {
+            if (updatingControls)
+                return;
+            for (int i = 0; i < trackList.SelectedIndices.Count; i++)
+            {
+                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.AudioProps.Filename = trackAudioFileTb.Text;
+                await Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.AudioProps.LoadAudioAsync();
             }
         }
     }
