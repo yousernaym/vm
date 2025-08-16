@@ -6,7 +6,6 @@ using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.Linq;
 using System.Runtime.InteropServices;
-using LibSidWiz.Outputs;
 
 namespace LibSidWiz
 {
@@ -26,13 +25,13 @@ namespace LibSidWiz
         private Image _backgroundImage;
         private Rectangle _renderingBounds;
 
-        public int Width { get => _width; set { _width = value; _templateDirty = true; } }                     
-        public int Height { get => _height; set { _height = value; _templateDirty = true; } }                  
-        public int Columns { get => _columns; set { _columns = value; _templateDirty = true; } }               
+        public int Width { get => _width; set { _width = value; _templateDirty = true; } }
+        public int Height { get => _height; set { _height = value; _templateDirty = true; } }
+        public int Columns { get => _columns; set { _columns = value; _templateDirty = true; } }
         public int SamplingRate { get => _samplingRate; set { _samplingRate = value; } }
         public int FramesPerSecond { get => _framesPerSecond; set { _framesPerSecond = value; } }
         public Color BackgroundColor { get => _backgroundColor; set { _backgroundColor = value; _templateDirty = true; } }
-        public Image BackgroundImage { get => _backgroundImage; set { _backgroundImage = value; _templateDirty = true; } } 
+        public Image BackgroundImage { get => _backgroundImage; set { _backgroundImage = value; _templateDirty = true; } }
         public Rectangle RenderingBounds { get => _renderingBounds; set { _renderingBounds = value; _templateDirty = true; } }
 
         public void AddChannel(Channel channel)
@@ -41,7 +40,7 @@ namespace LibSidWiz
             channel.Renderer = this;
             if (channel.SampleRate != 0)
                 SamplingRate = channel.SampleRate;
-            _templateDirty = true; 
+            _templateDirty = true;
         }
 
         private byte[] _templateData;              // premultiplied BGRA template (bg, labels, borders, zero lines)
@@ -105,7 +104,7 @@ namespace LibSidWiz
             _frameData = null;
             _templateData = null;
 
-            if (_pens != null) 
+            if (_pens != null)
                 foreach (var p in _pens) p?.Dispose();
             if (_brushes != null)
                 foreach (var b in _brushes) b?.Dispose();
@@ -163,7 +162,7 @@ namespace LibSidWiz
                 var ch = _channels[i];
                 if (ch.IsEmpty || ch.Loading || !string.IsNullOrEmpty(ch.ErrorMessage)) continue;
 
-                int trig = ch.GetTriggerPoint(frameIndexSamples, frameSamples, _prevTrigger[i]); 
+                int trig = ch.GetTriggerPoint(frameIndexSamples, frameSamples, _prevTrigger[i]);
                 _prevTrigger[i] = trig;
                 triggers[i] = trig;
 
@@ -182,7 +181,7 @@ namespace LibSidWiz
             }
 
             // === Copy template, then draw visible waveforms ===
-            Buffer.BlockCopy(_templateData, 0, _frameData, 0, _templateData.Length); 
+            Buffer.BlockCopy(_templateData, 0, _frameData, 0, _templateData.Length);
 
             using (var g = Graphics.FromImage(_frameBitmap))
             {
@@ -472,7 +471,7 @@ namespace LibSidWiz
 
         internal void ClearChannels()
         {
-            if (_channels.Count == 0) 
+            if (_channels.Count == 0)
                 return;
             _channels.Clear();
         }

@@ -7,7 +7,7 @@ using System.Text;
 namespace LibSidWiz.Triggers
 {
     // ReSharper disable once UnusedType.Global
-    internal class AutoCorrelationTrigger: ITriggerAlgorithm
+    internal class AutoCorrelationTrigger : ITriggerAlgorithm
     {
         private float[] _normalDistribution;
 
@@ -24,7 +24,7 @@ namespace LibSidWiz.Triggers
                 var scale = Math.Sqrt(2 * Math.PI * variance);
                 for (int i = 0; i < width; ++i)
                 {
-                    _normalDistribution[i] = (float) (Math.Exp(-(i - mu) * (i - mu) / (2 * variance)) / scale);
+                    _normalDistribution[i] = (float)(Math.Exp(-(i - mu) * (i - mu) / (2 * variance)) / scale);
                 }
             }
 
@@ -95,7 +95,7 @@ namespace LibSidWiz.Triggers
             }
 
 #if DEBUG
-            Debug.WriteLine($"Autocorrelation: between {startIndex} and {endIndex}, max = {maxCorrelation}, offset = {bestOffset} ({(float)(bestOffset - startIndex)/(endIndex - startIndex):P})");
+            Debug.WriteLine($"Autocorrelation: between {startIndex} and {endIndex}, max = {maxCorrelation}, offset = {bestOffset} ({(float)(bestOffset - startIndex) / (endIndex - startIndex):P})");
 
             var sb = new StringBuilder();
             for (int i = 0; i < width; ++i)

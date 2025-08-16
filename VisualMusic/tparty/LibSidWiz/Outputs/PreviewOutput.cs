@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Taskbar;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.WindowsAPICodePack.Taskbar;
 
 namespace LibSidWiz.Outputs
 {

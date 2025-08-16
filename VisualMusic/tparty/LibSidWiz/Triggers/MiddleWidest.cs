@@ -8,7 +8,7 @@ namespace LibSidWiz.Triggers
     /// We then select the start point of the "middle" one, if more than one was found.
     /// </summary>
     // ReSharper disable once UnusedType.Global
-    class MiddleWidest: ITriggerAlgorithm
+    class MiddleWidest : ITriggerAlgorithm
     {
         public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int previousIndex)
         {

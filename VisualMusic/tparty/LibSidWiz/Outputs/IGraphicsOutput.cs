@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace LibSidWiz.Outputs
 {
-    public interface IGraphicsOutput: IDisposable
+    public interface IGraphicsOutput : IDisposable
     {
         void Write(byte[] data, Image image, double fractionComplete);
     }

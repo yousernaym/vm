@@ -1,5 +1,4 @@
 #region Using Statements
-using LibSidWiz;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;

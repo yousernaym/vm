@@ -810,7 +810,7 @@ namespace VisualMusic
         public async Task LoadAudioAsync()
         {
             await SidWizChannel.LoadDataAsync();
-            
+
         }
 
         public void Dispose()

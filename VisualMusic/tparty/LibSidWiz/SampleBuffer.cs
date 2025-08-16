@@ -1,10 +1,10 @@
-﻿using System;
-using NAudio.Dsp;
+﻿using NAudio.Dsp;
 using NAudio.Wave;
+using System;
 
 namespace LibSidWiz
 {
-    internal class SampleBuffer: IDisposable
+    internal class SampleBuffer : IDisposable
     {
         private readonly WaveStream _reader;
         private readonly ISampleProvider _sampleProvider;

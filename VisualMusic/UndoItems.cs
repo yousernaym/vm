@@ -45,10 +45,10 @@ namespace VisualMusic
             var node = currentItem.Next;
             while (node != null)
             {
-                var next = node.Next;         
-                node.Value.Project.Dispose(); 
+                var next = node.Next;
+                node.Value.Project.Dispose();
                 items.Remove(node);
-                node = next;  
+                node = next;
             }
 
             currentItem = items.AddAfter(currentItem, snapshot);

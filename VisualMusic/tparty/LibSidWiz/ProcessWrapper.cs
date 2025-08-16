@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace LibSidWiz
 {
-    public class ProcessWrapper: IDisposable
+    public class ProcessWrapper : IDisposable
     {
         private readonly Process _process;
         private readonly BlockingCollection<string> _lines = new BlockingCollection<string>(new ConcurrentQueue<string>());

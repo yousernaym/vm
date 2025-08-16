@@ -1,4 +1,8 @@
-﻿using System;
+﻿using LibSidWiz.Triggers;
+using NAudio.Wave;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing;
@@ -11,17 +15,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using LibSidWiz.Triggers;
-using NAudio.Wave;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace LibSidWiz
 {
     /// <summary>
     /// Wraps a single "voice", and also deals with loading the data into memory
     /// </summary>
-    public class Channel: IDisposable
+    public class Channel : IDisposable
     {
         private readonly bool _autoReloadOnSettingChanged;
         private SampleBuffer _samples;
@@ -75,7 +75,7 @@ namespace LibSidWiz
                 try
                 {
                     ErrorMessage = "";
-                    
+
                     _samples?.Dispose();
 
                     if (string.IsNullOrEmpty(Filename))
@@ -501,7 +501,7 @@ namespace LibSidWiz
             get => SampleRate == 0 ? 0 : (float)_viewWidthInSamples * 1000 / SampleRate;
             set
             {
-                _viewWidthInSamples = (int) (value / 1000 * SampleRate);
+                _viewWidthInSamples = (int)(value / 1000 * SampleRate);
                 Changed?.Invoke(this, false);
             }
         }
@@ -678,7 +678,7 @@ namespace LibSidWiz
         /// This allows us to use a property grid to select a trigger algorithm
         /// </summary>
         // ReSharper disable once MemberCanBePrivate.Global
-        public class TriggerAlgorithmTypeConverter: StringConverter
+        public class TriggerAlgorithmTypeConverter : StringConverter
         {
             public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
             {
@@ -723,7 +723,7 @@ namespace LibSidWiz
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public class TriggerAlgorithmJsonConverter: JsonConverter<ITriggerAlgorithm>
+        public class TriggerAlgorithmJsonConverter : JsonConverter<ITriggerAlgorithm>
         {
             public override void WriteJson(JsonWriter writer, ITriggerAlgorithm value, JsonSerializer serializer)
             {
@@ -734,8 +734,8 @@ namespace LibSidWiz
             {
                 var type = Assembly.GetExecutingAssembly()
                     .GetTypes()
-                    .FirstOrDefault(t => 
-                        typeof(ITriggerAlgorithm).IsAssignableFrom(t) && 
+                    .FirstOrDefault(t =>
+                        typeof(ITriggerAlgorithm).IsAssignableFrom(t) &&
                         t.Name.ToLowerInvariant().Equals(reader.Value?.ToString().ToLowerInvariant()));
                 if (type != null)
                 {
