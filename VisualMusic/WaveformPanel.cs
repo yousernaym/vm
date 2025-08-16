@@ -74,7 +74,7 @@ namespace VisualMusic
 
         internal void Draw(double songPosS)
         {
-            if (_waveTex == null)
+            if (_waveTex == null || songPosS < 0)
                 return;
             var pixels = _renderer.RenderFrame(songPosS);
             _waveTex.SetData(pixels);

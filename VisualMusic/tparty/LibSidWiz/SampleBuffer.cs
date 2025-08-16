@@ -8,6 +8,8 @@ namespace LibSidWiz
     {
         private readonly WaveStream _reader;
         private readonly ISampleProvider _sampleProvider;
+        private float _gain = 1.0f;
+        public float TargetPeak { get; set; } = (float)Math.Pow(10.0, -1.0 / 20.0); // -1 dBFS
 
         private class Chunk
         {
@@ -39,7 +41,8 @@ namespace LibSidWiz
         public SampleBuffer(string filename, Channel.Sides side, bool filter)
         {
             _reader = new AudioFileReader(filename);
-            Count = _reader.Length;
+            Count = _reader.Length / (_reader.WaveFormat.BitsPerSample / 8) / _reader.WaveFormat.Channels;
+            //Count = _reader.Length;
             SampleRate = _reader.WaveFormat.SampleRate;
             Length = _reader.TotalTime;
             switch (side)
@@ -102,6 +105,12 @@ namespace LibSidWiz
                     _reader.Position = chunk.Offset * _reader.WaveFormat.BitsPerSample / 8 *
                                        _reader.WaveFormat.Channels;
                     _sampleProvider.Read(chunk.Buffer, 0, ChunkSize);
+
+                    for (int i = 0; i < ChunkSize; i++)
+                    {
+                        chunk.Buffer[i] *= _gain;
+                    }
+
                     return chunk.Buffer[index - chunk.Offset];
                 }
             }
@@ -123,6 +132,10 @@ namespace LibSidWiz
                     Max = sample;
                 }
             }
+            var peak = Math.Max(Math.Abs(Min), Math.Abs(Max));
+            _gain = peak > 0 ? TargetPeak / peak : 1.0f;
+            Min *= _gain;
+            Max *= _gain;
         }
     }
 
@@ -144,7 +157,7 @@ namespace LibSidWiz
             // Apply the filter
             for (int i = 0; i < result; ++i)
             {
-                buffer[i] = _filter.Transform(buffer[i]);
+                buffer[i] = _filter.Transform(buffer[offset + i]);
             }
 
             return result;

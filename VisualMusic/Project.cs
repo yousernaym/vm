@@ -522,7 +522,7 @@ namespace VisualMusic
             }
 
             SongPanel.SpriteBatch.End();
-            SongPanel.WaveformPanel.Draw(SongPosS);
+            SongPanel.WaveformPanel.Draw(SongPosS - Props.PlaybackOffsetS);
         }
 
         public int screenPosToSongPos(float normScreenPos)
