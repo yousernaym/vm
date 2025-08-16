@@ -771,15 +771,6 @@ namespace VisualMusic
         public LibSidWiz.Channel SidWizChannel { get; } = new LibSidWiz.Channel(false)
         {
             Algorithm = new PeakSpeedTrigger(),
-            Filename = "",
-            Side = LibSidWiz.Channel.Sides.Mix,     // or Left/Right if you want a specific side
-            HighPassFilter = false,       // optional
-            LineWidth = 2f,
-            ZeroLineColor = System.Drawing.Color.FromArgb(60, 255, 255, 255),
-            ZeroLineWidth = 0,
-            SmoothLines = true,
-            RenderIfSilent = true,
-            ViewWidthInSamples = 1500,
         };
         public string Filename
         {
@@ -819,6 +810,7 @@ namespace VisualMusic
         public async Task LoadAudioAsync()
         {
             await SidWizChannel.LoadDataAsync();
+            
         }
 
         public void Dispose()

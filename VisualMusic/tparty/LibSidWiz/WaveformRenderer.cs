@@ -193,10 +193,22 @@ namespace LibSidWiz
                 }
             }
 
+            SwapRBInPlace(_frameData);
             return _frameData;
         }
 
         // --- helpers ---------------------------------------------------------
+
+        static void SwapRBInPlace(byte[] data)
+        {
+            for (int i = 0; i < data.Length; i += 4)
+            {
+                byte b = data[i];       // B
+                data[i] = data[i + 2]; // R -> B slot
+                data[i + 2] = b;         // B -> R slot
+                                         // G and A stay as-is (data[i+1], data[i+3])
+            }
+        }
 
         private void EnsurePerFrameCachesInitialized(int startFrame, int frameSamples)
         {

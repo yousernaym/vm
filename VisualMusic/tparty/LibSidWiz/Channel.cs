@@ -35,9 +35,9 @@ namespace LibSidWiz
         private string _label = "";
         private float _lineWidth = 3;
         private float _scale = 1.0f;
-        private int _viewWidthInSamples = 1500;
+        private int _viewWidthInSamples = 750;
         private Color _fillColor = Color.Transparent;
-        private float _zeroLineWidth;
+        private float _zeroLineWidth = 0;
         private Color _zeroLineColor = Color.Transparent;
         private Font _labelFont;
         private Color _labelColor = Color.Transparent;
@@ -52,7 +52,6 @@ namespace LibSidWiz
         private Sides _side = Sides.Mix;
         private bool _smoothLines = true;
         private bool _filter;
-        private bool _renderIfSilent;
         private double _fillBase;
 
         public Channel(bool autoReloadOnSettingChanged)
@@ -551,18 +550,6 @@ namespace LibSidWiz
         [JsonIgnore]
         public int SampleRate { get; private set; }
 
-        [Category("Appearance")]
-        [Description("Whether to render silent channels normally. If false, a warning message is shown instead.")]
-        public bool RenderIfSilent
-        {
-            get => _renderIfSilent;
-            set
-            {
-                _renderIfSilent = value;
-                Changed?.Invoke(this, false);
-            }
-        }
-
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         [Browsable(false)]
         [JsonIgnore]
@@ -762,7 +749,7 @@ namespace LibSidWiz
         public void Dispose()
         {
             _samples?.Dispose();
-            if (_samplesForTrigger != _samples)
+            if (_samplesForTrigger != null && _samplesForTrigger != _samples)
             {
                 _samplesForTrigger.Dispose();
             }

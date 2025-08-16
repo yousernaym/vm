@@ -101,7 +101,6 @@ namespace VisualMusic
         int keyFrameLockRow = -1;
         bool unsavedChanges = false;
         bool viewWidthQnChangedWithCtrl = false;
-        bool focusChanged = false;
         static public Process RemuxerProcess;
 
         [DllImport("user32.dll")]
@@ -120,7 +119,7 @@ namespace VisualMusic
             }
 
             Camera.OnUserUpdating = updateCamControls;
-            Camera.OnUserUpdated = () => addUndoItem("Edit Camera");
+            Camera.OnUserUpdated = () => AddUndoItem("Edit Camera");
 
             SongPanel.Project = Project;
             startupArgs = args;
@@ -166,7 +165,7 @@ namespace VisualMusic
             foreach (NoteStyleType nse in enumArray)
                 styleList.Items.Add(nse.ToString());
 
-            addEventHandlers(this.Controls);
+            AddEventHandlers(this.Controls);
 
             string[] tptList = Enum.GetNames(typeof(TrackPropsType));
             for (int i = 0; i < selectedTrackPropsPanel.TabPages.Count; i++)
@@ -282,81 +281,75 @@ namespace VisualMusic
                 if (item is ToolStripMenuItem)
                 {
                     ToolStripMenuItem menuItem = (ToolStripMenuItem)item;
-                    menuItem.Click += onFocusChanged;
-                    menuItem.Click += addUndoItem;
+                    menuItem.Click += AddUndoItem;
                     menuItem.Click += invalidateSongPanel;
                     addMenuItemEventHandlers(menuItem.DropDownItems);
                 }
             }
         }
 
-        void addEventHandlers(Control.ControlCollection controls)
+        void AddEventHandlers(Control.ControlCollection controls)
         {
             foreach (Control control in controls)
             {
                 if (control.ContextMenuStrip != null)
                     addMenuItemEventHandlers(control.ContextMenuStrip.Items);
-                control.LostFocus += onFocusChanged;
                 if (control.GetType() == typeof(TextBox))
                 {
-                    ((TextBox)control).TextChanged += invalidateSongPanel;
-                    ((TextBox)control).TextChanged += addUndoItem;
+                    ((TextBox)control).Validated += invalidateSongPanel;
+                    ((TextBox)control).Validated += AddUndoItem;
                 }
                 else if (control.GetType() == typeof(TrackBar))
                 {
-                    control.Validated += addUndoItem;
+                    control.Validated += AddUndoItem;
                 }
                 else if (control.GetType() == typeof(NumericUpDown))
                 {
                     ((NumericUpDown)control).ValueChanged += invalidateSongPanel;
-                    ((NumericUpDown)control).ValueChanged += addUndoItem;
+                    ((NumericUpDown)control).Validated += AddUndoItem;
                 }
                 else if (control.GetType() == typeof(CheckBox))
                 {
                     ((CheckBox)control).CheckedChanged += invalidateSongPanel;
-                    ((CheckBox)control).Click += addUndoItem;
+                    ((CheckBox)control).Click += AddUndoItem;
                 }
                 else if (control.GetType() == typeof(Button))
                 {
                     ((Button)control).Click += invalidateSongPanel;
-                    ((Button)control).Click += addUndoItem;
+                    ((Button)control).Click += AddUndoItem;
                 }
                 else if (control.GetType() == typeof(RadioButton))
                 {
                     ((RadioButton)control).CheckedChanged += invalidateSongPanel;
-                    ((RadioButton)control).Click += addUndoItem;
+                    ((RadioButton)control).Click += AddUndoItem;
                 }
                 else if (control.GetType() == typeof(ComboBox))
                 {
                     ((ComboBox)control).SelectedIndexChanged += invalidateSongPanel;
-                    ((ComboBox)control).SelectedIndexChanged += addUndoItem;
+                    ((ComboBox)control).SelectedIndexChanged += AddUndoItem;
                 }
                 else if (control.GetType() == typeof(HueSatButton))
                 {
                     ((HueSatButton)control).ColorChanged += invalidateSongPanel;
-                    ((HueSatButton)control).ColorSubmitted += addUndoItem;
+                    ((HueSatButton)control).ColorSubmitted += AddUndoItem;
                 }
                 else if (control.GetType() == typeof(DataGridView))
                 {
-                    ((DataGridView)control).CellEndEdit += addUndoItem;
-                    ((DataGridView)control).RowsRemoved += addUndoItem;
+                    ((DataGridView)control).CellEndEdit += AddUndoItem;
+                    ((DataGridView)control).RowsRemoved += AddUndoItem;
                 }
                 else if (control.GetType() == typeof(Label))
-                    ((Label)control).Click += addUndoItem;
+                    ((Label)control).Click += AddUndoItem;
 
                 else if (control.GetType() == typeof(MenuStrip))
                     addMenuItemEventHandlers(((MenuStrip)control).Items);
                 else if (control.Controls.Count > 0)
-                    addEventHandlers(control.Controls);
+                    AddEventHandlers(control.Controls);
                 else
                     control.Click += invalidateSongPanel;
             }
         }
 
-        private void onFocusChanged(object sender, EventArgs e)
-        {
-            focusChanged = true;
-        }
 
         private void importMidiSongToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -400,8 +393,8 @@ namespace VisualMusic
 
             undoItems.clear();
             undoToolStripMenuItem.Enabled = redoToolStripMenuItem.Enabled = false;
-            undoItems.add("", Project);
-            updateUndoRedoDesc();
+            undoItems.Add("", Project);
+            UpdateUndoRedoDesc();
             //project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
             UpdateScrollBarChange();
             changeToScreen(SongPanel);
@@ -579,7 +572,7 @@ namespace VisualMusic
                 return;
             Project.createOcTrees();
             SongPanel.Invalidate();
-            addUndoItem("Edit Viewport Width");
+            AddUndoItem("Edit Viewport Width");
         }
 
         private void upDownVpWidth_ValueChanged(object sender, EventArgs e)
@@ -1013,7 +1006,7 @@ namespace VisualMusic
 
                 //for (int i = 0; i < Project.TrackViews.Count; i++)
                 //Project.TrackViews[i].TrackNumber = i;
-                addUndoItem("Reorder tracks");
+                AddUndoItem("Reorder tracks");
             }
             else //CTRL pressed
             {
@@ -1035,7 +1028,7 @@ namespace VisualMusic
                 }
                 updateTrackPropsControls();
                 updateTrackListColors();
-                addUndoItem("Copy track properties");
+                AddUndoItem("Copy track properties");
             }
             trackList.EndUpdate();
         }
@@ -1396,7 +1389,7 @@ namespace VisualMusic
             //songScrollBar.Value = SongPanel.SongPosT;
         }
 
-        private void addUndoItem(object sender, EventArgs e)
+        void AddUndoItem(object sender, EventArgs e)
         {
             object tag = null;
             if (sender is Control)
@@ -1414,24 +1407,20 @@ namespace VisualMusic
                 string action = ((CheckBox)sender).Checked ? "Check " : "Uncheck ";
                 desc = action + desc;
             }
-            addUndoItem(desc);
+            AddUndoItem(desc);
         }
 
-        void addUndoItem(string desc)
+        void AddUndoItem(string desc)
         {
             if (updatingControls)
                 return;
 
-            if (!focusChanged)
-                undoItems--;
-            undoItems.add(desc, Project);
-            //else
-            //.replaceLast(desc, Project);
-            focusChanged = false;
+            undoItems.Add(desc, Project);
+
 
             undoToolStripMenuItem.Enabled = true;
             redoToolStripMenuItem.Enabled = false;
-            updateUndoRedoDesc();
+            UpdateUndoRedoDesc();
             unsavedChanges = true;
         }
 
@@ -1463,10 +1452,10 @@ namespace VisualMusic
             else
                 updateTrackListColors();
             SongPanel.Invalidate();
-            updateUndoRedoDesc();
+            UpdateUndoRedoDesc();
         }
 
-        void updateUndoRedoDesc()
+        void UpdateUndoRedoDesc()
         {
             undoToolStripMenuItem.Text = "Undo " + undoItems.UndoDesc;
             redoToolStripMenuItem.Text = "Redo " + undoItems.RedoDesc;
@@ -2223,7 +2212,7 @@ namespace VisualMusic
             else
                 Project.TrackViews[0].TrackProps.cloneFrom(props, typeFlags, SongPanel);
 
-            addUndoItem("Load Track Properties");
+            AddUndoItem("Load Track Properties");
             updateTrackListColors();
             updateTrackPropsControls();
             if ((typeFlags & (int)TrackPropsType.TPT_Style) != 0)
@@ -2310,7 +2299,7 @@ namespace VisualMusic
             {
                 showErrorMsgBox(ex.Message);
             }
-            addUndoItem("Load Camera");
+            AddUndoItem("Load Camera");
         }
 
         private void saveCamToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2426,7 +2415,7 @@ namespace VisualMusic
             keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[0]; //Select cell 0 to update CurrentRow. Needed for SelectionChanged event to go to correct song pos.
             keyFramesDGV.CurrentCell = keyFramesDGV.Rows[row].Cells[1]; //Select cell in Description column
                                                                         //keyFramesDGV.BeginEdit(true);
-            addUndoItem("Insert Key Frame");
+            AddUndoItem("Insert Key Frame");
         }
 
         private void keyFramesDGV_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)

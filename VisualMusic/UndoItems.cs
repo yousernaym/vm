@@ -31,25 +31,27 @@ namespace VisualMusic
             items.Clear();
             currentItem = null;
         }
-        public void add(string desc, Project project)
+
+        public void Add(string desc, Project project)
         {
-            var newItem = new Item(desc, project.clone());
+            var snapshot = new Item(desc, project.clone());
 
             if (currentItem == null)
             {
-                items.AddLast(newItem);
-                currentItem = items.Last;
+                currentItem = items.AddLast(snapshot);
+                return;
             }
-            else
+
+            var node = currentItem.Next;
+            while (node != null)
             {
-                items.AddAfter(currentItem, newItem);
-                currentItem = currentItem.Next;
-                while (currentItem.Next != null)
-                {
-                    currentItem.Next.Value.Project.Dispose();
-                    items.Remove(currentItem.Next);
-                }
+                var next = node.Next;         
+                node.Value.Project.Dispose(); 
+                items.Remove(node);
+                node = next;  
             }
+
+            currentItem = items.AddAfter(currentItem, snapshot);
         }
 
         void replaceLast(string desc, Project project)

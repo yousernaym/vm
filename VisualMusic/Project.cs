@@ -947,7 +947,10 @@ namespace VisualMusic
         public void Dispose()
         {
             foreach (var tv in trackViews)
+            {
+                tv.TrackProps.AudioProps.Dispose();
                 tv.OcTree?.Dispose();
+            }
         }
 
         public void copyPropsFrom(Project project)
