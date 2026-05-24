@@ -291,7 +291,7 @@ namespace VisualMusic
                 uint[] frameData = null;
                 Project backupProject = Project;
                 Project = Project.clone();
-
+                
                 try
                 {
 
@@ -397,6 +397,7 @@ namespace VisualMusic
         void drawVideoFrameSample(VideoExportOptions options, RenderTargetCube renderTargetCube, RenderTarget2D renderTarget2d, Texture2D prevFrame, Effect cubeToPlaneFx)
         {
             GraphicsDevice.SetRenderTarget(renderTarget2d);
+
             GraphicsDevice.Clear(Color.Transparent);
             if (options.Sphere)
             {

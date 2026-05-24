@@ -21,11 +21,11 @@ namespace VisualMusic
 
         private void Ok_Click(object sender, EventArgs e)
         {
-            importFiles();
+            ImportFiles();
 
         }
         //getSongLength(subSong); //song length in seconds. 0 = NoteExtractor default
-        public override void importFiles()
+        public override void ImportFiles()
         {
             var options = new SidImportOptions();
 
@@ -44,7 +44,7 @@ namespace VisualMusic
             }
 
             //If sid file didn't exist, call importFiles anyway to get error message box
-            importFiles(options);
+            ImportFiles(options);
         }
 
         private void ImportSidForm_Shown(object sender, EventArgs e)
@@ -58,7 +58,7 @@ namespace VisualMusic
 
         private void ImportSidForm_Load(object sender, EventArgs e)
         {
-            createNoteFormatFilter("Sid files", Formats);
+            CreateNoteFormatFilter("Sid files", Formats);
         }
     }
 

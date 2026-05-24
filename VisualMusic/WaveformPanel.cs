@@ -3,11 +3,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace VisualMusic
 {
     public class WaveformPanel
     {
+        const float NormalizedWidth = 0.25f;
         private Texture2D _waveTex;
         private Rectangle _overlayRect;
         private WaveformRenderer _renderer;
@@ -22,7 +24,7 @@ namespace VisualMusic
         GraphicsDevice _gfxDevice;
         SpriteBatch _spriteBatch;
 
-        internal async void Init(GraphicsDevice gfxDevice, SpriteBatch spriteBatch)
+        internal void Init(GraphicsDevice gfxDevice, SpriteBatch spriteBatch)
         {
             _gfxDevice = gfxDevice;
             _spriteBatch = spriteBatch;
@@ -47,17 +49,17 @@ namespace VisualMusic
             _framePixels = new byte[_renderer.Width * _renderer.Height * 4];
         }
 
-        private void Resize()
+        public void Resize()
         {
             var vp = _gfxDevice.Viewport;
 
-            _overlayRect = new Rectangle(0, 0, (int)(vp.Width * 0.25f), vp.Height); // leftmost 25%
+            _overlayRect = new Rectangle(0, 0, (int)(vp.Width * NormalizedWidth), vp.Height); // leftmost 25%
             if (_renderer != null)
             {
                 _renderer.Width = _overlayRect.Width;
                 _renderer.Height = _overlayRect.Height;
                 _renderer.RenderingBounds = new System.Drawing.Rectangle(0, 0, _overlayRect.Width, _overlayRect.Height); // local in overlay. :contentReference[oaicite:9]{index=9}
-
+                _renderer.Init();
                 // Recreate texture if size changes
                 _waveTex?.Dispose();
                 _waveTex = new Texture2D(_gfxDevice, _renderer.Width, _renderer.Height, false, SurfaceFormat.Color);
@@ -67,8 +69,10 @@ namespace VisualMusic
 
         internal void Draw(double songPosS)
         {
-            if (_waveTex == null || songPosS < 0)
+            if (_waveTex == null || songPosS < 0 || _renderer.ChannelCount == 0)
                 return;
+            if (_renderer.Width != (int)(_gfxDevice.Viewport.Width * NormalizedWidth) || _renderer.Height != (int)(_gfxDevice.Viewport.Height))
+                Resize();
             var pixels = _renderer.RenderFrame(songPosS);
             _waveTex.SetData(pixels);
 
@@ -93,6 +97,11 @@ namespace VisualMusic
         {
             _renderer?.Dispose();
             _waveTex.Dispose();
+        }
+
+        internal void RemoveChannel(Channel sidWizChannel)
+        {
+            _renderer.RemoveChannel(sidWizChannel);
         }
     }
 }

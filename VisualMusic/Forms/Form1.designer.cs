@@ -1913,7 +1913,7 @@
             audio.Location = new System.Drawing.Point(4, 24);
             audio.Name = "audio";
             audio.Padding = new System.Windows.Forms.Padding(3);
-            audio.Size = new System.Drawing.Size(200, 4333);
+            audio.Size = new System.Drawing.Size(192, 72);
             audio.TabIndex = 4;
             audio.Text = "Audio";
             audio.UseVisualStyleBackColor = true;

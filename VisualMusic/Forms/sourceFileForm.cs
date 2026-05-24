@@ -96,7 +96,7 @@ namespace VisualMusic
             //AudioFilePath = audioFilePath.Text;
         }
 
-        public virtual void importFiles() //Can't be abstract because designer won't be able to show derived forms
+        public virtual void ImportFiles() //Can't be abstract because designer won't be able to show derived forms
         {
             throw new NotImplementedException();
         }
@@ -105,7 +105,7 @@ namespace VisualMusic
         {
             try
             {
-                options.checkSourceFile();
+                options.CheckSourceFile();
             }
             catch (FileImportException ex)
             {
@@ -114,7 +114,7 @@ namespace VisualMusic
             }
             try
             {
-                if (!await parent.openSourceFiles(options, this))
+                if (!await parent.OpenSourceFiles(options, this))
                     return;
             }
             catch (FileImportException ex)
@@ -136,7 +136,7 @@ namespace VisualMusic
             Ok.Focus();
         }
 
-        protected void createNoteFormatFilter(string description, string[] formatList)
+        protected void CreateNoteFormatFilter(string description, string[] formatList)
         {
             string formatString = "";
             foreach (string format in formatList)
@@ -294,7 +294,7 @@ namespace VisualMusic
             }
         }
 
-        public void checkSourceFile()
+        public void CheckSourceFile()
         {
             if (!SavedMidi)
             {

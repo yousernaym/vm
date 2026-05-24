@@ -88,21 +88,21 @@ namespace VisualMusic
         {
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.addModEntry(true);
-            ParentForm.updateTrackPropsControls();
+            ParentForm.UpdateTrackPropsControls();
         }
 
         private void deleteMi_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.deleteModEntry();
-            ParentForm.updateTrackPropsControls();
+            ParentForm.UpdateTrackPropsControls();
         }
 
         private void cloneMi_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.cloneModEntry(true);
-            ParentForm.updateTrackPropsControls();
+            ParentForm.UpdateTrackPropsControls();
         }
 
         private void modEntryCombo_SelectedIndexChanged(object sender, EventArgs e)
@@ -120,7 +120,7 @@ namespace VisualMusic
             //Debug.Assert(TrackList.SelectedIndices.Count == 1);  //modEntryCombo is disabled if more than one track is selected, and the entire track props panel is disabled if no track is selected, and if controls are updating, the method will return on the above line.
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntryIndex = modEntryCombo.SelectedIndex;
-            ParentForm.updateTrackPropsControls();
+            ParentForm.UpdateTrackPropsControls();
         }
 
         private void xOriginUd_ValueChanged(object sender, EventArgs e)

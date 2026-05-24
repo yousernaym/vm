@@ -83,7 +83,7 @@ namespace VisualMusic
                     importForm.AudioFilePath = "";
                     importForm.EraseCurrent = true;
                     //importForm.ShowDialog();
-                    importForm.importFiles();
+                    importForm.ImportFiles();
                 });
             }
         }

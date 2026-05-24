@@ -17,17 +17,17 @@ namespace VisualMusic
 
         private void Ok_Click(object sender, EventArgs e)
         {
-            importFiles();
+            ImportFiles();
         }
 
-        public override void importFiles()
+        public override void ImportFiles()
         {
-            importFiles(new MidiImportOptions());
+            ImportFiles(new MidiImportOptions());
         }
 
         private void ImportMidiForm_Load(object sender, EventArgs e)
         {
-            createNoteFormatFilter("Midi files", Formats);
+            CreateNoteFormatFilter("Midi files", Formats);
         }
     }
 

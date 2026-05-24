@@ -134,7 +134,7 @@ namespace VisualMusic
 
             ImportOptions.setNotePath();
             ImportOptions.EraseCurrent = false;
-            await importSong(ImportOptions, parentForm);
+            await ImportSong(ImportOptions, parentForm);
         }
 
         public Project(SerializationInfo info, StreamingContext ctxt) : this()
@@ -150,7 +150,6 @@ namespace VisualMusic
                 {
                     trackViews = (List<TrackView>)entry.Value;
                     TrackView.NumTracks = TrackViews.Count;
-                    SongPanel.WaveformPanel.ClearChannels();
                     for (int i = 0; i < trackViews.Count; i++)
                     {
                         var tv = trackViews[i];
@@ -158,8 +157,7 @@ namespace VisualMusic
                         tv.TrackProps.GlobalProps = TrackViews[0].TrackProps;
                         if (i > 0)
                         {
-                            tv.TrackProps.AudioProps.LineColor = tv.TrackProps.MaterialProps.getSysColor(true, tv.TrackProps.GlobalProps.MaterialProps);
-                            SongPanel.WaveformPanel.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
+                            tv.TrackProps.AudioProps.LineColor = tv.TrackProps.MaterialProps.GetSysColor(true, tv.TrackProps.GlobalProps.MaterialProps);
                         }
                     }
                 }
@@ -204,9 +202,9 @@ namespace VisualMusic
             info.AddValue("vertWidthQn", vertViewWidthQn);
         }
 
-        async public Task<bool> importSong(ImportOptions options, Form parentForm)
-        { //<Open project> and <import files> meet here
-            options.checkSourceFile();
+        async public Task<bool> ImportSong(ImportOptions options, Form parentForm)
+        { //`Open project` and `import files` meet here
+            options.CheckSourceFile();
             //Convert mod/sid files to mid/wav
             if (options.NoteFileType != Midi.FileType.Midi)
             {
@@ -292,8 +290,8 @@ namespace VisualMusic
                 options.AudioPath = audioPath;
             }
 
-            openNoteFile(options);
-            openAudioFile(options);
+            OpenNoteFile(options);
+            OpenAudioFile(options);
 
             ImportOptions = options;
             if (options.EraseCurrent)
@@ -301,7 +299,7 @@ namespace VisualMusic
                 DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + "." + DefaultFileExt;
                 Props.ViewWidthQn = vertViewWidthQn = ProjProps.DefaultViewWidthQn;
             }
-            createTrackViews(notes.Tracks.Count, options.EraseCurrent);
+            CreateTrackViews(notes.Tracks.Count, options.EraseCurrent);
             return true;
         }
 
@@ -309,7 +307,7 @@ namespace VisualMusic
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool IsIconic(IntPtr hWnd);
 
-        public bool openNoteFile(ImportOptions options)
+        public bool OpenNoteFile(ImportOptions options)
         {
             SongPanel.Invalidate();
             stopPlayback();
@@ -361,7 +359,7 @@ namespace VisualMusic
             //Props = interpolatedFrame.ProjProps;
         }
 
-        public void openAudioFile(ImportOptions options)
+        public void OpenAudioFile(ImportOptions options)
         {
             Media.closeAudioFile();
             string file = options.AudioPath;
@@ -413,7 +411,7 @@ namespace VisualMusic
             //}
         }
 
-        public void createTrackViews(int numTracks, bool eraseCurrent)
+        public void CreateTrackViews(int numTracks, bool eraseCurrent)
         {
             TrackView.NumTracks = numTracks;
             int startTrack; //At which index to start creating new (default) track props
@@ -421,6 +419,7 @@ namespace VisualMusic
             {
                 startTrack = 0;
                 trackViews = new List<TrackView>(numTracks);
+                SongPanel.WaveformPanel.ClearChannels();
             }
             else
             {
@@ -433,18 +432,23 @@ namespace VisualMusic
                 // Update notes
 
                 if (trackViews[i].TrackNumber >= notes.Tracks.Count) //The new note file has fewer tracks than the currently loaded
+                {
+                    SongPanel.WaveformPanel.RemoveChannel(trackViews[i].TrackProps.AudioProps.SidWizChannel);
                     continue;
+                }
 
+                // Update note information
                 trackViews[i].MidiTrack = notes.Tracks[trackViews[i].TrackNumber];
                 trackViews[i].createCurve();
-                //If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
-                trackViews[i].TrackProps.StyleProps.loadFx();
+                
+                // If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
+                trackViews[i].TrackProps.StyleProps.LoadFx();
             }
             for (int i = startTrack; i < numTracks; i++)
             {
                 //New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
                 TrackView view = new TrackView(i, numTracks, notes);
-                addTrackView(view);
+                AddTrackView(view);
             }
             //if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
             //trackViews.RemoveRange(numTracks, startTrack - numTracks);
@@ -458,10 +462,15 @@ namespace VisualMusic
             createOcTrees(false);
         }
 
-        private void addTrackView(TrackView view)
+        void AddTrackView(TrackView view)
         {
             trackViews.Add(view);
             view.TrackProps.GlobalProps = TrackViews[0].TrackProps;
+            view.TrackProps.AudioProps.LineColor = view.TrackProps.MaterialProps.GetSysColor(true, view.TrackProps.GlobalProps.MaterialProps);
+            view.TrackProps.AudioProps.SidWizChannel.Filename = "";
+            SongPanel.WaveformPanel.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
+            if (view.TrackNumber == 1)
+                view.TrackProps.AudioProps.SidWizChannel.LoadDataAsync();
         }
 
         public void createOcTrees(bool resetVertScale = true)
@@ -601,10 +610,10 @@ namespace VisualMusic
             if (indices != null)
             {
                 foreach (int index in indices)
-                    trackViews[index].TrackProps.resetProps();
+                    trackViews[index].TrackProps.ResetProps();
             }
             else
-                trackViews[0].TrackProps.resetProps();
+                trackViews[0].TrackProps.ResetProps();
             createOcTrees();
         }
 
@@ -934,6 +943,7 @@ namespace VisualMusic
                 dest.trackViews[i].MidiTrack = trackViews[i].MidiTrack;
                 dest.trackViews[i].OcTree = trackViews[i].OcTree;
                 dest.trackViews[i].Curve = trackViews[i].Curve;
+                dest.trackViews[i].TrackProps.AudioProps = trackViews[i].TrackProps.AudioProps;
             }
 
             dest.notes = notes;
@@ -958,9 +968,38 @@ namespace VisualMusic
             var source = project.clone();
             Props = source.Props;
             vertViewWidthQn = Props.ViewWidthQn;
-            TrackViews = source.TrackViews;
+            //TrackViews = source.TrackViews;
+            for (int i = 0; i < TrackViews.Count; i++)
+            {
+                var destProps = TrackViews[i].TrackProps;
+                var sourceProps = TrackViews[i].TrackProps;
+                destProps.StyleProps = sourceProps.StyleProps;
+                destProps.MaterialProps = sourceProps.MaterialProps;
+                destProps.LightProps = sourceProps.LightProps;
+                destProps.SpatialProps = sourceProps.SpatialProps;
+                //Skip AudioProps for more lightweight redos
+            }
             KeyFrames = source.KeyFrames;
             //source.Dispose();
+        }
+
+        internal void InitAfterDeserialization()
+        {
+            if (KeyFrames == null) //Old project file format
+                KeyFrames = new KeyFrames();
+            ImportOptions.updateImportForm();
+            SongPanel.WaveformPanel.ClearChannels();
+
+            for (int i = 0; i < TrackViews.Count; i++)
+            {
+                var tv = TrackViews[i];
+                //tv.TrackProps.StyleProps.LoadFx();
+                if (i > 0)
+                {
+                    _ = tv.TrackProps.AudioProps.LoadAudioAsync();
+                    SongPanel.WaveformPanel.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
+                }
+            }
         }
     }
 

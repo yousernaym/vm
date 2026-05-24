@@ -34,6 +34,8 @@ namespace LibSidWiz
         public Image BackgroundImage { get => _backgroundImage; set { _backgroundImage = value; _templateDirty = true; } }
         public Rectangle RenderingBounds { get => _renderingBounds; set { _renderingBounds = value; _templateDirty = true; } }
 
+        public int ChannelCount => _channels.Count;
+
         public void AddChannel(Channel channel)
         {
             _channels.Add(channel);
@@ -64,7 +66,7 @@ namespace LibSidWiz
         public float ActivityThreshold = 0.004f;   // ~ -48 dBFS; tweak
         public int ActivityWindowSamplesOverride = 0; // 0 => use ViewWidthInSamples
         public int ActivitySubsampleStride = 4;  // >=1; higher = faster
-        public float ActivityHoldBelowThresholdSeconds = 2.0f; // hang time after dropping below threshold
+        public float ActivityHoldBelowThresholdSeconds = 4.5f; // hang time after dropping below threshold
         private int[] _lastAboveThresholdSample;    // Per-channel activity state
         private int _lastFrameStartSample = int.MinValue;
 
@@ -91,6 +93,8 @@ namespace LibSidWiz
             _visible = _channels.ToList();
             _visibleSignature = string.Join("-", _visible.Select(c => _channels.IndexOf(c)));
             _templateDirty = false;
+            foreach (var ch in _channels)
+                ch.LineWidth = ch.LineWidth;
         }
 
         public void Dispose()
@@ -234,7 +238,7 @@ namespace LibSidWiz
 
                 _pens = _channels.Select(c => c.LineColor == Color.Transparent || c.LineWidth <= 0
                     ? null
-                    : new Pen(c.LineColor, c.LineWidth) { MiterLimit = c.LineWidth, LineJoin = LineJoin.Bevel }).ToArray();
+                    : new Pen(c.LineColor, c.LineWidth * Width / 500) { MiterLimit = c.LineWidth, LineJoin = LineJoin.Bevel }).ToArray();
                 _brushes = _channels.Select(c => c.FillColor == Color.Transparent ? null : new SolidBrush(c.FillColor)).ToArray();
             }
         }
@@ -474,6 +478,11 @@ namespace LibSidWiz
             if (_channels.Count == 0)
                 return;
             _channels.Clear();
+        }
+
+        internal void RemoveChannel(Channel sidWizChannel)
+        {
+            _channels.Remove(sidWizChannel);
         }
     }
 }

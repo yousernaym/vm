@@ -18,7 +18,7 @@ namespace VisualMusic
     using GdiPoint = System.Drawing.Point;
     using XnaColor = Microsoft.Xna.Framework.Color;
 
-    enum TrackPropsType { TPT_Style = 1, TPT_Material = 2, TPT_Light = 4, TPT_Spatial = 8, TPT_All = 255 }
+    enum TrackPropsType { TPT_Style = 1, TPT_Material = 2, TPT_Light = 4, TPT_Spatial = 8, TPT_Audio = 16, TPT_All = 255 }
 
     public partial class Form1 : Form
     {
@@ -254,17 +254,17 @@ namespace VisualMusic
                     if (bMidiFile)
                     {
                         ImportMidiForm.AudioFilePath = audioFile;
-                        ImportMidiForm.importFiles();
+                        ImportMidiForm.ImportFiles();
                     }
                     if (bModFile)
                     {
                         ImportModForm.AudioFilePath = audioFile;
-                        ImportModForm.importFiles();
+                        ImportModForm.ImportFiles();
                     }
                     else if (bSidFile)
                     {
                         ImportSidForm.AudioFilePath = audioFile;
-                        ImportSidForm.importFiles();
+                        ImportSidForm.ImportFiles();
                     }
                 }
                 catch (FileImportException ex)
@@ -365,7 +365,7 @@ namespace VisualMusic
                 SongPanel.Focus();
         }
 
-        void songLoaded(string path)
+        void SongLoaded(string path)
         {
             bool loaded = !string.IsNullOrEmpty(path);
             propsTogglePanel.Enabled = loaded;
@@ -387,9 +387,9 @@ namespace VisualMusic
             saveTrackPropsToolStripMenuItem.Enabled = loaded;
             insertKeyFrameToolStripMenuItem.Enabled = loaded;
 
-            createTrackList();
-            updateTrackPropsControls();
-            updateProjPropsControls();
+            CreateTrackList();
+            UpdateTrackPropsControls();
+            UpdateProjPropsControls();
 
             undoItems.clear();
             undoToolStripMenuItem.Enabled = redoToolStripMenuItem.Enabled = false;
@@ -397,10 +397,10 @@ namespace VisualMusic
             UpdateUndoRedoDesc();
             //project.KeyFrames[0].Camera.SpatialChanged();// = updateCamControls;
             UpdateScrollBarChange();
-            changeToScreen(SongPanel);
+            ChangeToScreen(SongPanel);
         }
 
-        private void updateProjPropsControls()
+        private void UpdateProjPropsControls()
         {
             updatingControls = true;
             upDownVpWidth.Value = Project.KeyFrames[0].ProjProps.ViewWidthQn;
@@ -441,16 +441,16 @@ namespace VisualMusic
         }
 
         //Called only when iomporting note and audio files.
-        async public Task<bool> openSourceFiles(ImportOptions options, Form parentForm)
+        async public Task<bool> OpenSourceFiles(ImportOptions options, Form parentForm)
         {
-            saveSettings();
-            changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
+            SaveSettings();
+            ChangeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
             try
             {
                 SongPanel.SuspendPaint();
                 if (!parentForm.Visible)
                     parentForm = this;
-                if (!await Project.importSong(options, parentForm))
+                if (!await Project.ImportSong(options, parentForm))
                     return false;
                 if (options.EraseCurrent)
                 {
@@ -459,7 +459,7 @@ namespace VisualMusic
                     resetCameras(false);
                 }
                 unsavedChanges = true;
-                songLoaded(options.NotePath);
+                SongLoaded(options.NotePath);
             }
             finally
             {
@@ -468,7 +468,7 @@ namespace VisualMusic
             return true;
         }
 
-        void saveSettings()
+        void SaveSettings()
         {
             DataContractSerializer dcs = new DataContractSerializer(typeof(Settings), Settings.Types);
             using (FileStream stream = File.Open(Settings.FilePath, FileMode.Create))
@@ -527,7 +527,7 @@ namespace VisualMusic
                 return;
             saveVideoDlg.InitialDirectory = Path.GetDirectoryName(saveVideoDlg.FileName);
 
-            saveSettings();
+            SaveSettings();
 
             //var scBackup = Camera.SpatialChanged;
             //Camera.SpatialChanged = null;
@@ -625,7 +625,7 @@ namespace VisualMusic
         {
 
         }
-        void createTrackList()
+        void CreateTrackList()
         {
             trackList.Items.Clear();
             if (Project.Notes == null || Project.Notes.Tracks.Count == 0)
@@ -660,7 +660,7 @@ namespace VisualMusic
                 selectedTrackPropsPanel.Enabled = true;
                 globalLightCb.Enabled = trackList.SelectedIndices[0] != 0; // || trackList.SelectedIndices.Count == 1
             }
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void enableTrackSpecificMenuItem()
@@ -854,7 +854,7 @@ namespace VisualMusic
                 trackTexPb.Image = null;
             }
         }
-        public void updateTrackPropsControls()
+        public void UpdateTrackPropsControls()
         {
             mergedTrackProps = Project.mergeTrackProps(trackList.SelectedIndices);
             Invalidate();
@@ -944,8 +944,8 @@ namespace VisualMusic
             trackList.BeginUpdate();
             for (int i = 1; i < trackList.Items.Count; i++)
             {
-                trackList.Items[i].SubItems[1].BackColor = Project.TrackViews[i].TrackProps.MaterialProps.getSysColor(false, Project.GlobalTrackProps.MaterialProps);
-                trackList.Items[i].SubItems[2].BackColor = Project.TrackViews[i].TrackProps.MaterialProps.getSysColor(true, Project.GlobalTrackProps.MaterialProps);
+                trackList.Items[i].SubItems[1].BackColor = Project.TrackViews[i].TrackProps.MaterialProps.GetSysColor(false, Project.GlobalTrackProps.MaterialProps);
+                trackList.Items[i].SubItems[2].BackColor = Project.TrackViews[i].TrackProps.MaterialProps.GetSysColor(true, Project.GlobalTrackProps.MaterialProps);
             }
             trackList.EndUpdate();
         }
@@ -1026,7 +1026,7 @@ namespace VisualMusic
                     destTrackProps.cloneFrom(sourceTrackProps, (int)tpt, SongPanel);
                     Project.TrackViews[trackNumber].createOcTree(Project, Project.GlobalTrackProps);
                 }
-                updateTrackPropsControls();
+                UpdateTrackPropsControls();
                 updateTrackListColors();
                 AddUndoItem("Copy track properties");
             }
@@ -1096,7 +1096,7 @@ namespace VisualMusic
                 Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.StyleProps.Type = type;
             }
             Project.createOcTrees();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void textureBrowseBtn_Click(object sender, EventArgs e)
@@ -1104,7 +1104,7 @@ namespace VisualMusic
             if (openTextureDlg.ShowDialog(this) == DialogResult.OK)
             {
                 openTextureDlg.InitialDirectory = Path.GetDirectoryName(openTextureDlg.FileName);
-                saveSettings();
+                SaveSettings();
             }
         }
 
@@ -1117,7 +1117,7 @@ namespace VisualMusic
                     return;
 
                 openTextureDlg.InitialDirectory = Path.GetDirectoryName(openTextureDlg.FileName);
-                saveSettings();
+                SaveSettings();
 
                 for (i = 0; i < trackList.SelectedIndices.Count; i++)
                 {
@@ -1134,7 +1134,7 @@ namespace VisualMusic
                 MessageBox.Show(ex.Message);
             }
             Project.createOcTrees();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private TrackPropsTex getActiveTexProps(int index)
@@ -1152,7 +1152,7 @@ namespace VisualMusic
             {
                 getActiveTexProps(i).unloadTexture();
             }
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void openSongToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1166,8 +1166,8 @@ namespace VisualMusic
                 return;
             }
             ProjectFolder = Path.GetDirectoryName(openProjDialog.FileName);
-            saveSettings();
-            changeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
+            SaveSettings();
+            ChangeToScreen(SongPanel); //Hide browsers if they haven't been hidden yet. Otherwise the last browser will be brought to front during loading.Hopefully they have had time to initialize.
             openProjectFile(openProjDialog.FileName);
         }
         async void openProjectFile(string projectPath)
@@ -1247,11 +1247,10 @@ namespace VisualMusic
                 }
             } while (true);
 
-            if (Project.KeyFrames == null) //Old project file format
-                Project.KeyFrames = new KeyFrames();
-            Project.ImportOptions.updateImportForm();
+            Project.InitAfterDeserialization();
+            
             currentProjPath = projectPath;
-            songLoaded(currentProjPath);
+            SongLoaded(currentProjPath);
             updateFormTitle(currentProjPath);
             Project.DefaultFileName = Path.GetFileName(currentProjPath);
             unsavedChanges = false;
@@ -1300,7 +1299,7 @@ namespace VisualMusic
             if (saveProjDialog.ShowDialog() != DialogResult.OK)
                 return false;
             ProjectFolder = Path.GetDirectoryName(saveProjDialog.FileName);
-            saveSettings();
+            SaveSettings();
 
             //Save audio mixdown
             saveMixdownDialog.FileName = Path.ChangeExtension(saveProjDialog.FileName, "wav");
@@ -1380,7 +1379,7 @@ namespace VisualMusic
                 updateCamControls();
                 updatingControls = false;
             };
-            changeToScreen(SongPanel, false);
+            ChangeToScreen(SongPanel, false);
         }
 
         private void invalidateSongPanel(object sender, EventArgs e)
@@ -1445,10 +1444,10 @@ namespace VisualMusic
         void applyUndoItem()
         {
             Project.copyPropsFrom(undoItems.Current.Project);
-            updateProjPropsControls();
-            updateTrackPropsControls();
+            UpdateProjPropsControls();
+            UpdateTrackPropsControls();
             if (undoItems.RedoDesc == "Reorder tracks")
-                createTrackList();
+                CreateTrackList();
             else
                 updateTrackListColors();
             SongPanel.Invalidate();
@@ -1501,17 +1500,17 @@ namespace VisualMusic
         private void defaultStyleBtn_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.resetStyle();
+                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.ResetStyle();
             Project.createOcTrees();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void defaultMaterial_Click(object sender, EventArgs e)
         {
             //unloadTexBtn.PerformClick();// _Click(null, null);
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.resetMaterial();
-            updateTrackPropsControls();
+                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.ResetMaterial();
+            UpdateTrackPropsControls();
             updateTrackListColors();
 
         }
@@ -1519,15 +1518,15 @@ namespace VisualMusic
         private void defaultLightBtn_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.resetLight();
-            updateTrackPropsControls();
+                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.ResetLight();
+            UpdateTrackPropsControls();
         }
 
         private void defaultSpatialBtn_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
-                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.resetSpatial();
-            updateTrackPropsControls();
+                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.ResetSpatial();
+            UpdateTrackPropsControls();
         }
 
         private void trackPropsCb_CheckedChanged(object sender, EventArgs e)
@@ -1607,7 +1606,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).PointSmp = ((CheckBox)sender).Checked;
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void texColBlendCb_CheckedChanged(object sender, EventArgs e)
@@ -1630,7 +1629,7 @@ namespace VisualMusic
                     getActiveTexProps(i).VTile = ((CheckBox)sender).Checked;
                 }
                 Project.createOcTrees();
-                updateTrackPropsControls();
+                UpdateTrackPropsControls();
             }
         }
         void updateTexUVCb(CheckBox uv, CheckBox u, CheckBox v)
@@ -1656,7 +1655,7 @@ namespace VisualMusic
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UTile = ((CheckBox)sender).Checked;
             Project.createOcTrees();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void texVTileCb_CheckedChanged(object sender, EventArgs e)
@@ -1666,7 +1665,7 @@ namespace VisualMusic
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).VTile = ((CheckBox)sender).Checked;
             Project.createOcTrees();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void noteAnchorLabel_Click(object sender, EventArgs e)
@@ -1676,7 +1675,7 @@ namespace VisualMusic
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UAnchor = getActiveTexProps(i).VAnchor = TexAnchorEnum.Note;
             Project.createOcTrees();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void screenAnchorLabel_Click(object sender, EventArgs e)
@@ -1686,7 +1685,7 @@ namespace VisualMusic
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UAnchor = getActiveTexProps(i).VAnchor = TexAnchorEnum.Screen;
             Project.createOcTrees();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void songAnchorLabel_Click(object sender, EventArgs e)
@@ -1696,7 +1695,7 @@ namespace VisualMusic
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UAnchor = TexAnchorEnum.Song;
             Project.createOcTrees();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
         }
 
         private void noteUAnchorRb_Click(object sender, EventArgs e)
@@ -1779,7 +1778,7 @@ namespace VisualMusic
         private void tpartyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TpartyIntegrationForm.ShowDialog();
-            saveSettings();
+            SaveSettings();
         }
         public static void showErrorMsgBox(string message, string caption = "")
         {
@@ -2032,25 +2031,25 @@ namespace VisualMusic
 
         private void viewSongTSMI_Click(object sender, EventArgs e)
         {
-            changeToScreen(SongPanel);
+            ChangeToScreen(SongPanel);
         }
 
         private void viewModBrowserTSMI_Click(object sender, EventArgs e)
         {
-            changeToScreen(modWebBrowser);
+            ChangeToScreen(modWebBrowser);
         }
 
         private void viewSidBrowserTSMI_Click(object sender, EventArgs e)
         {
-            changeToScreen(sidWebBrowser);
+            ChangeToScreen(sidWebBrowser);
         }
 
         private void viewMidiBrowserTSMI_Click(object sender, EventArgs e)
         {
-            changeToScreen(midiWebBrowser);
+            ChangeToScreen(midiWebBrowser);
         }
 
-        void changeToScreen(Control newScreen, bool hideOthers = true)
+        void ChangeToScreen(Control newScreen, bool hideOthers = true)
         {
             if (!hideOthers)
             {
@@ -2169,7 +2168,7 @@ namespace VisualMusic
             if (openTrackPropsFileDialog.ShowDialog() != DialogResult.OK)
                 return;
             TrackPropsFolder = Path.GetDirectoryName(openTrackPropsFileDialog.FileName);
-            saveSettings();
+            SaveSettings();
 
             TrackProps props;
             DataContractSerializer dcs = new DataContractSerializer(typeof(TrackProps), projectSerializationTypes);
@@ -2214,7 +2213,7 @@ namespace VisualMusic
 
             AddUndoItem("Load Track Properties");
             updateTrackListColors();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
             if ((typeFlags & (int)TrackPropsType.TPT_Style) != 0)
                 Project.createOcTrees();
         }
@@ -2232,7 +2231,7 @@ namespace VisualMusic
             if (saveTrackPropsFileDialog.ShowDialog() != DialogResult.OK)
                 return;
             TrackPropsFolder = Path.GetDirectoryName(saveTrackPropsFileDialog.FileName);
-            saveSettings();
+            SaveSettings();
 
             int trackIndex = trackPropsCb.Checked ? trackList.SelectedIndices[0] : 0;
             TrackProps props = (TrackProps)Project.TrackViews[trackIndex].TrackProps;
@@ -2284,7 +2283,7 @@ namespace VisualMusic
             if (openCamFileDialog.ShowDialog() != DialogResult.OK)
                 return;
             CamFolder = Path.GetDirectoryName(openCamFileDialog.FileName);
-            saveSettings();
+            SaveSettings();
 
             DataContractSerializer dcs = new DataContractSerializer(typeof(Camera), projectSerializationTypes);
             try
@@ -2307,7 +2306,7 @@ namespace VisualMusic
             if (saveCamFileDialog.ShowDialog() != DialogResult.OK)
                 return;
             CamFolder = Path.GetDirectoryName(saveCamFileDialog.FileName);
-            saveSettings();
+            SaveSettings();
 
             DataContractSerializer dcs = new DataContractSerializer(typeof(Camera), projectSerializationTypes);
             try
@@ -2349,12 +2348,12 @@ namespace VisualMusic
             if (trackList.SelectedIndices != null)
             {
                 foreach (int index in trackList.SelectedIndices)
-                    Project.TrackViews[index].TrackProps.resetProps();
+                    Project.TrackViews[index].TrackProps.ResetProps();
             }
             else
-                Project.TrackViews[0].TrackProps.resetProps();
+                Project.TrackViews[0].TrackProps.ResetProps();
             Project.createOcTrees();
-            updateTrackPropsControls();
+            UpdateTrackPropsControls();
             updateTrackListColors();
         }
 
@@ -2627,7 +2626,7 @@ namespace VisualMusic
             if (dlgResult == DialogResult.OK)
             {
                 openBkgDialog.InitialDirectory = Path.GetDirectoryName(openBkgDialog.FileName);
-                saveSettings();
+                SaveSettings();
                 Project.Props.BackgroundImagePath = openBkgDialog.FileName;
                 SongPanel.LoadBackgroundImage(Project.Props.BackgroundImagePath);
             }
@@ -2678,7 +2677,7 @@ namespace VisualMusic
             if (DialogResult.OK != openTrackAudioDlg.ShowDialog())
                 return;
             openTrackAudioDlg.InitialDirectory = Path.GetDirectoryName(openTrackAudioDlg.FileName);
-            saveSettings();
+            SaveSettings();
             trackAudioFileTb.Text = openTrackAudioDlg.FileName;
         }
     }

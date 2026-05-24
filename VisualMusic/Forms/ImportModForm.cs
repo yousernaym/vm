@@ -20,17 +20,17 @@ namespace VisualMusic
 
         private void Ok_Click(object sender, EventArgs e)
         {
-            importFiles();
+            ImportFiles();
         }
 
-        public override void importFiles()
+        public override void ImportFiles()
         {
-            importFiles(new ModImportOptions());
+            ImportFiles(new ModImportOptions());
         }
 
         private void ImportModForm_Load(object sender, EventArgs e)
         {
-            createNoteFormatFilter("Mod files", Formats);
+            CreateNoteFormatFilter("Mod files", Formats);
         }
     }
 

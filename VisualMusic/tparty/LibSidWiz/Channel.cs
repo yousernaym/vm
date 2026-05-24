@@ -35,7 +35,7 @@ namespace LibSidWiz
         private string _label = "";
         private float _lineWidth = 3;
         private float _scale = 1.0f;
-        private int _viewWidthInSamples = 750;
+        private int _viewWidthInSamples = 650;
         private Color _fillColor = Color.Transparent;
         private float _zeroLineWidth = 0;
         private Color _zeroLineColor = Color.Transparent;
@@ -53,9 +53,11 @@ namespace LibSidWiz
         private bool _smoothLines = true;
         private bool _filter;
         private double _fillBase;
-
+        static int idCounter;
+        public int Id;
         public Channel(bool autoReloadOnSettingChanged)
         {
+            Id = idCounter++;
             _autoReloadOnSettingChanged = autoReloadOnSettingChanged;
         }
 
@@ -295,7 +297,7 @@ namespace LibSidWiz
             set
             {
                 _lineWidth = value;
-                Pen.Width = value;
+                Pen.Width = value * Renderer.Width / 480;
                 Changed?.Invoke(this, false);
             }
         }

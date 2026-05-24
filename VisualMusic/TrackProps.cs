@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Sources;
 using System.Windows.Forms;
 
 
@@ -30,13 +31,13 @@ namespace VisualMusic
         public MaterialProps MaterialProps { get; set; }
         public LightProps LightProps { get; set; }
         public SpatialProps SpatialProps { get; set; }
-        public AudioProps AudioProps { get; set; } = new AudioProps();
+        public AudioProps AudioProps { get; set; }
         public int TypeFlags { get; set; } //Determines which type of properties should be saved or loaded to/from file.
 
         public TrackProps(TrackView view)
         {
             TrackView = view;
-            resetProps();
+            ResetProps();
         }
 
         public TrackProps(SerializationInfo info, StreamingContext ctxt)
@@ -57,6 +58,8 @@ namespace VisualMusic
                     TypeFlags = (int)entry.Value;
 
             }
+            if (AudioProps == null)
+                AudioProps = new();
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -74,32 +77,39 @@ namespace VisualMusic
             MaterialProps.loadContent();
         }
 
-        public void resetStyle()
+        public void ResetStyle()
         {
             StyleProps = new StyleProps(TrackNumber);
         }
 
-        public void resetMaterial()
+        public void ResetMaterial()
         {
             MaterialProps = new MaterialProps(TrackNumber, NumTracks);
         }
 
-        public void resetLight()
+        public void ResetLight()
         {
             LightProps = new LightProps(TrackNumber);
         }
 
-        public void resetSpatial()
+        public void ResetSpatial()
         {
             SpatialProps = new SpatialProps();
         }
 
-        public void resetProps()
+        public void ResetProps()
         {
-            resetMaterial();
-            resetStyle();
-            resetLight();
-            resetSpatial();
+            ResetMaterial();
+            ResetStyle();
+            ResetLight();
+            ResetSpatial();
+            ResetAudio();
+        }
+
+        async void ResetAudio()
+        {
+            AudioProps?.Dispose();
+            AudioProps = new AudioProps();
         }
 
         public TrackProps clone(SongPanel songPanel)
@@ -119,6 +129,8 @@ namespace VisualMusic
                 LightProps = source.LightProps.clone();
             if ((type & (int)TrackPropsType.TPT_Spatial) > 0)
                 SpatialProps = source.SpatialProps.clone();
+            if ((type & (int)TrackPropsType.TPT_Audio) > 0)
+                AudioProps = source.AudioProps;
         }
     }
 
@@ -419,7 +431,7 @@ namespace VisualMusic
                 if (entry.Name == "noteStyles")
                 {
                     styles = (NoteStyle[])entry.Value;
-                    loadFx();
+                    LoadFx();
                 }
                 else if (entry.Name == "noteStyleType")
                     Type = (NoteStyleType)entry.Value;
@@ -478,7 +490,7 @@ namespace VisualMusic
             return (NoteStyle_Line)styles[(int)NoteStyleType.Line];
         }
 
-        public void loadFx()
+        public void LoadFx()
         {
             foreach (NoteStyle ns in styles)
             {
@@ -581,7 +593,7 @@ namespace VisualMusic
             }
             return tex;
         }
-        public System.Drawing.Color getSysColor(bool bhilited, MaterialProps globalMaterial)
+        public System.Drawing.Color GetSysColor(bool bhilited, MaterialProps globalMaterial)
         {
             Vector4 hsla = getColor(bhilited, globalMaterial);
             //hsla.Z *= 0.5f;
@@ -797,7 +809,7 @@ namespace VisualMusic
                 if (entry.Name == "audioFile")
                 {
                     SidWizChannel.Filename = (string)entry.Value;
-                    SidWizChannel.LoadDataAsync();
+                    //SidWizChannel.LoadDataAsync();
                 }
             }
         }

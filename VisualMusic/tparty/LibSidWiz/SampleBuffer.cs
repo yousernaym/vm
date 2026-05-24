@@ -1,6 +1,7 @@
 ﻿using NAudio.Dsp;
 using NAudio.Wave;
 using System;
+using System.Windows;
 
 namespace LibSidWiz
 {
@@ -102,8 +103,15 @@ namespace LibSidWiz
                     var chunk = _chunk1.Offset < _chunk2.Offset ? _chunk1 : _chunk2;
                     // Pick the rounded offset
                     chunk.Offset = (index / ChunkSize) * ChunkSize;
-                    _reader.Position = chunk.Offset * _reader.WaveFormat.BitsPerSample / 8 *
-                                       _reader.WaveFormat.Channels;
+                    try
+                    {
+                        _reader.Position = chunk.Offset * _reader.WaveFormat.BitsPerSample / 8 *
+                                           _reader.WaveFormat.Channels;
+                    }
+                    catch (NullReferenceException ex)
+                    {
+                        MessageBox.Show($"{ex.ToString()} \n chunk.Offset: {chunk.Offset}\n_reader.WaveFormat.BitsPerSample: {_reader.WaveFormat.BitsPerSample}\n_reader.WaveFormat.Channels: {_reader.WaveFormat.Channels}");
+                    }
                     _sampleProvider.Read(chunk.Buffer, 0, ChunkSize);
 
                     for (int i = 0; i < ChunkSize; i++)

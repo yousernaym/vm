@@ -55,7 +55,7 @@ namespace VisualMusic
                 tpartyOutputTb.Text = tpartyAudioDirDlg.InitialDirectory = tpartyAudioDirDlg.FileName;
         }
 
-        new protected void importFiles(ImportOptions options)
+        new protected void ImportFiles(ImportOptions options)
         {
             if (existingAudioRbtn.Checked)
             {   //No user-specified command line

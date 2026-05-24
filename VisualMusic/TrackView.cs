@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Reflection;
 using System.Runtime.Serialization;
+using System.Windows.Forms;
 
 namespace VisualMusic
 {
