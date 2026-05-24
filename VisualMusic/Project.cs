@@ -956,9 +956,11 @@ namespace VisualMusic
 
         public void Dispose()
         {
+            // Only called on undo snapshots, which share AudioProps with the live project via clone().
+            // Disposing AudioProps here would dispose the live SampleBuffer/AudioFileReader and cause
+            // NREs the next time a chunk is loaded (e.g. after seeking).
             foreach (var tv in trackViews)
             {
-                tv.TrackProps.AudioProps.Dispose();
                 tv.OcTree?.Dispose();
             }
         }
