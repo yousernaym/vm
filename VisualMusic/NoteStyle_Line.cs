@@ -104,7 +104,7 @@ namespace VisualMusic
         }
         override public void loadFx()
         {
-            fx = SongPanel.Content.Load<Effect>("Line");
+            fx = Content.Load<Effect>("Line");
         }
 
         void getCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset, float step, float x, TrackProps trackProps, float lineWidth)

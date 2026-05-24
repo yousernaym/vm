@@ -63,7 +63,12 @@ namespace VisualMusic
 
         // --- Public properties ---
         public SpriteFont LyricsFont { get; private set; }
-        public Project Project { get; set; }
+        Project _project;
+        public Project Project
+        {
+            get => _project;
+            set { _project = value; NoteStyle.SetProject(value); }
+        }
         public float NormMouseX { get; set; }
         public float NormMouseY { get; set; }
         public bool LeftMbPressed => leftMbPressed;
@@ -108,6 +113,7 @@ namespace VisualMusic
 
             content = new ContentManager(services, "Content");
             NoteStyle.SetGraphicsDevice(graphicsDevice);
+            NoteStyle.SetContent(content);
             NoteStyle.sInitAllStyles();
             LyricsFont = content.Load<SpriteFont>("Font");
 

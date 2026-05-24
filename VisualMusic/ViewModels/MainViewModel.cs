@@ -118,18 +118,24 @@ namespace VisualMusic.ViewModels
                 return;
             }
 
+            // Set static project reference before loadContent so NoteStyle.createGeoChunk
+            // (called from createOcTrees inside loadContent) can access Project.Props.
+            NoteStyle.SetProject(tempProject);
+
             try
             {
                 await tempProject.loadContent();
             }
             catch (FileImportException ex)
             {
+                NoteStyle.SetProject(null);
                 MessageBox.Show($"Could not load project file: {ex.Message}\n\nMissing file: {ex.FileName}",
                     Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (Exception ex)
             {
+                NoteStyle.SetProject(null);
                 MessageBox.Show("Error loading project: " + ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }

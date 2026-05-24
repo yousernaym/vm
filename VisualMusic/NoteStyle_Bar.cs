@@ -59,7 +59,7 @@ namespace VisualMusic
 
         override public void loadFx()
         {
-            fx = SongPanel.Content.Load<Effect>("Bar");
+            fx = Content.Load<Effect>("Bar");
         }
 
         public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)

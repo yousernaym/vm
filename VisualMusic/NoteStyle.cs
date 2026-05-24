@@ -168,12 +168,15 @@ namespace VisualMusic
 
         static GraphicsDevice _graphicsDeviceOverride;
         static Project _projectOverride;
+        static Microsoft.Xna.Framework.Content.ContentManager _contentOverride;
 
         public static void SetGraphicsDevice(GraphicsDevice gd) => _graphicsDeviceOverride = gd;
         public static void SetProject(Project p) => _projectOverride = p;
+        public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm) => _contentOverride = cm;
 
         protected static GraphicsDevice GraphicsDevice => _graphicsDeviceOverride ?? SongPanel?.GraphicsDevice;
         protected static Project Project => _projectOverride ?? SongPanel?.Project;
+        protected static Microsoft.Xna.Framework.Content.ContentManager Content => _contentOverride ?? SongPanel?.Content;
 
         //Serializable----------
         protected NoteStyleType styleType; //Set in constructor of inherited class
