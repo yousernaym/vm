@@ -6,8 +6,9 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows7.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <StartupObject>VisualMusic.Program</StartupObject>
+    <StartupObject>VisualMusic.App</StartupObject>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <PropertyGroup>
@@ -53,6 +54,10 @@
     <PackageReference Include="cef.redist.x86" Version="120.2.7" />
     <PackageReference Include="CefSharp.Common.NETCore" Version="121.3.70" />
     <PackageReference Include="CefSharp.WinForms.NETCore" Version="121.3.70" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="121.3.70" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="5.0.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core-6.0" Version="1.1.6" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell-6.0" Version="1.1.6" />
     <PackageReference Include="NAudio" Version="2.2.1" />
