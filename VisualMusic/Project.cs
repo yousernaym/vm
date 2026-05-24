@@ -559,6 +559,9 @@ namespace VisualMusic
             if (listIndices.Count == 1)
                 return outProps;
             outProps = outProps.clone(SongPanel);
+            // TrackProps.cloneFrom shares the AudioProps reference with the source track.
+            // Detach it here so mergeObjects can null out Filename without corrupting the source.
+            outProps.AudioProps = new AudioProps { Filename = outProps.AudioProps.Filename, LineColor = outProps.AudioProps.LineColor };
             for (int i = 1; i < listIndices.Count; i++)
                 outProps = (TrackProps)mergeObjects(outProps, TrackViews[listIndices[i]].TrackProps);
             return outProps;
