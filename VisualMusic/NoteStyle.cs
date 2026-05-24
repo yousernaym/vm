@@ -133,7 +133,7 @@ namespace VisualMusic
 
         public NoteStyleMod clone()
         {
-            DataContractSerializer dcs = new DataContractSerializer(typeof(NoteStyleMod), Form1.projectSerializationTypes);
+            DataContractSerializer dcs = new DataContractSerializer(typeof(NoteStyleMod), ProjectSerializer.KnownTypes);
             MemoryStream stream = new MemoryStream();
             dcs.WriteObject(stream, this);
             stream.Flush();

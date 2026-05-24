@@ -127,6 +127,8 @@ namespace VisualMusic
         }
 
 
+        public Task loadContent() => loadContent(null);
+
         async public Task loadContent(Form parentForm)
         {
             if (ImportOptions == null)
@@ -135,6 +137,13 @@ namespace VisualMusic
             ImportOptions.setNotePath();
             ImportOptions.EraseCurrent = false;
             await ImportSong(ImportOptions, parentForm);
+        }
+
+        public void NudgeSongPos(float stepFraction)
+        {
+            if (Notes == null) return;
+            float newPos = (float)(NormSongPos - (double)ViewWidthT * stepFraction / SongLengthT);
+            NormSongPos = Math.Max(0, Math.Min(1, newPos));
         }
 
         public Project(SerializationInfo info, StreamingContext ctxt) : this()
@@ -244,35 +253,37 @@ namespace VisualMusic
                     startInfo.WorkingDirectory = workingDir;
                     var process = Process.Start(startInfo);
                     Form1.RemuxerProcess = process;
-                    parentForm.Enabled = false;
+                    if (parentForm != null)
+                        parentForm.Enabled = false;
                     try
                     {
-                        FormWindowState initialWindowState = Program.form1.WindowState;
+                        FormWindowState initialWindowState = Program.form1?.WindowState ?? FormWindowState.Normal;
                         await Task.Run(() =>
                         {
-                            //Minimize parent form when process form is minimized,
-                            //and restore parent form when process form is restored
-                            //Process form also needs to be restored if parent form is restored, which is done in Form1.Form1_Activated event handler
                             bool wasMinimized = false;
                             while (!process.HasExited)
                             {
-                                bool isMinimized = IsIconic(process.MainWindowHandle);
-                                if (isMinimized && !wasMinimized)
-                                    Program.form1.Invoke(new Action(() => Program.form1.WindowState = FormWindowState.Minimized));
-                                else if (!isMinimized && wasMinimized)
+                                if (Program.form1 != null)
                                 {
-                                    Program.form1.Invoke(new Action(() => Program.form1.WindowState = initialWindowState));
-                                    Form1.regainFocus(process); //Prevent parentForm to steal focus from process when its initial window state is restored
+                                    bool isMinimized = IsIconic(process.MainWindowHandle);
+                                    if (isMinimized && !wasMinimized)
+                                        Program.form1.Invoke(new Action(() => Program.form1.WindowState = FormWindowState.Minimized));
+                                    else if (!isMinimized && wasMinimized)
+                                    {
+                                        Program.form1.Invoke(new Action(() => Program.form1.WindowState = initialWindowState));
+                                        Form1.regainFocus(process);
+                                    }
+                                    wasMinimized = isMinimized;
                                 }
-                                wasMinimized = isMinimized;
-                                Thread.Sleep(200); //Free cpu cycles
+                                Thread.Sleep(200);
                             }
                         });
                     }
                     finally
                     {
-                        parentForm.Enabled = true;
-                        Program.form1.Activate();
+                        if (parentForm != null)
+                            parentForm.Enabled = true;
+                        Program.form1?.Activate();
                     }
                     if (process.ExitCode != 0)
                         throw new FileImportException(null, ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
@@ -988,12 +999,13 @@ namespace VisualMusic
             //source.Dispose();
         }
 
-        internal void InitAfterDeserialization()
+        internal void InitAfterDeserialization(WaveformPanel waveformPanel = null)
         {
             if (KeyFrames == null) //Old project file format
                 KeyFrames = new KeyFrames();
             ImportOptions.updateImportForm();
-            SongPanel.WaveformPanel.ClearChannels();
+            var wp = waveformPanel ?? SongPanel.WaveformPanel;
+            wp.ClearChannels();
 
             for (int i = 0; i < TrackViews.Count; i++)
             {
@@ -1002,7 +1014,7 @@ namespace VisualMusic
                 if (i > 0)
                 {
                     _ = tv.TrackProps.AudioProps.LoadAudioAsync();
-                    SongPanel.WaveformPanel.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
+                    wp.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
                 }
             }
         }

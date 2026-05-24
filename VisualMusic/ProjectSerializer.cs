@@ -1,0 +1,25 @@
+using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using XnaColor = Microsoft.Xna.Framework.Color;
+
+namespace VisualMusic
+{
+    static class ProjectSerializer
+    {
+        public static readonly Type[] KnownTypes = new Type[]
+        {
+            typeof(TrackView), typeof(TrackProps), typeof(StyleProps), typeof(MaterialProps),
+            typeof(LightProps), typeof(SpatialProps), typeof(NoteTypeMaterial), typeof(TrackPropsTex),
+            typeof(Microsoft.Xna.Framework.Point), typeof(Vector2), typeof(Vector3), typeof(Vector4),
+            typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType),
+            typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(Midi.FileType),
+            typeof(Midi.MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType),
+            typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions),
+            typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment),
+            typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps),
+            typeof(List<TrackProps>), typeof(AudioProps)
+        };
+    }
+}

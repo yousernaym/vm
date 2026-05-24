@@ -81,8 +81,8 @@ namespace VisualMusic
             set => forceDefaultNoteStyle = value;
         }
 
-        public readonly float SmallScrollStep = 1.0f / 16;
-        public readonly float LargeScrollStep = 1.0f;
+        public const float SmallScrollStep = 1.0f / 16;
+        public const float LargeScrollStep = 1.0f;
 
         public delegate void Delegate_songPosChanged();
         public Delegate_songPosChanged OnSongPosChanged { get; set; }

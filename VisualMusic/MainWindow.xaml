@@ -2,35 +2,127 @@
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                 xmlns:vm="clr-namespace:VisualMusic.ViewModels"
-                 xmlns:local="clr-namespace:VisualMusic"
                  xmlns:ctrl="clr-namespace:VisualMusic.Controls"
                  xmlns:conv="clr-namespace:VisualMusic.Converters"
+                 xmlns:local="clr-namespace:VisualMusic"
                  Title="{Binding WindowTitle}"
                  Height="800" Width="1200"
                  WindowStartupLocation="CenterScreen">
-    <mah:MetroWindow.DataContext>
-        <vm:MainViewModel />
-    </mah:MetroWindow.DataContext>
     <mah:MetroWindow.Resources>
         <conv:EqualityToVisibilityConverter x:Key="ScreenVis"/>
     </mah:MetroWindow.Resources>
 
-    <Grid>
-        <!-- MonoGame render surface — visible on Song screen -->
-        <local:MonoGameHost x:Name="monoGameHost"
-            Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=Song}"/>
+    <!-- Keyboard bindings -->
+    <mah:MetroWindow.InputBindings>
+        <!-- File -->
+        <KeyBinding Command="{Binding ImportMidiCommand}"     Key="M"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding ImportModCommand}"      Key="M"    Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding ImportSidCommand}"      Key="S"    Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding OpenProjectCommand}"    Key="O"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding SaveProjectCommand}"    Key="S"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding SaveProjectAsCommand}"  Key="S"    Modifiers="Alt+Shift"/>
+        <KeyBinding Command="{Binding ExportVideoCommand}"    Key="E"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding TpartyIntegrationCommand}" Key="T" Modifiers="Control"/>
+        <!-- Edit -->
+        <KeyBinding Command="{Binding UndoCommand}"           Key="Z"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding RedoCommand}"           Key="Z"    Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding ResetCameraCommand}"    Key="R"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding DefaultTrackPropsCommand}" Key="D" Modifiers="Control"/>
+        <KeyBinding Command="{Binding LoadTrackPropsCommand}" Key="P"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding SaveTrackPropsCommand}" Key="P"    Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding InsertLyricsCommand}"   Key="L"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding InsertKeyFrameCommand}" Key="K"    Modifiers="Control"/>
+        <!-- Playback -->
+        <KeyBinding Command="{Binding TogglePlaybackCommand}" Key="Space" Modifiers="Control"/>
+        <KeyBinding Command="{Binding GoToBeginningCommand}"  Key="Home"  Modifiers="Control"/>
+        <KeyBinding Command="{Binding GoToEndCommand}"        Key="End"   Modifiers="Control"/>
+        <KeyBinding Command="{Binding NudgeBackCommand}"      Key="Left"  Modifiers="Control"/>
+        <KeyBinding Command="{Binding NudgeForwardCommand}"   Key="Right" Modifiers="Control"/>
+        <KeyBinding Command="{Binding JumpBackCommand}"       Key="Left"  Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding JumpForwardCommand}"    Key="Right" Modifiers="Control+Shift"/>
+        <!-- View -->
+        <KeyBinding Command="{Binding ShowSongCommand}"       Key="F1"/>
+        <KeyBinding Command="{Binding ShowModBrowserCommand}" Key="F2"/>
+        <KeyBinding Command="{Binding ShowSidBrowserCommand}" Key="F3"/>
+        <KeyBinding Command="{Binding ShowMidiBrowserCommand}" Key="F4"/>
+    </mah:MetroWindow.InputBindings>
 
-        <!-- MOD Archive browser -->
-        <ctrl:SongWebBrowserWpf x:Name="modBrowser"
-            Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=ModBrowser}"/>
+    <DockPanel>
+        <!-- Menu bar -->
+        <Menu DockPanel.Dock="Top">
 
-        <!-- HVSC / SID browser -->
-        <ctrl:SongWebBrowserWpf x:Name="sidBrowser"
-            Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=SidBrowser}"/>
+            <!-- FILE -->
+            <MenuItem Header="_File">
+                <MenuItem Header="Import _MIDI song..."   Command="{Binding ImportMidiCommand}"    InputGestureText="Ctrl+M"/>
+                <MenuItem Header="Import M_odule..."      Command="{Binding ImportModCommand}"     InputGestureText="Ctrl+Shift+M"/>
+                <MenuItem Header="Import _SID song..."    Command="{Binding ImportSidCommand}"     InputGestureText="Ctrl+Shift+S"/>
+                <Separator/>
+                <MenuItem Header="_Open project..."       Command="{Binding OpenProjectCommand}"   InputGestureText="Ctrl+O"/>
+                <MenuItem Header="_Save project"          Command="{Binding SaveProjectCommand}"   InputGestureText="Ctrl+S"/>
+                <MenuItem Header="Save project _as..."    Command="{Binding SaveProjectAsCommand}" InputGestureText="Alt+Shift+S"/>
+                <Separator/>
+                <MenuItem Header="_Export video..."       Command="{Binding ExportVideoCommand}"   InputGestureText="Ctrl+E"/>
+                <MenuItem Header="_Third-party integration..." Command="{Binding TpartyIntegrationCommand}" InputGestureText="Ctrl+T"/>
+            </MenuItem>
 
-        <!-- BitMidi browser -->
-        <ctrl:SongWebBrowserWpf x:Name="midiBrowser"
-            Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=MidiBrowser}"/>
-    </Grid>
+            <!-- EDIT -->
+            <MenuItem Header="_Edit">
+                <MenuItem Header="{Binding UndoMenuHeader}" Command="{Binding UndoCommand}"  InputGestureText="Ctrl+Z"/>
+                <MenuItem Header="{Binding RedoMenuHeader}" Command="{Binding RedoCommand}"  InputGestureText="Ctrl+Shift+Z"/>
+                <Separator/>
+                <MenuItem Header="_Camera">
+                    <MenuItem Header="_Reset"  Command="{Binding ResetCameraCommand}" InputGestureText="Ctrl+R"/>
+                    <MenuItem Header="_Load..."  Command="{Binding LoadCameraCommand}"/>
+                    <MenuItem Header="_Save..."  Command="{Binding SaveCameraCommand}"/>
+                </MenuItem>
+                <MenuItem Header="_Tracks">
+                    <MenuItem Header="_Default Properties" Command="{Binding DefaultTrackPropsCommand}" InputGestureText="Ctrl+D"/>
+                    <MenuItem Header="_Load properties..."  Command="{Binding LoadTrackPropsCommand}"   InputGestureText="Ctrl+P"/>
+                    <MenuItem Header="_Save properties..."  Command="{Binding SaveTrackPropsCommand}"   InputGestureText="Ctrl+Shift+P"/>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Insert _Lyrics"    Command="{Binding InsertLyricsCommand}"   InputGestureText="Ctrl+L"/>
+                <MenuItem Header="Insert _Key Frame" Command="{Binding InsertKeyFrameCommand}" InputGestureText="Ctrl+K"/>
+            </MenuItem>
+
+            <!-- PLAYBACK -->
+            <MenuItem Header="_Playback">
+                <MenuItem Header="_Start/Stop"      Command="{Binding TogglePlaybackCommand}" InputGestureText="Ctrl+Space"/>
+                <MenuItem Header="Go to _beginning" Command="{Binding GoToBeginningCommand}"  InputGestureText="Ctrl+Home"/>
+                <MenuItem Header="Go to _end"       Command="{Binding GoToEndCommand}"        InputGestureText="Ctrl+End"/>
+                <Separator/>
+                <MenuItem Header="Nudge _backwards" Command="{Binding NudgeBackCommand}"    InputGestureText="Ctrl+Left"/>
+                <MenuItem Header="Nudge _forwards"  Command="{Binding NudgeForwardCommand}" InputGestureText="Ctrl+Right"/>
+                <MenuItem Header="Jump b_ackwards"  Command="{Binding JumpBackCommand}"     InputGestureText="Ctrl+Shift+Left"/>
+                <MenuItem Header="Jump fo_rwards"   Command="{Binding JumpForwardCommand}"  InputGestureText="Ctrl+Shift+Right"/>
+            </MenuItem>
+
+            <!-- VIEW -->
+            <MenuItem Header="_View">
+                <MenuItem Header="_Song"         Command="{Binding ShowSongCommand}"       InputGestureText="F1"/>
+                <MenuItem Header="_Mod browser"  Command="{Binding ShowModBrowserCommand}" InputGestureText="F2"/>
+                <MenuItem Header="S_ID browser"  Command="{Binding ShowSidBrowserCommand}" InputGestureText="F3"/>
+                <MenuItem Header="M_IDI browser" Command="{Binding ShowMidiBrowserCommand}" InputGestureText="F4"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Content area -->
+        <Grid>
+            <!-- MonoGame render surface — visible on Song screen -->
+            <local:MonoGameHost x:Name="monoGameHost"
+                Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=Song}"/>
+
+            <!-- MOD Archive browser -->
+            <ctrl:SongWebBrowserWpf x:Name="modBrowser"
+                Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=ModBrowser}"/>
+
+            <!-- HVSC / SID browser -->
+            <ctrl:SongWebBrowserWpf x:Name="sidBrowser"
+                Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=SidBrowser}"/>
+
+            <!-- BitMidi browser -->
+            <ctrl:SongWebBrowserWpf x:Name="midiBrowser"
+                Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=MidiBrowser}"/>
+        </Grid>
+    </DockPanel>
 </mah:MetroWindow>

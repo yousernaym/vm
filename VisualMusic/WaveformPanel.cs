@@ -86,14 +86,12 @@ namespace VisualMusic
 
         internal void ClearChannels()
         {
-            _renderer.ClearChannels();
+            _renderer?.ClearChannels();
         }
 
         public void AddChannel(Channel channel)
         {
-            if (_renderer == null)
-                throw new InvalidOperationException("Renderer not initialized. Call Init() first.");
-            _renderer.AddChannel(channel);
+            _renderer?.AddChannel(channel);
         }
 
         public void Dispose()

@@ -275,6 +275,7 @@ namespace VisualMusic
 
         public void updateImportForm()
         {
+            if (Form1.ImportMidiForm == null) return; // WPF path — no WinForms import dialogs
             //Clear all forms before update
             Form1.ImportMidiForm.NoteFilePath = Form1.ImportMidiForm.AudioFilePath = Form1.ImportModForm.NoteFilePath = Form1.ImportModForm.AudioFilePath = Form1.ImportSidForm.NoteFilePath = Form1.ImportSidForm.AudioFilePath = null;
 
