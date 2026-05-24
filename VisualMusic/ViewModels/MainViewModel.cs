@@ -71,6 +71,8 @@ namespace VisualMusic.ViewModels
         public Action<Project> OnProjectLoaded { get; set; }
         /// <summary>Called to load the background image on the renderer.</summary>
         public Action<string> OnLoadBackgroundImage { get; set; }
+        /// <summary>Returns the active draw host (SongRenderer) for wiring up Project.SetDrawHost.</summary>
+        public Func<ISongDrawHost> GetDrawHost { get; set; }
 
         // ---- Folder memory for file dialogs ----
 
@@ -118,8 +120,10 @@ namespace VisualMusic.ViewModels
                 return;
             }
 
-            // Set static project reference before loadContent so NoteStyle.createGeoChunk
-            // (called from createOcTrees inside loadContent) can access Project.Props.
+            // Set static references before loadContent so NoteStyle.createGeoChunk and
+            // Project.drawSong() (both called from inside loadContent) can access the renderer.
+            var drawHost = GetDrawHost?.Invoke();
+            if (drawHost != null) Project.SetDrawHost(drawHost);
             NoteStyle.SetProject(tempProject);
 
             try

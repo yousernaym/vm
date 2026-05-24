@@ -112,14 +112,14 @@ namespace VisualMusic
             AudioProps = new AudioProps();
         }
 
-        public TrackProps clone(SongPanel songPanel)
+        public TrackProps clone(ISongDrawHost host = null)
         {
             TrackProps newProps = new TrackProps(TrackView);
-            newProps.cloneFrom(this, (int)TrackPropsType.TPT_All, songPanel);
+            newProps.cloneFrom(this, (int)TrackPropsType.TPT_All, host);
             return newProps;
         }
 
-        internal void cloneFrom(TrackProps source, int type, SongPanel songPanel)
+        internal void cloneFrom(TrackProps source, int type, ISongDrawHost host = null)
         {
             if ((type & (int)TrackPropsType.TPT_Style) > 0)
                 StyleProps = source.StyleProps.clone();

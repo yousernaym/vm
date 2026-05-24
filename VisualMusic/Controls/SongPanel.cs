@@ -19,7 +19,7 @@ namespace VisualMusic
     //using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
     using WinKeys = System.Windows.Forms.Keys;
 
-    public class SongPanel : GraphicsDeviceControl
+    public class SongPanel : GraphicsDeviceControl, ISongDrawHost
     {
         public SpriteFont LyricsFont { get; private set; }
         GdiPoint previousMousePos = MousePosition;
@@ -632,6 +632,13 @@ namespace VisualMusic
         //    props.color = trackProps[track].getColor(hilited, GlobalTrackProps, true);
         //    return props;
         //}
+
+        // ---- ISongDrawHost ----
+        public int ClientWidth  => ClientRectangle.Width;
+        public int ClientHeight => ClientRectangle.Height;
+        public void NotifySongPosChanged() => OnSongPosChanged?.Invoke();
+        // DrawBackground, InitFrame, GraphicsDevice, ForceDefaultNoteStyle, LyricsFont,
+        // SpriteBatch, WaveformPanel, TotalTimeElapsed, Invalidate — already declared above.
 
         public void updateTimeStamp()
         {

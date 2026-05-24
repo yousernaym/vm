@@ -32,7 +32,9 @@ namespace VisualMusic
                 Props.OnPlaybackOffsetSChanged();
             }
         }
-        SongPanel SongPanel => Form1.SongPanel;
+        static ISongDrawHost _drawHostOverride;
+        public static void SetDrawHost(ISongDrawHost host) => _drawHostOverride = host;
+        ISongDrawHost DrawHost => _drawHostOverride ?? Form1.SongPanel;
 
         TimeSpan pbStartSysTime = new TimeSpan(0);
         double pbStartSongTimeS;
@@ -94,10 +96,8 @@ namespace VisualMusic
                     normSongPos = value;
                     normSongPos = Math.Max(0, normSongPos);
                     normSongPos = Math.Min(1, normSongPos);
-                    //SongPanel.paint();
-                    SongPanel.Invalidate();
-                    if (SongPanel.OnSongPosChanged != null)
-                        SongPanel.OnSongPosChanged();
+                    DrawHost?.Invalidate();
+                    DrawHost?.NotifySongPosChanged();
                 }
             }
         }
@@ -320,7 +320,7 @@ namespace VisualMusic
 
         public bool OpenNoteFile(ImportOptions options)
         {
-            SongPanel.Invalidate();
+            DrawHost?.Invalidate();
             stopPlayback();
             pbTempoEvent = 0;
             pbTimeT = 0;
@@ -430,7 +430,7 @@ namespace VisualMusic
             {
                 startTrack = 0;
                 trackViews = new List<TrackView>(numTracks);
-                SongPanel.WaveformPanel.ClearChannels();
+                DrawHost?.WaveformPanel?.ClearChannels();
             }
             else
             {
@@ -444,7 +444,7 @@ namespace VisualMusic
 
                 if (trackViews[i].TrackNumber >= notes.Tracks.Count) //The new note file has fewer tracks than the currently loaded
                 {
-                    SongPanel.WaveformPanel.RemoveChannel(trackViews[i].TrackProps.AudioProps.SidWizChannel);
+                    DrawHost?.WaveformPanel?.RemoveChannel(trackViews[i].TrackProps.AudioProps.SidWizChannel);
                     continue;
                 }
 
@@ -479,7 +479,7 @@ namespace VisualMusic
             view.TrackProps.GlobalProps = TrackViews[0].TrackProps;
             view.TrackProps.AudioProps.LineColor = view.TrackProps.MaterialProps.GetSysColor(true, view.TrackProps.GlobalProps.MaterialProps);
             view.TrackProps.AudioProps.SidWizChannel.Filename = "";
-            SongPanel.WaveformPanel.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
+            DrawHost?.WaveformPanel?.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
             if (view.TrackNumber == 1)
                 view.TrackProps.AudioProps.SidWizChannel.LoadDataAsync();
         }
@@ -500,49 +500,51 @@ namespace VisualMusic
 
         public void drawSong()
         {
-            SongPanel.DrawBackground();
+            var host = DrawHost;
+            if (host == null) return;
+
+            host.DrawBackground();
 
             if (notes == null || trackViews == null)
                 return;
 
-            SongPanel.InitFrame();
-            DepthStencilState oldDss = SongPanel.GraphicsDevice.DepthStencilState;
+            host.InitFrame();
+            DepthStencilState oldDss = host.GraphicsDevice.DepthStencilState;
             DepthStencilState dss = new DepthStencilState();
             dss.StencilEnable = true;
             dss.StencilFunction = CompareFunction.Greater;
             dss.StencilPass = StencilOperation.Replace;
             dss.ReferenceStencil = 1;
-            SongPanel.GraphicsDevice.DepthStencilState = dss;
+            host.GraphicsDevice.DepthStencilState = dss;
             for (int t = 1; t < trackViews.Count; t++)
             {
-                SongPanel.GraphicsDevice.Clear(ClearOptions.Stencil | ClearOptions.DepthBuffer, Color.AliceBlue, 1, 0);
-                trackViews[t].drawTrack(GlobalTrackProps, SongPanel.ForceDefaultNoteStyle);
+                host.GraphicsDevice.Clear(ClearOptions.Stencil | ClearOptions.DepthBuffer, Color.AliceBlue, 1, 0);
+                trackViews[t].drawTrack(GlobalTrackProps, host.ForceDefaultNoteStyle);
             }
-            SongPanel.GraphicsDevice.DepthStencilState = oldDss;
+            host.GraphicsDevice.DepthStencilState = oldDss;
 
-            var effect = new BasicEffect(SongPanel.GraphicsDevice)
+            var effect = new BasicEffect(host.GraphicsDevice)
             {
                 TextureEnabled = true,
                 VertexColorEnabled = true,
             };
-            Viewport viewport = SongPanel.GraphicsDevice.Viewport;
-            //effect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
+            Viewport viewport = host.GraphicsDevice.Viewport;
             effect.Projection = Props.Camera.ProjMat;
             effect.View = Matrix.CreateTranslation(new Vector3(0, 0, -Props.Camera.ProjMat.M11 / 2));
-            Vector2 songPanelSize = new Vector2(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
+            Vector2 songPanelSize = new Vector2(host.ClientWidth, host.ClientHeight);
             Vector2 scale = new Vector2(Props.Camera.ViewportSize.X / songPanelSize.X, -Props.Camera.ViewportSize.Y / songPanelSize.Y);
 
-            SongPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
+            host.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
             foreach (var lyricsSegment in Props.LyricsSegments)
             {
                 if (string.IsNullOrWhiteSpace(lyricsSegment.Lyrics))
                     continue;
-                float textHeight = -SongPanel.LyricsFont.MeasureString(lyricsSegment.Lyrics).Y * scale.Y;
-                SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP + getScreenPosX(secondsToTicks(lyricsSegment.Time) + PlaybackOffsetT), -Props.Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                float textHeight = -host.LyricsFont.MeasureString(lyricsSegment.Lyrics).Y * scale.Y;
+                host.SpriteBatch.DrawString(host.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP + getScreenPosX(secondsToTicks(lyricsSegment.Time) + PlaybackOffsetT), -Props.Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
             }
 
-            SongPanel.SpriteBatch.End();
-            SongPanel.WaveformPanel.Draw(SongPosS - Props.PlaybackOffsetS);
+            host.SpriteBatch.End();
+            host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS);
         }
 
         public int screenPosToSongPos(float normScreenPos)
@@ -569,7 +571,7 @@ namespace VisualMusic
             TrackProps outProps = TrackViews[listIndices[0]].TrackProps;
             if (listIndices.Count == 1)
                 return outProps;
-            outProps = outProps.clone(SongPanel);
+            outProps = outProps.clone(DrawHost);
             // TrackProps.cloneFrom shares the AudioProps reference with the source track.
             // Detach it here so mergeObjects can null out Filename without corrupting the source.
             outProps.AudioProps = new AudioProps { Filename = outProps.AudioProps.Filename, LineColor = outProps.AudioProps.LineColor };
@@ -736,7 +738,7 @@ namespace VisualMusic
                 double timeS;
                 if (!AudioHasStarted)
                 {
-                    timeS = (SongPanel.TotalTimeElapsed - pbStartSysTime).TotalSeconds + pbStartSongTimeS;
+                    timeS = ((DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero) - pbStartSysTime).TotalSeconds + pbStartSongTimeS;
                     if (timeS > Props.AudioOffset + Props.PlaybackOffsetS)
                     {
                         AudioHasStarted = true;
@@ -791,7 +793,7 @@ namespace VisualMusic
                 }
                 else
                 {
-                    pbStartSysTime = SongPanel.TotalTimeElapsed;
+                    pbStartSysTime = DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero;
                     pbStartSongTimeS = songPosS;
                     AudioHasStarted = false;
                 }
@@ -836,8 +838,8 @@ namespace VisualMusic
 
         public float SongLengthP => (float)(SongLengthT * Props.Camera.ViewportSize.X) / ViewWidthT;
 
-        public int SmallScrollStepT => (int)(ViewWidthT * SongPanel.SmallScrollStep);
-        public int LargeScrollStepT => (int)(ViewWidthT * SongPanel.LargeScrollStep);
+        public int SmallScrollStepT => (int)(ViewWidthT / 16f);   // 1/16 of visible width
+        public int LargeScrollStepT => (int)ViewWidthT;            // one full visible width
 
         public string DefaultFileName { get; set; }
         public string AudioFilePath { get; private set; }
@@ -1004,7 +1006,7 @@ namespace VisualMusic
             if (KeyFrames == null) //Old project file format
                 KeyFrames = new KeyFrames();
             ImportOptions.updateImportForm();
-            var wp = waveformPanel ?? SongPanel.WaveformPanel;
+            var wp = waveformPanel ?? DrawHost?.WaveformPanel;
             wp.ClearChannels();
 
             for (int i = 0; i < TrackViews.Count; i++)

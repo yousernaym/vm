@@ -16,7 +16,7 @@ namespace VisualMusic
     /// Has no dependency on WinForms Control or GraphicsDeviceControl.
     /// Hosted by MonoGameHost (HwndHost).
     /// </summary>
-    public class SongRenderer
+    public class SongRenderer : ISongDrawHost
     {
         // --- Core rendering ---
         GraphicsDevice graphicsDevice;
@@ -67,7 +67,12 @@ namespace VisualMusic
         public Project Project
         {
             get => _project;
-            set { _project = value; NoteStyle.SetProject(value); }
+            set
+            {
+                _project = value;
+                NoteStyle.SetProject(value);
+                Project.SetDrawHost(value != null ? this : null);
+            }
         }
         public float NormMouseX { get; set; }
         public float NormMouseY { get; set; }
@@ -454,6 +459,15 @@ namespace VisualMusic
         {
             graphicsDevice.RasterizerState = rastState;
         }
+
+        // ---- ISongDrawHost extras ----
+        public int ClientWidth  => clientWidth;
+        public int ClientHeight => clientHeight;
+        // TotalTimeElapsed already declared above (line ~86).
+        /// <summary>No-op: WPF render loop is continuous — no explicit invalidation needed.</summary>
+        public void Invalidate() { }
+        /// <summary>No-op: WPF uses data binding / polling for position display.</summary>
+        public void NotifySongPosChanged() { }
 
         public void updateTimeStamp()
         {

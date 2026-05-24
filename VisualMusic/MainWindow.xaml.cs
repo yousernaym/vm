@@ -30,6 +30,8 @@ namespace VisualMusic
             sidBrowser.Url  = "https://www.exotica.org.uk/wiki/Special:HVSC";
             midiBrowser.Url = "https://bitmidi.com/";
 
+            vm.GetDrawHost = () => monoGameHost.Renderer;
+
             vm.OnProjectLoaded = project =>
             {
                 if (monoGameHost.Renderer != null)
