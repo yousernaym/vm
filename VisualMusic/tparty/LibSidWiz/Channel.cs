@@ -158,7 +158,9 @@ namespace LibSidWiz
                 }
                 finally
                 {
-                    if (Renderer != null)
+                    // Only propagate a non-zero rate; a failed load leaves SampleRate==0 and would
+                    // otherwise zero the renderer's rate, halting rendering of every other channel.
+                    if (Renderer != null && SampleRate != 0)
                         Renderer.SamplingRate = SampleRate;
                     Changed?.Invoke(this, false);
                 }

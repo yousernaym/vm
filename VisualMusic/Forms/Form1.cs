@@ -181,6 +181,7 @@ namespace VisualMusic
             openCamFileDialog.Filter = saveCamFileDialog.Filter = "Camera files|*.cam|All files|*.*";
             openProjDialog.Filter = $"Visual Music projects |*.{Project.DefaultFileExt}|All files|*.*";
             saveProjDialog.Filter = $"Visual Music projects |*.{Project.DefaultFileExt}|All files|*.*";
+            openTrackAudioDlg.Filter = "Wave files (*.wav)|*.wav|All files (*.*)|*.*";
         }
 
         static public void pressCapsLock()
@@ -2665,11 +2666,17 @@ namespace VisualMusic
         {
             if (updatingControls)
                 return;
+            string failedFile = null;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
             {
-                Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.AudioProps.Filename = trackAudioFileTb.Text;
-                await Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.AudioProps.LoadAudioAsync();
+                var audioProps = Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.AudioProps;
+                audioProps.Filename = trackAudioFileTb.Text;
+                await audioProps.LoadAudioAsync();
+                if (!string.IsNullOrEmpty(audioProps.SidWizChannel.ErrorMessage) && failedFile == null)
+                    failedFile = trackAudioFileTb.Text;
             }
+            if (failedFile != null)
+                showWarningMsgBox($"Couldn't load audio file:\r\n{failedFile}", "Audio load failed");
         }
 
         private void browseTrackAudioBtn_Click(object sender, EventArgs e)
