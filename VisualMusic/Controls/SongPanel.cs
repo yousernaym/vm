@@ -105,13 +105,14 @@ namespace VisualMusic
 
             //BlendState = BlendState.AlphaBlend;
             content = new ContentManager(Services, "Content");
+            NoteStyle.SetGraphicsDevice(GraphicsDevice);
             NoteStyle.sInitAllStyles();
             LyricsFont = Content.Load<SpriteFont>("Font");
 
             regionSelectTexture = new Texture2D(GraphicsDevice, 1, 1);
             regionSelectTexture.SetData(new[] { Color.White });
 
-            quad = new ScreenQuad(this);
+            quad = new ScreenQuad(GraphicsDevice);
 
             timer.Interval = 1000 / 120;
             //timer.Elapsed += delegate { update(); };

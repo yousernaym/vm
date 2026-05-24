@@ -3,13 +3,34 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:vm="clr-namespace:VisualMusic.ViewModels"
+                 xmlns:local="clr-namespace:VisualMusic"
+                 xmlns:ctrl="clr-namespace:VisualMusic.Controls"
+                 xmlns:conv="clr-namespace:VisualMusic.Converters"
                  Title="{Binding WindowTitle}"
                  Height="800" Width="1200"
                  WindowStartupLocation="CenterScreen">
     <mah:MetroWindow.DataContext>
         <vm:MainViewModel />
     </mah:MetroWindow.DataContext>
+    <mah:MetroWindow.Resources>
+        <conv:EqualityToVisibilityConverter x:Key="ScreenVis"/>
+    </mah:MetroWindow.Resources>
+
     <Grid>
-        <!-- Content built out in subsequent phases -->
+        <!-- MonoGame render surface — visible on Song screen -->
+        <local:MonoGameHost x:Name="monoGameHost"
+            Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=Song}"/>
+
+        <!-- MOD Archive browser -->
+        <ctrl:SongWebBrowserWpf x:Name="modBrowser"
+            Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=ModBrowser}"/>
+
+        <!-- HVSC / SID browser -->
+        <ctrl:SongWebBrowserWpf x:Name="sidBrowser"
+            Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=SidBrowser}"/>
+
+        <!-- BitMidi browser -->
+        <ctrl:SongWebBrowserWpf x:Name="midiBrowser"
+            Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=MidiBrowser}"/>
     </Grid>
 </mah:MetroWindow>

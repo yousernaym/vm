@@ -165,8 +165,15 @@ namespace VisualMusic
         //}
 
         protected static SongPanel SongPanel => Form1.SongPanel;
-        protected static GraphicsDevice GraphicsDevice => SongPanel.GraphicsDevice;
-        protected static Project Project => SongPanel.Project;
+
+        static GraphicsDevice _graphicsDeviceOverride;
+        static Project _projectOverride;
+
+        public static void SetGraphicsDevice(GraphicsDevice gd) => _graphicsDeviceOverride = gd;
+        public static void SetProject(Project p) => _projectOverride = p;
+
+        protected static GraphicsDevice GraphicsDevice => _graphicsDeviceOverride ?? SongPanel?.GraphicsDevice;
+        protected static Project Project => _projectOverride ?? SongPanel?.Project;
 
         //Serializable----------
         protected NoteStyleType styleType; //Set in constructor of inherited class
