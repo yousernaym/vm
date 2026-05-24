@@ -164,7 +164,7 @@ namespace LibSidWiz
             for (int i = 0; i < _channels.Count; ++i)
             {
                 var ch = _channels[i];
-                if (ch.IsEmpty || ch.Loading || !string.IsNullOrEmpty(ch.ErrorMessage)) continue;
+                if (ch.IsEmpty || ch.Loading || ch.Failed || !string.IsNullOrEmpty(ch.ErrorMessage)) continue;
 
                 int trig = ch.GetTriggerPoint(frameIndexSamples, frameSamples, _prevTrigger[i]);
                 _prevTrigger[i] = trig;

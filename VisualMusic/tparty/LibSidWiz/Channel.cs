@@ -130,12 +130,14 @@ namespace LibSidWiz
                     Max = 0;
                     SampleRate = 0;
                     Length = TimeSpan.Zero;
-                    if (_samplesForTrigger != _samples)
+                    try
                     {
-                        _samplesForTrigger?.Dispose();
+                        if (_samplesForTrigger != _samples)
+                            _samplesForTrigger?.Dispose();
                     }
+                    catch { }
                     _samplesForTrigger = null;
-                    _samples?.Dispose();
+                    try { _samples?.Dispose(); } catch { }
                     _samples = null;
                     Loading = false;
                     return false;
@@ -146,12 +148,16 @@ namespace LibSidWiz
                     Max = 0;
                     SampleRate = 0;
                     Length = TimeSpan.Zero;
-                    if (_samplesForTrigger != _samples)
+                    // Dispose may itself throw (e.g. MP3 COM Release across apartments). Guard it so
+                    // we don't lose the original error and crash the awaiting async void handler.
+                    try
                     {
-                        _samplesForTrigger?.Dispose();
+                        if (_samplesForTrigger != _samples)
+                            _samplesForTrigger?.Dispose();
                     }
+                    catch { }
                     _samplesForTrigger = null;
-                    _samples?.Dispose();
+                    try { _samples?.Dispose(); } catch { }
                     _samples = null;
                     Loading = false;
                     return false;
@@ -567,15 +573,37 @@ namespace LibSidWiz
         [JsonIgnore]
         public bool IsEmpty { get; private set; }
 
+        // True if a sample read has failed at any point. Renderer skips failed channels so a
+        // single broken file (e.g. an MP3 whose COM reader can't be used from the UI thread)
+        // can't break rendering of the others.
+        [Browsable(false)]
+        [JsonIgnore]
+        public bool Failed => _samples != null && _samples.Failed;
+
         [Browsable(false)]
         [JsonIgnore]
         internal Rectangle Bounds { get; set; }
         public WaveformRenderer Renderer { get; set; }
         public Pen Pen { get; } = new Pen(Color.White, 2);
 
+        /// <summary>
+        /// Reads one sample from the calling thread. Use after LoadDataAsync to detect
+        /// readers (e.g. MediaFoundation MP3) that load on a worker thread but fail on
+        /// the UI thread due to COM apartment mismatch. Returns false if the read failed.
+        /// </summary>
+        public bool TestReadOnCurrentThread()
+        {
+            if (_samples == null || _samples.Count == 0)
+                return _samples != null;
+            _ = _samples[0];
+            return !_samples.Failed;
+        }
+
         internal float GetSample(int sampleIndex, bool forTrigger = true)
         {
             var source = forTrigger ? _samplesForTrigger : _samples;
+            if (source == null)
+                return 0;
             return sampleIndex < 0 || sampleIndex >= source.Count ? 0 : source[sampleIndex] * Scale * (forTrigger && InvertedTrigger ? -1 : 1);
         }
 

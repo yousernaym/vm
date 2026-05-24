@@ -38,6 +38,11 @@ namespace LibSidWiz
 
         public float Min { get; private set; }
 
+        // Set to true if any read fails (e.g. an MP3 / MediaFoundation COM object
+        // crossing thread apartments throws InvalidCastException). Once set, the
+        // buffer returns zeros and stops touching the reader.
+        public bool Failed { get; private set; }
+
         public SampleBuffer(string filename, Channel.Sides side, bool filter)
         {
             _reader = new AudioFileReader(filename);
@@ -77,16 +82,25 @@ namespace LibSidWiz
 
         public void Dispose()
         {
-            _reader.Dispose();
+            // Swallow any errors so a broken reader (e.g. an MP3 whose COM object can't
+            // be released from this thread) can't propagate out of a using-block or catch.
+            try { _reader.Dispose(); }
+            catch { }
         }
 
         public float this[long index]
         {
             get
             {
+                if (Failed)
+                    return 0;
+
                 // We may be accessed from multiple threads; we therefore need to lock access to avoid concurrent access.
                 lock (this)
                 {
+                    if (Failed)
+                        return 0;
+
                     // Return from an existing chunk if possible
                     if (_chunk1.Contains(index))
                     {
@@ -102,9 +116,20 @@ namespace LibSidWiz
                     var chunk = _chunk1.Offset < _chunk2.Offset ? _chunk1 : _chunk2;
                     // Pick the rounded offset
                     chunk.Offset = (index / ChunkSize) * ChunkSize;
-                    _reader.Position = chunk.Offset * _reader.WaveFormat.BitsPerSample / 8 *
-                                       _reader.WaveFormat.Channels;
-                    _sampleProvider.Read(chunk.Buffer, 0, ChunkSize);
+                    try
+                    {
+                        _reader.Position = chunk.Offset * _reader.WaveFormat.BitsPerSample / 8 *
+                                           _reader.WaveFormat.Channels;
+                        _sampleProvider.Read(chunk.Buffer, 0, ChunkSize);
+                    }
+                    catch
+                    {
+                        // Typically NAudio MediaFoundation COM cast errors when an MP3 / other
+                        // non-WAV reader is used from a different apartment than it was created in.
+                        Failed = true;
+                        chunk.Offset = -1;
+                        return 0;
+                    }
 
                     for (int i = 0; i < ChunkSize; i++)
                     {

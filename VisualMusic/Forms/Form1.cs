@@ -2672,7 +2672,14 @@ namespace VisualMusic
                 var audioProps = Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.AudioProps;
                 audioProps.Filename = trackAudioFileTb.Text;
                 await audioProps.LoadAudioAsync();
-                if (!string.IsNullOrEmpty(audioProps.SidWizChannel.ErrorMessage) && failedFile == null)
+                var ch = audioProps.SidWizChannel;
+                // Probe from the UI thread. MediaFoundation readers (mp3 etc.) created on the
+                // worker thread can't be marshalled to the STA UI render thread; this surfaces
+                // such failures before the renderer hits them.
+                bool readOk = false;
+                try { readOk = ch.TestReadOnCurrentThread(); }
+                catch { }
+                if (failedFile == null && !ch.IsEmpty && (!string.IsNullOrEmpty(ch.ErrorMessage) || !readOk))
                     failedFile = trackAudioFileTb.Text;
             }
             if (failedFile != null)
