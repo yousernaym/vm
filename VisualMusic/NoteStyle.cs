@@ -269,9 +269,9 @@ namespace VisualMusic
             float songFade = 1;
             float songPosS = (float)Project.SongPosS;
             float songLength = (float)Project.SongLengthS;
-            if (songPosS < Project.Props.FadeIn)
+            if (Project.Props.FadeIn > 0 && songPosS < Project.Props.FadeIn)
                 songFade = songPosS / Project.Props.FadeIn;
-            else if (songLength - songPosS < Project.Props.FadeOut)
+            else if (Project.Props.FadeOut > 0 && songLength - songPosS < Project.Props.FadeOut)
                 songFade = (songLength - songPosS) / Project.Props.FadeOut;
 
             fx.Parameters["SongFade"].SetValue(songFade);
@@ -326,9 +326,6 @@ namespace VisualMusic
             //Material
             GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
             GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
-            //			GraphicsDevice.RasterizerState = new RasterizerState { MultiSampleAntiAlias = true, CullMode = CullMode.None };
-            //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-            //GraphicsDevice.RasterizerState.MultiSampleAntiAlias = true;
             Texture2D texture;
             Vector4 color;
             getMaterial(trackProps, false, out color, out texture);

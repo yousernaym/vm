@@ -1019,6 +1019,14 @@ namespace VisualMusic
                     wp.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
                 }
             }
+
+            // Force recalculation of derived state (SongLengthS, playbackOffsetT, etc).
+            // During deserialization, Props was set BEFORE notes were loaded, so the
+            // playback-offset callback fired with notes==null and returned early.
+            // In WinForms this is done indirectly via UpdateProjPropsControls() doing
+            // `Props.PlaybackOffsetS = Props.PlaybackOffsetS`; do it explicitly here so
+            // both WPF and WinForms paths get correct SongLengthS.
+            onPlaybackOffsetSChanged();
         }
     }
 
