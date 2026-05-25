@@ -199,6 +199,9 @@ namespace VisualMusic
         public ImportOptions(Midi.FileType noteFileType)
         {
             NoteFileType = noteFileType;
+            // WPF path: Form1 import forms are never created; ImportForm is null.
+            // Caller is responsible for setting RawNotePath, AudioPath, etc. directly.
+            if (_importForm == null) return;
             RawNotePath = ImportForm.NoteFilePath;
             try
             {

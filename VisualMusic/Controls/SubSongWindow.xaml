@@ -1,0 +1,30 @@
+<mah:MetroWindow x:Class="VisualMusic.Controls.SubSongWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 Title="Select Sub-song"
+                 ResizeMode="NoResize"
+                 SizeToContent="WidthAndHeight"
+                 WindowStartupLocation="CenterOwner"
+                 ShowMinButton="False"
+                 ShowMaxRestoreButton="False">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Select a sub-song to import:"/>
+
+        <ListBox Grid.Row="2" x:Name="subSongList"
+                 MinWidth="260" MaxHeight="300"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 MouseDoubleClick="SubSongList_MouseDoubleClick"/>
+
+        <Button Grid.Row="4" Content="OK" Width="80" IsDefault="True"
+                HorizontalAlignment="Right" Click="Ok_Click"/>
+    </Grid>
+</mah:MetroWindow>

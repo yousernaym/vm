@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
+using VisualMusic.Controls;
 
 namespace VisualMusic.ViewModels
 {
@@ -198,16 +199,133 @@ namespace VisualMusic.ViewModels
         }
 
         [RelayCommand]
-        void ImportMidi()
-            => MessageBox.Show("Import MIDI not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        async Task ImportMidi()
+        {
+            var dlg = new ImportSongWindow(Midi.FileType.Midi) { Owner = Application.Current.MainWindow };
+            if (dlg.ShowDialog() != true) return;
+            await DoImport(BuildOptions(Midi.FileType.Midi, dlg));
+        }
 
         [RelayCommand]
-        void ImportMod()
-            => MessageBox.Show("Import Module not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        async Task ImportMod()
+        {
+            var dlg = new ImportSongWindow(Midi.FileType.Mod) { Owner = Application.Current.MainWindow };
+            if (dlg.ShowDialog() != true) return;
+            await DoImport(BuildOptions(Midi.FileType.Mod, dlg));
+        }
 
         [RelayCommand]
-        void ImportSid()
-            => MessageBox.Show("Import SID not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        async Task ImportSid()
+        {
+            var dlg = new ImportSongWindow(Midi.FileType.Sid) { Owner = Application.Current.MainWindow };
+            if (dlg.ShowDialog() != true) return;
+
+            var options = BuildOptions(Midi.FileType.Sid, dlg);
+
+            // SID files may contain multiple sub-songs — let the user pick.
+            if (!string.IsNullOrEmpty(options.NotePath) && File.Exists(options.NotePath))
+            {
+                var subWin = new SubSongWindow(options.NotePath) { Owner = Application.Current.MainWindow };
+                if (subWin.NumSongs > 1 && subWin.ShowDialog() != true) return;
+                options.SubSong    = subWin.SelectedSong;
+                options.SongLengthS = subWin.SongLengthS;
+            }
+
+            await DoImport(options);
+        }
+
+        /// <summary>Build an ImportOptions from the dialog fields (WPF path).</summary>
+        static ImportOptions BuildOptions(Midi.FileType fileType, ImportSongWindow dlg)
+        {
+            ImportOptions options;
+            switch (fileType)
+            {
+                case Midi.FileType.Midi: options = new MidiImportOptions(); break;
+                case Midi.FileType.Mod:  options = new ModImportOptions();  break;
+                default:                 options = new SidImportOptions();  break;
+            }
+
+            options.RawNotePath  = dlg.NoteFilePath;
+            try { options.setNotePath(); } catch (FileImportException) { }
+
+            if (!string.IsNullOrWhiteSpace(dlg.AudioFilePath))
+            {
+                options.AudioPath   = dlg.AudioFilePath;
+                options.MixdownType = Midi.MixdownType.None;
+            }
+
+            options.EraseCurrent = dlg.EraseCurrent;
+            options.InsTrack     = dlg.InsTrack;
+            return options;
+        }
+
+        /// <summary>Shared post-dialog import logic.</summary>
+        async Task DoImport(ImportOptions options)
+        {
+            // Ensure a project object exists to import into.
+            if (project == null)
+            {
+                var fresh = new Project();
+                NoteStyle.SetProject(fresh);
+                Project = fresh;
+            }
+
+            var drawHost = GetDrawHost?.Invoke();
+            if (drawHost != null) Project.SetDrawHost(drawHost);
+            NoteStyle.SetProject(project);
+
+            try { options.CheckSourceFile(); }
+            catch (FileImportException ex)
+            {
+                MessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
+                if (!await project.ImportSong(options, null)) return;
+            }
+            catch (FileImportException ex)
+            {
+                MessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Import failed: " + ex.Message, Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (options.EraseCurrent)
+                currentProjectPath = "";
+
+            var wfp = GetRendererWaveformPanel?.Invoke();
+            project.InitAfterDeserialization(wfp);
+
+            OnProjectLoaded?.Invoke(project);
+            OnLoadBackgroundImage?.Invoke(project.Props.BackgroundImagePath);
+
+            // Refresh audio-dependent CanExecute (HasAudio depends on Media.getAudioLength()).
+            OnPropertyChanged(nameof(HasAudio));
+            TogglePlaybackCommand.NotifyCanExecuteChanged();
+            GoToBeginningCommand.NotifyCanExecuteChanged();
+            GoToEndCommand.NotifyCanExecuteChanged();
+            NudgeBackCommand.NotifyCanExecuteChanged();
+            NudgeForwardCommand.NotifyCanExecuteChanged();
+            JumpBackCommand.NotifyCanExecuteChanged();
+            JumpForwardCommand.NotifyCanExecuteChanged();
+
+            undoItems.clear();
+            undoItems.Add("", project);
+            UpdateUndoRedo();
+
+            string name = Path.GetFileName(options.RawNotePath ?? options.NotePath ?? "");
+            WindowTitle = $"{Program.AppName} — {name}";
+            CurrentScreen = AppScreen.Song;
+        }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void ExportVideo()
@@ -376,36 +494,133 @@ namespace VisualMusic.ViewModels
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void LoadTrackProps()
-            => MessageBox.Show("Load Track Properties not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        {
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Track property files|*.tp|All files|*.*",
+                InitialDirectory = trackPropsFolder
+            };
+            if (dlg.ShowDialog() != true) return;
+            trackPropsFolder = Path.GetDirectoryName(dlg.FileName);
+
+            TrackProps props;
+            var dcs = new DataContractSerializer(typeof(TrackProps), ProjectSerializer.KnownTypes);
+            try
+            {
+                using var stream = File.Open(dlg.FileName, FileMode.Open);
+                props = (TrackProps)dcs.ReadObject(stream);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Apply to the global (index 0) track — full track-list editing comes in a later phase.
+            project.TrackViews[0].TrackProps.cloneFrom(props, (int)TrackPropsType.TPT_All);
+            if ((props.TypeFlags & (int)TrackPropsType.TPT_Style) != 0)
+                project.createOcTrees();
+            AddUndoItem("Load Track Properties");
+        }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void SaveTrackProps()
-            => MessageBox.Show("Save Track Properties not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        {
+            var dlg = new SaveFileDialog
+            {
+                Filter = "Track property files|*.tp|All files|*.*",
+                InitialDirectory = trackPropsFolder,
+                FileName = "track.tp"
+            };
+            if (dlg.ShowDialog() != true) return;
+            trackPropsFolder = Path.GetDirectoryName(dlg.FileName);
+
+            TrackProps props = project.TrackViews[0].TrackProps;
+            props.TypeFlags = (int)TrackPropsType.TPT_All;
+            var dcs = new DataContractSerializer(typeof(TrackProps), ProjectSerializer.KnownTypes);
+            try
+            {
+                using var stream = File.Open(dlg.FileName, FileMode.Create);
+                dcs.WriteObject(stream, props);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void DefaultTrackProps()
-            => MessageBox.Show("Default Track Properties not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        {
+            foreach (var tv in project.TrackViews)
+                tv.TrackProps.ResetProps();
+            project.createOcTrees();
+            AddUndoItem("Default Track Properties");
+        }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void InsertLyrics()
-            => MessageBox.Show("Insert Lyrics not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        {
+            project.insertLyrics();
+            AddUndoItem("Insert Lyrics");
+        }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void InsertKeyFrame()
-            => MessageBox.Show("Insert Key Frame not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        {
+            int row = project.insertKeyFrameAtSongPos();
+            if (row < 0)
+            {
+                MessageBox.Show("A key frame already exists at this position.", Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            AddUndoItem("Insert Key Frame");
+        }
 
         // ---- Renderer WaveformPanel accessor (set by MainWindow) ----
 
         public Func<WaveformPanel> GetRendererWaveformPanel { get; set; }
 
-        // ---- IImportService (browser import — Phase 6) ----
+        // ---- IImportService (browser download import) ----
 
         public void ImportFromUrl(string url, string suggestedFileName)
         {
             string ext = suggestedFileName.Split('.').Last().ToLower();
-            MessageBox.Show(
-                $"Import from browser not yet supported in WPF mode.\n\nFile: {suggestedFileName}",
-                Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+
+            Midi.FileType? fileType = null;
+            if (ImportMidiForm.Formats.Contains(ext))      fileType = Midi.FileType.Midi;
+            else if (ImportModForm.Formats.Contains(ext))  fileType = Midi.FileType.Mod;
+            else if (ImportSidForm.Formats.Contains(ext))  fileType = Midi.FileType.Sid;
+
+            if (fileType == null)
+            {
+                MessageBox.Show(
+                    $"Unrecognised file type: .{ext}\n\nFile: {suggestedFileName}",
+                    Program.AppName, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Download to a temp location then show the import dialog pre-filled.
+            string tempPath = Path.Combine(Program.TempDir, suggestedFileName);
+            try
+            {
+                using var client = new System.Net.WebClient();
+                client.DownloadFile(url, tempPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Download failed: " + ex.Message, Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var dlg = new ImportSongWindow(fileType.Value) { Owner = Application.Current.MainWindow };
+            dlg.NoteFilePath = tempPath;
+            if (dlg.ShowDialog() != true) return;
+
+            var options = BuildOptions(fileType.Value, dlg);
+            _ = DoImport(options);   // fire-and-forget on the UI thread (async void pattern)
         }
     }
 }
