@@ -120,16 +120,6 @@
         </Menu>
         </DockPanel>
 
-        <!-- Bottom: timeline scrollbar (Song screen only) -->
-        <ScrollBar DockPanel.Dock="Bottom" Orientation="Horizontal"
-                   Minimum="0" Maximum="1"
-                   SmallChange="0.0625" LargeChange="1.0"
-                   Value="{Binding ScrollPosition, Mode=TwoWay}"
-                   IsEnabled="{Binding HasProject}"
-                   Visibility="{Binding CurrentScreen,
-                                Converter={StaticResource ScreenVis},
-                                ConverterParameter=Song}"/>
-
         <!-- Left: project-wide properties placeholder -->
         <ctrl:SongPropsPanel DockPanel.Dock="Left" Width="216"
                              DataContext="{Binding SongProps}"
@@ -151,23 +141,34 @@
             <ctrl:TrackPropsView Grid.Column="2" DataContext="{Binding SelectedTrackProps}"/>
         </Grid>
 
-        <!-- Center (LastChildFill): MonoGame + browser screens -->
-        <Grid>
-            <!-- MonoGame render surface — visible on Song screen -->
-            <local:MonoGameHost x:Name="monoGameHost"
-                Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=Song}"/>
+        <!-- Center (LastChildFill): scrollbar + MonoGame + browser screens -->
+        <DockPanel>
+            <!-- Timeline scrollbar at bottom, confined to center column only -->
+            <ScrollBar DockPanel.Dock="Bottom" Orientation="Horizontal"
+                       Minimum="0" Maximum="1"
+                       SmallChange="0.0625" LargeChange="1.0"
+                       Value="{Binding ScrollPosition, Mode=TwoWay}"
+                       IsEnabled="{Binding HasProject}"
+                       Visibility="{Binding CurrentScreen,
+                                    Converter={StaticResource ScreenVis},
+                                    ConverterParameter=Song}"/>
+            <Grid>
+                <!-- MonoGame render surface — visible on Song screen -->
+                <local:MonoGameHost x:Name="monoGameHost"
+                    Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=Song}"/>
 
-            <!-- MOD Archive browser -->
-            <ctrl:SongWebBrowserWpf x:Name="modBrowser"
-                Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=ModBrowser}"/>
+                <!-- MOD Archive browser -->
+                <ctrl:SongWebBrowserWpf x:Name="modBrowser"
+                    Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=ModBrowser}"/>
 
-            <!-- HVSC / SID browser -->
-            <ctrl:SongWebBrowserWpf x:Name="sidBrowser"
-                Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=SidBrowser}"/>
+                <!-- HVSC / SID browser -->
+                <ctrl:SongWebBrowserWpf x:Name="sidBrowser"
+                    Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=SidBrowser}"/>
 
-            <!-- BitMidi browser -->
-            <ctrl:SongWebBrowserWpf x:Name="midiBrowser"
-                Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=MidiBrowser}"/>
-        </Grid>
+                <!-- BitMidi browser -->
+                <ctrl:SongWebBrowserWpf x:Name="midiBrowser"
+                    Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=MidiBrowser}"/>
+            </Grid>
+        </DockPanel>
     </DockPanel>
 </mah:MetroWindow>
