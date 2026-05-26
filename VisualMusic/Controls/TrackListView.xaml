@@ -1,0 +1,49 @@
+<UserControl x:Class="VisualMusic.Controls.TrackListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:VisualMusic.ViewModels">
+    <ListView x:Name="trackListView"
+              SelectionMode="Extended"
+              AllowDrop="True"
+              ItemsSource="{Binding Items}"
+              SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+              SelectionChanged="OnSelectionChanged"
+              PreviewMouseLeftButtonDown="OnPreviewMouseLeftButtonDown"
+              MouseMove="OnMouseMove"
+              Drop="OnDrop"
+              DragOver="OnDragOver">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Header="Track" Width="130">
+                    <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                        </DataTemplate>
+                    </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+                <GridViewColumn Header="" Width="22">
+                    <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <Rectangle Width="16" Height="12">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush Color="{Binding NormalColor}"/>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </DataTemplate>
+                    </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+                <GridViewColumn Header="" Width="22">
+                    <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <Rectangle Width="16" Height="12">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush Color="{Binding HilitedColor}"/>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </DataTemplate>
+                    </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+            </GridView>
+        </ListView.View>
+    </ListView>
+</UserControl>

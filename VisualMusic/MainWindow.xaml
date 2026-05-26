@@ -10,6 +10,7 @@
                  WindowStartupLocation="CenterScreen">
     <mah:MetroWindow.Resources>
         <conv:EqualityToVisibilityConverter x:Key="ScreenVis"/>
+        <BooleanToVisibilityConverter x:Key="BoolVis"/>
     </mah:MetroWindow.Resources>
 
     <!-- Keyboard bindings -->
@@ -48,8 +49,20 @@
     </mah:MetroWindow.InputBindings>
 
     <DockPanel>
+        <!-- Top row: menu + panel toggle buttons share one dock slot -->
+        <DockPanel DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,8,0"
+                        IsEnabled="{Binding HasProject}">
+                <ToggleButton Content="Pr_oject properties"
+                              IsChecked="{Binding ShowSongProps, Mode=TwoWay}"
+                              Margin="2,1" Padding="4,1"/>
+                <ToggleButton Content="_Track properties"
+                              IsChecked="{Binding ShowTrackProps, Mode=TwoWay}"
+                              Margin="2,1" Padding="4,1"/>
+            </StackPanel>
+
         <!-- Menu bar -->
-        <Menu DockPanel.Dock="Top">
+        <Menu>
 
             <!-- FILE -->
             <MenuItem Header="_File">
@@ -105,8 +118,40 @@
                 <MenuItem Header="M_IDI browser" Command="{Binding ShowMidiBrowserCommand}" InputGestureText="F4"/>
             </MenuItem>
         </Menu>
+        </DockPanel>
 
-        <!-- Content area -->
+        <!-- Bottom: timeline scrollbar (Song screen only) -->
+        <ScrollBar DockPanel.Dock="Bottom" Orientation="Horizontal"
+                   Minimum="0" Maximum="1"
+                   SmallChange="0.0625" LargeChange="1.0"
+                   Value="{Binding ScrollPosition, Mode=TwoWay}"
+                   IsEnabled="{Binding HasProject}"
+                   Visibility="{Binding CurrentScreen,
+                                Converter={StaticResource ScreenVis},
+                                ConverterParameter=Song}"/>
+
+        <!-- Left: project-wide properties placeholder -->
+        <ctrl:SongPropsPanel DockPanel.Dock="Left" Width="216"
+                             DataContext="{Binding SongProps}"
+                             Visibility="{Binding DataContext.ShowSongProps,
+                                          RelativeSource={RelativeSource AncestorType=Window},
+                                          Converter={StaticResource BoolVis}}"/>
+
+        <!-- Right: track list (with splitter) + property tabs -->
+        <Grid DockPanel.Dock="Right" Width="395"
+              Visibility="{Binding ShowTrackProps,
+                           Converter={StaticResource BoolVis}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="186" MinWidth="120"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="*" MinWidth="180"/>
+            </Grid.ColumnDefinitions>
+            <ctrl:TrackListView  Grid.Column="0" DataContext="{Binding TrackList}"/>
+            <GridSplitter        Grid.Column="1" HorizontalAlignment="Stretch" Width="4"/>
+            <ctrl:TrackPropsView Grid.Column="2" DataContext="{Binding SelectedTrackProps}"/>
+        </Grid>
+
+        <!-- Center (LastChildFill): MonoGame + browser screens -->
         <Grid>
             <!-- MonoGame render surface — visible on Song screen -->
             <local:MonoGameHost x:Name="monoGameHost"

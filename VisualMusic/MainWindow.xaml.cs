@@ -35,7 +35,11 @@ namespace VisualMusic
             vm.OnProjectLoaded = project =>
             {
                 if (monoGameHost.Renderer != null)
+                {
                     monoGameHost.Renderer.Project = project;
+                    monoGameHost.Renderer.OnSongPosChanged = () =>
+                        Dispatcher.InvokeAsync(() => vm.NotifyScrollPositionChanged());
+                }
             };
 
             vm.OnLoadBackgroundImage = path =>

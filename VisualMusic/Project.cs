@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -564,6 +565,19 @@ namespace VisualMusic
             float pos = normPosY - ProjProps.NormPitchMargin;
             return Props.MinPitch + (int)(pos / noteHeight);
         }
+        public TrackProps mergeTrackProps(IEnumerable<int> indices)
+        {
+            var list = indices.ToList();
+            if (list.Count == 0) return null;
+            TrackProps outProps = TrackViews[list[0]].TrackProps;
+            if (list.Count == 1) return outProps;
+            outProps = outProps.clone(DrawHost);
+            outProps.AudioProps = new AudioProps { Filename = outProps.AudioProps.Filename, LineColor = outProps.AudioProps.LineColor };
+            for (int i = 1; i < list.Count; i++)
+                outProps = (TrackProps)mergeObjects(outProps, TrackViews[list[i]].TrackProps);
+            return outProps;
+        }
+
         public TrackProps mergeTrackProps(ListView.SelectedIndexCollection listIndices)
         {
             if (listIndices.Count == 0)

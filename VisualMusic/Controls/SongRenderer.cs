@@ -466,8 +466,7 @@ namespace VisualMusic
         // TotalTimeElapsed already declared above (line ~86).
         /// <summary>No-op: WPF render loop is continuous — no explicit invalidation needed.</summary>
         public void Invalidate() { }
-        /// <summary>No-op: WPF uses data binding / polling for position display.</summary>
-        public void NotifySongPosChanged() { }
+        public void NotifySongPosChanged() => OnSongPosChanged?.Invoke();
 
         public void updateTimeStamp()
         {

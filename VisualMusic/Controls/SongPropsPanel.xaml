@@ -1,0 +1,6 @@
+<UserControl x:Class="VisualMusic.Controls.SongPropsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Placeholder — content added when the left-panel phase ships. -->
+    <Border/>
+</UserControl>

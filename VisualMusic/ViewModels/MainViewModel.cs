@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -22,6 +23,17 @@ namespace VisualMusic.ViewModels
 
         [ObservableProperty]
         private AppScreen currentScreen = AppScreen.Song;
+
+        // ---- Panel toggles ----
+
+        [ObservableProperty] bool showSongProps;
+        [ObservableProperty] bool showTrackProps;
+
+        // ---- Child view models ----
+
+        public TrackListViewModel TrackList { get; } = new();
+        public TrackPropsViewModel SelectedTrackProps { get; } = new();
+        public SongPropsViewModel SongProps { get; } = new();
 
         // ---- Project state ----
 
@@ -65,6 +77,39 @@ namespace VisualMusic.ViewModels
 
         string currentProjectPath = "";
         UndoItems undoItems = new UndoItems();
+
+        public MainViewModel()
+        {
+            TrackList.SelectionChanged += OnTrackListSelectionChanged;
+        }
+
+        void OnTrackListSelectionChanged()
+        {
+            if (project == null) return;
+            var indices = TrackList.SelectedItems
+                .Select(item => TrackList.Items.IndexOf(item))
+                .Where(i => i >= 0);
+            SelectedTrackProps.MergedProps = project.mergeTrackProps(indices);
+        }
+
+        // ---- Scrollbar binding ----
+
+        public double ScrollPosition
+        {
+            get => project?.NormSongPos ?? 0;
+            set { if (project != null) project.NormSongPos = value; }
+        }
+
+        public void NotifyScrollPositionChanged() => OnPropertyChanged(nameof(ScrollPosition));
+
+        partial void OnProjectChanged(Project value)
+        {
+            ShowSongProps = false;
+            ShowTrackProps = false;
+            TrackList.Rebuild(value);
+            SelectedTrackProps.MergedProps = null;
+            NotifyScrollPositionChanged();
+        }
 
         // ---- Renderer callbacks (set by MainWindow after load) ----
 
