@@ -350,6 +350,7 @@ namespace VisualMusic.ViewModels
             var wfp = GetRendererWaveformPanel?.Invoke();
             project.InitAfterDeserialization(wfp);
 
+            TrackList.Rebuild(project);
             OnProjectLoaded?.Invoke(project);
             OnLoadBackgroundImage?.Invoke(project.Props.BackgroundImagePath);
 
