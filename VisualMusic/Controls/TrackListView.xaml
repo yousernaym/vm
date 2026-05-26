@@ -11,7 +11,8 @@
               PreviewMouseLeftButtonDown="OnPreviewMouseLeftButtonDown"
               MouseMove="OnMouseMove"
               Drop="OnDrop"
-              DragOver="OnDragOver">
+              DragOver="OnDragOver"
+              DragLeave="OnDragLeave">
         <ListView.View>
             <GridView>
                 <GridViewColumn Header="Track" Width="130">
