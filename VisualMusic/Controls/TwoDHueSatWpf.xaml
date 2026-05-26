@@ -1,0 +1,17 @@
+<UserControl x:Class="VisualMusic.Controls.TwoDHueSatWpf"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             SizeChanged="UserControl_SizeChanged">
+    <Grid>
+        <Image x:Name="gradientImage" Stretch="Fill"/>
+        <Canvas x:Name="crosshairCanvas" IsHitTestVisible="False">
+            <Line x:Name="crossH" Stroke="Black" StrokeThickness="1.5" SnapsToDevicePixels="True"/>
+            <Line x:Name="crossV" Stroke="Black" StrokeThickness="1.5" SnapsToDevicePixels="True"/>
+        </Canvas>
+        <Canvas Background="Transparent"
+                MouseDown="Canvas_MouseDown"
+                MouseMove="Canvas_MouseMove"
+                MouseUp="Canvas_MouseUp"
+                MouseLeave="Canvas_MouseLeave"/>
+    </Grid>
+</UserControl>

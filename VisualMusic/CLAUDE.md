@@ -148,12 +148,14 @@ The application follows an **MVVM pattern** (in progress) with:
 ## WPF Migration Status
 
 **Current state (feature/wpf-migration):**
-- Phase 5 in progress: Import dialogs, InsertKeyFrame/Lyrics, TrackProps commands
+- Phase 5 complete: All 5 property tabs (Style, Material, Light, Spatial, Audio) are WPF UserControls
 - Main UI now WPF-based (MetroWindow, MahApps styling)
 - Core rendering abstracted via `ISongDrawHost` ✓
 - MonoGameHost bridge complete ✓
 - Menu commands and keyboard bindings mapped ✓
 - Web browsers (MOD, SID, MIDI) functional ✓
+- TbSliderWpf, TwoDHueSatWpf, HueSatButtonWpf custom controls complete ✓
+- TrackPropsViewModel exposes all per-tab properties with write-back callbacks ✓
 
 **Legacy WinForms code:**
 - Still present (Form1, SongPanel) for backwards compatibility

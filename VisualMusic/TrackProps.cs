@@ -270,42 +270,45 @@ namespace VisualMusic
             info.AddValue("anchor", Anchor);
             info.AddValue("scroll", Scroll);
         }
-        Texture2D createMipLevels(Texture2D tex, SongPanel songPanel)
+        Texture2D createMipLevels(Texture2D tex, GraphicsDevice gd, SpriteBatch sb)
         {
-            RenderTarget2D renderTarget = new RenderTarget2D(songPanel.GraphicsDevice, tex.Width, tex.Height, true, SurfaceFormat.Color, DepthFormat.None);
-            songPanel.GraphicsDevice.SetRenderTarget(renderTarget);
-
-            songPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null);
-            songPanel.SpriteBatch.Draw(tex, new Vector2(0, 0), Color.White);
-            songPanel.SpriteBatch.End();
-
+            RenderTarget2D renderTarget = new RenderTarget2D(gd, tex.Width, tex.Height, true, SurfaceFormat.Color, DepthFormat.None);
+            gd.SetRenderTarget(renderTarget);
+            sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null);
+            sb.Draw(tex, new Vector2(0, 0), Color.White);
+            sb.End();
             Texture2D outTex = (Texture2D)renderTarget;
-            songPanel.GraphicsDevice.SetRenderTarget(null);
+            gd.SetRenderTarget(null);
             tex.Dispose();
             return outTex;
         }
 
         public bool loadTexture(string path, FileStream stream, SongPanel songPanel)
+            => loadTexture(path, stream, songPanel.GraphicsDevice, songPanel.SpriteBatch);
+
+        public bool loadTexture(string path, FileStream stream, ISongDrawHost host)
+            => loadTexture(path, stream, host.GraphicsDevice, host.SpriteBatch);
+
+        bool loadTexture(string path, FileStream stream, GraphicsDevice gd, SpriteBatch sb)
         {
             Path = path;
             Texture2D tex = Texture;
-            if (tex != null)
-            {
-                tex.Dispose();
-                tex = null;
-            }
-            tex = Texture2D.FromStream(songPanel.GraphicsDevice, stream);
-            Texture = createMipLevels(tex, songPanel);
-            //trackProps[index].Texture = tex;
+            if (tex != null) { tex.Dispose(); tex = null; }
+            tex = Texture2D.FromStream(gd, stream);
+            Texture = createMipLevels(tex, gd, sb);
             return tex != null;
         }
 
         public bool loadTexture(string path, SongPanel songPanel)
         {
             using (FileStream stream = File.Open(path, FileMode.Open))
-            {
                 return loadTexture(path, stream, songPanel);
-            }
+        }
+
+        public bool loadTexture(string path, ISongDrawHost host)
+        {
+            using var stream = File.Open(path, FileMode.Open);
+            return loadTexture(path, stream, host);
         }
         public void unloadTexture()
         {

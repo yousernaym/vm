@@ -1,0 +1,12 @@
+<UserControl x:Class="VisualMusic.Controls.Tabs.AudioTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel Margin="4">
+        <TextBlock Text="Audio file" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <TextBox Text="{Binding AudioFilename, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                 IsReadOnly="True"
+                 Margin="0,0,0,4"/>
+        <Button Content="Browse..." HorizontalAlignment="Left"
+                Width="72" Click="BrowseBtn_Click"/>
+    </StackPanel>
+</UserControl>

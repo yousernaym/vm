@@ -1,0 +1,28 @@
+<UserControl x:Class="VisualMusic.Controls.Tabs.SpatialTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrl="clr-namespace:VisualMusic.Controls">
+    <StackPanel Margin="4">
+        <TextBlock Text="Position offset" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="X" VerticalAlignment="Center"/>
+            <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
+                              Value="{Binding XOffset, Mode=TwoWay}" Min="-100" Max="100" Decimals="2"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Y" VerticalAlignment="Center"/>
+            <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
+                              Value="{Binding YOffset, Mode=TwoWay}" Min="-100" Max="100" Decimals="2"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Z" VerticalAlignment="Center"/>
+            <ctrl:TbSliderWpf Grid.Row="2" Grid.Column="1" Margin="2"
+                              Value="{Binding ZOffset, Mode=TwoWay}" Min="-100" Max="100" Decimals="2"/>
+        </Grid>
+    </StackPanel>
+</UserControl>

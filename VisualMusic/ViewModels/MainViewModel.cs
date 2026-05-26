@@ -81,6 +81,61 @@ namespace VisualMusic.ViewModels
         public MainViewModel()
         {
             TrackList.SelectionChanged += OnTrackListSelectionChanged;
+            WireTrackPropsCallbacks();
+        }
+
+        void WireTrackPropsCallbacks()
+        {
+            SelectedTrackProps.ApplyToSelected = fn =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                    fn(item.TrackView.TrackProps);
+                // Trigger rendering refresh — the draw host invalidates on next frame tick.
+            };
+
+            SelectedTrackProps.ApplyAndRebuild = fn =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                    fn(item.TrackView.TrackProps);
+                project?.createOcTrees();
+            };
+
+            SelectedTrackProps.LoadTexture = path =>
+            {
+                if (project == null) return;
+                var drawHost = GetDrawHost?.Invoke();
+                if (drawHost == null) return;
+                try
+                {
+                    foreach (var item in TrackList.SelectedItems)
+                        item.TrackView.TrackProps.MaterialProps.TexProps.loadTexture(path, drawHost);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, Program.AppName,
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                project.createOcTrees();
+                OnTrackListSelectionChanged();
+            };
+
+            SelectedTrackProps.UnloadTexture = () =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                    item.TrackView.TrackProps.MaterialProps.TexProps.unloadTexture();
+                project?.createOcTrees();
+                OnTrackListSelectionChanged();
+            };
+
+            SelectedTrackProps.BrowseAudioFile = () =>
+            {
+                var dlg = new Microsoft.Win32.OpenFileDialog
+                {
+                    Filter = "Audio files|*.wav;*.flac;*.mp3;*.ogg|All files|*.*"
+                };
+                if (dlg.ShowDialog() != true) return;
+                SelectedTrackProps.AudioFilename = dlg.FileName;
+            };
         }
 
         void OnTrackListSelectionChanged()
