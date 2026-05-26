@@ -1,7 +1,11 @@
 <UserControl x:Class="VisualMusic.Controls.TrackPropsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <TabControl SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+        <TabControl.Resources>
+			<sys:Double x:Key="MahApps.Font.Size.TabItem">12</sys:Double>
+        </TabControl.Resources>
         <TabItem Header="Style"/>
         <TabItem Header="Material"/>
         <TabItem Header="Light"/>
