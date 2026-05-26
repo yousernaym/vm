@@ -11,6 +11,7 @@
               PreviewMouseLeftButtonDown="OnPreviewMouseLeftButtonDown"
               MouseMove="OnMouseMove"
               Drop="OnDrop"
+              DragEnter="OnDragEnter"
               DragOver="OnDragOver"
               DragLeave="OnDragLeave">
         <ListView.View>

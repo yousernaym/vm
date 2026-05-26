@@ -16,6 +16,7 @@ namespace VisualMusic.Controls
         TrackItemViewModel _dragItem;
         DragAdorner _dragAdorner;
         int _dropIndex = -1;
+        TrackItemViewModel _ctrlDropTarget;
 
         public TrackListView()
         {
@@ -54,6 +55,17 @@ namespace VisualMusic.Controls
             // DoDragDrop is synchronous; clean up in case OnDrop/OnDragLeave didn't fire
             RemoveAdorner();
             _dropIndex = -1;
+            _ctrlDropTarget = null;
+        }
+
+        void OnDragEnter(object sender, DragEventArgs e)
+        {
+            // Set effects immediately on enter to prevent the brief "no-drop" cursor flash
+            // that occurs during the DragLeave→DragOver transition between items.
+            e.Effects = e.Data.GetDataPresent(typeof(TrackItemViewModel))
+                ? DragDropEffects.Move
+                : DragDropEffects.None;
+            e.Handled = true;
         }
 
         void OnDragOver(object sender, DragEventArgs e)
@@ -76,19 +88,19 @@ namespace VisualMusic.Controls
             if (isCtrl)
             {
                 _dropIndex = -1;
-                var container = HitTestListViewItem(pos);
+                // Use nearest item so the box stays stable when the cursor is in the
+                // pixel gap between two rows (where hit-testing finds no ListViewItem).
+                var container = HitTestListViewItem(pos) ?? FindNearestListViewItem(pos);
                 if (container != null)
                 {
+                    _ctrlDropTarget = container.DataContext as TrackItemViewModel;
                     var itemPos = container.TransformToAncestor(trackListView).Transform(new Point(0, 0));
                     _dragAdorner?.ShowTargetBox(new Rect(0, itemPos.Y, trackListView.ActualWidth, container.ActualHeight));
-                }
-                else
-                {
-                    _dragAdorner?.Hide();
                 }
             }
             else
             {
+                _ctrlDropTarget = null;
                 var (index, lineY) = GetInsertionPoint(pos);
                 _dropIndex = index;
                 _dragAdorner?.ShowInsertLine(lineY);
@@ -104,13 +116,16 @@ namespace VisualMusic.Controls
                 return;
             RemoveAdorner();
             _dropIndex = -1;
+            _ctrlDropTarget = null;
         }
 
         void OnDrop(object sender, DragEventArgs e)
         {
             int dropIndex = _dropIndex;
+            var ctrlTarget = _ctrlDropTarget;
             RemoveAdorner();
             _dropIndex = -1;
+            _ctrlDropTarget = null;
 
             var dragged = e.Data.GetData(typeof(TrackItemViewModel)) as TrackItemViewModel;
             if (dragged == null || !(DataContext is TrackListViewModel vm)) return;
@@ -119,7 +134,9 @@ namespace VisualMusic.Controls
 
             if (isCtrl)
             {
-                var target = HitTestItem(e.GetPosition(trackListView));
+                // Prefer the item directly under the cursor; fall back to the last item
+                // the box was highlighting (covers drops in the gap between rows).
+                var target = HitTestItem(e.GetPosition(trackListView)) ?? ctrlTarget;
                 if (target != null && dragged != target)
                 {
                     int from = vm.Items.IndexOf(dragged);
@@ -199,6 +216,26 @@ namespace VisualMusic.Controls
                 el = VisualTreeHelper.GetParent(el);
             }
             return null;
+        }
+
+        // Returns the ListViewItem whose vertical extent is closest to pos.Y.
+        // Used in Ctrl mode to keep the target box stable when the cursor is in the
+        // pixel gap between rows where no ListViewItem is directly hit.
+        ListViewItem FindNearestListViewItem(Point pos)
+        {
+            if (!(DataContext is TrackListViewModel vm)) return null;
+            ListViewItem nearest = null;
+            double minDist = double.MaxValue;
+            foreach (var item in vm.Items)
+            {
+                if (trackListView.ItemContainerGenerator.ContainerFromItem(item) is not ListViewItem container)
+                    continue;
+                var itemPos = container.TransformToAncestor(trackListView).Transform(new Point(0, 0));
+                double top = itemPos.Y, bottom = itemPos.Y + container.ActualHeight;
+                double dist = pos.Y < top ? top - pos.Y : pos.Y > bottom ? pos.Y - bottom : 0;
+                if (dist < minDist) { minDist = dist; nearest = container; }
+            }
+            return nearest;
         }
 
         TrackItemViewModel HitTestItem(Point pos) =>
