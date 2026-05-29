@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using XnaColor = Microsoft.Xna.Framework.Color;
@@ -239,63 +240,92 @@ namespace VisualMusic.ViewModels
         public bool? DisableTexture
         {
             get => TexProps?.DisableTexture;
-            set { if (value != null) Apply(tp => tp.MaterialProps.TexProps.DisableTexture = value); OnPropertyChanged(); }
+            set { Apply(tp => tp.MaterialProps.TexProps.DisableTexture = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? PointSmp
         {
             get => TexProps?.PointSmp;
-            set { if (value != null) Apply(tp => tp.MaterialProps.TexProps.PointSmp = value); OnPropertyChanged(); }
+            set { Apply(tp => tp.MaterialProps.TexProps.PointSmp = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? TexColBlend
         {
             get => TexProps?.TexColBlend;
-            set { if (value != null) Apply(tp => tp.MaterialProps.TexProps.TexColBlend = value); OnPropertyChanged(); }
+            set { Apply(tp => tp.MaterialProps.TexProps.TexColBlend = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? UTile
         {
             get => TexProps?.UTile;
-            set { if (value != null) Apply(tp => tp.MaterialProps.TexProps.UTile = value); OnPropertyChanged(); }
+            // Bug fix: route through Rebuild so createOcTrees() is called (tex coords baked into geometry)
+            set { Rebuild(tp => tp.MaterialProps.TexProps.UTile = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? VTile
         {
             get => TexProps?.VTile;
-            set { if (value != null) Apply(tp => tp.MaterialProps.TexProps.VTile = value); OnPropertyChanged(); }
+            set { Rebuild(tp => tp.MaterialProps.TexProps.VTile = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? KeepAspect
         {
             get => TexProps?.KeepAspect;
-            set { if (value != null) Apply(tp => tp.MaterialProps.TexProps.KeepAspect = value); OnPropertyChanged(); }
+            set { Rebuild(tp => tp.MaterialProps.TexProps.KeepAspect = value ?? false); OnPropertyChanged(); }
         }
 
         public bool UAnchorNote
         {
             get => TexProps?.UAnchor == TexAnchorEnum.Note;
-            set { if (value) Apply(tp => tp.MaterialProps.TexProps.UAnchor = TexAnchorEnum.Note); OnPropertyChanged(); }
+            set
+            {
+                if (value) Rebuild(tp => tp.MaterialProps.TexProps.UAnchor = TexAnchorEnum.Note);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(UAnchorScreen));
+                OnPropertyChanged(nameof(UAnchorSong));
+            }
         }
         public bool UAnchorScreen
         {
             get => TexProps?.UAnchor == TexAnchorEnum.Screen;
-            set { if (value) Apply(tp => tp.MaterialProps.TexProps.UAnchor = TexAnchorEnum.Screen); OnPropertyChanged(); }
+            set
+            {
+                if (value) Rebuild(tp => tp.MaterialProps.TexProps.UAnchor = TexAnchorEnum.Screen);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(UAnchorNote));
+                OnPropertyChanged(nameof(UAnchorSong));
+            }
         }
         public bool UAnchorSong
         {
             get => TexProps?.UAnchor == TexAnchorEnum.Song;
-            set { if (value) Apply(tp => tp.MaterialProps.TexProps.UAnchor = TexAnchorEnum.Song); OnPropertyChanged(); }
+            set
+            {
+                if (value) Rebuild(tp => tp.MaterialProps.TexProps.UAnchor = TexAnchorEnum.Song);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(UAnchorNote));
+                OnPropertyChanged(nameof(UAnchorScreen));
+            }
         }
         public bool VAnchorNote
         {
             get => TexProps?.VAnchor == TexAnchorEnum.Note;
-            set { if (value) Apply(tp => tp.MaterialProps.TexProps.VAnchor = TexAnchorEnum.Note); OnPropertyChanged(); }
+            set
+            {
+                if (value) Rebuild(tp => tp.MaterialProps.TexProps.VAnchor = TexAnchorEnum.Note);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(VAnchorScreen));
+            }
         }
         public bool VAnchorScreen
         {
             get => TexProps?.VAnchor == TexAnchorEnum.Screen;
-            set { if (value) Apply(tp => tp.MaterialProps.TexProps.VAnchor = TexAnchorEnum.Screen); OnPropertyChanged(); }
+            set
+            {
+                if (value) Rebuild(tp => tp.MaterialProps.TexProps.VAnchor = TexAnchorEnum.Screen);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(VAnchorNote));
+            }
         }
 
         public double? UScroll
@@ -316,23 +346,16 @@ namespace VisualMusic.ViewModels
 
         BitmapSource BuildTextureThumbnail()
         {
-            if (TexProps?.Texture == null) return null;
+            var path = TexProps?.Path;
+            if (string.IsNullOrEmpty(path) || !File.Exists(path)) return null;
             try
             {
-                var tex = TexProps.Texture;
-                int w = tex.Width, h = tex.Height;
-                var data = new Color[w * h];
-                tex.GetData(data);
-                var bmp = new WriteableBitmap(w, h, 96, 96, PixelFormats.Bgra32, null);
-                byte[] pixels = new byte[w * h * 4];
-                for (int i = 0; i < data.Length; i++)
-                {
-                    pixels[i * 4 + 0] = data[i].B;
-                    pixels[i * 4 + 1] = data[i].G;
-                    pixels[i * 4 + 2] = data[i].R;
-                    pixels[i * 4 + 3] = data[i].A;
-                }
-                bmp.WritePixels(new System.Windows.Int32Rect(0, 0, w, h), pixels, w * 4, 0);
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.CacheOption = BitmapCacheOption.OnLoad;  // load fully into memory, don't lock the file
+                bmp.UriSource = new Uri(path, UriKind.Absolute);
+                bmp.EndInit();
+                bmp.Freeze();
                 return bmp;
             }
             catch { return null; }

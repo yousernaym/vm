@@ -7,7 +7,8 @@
                  xmlns:local="clr-namespace:VisualMusic"
                  Title="{Binding WindowTitle}"
                  Height="800" Width="1200"
-                 WindowStartupLocation="CenterScreen">
+                 WindowStartupLocation="CenterScreen"
+                 PreviewKeyDown="Window_PreviewKeyDown">
     <mah:MetroWindow.Resources>
         <conv:EqualityToVisibilityConverter x:Key="ScreenVis"/>
         <BooleanToVisibilityConverter x:Key="BoolVis"/>
@@ -33,8 +34,9 @@
         <KeyBinding Command="{Binding SaveTrackPropsCommand}" Key="P"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding InsertLyricsCommand}"   Key="L"    Modifiers="Control"/>
         <KeyBinding Command="{Binding InsertKeyFrameCommand}" Key="K"    Modifiers="Control"/>
-        <!-- Playback -->
-        <KeyBinding Command="{Binding TogglePlaybackCommand}" Key="Space" Modifiers="Control"/>
+        <!-- Playback — Ctrl+Space handled via PreviewKeyDown in code-behind (tunneling) so it
+             fires even when a focused panel control (CheckBox, ListBox, etc.) would otherwise
+             swallow the Space activation key. -->
         <KeyBinding Command="{Binding GoToBeginningCommand}"  Key="Home"  Modifiers="Control"/>
         <KeyBinding Command="{Binding GoToEndCommand}"        Key="End"   Modifiers="Control"/>
         <KeyBinding Command="{Binding NudgeBackCommand}"      Key="Left"  Modifiers="Control"/>

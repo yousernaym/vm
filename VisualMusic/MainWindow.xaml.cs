@@ -1,5 +1,6 @@
 using MahApps.Metro.Controls;
 using System.Windows;
+using System.Windows.Input;
 using VisualMusic.ViewModels;
 
 namespace VisualMusic
@@ -14,6 +15,19 @@ namespace VisualMusic
             DataContext = vm;
             InitializeComponent();
             Loaded += OnLoaded;
+        }
+
+        // Tunneling PreviewKeyDown ensures Ctrl+Space reaches us before focusable panel controls
+        // (CheckBox, RadioButton, ListView items) can swallow the Space activation key — mirrors
+        // the old WinForms KeyPreview = true behavior.
+        void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (vm.TogglePlaybackCommand.CanExecute(null))
+                    vm.TogglePlaybackCommand.Execute(null);
+                e.Handled = true;
+            }
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
