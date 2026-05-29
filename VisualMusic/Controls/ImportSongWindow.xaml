@@ -2,7 +2,6 @@
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                 Title="{Binding Title}"
                  ResizeMode="NoResize"
                  SizeToContent="WidthAndHeight"
                  WindowStartupLocation="CenterOwner"
@@ -49,8 +48,9 @@
 
         <!-- Options -->
         <StackPanel Grid.Row="4" Orientation="Vertical">
-            <CheckBox Content="Erase current project" IsChecked="{Binding EraseCurrent}" Margin="0,0,0,6"/>
-            <CheckBox Content="Insert track (keep existing tracks)" IsChecked="{Binding InsTrack}"/>
+            <CheckBox Content="Erase current project" IsChecked="{Binding EraseCurrent}" Margin="0,0,0,10"/>
+            <RadioButton GroupName="TrackSplit" Content="{Binding PerInstrumentLabel}" IsChecked="{Binding InsTrack}"  Margin="0,0,0,2"/>
+            <RadioButton GroupName="TrackSplit" Content="{Binding PerChannelLabel}"    IsChecked="{Binding PerChannel}"/>
         </StackPanel>
 
         <!-- Buttons -->

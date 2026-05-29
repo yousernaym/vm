@@ -349,6 +349,8 @@ namespace VisualMusic
                 throw new FileImportException("No notes found.", ImportError.Corrupt, ImportFileType.Note, errorPath);
 
             notes = newNotes;
+            if (options.NoteFileType == Midi.FileType.Midi && !options.InsTrack)
+                splitTracksByChannel(notes);
             notes.createNoteBsp();
 
             if (options.EraseCurrent)
@@ -390,6 +392,39 @@ namespace VisualMusic
             if (notes != null)
                 notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + Props.AudioOffset));
             AudioFilePath = file;
+        }
+
+        /// <summary>
+        /// Regroup all MIDI notes by channel so each MIDI channel becomes its own app track.
+        /// Track 0 is left empty (the global/master track — <see cref="CreateTrackViews"/> starts
+        /// assigning visuals from index 1 and <see cref="AddTrackView"/> sets GlobalProps from
+        /// Tracks[0], mirroring the MOD/SID Remuxer convention).
+        /// </summary>
+        static void splitTracksByChannel(Midi.Song song)
+        {
+            var byChannel = new SortedDictionary<int, List<Midi.Note>>();
+            foreach (var track in song.Tracks)
+                foreach (var note in track.Notes)
+                {
+                    if (!byChannel.TryGetValue(note.channel, out var list))
+                        byChannel[note.channel] = list = new List<Midi.Note>();
+                    list.Add(note);
+                }
+
+            // Index 0: empty global/master track (not rendered)
+            var newTracks = new List<Midi.Track> { new Midi.Track { Length = song.SongLengthT } };
+            foreach (var kv in byChannel)
+            {
+                var t = new Midi.Track
+                {
+                    Length = song.SongLengthT,
+                    Name   = $"Channel {kv.Key + 1}"
+                };
+                kv.Value.Sort((a, b) => a.start.CompareTo(b.start));
+                t.Notes = kv.Value;
+                newTracks.Add(t);
+            }
+            song.Tracks = newTracks;
         }
 
         public void resetPitchLimits()

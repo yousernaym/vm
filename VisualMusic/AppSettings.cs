@@ -45,6 +45,15 @@ namespace VisualMusic
         public void SetAudioFolder(Midi.FileType type, string dir)
             => _audioFolders[type] = dir;
 
+        // ---- Per-file-type track-split preference ----
+
+        // true = one track per instrument (MIDI: per track chunk) — the default, matching old WinForms
+        // false = one track per channel (MIDI: per MIDI channel)
+        [DataMember] Dictionary<Midi.FileType, bool> _insTrack = new();
+
+        public bool GetInsTrack(Midi.FileType type) => _insTrack.TryGetValue(type, out var v) ? v : true;
+        public void SetInsTrack(Midi.FileType type, bool v) => _insTrack[type] = v;
+
         // ---- Defaults (applied when a stored value is null/empty) ----
 
         public string ProjectFolderOrDefault

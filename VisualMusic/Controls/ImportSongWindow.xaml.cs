@@ -1,5 +1,6 @@
 using MahApps.Metro.Controls;
 using Microsoft.Win32;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -9,7 +10,9 @@ namespace VisualMusic.Controls
 {
     /// <summary>
     /// WPF replacement for the WinForms SourceFileForm / ImportNotesWithAudioForm hierarchy.
-    /// Parameterised by file type; caller reads NoteFilePath, AudioFilePath, EraseCurrent, InsTrack.
+    /// Parameterised by file type; title is set in the constructor switch (not via binding).
+    /// Caller reads NoteFilePath, AudioFilePath, EraseCurrent, InsTrack.
+    /// InsTrack: true = one track per instrument (MIDI: per track chunk), false = per channel.
     /// </summary>
     public partial class ImportSongWindow : MetroWindow, INotifyPropertyChanged
     {
@@ -20,9 +23,10 @@ namespace VisualMusic.Controls
 
         Midi.FileType _fileType;
 
-        // ---- Bound properties ----
+        // ---- In-memory session cache (resets to defaults after app restart) ----
+        static readonly Dictionary<Midi.FileType, (bool Erase, string NotePath, string AudioPath)> _session = new();
 
-        public string Title { get; }
+        // ---- Bound properties ----
 
         string _noteFilePath = "";
         public string NoteFilePath
@@ -52,11 +56,33 @@ namespace VisualMusic.Controls
             set { _eraseCurrent = value; Notify(); }
         }
 
-        bool _insTrack;
+        bool _insTrack = true;
+        /// <summary>true = one track per instrument (MIDI: per track chunk).</summary>
         public bool InsTrack
         {
             get => _insTrack;
-            set { _insTrack = value; Notify(); }
+            set { _insTrack = value; Notify(); Notify(nameof(PerChannel)); }
+        }
+
+        /// <summary>Mirror of !InsTrack for the "per channel" radio button.</summary>
+        public bool PerChannel
+        {
+            get => !InsTrack;
+            set { if (value) InsTrack = false; }
+        }
+
+        string _perInstrumentLabel = "One track per instrument";
+        public string PerInstrumentLabel
+        {
+            get => _perInstrumentLabel;
+            set { _perInstrumentLabel = value; Notify(); }
+        }
+
+        string _perChannelLabel = "One track per channel";
+        public string PerChannelLabel
+        {
+            get => _perChannelLabel;
+            set { _perChannelLabel = value; Notify(); }
         }
 
         // ---- File-dialog filters ----
@@ -77,11 +103,24 @@ namespace VisualMusic.Controls
             DataContext = this;
             InitializeComponent();
 
+            // Restore persisted track-split preference
+            InsTrack = AppSettings.Instance.GetInsTrack(fileType);
+
+            // Restore in-memory session values (resets to defaults after app restart)
+            if (_session.TryGetValue(fileType, out var s))
+            {
+                EraseCurrent  = s.Erase;
+                NoteFilePath  = s.NotePath;
+                AudioFilePath = s.AudioPath;
+            }
+
             switch (fileType)
             {
                 case Midi.FileType.Midi:
                     Title = "Import MIDI Song";
                     _noteFilter = BuildFilter("MIDI files", ImportMidiForm.Formats);
+                    PerInstrumentLabel = "One track per MIDI track";
+                    PerChannelLabel    = "One track per MIDI channel";
                     break;
                 case Midi.FileType.Mod:
                     Title = "Import Module";
@@ -140,6 +179,14 @@ namespace VisualMusic.Controls
                 noteFileBox.Focus();
                 return;
             }
+
+            // Persist the track-split choice across app restarts
+            AppSettings.Instance.SetInsTrack(_fileType, InsTrack);
+            AppSettings.Instance.Save();
+
+            // Remember the other fields for the rest of this session
+            _session[_fileType] = (EraseCurrent, NoteFilePath, AudioFilePath);
+
             DialogResult = true;
         }
 
