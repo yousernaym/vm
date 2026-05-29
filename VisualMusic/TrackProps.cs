@@ -236,10 +236,7 @@ namespace VisualMusic
             foreach (var entry in info)
             {
                 if (entry.Name == "path")
-                {
                     Path = (string)entry.Value;
-                    loadContent();
-                }
                 else if (entry.Name == "disableTexture")
                     DisableTexture = (bool)entry.Value;
                 else if (entry.Name == "pointSmp")
@@ -322,11 +319,11 @@ namespace VisualMusic
 
         internal void loadContent()
         {
-            //Deserialization inits PJath but not Texture because Texture2D is not serializable, and you can't load texture before the device is created.
+            //Deserialization inits Path but not Texture because Texture2D is not serializable, and you can't load texture before the device is created.
             try
             {
                 if (!string.IsNullOrEmpty(Path))
-                    loadTexture(Path, Form1.SongPanel);
+                    loadTexture(Path, Project.StaticDrawHost);
             }
             catch (Exception)
             {

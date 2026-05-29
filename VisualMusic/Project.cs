@@ -35,7 +35,8 @@ namespace VisualMusic
         }
         static ISongDrawHost _drawHostOverride;
         public static void SetDrawHost(ISongDrawHost host) => _drawHostOverride = host;
-        ISongDrawHost DrawHost => _drawHostOverride ?? Form1.SongPanel;
+        public static ISongDrawHost StaticDrawHost => _drawHostOverride ?? Form1.SongPanel;
+        ISongDrawHost DrawHost => StaticDrawHost;
 
         TimeSpan pbStartSysTime = new TimeSpan(0);
         double pbStartSongTimeS;
@@ -1026,7 +1027,7 @@ namespace VisualMusic
             for (int i = 0; i < TrackViews.Count; i++)
             {
                 var tv = TrackViews[i];
-                //tv.TrackProps.StyleProps.LoadFx();
+                tv.TrackProps.loadContent();
                 if (i > 0)
                 {
                     _ = tv.TrackProps.AudioProps.LoadAudioAsync();
