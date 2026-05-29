@@ -18,6 +18,8 @@ namespace VisualMusic.Controls
         void Notify([CallerMemberName] string name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
+        Midi.FileType _fileType;
+
         // ---- Bound properties ----
 
         public string Title { get; }
@@ -61,13 +63,17 @@ namespace VisualMusic.Controls
         readonly string _noteFilter;
         readonly string _audioFilter = "Wave files (*.wav)|*.wav|All files (*.*)|*.*";
 
-        string _noteFolder = "";
-        string _audioFolder = "";
+        string _noteFolder;
+        string _audioFolder;
 
         // ---- Constructor ----
 
         public ImportSongWindow(Midi.FileType fileType)
         {
+            _fileType = fileType;
+            _noteFolder  = AppSettings.Instance.GetNoteFolder(fileType);
+            _audioFolder = AppSettings.Instance.GetAudioFolder(fileType);
+
             DataContext = this;
             InitializeComponent();
 
@@ -108,6 +114,8 @@ namespace VisualMusic.Controls
             if (dlg.ShowDialog(this) != true) return;
             NoteFilePath = dlg.FileName;
             _noteFolder = Path.GetDirectoryName(dlg.FileName);
+            AppSettings.Instance.SetNoteFolder(_fileType, _noteFolder);
+            AppSettings.Instance.Save();
         }
 
         void BrowseAudio_Click(object sender, RoutedEventArgs e)
@@ -117,6 +125,8 @@ namespace VisualMusic.Controls
             if (dlg.ShowDialog(this) != true) return;
             AudioFilePath = dlg.FileName;
             _audioFolder = Path.GetDirectoryName(dlg.FileName);
+            AppSettings.Instance.SetAudioFolder(_fileType, _audioFolder);
+            AppSettings.Instance.Save();
         }
 
         // ---- OK / Cancel ----

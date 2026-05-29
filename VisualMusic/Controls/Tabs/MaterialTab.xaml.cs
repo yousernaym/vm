@@ -22,7 +22,10 @@ namespace VisualMusic.Controls.Tabs
             {
                 Filter = "Image files|*.png;*.jpg;*.jpeg;*.bmp;*.dds|All files|*.*"
             };
+            var texDir = AppSettings.Instance.TextureFolder;
+            if (!string.IsNullOrEmpty(texDir)) dlg.InitialDirectory = texDir;
             if (dlg.ShowDialog() != true) return;
+            AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TextureFolder = dir);
             vm.LoadTexture(dlg.FileName);
         }
 

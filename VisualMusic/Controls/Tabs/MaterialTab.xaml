@@ -63,35 +63,35 @@
                 <CheckBox Content="Keep aspect" IsChecked="{Binding KeepAspect,    Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"/>
             </WrapPanel>
 
-            <Grid Margin="0,6,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="60"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="U anchor:" VerticalAlignment="Center"/>
-                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+            <StackPanel Margin="0,6,0,0">
+                <TextBlock Text="U anchor:" Margin="0,0,0,2"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                     <RadioButton Content="Note"   IsChecked="{Binding UAnchorNote,   Mode=TwoWay}" Margin="0,0,6,0"/>
                     <RadioButton Content="Screen" IsChecked="{Binding UAnchorScreen, Mode=TwoWay}" Margin="0,0,6,0"/>
                     <RadioButton Content="Song"   IsChecked="{Binding UAnchorSong,   Mode=TwoWay}"/>
                 </StackPanel>
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="V anchor:" VerticalAlignment="Center" Margin="0,2"/>
-                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="V anchor:" Margin="0,0,0,2"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                     <RadioButton Content="Note"   IsChecked="{Binding VAnchorNote,   Mode=TwoWay}" Margin="0,0,6,0"/>
                     <RadioButton Content="Screen" IsChecked="{Binding VAnchorScreen, Mode=TwoWay}" Margin="0,0,6,0"/>
                 </StackPanel>
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="U scroll:" VerticalAlignment="Center" Margin="0,2"/>
-                <ctrl:TbSliderWpf Grid.Row="2" Grid.Column="1" Margin="2"
-                                  Value="{Binding UScroll, Mode=TwoWay}" Min="-5" Max="5" Decimals="2"/>
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="V scroll:" VerticalAlignment="Center" Margin="0,2"/>
-                <ctrl:TbSliderWpf Grid.Row="3" Grid.Column="1" Margin="2"
-                                  Value="{Binding VScroll, Mode=TwoWay}" Min="-5" Max="5" Decimals="2"/>
-            </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="U scroll:" VerticalAlignment="Center" Margin="0,2"/>
+                    <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
+                                      Value="{Binding UScroll, Mode=TwoWay}" Min="-5" Max="5" Decimals="2"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="V scroll:" VerticalAlignment="Center" Margin="0,2"/>
+                    <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
+                                      Value="{Binding VScroll, Mode=TwoWay}" Min="-5" Max="5" Decimals="2"/>
+                </Grid>
+            </StackPanel>
 
         </StackPanel>
     </ScrollViewer>

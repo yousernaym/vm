@@ -133,7 +133,10 @@ namespace VisualMusic.ViewModels
                 {
                     Filter = "Audio files|*.wav;*.flac;*.mp3;*.ogg|All files|*.*"
                 };
+                var audioDir = AppSettings.Instance.TrackAudioFolder;
+                if (!string.IsNullOrEmpty(audioDir)) dlg.InitialDirectory = audioDir;
                 if (dlg.ShowDialog() != true) return;
+                AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TrackAudioFolder = dir);
                 SelectedTrackProps.AudioFilename = dlg.FileName;
             };
         }
@@ -175,12 +178,6 @@ namespace VisualMusic.ViewModels
         /// <summary>Returns the active draw host (SongRenderer) for wiring up Project.SetDrawHost.</summary>
         public Func<ISongDrawHost> GetDrawHost { get; set; }
 
-        // ---- Folder memory for file dialogs ----
-
-        string projectFolder = Path.Combine(Program.DefaultUserFilesDir, "Projects");
-        string camFolder = Path.Combine(Program.DefaultUserFilesDir, "Props");
-        string trackPropsFolder = Path.Combine(Program.DefaultUserFilesDir, "Props");
-
         // ---- Screen commands ----
 
         [RelayCommand] void ShowSong() => CurrentScreen = AppScreen.Song;
@@ -196,12 +193,12 @@ namespace VisualMusic.ViewModels
             var dlg = new OpenFileDialog
             {
                 Filter = $"Visual Music projects|*.{Project.DefaultFileExt}|All files|*.*",
-                InitialDirectory = projectFolder
+                InitialDirectory = AppSettings.Instance.ProjectFolderOrDefault
             };
             if (dlg.ShowDialog() != true) return;
 
             string path = dlg.FileName;
-            projectFolder = Path.GetDirectoryName(path);
+            AppSettings.Instance.RememberFolder(path, dir => AppSettings.Instance.ProjectFolder = dir);
 
             Project tempProject;
             var dcs = new DataContractSerializer(typeof(Project), ProjectSerializer.KnownTypes);
@@ -272,11 +269,11 @@ namespace VisualMusic.ViewModels
             var dlg = new SaveFileDialog
             {
                 Filter = $"Visual Music projects|*.{Project.DefaultFileExt}|All files|*.*",
-                InitialDirectory = projectFolder,
+                InitialDirectory = AppSettings.Instance.ProjectFolderOrDefault,
                 FileName = project.DefaultFileName
             };
             if (dlg.ShowDialog() != true) return;
-            projectFolder = Path.GetDirectoryName(dlg.FileName);
+            AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.ProjectFolder = dir);
             currentProjectPath = dlg.FileName;
             SaveToPath(currentProjectPath);
         }
@@ -555,10 +552,10 @@ namespace VisualMusic.ViewModels
             var dlg = new OpenFileDialog
             {
                 Filter = "Camera files|*.cam|All files|*.*",
-                InitialDirectory = camFolder
+                InitialDirectory = AppSettings.Instance.CamFolderOrDefault
             };
             if (dlg.ShowDialog() != true) return;
-            camFolder = Path.GetDirectoryName(dlg.FileName);
+            AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.CamFolder = dir);
             try
             {
                 var dcs = new DataContractSerializer(typeof(Camera), ProjectSerializer.KnownTypes);
@@ -578,9 +575,9 @@ namespace VisualMusic.ViewModels
         [RelayCommand(CanExecute = nameof(HasProject))]
         void SaveCamera()
         {
-            var dlg = new SaveFileDialog { Filter = "Camera files|*.cam|All files|*.*", InitialDirectory = camFolder };
+            var dlg = new SaveFileDialog { Filter = "Camera files|*.cam|All files|*.*", InitialDirectory = AppSettings.Instance.CamFolderOrDefault };
             if (dlg.ShowDialog() != true) return;
-            camFolder = Path.GetDirectoryName(dlg.FileName);
+            AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.CamFolder = dir);
             try
             {
                 var dcs = new DataContractSerializer(typeof(Camera), ProjectSerializer.KnownTypes);
@@ -599,10 +596,10 @@ namespace VisualMusic.ViewModels
             var dlg = new OpenFileDialog
             {
                 Filter = "Track property files|*.tp|All files|*.*",
-                InitialDirectory = trackPropsFolder
+                InitialDirectory = AppSettings.Instance.TrackPropsFolderOrDefault
             };
             if (dlg.ShowDialog() != true) return;
-            trackPropsFolder = Path.GetDirectoryName(dlg.FileName);
+            AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TrackPropsFolder = dir);
 
             TrackProps props;
             var dcs = new DataContractSerializer(typeof(TrackProps), ProjectSerializer.KnownTypes);
@@ -630,11 +627,11 @@ namespace VisualMusic.ViewModels
             var dlg = new SaveFileDialog
             {
                 Filter = "Track property files|*.tp|All files|*.*",
-                InitialDirectory = trackPropsFolder,
+                InitialDirectory = AppSettings.Instance.TrackPropsFolderOrDefault,
                 FileName = "track.tp"
             };
             if (dlg.ShowDialog() != true) return;
-            trackPropsFolder = Path.GetDirectoryName(dlg.FileName);
+            AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TrackPropsFolder = dir);
 
             TrackProps props = project.TrackViews[0].TrackProps;
             props.TypeFlags = (int)TrackPropsType.TPT_All;
