@@ -24,15 +24,15 @@ namespace VisualMusic.Controls
         Midi.FileType _fileType;
 
         // ---- In-memory session cache (resets to defaults after app restart) ----
-        static readonly Dictionary<Midi.FileType, (bool Erase, string NotePath, string AudioPath)> _session = new();
+        static readonly Dictionary<Midi.FileType, (bool Erase, string NotePath, string AudioPath, bool InsTrack)> _session = new();
 
         /// <summary>
         /// Update the session cache for <paramref name="type"/> without opening the dialog.
-        /// Call this after a silent import (e.g. browser download) so the dialog is pre-filled
-        /// correctly if the user opens it manually afterward.
+        /// Call this after a silent import or project load so the dialog is pre-filled correctly
+        /// if the user opens it manually afterward.
         /// </summary>
-        internal static void UpdateSession(Midi.FileType type, bool erase, string notePath, string audioPath)
-            => _session[type] = (erase, notePath, audioPath);
+        internal static void UpdateSession(Midi.FileType type, bool erase, string notePath, string audioPath, bool insTrack)
+            => _session[type] = (erase, notePath, audioPath, insTrack);
 
         // ---- Bound properties ----
 
@@ -111,7 +111,7 @@ namespace VisualMusic.Controls
             DataContext = this;
             InitializeComponent();
 
-            // Restore persisted track-split preference
+            // Restore persisted track-split preference, then let the session override if present
             InsTrack = AppSettings.Instance.GetInsTrack(fileType);
 
             // Restore in-memory session values (resets to defaults after app restart)
@@ -120,6 +120,7 @@ namespace VisualMusic.Controls
                 EraseCurrent  = s.Erase;
                 NoteFilePath  = s.NotePath;
                 AudioFilePath = s.AudioPath;
+                InsTrack      = s.InsTrack;
             }
 
             switch (fileType)
@@ -192,8 +193,8 @@ namespace VisualMusic.Controls
             AppSettings.Instance.SetInsTrack(_fileType, InsTrack);
             AppSettings.Instance.Save();
 
-            // Remember the other fields for the rest of this session
-            _session[_fileType] = (EraseCurrent, NoteFilePath, AudioFilePath);
+            // Remember all fields for the rest of this session
+            _session[_fileType] = (EraseCurrent, NoteFilePath, AudioFilePath, InsTrack);
 
             DialogResult = true;
         }

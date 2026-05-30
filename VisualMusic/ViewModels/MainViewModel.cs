@@ -244,6 +244,18 @@ namespace VisualMusic.ViewModels
 
             var rendererWfp = GetRendererWaveformPanel?.Invoke();
             tempProject.InitAfterDeserialization(rendererWfp);
+
+            // Pre-fill the import dialog with this project's saved import options so that
+            // opening the dialog after loading a project shows the correct file paths and settings.
+            var io = tempProject.ImportOptions;
+            if (io != null)
+            {
+                // Only show the audio path if it was an explicit user-provided file, not an internal mixdown.
+                string audioPath = io.MixdownType == Midi.MixdownType.None ? (io.AudioPath ?? "") : "";
+                ImportSongWindow.UpdateSession(io.NoteFileType, erase: true,
+                    notePath: io.RawNotePath ?? "", audioPath: audioPath, insTrack: io.InsTrack);
+            }
+
             currentProjectPath = path;
             Project = tempProject;
             tempProject.DefaultFileName = Path.GetFileName(path);
@@ -726,7 +738,8 @@ namespace VisualMusic.ViewModels
             try { options.setNotePath(); } catch (FileImportException) { }
             options.EraseCurrent = true;
             options.InsTrack     = AppSettings.Instance.GetInsTrack(fileType.Value);
-            ImportSongWindow.UpdateSession(fileType.Value, erase: true, notePath: tempPath, audioPath: "");
+            ImportSongWindow.UpdateSession(fileType.Value, erase: true, notePath: tempPath, audioPath: "",
+                insTrack: AppSettings.Instance.GetInsTrack(fileType.Value));
             _ = DoImport(options);   // fire-and-forget on the UI thread (async void pattern)
         }
     }
