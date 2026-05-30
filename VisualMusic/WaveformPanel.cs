@@ -72,6 +72,8 @@ namespace VisualMusic
         {
             if (songPosS < 0 || _renderer.ChannelCount == 0)
                 return;
+            if (!_channels.Exists(c => !string.IsNullOrEmpty(c.Filename)))
+                return;
             if (_waveTex == null || _renderer.Width != (int)(_gfxDevice.Viewport.Width * NormalizedWidth) || _renderer.Height != (int)(_gfxDevice.Viewport.Height))
                 Resize();
             if (_waveTex == null)
@@ -86,11 +88,13 @@ namespace VisualMusic
 
         internal void ClearChannels()
         {
+            _channels.Clear();
             _renderer?.ClearChannels();
         }
 
         public void AddChannel(Channel channel)
         {
+            _channels.Add(channel);
             _renderer?.AddChannel(channel);
         }
 
@@ -102,6 +106,7 @@ namespace VisualMusic
 
         internal void RemoveChannel(Channel sidWizChannel)
         {
+            _channels.Remove(sidWizChannel);
             _renderer.RemoveChannel(sidWizChannel);
         }
     }
