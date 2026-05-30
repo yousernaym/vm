@@ -32,12 +32,71 @@ namespace VisualMusic
         [DllImport("user32.dll")]
         static extern IntPtr DefWindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        static extern ushort RegisterClassEx(ref WNDCLASSEX lpwcx);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        struct WNDCLASSEX
+        {
+            public uint cbSize;
+            public uint style;
+            public WndProcDelegate lpfnWndProc;
+            public int cbClsExtra;
+            public int cbWndExtra;
+            public IntPtr hInstance;
+            public IntPtr hIcon;
+            public IntPtr hCursor;
+            public IntPtr hbrBackground;
+            public string lpszMenuName;
+            public string lpszClassName;
+            public IntPtr hIconSm;
+        }
+
+        // A NULL background brush means Windows never erases the window to any colour,
+        // so the only thing ever shown is what MonoGame presents — no white flashes on
+        // resize. Registered once per process; the delegate is held alive in a static field.
+        const string WindowClassName = "VMMonoGameHost";
+        static WndProcDelegate _classWndProc;
+        static ushort _classAtom;
+
+        static void EnsureWindowClassRegistered()
+        {
+            if (_classAtom != 0)
+                return;
+
+            _classWndProc = DefWindowProc;
+            var wc = new WNDCLASSEX
+            {
+                cbSize = (uint)Marshal.SizeOf<WNDCLASSEX>(),
+                style = 0,
+                lpfnWndProc = _classWndProc,
+                hInstance = GetModuleHandle(null),
+                hbrBackground = IntPtr.Zero,
+                lpszClassName = WindowClassName,
+            };
+
+            _classAtom = RegisterClassEx(ref wc);
+            if (_classAtom == 0)
+            {
+                const int ERROR_CLASS_ALREADY_EXISTS = 1410;
+                int err = Marshal.GetLastWin32Error();
+                if (err != ERROR_CLASS_ALREADY_EXISTS)
+                    throw new InvalidOperationException($"RegisterClassEx failed: {err}");
+            }
+        }
+
         const uint WS_CHILD = 0x40000000;
         const uint WS_VISIBLE = 0x10000000;
         const uint SWP_NOZORDER = 0x0004;
         const uint SWP_NOACTIVATE = 0x0010;
 
         // ---- Win32 messages ----
+        const int WM_ERASEBKGND = 0x0014;
         const int WM_LBUTTONDOWN = 0x0201;
         const int WM_LBUTTONUP = 0x0202;
         const int WM_RBUTTONDOWN = 0x0204;
@@ -71,7 +130,9 @@ namespace VisualMusic
             int w = Math.Max(1, (int)ActualWidth);
             int h = Math.Max(1, (int)ActualHeight);
 
-            _hwnd = CreateWindowEx(0, "STATIC", "",
+            EnsureWindowClassRegistered();
+
+            _hwnd = CreateWindowEx(0, WindowClassName, "",
                 WS_CHILD | WS_VISIBLE,
                 0, 0, w, h,
                 hwndParent.Handle, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
@@ -86,6 +147,8 @@ namespace VisualMusic
             Renderer = new SongRenderer();
             Renderer.SetCursorPosition = SetCursorFromHostCoords;
             Renderer.Initialize(_gds.GraphicsDevice, _gds.ResetDevice, svc, w, h);
+
+            RenderNow();
 
             _clock.Start();
             _timer = new DispatcherTimer(DispatcherPriority.Render, Dispatcher)
@@ -119,7 +182,12 @@ namespace VisualMusic
             _oldTime = now;
 
             Renderer.Update(dt);
+            RenderNow();
+        }
 
+        void RenderNow()
+        {
+            if (Renderer == null) return;
             string err = Renderer.BeginDraw();
             if (err == null)
             {
@@ -141,6 +209,8 @@ namespace VisualMusic
             SetWindowPos(_hwnd, IntPtr.Zero, 0, 0, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
             _gds.ResetDevice(w, h);
             Renderer?.OnResize(w, h);
+
+            RenderNow();
         }
 
         // ---- Input via WndProc ----
@@ -156,6 +226,10 @@ namespace VisualMusic
 
             switch (msg)
             {
+                case WM_ERASEBKGND:
+                    handled = true;
+                    return (IntPtr)1;
+
                 case WM_LBUTTONDOWN:
                     bool isShift = (wParam.ToInt32() & MK_SHIFT) != 0;
                     Renderer.HandleMouseDown(true, isShift, lo, hi);
