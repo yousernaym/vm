@@ -479,7 +479,15 @@ namespace VisualMusic.ViewModels
         public string AudioFilename
         {
             get => _mergedProps?.AudioProps?.Filename ?? "";
-            set { Apply(tp => tp.AudioProps.Filename = value); OnPropertyChanged(); }
+            set
+            {
+                Apply(tp =>
+                {
+                    tp.AudioProps.Filename = value;
+                    _ = tp.AudioProps.LoadAudioAsync();
+                });
+                OnPropertyChanged();
+            }
         }
 
         public Action BrowseAudioFile { get; set; }
