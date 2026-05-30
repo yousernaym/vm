@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using XnaColor = Microsoft.Xna.Framework.Color;
@@ -481,15 +482,13 @@ namespace VisualMusic.ViewModels
             get => _mergedProps?.AudioProps?.Filename ?? "";
             set
             {
-                Apply(tp =>
-                {
-                    tp.AudioProps.Filename = value;
-                    _ = tp.AudioProps.LoadAudioAsync();
-                });
+                Apply(tp => tp.AudioProps.Filename = value);
                 OnPropertyChanged();
+                _ = LoadSelectedTracksAudio?.Invoke();
             }
         }
 
         public Action BrowseAudioFile { get; set; }
+        public Func<Task> LoadSelectedTracksAudio { get; set; }
     }
 }

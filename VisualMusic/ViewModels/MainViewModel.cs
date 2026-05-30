@@ -139,6 +139,19 @@ namespace VisualMusic.ViewModels
                 AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TrackAudioFolder = dir);
                 SelectedTrackProps.AudioFilename = dlg.FileName;
             };
+
+            SelectedTrackProps.LoadSelectedTracksAudio = async () =>
+            {
+                var selectedItems = TrackList.SelectedItems.ToList();
+                await Task.WhenAll(
+                    selectedItems.Select(item => item.TrackView.TrackProps.AudioProps.LoadAudioAsync()));
+                var failedChannel = selectedItems
+                    .Select(item => item.TrackView.TrackProps.AudioProps.SidWizChannel)
+                    .FirstOrDefault(ch => !string.IsNullOrEmpty(ch.ErrorMessage));
+                if (failedChannel != null)
+                    MessageBox.Show($"Couldn't load audio file:\n{failedChannel.Filename}", Program.AppName,
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+            };
         }
 
         void OnTrackListSelectionChanged()
