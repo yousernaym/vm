@@ -5,6 +5,7 @@ using CefSharp.WinForms;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -12,16 +13,56 @@ namespace VisualMusic
 {
     public static class Download
     {
-        static Client client = new Client();
+        // Lazily created by init() — only the legacy WinForms/Form1 path uses the embedded
+        // CefSharp browser. The WPF app never calls init(), so this stays null there and the
+        // CefSharp.WinForms control is never instantiated inside the WPF (CefSharp.Wpf) process.
+        static Client client;
 
         public static void init(Form form)
         {
+            client = new Client();
             form.Controls.Add(client);
         }
 
-        public static string downloadFile(this string path)
+        /// <summary>
+        /// Downloads <paramref name="url"/> to a file in the temp dir and returns the local path
+        /// (or null on failure). Uses WebClient rather than the embedded CefSharp browser so it
+        /// works in the WPF app, where the CefSharp.WinForms download client is never initialized.
+        /// The filename is taken from the server's Content-Disposition header when present
+        /// (matching the old CefSharp behavior), else derived from the URL.
+        /// </summary>
+        public static string downloadFile(this string url)
         {
-            return client.Load(path);
+            try
+            {
+                using var webClient = new WebClient();
+                byte[] data = webClient.DownloadData(url);
+                string fileName = getDownloadFileName(webClient.ResponseHeaders, url);
+                string path = Path.Combine(Program.TempDir, fileName);
+                File.WriteAllBytes(path, data);
+                return path;
+            }
+            catch
+            {
+                return null;   // setNotePath() turns this into a FileImportException
+            }
+        }
+
+        static string getDownloadFileName(WebHeaderCollection headers, string url)
+        {
+            string contentDisposition = headers?["Content-Disposition"];
+            if (!string.IsNullOrEmpty(contentDisposition))
+            {
+                try
+                {
+                    string name = new System.Net.Mime.ContentDisposition(contentDisposition).FileName;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        return Path.GetFileName(name);
+                }
+                catch { /* malformed header — fall back to the URL */ }
+            }
+            string urlName = Path.GetFileName(new Uri(url).LocalPath);
+            return string.IsNullOrWhiteSpace(urlName) ? Path.GetRandomFileName() : urlName;
         }
 
         public static bool IsUrl(this string path)

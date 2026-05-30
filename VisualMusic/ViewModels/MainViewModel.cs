@@ -711,22 +711,10 @@ namespace VisualMusic.ViewModels
                 return;
             }
 
-            // Download to a temp location then import directly (no dialog).
-            string tempPath = Path.Combine(Program.TempDir, suggestedFileName);
-            try
-            {
-                using var client = new System.Net.WebClient();
-                client.DownloadFile(url, tempPath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Download failed: " + ex.Message, Program.AppName,
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            // Browser imports always erase the current project, use no audio file,
-            // and use the saved per-type track-split preference.
+            // Browser imports skip the dialog: always erase the current project, use no audio file,
+            // and use the saved per-type track-split preference. The note path is the original URL;
+            // setNotePath() downloads it to a temp file — the same path the dialog takes when a URL
+            // is typed into the note field, so re-importing the URL later behaves identically.
             ImportOptions options;
             switch (fileType.Value)
             {
@@ -734,11 +722,17 @@ namespace VisualMusic.ViewModels
                 case Midi.FileType.Mod:  options = new ModImportOptions();  break;
                 default:                 options = new SidImportOptions();  break;
             }
-            options.RawNotePath  = tempPath;
-            try { options.setNotePath(); } catch (FileImportException) { }
+            options.RawNotePath  = url;       // preserve original URL for project save and dialog display
+            try { options.setNotePath(); }    // downloads the URL to a temp file (WebClient)
+            catch (FileImportException)
+            {
+                MessageBox.Show("Download failed: " + url, Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             options.EraseCurrent = true;
             options.InsTrack     = AppSettings.Instance.GetInsTrack(fileType.Value);
-            ImportSongWindow.UpdateSession(fileType.Value, erase: true, notePath: tempPath, audioPath: "",
+            ImportSongWindow.UpdateSession(fileType.Value, erase: true, notePath: url, audioPath: "",
                 insTrack: AppSettings.Instance.GetInsTrack(fileType.Value));
             _ = DoImport(options);   // fire-and-forget on the UI thread (async void pattern)
         }
