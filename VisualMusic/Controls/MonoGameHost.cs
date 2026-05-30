@@ -26,6 +26,12 @@ namespace VisualMusic
         static extern bool DestroyWindow(IntPtr hWnd);
 
         [DllImport("user32.dll")]
+        static extern IntPtr SetCapture(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        static extern bool ReleaseCapture();
+
+        [DllImport("user32.dll")]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
             int x, int y, int cx, int cy, uint flags);
 
@@ -96,14 +102,15 @@ namespace VisualMusic
         const uint SWP_NOACTIVATE = 0x0010;
 
         // ---- Win32 messages ----
-        const int WM_ERASEBKGND = 0x0014;
-        const int WM_LBUTTONDOWN = 0x0201;
-        const int WM_LBUTTONUP = 0x0202;
-        const int WM_RBUTTONDOWN = 0x0204;
-        const int WM_RBUTTONUP = 0x0205;
-        const int WM_MOUSEMOVE = 0x0200;
-        const int WM_KEYDOWN = 0x0100;
-        const int WM_SIZE = 0x0005;
+        const int WM_ERASEBKGND    = 0x0014;
+        const int WM_LBUTTONDOWN   = 0x0201;
+        const int WM_LBUTTONUP     = 0x0202;
+        const int WM_RBUTTONDOWN   = 0x0204;
+        const int WM_RBUTTONUP     = 0x0205;
+        const int WM_MOUSEMOVE     = 0x0200;
+        const int WM_CAPTURECHANGED = 0x0215;
+        const int WM_KEYDOWN       = 0x0100;
+        const int WM_SIZE          = 0x0005;
 
         const int MK_SHIFT = 0x0004;
 
@@ -233,17 +240,27 @@ namespace VisualMusic
                 case WM_LBUTTONDOWN:
                     bool isShift = (wParam.ToInt32() & MK_SHIFT) != 0;
                     Renderer.HandleMouseDown(true, isShift, lo, hi);
+                    SetCapture(_hwnd);
                     break;
 
                 case WM_RBUTTONDOWN:
                     Renderer.HandleMouseDown(false, false, lo, hi);
+                    SetCapture(_hwnd);
                     break;
 
                 case WM_LBUTTONUP:
                     Renderer.HandleMouseUp(true);
+                    ReleaseCapture();
                     break;
 
                 case WM_RBUTTONUP:
+                    Renderer.HandleMouseUp(false);
+                    ReleaseCapture();
+                    break;
+
+                case WM_CAPTURECHANGED:
+                    // Capture was lost externally — clear any stuck drag/scroll state.
+                    Renderer.HandleMouseUp(true);
                     Renderer.HandleMouseUp(false);
                     break;
 

@@ -50,7 +50,6 @@ namespace VisualMusic
         bool mergeRegionSelection = false;
         bool mousePosScrollSong = false;
         bool isPausingWhileScrolling = false;
-        double scrollCenter = 0;
         Rectangle selectedScreenRegion;
         bool forceDefaultNoteStyle = false;
 
@@ -244,7 +243,6 @@ namespace VisualMusic
             {
                 rightMbPressed = true;
                 mousePosScrollSong = true;
-                scrollCenter = NormMouseX;
                 if (Project.IsPlaying)
                 {
                     isPausingWhileScrolling = true;
@@ -415,10 +413,7 @@ namespace VisualMusic
         public void scrollSong()
         {
             if (mousePosScrollSong && !selectingRegion && Project != null)
-            {
-                double dNormMouseX = (double)NormMouseX - scrollCenter;
-                Project.NormSongPos += (float)(Math.Pow(dNormMouseX, 2) * Math.Sign(dNormMouseX) * deltaTimeS * 0.3f);
-            }
+                Project.NormSongPos += (float)(Math.Pow(NormMouseX, 2) * Math.Sign(NormMouseX) * deltaTimeS * 0.3f);
         }
 
         // ---- Background image ----

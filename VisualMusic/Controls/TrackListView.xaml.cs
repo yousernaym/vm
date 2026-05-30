@@ -10,8 +10,20 @@ using VisualMusic.ViewModels;
 
 namespace VisualMusic.Controls
 {
-    public partial class TrackListView : UserControl
+    public partial class TrackListView : UserControl, ITrackSelectionService
     {
+        // ITrackSelectionService — called from SongRenderer on the UI thread (DispatcherTimer tick).
+        public int TrackListCount => trackListView.Items.Count;
+
+        public void SetTrackSelected(int index, bool selected)
+        {
+            if (index < 0 || index >= trackListView.Items.Count) return;
+            var item = trackListView.Items[index];
+            bool isSel = trackListView.SelectedItems.Contains(item);
+            if (selected && !isSel) trackListView.SelectedItems.Add(item);
+            else if (!selected && isSel) trackListView.SelectedItems.Remove(item);
+        }
+
         Point _dragStart;
         TrackItemViewModel _dragItem;
         DragAdorner _dragAdorner;

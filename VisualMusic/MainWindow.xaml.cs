@@ -45,6 +45,7 @@ namespace VisualMusic
             midiBrowser.Url = "https://bitmidi.com/";
 
             vm.GetDrawHost = () => monoGameHost.Renderer;
+            monoGameHost.Renderer?.SetTrackSelectionService(trackListControl);
 
             vm.OnProjectLoaded = project =>
             {

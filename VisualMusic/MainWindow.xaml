@@ -138,7 +138,7 @@
                 <ColumnDefinition Width="4"/>
                 <ColumnDefinition Width="*" MinWidth="180"/>
             </Grid.ColumnDefinitions>
-            <ctrl:TrackListView  Grid.Column="0" DataContext="{Binding TrackList}"/>
+            <ctrl:TrackListView  x:Name="trackListControl" Grid.Column="0" DataContext="{Binding TrackList}"/>
             <GridSplitter        Grid.Column="1" HorizontalAlignment="Stretch" Width="4"/>
             <ctrl:TrackPropsView Grid.Column="2" DataContext="{Binding SelectedTrackProps}"/>
         </Grid>
