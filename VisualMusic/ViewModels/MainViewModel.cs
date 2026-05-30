@@ -161,6 +161,28 @@ namespace VisualMusic.ViewModels
                 OnTrackListSelectionChanged();
             };
 
+            SelectedTrackProps.ResetMaterial = () =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                    item.TrackView.TrackProps.ResetMaterial();
+                project?.createOcTrees();
+                OnTrackListSelectionChanged();
+            };
+
+            SelectedTrackProps.ResetLight = () =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                    item.TrackView.TrackProps.ResetLight();
+                OnTrackListSelectionChanged();
+            };
+
+            SelectedTrackProps.ResetSpatial = () =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                    item.TrackView.TrackProps.ResetSpatial();
+                OnTrackListSelectionChanged();
+            };
+
             SelectedTrackProps.AddModEntry = () =>
             {
                 foreach (var item in TrackList.SelectedItems)

@@ -97,10 +97,10 @@
                                       Value="{Binding HlMovementPow, Mode=TwoWay}"
                                       Min="0.1" Max="5" Decimals="2"/>
                     <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
-                                Orientation="Horizontal" Margin="0,4,0,0">
-                        <CheckBox Content="Moving"   IsChecked="{Binding MovingHl,   Mode=TwoWay}" IsThreeState="True" Margin="0,0,8,0"/>
-                        <CheckBox Content="Shrinking" IsChecked="{Binding ShrinkingHl, Mode=TwoWay}" IsThreeState="True" Margin="0,0,8,0"/>
-                        <CheckBox Content="Border"   IsChecked="{Binding HlBorder,   Mode=TwoWay}" IsThreeState="True"/>
+                                Margin="0,4,0,0">
+                        <CheckBox Content="Moving"    IsChecked="{Binding MovingHl,    Mode=TwoWay}" IsThreeState="True" Margin="0,0,0,2"/>
+                        <CheckBox Content="Shrinking" IsChecked="{Binding ShrinkingHl, Mode=TwoWay}" IsThreeState="True" Margin="0,0,0,2"/>
+                        <CheckBox Content="Border"    IsChecked="{Binding HlBorder,    Mode=TwoWay}" IsThreeState="True"/>
                     </StackPanel>
                 </Grid>
             </StackPanel>

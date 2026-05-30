@@ -31,5 +31,8 @@ namespace VisualMusic.Controls.Tabs
 
         void UnloadTexBtn_Click(object sender, RoutedEventArgs e)
             => VM?.UnloadTexture?.Invoke();
+
+        void DefaultMaterialBtn_Click(object sender, RoutedEventArgs e)
+            => VM?.ResetMaterial?.Invoke();
     }
 }

@@ -179,7 +179,7 @@ namespace VisualMusic.ViewModels
         public bool? Continuous
         {
             get => LineStyle?.Continuous;
-            set { if (value != null) Apply(tp => tp.StyleProps.getLineStyle().Continuous = value); OnPropertyChanged(); }
+            set { Apply(tp => tp.StyleProps.getLineStyle().Continuous = value ?? false); OnPropertyChanged(); }
         }
 
         public int LineTypeIndex
@@ -221,24 +221,27 @@ namespace VisualMusic.ViewModels
         public bool? MovingHl
         {
             get => LineStyle?.MovingHl;
-            set { if (value != null) Apply(tp => tp.StyleProps.getLineStyle().MovingHl = value); OnPropertyChanged(); }
+            set { Apply(tp => tp.StyleProps.getLineStyle().MovingHl = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? ShrinkingHl
         {
             get => LineStyle?.ShrinkingHl;
-            set { if (value != null) Apply(tp => tp.StyleProps.getLineStyle().ShrinkingHl = value); OnPropertyChanged(); }
+            set { Apply(tp => tp.StyleProps.getLineStyle().ShrinkingHl = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? HlBorder
         {
             get => LineStyle?.HlBorder;
-            set { if (value != null) Apply(tp => tp.StyleProps.getLineStyle().HlBorder = value); OnPropertyChanged(); }
+            set { Apply(tp => tp.StyleProps.getLineStyle().HlBorder = value ?? false); OnPropertyChanged(); }
         }
 
-        // ---- Default Style ----
+        // ---- Default buttons ----
 
         public Action ResetStyle { get; set; }
+        public Action ResetMaterial { get; set; }
+        public Action ResetLight { get; set; }
+        public Action ResetSpatial { get; set; }
 
         // ---- Modulation ----
 
@@ -281,7 +284,7 @@ namespace VisualMusic.ViewModels
             get => ME?.XOriginEnable;
             set
             {
-                if (value != null) ApplyMod(m => m.XOriginEnable = value);
+                ApplyMod(m => m.XOriginEnable = value ?? false);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ModXOriginEnabled));
                 OnPropertyChanged(nameof(ModCombineEnabled));
@@ -293,7 +296,7 @@ namespace VisualMusic.ViewModels
             get => ME?.YOriginEnable;
             set
             {
-                if (value != null) ApplyMod(m => m.YOriginEnable = value);
+                ApplyMod(m => m.YOriginEnable = value ?? false);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ModYOriginEnabled));
                 OnPropertyChanged(nameof(ModCombineEnabled));
@@ -313,7 +316,7 @@ namespace VisualMusic.ViewModels
         public bool? ModSquareAspect
         {
             get => ME?.SquareAspect;
-            set { if (value != null) ApplyMod(m => m.SquareAspect = value); OnPropertyChanged(); }
+            set { ApplyMod(m => m.SquareAspect = value ?? false); OnPropertyChanged(); }
         }
 
         // -- Destinations --
@@ -321,7 +324,7 @@ namespace VisualMusic.ViewModels
         public bool? ModColorDestEnable
         {
             get => ME?.ColorDestEnable;
-            set { if (value != null) ApplyMod(m => m.ColorDestEnable = value); OnPropertyChanged(); }
+            set { ApplyMod(m => m.ColorDestEnable = value ?? false); OnPropertyChanged(); }
         }
 
         public XnaColor? ModColorDest
@@ -333,7 +336,7 @@ namespace VisualMusic.ViewModels
         public bool? ModAngleDestEnable
         {
             get => ME?.AngleDestEnable;
-            set { if (value != null) ApplyMod(m => m.AngleDestEnable = value); OnPropertyChanged(); }
+            set { ApplyMod(m => m.AngleDestEnable = value ?? false); OnPropertyChanged(); }
         }
 
         public double? ModAngleDest
@@ -377,13 +380,13 @@ namespace VisualMusic.ViewModels
         public bool? ModDiscardAfterStop
         {
             get => ME?.DiscardAfterStop;
-            set { if (value != null) ApplyMod(m => m.DiscardAfterStop = value); OnPropertyChanged(); }
+            set { ApplyMod(m => m.DiscardAfterStop = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? ModInvert
         {
             get => ME?.Invert;
-            set { if (value != null) ApplyMod(m => m.Invert = value); OnPropertyChanged(); }
+            set { ApplyMod(m => m.Invert = value ?? false); OnPropertyChanged(); }
         }
 
         // =====================================================================
@@ -568,7 +571,7 @@ namespace VisualMusic.ViewModels
         public bool? UseGlobalLight
         {
             get => LP?.UseGlobalLight;
-            set { if (value != null) Apply(tp => tp.LightProps.UseGlobalLight = value); OnPropertyChanged(); }
+            set { Apply(tp => tp.LightProps.UseGlobalLight = value ?? false); OnPropertyChanged(); }
         }
 
         public double? LightDirX

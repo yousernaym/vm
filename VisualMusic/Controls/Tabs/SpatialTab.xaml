@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ctrl="clr-namespace:VisualMusic.Controls">
     <StackPanel Margin="4">
+        <Button Content="Default Spatial" HorizontalAlignment="Left"
+                Margin="0,0,0,6" Click="DefaultSpatialBtn_Click"/>
         <TextBlock Text="Position offset" FontWeight="SemiBold" Margin="0,0,0,4"/>
         <Grid>
             <Grid.ColumnDefinitions>
