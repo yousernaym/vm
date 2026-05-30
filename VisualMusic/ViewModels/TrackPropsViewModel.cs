@@ -52,6 +52,33 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(ShrinkingHl));
             OnPropertyChanged(nameof(HlBorder));
 
+            // Modulation
+            OnPropertyChanged(nameof(ModulationVisible));
+            OnPropertyChanged(nameof(ModEntries));
+            OnPropertyChanged(nameof(ModEntryComboEnabled));
+            OnPropertyChanged(nameof(ModEntryIndex));
+            OnPropertyChanged(nameof(ModEntryDetailsVisible));
+            OnPropertyChanged(nameof(ModXOrigin));
+            OnPropertyChanged(nameof(ModYOrigin));
+            OnPropertyChanged(nameof(ModXOriginEnable));
+            OnPropertyChanged(nameof(ModYOriginEnable));
+            OnPropertyChanged(nameof(ModXOriginEnabled));
+            OnPropertyChanged(nameof(ModYOriginEnabled));
+            OnPropertyChanged(nameof(ModCombineEnabled));
+            OnPropertyChanged(nameof(ModCombineIndex));
+            OnPropertyChanged(nameof(ModSquareAspect));
+            OnPropertyChanged(nameof(ModColorDestEnable));
+            OnPropertyChanged(nameof(ModColorDest));
+            OnPropertyChanged(nameof(ModAngleDestEnable));
+            OnPropertyChanged(nameof(ModAngleDest));
+            OnPropertyChanged(nameof(ModStart));
+            OnPropertyChanged(nameof(ModStop));
+            OnPropertyChanged(nameof(ModFadeIn));
+            OnPropertyChanged(nameof(ModFadeOut));
+            OnPropertyChanged(nameof(ModPower));
+            OnPropertyChanged(nameof(ModDiscardAfterStop));
+            OnPropertyChanged(nameof(ModInvert));
+
             // Material
             OnPropertyChanged(nameof(Transp));
             OnPropertyChanged(nameof(MaterialHue));
@@ -106,6 +133,16 @@ namespace VisualMusic.ViewModels
         StyleProps SP => _mergedProps?.StyleProps;
         NoteStyle_Line LineStyle => SP?.getLineStyle();
 
+        // Non-null only when a concrete (Bar/Line) style is selected.
+        // Deliberately avoids ActiveNoteStyle which would follow the Default→GlobalProps chain
+        // on merged clones (where GlobalProps is null).
+        NoteStyle AS => (SP == null || SP.Type == null || SP.Type == NoteStyleType.Default)
+                        ? null : SP.getStyle(SP.Type);
+        NoteStyleMod ME => AS?.SelectedModEntry;
+
+        void ApplyMod(Action<NoteStyleMod> fn) =>
+            Apply(tp => { var m = tp.ActiveNoteStyle?.SelectedModEntry; if (m != null) fn(m); });
+
         /// <summary>0=Default, 1=Bar, 2=Line; -1 if null/mixed.</summary>
         public int StyleTypeIndex
         {
@@ -117,6 +154,11 @@ namespace VisualMusic.ViewModels
                 Rebuild(tp => tp.StyleProps.Type = t);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(LineStyleVisible));
+                OnPropertyChanged(nameof(ModulationVisible));
+                OnPropertyChanged(nameof(ModEntries));
+                OnPropertyChanged(nameof(ModEntryComboEnabled));
+                OnPropertyChanged(nameof(ModEntryIndex));
+                OnPropertyChanged(nameof(ModEntryDetailsVisible));
             }
         }
 
@@ -192,6 +234,156 @@ namespace VisualMusic.ViewModels
         {
             get => LineStyle?.HlBorder;
             set { if (value != null) Apply(tp => tp.StyleProps.getLineStyle().HlBorder = value); OnPropertyChanged(); }
+        }
+
+        // ---- Default Style ----
+
+        public Action ResetStyle { get; set; }
+
+        // ---- Modulation ----
+
+        public bool ModulationVisible => SP?.Type == NoteStyleType.Bar || SP?.Type == NoteStyleType.Line;
+
+        public System.Collections.IEnumerable ModEntries => AS?.ModEntries;
+
+        public bool ModEntryComboEnabled => AS?.ModEntries != null;
+
+        public bool ModEntryDetailsVisible => ME != null;
+
+        public int ModEntryIndex
+        {
+            get => AS?.SelectedModEntryIndex ?? -1;
+            set { SelectModEntry?.Invoke(value); }
+        }
+
+        // Callbacks for structural modulation changes (wired in MainViewModel)
+        public Action AddModEntry { get; set; }
+        public Action CloneModEntry { get; set; }
+        public Action DeleteModEntry { get; set; }
+        public Action<int> SelectModEntry { get; set; }
+
+        // -- Pixel position --
+
+        public double? ModXOrigin
+        {
+            get => (double?)ME?.XOrigin;
+            set { if (value != null) ApplyMod(m => m.XOrigin = (float)value); OnPropertyChanged(); }
+        }
+
+        public double? ModYOrigin
+        {
+            get => (double?)ME?.YOrigin;
+            set { if (value != null) ApplyMod(m => m.YOrigin = (float)value); OnPropertyChanged(); }
+        }
+
+        public bool? ModXOriginEnable
+        {
+            get => ME?.XOriginEnable;
+            set
+            {
+                if (value != null) ApplyMod(m => m.XOriginEnable = value);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ModXOriginEnabled));
+                OnPropertyChanged(nameof(ModCombineEnabled));
+            }
+        }
+
+        public bool? ModYOriginEnable
+        {
+            get => ME?.YOriginEnable;
+            set
+            {
+                if (value != null) ApplyMod(m => m.YOriginEnable = value);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ModYOriginEnabled));
+                OnPropertyChanged(nameof(ModCombineEnabled));
+            }
+        }
+
+        public bool ModXOriginEnabled => ME?.XOriginEnable == true;
+        public bool ModYOriginEnabled => ME?.YOriginEnable == true;
+        public bool ModCombineEnabled => ME?.XOriginEnable == true && ME?.YOriginEnable == true;
+
+        public int ModCombineIndex
+        {
+            get => ME?.CombineXY ?? -1;
+            set { if (value >= 0) ApplyMod(m => m.CombineXY = value); OnPropertyChanged(); }
+        }
+
+        public bool? ModSquareAspect
+        {
+            get => ME?.SquareAspect;
+            set { if (value != null) ApplyMod(m => m.SquareAspect = value); OnPropertyChanged(); }
+        }
+
+        // -- Destinations --
+
+        public bool? ModColorDestEnable
+        {
+            get => ME?.ColorDestEnable;
+            set { if (value != null) ApplyMod(m => m.ColorDestEnable = value); OnPropertyChanged(); }
+        }
+
+        public XnaColor? ModColorDest
+        {
+            get => ME?.ColorDest;
+            set { if (value != null) ApplyMod(m => m.ColorDest = value); OnPropertyChanged(); }
+        }
+
+        public bool? ModAngleDestEnable
+        {
+            get => ME?.AngleDestEnable;
+            set { if (value != null) ApplyMod(m => m.AngleDestEnable = value); OnPropertyChanged(); }
+        }
+
+        public double? ModAngleDest
+        {
+            get => (double?)ME?.AngleDest;
+            set { if (value != null) ApplyMod(m => m.AngleDest = (int)value); OnPropertyChanged(); }
+        }
+
+        // -- Interpolation --
+
+        public double? ModStart
+        {
+            get => (double?)ME?.Start;
+            set { if (value != null) ApplyMod(m => m.Start = (float)value); OnPropertyChanged(); }
+        }
+
+        public double? ModStop
+        {
+            get => (double?)ME?.Stop;
+            set { if (value != null) ApplyMod(m => m.Stop = (float)value); OnPropertyChanged(); }
+        }
+
+        public double? ModFadeIn
+        {
+            get => (double?)ME?.FadeIn;
+            set { if (value != null) ApplyMod(m => m.FadeIn = (float)value); OnPropertyChanged(); }
+        }
+
+        public double? ModFadeOut
+        {
+            get => (double?)ME?.FadeOut;
+            set { if (value != null) ApplyMod(m => m.FadeOut = (float)value); OnPropertyChanged(); }
+        }
+
+        public double? ModPower
+        {
+            get => (double?)ME?.Power;
+            set { if (value != null) ApplyMod(m => m.Power = (float)value); OnPropertyChanged(); }
+        }
+
+        public bool? ModDiscardAfterStop
+        {
+            get => ME?.DiscardAfterStop;
+            set { if (value != null) ApplyMod(m => m.DiscardAfterStop = value); OnPropertyChanged(); }
+        }
+
+        public bool? ModInvert
+        {
+            get => ME?.Invert;
+            set { if (value != null) ApplyMod(m => m.Invert = value); OnPropertyChanged(); }
         }
 
         // =====================================================================

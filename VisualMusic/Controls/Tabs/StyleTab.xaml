@@ -8,14 +8,18 @@
     </UserControl.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="4">
+
+            <!-- Default Style button -->
+            <Button Content="Default Style" HorizontalAlignment="Left"
+                    Margin="0,0,0,6" Click="DefaultStyleBtn_Click"/>
+
             <!-- Note style type selector -->
             <TextBlock Text="Note style:" Margin="0,0,0,2"/>
-            <ListBox x:Name="styleList" Height="66"
-                     SelectedIndex="{Binding StyleTypeIndex, Mode=TwoWay}">
-                <ListBoxItem Content="Default"/>
-                <ListBoxItem Content="Bar"/>
-                <ListBoxItem Content="Line"/>
-            </ListBox>
+            <ComboBox SelectedIndex="{Binding StyleTypeIndex, Mode=TwoWay}">
+                <ComboBoxItem Content="Default"/>
+                <ComboBoxItem Content="Bar"/>
+                <ComboBoxItem Content="Line"/>
+            </ComboBox>
 
             <!-- Line style sub-panel -->
             <StackPanel Visibility="{Binding LineStyleVisible,
@@ -100,6 +104,174 @@
                     </StackPanel>
                 </Grid>
             </StackPanel>
+
+            <!-- Modulation editor (Bar and Line) -->
+            <StackPanel Visibility="{Binding ModulationVisible, Converter={StaticResource BoolVis}}"
+                        Margin="0,6,0,0">
+                <Separator/>
+                <TextBlock Text="Modulation" FontWeight="SemiBold" Margin="0,4,0,4"/>
+
+                <!-- Entry selector with right-click context menu -->
+                <ComboBox x:Name="modEntryCombo"
+                          ItemsSource="{Binding ModEntries}"
+                          DisplayMemberPath="Name"
+                          IsEnabled="{Binding ModEntryComboEnabled}"
+                          SelectedIndex="{Binding ModEntryIndex, Mode=TwoWay}">
+                    <ComboBox.ContextMenu>
+                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext,
+                                               RelativeSource={RelativeSource Self}}">
+                            <MenuItem Header="New entry"    Click="NewModEntry_Click"/>
+                            <MenuItem Header="Clone entry"  Click="CloneModEntry_Click"
+                                      IsEnabled="{Binding ModEntryDetailsVisible}"/>
+                            <MenuItem Header="Delete entry" Click="DeleteModEntry_Click"
+                                      IsEnabled="{Binding ModEntryDetailsVisible}"/>
+                        </ContextMenu>
+                    </ComboBox.ContextMenu>
+                </ComboBox>
+
+                <!-- Entry-details panel (only when an entry is selected) -->
+                <StackPanel Visibility="{Binding ModEntryDetailsVisible, Converter={StaticResource BoolVis}}"
+                            Margin="0,6,0,0">
+
+                    <!-- Pixel position -->
+                    <TextBlock Text="Pixel position" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Origin X -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Origin X:" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding ModXOriginEnable, Mode=TwoWay}"
+                                      IsThreeState="True" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <ctrl:TbSliderWpf Value="{Binding ModXOrigin, Mode=TwoWay}"
+                                              IsEnabled="{Binding ModXOriginEnabled}"
+                                              Min="-10" Max="10" Decimals="2" Width="120"/>
+                        </StackPanel>
+
+                        <!-- Origin Y -->
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Origin Y:" VerticalAlignment="Center" Margin="0,2,0,0"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,2,0,0">
+                            <CheckBox IsChecked="{Binding ModYOriginEnable, Mode=TwoWay}"
+                                      IsThreeState="True" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <ctrl:TbSliderWpf Value="{Binding ModYOrigin, Mode=TwoWay}"
+                                              IsEnabled="{Binding ModYOriginEnabled}"
+                                              Min="-10" Max="10" Decimals="2" Width="120"/>
+                        </StackPanel>
+
+                        <!-- Combine -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Combine:" VerticalAlignment="Center" Margin="0,4,0,0"/>
+                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,4,2,0"
+                                  IsEnabled="{Binding ModCombineEnabled}"
+                                  SelectedIndex="{Binding ModCombineIndex, Mode=TwoWay}">
+                            <ComboBoxItem Content="x + y"/>
+                            <ComboBoxItem Content="x² + y²"/>
+                            <ComboBoxItem Content="Max (x, y)"/>
+                        </ComboBox>
+
+                        <!-- Square aspect -->
+                        <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                                  Content="Square aspect"
+                                  IsChecked="{Binding ModSquareAspect, Mode=TwoWay}"
+                                  IsThreeState="True" Margin="0,4,0,0"/>
+                    </Grid>
+
+                    <!-- Destinations -->
+                    <Separator Margin="0,6,0,0"/>
+                    <TextBlock Text="Destinations" FontWeight="SemiBold" Margin="0,4,0,4"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Color destination -->
+                        <CheckBox Grid.Row="0" Grid.Column="0" Content="Color"
+                                  IsChecked="{Binding ModColorDestEnable, Mode=TwoWay}"
+                                  IsThreeState="True" VerticalAlignment="Center"/>
+                        <ctrl:HueSatButtonWpf Grid.Row="0" Grid.Column="1" Margin="2"
+                                              SelectedXnaColor="{Binding ModColorDest, Mode=TwoWay}"/>
+
+                        <!-- Angle destination -->
+                        <CheckBox Grid.Row="1" Grid.Column="0" Content="Angle"
+                                  IsChecked="{Binding ModAngleDestEnable, Mode=TwoWay}"
+                                  IsThreeState="True" VerticalAlignment="Center" Margin="0,4,0,0"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="2,4,0,0">
+                            <ctrl:TbSliderWpf Value="{Binding ModAngleDest, Mode=TwoWay}"
+                                              Min="0" Max="90" Decimals="0" Width="100"/>
+                            <TextBlock Text="°" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Interpolation -->
+                    <Separator Margin="0,6,0,0"/>
+                    <TextBlock Text="Interpolation" FontWeight="SemiBold" Margin="0,4,0,4"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Start:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModStart, Mode=TwoWay}"
+                                          Min="0" Max="1" Decimals="2"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Stop:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModStop, Mode=TwoWay}"
+                                          Min="0" Max="1" Decimals="2"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Fade in:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="2" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModFadeIn, Mode=TwoWay}"
+                                          Min="0" Max="1" Decimals="2"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Fade out:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="3" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModFadeOut, Mode=TwoWay}"
+                                          Min="0" Max="1" Decimals="2"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Fade pow:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="4" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModPower, Mode=TwoWay}"
+                                          Min="0" Max="10" Decimals="2"/>
+
+                        <CheckBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                                  Content="Discard after stop"
+                                  IsChecked="{Binding ModDiscardAfterStop, Mode=TwoWay}"
+                                  IsThreeState="True" Margin="0,4,0,0"/>
+
+                        <CheckBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                                  Content="Invert"
+                                  IsChecked="{Binding ModInvert, Mode=TwoWay}"
+                                  IsThreeState="True" Margin="0,2,0,0"/>
+                    </Grid>
+
+                </StackPanel>
+            </StackPanel>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>

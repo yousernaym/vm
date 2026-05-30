@@ -152,6 +152,53 @@ namespace VisualMusic.ViewModels
                     MessageBox.Show($"Couldn't load audio file:\n{failedChannel.Filename}", Program.AppName,
                         MessageBoxButton.OK, MessageBoxImage.Warning);
             };
+
+            SelectedTrackProps.ResetStyle = () =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                    item.TrackView.TrackProps.ResetStyle();
+                project?.createOcTrees();
+                OnTrackListSelectionChanged();
+            };
+
+            SelectedTrackProps.AddModEntry = () =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                    item.TrackView.TrackProps.ActiveNoteStyle?.addModEntry(true);
+                OnTrackListSelectionChanged();
+            };
+
+            SelectedTrackProps.CloneModEntry = () =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                {
+                    var ns = item.TrackView.TrackProps.ActiveNoteStyle;
+                    if (ns?.SelectedModEntryIndex >= 0 && ns.ModEntries?.Count > 0)
+                        ns.cloneModEntry(true);
+                }
+                OnTrackListSelectionChanged();
+            };
+
+            SelectedTrackProps.DeleteModEntry = () =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                {
+                    var ns = item.TrackView.TrackProps.ActiveNoteStyle;
+                    if (ns?.SelectedModEntryIndex >= 0 && ns.ModEntries?.Count > 0)
+                        ns.deleteModEntry();
+                }
+                OnTrackListSelectionChanged();
+            };
+
+            SelectedTrackProps.SelectModEntry = idx =>
+            {
+                foreach (var item in TrackList.SelectedItems)
+                {
+                    var ns = item.TrackView.TrackProps.ActiveNoteStyle;
+                    if (ns != null) ns.SelectedModEntryIndex = idx;
+                }
+                OnTrackListSelectionChanged();
+            };
         }
 
         void OnTrackListSelectionChanged()
