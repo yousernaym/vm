@@ -71,6 +71,17 @@ namespace VisualMusic
                ? Path.Combine(Program.DefaultUserFilesDir, "Props")
                : TrackPropsFolder;
 
+        // ---- Deserialization init ----
+        // DataContractSerializer bypasses the constructor, so field initializers (= new()) don't run
+        // for fields that are absent from the XML (e.g. newly added fields on an old file).
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext _)
+        {
+            _noteFolders  ??= new();
+            _audioFolders ??= new();
+            _insTrack     ??= new();
+        }
+
         // ---- Persistence ----
 
         static AppSettings Load()

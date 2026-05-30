@@ -26,6 +26,14 @@ namespace VisualMusic.Controls
         // ---- In-memory session cache (resets to defaults after app restart) ----
         static readonly Dictionary<Midi.FileType, (bool Erase, string NotePath, string AudioPath)> _session = new();
 
+        /// <summary>
+        /// Update the session cache for <paramref name="type"/> without opening the dialog.
+        /// Call this after a silent import (e.g. browser download) so the dialog is pre-filled
+        /// correctly if the user opens it manually afterward.
+        /// </summary>
+        internal static void UpdateSession(Midi.FileType type, bool erase, string notePath, string audioPath)
+            => _session[type] = (erase, notePath, audioPath);
+
         // ---- Bound properties ----
 
         string _noteFilePath = "";

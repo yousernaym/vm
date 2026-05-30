@@ -699,7 +699,7 @@ namespace VisualMusic.ViewModels
                 return;
             }
 
-            // Download to a temp location then show the import dialog pre-filled.
+            // Download to a temp location then import directly (no dialog).
             string tempPath = Path.Combine(Program.TempDir, suggestedFileName);
             try
             {
@@ -713,11 +713,20 @@ namespace VisualMusic.ViewModels
                 return;
             }
 
-            var dlg = new ImportSongWindow(fileType.Value) { Owner = Application.Current.MainWindow };
-            dlg.NoteFilePath = tempPath;
-            if (dlg.ShowDialog() != true) return;
-
-            var options = BuildOptions(fileType.Value, dlg);
+            // Browser imports always erase the current project, use no audio file,
+            // and use the saved per-type track-split preference.
+            ImportOptions options;
+            switch (fileType.Value)
+            {
+                case Midi.FileType.Midi: options = new MidiImportOptions(); break;
+                case Midi.FileType.Mod:  options = new ModImportOptions();  break;
+                default:                 options = new SidImportOptions();  break;
+            }
+            options.RawNotePath  = tempPath;
+            try { options.setNotePath(); } catch (FileImportException) { }
+            options.EraseCurrent = true;
+            options.InsTrack     = AppSettings.Instance.GetInsTrack(fileType.Value);
+            ImportSongWindow.UpdateSession(fileType.Value, erase: true, notePath: tempPath, audioPath: "");
             _ = DoImport(options);   // fire-and-forget on the UI thread (async void pattern)
         }
     }
