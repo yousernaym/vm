@@ -1,0 +1,75 @@
+<mah:MetroWindow x:Class="VisualMusic.Controls.HvscIntegrationWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 Title="HVSC Integration"
+                 ResizeMode="NoResize"
+                 SizeToContent="WidthAndHeight"
+                 WindowStartupLocation="CenterOwner"
+                 ShowMinButton="False"
+                 ShowMaxRestoreButton="False">
+
+    <mah:MetroWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolVis"/>
+    </mah:MetroWindow.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="16"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- URL label -->
+        <TextBlock Grid.Row="0" Text="HVSC song lengths URL:"/>
+
+        <!-- URL textbox + Default URL button -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0"
+                     Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
+                     VerticalAlignment="Center"/>
+            <Button Grid.Column="2" Content="Default URL" Width="100"
+                    IsEnabled="{Binding IsIdle}" Click="DefaultUrl_Click"/>
+        </Grid>
+
+        <!-- Update / progress / cancel row -->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Update" Width="80"
+                    IsEnabled="{Binding IsIdle}" Click="Update_Click"/>
+            <ProgressBar Grid.Column="2"
+                         Minimum="0" Maximum="100"
+                         Value="{Binding DownloadProgress}"
+                         Height="20"
+                         MinWidth="200"
+                         Visibility="{Binding IsDownloading, Converter={StaticResource BoolVis}}"/>
+            <Button Grid.Column="4" Content="Cancel" Width="80"
+                    Visibility="{Binding IsDownloading, Converter={StaticResource BoolVis}}"
+                    Click="CancelDownload_Click"/>
+        </Grid>
+
+        <!-- Last-updated label -->
+        <TextBlock Grid.Row="6" Text="{Binding LastUpdated}" Foreground="Gray"/>
+
+        <!-- Close button -->
+        <Button Grid.Row="8" Content="Close" Width="80"
+                HorizontalAlignment="Right" Click="Close_Click"/>
+    </Grid>
+</mah:MetroWindow>

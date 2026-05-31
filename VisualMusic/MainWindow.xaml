@@ -24,7 +24,7 @@
         <KeyBinding Command="{Binding SaveProjectCommand}"    Key="S"    Modifiers="Control"/>
         <KeyBinding Command="{Binding SaveProjectAsCommand}"  Key="S"    Modifiers="Alt+Shift"/>
         <KeyBinding Command="{Binding ExportVideoCommand}"    Key="E"    Modifiers="Control"/>
-        <KeyBinding Command="{Binding TpartyIntegrationCommand}" Key="T" Modifiers="Control"/>
+        <KeyBinding Command="{Binding HvscIntegrationCommand}" Key="T" Modifiers="Control"/>
         <!-- Edit -->
         <KeyBinding Command="{Binding UndoCommand}"           Key="Z"    Modifiers="Control"/>
         <KeyBinding Command="{Binding RedoCommand}"           Key="Z"    Modifiers="Control+Shift"/>
@@ -84,7 +84,7 @@
                 <MenuItem Header="Save project _as..."    Command="{Binding SaveProjectAsCommand}" InputGestureText="Alt+Shift+S"/>
                 <Separator/>
                 <MenuItem Header="_Export video..."       Command="{Binding ExportVideoCommand}"   InputGestureText="Ctrl+E"/>
-                <MenuItem Header="_Third-party integration..." Command="{Binding TpartyIntegrationCommand}" InputGestureText="Ctrl+T"/>
+                <MenuItem Header="_HVSC integration..." Command="{Binding HvscIntegrationCommand}" InputGestureText="Ctrl+T"/>
             </MenuItem>
 
             <!-- EDIT -->

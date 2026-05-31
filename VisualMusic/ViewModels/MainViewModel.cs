@@ -459,15 +459,26 @@ namespace VisualMusic.ViewModels
             var options = BuildOptions(Midi.FileType.Sid, dlg);
 
             // SID files may contain multiple sub-songs — let the user pick.
-            if (!string.IsNullOrEmpty(options.NotePath) && File.Exists(options.NotePath))
-            {
-                var subWin = new SubSongWindow(options.NotePath) { Owner = Application.Current.MainWindow };
-                if (subWin.NumSongs > 1 && subWin.ShowDialog() != true) return;
-                options.SubSong    = subWin.SelectedSong;
-                options.SongLengthS = subWin.SongLengthS;
-            }
+            if (!SelectSidSubSong(options)) return;
 
             await DoImport(options);
+        }
+
+        /// <summary>
+        /// For a SID import, shows the sub-song picker when the file has more than one
+        /// sub-song and writes the chosen sub-song + its length into <paramref name="options"/>.
+        /// Returns false only if the user cancelled the picker (caller should abort the import).
+        /// </summary>
+        static bool SelectSidSubSong(ImportOptions options)
+        {
+            if (options is not SidImportOptions) return true;
+            if (string.IsNullOrEmpty(options.NotePath) || !File.Exists(options.NotePath)) return true;
+
+            var subWin = new SubSongWindow(options.NotePath) { Owner = Application.Current.MainWindow };
+            if (subWin.NumSongs > 1 && subWin.ShowDialog() != true) return false;
+            options.SubSong     = subWin.SelectedSong;
+            options.SongLengthS = subWin.SongLengthS;
+            return true;
         }
 
         /// <summary>Build an ImportOptions from the dialog fields (WPF path).</summary>
@@ -569,8 +580,11 @@ namespace VisualMusic.ViewModels
             => MessageBox.Show("Export Video not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
 
         [RelayCommand]
-        void TpartyIntegration()
-            => MessageBox.Show("Third-party integration not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        void HvscIntegration()
+        {
+            var dlg = new Controls.HvscIntegrationWindow { Owner = Application.Current.MainWindow };
+            dlg.ShowDialog();
+        }
 
         // ---- Playback commands ----
 
@@ -862,6 +876,10 @@ namespace VisualMusic.ViewModels
             options.InsTrack     = AppSettings.Instance.GetInsTrack(fileType.Value);
             ImportSongWindow.UpdateSession(fileType.Value, erase: true, notePath: url, audioPath: "",
                 insTrack: AppSettings.Instance.GetInsTrack(fileType.Value));
+
+            // SID downloads may contain multiple sub-songs — let the user pick.
+            if (!SelectSidSubSong(options)) return;
+
             _ = DoImport(options);   // fire-and-forget on the UI thread (async void pattern)
         }
     }

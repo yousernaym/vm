@@ -28,6 +28,10 @@ namespace VisualMusic
             var mainWindow = new MainWindow(e.Args);
             MainWindow = mainWindow;
             mainWindow.Show();
+
+            // Silently refresh the HVSC song-lengths DB if it's absent or older than 30 days.
+            // Fire-and-forget: all exceptions are swallowed inside EnsureRecentAsync.
+            _ = Hvsc.EnsureRecentAsync();
         }
 
         protected override void OnExit(ExitEventArgs e)

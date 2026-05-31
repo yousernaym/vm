@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Input;
 
@@ -25,66 +24,43 @@ namespace VisualMusic.Controls
         {
             InitializeComponent();
 
-            using (var f = File.Open(sidPath, FileMode.Open, FileAccess.Read))
+            // Read the SID header (song count + default song). Use a shared-read open and
+            // release it before the HVSC lookup, which reopens the same file.
+            int defSong;
+            using (var f = File.Open(sidPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 f.Seek(0x0e, SeekOrigin.Begin);
-                NumSongs    = (f.ReadByte() << 8) | f.ReadByte();
-                int defSong = (f.ReadByte() << 8) | f.ReadByte();
-                if (NumSongs < 1)  NumSongs = 1;
-                if (defSong < 1 || defSong > NumSongs) defSong = 1;
+                NumSongs = (f.ReadByte() << 8) | f.ReadByte();
+                defSong  = (f.ReadByte() << 8) | f.ReadByte();
+            }
+            if (NumSongs < 1) NumSongs = 1;
+            if (defSong < 1 || defSong > NumSongs) defSong = 1;
 
-                string[] lengths = GetSongLengths(sidPath);
-                for (int i = 0; i < NumSongs; i++)
+            string[] lengths = Hvsc.GetSongLengths(sidPath);
+            for (int i = 0; i < NumSongs; i++)
+            {
+                bool isDefault = i == defSong - 1;
+                float sec = 0;
+                string label;
+                if (lengths != null && i < lengths.Length)
                 {
-                    bool isDefault = i == defSong - 1;
-                    float sec = 0;
-                    string label;
-                    if (lengths != null && i < lengths.Length)
-                    {
-                        label = $"{i + 1} - {lengths[i]}{(isDefault ? " (default)" : "")}";
-                        string[] parts = lengths[i].Split(':');
-                        if (parts.Length == 2 &&
-                            float.TryParse(parts[0], out float m) &&
-                            float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float s))
-                            sec = m * 60 + s;
-                    }
-                    else
-                        label = $"{i + 1} - unknown length{(isDefault ? " (default)" : "")}";
-
-                    _lengths.Add(sec);
-                    subSongList.Items.Add(label);
+                    label = $"{i + 1} - {lengths[i]}{(isDefault ? " (default)" : "")}";
+                    string[] parts = lengths[i].Split(':');
+                    if (parts.Length == 2 &&
+                        float.TryParse(parts[0], out float m) &&
+                        float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float s))
+                        sec = m * 60 + s;
                 }
+                else
+                    label = $"{i + 1} - unknown length{(isDefault ? " (default)" : "")}";
 
-                subSongList.SelectedIndex = Math.Max(0, defSong - 1);
-                SelectedSong  = defSong;
-                SongLengthS   = _lengths.Count > defSong - 1 ? _lengths[defSong - 1] : 0;
-            }
-        }
-
-        static string[] GetSongLengths(string sidPath)
-        {
-            // Replicate the path from TpartyIntegrationForm without instantiating it.
-            string dbPath = Path.Combine(TpartyIntegrationForm.TpartyDir, "hvsc", "songlenghts.md5");
-            if (!File.Exists(dbPath)) return null;
-
-            string hash;
-            using (var stream = File.OpenRead(sidPath))
-            {
-                byte[] bytes = MD5.HashData(stream);
-                hash = BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
+                _lengths.Add(sec);
+                subSongList.Items.Add(label);
             }
 
-            using var reader = new StreamReader(dbPath);
-            while (!reader.EndOfStream)
-            {
-                string line = reader.ReadLine()?.Trim();
-                if (string.IsNullOrEmpty(line) || line[0] == ';') continue;
-                int eq = line.IndexOf('=');
-                if (eq <= 0) continue;
-                if (line.Substring(0, eq).ToLowerInvariant() == hash)
-                    return line.Substring(eq + 1).Split(' ');
-            }
-            return null;
+            subSongList.SelectedIndex = Math.Max(0, defSong - 1);
+            SelectedSong = defSong;
+            SongLengthS  = _lengths.Count > defSong - 1 ? _lengths[defSong - 1] : 0;
         }
 
         void Ok_Click(object sender, RoutedEventArgs e)

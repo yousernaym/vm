@@ -45,6 +45,15 @@ namespace VisualMusic
         public void SetAudioFolder(Midi.FileType type, string dir)
             => _audioFolders[type] = dir;
 
+        // ---- HVSC song-length DB ----
+
+        /// <summary>Persisted URL for the HVSC Songlengths.md5 database download.</summary>
+        [DataMember] public string SongLengthsUrl { get; set; }
+
+        /// <summary>Returns the persisted URL, falling back to the built-in default.</summary>
+        public string SongLengthsUrlOrDefault
+            => string.IsNullOrEmpty(SongLengthsUrl) ? Hvsc.DefaultSongLengthsUrl : SongLengthsUrl;
+
         // ---- Per-file-type track-split preference ----
 
         // true = one track per instrument (MIDI: per track chunk) — the default, matching old WinForms
