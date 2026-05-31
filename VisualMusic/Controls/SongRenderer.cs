@@ -60,6 +60,12 @@ namespace VisualMusic
         /// <summary>Sets the screen-space cursor position (x,y in host client coordinates).</summary>
         public Action<int, int> SetCursorPosition { get; set; }
 
+        /// <summary>
+        /// Called whenever mouse-look mode is toggled.  Argument is <c>true</c> when mode activates,
+        /// <c>false</c> when it deactivates.  Wire this on the UI thread (e.g. via Dispatcher).
+        /// </summary>
+        public Action<bool> OnCameraControlModeChanged { get; set; }
+
         // --- Public properties ---
         public SpriteFont LyricsFont { get; private set; }
         Project _project;
@@ -231,6 +237,13 @@ namespace VisualMusic
             if (Project?.Notes == null)
                 return;
 
+            // In mouse-look mode the left button is used for roll; right button has no special action.
+            if (Camera.MouseRot)
+            {
+                if (isLeft) leftMbPressed = true;
+                return;
+            }
+
             if (isLeft)
             {
                 leftMbPressed = true;
@@ -253,6 +266,13 @@ namespace VisualMusic
 
         public void HandleMouseUp(bool isLeft)
         {
+            // In mouse-look mode only track left button for roll; suppress normal scroll/select.
+            if (Camera.MouseRot)
+            {
+                if (isLeft) leftMbPressed = false;
+                return;
+            }
+
             if (isLeft)
             {
                 leftMbPressed = false;
@@ -283,7 +303,8 @@ namespace VisualMusic
                 NormMouseX = (float)(x - middleX) * 2 / workAreaHeight;
                 NormMouseY = (float)(y - middleY) * 2 / workAreaHeight;
                 SetCursorPosition?.Invoke(middleX, middleY);
-                Project?.getKeyFrameAtSongPos()?.ProjProps.Camera.ApplyMouseRot(NormMouseX, NormMouseY);
+                // Hold left button to roll; otherwise yaw/pitch.
+                Project?.getKeyFrameAtSongPos()?.ProjProps.Camera.ApplyMouseRot(NormMouseX, NormMouseY, leftMbPressed);
             }
         }
 
@@ -296,6 +317,13 @@ namespace VisualMusic
             bool suppress = false;
             var key = (WinKeys)vkCode;
             var modifiers = System.Windows.Forms.Control.ModifierKeys;
+
+            // Escape exits mouse-look mode.
+            if (key == WinKeys.Escape && Camera.MouseRot)
+            {
+                SetMouseLook(false);
+                return true;
+            }
 
             if (keyFrame.ProjProps.Camera.control(key, true, modifiers))
             {
@@ -336,6 +364,38 @@ namespace VisualMusic
             }
 
             return suppress;
+        }
+
+        /// <summary>Resets camera velocity when a movement/rotation key is released.</summary>
+        public void HandleKeyUp(int vkCode)
+        {
+            var keyFrame = Project?.getKeyFrameAtSongPos();
+            if (keyFrame == null) return;
+
+            var key = (WinKeys)vkCode;
+            var modifiers = System.Windows.Forms.Control.ModifierKeys;
+
+            if (keyFrame.ProjProps.Camera.control(key, false, modifiers))
+            {
+                foreach (var other in Project.KeyFrames.Values)
+                {
+                    if (keyFrame != other && other.Selected)
+                    {
+                        other.ProjProps.Camera.Pos = keyFrame.ProjProps.Camera.Pos;
+                        other.ProjProps.Camera.Orientation = keyFrame.ProjProps.Camera.Orientation;
+                    }
+                }
+            }
+        }
+
+        /// <summary>Toggles mouse-look mode on/off (e.g. triggered by middle-mouse click).</summary>
+        public void ToggleMouseLook() => SetMouseLook(!Camera.MouseRot);
+
+        void SetMouseLook(bool on)
+        {
+            if (Camera.MouseRot == on) return;
+            Camera.MouseRot = on;
+            OnCameraControlModeChanged?.Invoke(on);
         }
 
         // ---- Selection ----

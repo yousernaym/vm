@@ -29,6 +29,11 @@ namespace VisualMusic.ViewModels
         [ObservableProperty] bool showSongProps;
         [ObservableProperty] bool showTrackProps;
 
+        // ---- Camera mouse-look mode ----
+
+        /// <summary>True while mouse-look mode is active; drives the yellow "MOUSE LOOK" label.</summary>
+        [ObservableProperty] bool isMouseLookMode;
+
         // ---- Child view models ----
 
         public TrackListViewModel TrackList { get; } = new();

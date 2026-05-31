@@ -325,14 +325,20 @@ namespace VisualMusic
             return _pos * ViewportSize.X;
         }
 
-        internal void ApplyMouseRot(float x, float y)
+        /// <summary>
+        /// Applies a mouse-movement rotation to the camera orientation.
+        /// When <paramref name="roll"/> is false (default), horizontal movement yaws and
+        /// vertical movement pitches.  When <paramref name="roll"/> is true (left button held),
+        /// horizontal movement rolls and vertical movement still pitches.
+        /// </summary>
+        internal void ApplyMouseRot(float x, float y, bool roll = false)
         {
             const float maxStep = 0.03f;
-            if (Math.Abs(x) > maxStep)
-                x *= maxStep / Math.Abs(x);
-            if (Math.Abs(y) > maxStep)
-                y *= maxStep / Math.Abs(y);
-            Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(-x, -y, 0);
+            if (Math.Abs(x) > maxStep) x *= maxStep / Math.Abs(x);
+            if (Math.Abs(y) > maxStep) y *= maxStep / Math.Abs(y);
+            float yaw  = roll ?  0 : -x;
+            float rollZ = roll ? -x :  0;
+            Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(yaw, -y, rollZ);
             OnUserUpdating?.Invoke();
         }
     }

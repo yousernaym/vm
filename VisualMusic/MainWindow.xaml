@@ -63,6 +63,13 @@
                               Margin="2,1" Padding="4,1"/>
             </StackPanel>
 
+            <!-- Mouse-look mode indicator — yellow label, visible only while mode is active -->
+            <TextBlock DockPanel.Dock="Right"
+                       Text="MOUSE LOOK"
+                       Foreground="Yellow" FontWeight="Bold"
+                       VerticalAlignment="Center" Margin="8,0"
+                       Visibility="{Binding IsMouseLookMode, Converter={StaticResource BoolVis}}"/>
+
         <!-- Menu bar -->
         <Menu>
 

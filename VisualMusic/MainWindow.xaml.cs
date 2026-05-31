@@ -28,6 +28,13 @@ namespace VisualMusic
                     vm.TogglePlaybackCommand.Execute(null);
                 e.Handled = true;
             }
+
+            // Escape exits mouse-look mode even when WPF focus is outside the song panel.
+            if (e.Key == Key.Escape && vm.IsMouseLookMode)
+            {
+                monoGameHost.Renderer?.ToggleMouseLook();
+                e.Handled = true;
+            }
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
@@ -46,6 +53,11 @@ namespace VisualMusic
 
             vm.GetDrawHost = () => monoGameHost.Renderer;
             monoGameHost.Renderer?.SetTrackSelectionService(trackListControl);
+
+            // Wire mouse-look mode toggle to the view-model flag so the yellow label updates.
+            if (monoGameHost.Renderer != null)
+                monoGameHost.Renderer.OnCameraControlModeChanged =
+                    on => Dispatcher.InvokeAsync(() => vm.IsMouseLookMode = on);
 
             vm.OnProjectLoaded = project =>
             {

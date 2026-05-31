@@ -32,6 +32,9 @@ namespace VisualMusic
         static extern bool ReleaseCapture();
 
         [DllImport("user32.dll")]
+        static extern IntPtr SetFocus(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
             int x, int y, int cx, int cy, uint flags);
 
@@ -107,9 +110,12 @@ namespace VisualMusic
         const int WM_LBUTTONUP     = 0x0202;
         const int WM_RBUTTONDOWN   = 0x0204;
         const int WM_RBUTTONUP     = 0x0205;
+        const int WM_MBUTTONDOWN   = 0x0207;
+        const int WM_MBUTTONUP     = 0x0208;
         const int WM_MOUSEMOVE     = 0x0200;
         const int WM_CAPTURECHANGED = 0x0215;
         const int WM_KEYDOWN       = 0x0100;
+        const int WM_KEYUP         = 0x0101;
         const int WM_SIZE          = 0x0005;
 
         const int MK_SHIFT = 0x0004;
@@ -239,13 +245,25 @@ namespace VisualMusic
 
                 case WM_LBUTTONDOWN:
                     bool isShift = (wParam.ToInt32() & MK_SHIFT) != 0;
+                    SetFocus(_hwnd);
                     Renderer.HandleMouseDown(true, isShift, lo, hi);
                     SetCapture(_hwnd);
                     break;
 
                 case WM_RBUTTONDOWN:
+                    SetFocus(_hwnd);
                     Renderer.HandleMouseDown(false, false, lo, hi);
                     SetCapture(_hwnd);
+                    break;
+
+                case WM_MBUTTONDOWN:
+                    SetFocus(_hwnd);
+                    Renderer.ToggleMouseLook();
+                    handled = true;
+                    break;
+
+                case WM_MBUTTONUP:
+                    handled = true;
                     break;
 
                 case WM_LBUTTONUP:
@@ -273,6 +291,10 @@ namespace VisualMusic
                     int vk = wParam.ToInt32();
                     bool suppress = Renderer.HandleKeyDown(vk);
                     if (suppress) handled = true;
+                    break;
+
+                case WM_KEYUP:
+                    Renderer.HandleKeyUp(wParam.ToInt32());
                     break;
             }
 
