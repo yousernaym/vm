@@ -61,6 +61,17 @@ namespace VisualMusic.Controls
             subSongList.SelectedIndex = Math.Max(0, defSong - 1);
             SelectedSong = defSong;
             SongLengthS  = _lengths.Count > defSong - 1 ? _lengths[defSong - 1] : 0;
+
+            // Scroll the default sub-song into view once the list is laid out.
+            Loaded += (_, _) =>
+            {
+                if (subSongList.SelectedItem != null)
+                {
+                    subSongList.ScrollIntoView(subSongList.SelectedItem);
+                    (subSongList.ItemContainerGenerator.ContainerFromIndex(subSongList.SelectedIndex)
+                        as System.Windows.Controls.ListBoxItem)?.Focus();
+                }
+            };
         }
 
         void Ok_Click(object sender, RoutedEventArgs e)
