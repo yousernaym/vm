@@ -676,6 +676,7 @@ namespace VisualMusic.ViewModels
         void ResetCamera()
         {
             if (project == null) return;
+            project.selectKeyFrameAtSongPos();
             foreach (var kf in project.KeyFrames.Values)
             {
                 if (kf.Selected)

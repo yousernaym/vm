@@ -56,8 +56,17 @@ namespace VisualMusic
 
             // Wire mouse-look mode toggle to the view-model flag so the yellow label updates.
             if (monoGameHost.Renderer != null)
+            {
                 monoGameHost.Renderer.OnCameraControlModeChanged =
                     on => Dispatcher.InvokeAsync(() => vm.IsMouseLookMode = on);
+
+                // Ctrl+R from the focused song panel can't reach the WPF key binding; route it here.
+                monoGameHost.Renderer.OnResetCamera = () => Dispatcher.InvokeAsync(() =>
+                {
+                    if (vm.ResetCameraCommand.CanExecute(null))
+                        vm.ResetCameraCommand.Execute(null);
+                });
+            }
 
             vm.OnProjectLoaded = project =>
             {

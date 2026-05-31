@@ -967,6 +967,19 @@ namespace VisualMusic
             return KeyFrames[(int)SongPosT];
         }
 
+        /// <summary>
+        /// Selects only the keyframe at the current song position, deselecting all others.
+        /// The WPF build has no keyframe-selection grid (unlike the legacy WinForms UI), so camera
+        /// movement (<see cref="update"/> integrates only selected keyframes) and reset need the
+        /// keyframe under the playhead to be marked selected. Safe to call every frame.
+        /// </summary>
+        public void selectKeyFrameAtSongPos()
+        {
+            var current = getKeyFrameAtSongPos();
+            foreach (var keyFrame in KeyFrames.Values)
+                keyFrame.Selected = (keyFrame == current);
+        }
+
         void onPlaybackOffsetSChanged()
         {
             if (notes == null)
