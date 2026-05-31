@@ -66,6 +66,12 @@ namespace VisualMusic
         /// </summary>
         public Action<bool> OnCameraControlModeChanged { get; set; }
 
+        /// <summary>
+        /// Requests a camera reset (Ctrl+R from the focused song panel, which doesn't reach WPF key
+        /// bindings). Wire this on the UI thread to invoke the reset-camera command.
+        /// </summary>
+        public Action OnResetCamera { get; set; }
+
         // --- Public properties ---
         public SpriteFont LyricsFont { get; private set; }
         Project _project;
@@ -147,6 +153,9 @@ namespace VisualMusic
             oldTime = newTime;
 
             selectRegion();
+            // No keyframe-selection UI in WPF yet: keep the playhead keyframe selected so camera
+            // movement (WASD/RF) integrates and camera reset targets it.
+            Project.selectKeyFrameAtSongPos();
             Project.update(deltaTimeS);
             scrollSong();
         }
@@ -324,6 +333,7 @@ namespace VisualMusic
                 SetMouseLook(false);
                 return true;
             }
+
 
             if (keyFrame.ProjProps.Camera.control(key, true, modifiers))
             {
