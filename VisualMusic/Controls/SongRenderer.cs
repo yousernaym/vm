@@ -334,14 +334,6 @@ namespace VisualMusic
                 return true;
             }
 
-            // Ctrl+R resets the camera. Handled here because, while the song panel has Win32 focus,
-            // keystrokes go to this WndProc path rather than the window's WPF key bindings.
-            if (key == WinKeys.R && modifiers == WinKeys.Control)
-            {
-                OnResetCamera?.Invoke();
-                return true;
-            }
-
             if (keyFrame.ProjProps.Camera.control(key, true, modifiers))
             {
                 suppress = true;
