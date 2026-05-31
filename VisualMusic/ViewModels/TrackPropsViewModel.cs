@@ -256,7 +256,14 @@ namespace VisualMusic.ViewModels
         public int ModEntryIndex
         {
             get => AS?.SelectedModEntryIndex ?? -1;
-            set { SelectModEntry?.Invoke(value); }
+            set
+            {
+                // The ComboBox writes -1 back while ItemsSource is being swapped on track switch;
+                // ignore it (and no-op reselects) so each track's stored SelectedModEntryIndex —
+                // its "last selected modulation" — survives and is re-displayed by RefreshAll.
+                if (value < 0 || value == (AS?.SelectedModEntryIndex ?? -1)) return;
+                SelectModEntry?.Invoke(value);
+            }
         }
 
         // Callbacks for structural modulation changes (wired in MainViewModel)

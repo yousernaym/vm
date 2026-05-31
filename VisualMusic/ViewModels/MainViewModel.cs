@@ -214,12 +214,41 @@ namespace VisualMusic.ViewModels
 
             SelectedTrackProps.SelectModEntry = idx =>
             {
+                if (idx < 0) return;   // guard spurious -1 writes (belt-and-suspenders)
                 foreach (var item in TrackList.SelectedItems)
                 {
                     var ns = item.TrackView.TrackProps.ActiveNoteStyle;
                     if (ns != null) ns.SelectedModEntryIndex = idx;
                 }
                 OnTrackListSelectionChanged();
+            };
+
+            // Ctrl+drag-drop: copy the currently-open tab's props from the drop-target (source)
+            // to all dragged items (destinations). Visual tabs only (Style/Material/Light/Spatial).
+            TrackList.CopyTabPropsToDropped = (sourceItem, destItems) =>
+            {
+                if (project == null || sourceItem == null) return;
+                int tabIndex = SelectedTrackProps.SelectedTabIndex;   // 0=Style…3=Spatial, 4=Audio
+                if (tabIndex < 0 || tabIndex > 3) return;             // Audio tab = no-op
+                int flag = 1 << tabIndex;
+                var drawHost = GetDrawHost?.Invoke();
+                var source = sourceItem.TrackView.TrackProps;
+
+                bool changed = false;
+                foreach (var item in destItems)
+                {
+                    if (item == sourceItem || TrackList.Items.IndexOf(item) <= 0) continue;
+                    item.TrackView.TrackProps.cloneFrom(source, flag, drawHost);
+                    changed = true;
+                }
+                if (!changed) return;
+
+                if ((flag & ((int)TrackPropsType.TPT_Style | (int)TrackPropsType.TPT_Material)) != 0)
+                    project.createOcTrees();   // geometry/texture coords are baked per track
+                if (flag == (int)TrackPropsType.TPT_Material)
+                    TrackList.RefreshColors(); // update the two color swatches in the list
+                OnTrackListSelectionChanged(); // refresh the tabs for the (still-selected) dragged tracks
+                AddUndoItem("Copy Track Properties");
             };
         }
 
@@ -247,8 +276,19 @@ namespace VisualMusic.ViewModels
             ShowSongProps = false;
             ShowTrackProps = false;
             TrackList.Rebuild(value);
-            SelectedTrackProps.MergedProps = null;
+            // Rebuild selects the global track (index 0), which drives MergedProps via the
+            // selection event. Only clear the panel when there is nothing to select — otherwise
+            // we'd wipe the global track's props (incl. its modulation selection) right after load.
+            if (TrackList.Items.Count == 0)
+                SelectedTrackProps.MergedProps = null;
             NotifyScrollPositionChanged();
+        }
+
+        // The track list and property tabs live in a collapsed panel until ShowTrackProps turns on;
+        // re-sync the tabs (incl. the modulation ComboBox) to the current selection when it opens.
+        partial void OnShowTrackPropsChanged(bool value)
+        {
+            if (value) OnTrackListSelectionChanged();
         }
 
         // ---- Renderer callbacks (set by MainWindow after load) ----

@@ -9,6 +9,7 @@
               SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
               SelectionChanged="OnSelectionChanged"
               PreviewMouseLeftButtonDown="OnPreviewMouseLeftButtonDown"
+              PreviewMouseLeftButtonUp="OnPreviewMouseLeftButtonUp"
               MouseMove="OnMouseMove"
               Drop="OnDrop"
               DragEnter="OnDragEnter"

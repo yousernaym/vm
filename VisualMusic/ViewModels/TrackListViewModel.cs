@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Media;
 
 namespace VisualMusic.ViewModels
@@ -16,6 +17,10 @@ namespace VisualMusic.ViewModels
         public IList<TrackItemViewModel> SelectedItems { get; set; } = new List<TrackItemViewModel>();
 
         public event Action SelectionChanged;
+
+        // Wired by MainViewModel: copy the currently-open tab's props from the drop-target
+        // (source) to the dragged items (destinations). Ctrl+drag gesture.
+        public Action<TrackItemViewModel, IReadOnlyList<TrackItemViewModel>> CopyTabPropsToDropped { get; set; }
 
         Project _project;
 
@@ -54,6 +59,53 @@ namespace VisualMusic.ViewModels
             var tv = _project.TrackViews[fromIndex];
             _project.TrackViews.RemoveAt(fromIndex);
             _project.TrackViews.Insert(toIndex, tv);
+        }
+
+        // Moves a block of items (preserving their relative order) to insertIndex in both
+        // the display list and Project.TrackViews. Global (index 0) is always skipped.
+        // Uses ObservableCollection.Move so the ListView keeps the rows selected (rather than
+        // removing/re-adding, which would drop the selection and need restoring afterwards).
+        public void ReorderMultiple(IReadOnlyList<TrackItemViewModel> draggedItems, int insertIndex)
+        {
+            if (_project == null) return;
+            var block = draggedItems.Where(it => Items.IndexOf(it) > 0)
+                                    .OrderBy(it => Items.IndexOf(it)).ToList();
+            if (block.Count == 0) return;
+            var moving = new HashSet<TrackItemViewModel>(block);
+
+            // Find the first non-moving item at or after insertIndex — the "anchor" we insert
+            // before; null means the block goes to the end.
+            TrackItemViewModel anchor = null;
+            for (int i = insertIndex; i < Items.Count; i++)
+                if (!moving.Contains(Items[i])) { anchor = Items[i]; break; }
+
+            // Move each item (in original order) to just before the anchor. Indices are
+            // recomputed each step because earlier moves shift them.
+            foreach (var it in block)
+            {
+                int from = Items.IndexOf(it);
+                int to = anchor != null
+                    ? (from < Items.IndexOf(anchor) ? Items.IndexOf(anchor) - 1 : Items.IndexOf(anchor))
+                    : Items.Count - 1;
+                if (from == to) continue;
+                Items.Move(from, to);
+                var tv = _project.TrackViews[from];
+                _project.TrackViews.RemoveAt(from);
+                _project.TrackViews.Insert(to, tv);
+            }
+        }
+
+        // Refreshes the color swatches for all non-Global tracks (call after a Material copy).
+        public void RefreshColors()
+        {
+            if (_project == null) return;
+            var globalMat = _project.GlobalTrackProps.MaterialProps;
+            for (int i = 1; i < Items.Count; i++)
+            {
+                var mp = _project.TrackViews[i].TrackProps.MaterialProps;
+                Items[i].NormalColor  = TrackItemViewModel.ToWpfColor(mp.GetSysColor(false, globalMat));
+                Items[i].HilitedColor = TrackItemViewModel.ToWpfColor(mp.GetSysColor(true,  globalMat));
+            }
         }
 
         internal void RaiseSelectionChanged() => SelectionChanged?.Invoke();

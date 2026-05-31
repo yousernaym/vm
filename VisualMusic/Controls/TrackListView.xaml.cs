@@ -24,8 +24,11 @@ namespace VisualMusic.Controls
             else if (!selected && isSel) trackListView.SelectedItems.Remove(item);
         }
 
+        const string DragFormat = "VisualMusic.TrackItemList";
+
         Point _dragStart;
         TrackItemViewModel _dragItem;
+        bool _deferSelectionToMouseUp;   // Explorer-style: apply a click on a selected row on mouse-up
         DragAdorner _dragAdorner;
         int _dropIndex = -1;
         TrackItemViewModel _ctrlDropTarget;
@@ -49,6 +52,46 @@ namespace VisualMusic.Controls
         {
             _dragStart = e.GetPosition(null);
             _dragItem = HitTestItem(e.GetPosition(trackListView));
+            _deferSelectionToMouseUp = false;
+
+            // Explorer-style: clicking an already-selected row must not change the selection on
+            // mouse-down — defer it to mouse-up so the user can drag the whole selection and see
+            // it highlighted while dragging. Without Ctrl a plain click keeps the other selected
+            // rows; with Ctrl the clicked row isn't toggled off. (Shift = range select, left alone.)
+            bool ctrl  = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+            bool shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+            bool itemSelected = _dragItem != null && trackListView.SelectedItems.Contains(_dragItem);
+            if (!shift && itemSelected && (ctrl || trackListView.SelectedItems.Count > 1))
+            {
+                _deferSelectionToMouseUp = true;
+                e.Handled = true;
+            }
+        }
+
+        void OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!_deferSelectionToMouseUp) return;
+            _deferSelectionToMouseUp = false;
+
+            // We get here only when no drag started (a drag consumes the mouse-up), so apply the
+            // click that was suppressed on mouse-down.
+            var item = HitTestItem(e.GetPosition(trackListView));
+            if (item == null) return;
+
+            if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
+            {
+                // Ctrl+click toggles just the clicked row.
+                if (trackListView.SelectedItems.Contains(item))
+                    trackListView.SelectedItems.Remove(item);
+                else
+                    trackListView.SelectedItems.Add(item);
+            }
+            else
+            {
+                // Plain click collapses the selection to the clicked row.
+                trackListView.SelectedItems.Clear();
+                trackListView.SelectedItem = item;
+            }
         }
 
         void OnMouseMove(object sender, MouseEventArgs e)
@@ -60,8 +103,22 @@ namespace VisualMusic.Controls
 
             var item = _dragItem;
             _dragItem = null;
+            _deferSelectionToMouseUp = false;   // a drag is starting; don't collapse on mouse-up
+
+            if (!(DataContext is TrackListViewModel vm)) return;
+
+            // Drag all selected tracks if the grabbed row is among them, else just that row.
+            // Selection is intact here (a click on a selected row was suppressed on mouse-down).
+            // Global (index 0) is always pinned and excluded.
+            var selected = trackListView.SelectedItems.Cast<TrackItemViewModel>().ToList();
+            var dragged = selected.Contains(item)
+                ? selected
+                : new List<TrackItemViewModel> { item };
+            dragged = dragged.Where(d => vm.Items.IndexOf(d) > 0).ToList();
+            if (dragged.Count == 0) return;
+
             DragDrop.DoDragDrop(trackListView,
-                new DataObject(typeof(TrackItemViewModel), item),
+                new DataObject(DragFormat, dragged),
                 DragDropEffects.Move);
 
             // DoDragDrop is synchronous; clean up in case OnDrop/OnDragLeave didn't fire
@@ -74,7 +131,7 @@ namespace VisualMusic.Controls
         {
             // Set effects immediately on enter to prevent the brief "no-drop" cursor flash
             // that occurs during the DragLeave→DragOver transition between items.
-            e.Effects = e.Data.GetDataPresent(typeof(TrackItemViewModel))
+            e.Effects = e.Data.GetDataPresent(DragFormat)
                 ? DragDropEffects.Move
                 : DragDropEffects.None;
             e.Handled = true;
@@ -82,7 +139,7 @@ namespace VisualMusic.Controls
 
         void OnDragOver(object sender, DragEventArgs e)
         {
-            if (!e.Data.GetDataPresent(typeof(TrackItemViewModel)))
+            if (!e.Data.GetDataPresent(DragFormat))
             {
                 e.Effects = DragDropEffects.None;
                 e.Handled = true;
@@ -139,33 +196,28 @@ namespace VisualMusic.Controls
             _dropIndex = -1;
             _ctrlDropTarget = null;
 
-            var dragged = e.Data.GetData(typeof(TrackItemViewModel)) as TrackItemViewModel;
-            if (dragged == null || !(DataContext is TrackListViewModel vm)) return;
+            var dragged = e.Data.GetData(DragFormat) as List<TrackItemViewModel>;
+            if (dragged == null || dragged.Count == 0 || !(DataContext is TrackListViewModel vm)) return;
 
             bool isCtrl = (e.KeyStates & DragDropKeyStates.ControlKey) != 0;
 
             if (isCtrl)
             {
+                // COPY: the drop-target row is the property source; dragged items are destinations.
                 // Prefer the item directly under the cursor; fall back to the last item
                 // the box was highlighting (covers drops in the gap between rows).
                 var target = HitTestItem(e.GetPosition(trackListView)) ?? ctrlTarget;
-                if (target != null && dragged != target)
-                {
-                    int from = vm.Items.IndexOf(dragged);
-                    int to   = vm.Items.IndexOf(target);
-                    if (from > 0)
-                        vm.Reorder(from, to);
-                }
+                if (target != null)
+                    vm.CopyTabPropsToDropped?.Invoke(target, dragged);
             }
             else
             {
-                int from = vm.Items.IndexOf(dragged);
-                if (from <= 0 || dropIndex < 1) return;
-                // Items.Move(from, to) removes the item then inserts at to (index in reduced list)
-                int to = from < dropIndex ? dropIndex - 1 : dropIndex;
-                if (from != to)
-                    vm.Reorder(from, to);
+                // MOVE: relocate the whole block to the insertion point.
+                if (dropIndex < 1) return;
+                vm.ReorderMultiple(dragged, dropIndex);
             }
+            // No re-selection needed: the dragged rows stay selected throughout (Items.Move
+            // preserves selection, and Ctrl-copy doesn't touch it).
         }
 
         void EnsureAdorner()
