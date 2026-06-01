@@ -595,6 +595,13 @@ namespace VisualMusic.ViewModels
             dlg.ShowDialog();
         }
 
+        [RelayCommand]
+        void Preferences()
+        {
+            var dlg = new Controls.PreferencesWindow { Owner = Application.Current.MainWindow };
+            dlg.ShowDialog();
+        }
+
         // ---- Playback commands ----
 
         [RelayCommand(CanExecute = nameof(HasProject))]

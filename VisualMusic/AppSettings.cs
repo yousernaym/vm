@@ -14,14 +14,16 @@ namespace VisualMusic
     public class AppSettings
     {
         static readonly string FilePath = Path.Combine(Program.AppDataDir, "appsettings.xml");
+        
+        // ---- Default theme - Also change in app.xaml.
+        const string DefaultThemeBaseColor = "Dark";
+        const string DefaulutThemeColorScheme = "Teal";
 
         // ---- Singleton ----
-
         static AppSettings _instance;
         public static AppSettings Instance => _instance ??= Load();
 
         // ---- Scalar dialog folders ----
-
         [DataMember] public string ProjectFolder  { get; set; }
         [DataMember] public string CamFolder      { get; set; }
         [DataMember] public string TrackPropsFolder { get; set; }
@@ -44,6 +46,16 @@ namespace VisualMusic
 
         public void SetAudioFolder(Midi.FileType type, string dir)
             => _audioFolders[type] = dir;
+
+        // ---- Theme ----
+
+        [DataMember] public string ThemeBaseColor   { get; set; }  // e.g. "Dark" or "Light"
+        [DataMember] public string ThemeColorScheme { get; set; }  // e.g. "Steel", "Blue", ...
+
+        public string ThemeBaseColorOrDefault
+            => string.IsNullOrEmpty(ThemeBaseColor)   ? DefaultThemeBaseColor  : ThemeBaseColor;
+        public string ThemeColorSchemeOrDefault
+            => string.IsNullOrEmpty(ThemeColorScheme) ? DefaultThemeColorScheme : ThemeColorScheme;
 
         // ---- HVSC song-length DB ----
 

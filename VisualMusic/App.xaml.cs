@@ -10,6 +10,12 @@ namespace VisualMusic
         {
             base.OnStartup(e);
 
+            // Apply the user-selected theme before any window is created.
+            ControlzEx.Theming.ThemeManager.Current.ChangeTheme(
+                this,
+                AppSettings.Instance.ThemeBaseColorOrDefault,
+                AppSettings.Instance.ThemeColorSchemeOrDefault);
+
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
             MidMix.init();
             if (!Media.initMF())

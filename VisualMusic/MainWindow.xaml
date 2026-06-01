@@ -31,10 +31,11 @@
         <KeyBinding Command="{Binding RedoCommand}"           Key="Z"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding ResetCameraCommand}"    Key="R"    Modifiers="Control"/>
         <KeyBinding Command="{Binding DefaultTrackPropsCommand}" Key="D" Modifiers="Control"/>
-        <KeyBinding Command="{Binding LoadTrackPropsCommand}" Key="P"    Modifiers="Control"/>
-        <KeyBinding Command="{Binding SaveTrackPropsCommand}" Key="P"    Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding LoadTrackPropsCommand}" Key="T"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding SaveTrackPropsCommand}" Key="T"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding InsertLyricsCommand}"   Key="L"    Modifiers="Control"/>
         <KeyBinding Command="{Binding InsertKeyFrameCommand}" Key="K"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding PreferencesCommand}"    Key="P"    Modifiers="Control"/>
         <!-- Playback — Ctrl+Space handled via PreviewKeyDown in code-behind (tunneling) so it
              fires even when a focused panel control (CheckBox, ListBox, etc.) would otherwise
              swallow the Space activation key. -->
@@ -101,12 +102,14 @@
                 </MenuItem>
                 <MenuItem Header="_Tracks">
                     <MenuItem Header="_Default Properties" Command="{Binding DefaultTrackPropsCommand}" InputGestureText="Ctrl+D"/>
-                    <MenuItem Header="_Load properties..."  Command="{Binding LoadTrackPropsCommand}"   InputGestureText="Ctrl+P"/>
-                    <MenuItem Header="_Save properties..."  Command="{Binding SaveTrackPropsCommand}"   InputGestureText="Ctrl+Shift+P"/>
+                    <MenuItem Header="_Load properties..."  Command="{Binding LoadTrackPropsCommand}"   InputGestureText="Ctrl+T"/>
+                    <MenuItem Header="_Save properties..."  Command="{Binding SaveTrackPropsCommand}"   InputGestureText="Ctrl+Shift+T"/>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Insert _Lyrics"    Command="{Binding InsertLyricsCommand}"   InputGestureText="Ctrl+L"/>
                 <MenuItem Header="Insert _Key Frame" Command="{Binding InsertKeyFrameCommand}" InputGestureText="Ctrl+K"/>
+                <Separator/>
+                <MenuItem Header="_Preferences..."   Command="{Binding PreferencesCommand}" InputGestureText="Ctrl+P"/>
             </MenuItem>
 
             <!-- PLAYBACK -->
