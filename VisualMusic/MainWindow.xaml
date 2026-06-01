@@ -19,12 +19,13 @@
         <!-- File -->
         <KeyBinding Command="{Binding ImportMidiCommand}"     Key="M"    Modifiers="Control"/>
         <KeyBinding Command="{Binding ImportModCommand}"      Key="M"    Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding ImportHvlCommand}"      Key="H"    Modifiers="Control"/>
         <KeyBinding Command="{Binding ImportSidCommand}"      Key="S"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding OpenProjectCommand}"    Key="O"    Modifiers="Control"/>
         <KeyBinding Command="{Binding SaveProjectCommand}"    Key="S"    Modifiers="Control"/>
         <KeyBinding Command="{Binding SaveProjectAsCommand}"  Key="S"    Modifiers="Alt+Shift"/>
         <KeyBinding Command="{Binding ExportVideoCommand}"    Key="E"    Modifiers="Control"/>
-        <KeyBinding Command="{Binding HvscIntegrationCommand}" Key="T" Modifiers="Control"/>
+        <KeyBinding Command="{Binding HvscIntegrationCommand}" Key="H" Modifiers="Control+Shift"/>
         <!-- Edit -->
         <KeyBinding Command="{Binding UndoCommand}"           Key="Z"    Modifiers="Control"/>
         <KeyBinding Command="{Binding RedoCommand}"           Key="Z"    Modifiers="Control+Shift"/>
@@ -77,6 +78,7 @@
             <MenuItem Header="_File">
                 <MenuItem Header="Import _MIDI song..."   Command="{Binding ImportMidiCommand}"    InputGestureText="Ctrl+M"/>
                 <MenuItem Header="Import M_odule..."      Command="{Binding ImportModCommand}"     InputGestureText="Ctrl+Shift+M"/>
+                <MenuItem Header="Import _HVL song..."    Command="{Binding ImportHvlCommand}"     InputGestureText="Ctrl+H"/>
                 <MenuItem Header="Import _SID song..."    Command="{Binding ImportSidCommand}"     InputGestureText="Ctrl+Shift+S"/>
                 <Separator/>
                 <MenuItem Header="_Open project..."       Command="{Binding OpenProjectCommand}"   InputGestureText="Ctrl+O"/>
@@ -84,7 +86,7 @@
                 <MenuItem Header="Save project _as..."    Command="{Binding SaveProjectAsCommand}" InputGestureText="Alt+Shift+S"/>
                 <Separator/>
                 <MenuItem Header="_Export video..."       Command="{Binding ExportVideoCommand}"   InputGestureText="Ctrl+E"/>
-                <MenuItem Header="_HVSC integration..." Command="{Binding HvscIntegrationCommand}" InputGestureText="Ctrl+T"/>
+                <MenuItem Header="_HVSC integration..." Command="{Binding HvscIntegrationCommand}" InputGestureText="Ctrl+Shift+H"/>
             </MenuItem>
 
             <!-- EDIT -->

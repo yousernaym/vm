@@ -451,6 +451,14 @@ namespace VisualMusic.ViewModels
         }
 
         [RelayCommand]
+        async Task ImportHvl()
+        {
+            var dlg = new ImportSongWindow(Midi.FileType.Hvl) { Owner = Application.Current.MainWindow };
+            if (dlg.ShowDialog() != true) return;
+            await DoImport(BuildOptions(Midi.FileType.Hvl, dlg));
+        }
+
+        [RelayCommand]
         async Task ImportSid()
         {
             var dlg = new ImportSongWindow(Midi.FileType.Sid) { Owner = Application.Current.MainWindow };
@@ -489,6 +497,7 @@ namespace VisualMusic.ViewModels
             {
                 case Midi.FileType.Midi: options = new MidiImportOptions(); break;
                 case Midi.FileType.Mod:  options = new ModImportOptions();  break;
+                case Midi.FileType.Hvl:  options = new HvlImportOptions();  break;
                 default:                 options = new SidImportOptions();  break;
             }
 
@@ -841,8 +850,9 @@ namespace VisualMusic.ViewModels
             string ext = suggestedFileName.Split('.').Last().ToLower();
 
             Midi.FileType? fileType = null;
-            if (ImportMidiForm.Formats.Contains(ext))      fileType = Midi.FileType.Midi;
+            if (ImportMidiForm.Formats.Contains(ext))       fileType = Midi.FileType.Midi;
             else if (ImportModForm.Formats.Contains(ext))  fileType = Midi.FileType.Mod;
+            else if (ImportHvlForm.Formats.Contains(ext))  fileType = Midi.FileType.Hvl;
             else if (ImportSidForm.Formats.Contains(ext))  fileType = Midi.FileType.Sid;
 
             if (fileType == null)
@@ -862,6 +872,7 @@ namespace VisualMusic.ViewModels
             {
                 case Midi.FileType.Midi: options = new MidiImportOptions(); break;
                 case Midi.FileType.Mod:  options = new ModImportOptions();  break;
+                case Midi.FileType.Hvl:  options = new HvlImportOptions();  break;
                 default:                 options = new SidImportOptions();  break;
             }
             options.RawNotePath  = url;       // preserve original URL for project save and dialog display

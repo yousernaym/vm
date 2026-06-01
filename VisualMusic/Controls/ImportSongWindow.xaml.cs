@@ -140,6 +140,10 @@ namespace VisualMusic.Controls
                     _noteFilter = BuildFilter("SID files", ImportSidForm.Formats);
                     AudioLabel = "Audio file (leave empty for SID audio):";
                     break;
+                case Midi.FileType.Hvl:
+                    Title = "Import HVL Song";
+                    _noteFilter = BuildFilter("HVL files", ImportHvlForm.Formats);
+                    break;
                 default:
                     Title = "Import Song";
                     _noteFilter = "All files (*.*)|*.*";

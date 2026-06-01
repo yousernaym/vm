@@ -70,6 +70,15 @@ namespace VisualMusic.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to hvl ahx.
+        /// </summary>
+        internal static string HvlFormats {
+            get {
+                return ResourceManager.GetString("HvlFormats", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to 669 AMF APUN DSM FAR GDM IT IMF MOD MED MTM OKT S3M STM STX ULT UNI XM.
         /// </summary>
         internal static string ModFormats {
