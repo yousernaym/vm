@@ -2,17 +2,25 @@
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                 Title="Rendering Video"
+                 Title="{Binding TitleText}"
                  ResizeMode="NoResize"
                  SizeToContent="WidthAndHeight"
                  WindowStartupLocation="CenterOwner"
                  ShowMinButton="False"
                  ShowMaxRestoreButton="False"
                  Closing="Window_Closing">
+
+    <mah:MetroWindow.TaskbarItemInfo>
+        <TaskbarItemInfo x:Name="taskbarInfo"/>
+    </mah:MetroWindow.TaskbarItemInfo>
+
     <StackPanel Margin="16" MinWidth="320">
-        <TextBlock Text="{Binding ProgressText}" Margin="0,0,0,8"/>
         <ProgressBar Minimum="0" Maximum="100"
                      Value="{Binding Progress, Mode=OneWay}"
-                     Height="20"/>
+                     Height="20"
+                     Margin="0,0,0,8"/>
+        <TextBlock Text="{Binding ElapsedText}"   Margin="0,0,0,2"/>
+        <TextBlock Text="{Binding RemainingText}"/>
     </StackPanel>
+
 </mah:MetroWindow>
