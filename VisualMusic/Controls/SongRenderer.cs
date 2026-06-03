@@ -41,6 +41,9 @@ namespace VisualMusic
         TimeSpan oldTime = new TimeSpan(0);
         double deltaTimeS;
         bool isRenderingVideo = false;
+        /// <summary>True while a background video export is using the GraphicsDevice. The live
+        /// game loop must skip Draw() during this time to avoid corrupting device state.</summary>
+        public bool IsRenderingVideo => isRenderingVideo;
         const int CmFaceSide = 4096;
 
         // --- Input state ---
@@ -595,12 +598,15 @@ namespace VisualMusic
 
                     ssFx = content.Load<Effect>("ss");
                     Camera.InvertY = options.Sphere;
+
+                    int frameSamples = 1;
+                    double songPosS = 0;
                     Project.setSongPosS(0, false);
 
                     while (Project.NormSongPos < 1 && !progress.Cancel)
                     {
                         Project.interpolateFrames();
-                        drawVideoFrame(0, videoFormat.fps, 1, options, rtCube, rt32, rt8, cubeToPlaneFx);
+                        drawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, rtCube, rt32, rt8, cubeToPlaneFx);
                         if (options.SSAAEnabled)
                         {
                             graphicsDevice.SetRenderTarget(rtFinal);
@@ -616,9 +622,12 @@ namespace VisualMusic
                             progress.ShowMessage("Couldn't add frame");
                             break;
                         }
+                        // Advance the playhead by one frame's worth of *seconds* (setSongPosS takes
+                        // seconds). songPosS is the running second-accumulator; the earlier code used a
+                        // normalized [0,1] position here, which pinned every frame to the song start.
                         double frameTimeS = 1.0 / videoFormat.fps;
-                        double pos = (Project.SongPosT / (double)Project.SongLengthT);
-                        Project.setSongPosS((float)(pos + frameTimeS), false);
+                        Project.setSongPosS(songPosS + frameTimeS, false);
+                        songPosS += frameTimeS;
                         progress.UpdateProgress((float)Project.NormSongPos);
                     }
                 }

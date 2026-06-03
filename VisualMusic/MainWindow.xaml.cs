@@ -76,6 +76,9 @@ namespace VisualMusic
 
             vm.GetRendererWaveformPanel = () =>
                 monoGameHost.Renderer?.WaveformPanel;
+
+            vm.RenderVideo = (file, cb, opts) =>
+                monoGameHost.Renderer?.renderVideo(file, cb, opts);
         }
     }
 }

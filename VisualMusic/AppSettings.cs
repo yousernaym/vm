@@ -17,7 +17,7 @@ namespace VisualMusic
         
         // ---- Default theme - Also change in app.xaml.
         const string DefaultThemeBaseColor = "Dark";
-        const string DefaulutThemeColorScheme = "Teal";
+        const string DefaultThemeColorScheme = "Teal";
 
         // ---- Singleton ----
         static AppSettings _instance;
@@ -65,6 +65,55 @@ namespace VisualMusic
         /// <summary>Returns the persisted URL, falling back to the built-in default.</summary>
         public string SongLengthsUrlOrDefault
             => string.IsNullOrEmpty(SongLengthsUrl) ? Hvsc.DefaultSongLengthsUrl : SongLengthsUrl;
+
+        // ---- Video export ----
+
+        [DataMember] public string VideoFolder         { get; set; }
+        [DataMember] public bool   VideoSphere         { get; set; }
+        [DataMember] public bool   VideoSphericalMetadata { get; set; }
+        [DataMember] public bool   VideoSphericalStereo   { get; set; }
+        [DataMember] public int    VideoSphereResoIndex    { get; set; }
+        [DataMember] public int    VideoNonSphereResoIndex { get; set; }
+        [DataMember] public int    VideoSsaaFactor    { get; set; }
+        [DataMember] public int?   VideoQualityLoss   { get; set; }
+        [DataMember] public float  VideoFps           { get; set; }
+
+        public string VideoFolderOrDefault
+            => string.IsNullOrEmpty(VideoFolder)
+               ? Path.Combine(Program.DefaultUserFilesDir, "Videos")
+               : VideoFolder;
+
+        /// <summary>Reconstruct a <see cref="VideoExportOptions"/> from persisted scalars.</summary>
+        public VideoExportOptions LoadVideoExportOptions()
+        {
+            var o = new VideoExportOptions();
+            // ResoIndex setter routes by Sphere, so set the non-sphere index first.
+            o.Sphere = false; o.ResoIndex = VideoNonSphereResoIndex;
+            o.Sphere = true;  o.ResoIndex = VideoSphereResoIndex;
+            o.Sphere            = VideoSphere;
+            o.SphericalMetadata = VideoSphericalMetadata;
+            o.SphericalStereo   = VideoSphericalStereo;
+            o.SSAAFactor        = VideoSsaaFactor > 0 ? VideoSsaaFactor : 4;
+            o.VideoQualityLoss  = VideoQualityLoss ?? 1;
+            o.Fps               = VideoFps > 0 ? VideoFps : 60f;
+            return o;
+        }
+
+        /// <summary>Persist <paramref name="o"/> as scalars and save to disk.</summary>
+        public void SaveVideoExportOptions(VideoExportOptions o)
+        {
+            VideoSphere             = o.Sphere;
+            VideoSphericalMetadata  = o.SphericalMetadata;
+            VideoSphericalStereo    = o.SphericalStereo;
+            bool origSphere = o.Sphere;
+            o.Sphere = true;  VideoSphereResoIndex    = o.ResoIndex;
+            o.Sphere = false; VideoNonSphereResoIndex = o.ResoIndex;
+            o.Sphere = origSphere;
+            VideoSsaaFactor    = o.SSAAFactor;
+            VideoQualityLoss   = o.VideoQualityLoss;
+            VideoFps           = o.Fps;
+            Save();
+        }
 
         // ---- Per-file-type track-split preference ----
 

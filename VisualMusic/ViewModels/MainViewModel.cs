@@ -304,6 +304,8 @@ namespace VisualMusic.ViewModels
         public Action<string> OnLoadBackgroundImage { get; set; }
         /// <summary>Returns the active draw host (SongRenderer) for wiring up Project.SetDrawHost.</summary>
         public Func<ISongDrawHost> GetDrawHost { get; set; }
+        /// <summary>Invokes SongRenderer.renderVideo on the background thread supplied by the caller.</summary>
+        public Action<string, IRenderProgressCallback, VideoExportOptions> RenderVideo { get; set; }
 
         // ---- Screen commands ----
 
@@ -586,7 +588,27 @@ namespace VisualMusic.ViewModels
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void ExportVideo()
-            => MessageBox.Show("Export Video not yet available in WPF mode.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+        {
+            var options = AppSettings.Instance.LoadVideoExportOptions();
+
+            var dlg = new Controls.VideoExportWindow(options) { Owner = Application.Current.MainWindow };
+            if (dlg.ShowDialog() != true) return;
+
+            var save = new SaveFileDialog
+            {
+                Filter = "Mkv files (*.mkv)|*.mkv",
+                Title  = "Save video file",
+                InitialDirectory = AppSettings.Instance.VideoFolderOrDefault
+            };
+            if (save.ShowDialog() != true) return;
+
+            AppSettings.Instance.RememberFolder(save.FileName, dir => AppSettings.Instance.VideoFolder = dir);
+            AppSettings.Instance.SaveVideoExportOptions(dlg.Options);
+
+            var progress = new Controls.RenderProgressWindow(save.FileName, dlg.Options, RenderVideo)
+                { Owner = Application.Current.MainWindow };
+            progress.ShowDialog();
+        }
 
         [RelayCommand]
         void HvscIntegration()

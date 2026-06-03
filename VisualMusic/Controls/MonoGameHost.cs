@@ -194,6 +194,11 @@ namespace VisualMusic
             double dt = (now - _oldTime).TotalSeconds;
             _oldTime = now;
 
+            // While a background video export owns the GraphicsDevice, skip the live game loop —
+            // the modal export dialog keeps this timer ticking, and a concurrent Draw on the same
+            // device from this (UI) thread corrupts its state mid-render.
+            if (Renderer.IsRenderingVideo) return;
+
             Renderer.Update(dt);
             RenderNow();
         }
