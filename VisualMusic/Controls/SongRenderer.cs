@@ -417,7 +417,8 @@ namespace VisualMusic
             if (trackSelection == null || trackSelection.TrackListCount == 0)
                 return;
 
-            if (leftMbPressed)
+            // In mouse-look mode the left button rolls the camera, so it must not start a region selection.
+            if (leftMbPressed && !Camera.MouseRot)
             {
                 selectingRegion = true;
 
