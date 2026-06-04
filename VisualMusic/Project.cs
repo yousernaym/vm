@@ -339,7 +339,7 @@ namespace VisualMusic
 
             try
             {
-                newNotes.openFile(path);
+                newNotes.OpenFile(path);
             }
             catch (FileFormatException ex)
             {
@@ -351,7 +351,7 @@ namespace VisualMusic
             _notes = newNotes;
             if (options.NoteFileType == Midi.FileType.Midi && !options.InsTrack)
                 SplitTracksByChannel(_notes);
-            _notes.createNoteBsp();
+            _notes.CreateNoteBsp();
 
             if (options.EraseCurrent)
             {

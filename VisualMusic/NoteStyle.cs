@@ -259,7 +259,7 @@ namespace VisualMusic
         }
         protected List<Midi.Note> GetNotes(int leftMargin, Midi.Track track)
         {   //Get currently visible notes in specified track
-            return track.getNotes((int)(Project.SongPosT - Project.ViewWidthT / 2 - leftMargin), (int)(Project.SongPosT + Project.ViewWidthT / 2 + leftMargin));
+            return track.GetNotes((int)(Project.SongPosT - Project.ViewWidthT / 2 - leftMargin), (int)(Project.SongPosT + Project.ViewWidthT / 2 + leftMargin));
         }
 
         abstract public void DrawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
