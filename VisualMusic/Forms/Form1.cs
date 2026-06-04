@@ -558,7 +558,7 @@ namespace VisualMusic
                 for (int t = 1; t < Project.TrackViews.Count; t++)
                 {
                     TrackProps tprops = Project.TrackViews[t].TrackProps;
-                    Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
+                    Project.TrackViews[t].createGeo(Project, Project.GlobalTrackProps);
                 }
             }
             else if (e.KeyCode == Keys.ControlKey && viewWidthQnChangedWithCtrl)
@@ -571,7 +571,7 @@ namespace VisualMusic
         {
             if (Project.ViewWidthQnScale == 1)
                 return;
-            Project.createOcTrees();
+            Project.createGeos();
             SongPanel.Invalidate();
             AddUndoItem("Edit Viewport Width");
         }
@@ -1025,7 +1025,7 @@ namespace VisualMusic
                         Enum.TryParse(tabName, out tpt);
                     }
                     destTrackProps.cloneFrom(sourceTrackProps, (int)tpt, SongPanel);
-                    Project.TrackViews[trackNumber].createOcTree(Project, Project.GlobalTrackProps);
+                    Project.TrackViews[trackNumber].createGeo(Project, Project.GlobalTrackProps);
                 }
                 UpdateTrackPropsControls();
                 updateTrackListColors();
@@ -1096,7 +1096,7 @@ namespace VisualMusic
                 NoteStyleType type = (NoteStyleType)Enum.Parse(typeof(NoteStyleType), (string)styleList.SelectedItem);
                 Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.StyleProps.Type = type;
             }
-            Project.createOcTrees();
+            Project.createGeos();
             UpdateTrackPropsControls();
         }
 
@@ -1134,7 +1134,7 @@ namespace VisualMusic
                 getActiveTexProps(i).Path = "";
                 MessageBox.Show(ex.Message);
             }
-            Project.createOcTrees();
+            Project.createGeos();
             UpdateTrackPropsControls();
         }
 
@@ -1502,7 +1502,7 @@ namespace VisualMusic
         {
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 Project.TrackViews[trackList.SelectedIndices[i]].TrackProps.ResetStyle();
-            Project.createOcTrees();
+            Project.createGeos();
             UpdateTrackPropsControls();
         }
 
@@ -1565,7 +1565,7 @@ namespace VisualMusic
                 return;
             }
             Project.Props.MaxPitch = (int)maxPitchUd.Value;
-            Project.createOcTrees();
+            Project.createGeos();
         }
 
         private void minPitchUd_ValueChanged(object sender, EventArgs e)
@@ -1575,7 +1575,7 @@ namespace VisualMusic
             if ((int)minPitchUd.Value > Project.Notes.MaxPitch)
                 minPitchUd.Value = Project.Notes.MaxPitch;
             Project.Props.MinPitch = (int)minPitchUd.Value;
-            Project.createOcTrees();
+            Project.createGeos();
         }
 
         void resetPitchLimits()
@@ -1585,7 +1585,7 @@ namespace VisualMusic
             maxPitchUd.Value = (decimal)Project.Props.MaxPitch;
             minPitchUd.Value = (decimal)Project.Props.MinPitch;
             updatingControls = false;
-            Project.createOcTrees();
+            Project.createGeos();
         }
 
         private void defaultPitchesBtn_Click(object sender, EventArgs e)
@@ -1629,7 +1629,7 @@ namespace VisualMusic
                     getActiveTexProps(i).UTile = ((CheckBox)sender).Checked;
                     getActiveTexProps(i).VTile = ((CheckBox)sender).Checked;
                 }
-                Project.createOcTrees();
+                Project.createGeos();
                 UpdateTrackPropsControls();
             }
         }
@@ -1655,7 +1655,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UTile = ((CheckBox)sender).Checked;
-            Project.createOcTrees();
+            Project.createGeos();
             UpdateTrackPropsControls();
         }
 
@@ -1665,7 +1665,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).VTile = ((CheckBox)sender).Checked;
-            Project.createOcTrees();
+            Project.createGeos();
             UpdateTrackPropsControls();
         }
 
@@ -1675,7 +1675,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UAnchor = getActiveTexProps(i).VAnchor = TexAnchorEnum.Note;
-            Project.createOcTrees();
+            Project.createGeos();
             UpdateTrackPropsControls();
         }
 
@@ -1685,7 +1685,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UAnchor = getActiveTexProps(i).VAnchor = TexAnchorEnum.Screen;
-            Project.createOcTrees();
+            Project.createGeos();
             UpdateTrackPropsControls();
         }
 
@@ -1695,7 +1695,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UAnchor = TexAnchorEnum.Song;
-            Project.createOcTrees();
+            Project.createGeos();
             UpdateTrackPropsControls();
         }
 
@@ -1705,7 +1705,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UAnchor = TexAnchorEnum.Note;
-            Project.createOcTrees();
+            Project.createGeos();
         }
 
         private void noteVAnchorRb_Click(object sender, EventArgs e)
@@ -1714,7 +1714,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).VAnchor = TexAnchorEnum.Note;
-            Project.createOcTrees();
+            Project.createGeos();
         }
 
         private void screenUAnchorRb_Click(object sender, EventArgs e)
@@ -1723,7 +1723,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UAnchor = TexAnchorEnum.Screen;
-            Project.createOcTrees();
+            Project.createGeos();
         }
 
         private void screenVAnchorRb_Click(object sender, EventArgs e)
@@ -1732,7 +1732,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).VAnchor = TexAnchorEnum.Screen;
-            Project.createOcTrees();
+            Project.createGeos();
         }
 
         private void songAnchorRb_Click(object sender, EventArgs e)
@@ -1741,7 +1741,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).UAnchor = TexAnchorEnum.Song;
-            Project.createOcTrees();
+            Project.createGeos();
         }
 
         private void texUScrollUD_ValueChanged(object sender, EventArgs e)
@@ -1766,7 +1766,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < trackList.SelectedIndices.Count; i++)
                 getActiveTexProps(i).KeepAspect = ((CheckBox)sender).Checked;
-            Project.createOcTrees();
+            Project.createGeos();
         }
 
         private void importSidSongToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2216,7 +2216,7 @@ namespace VisualMusic
             updateTrackListColors();
             UpdateTrackPropsControls();
             if ((typeFlags & (int)TrackPropsType.TPT_Style) != 0)
-                Project.createOcTrees();
+                Project.createGeos();
         }
         void saveTrackProps(int typeFlags)
         {
@@ -2353,7 +2353,7 @@ namespace VisualMusic
             }
             else
                 Project.TrackViews[0].TrackProps.ResetProps();
-            Project.createOcTrees();
+            Project.createGeos();
             UpdateTrackPropsControls();
             updateTrackListColors();
         }

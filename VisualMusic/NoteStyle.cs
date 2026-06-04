@@ -482,7 +482,41 @@ namespace VisualMusic
     public abstract class Geo : IDisposable
     {
         public List<BoundingBoxEx> bboxes = new List<BoundingBoxEx>();
-        public abstract void Dispose();
+        int refCount = 0;
+
+        public Geo AddRef()
+        {
+            refCount++;
+            return this;
+        }
+
+        public void Dispose()
+        {
+            if (refCount-- == 0)
+                throw new AccessViolationException("Object already disposed");
+            if (refCount > 0)
+                return;
+            releaseResources();
+        }
+
+        protected abstract void releaseResources();
+
+        public bool areObjectsInFrustum(BoundingFrustum frustum, float songPos, Project project, TrackProps trackProps)
+        {
+            foreach (var bbox in bboxes)
+            {
+                BoundingBoxEx bb = bbox.clone();
+                bb.scale(new Vector3(project.ViewWidthQnScale, 1, 1));
+
+                Vector3 posOffset = project.getSpatialNormPosOffset(trackProps);
+                posOffset.X -= songPos;
+                bb.translate(posOffset);
+
+                if (bb.intersects(frustum))
+                    return true;
+            }
+            return false;
+        }
     }
 
     public class BoundingBoxEx

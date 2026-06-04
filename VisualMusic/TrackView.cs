@@ -10,15 +10,15 @@ namespace VisualMusic
     public class TrackView : ISerializable
     {
 
-        OcTree<Geo> ocTree;
-        public OcTree<Geo> OcTree
+        Geo geo;
+        public Geo Geo
         {
             set
             {
-                ocTree?.Dispose();
-                ocTree = value?.AddRef();
+                geo?.Dispose();
+                geo = value?.AddRef();
             }
-            get => ocTree;
+            get => geo;
         }
         public TrackProps TrackProps { get; set; }
         int trackNumber;
@@ -125,7 +125,7 @@ namespace VisualMusic
                 TrackProps.ActiveNoteStyle.drawTrack(midiTrack, TrackProps, texMaterial);
         }
 
-        public void createOcTree(Project project, TrackProps globalTrackProps)
+        public void createGeo(Project project, TrackProps globalTrackProps)
         {
             if (MidiTrack.Notes.Count == 0)
                 return;
@@ -140,9 +140,8 @@ namespace VisualMusic
             MaterialProps texMaterial = TrackProps.MaterialProps.getTexture(false, null) != null ? TrackProps.MaterialProps : globalTrackProps.MaterialProps;
 
             NoteStyle noteStyle = TrackProps.ActiveNoteStyle;
-            OcTree = new OcTree<Geo>(minPos, maxPos - minPos, new Vector3(1000, 1000, 1000), noteStyle.createGeoChunk, noteStyle.drawGeoChunk);
-            OcTree.createGeo(midiTrack, TrackProps, globalTrackProps, texMaterial);
-            //TrackProps.SelectedNoteStyle.createOcTree(minPos, maxPos - minPos, midiTrack, songDrawProps, globalTrackProps, TrackProps, texMaterial);
+            noteStyle.createGeoChunk(out Geo newGeo, new BoundingBox(minPos, maxPos), midiTrack, TrackProps, texMaterial);
+            Geo = newGeo;
         }
 
         public TrackView clone()

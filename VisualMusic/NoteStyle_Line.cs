@@ -579,10 +579,10 @@ namespace VisualMusic
             fx.CurrentTechnique = fx.Techniques["Line"];
             fx.Parameters["DiscardAtOnce"].SetValue(true);
             fx.CurrentTechnique.Passes[0].Apply();
-            trackProps.TrackView.OcTree.drawGeo(Project.Props.Camera);
+            drawGeoChunk(trackProps.TrackView.Geo);
             fx.Parameters["DiscardAtOnce"].SetValue(false);
             fx.CurrentTechnique.Passes[0].Apply();
-            trackProps.TrackView.OcTree.drawGeo(Project.Props.Camera);
+            drawGeoChunk(trackProps.TrackView.Geo);
 
             DepthStencilState oldDss = GraphicsDevice.DepthStencilState;
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
@@ -735,7 +735,7 @@ namespace VisualMusic
     {
         public List<VertexBuffer> lineVb = new List<VertexBuffer>();
         public List<VertexBuffer> hLineVb = new List<VertexBuffer>();
-        public override void Dispose()
+        protected override void releaseResources()
         {
             foreach (var vb in lineVb)
                 vb.Dispose();

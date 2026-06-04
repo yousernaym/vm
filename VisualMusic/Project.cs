@@ -53,7 +53,7 @@ namespace VisualMusic
             set
             {
                 foreach (var tv in trackViews)
-                    tv.OcTree?.Dispose();
+                    tv.Geo?.Dispose();
                 trackViews = value;
             }
         }
@@ -507,7 +507,7 @@ namespace VisualMusic
                     tvCopy.Add(trackViews[i]);
             }
             trackViews = tvCopy;
-            createOcTrees(false);
+            createGeos(false);
         }
 
         void AddTrackView(TrackView view)
@@ -521,7 +521,7 @@ namespace VisualMusic
                 view.TrackProps.AudioProps.SidWizChannel.LoadDataAsync();
         }
 
-        public void createOcTrees(bool resetVertScale = true)
+        public void createGeos(bool resetVertScale = true)
         {
             if (trackViews == null || Props.ViewWidthQn == 0 || Notes == null)
                 return;
@@ -531,7 +531,7 @@ namespace VisualMusic
             else
                 Props.ViewWidthQn = vertViewWidthQn;
             for (int i = 1; i < trackViews.Count; i++)
-                TrackViews[i].createOcTree(this, GlobalTrackProps);
+                TrackViews[i].createGeo(this, GlobalTrackProps);
             Props.ViewWidthQn = viewWidthQnBackup;
         }
 
@@ -680,7 +680,7 @@ namespace VisualMusic
             }
             else
                 trackViews[0].TrackProps.ResetProps();
-            createOcTrees();
+            createGeos();
         }
 
         public double ticksToSeconds(double ticks)
@@ -1020,7 +1020,7 @@ namespace VisualMusic
                 //dest.trackViews[i] = trackViews[i].clone();
                 //dest.TrackViews[i].TrackProps.GlobalProps = dest.TrackViews[0].TrackProps;
                 dest.trackViews[i].MidiTrack = trackViews[i].MidiTrack;
-                dest.trackViews[i].OcTree = trackViews[i].OcTree;
+                dest.trackViews[i].Geo = trackViews[i].Geo;
                 dest.trackViews[i].Curve = trackViews[i].Curve;
                 dest.trackViews[i].TrackProps.AudioProps = trackViews[i].TrackProps.AudioProps;
             }
@@ -1040,7 +1040,7 @@ namespace VisualMusic
             // NREs the next time a chunk is loaded (e.g. after seeking).
             foreach (var tv in trackViews)
             {
-                tv.OcTree?.Dispose();
+                tv.Geo?.Dispose();
             }
         }
 

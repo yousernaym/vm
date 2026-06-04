@@ -368,7 +368,7 @@ namespace VisualMusic
                         if (tprops.ActiveNoteStyle.GetType() != typeof(NoteStyle_Bar))
                         {
                             tprops.StyleProps.Type = NoteStyleType.Bar;
-                            Project.TrackViews[t].createOcTree(Project, Project.GlobalTrackProps);
+                            Project.TrackViews[t].createGeo(Project, Project.GlobalTrackProps);
                             tprops.StyleProps.Type = currentNoteStyle;
                         }
                     }
@@ -454,7 +454,7 @@ namespace VisualMusic
                 for (int i = 1; i < Project.TrackViews.Count; i++)
                 {
                     if (Project.TrackViews[i].MidiTrack.Notes.Count > 0 &&
-                        Project.TrackViews[i].OcTree.areObjectsInFrustum(selectionFrustum, Project.SongPosP - Project.PlaybackOffsetP, Project, Project.TrackViews[i].TrackProps))
+                        Project.TrackViews[i].Geo.areObjectsInFrustum(selectionFrustum, Project.SongPosP - Project.PlaybackOffsetP, Project, Project.TrackViews[i].TrackProps))
                     {
                         trackSelection.SetTrackSelected(i, true);
                         selectedCount++;

@@ -48,7 +48,7 @@ namespace VisualMusic
             //SongPanel.Invalidate();
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().LineType = (LineType)lineTypeList.SelectedIndex;
-            SongPanel.Project.createOcTrees();
+            SongPanel.Project.createGeos();
         }
 
         private void lineWidthUd_ValueChanged(object sender, EventArgs e)
@@ -57,7 +57,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().LineWidth = (float)lineWidthUd.Value;
-            SongPanel.Project.createOcTrees();
+            SongPanel.Project.createGeos();
         }
 
         private void qnGapFillUd_ValueChanged(object sender, EventArgs e)
@@ -66,7 +66,7 @@ namespace VisualMusic
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().Qn_gapThreshold = (int)qnGapFillUd.Value;
-            SongPanel.Project.createOcTrees();
+            SongPanel.Project.createGeos();
         }
 
         private void lineHlTypeList_SelectedIndexChanged(object sender, EventArgs e)

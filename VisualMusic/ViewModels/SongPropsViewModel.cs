@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Linq;
 
@@ -17,9 +17,9 @@ namespace VisualMusic.ViewModels
 
         // ---- Write-back callbacks (set by MainViewModel) ----
 
-        public Action CreateOcTrees { get; set; }
+        public Action CreateGeos { get; set; }
 
-        /// <summary>Called on slider release — rebuilds octrees and adds an undo entry.</summary>
+        /// <summary>Called on slider release — rebuilds track geometry and adds an undo entry.</summary>
         public Action CommitViewWidth { get; set; }
 
         public Action ResetPitches { get; set; }
@@ -149,7 +149,7 @@ namespace VisualMusic.ViewModels
                 int? minNote = NotesMinPitch?.Invoke();
                 if (minNote.HasValue && v < minNote.Value) v = minNote.Value;
                 Props.MaxPitch = v;
-                CreateOcTrees?.Invoke();
+                CreateGeos?.Invoke();
                 OnPropertyChanged();
             }
         }
@@ -164,7 +164,7 @@ namespace VisualMusic.ViewModels
                 int? maxNote = NotesMaxPitch?.Invoke();
                 if (maxNote.HasValue && v > maxNote.Value) v = maxNote.Value;
                 Props.MinPitch = v;
-                CreateOcTrees?.Invoke();
+                CreateGeos?.Invoke();
                 OnPropertyChanged();
             }
         }

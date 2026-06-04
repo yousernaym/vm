@@ -133,7 +133,7 @@ namespace VisualMusic
         {
             float songPosP;
             base.drawTrack(midiTrack, trackProps, texMaterial, out songPosP);
-            trackProps.TrackView.OcTree.drawGeo(Project.Props.Camera);
+            drawGeoChunk(trackProps.TrackView.Geo);
         }
 
         public static void sInit()
@@ -170,7 +170,7 @@ namespace VisualMusic
     public class BarGeo : Geo
     {
         public List<VertexBufferBinding> instanceBindingList = new List<VertexBufferBinding>();
-        public override void Dispose()
+        protected override void releaseResources()
         {
             foreach (var vb in instanceBindingList)
                 vb.VertexBuffer.Dispose();

@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
@@ -103,7 +103,7 @@ namespace VisualMusic.ViewModels
             {
                 foreach (var item in TrackList.SelectedItems)
                     fn(item.TrackView.TrackProps);
-                project?.createOcTrees();
+                project?.createGeos();
             };
 
             SelectedTrackProps.LoadTexture = path =>
@@ -121,7 +121,7 @@ namespace VisualMusic.ViewModels
                     MessageBox.Show(ex.Message, Program.AppName,
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                project.createOcTrees();
+                project.createGeos();
                 OnTrackListSelectionChanged();
             };
 
@@ -129,7 +129,7 @@ namespace VisualMusic.ViewModels
             {
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.MaterialProps.TexProps.unloadTexture();
-                project?.createOcTrees();
+                project?.createGeos();
                 OnTrackListSelectionChanged();
             };
 
@@ -163,7 +163,7 @@ namespace VisualMusic.ViewModels
             {
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.ResetStyle();
-                project?.createOcTrees();
+                project?.createGeos();
                 OnTrackListSelectionChanged();
             };
 
@@ -171,7 +171,7 @@ namespace VisualMusic.ViewModels
             {
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.ResetMaterial();
-                project?.createOcTrees();
+                project?.createGeos();
                 OnTrackListSelectionChanged();
             };
 
@@ -250,7 +250,7 @@ namespace VisualMusic.ViewModels
                 if (!changed) return;
 
                 if ((flag & ((int)TrackPropsType.TPT_Style | (int)TrackPropsType.TPT_Material)) != 0)
-                    project.createOcTrees();   // geometry/texture coords are baked per track
+                    project.createGeos();   // geometry/texture coords are baked per track
                 if (flag == (int)TrackPropsType.TPT_Material)
                     TrackList.RefreshColors(); // update the two color swatches in the list
                 OnTrackListSelectionChanged(); // refresh the tabs for the (still-selected) dragged tracks
@@ -269,18 +269,18 @@ namespace VisualMusic.ViewModels
 
         void WireSongPropsCallbacks()
         {
-            SongProps.CreateOcTrees = () => project?.createOcTrees();
+            SongProps.CreateGeos = () => project?.createGeos();
 
             SongProps.CommitViewWidth = () =>
             {
-                project?.createOcTrees();
+                project?.createGeos();
                 AddUndoItem("Edit Viewport Width");
             };
 
             SongProps.ResetPitches = () =>
             {
                 project?.resetPitchLimits();
-                project?.createOcTrees();
+                project?.createGeos();
                 SongProps.RefreshAll();
             };
 
@@ -865,7 +865,7 @@ namespace VisualMusic.ViewModels
             // Apply to the global (index 0) track — full track-list editing comes in a later phase.
             project.TrackViews[0].TrackProps.cloneFrom(props, (int)TrackPropsType.TPT_All);
             if ((props.TypeFlags & (int)TrackPropsType.TPT_Style) != 0)
-                project.createOcTrees();
+                project.createGeos();
             AddUndoItem("Load Track Properties");
         }
 
@@ -900,7 +900,7 @@ namespace VisualMusic.ViewModels
         {
             foreach (var tv in project.TrackViews)
                 tv.TrackProps.ResetProps();
-            project.createOcTrees();
+            project.createGeos();
             AddUndoItem("Default Track Properties");
         }
 

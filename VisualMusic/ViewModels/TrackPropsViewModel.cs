@@ -28,7 +28,7 @@ namespace VisualMusic.ViewModels
         /// <summary>Apply a mutation to all selected TrackProps, then repaint.</summary>
         public Action<Action<TrackProps>> ApplyToSelected { get; set; }
 
-        /// <summary>Apply + rebuild octrees (needed for style/geometry changes).</summary>
+        /// <summary>Apply + rebuild track geometry (needed for style/geometry changes).</summary>
         public Action<Action<TrackProps>> ApplyAndRebuild { get; set; }
 
         void Apply(Action<TrackProps> fn) => ApplyToSelected?.Invoke(fn);
@@ -461,7 +461,7 @@ namespace VisualMusic.ViewModels
         public bool? UTile
         {
             get => TexProps?.UTile;
-            // Bug fix: route through Rebuild so createOcTrees() is called (tex coords baked into geometry)
+            // Bug fix: route through Rebuild so createGeos() is called (tex coords baked into geometry)
             set { Rebuild(tp => tp.MaterialProps.TexProps.UTile = value ?? false); OnPropertyChanged(); }
         }
 
