@@ -12,7 +12,7 @@ namespace VisualMusic
     {
         public event EventHandler SelectionChanged;
 
-        bool mouseDown = false;
+        bool _mouseDown = false;
         float _x;
         protected float X
         {
@@ -68,12 +68,12 @@ namespace VisualMusic
                 SelectionChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-        protected PointF origin = new PointF(0, 0);
-        protected Pen SelectionPen = new Pen(Color.Black, 2);
+        protected PointF _origin = new PointF(0, 0);
+        protected Pen _selectionPen = new Pen(Color.Black, 2);
         public Color SetSelectionColor
         {
-            get => SelectionPen.Color;
-            set => SelectionPen.Color = value;
+            get => _selectionPen.Color;
+            set => _selectionPen.Color = value;
         }
         public int SelectionSize { get; set; } = 20;
 
@@ -86,28 +86,28 @@ namespace VisualMusic
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            e.Graphics.DrawLine(SelectionPen, new Point(SelectionPointCoords.X - SelectionSize / 2, SelectionPointCoords.Y), new Point(SelectionPointCoords.X + SelectionSize / 2, SelectionPointCoords.Y));
-            e.Graphics.DrawLine(SelectionPen, new Point(SelectionPointCoords.X, SelectionPointCoords.Y - SelectionSize / 2), new Point(SelectionPointCoords.X, SelectionPointCoords.Y + SelectionSize / 2));
+            e.Graphics.DrawLine(_selectionPen, new Point(SelectionPointCoords.X - SelectionSize / 2, SelectionPointCoords.Y), new Point(SelectionPointCoords.X + SelectionSize / 2, SelectionPointCoords.Y));
+            e.Graphics.DrawLine(_selectionPen, new Point(SelectionPointCoords.X, SelectionPointCoords.Y - SelectionSize / 2), new Point(SelectionPointCoords.X, SelectionPointCoords.Y + SelectionSize / 2));
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
             SelectionPointCoords = new Point(e.X, e.Y);
-            mouseDown = true;
+            _mouseDown = true;
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            if (mouseDown)
+            if (_mouseDown)
                 SelectionPointCoords = new Point(e.X, e.Y);
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            mouseDown = false;
+            _mouseDown = false;
         }
     }
 

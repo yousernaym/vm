@@ -314,18 +314,18 @@ namespace VisualMusic.Controls
         double _lineY;
         Rect _boxRect;
 
-        static readonly Pen LinePen;
-        static readonly Pen BoxPen;
-        static readonly SolidColorBrush BoxFill;
+        static readonly Pen s_linePen;
+        static readonly Pen s_boxPen;
+        static readonly SolidColorBrush s_boxFill;
 
         static DragAdorner()
         {
-            LinePen = new Pen(new SolidColorBrush(Color.FromRgb(51, 153, 255)), 2);
-            LinePen.Freeze();
-            BoxPen = new Pen(new SolidColorBrush(Color.FromRgb(51, 153, 255)), 2);
-            BoxPen.Freeze();
-            BoxFill = new SolidColorBrush(Color.FromArgb(40, 51, 153, 255));
-            BoxFill.Freeze();
+            s_linePen = new Pen(new SolidColorBrush(Color.FromRgb(51, 153, 255)), 2);
+            s_linePen.Freeze();
+            s_boxPen = new Pen(new SolidColorBrush(Color.FromRgb(51, 153, 255)), 2);
+            s_boxPen.Freeze();
+            s_boxFill = new SolidColorBrush(Color.FromArgb(40, 51, 153, 255));
+            s_boxFill.Freeze();
         }
 
         public DragAdorner(UIElement adornedElement) : base(adornedElement)
@@ -359,10 +359,10 @@ namespace VisualMusic.Controls
             switch (_mode)
             {
                 case Mode.InsertLine:
-                    dc.DrawLine(LinePen, new Point(0, _lineY), new Point(width, _lineY));
+                    dc.DrawLine(s_linePen, new Point(0, _lineY), new Point(width, _lineY));
                     break;
                 case Mode.TargetBox:
-                    dc.DrawRectangle(BoxFill, BoxPen, _boxRect);
+                    dc.DrawRectangle(s_boxFill, s_boxPen, _boxRect);
                     break;
             }
         }

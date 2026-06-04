@@ -24,7 +24,7 @@ namespace VisualMusic.Controls
         Midi.FileType _fileType;
 
         // ---- In-memory session cache (resets to defaults after app restart) ----
-        static readonly Dictionary<Midi.FileType, (bool Erase, string NotePath, string AudioPath, bool InsTrack)> _session = new();
+        static readonly Dictionary<Midi.FileType, (bool Erase, string NotePath, string AudioPath, bool InsTrack)> s_session = new();
 
         /// <summary>
         /// Update the session cache for <paramref name="type"/> without opening the dialog.
@@ -32,7 +32,7 @@ namespace VisualMusic.Controls
         /// if the user opens it manually afterward.
         /// </summary>
         internal static void UpdateSession(Midi.FileType type, bool erase, string notePath, string audioPath, bool insTrack)
-            => _session[type] = (erase, notePath, audioPath, insTrack);
+            => s_session[type] = (erase, notePath, audioPath, insTrack);
 
         // ---- Bound properties ----
 
@@ -115,7 +115,7 @@ namespace VisualMusic.Controls
             InsTrack = AppSettings.Instance.GetInsTrack(fileType);
 
             // Restore in-memory session values (resets to defaults after app restart)
-            if (_session.TryGetValue(fileType, out var s))
+            if (s_session.TryGetValue(fileType, out var s))
             {
                 EraseCurrent  = s.Erase;
                 NoteFilePath  = s.NotePath;
@@ -198,7 +198,7 @@ namespace VisualMusic.Controls
             AppSettings.Instance.Save();
 
             // Remember all fields for the rest of this session
-            _session[_fileType] = (EraseCurrent, NoteFilePath, AudioFilePath, InsTrack);
+            s_session[_fileType] = (EraseCurrent, NoteFilePath, AudioFilePath, InsTrack);
 
             DialogResult = true;
         }

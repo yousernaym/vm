@@ -9,11 +9,11 @@ namespace VisualMusic
     public partial class ImportNotesWithAudioForm : SourceFileForm
     {
         //AutoResetEvent tpartyDoneEvent = new AutoResetEvent(false);
-        static Process tpartyProcess;
-        static FileSystemWatcher watcher;
-        static string tpartyOutputFile;
+        static Process s_tpartyProcess;
+        static FileSystemWatcher s_watcher;
+        static string s_tpartyOutputFile;
 
-        CommonOpenFileDialog tpartyAudioDirDlg = new CommonOpenFileDialog();
+        CommonOpenFileDialog _tpartyAudioDirDlg = new CommonOpenFileDialog();
 
         public ImportNotesWithAudioForm()
         {
@@ -24,35 +24,35 @@ namespace VisualMusic
             InitializeComponent();
             existingAudioRbtn.Checked = true;
 
-            if (watcher != null)
-                watcher.Dispose();
-            watcher = new FileSystemWatcher();
-            watcher.Changed += new FileSystemEventHandler(OnChanged);
+            if (s_watcher != null)
+                s_watcher.Dispose();
+            s_watcher = new FileSystemWatcher();
+            s_watcher.Changed += new FileSystemEventHandler(OnChanged);
 
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
-            watcher.Filter = "*.wav";
+            s_watcher.NotifyFilter = NotifyFilters.LastWrite;
+            s_watcher.Filter = "*.wav";
 
-            tpartyAudioDirDlg.IsFolderPicker = true;
-            tpartyAudioDirDlg.EnsurePathExists = true;
+            _tpartyAudioDirDlg.IsFolderPicker = true;
+            _tpartyAudioDirDlg.EnsurePathExists = true;
         }
 
-        private void existingAudioRbtn_CheckedChanged(object sender, EventArgs e)
+        private void ExistingAudioRbtn_CheckedChanged(object sender, EventArgs e)
         {
             audioFilePath.Enabled = BrowseAudioBtn.Enabled = existingAudioRbtn.Checked;
             tPartyMixdownPnl.Enabled = !existingAudioRbtn.Checked;
         }
 
-        private void browseTpartyExeBtn_Click(object sender, EventArgs e)
+        private void BrowseTpartyExeBtn_Click(object sender, EventArgs e)
         {
             if (openTpartyExeDlg.ShowDialog() == DialogResult.OK)
                 tpartyAppTb.Text = openTpartyExeDlg.FileName;
         }
 
-        private void browseTpartyOutputBtn_Click(object sender, EventArgs e)
+        private void BrowseTpartyOutputBtn_Click(object sender, EventArgs e)
         {
-            tpartyAudioDirDlg.InitialDirectory = tpartyOutputTb.Text;
-            if (tpartyAudioDirDlg.ShowDialog() == CommonFileDialogResult.Ok)
-                tpartyOutputTb.Text = tpartyAudioDirDlg.InitialDirectory = tpartyAudioDirDlg.FileName;
+            _tpartyAudioDirDlg.InitialDirectory = tpartyOutputTb.Text;
+            if (_tpartyAudioDirDlg.ShowDialog() == CommonFileDialogResult.Ok)
+                tpartyOutputTb.Text = _tpartyAudioDirDlg.InitialDirectory = _tpartyAudioDirDlg.FileName;
         }
 
         new protected void ImportFiles(ImportOptions options)
@@ -66,16 +66,16 @@ namespace VisualMusic
                     if (options.MixdownType == Midi.MixdownType.Tparty)
                     {   //Mixdown with xmplay
                         options.MixdownOutputDir = TpartyIntegrationForm.MixdownOutputDir;
-                        base.importFiles(options);
+                        base.ImportFiles(options);
                     }
                     else
                     {   //Mixdown internally
-                        base.importFiles(options);
+                        base.ImportFiles(options);
                     }
                 }
                 else
                 {   //No mixdown
-                    base.importFiles(options);
+                    base.ImportFiles(options);
                 }
             }
             else
@@ -84,69 +84,69 @@ namespace VisualMusic
                 options.MixdownAppPath = tpartyAppTb.Text;
                 options.MixdownAppArgs = tpartyArgsTb.Text;
                 options.MixdownOutputDir = tpartyOutputTb.Text;
-                base.importFiles(options);
+                base.ImportFiles(options);
             }
         }
 
-        static public string runTpartyProcess(ImportOptions options)
+        static public string RunTpartyProcess(ImportOptions options)
         {
-            if (!createTpartyProcess(options))
+            if (!CreateTpartyProcess(options))
                 return null;
             string processName = "";
             try
             {
-                tpartyOutputFile = null;
-                tpartyProcess.Start();
-                processName = tpartyProcess.ProcessName;
-                tpartyProcess.WaitForExit();
-                watcher.EnableRaisingEvents = false;
+                s_tpartyOutputFile = null;
+                s_tpartyProcess.Start();
+                processName = s_tpartyProcess.ProcessName;
+                s_tpartyProcess.WaitForExit();
+                s_watcher.EnableRaisingEvents = false;
                 Program.form1.Activate();
-                if (tpartyOutputFile == null)
-                    Form1.showWarningMsgBox("Couldn't find audio mixdown at " + options.MixdownOutputDir);
+                if (s_tpartyOutputFile == null)
+                    Form1.ShowWarningMsgBox("Couldn't find audio mixdown at " + options.MixdownOutputDir);
                 else
                 {
                     File.Delete(Program.MixdownPath);
-                    File.Move(tpartyOutputFile, Program.MixdownPath);
-                    tpartyOutputFile = Program.MixdownPath;
+                    File.Move(s_tpartyOutputFile, Program.MixdownPath);
+                    s_tpartyOutputFile = Program.MixdownPath;
                 }
             }
             catch (Exception e)
             {
-                Form1.showWarningMsgBox(e.Message, $"An unexpected error occurred with process: {tpartyProcess.StartInfo.FileName}");
+                Form1.ShowWarningMsgBox(e.Message, $"An unexpected error occurred with process: {s_tpartyProcess.StartInfo.FileName}");
                 return null;
             }
 
-            return tpartyOutputFile;
+            return s_tpartyOutputFile;
         }
 
-        static bool createTpartyProcess(ImportOptions options)
+        static bool CreateTpartyProcess(ImportOptions options)
         {
             if (!Directory.Exists(options.MixdownOutputDir))
             {
-                Form1.showWarningMsgBox("Couldn't find mixdown directory: \n" + options.MixdownOutputDir);
+                Form1.ShowWarningMsgBox("Couldn't find mixdown directory: \n" + options.MixdownOutputDir);
                 return false;
             }
-            try { watcher.Path = options.MixdownOutputDir; }
+            try { s_watcher.Path = options.MixdownOutputDir; }
             catch (System.ArgumentException e)
             {
-                Form1.showWarningMsgBox(e.Message);
+                Form1.ShowWarningMsgBox(e.Message);
                 return false;
             }
 
-            watcher.EnableRaisingEvents = true;
+            s_watcher.EnableRaisingEvents = true;
 
-            if (tpartyProcess != null)
-                tpartyProcess.Dispose();
-            tpartyProcess = new Process();
-            tpartyProcess.StartInfo.FileName = options.MixdownAppPath;
-            tpartyProcess.StartInfo.Arguments = options.MixdownAppArgs?.Replace("%notefilepath", options.NotePath);
+            if (s_tpartyProcess != null)
+                s_tpartyProcess.Dispose();
+            s_tpartyProcess = new Process();
+            s_tpartyProcess.StartInfo.FileName = options.MixdownAppPath;
+            s_tpartyProcess.StartInfo.Arguments = options.MixdownAppArgs?.Replace("%notefilepath", options.NotePath);
             return true;
         }
 
         static private void OnChanged(object sender, FileSystemEventArgs e)
         {
             //Console.WriteLine("OnChanged");
-            watcher.EnableRaisingEvents = false;
+            s_watcher.EnableRaisingEvents = false;
             var file = new FileInfo(e.FullPath);
             FileStream stream = null;
             while (stream == null)
@@ -164,17 +164,17 @@ namespace VisualMusic
                     if (stream != null)
                         stream.Close();
                 }
-                if (tpartyProcess.HasExited && stream == null)
+                if (s_tpartyProcess.HasExited && stream == null)
                     return;
             }
-            tpartyOutputFile = e.FullPath;
+            s_tpartyOutputFile = e.FullPath;
             //tpartyDoneEvent.Set();
             //Process[] components = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tpartyProcess.StartInfo.FileName)));
             //if (components.Length > 0)R
             //{
-            if (!tpartyProcess.HasExited)
+            if (!s_tpartyProcess.HasExited)
             {
-                tpartyProcess.Kill();
+                s_tpartyProcess.Kill();
             }
         }
     }

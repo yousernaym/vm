@@ -21,12 +21,12 @@ namespace VisualMusic
             InitializeComponent();
         }
 
-        private void twoDHueSat1_SelectionChanged(object sender, EventArgs e)
+        private void TwoDHueSat1_SelectionChanged(object sender, EventArgs e)
         {
             SelectionChanged?.Invoke(sender, e);
         }
 
-        private void okBtn_Click(object sender, EventArgs e)
+        private void OkBtn_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
         }

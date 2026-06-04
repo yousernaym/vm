@@ -23,7 +23,7 @@ namespace VisualMusic
             set { audioFilePath.Text = value; }
         }
 
-        protected Form1 parent;
+        protected Form1 _parent;
         public string NoteFolder
         {
             get { return openNoteFileDlg.InitialDirectory; }
@@ -57,12 +57,12 @@ namespace VisualMusic
         }
         public SourceFileForm(Form1 _parent)
         {
-            parent = _parent;
+            _parent = _parent;
             InitializeComponent();
         }
 
 
-        private void browseNoteBtn_Click(object sender, EventArgs e)
+        private void BrowseNoteBtn_Click(object sender, EventArgs e)
         {
             openNoteFileDlg.ShowDialog();
             Ok.Focus();
@@ -74,24 +74,24 @@ namespace VisualMusic
             Ok.Focus();
         }
 
-        private void openNoteFileDlg_FileOk(object sender, CancelEventArgs e)
+        private void OpenNoteFileDlg_FileOk(object sender, CancelEventArgs e)
         {
             noteFilePath.Text = openNoteFileDlg.FileName;
             NoteFolder = Path.GetDirectoryName(noteFilePath.Text);
         }
 
-        private void openAudioFileDlg_FileOk(object sender, CancelEventArgs e)
+        private void OpenAudioFileDlg_FileOk(object sender, CancelEventArgs e)
         {
             audioFilePath.Text = openAudioFileDlg.FileName;
             AudioFolder = Path.GetDirectoryName(audioFilePath.Text);
         }
 
-        private void noteFilePath_TextChanged(object sender, EventArgs e)
+        private void NoteFilePath_TextChanged(object sender, EventArgs e)
         {
             //DownloadedFilePath = null;
         }
 
-        private void audioFilePath_TextChanged(object sender, EventArgs e)
+        private void AudioFilePath_TextChanged(object sender, EventArgs e)
         {
             //AudioFilePath = audioFilePath.Text;
         }
@@ -101,7 +101,7 @@ namespace VisualMusic
             throw new NotImplementedException();
         }
 
-        async protected void importFiles(ImportOptions options)
+        async protected void ImportFiles(ImportOptions options)
         {
             try
             {
@@ -109,17 +109,17 @@ namespace VisualMusic
             }
             catch (FileImportException ex)
             {
-                Form1.showErrorMsgBox(ex.Message + "\r\n" + ex.FileName);
+                Form1.ShowErrorMsgBox(ex.Message + "\r\n" + ex.FileName);
                 return;
             }
             try
             {
-                if (!await parent.OpenSourceFiles(options, this))
+                if (!await _parent.OpenSourceFiles(options, this))
                     return;
             }
             catch (FileImportException ex)
             {
-                Form1.showErrorMsgBox("Couldn't read note file.\r\n" + ex.Message);
+                Form1.ShowErrorMsgBox("Couldn't read note file.\r\n" + ex.Message);
                 return;
             }
             DialogResult = DialogResult.OK;
@@ -168,11 +168,11 @@ namespace VisualMusic
             }
         }
 
-        string rawNotePath;
+        string _rawNotePath;
         public string RawNotePath
         {
-            get => rawNotePath; //Note path as entered at import, either local file or url.
-            set => rawNotePath = value;
+            get => _rawNotePath; //Note path as entered at import, either local file or url.
+            set => _rawNotePath = value;
         }
 
         new public string NotePath
@@ -205,7 +205,7 @@ namespace VisualMusic
             RawNotePath = ImportForm.NoteFilePath;
             try
             {
-                setNotePath();
+                SetNotePath();
             }
             catch (FileImportException)
             {
@@ -276,7 +276,7 @@ namespace VisualMusic
             info.AddValue("savedMidi", SavedMidi);
         }
 
-        public void updateImportForm()
+        public void UpdateImportForm()
         {
             if (Form1.ImportMidiForm == null) return; // WPF path — no WinForms import dialogs
             //Clear all forms before update
@@ -311,23 +311,23 @@ namespace VisualMusic
             {
                 if (!File.Exists(AudioPath))
                     throw new FileImportException("Audio file not found", ImportError.Missing, ImportFileType.Audio, AudioPath);
-                else if (!Media.openAudioFile(AudioPath))
+                else if (!Media.OpenAudioFile(AudioPath))
                     throw new FileImportException("Couldn't read audio file", ImportError.Corrupt, ImportFileType.Audio, AudioPath);
             }
         }
 
-        public void setNotePath()
+        public void SetNotePath()
         {
             if (SavedMidi)
                 return;
-            if (rawNotePath.IsUrl())
+            if (_rawNotePath.IsUrl())
             {
-                NotePath = rawNotePath.downloadFile();
+                NotePath = _rawNotePath.DownloadFile();
                 if (string.IsNullOrEmpty(NotePath))
-                    throw new FileImportException("", ImportError.Missing, ImportFileType.Note, rawNotePath);
+                    throw new FileImportException("", ImportError.Missing, ImportFileType.Note, _rawNotePath);
             }
             else
-                NotePath = rawNotePath;
+                NotePath = _rawNotePath;
         }
     }
 }

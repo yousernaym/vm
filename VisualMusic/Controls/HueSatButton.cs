@@ -25,7 +25,7 @@ namespace VisualMusic
         }
         public Color SelectedColor
         {
-            get => toGdiColor();
+            get => ToGdiColor();
             set
             {
                 HslColor c = value;
@@ -34,7 +34,7 @@ namespace VisualMusic
                 if (value == Color.Black) //signaling that two or more selected tracks had different color. Set to black since HueSatButton colors can never be black normally.
                     BackColor = Color.Black;
                 else
-                    updateColor();
+                    UpdateColor();
             }
         }
 
@@ -42,37 +42,37 @@ namespace VisualMusic
 
         public HueSatButton()
         {
-            form.SelectionChanged += form_SelectionChanged;
-            Click += this_Click;
+            form.SelectionChanged += Form_SelectionChanged;
+            Click += This_Click;
             Text = "";
         }
 
-        private void this_Click(object sender, EventArgs e)
+        private void This_Click(object sender, EventArgs e)
         {
             float hue = Hue, sat = Saturation;
             if (form.ShowDialog() != DialogResult.OK)
             {
                 Hue = hue;
                 Saturation = sat;
-                updateColor();
+                UpdateColor();
                 ColorChanged?.Invoke(this, new ColorChangedTventArgs(true));
             }
             else
                 ColorSubmitted?.Invoke(this, new EventArgs());
         }
 
-        private void form_SelectionChanged(object sender, EventArgs e)
+        private void Form_SelectionChanged(object sender, EventArgs e)
         {
-            updateColor();
+            UpdateColor();
             ColorChanged?.Invoke(this, new ColorChangedTventArgs(false));
         }
 
-        void updateColor()
+        void UpdateColor()
         {
-            BackColor = toGdiColor();
+            BackColor = ToGdiColor();
         }
 
-        Color toGdiColor()
+        Color ToGdiColor()
         {
             return new HslColor(Hue, Saturation, 0.5 + (1 - Saturation) / 2);
         }

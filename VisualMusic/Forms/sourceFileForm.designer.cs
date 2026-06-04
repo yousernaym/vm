@@ -49,7 +49,7 @@
 			resources.ApplyResources(this.browseNoteBtn, "browseNoteBtn");
 			this.browseNoteBtn.Name = "browseNoteBtn";
 			this.browseNoteBtn.UseVisualStyleBackColor = true;
-			this.browseNoteBtn.Click += new System.EventHandler(this.browseNoteBtn_Click);
+			this.browseNoteBtn.Click += new System.EventHandler(this.BrowseNoteBtn_Click);
 			// 
 			// BrowseAudioBtn
 			// 
@@ -72,13 +72,13 @@
 			// 
 			resources.ApplyResources(this.noteFilePath, "noteFilePath");
 			this.noteFilePath.Name = "noteFilePath";
-			this.noteFilePath.TextChanged += new System.EventHandler(this.noteFilePath_TextChanged);
+			this.noteFilePath.TextChanged += new System.EventHandler(this.NoteFilePath_TextChanged);
 			// 
 			// audioFilePath
 			// 
 			resources.ApplyResources(this.audioFilePath, "audioFilePath");
 			this.audioFilePath.Name = "audioFilePath";
-			this.audioFilePath.TextChanged += new System.EventHandler(this.audioFilePath_TextChanged);
+			this.audioFilePath.TextChanged += new System.EventHandler(this.AudioFilePath_TextChanged);
 			// 
 			// Cancel
 			// 
@@ -90,12 +90,12 @@
 			// openNoteFileDlg
 			// 
 			resources.ApplyResources(this.openNoteFileDlg, "openNoteFileDlg");
-			this.openNoteFileDlg.FileOk += new System.ComponentModel.CancelEventHandler(this.openNoteFileDlg_FileOk);
+			this.openNoteFileDlg.FileOk += new System.ComponentModel.CancelEventHandler(this.OpenNoteFileDlg_FileOk);
 			// 
 			// openAudioFileDlg
 			// 
 			resources.ApplyResources(this.openAudioFileDlg, "openAudioFileDlg");
-			this.openAudioFileDlg.FileOk += new System.ComponentModel.CancelEventHandler(this.openAudioFileDlg_FileOk);
+			this.openAudioFileDlg.FileOk += new System.ComponentModel.CancelEventHandler(this.OpenAudioFileDlg_FileOk);
 			// 
 			// eraseCurrent
 			// 

@@ -13,14 +13,14 @@ namespace VisualMusic
 
         public bool Cancel { get; set; }
         public object cancelLock = new object();
-        bool finished = false;
-        SongPanel songPanel;
+        bool _finished = false;
+        SongPanel _songPanel;
 
-        ProgressAtTime[] progressBuf = new ProgressAtTime[100];
+        ProgressAtTime[] _progressBuf = new ProgressAtTime[100];
 
-        public new void updateProgress(double progress)
+        public new void UpdateProgress(double progress)
         {
-            Invoke(new Delegate_updateProgress(base.updateProgress), progress);
+            Invoke(new Delegate_updateProgress(base.UpdateProgress), progress);
         }
 
         public RenderProgressForm()
@@ -30,20 +30,20 @@ namespace VisualMusic
         public RenderProgressForm(SongPanel _songPanel, string file, VideoExportOptions options)
         {
             InitializeComponent();
-            songPanel = _songPanel;
+            _songPanel = _songPanel;
             Cancel = false;
-            Task.Run(() => songPanel.renderVideo(file, this, options)).ContinueWith(renderingFinished);
+            Task.Run(() => _songPanel.RenderVideo(file, this, options)).ContinueWith(RenderingFinished);
             ProgressText = "Render progress";
         }
 
-        void renderingFinished(IAsyncResult result)
+        void RenderingFinished(IAsyncResult result)
         {
-            finished = true;
+            _finished = true;
             Delegate_renderVideo rv = (Delegate_renderVideo)result.AsyncState;
-            Invoke(new Delegate_void_noparams(closeForm));
+            Invoke(new Delegate_void_noparams(CloseForm));
         }
 
-        void closeForm()
+        void CloseForm()
         {
             if (Cancel)
                 DialogResult = DialogResult.Cancel;
@@ -57,7 +57,7 @@ namespace VisualMusic
 
         private void RenderProgressForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (finished != true)
+            if (_finished != true)
             {
                 e.Cancel = true;
                 using (StopRenderingMb cancelMb = new StopRenderingMb())
@@ -71,7 +71,7 @@ namespace VisualMusic
             }
         }
 
-        public void showMessage(string message)
+        public void ShowMessage(string message)
         {
             Invoke(new Delegate_void_string(_showMessage), message);
         }

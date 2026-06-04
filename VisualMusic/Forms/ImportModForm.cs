@@ -37,13 +37,13 @@ namespace VisualMusic
     [Serializable()]
     class ModImportOptions : ImportOptions
     {
-        static string[] XmPlayFormats = { "IT", "XM", "S3M", "MTM", "MOD", "UMX", "MO3" };
+        static string[] s_xmPlayFormats = { "IT", "XM", "S3M", "MTM", "MOD", "UMX", "MO3" };
         //new ImportModForm ImportForm;
         public ModImportOptions() : base(Midi.FileType.Mod)
         {
             //ImportForm = (ImportModForm)base.ImportForm; //Cast base import form to ModImportForm to access InsTrack property
             string ext = NotePath?.Split('.').Last().ToUpper();
-            bool xmPlayMixdownSupported = XmPlayFormats.Contains(ext);
+            bool xmPlayMixdownSupported = s_xmPlayFormats.Contains(ext);
             MixdownType = xmPlayMixdownSupported && Form1.TpartyIntegrationForm.ModuleMixdown ? Midi.MixdownType.Tparty : Midi.MixdownType.Internal;
             //InsTrack = ImportForm.InsTrack;
             MixdownAppPath = TpartyIntegrationForm.XmPlayPath;

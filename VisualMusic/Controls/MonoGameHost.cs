@@ -70,27 +70,27 @@ namespace VisualMusic
         // so the only thing ever shown is what MonoGame presents — no white flashes on
         // resize. Registered once per process; the delegate is held alive in a static field.
         const string WindowClassName = "VMMonoGameHost";
-        static WndProcDelegate _classWndProc;
-        static ushort _classAtom;
+        static WndProcDelegate s_classWndProc;
+        static ushort s_classAtom;
 
         static void EnsureWindowClassRegistered()
         {
-            if (_classAtom != 0)
+            if (s_classAtom != 0)
                 return;
 
-            _classWndProc = DefWindowProc;
+            s_classWndProc = DefWindowProc;
             var wc = new WNDCLASSEX
             {
                 cbSize = (uint)Marshal.SizeOf<WNDCLASSEX>(),
                 style = 0,
-                lpfnWndProc = _classWndProc,
+                lpfnWndProc = s_classWndProc,
                 hInstance = GetModuleHandle(null),
                 hbrBackground = IntPtr.Zero,
                 lpszClassName = WindowClassName,
             };
 
-            _classAtom = RegisterClassEx(ref wc);
-            if (_classAtom == 0)
+            s_classAtom = RegisterClassEx(ref wc);
+            if (s_classAtom == 0)
             {
                 const int ERROR_CLASS_ALREADY_EXISTS = 1410;
                 int err = Marshal.GetLastWin32Error();

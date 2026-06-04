@@ -305,7 +305,7 @@ namespace VisualMusic.Controls
                 if (cb.Cancel) return null;
 
                 // Grab response headers while the WebClient still holds them.
-                string fileName = Download.getDownloadFileName(webClient.ResponseHeaders, url);
+                string fileName = Download.GetDownloadFileName(webClient.ResponseHeaders, url);
                 string path = Path.Combine(Program.TempDir, fileName);
                 File.WriteAllBytes(path, data);
                 return path;

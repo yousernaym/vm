@@ -131,7 +131,7 @@ namespace VisualMusic
             info.AddValue("invert", Invert);
         }
 
-        public NoteStyleMod clone()
+        public NoteStyleMod Clone()
         {
             DataContractSerializer dcs = new DataContractSerializer(typeof(NoteStyleMod), ProjectSerializer.KnownTypes);
             MemoryStream stream = new MemoryStream();
@@ -155,7 +155,7 @@ namespace VisualMusic
             public Texture2D normal;
         }
 
-        protected Effect fx;
+        protected Effect _fx;
 
         //protected TrackProps trackProps = null;
         //public TrackProps TrackProps
@@ -166,20 +166,20 @@ namespace VisualMusic
 
         protected static SongPanel SongPanel => Form1.SongPanel;
 
-        static GraphicsDevice _graphicsDeviceOverride;
-        static Project _projectOverride;
-        static Microsoft.Xna.Framework.Content.ContentManager _contentOverride;
+        static GraphicsDevice s_graphicsDeviceOverride;
+        static Project s_projectOverride;
+        static Microsoft.Xna.Framework.Content.ContentManager s_contentOverride;
 
-        public static void SetGraphicsDevice(GraphicsDevice gd) => _graphicsDeviceOverride = gd;
-        public static void SetProject(Project p) => _projectOverride = p;
-        public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm) => _contentOverride = cm;
+        public static void SetGraphicsDevice(GraphicsDevice gd) => s_graphicsDeviceOverride = gd;
+        public static void SetProject(Project p) => s_projectOverride = p;
+        public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm) => s_contentOverride = cm;
 
-        protected static GraphicsDevice GraphicsDevice => _graphicsDeviceOverride ?? SongPanel?.GraphicsDevice;
-        protected static Project Project => _projectOverride ?? SongPanel?.Project;
-        protected static Microsoft.Xna.Framework.Content.ContentManager Content => _contentOverride ?? SongPanel?.Content;
+        protected static GraphicsDevice GraphicsDevice => s_graphicsDeviceOverride ?? SongPanel?.GraphicsDevice;
+        protected static Project Project => s_projectOverride ?? SongPanel?.Project;
+        protected static Microsoft.Xna.Framework.Content.ContentManager Content => s_contentOverride ?? SongPanel?.Content;
 
         //Serializable----------
-        protected NoteStyleType styleType; //Set in constructor of inherited class
+        protected NoteStyleType _styleType; //Set in constructor of inherited class
                                            //public BindingList<NoteStyleMod> ModEntries { get; set; } = new BindingList<NoteStyleMod>();
         internal List<NoteStyleMod> ModEntries { get; set; } = new List<NoteStyleMod>();
         public int? SelectedModEntryIndex { get; set; } = -1;
@@ -210,7 +210,7 @@ namespace VisualMusic
             foreach (SerializationEntry entry in info)
             {
                 if (entry.Name == "styleType")
-                    styleType = (NoteStyleType)entry.Value;
+                    _styleType = (NoteStyleType)entry.Value;
                 else if (entry.Name == "modEntries")
                 {
                     ModEntries = (List<NoteStyleMod>)entry.Value;
@@ -224,31 +224,31 @@ namespace VisualMusic
 
         virtual public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
-            info.AddValue("styleType", styleType);
+            info.AddValue("styleType", _styleType);
             info.AddValue("modEntries", ModEntries);
             info.AddValue("selectedModEntryIndex", SelectedModEntryIndex);
         }
 
-        public static void sInitAllStyles()
+        public static void SInitAllStyles()
         {
-            NoteStyle_Bar.sInit();
-            NoteStyle_Line.sInit();
+            NoteStyle_Bar.SInit();
+            NoteStyle_Line.SInit();
         }
-        public abstract void loadFx();
-        public abstract void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
-        public abstract void drawGeoChunk(Geo geo);
+        public abstract void LoadFx();
+        public abstract void CreateGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
+        public abstract void DrawGeoChunk(Geo geo);
 
-        protected void getMaterial(TrackProps trackProps, float x1, float x2, out Vector4 color, out Texture2D texture)
+        protected void GetMaterial(TrackProps trackProps, float x1, float x2, out Vector4 color, out Texture2D texture)
         {
             bool bHilited = false;
             if (x1 < 0 && x2 > 0)
                 bHilited = true;
-            getMaterial(trackProps, bHilited, out color, out texture);
+            GetMaterial(trackProps, bHilited, out color, out texture);
         }
-        protected void getMaterial(TrackProps trackProps, bool bHilited, out Vector4 color, out Texture2D texture)
+        protected void GetMaterial(TrackProps trackProps, bool bHilited, out Vector4 color, out Texture2D texture)
         {
-            color = trackProps.MaterialProps.getColor(bHilited, Project.GlobalTrackProps.MaterialProps);
-            texture = trackProps.MaterialProps.getTexture(bHilited, Project.GlobalTrackProps.MaterialProps);
+            color = trackProps.MaterialProps.GetColor(bHilited, Project.GlobalTrackProps.MaterialProps);
+            texture = trackProps.MaterialProps.GetTexture(bHilited, Project.GlobalTrackProps.MaterialProps);
             //if (texture == null)
             //{
             //	if (bHilited)
@@ -257,14 +257,14 @@ namespace VisualMusic
             //		texture = defaultTextures[(int)styleType].normal;
             //}
         }
-        protected List<Midi.Note> getNotes(int leftMargin, Midi.Track track)
+        protected List<Midi.Note> GetNotes(int leftMargin, Midi.Track track)
         {   //Get currently visible notes in specified track
             return track.getNotes((int)(Project.SongPosT - Project.ViewWidthT / 2 - leftMargin), (int)(Project.SongPosT + Project.ViewWidthT / 2 + leftMargin));
         }
 
-        abstract public void drawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
+        abstract public void DrawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
 
-        protected void drawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial, out float songPosP)
+        protected void DrawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial, out float songPosP)
         {
             float songFade = 1;
             float songPosS = (float)Project.SongPosS;
@@ -274,18 +274,18 @@ namespace VisualMusic
             else if (Project.Props.FadeOut > 0 && songLength - songPosS < Project.Props.FadeOut)
                 songFade = (songLength - songPosS) / Project.Props.FadeOut;
 
-            fx.Parameters["SongFade"].SetValue(songFade);
-            fx.Parameters["BlurredEdge"].SetValue(0.002f * Project.Props.Camera.ViewportSize.X);
+            _fx.Parameters["SongFade"].SetValue(songFade);
+            _fx.Parameters["BlurredEdge"].SetValue(0.002f * Project.Props.Camera.ViewportSize.X);
             songPosP = Project.SongPosP - Project.PlaybackOffsetP;
-            fx.Parameters["SongPos"].SetValue(songPosP);
-            fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Props.Camera.ViewportSize.X, Project.Props.Camera.ViewportSize.Y));
-            fx.Parameters["VpMat"].SetValue(Project.Props.Camera.VpMat);
-            fx.Parameters["VertWidthScale"].SetValue(Project.ViewWidthQnScale);
+            _fx.Parameters["SongPos"].SetValue(songPosP);
+            _fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Props.Camera.ViewportSize.X, Project.Props.Camera.ViewportSize.Y));
+            _fx.Parameters["VpMat"].SetValue(Project.Props.Camera.VpMat);
+            _fx.Parameters["VertWidthScale"].SetValue(Project.ViewWidthQnScale);
             //fx.Parameters["TexWidthScale"].SetValue(texMaterial.TexProps.UAnchor == TexAnchorEnum.Screen ? VertWidthScale : 1);
 
             //Common notestyle props
             //EffectParameterCollection fxModEntries = fx.Parameters["ModEntries"].Elements;
-            fx.Parameters["ActiveModEntries"].SetValue(ModEntries.Count);
+            _fx.Parameters["ActiveModEntries"].SetValue(ModEntries.Count);
             for (int i = 0; i < ModEntries.Count; i++)
             {
                 //EffectParameterCollection fxModEntry = fxModEntries[i].StructureMembers;
@@ -304,23 +304,23 @@ namespace VisualMusic
                 //fxModEntry["Power"].SetValue(ModEntries[i].Power);
                 //fxModEntry["Scale"].SetValue(ModEntries[i].Scale);
 
-                fx.Parameters["Origin"].Elements[i].SetValue(ModEntries[i].Origin);
-                fx.Parameters["XOriginEnable"].Elements[i].SetValue((bool)ModEntries[i].XOriginEnable);
-                fx.Parameters["YOriginEnable"].Elements[i].SetValue((bool)ModEntries[i].YOriginEnable);
-                fx.Parameters["CombineXY"].Elements[i].SetValue((int)ModEntries[i].CombineXY);
-                fx.Parameters["SquareAspect"].Elements[i].SetValue((bool)ModEntries[i].SquareAspect);
-                fx.Parameters["ColorDestEnable"].Elements[i].SetValue((bool)ModEntries[i].ColorDestEnable);
-                fx.Parameters["AngleDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AngleDestEnable);
-                fx.Parameters["AlphaDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AlphaDestEnable);
-                fx.Parameters["ColorDest"].Elements[i].SetValue(((Color)ModEntries[i].ColorDest).ToVector4());
-                fx.Parameters["AngleDest"].Elements[i].SetValue(ModEntries[i].RadAngleDest);
-                fx.Parameters["Start"].Elements[i].SetValue((float)ModEntries[i].Start);
-                fx.Parameters["Stop"].Elements[i].SetValue((float)ModEntries[i].Stop);
-                fx.Parameters["FadeIn"].Elements[i].SetValue((float)ModEntries[i].FadeIn);
-                fx.Parameters["FadeOut"].Elements[i].SetValue((float)ModEntries[i].FadeOut);
-                fx.Parameters["Power"].Elements[i].SetValue((float)ModEntries[i].Power);
-                fx.Parameters["DiscardAfterStop"].Elements[i].SetValue((bool)ModEntries[i].DiscardAfterStop);
-                fx.Parameters["Invert"].Elements[i].SetValue((bool)ModEntries[i].Invert);
+                _fx.Parameters["Origin"].Elements[i].SetValue(ModEntries[i].Origin);
+                _fx.Parameters["XOriginEnable"].Elements[i].SetValue((bool)ModEntries[i].XOriginEnable);
+                _fx.Parameters["YOriginEnable"].Elements[i].SetValue((bool)ModEntries[i].YOriginEnable);
+                _fx.Parameters["CombineXY"].Elements[i].SetValue((int)ModEntries[i].CombineXY);
+                _fx.Parameters["SquareAspect"].Elements[i].SetValue((bool)ModEntries[i].SquareAspect);
+                _fx.Parameters["ColorDestEnable"].Elements[i].SetValue((bool)ModEntries[i].ColorDestEnable);
+                _fx.Parameters["AngleDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AngleDestEnable);
+                _fx.Parameters["AlphaDestEnable"].Elements[i].SetValue((bool)ModEntries[i].AlphaDestEnable);
+                _fx.Parameters["ColorDest"].Elements[i].SetValue(((Color)ModEntries[i].ColorDest).ToVector4());
+                _fx.Parameters["AngleDest"].Elements[i].SetValue(ModEntries[i].RadAngleDest);
+                _fx.Parameters["Start"].Elements[i].SetValue((float)ModEntries[i].Start);
+                _fx.Parameters["Stop"].Elements[i].SetValue((float)ModEntries[i].Stop);
+                _fx.Parameters["FadeIn"].Elements[i].SetValue((float)ModEntries[i].FadeIn);
+                _fx.Parameters["FadeOut"].Elements[i].SetValue((float)ModEntries[i].FadeOut);
+                _fx.Parameters["Power"].Elements[i].SetValue((float)ModEntries[i].Power);
+                _fx.Parameters["DiscardAfterStop"].Elements[i].SetValue((bool)ModEntries[i].DiscardAfterStop);
+                _fx.Parameters["Invert"].Elements[i].SetValue((bool)ModEntries[i].Invert);
             }
 
             //Material
@@ -328,34 +328,34 @@ namespace VisualMusic
             GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
             Texture2D texture;
             Vector4 color;
-            getMaterial(trackProps, false, out color, out texture);
-            bool useTexture = texture != null && !(bool)trackProps.MaterialProps.getTexProps(0).DisableTexture && !(bool)Project.GlobalTrackProps.MaterialProps.getTexProps(0).DisableTexture;
+            GetMaterial(trackProps, false, out color, out texture);
+            bool useTexture = texture != null && !(bool)trackProps.MaterialProps.GetTexProps(0).DisableTexture && !(bool)Project.GlobalTrackProps.MaterialProps.GetTexProps(0).DisableTexture;
             if (useTexture)
-                fx.Parameters["Texture"].SetValue(texture);
-            fx.Parameters["UseTexture"].SetValue(useTexture);
-            fx.Parameters["Color"].SetValue(color);
-            Vector4 hlColor = trackProps.MaterialProps.getColor(true, Project.GlobalTrackProps.MaterialProps);
-            fx.Parameters["HlColor"].SetValue(hlColor);
-            fx.Parameters["TexColBlend"].SetValue((bool)texMaterial.TexProps.TexColBlend);
+                _fx.Parameters["Texture"].SetValue(texture);
+            _fx.Parameters["UseTexture"].SetValue(useTexture);
+            _fx.Parameters["Color"].SetValue(color);
+            Vector4 hlColor = trackProps.MaterialProps.GetColor(true, Project.GlobalTrackProps.MaterialProps);
+            _fx.Parameters["HlColor"].SetValue(hlColor);
+            _fx.Parameters["TexColBlend"].SetValue((bool)texMaterial.TexProps.TexColBlend);
 
             //Light
             LightProps lightProps = (bool)trackProps.LightProps.UseGlobalLight ? Project.GlobalTrackProps.LightProps : trackProps.LightProps;
             Vector3 normLightDir = lightProps.Dir;
             normLightDir.Normalize();
-            fx.Parameters["LightDir"].SetValue(normLightDir);
-            fx.Parameters["AmbientColor"].SetValue(((Color)lightProps.AmbientColor).ToVector4() * (float)lightProps.AmbientAmount);
-            fx.Parameters["DiffuseColor"].SetValue(((Color)lightProps.DiffuseColor).ToVector4() * (float)lightProps.DiffuseAmount);
-            fx.Parameters["SpecColor"].SetValue(((Color)lightProps.SpecColor).ToVector4() * (float)lightProps.SpecAmount);
-            fx.Parameters["SpecPower"].SetValue((float)(lightProps.SpecPower));
-            fx.Parameters["LightFilter"].SetValue(((Color)lightProps.MasterColor).ToVector4() * (float)lightProps.MasterAmount);
+            _fx.Parameters["LightDir"].SetValue(normLightDir);
+            _fx.Parameters["AmbientColor"].SetValue(((Color)lightProps.AmbientColor).ToVector4() * (float)lightProps.AmbientAmount);
+            _fx.Parameters["DiffuseColor"].SetValue(((Color)lightProps.DiffuseColor).ToVector4() * (float)lightProps.DiffuseAmount);
+            _fx.Parameters["SpecColor"].SetValue(((Color)lightProps.SpecColor).ToVector4() * (float)lightProps.SpecAmount);
+            _fx.Parameters["SpecPower"].SetValue((float)(lightProps.SpecPower));
+            _fx.Parameters["LightFilter"].SetValue(((Color)lightProps.MasterColor).ToVector4() * (float)lightProps.MasterAmount);
 
             //Spatial props
-            fx.Parameters["PosOffset"].SetValue(Project.getSpatialNormPosOffset(trackProps)); ;
+            _fx.Parameters["PosOffset"].SetValue(Project.GetSpatialNormPosOffset(trackProps)); ;
             //Scale world space if rendering to cubemap to make non-360 and 360 videos look the same
             Matrix worldMat = Matrix.CreateScale(Project.Props.Camera.RenderingToCubemap ? 5f / 3 : 1);
-            fx.Parameters["WorldMat"].SetValue(worldMat);
+            _fx.Parameters["WorldMat"].SetValue(worldMat);
 
-            fx.Parameters["CamPos"].SetValue(Project.Props.Camera.Pos);
+            _fx.Parameters["CamPos"].SetValue(Project.Props.Camera.Pos);
 
             //Texture scrolling including adjustment for screen anchoring
             if (texture != null)
@@ -377,13 +377,13 @@ namespace VisualMusic
 
                     texScrollOffset.X += xOffset;
                 }
-                fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
+                _fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
             }
         }
 
         //public abstract void createGeoChunk(BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, Material texMaterial);
 
-        public void addModEntry(bool selectItem, string name = "")
+        public void AddModEntry(bool selectItem, string name = "")
         {
             if (string.IsNullOrWhiteSpace(name))
                 name = "Entry " + ModEntries.Count;
@@ -392,7 +392,7 @@ namespace VisualMusic
                 SelectedModEntryIndex = ModEntries.Count - 1;
         }
 
-        public void deleteModEntry(int entry = -1)
+        public void DeleteModEntry(int entry = -1)
         {
             if (entry < 0)
                 entry = (int)SelectedModEntryIndex;
@@ -403,20 +403,20 @@ namespace VisualMusic
             }
         }
 
-        public void cloneModEntry(bool selectItem, int entry = -1)
+        public void CloneModEntry(bool selectItem, int entry = -1)
         {
             if (entry < 0)
                 entry = (int)SelectedModEntryIndex;
-            ModEntries.Add(ModEntries[entry].clone());
+            ModEntries.Add(ModEntries[entry].Clone());
             if (selectItem)
                 SelectedModEntryIndex = ModEntries.Count - 1;
 
         }
 
-        protected void calcRectTexCoords(out Vector2 topLeft_tex, out Vector2 size_tex, Vector2 texSize, Vector2 topLeft_world, Vector2 size_world, MaterialProps texMaterial)
+        protected void CalcRectTexCoords(out Vector2 topLeft_tex, out Vector2 size_tex, Vector2 texSize, Vector2 topLeft_world, Vector2 size_world, MaterialProps texMaterial)
         {
-            topLeft_tex = calcTexCoords(texSize, topLeft_world, size_world, new Vector2(0, 0), texMaterial);
-            size_tex = calcTexCoords(texSize, topLeft_world, size_world, size_world, texMaterial) - topLeft_tex;
+            topLeft_tex = CalcTexCoords(texSize, topLeft_world, size_world, new Vector2(0, 0), texMaterial);
+            size_tex = CalcTexCoords(texSize, topLeft_world, size_world, size_world, texMaterial) - topLeft_tex;
 
             if ((bool)texMaterial.TexProps.KeepAspect)
             {
@@ -437,16 +437,16 @@ namespace VisualMusic
             //topLeft_tex -= Project.SongPosB * texMaterial.TexProps.Scroll;
         }
 
-        protected Vector2 calcTexCoords(Vector2 texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, MaterialProps texMaterial)
+        protected Vector2 CalcTexCoords(Vector2 texSize, Vector2 notePos, Vector2 noteSize, Vector2 posOffset, MaterialProps texMaterial)
         {
             Vector2 coords = new Vector2();
-            coords.X = calcTexCoordComponent(texSize.X, Project.Props.Camera.ViewportSize.X, notePos.X, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor, true);
-            coords.Y = calcTexCoordComponent(texSize.Y, Project.Props.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texMaterial.TexProps.VTile, (TexAnchorEnum)texMaterial.TexProps.VAnchor, false);
+            coords.X = CalcTexCoordComponent(texSize.X, Project.Props.Camera.ViewportSize.X, notePos.X, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor, true);
+            coords.Y = CalcTexCoordComponent(texSize.Y, Project.Props.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texMaterial.TexProps.VTile, (TexAnchorEnum)texMaterial.TexProps.VAnchor, false);
             coords.Y *= -1;
             return coords;
         }
 
-        float calcTexCoordComponent(float texSize, float vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor, bool u)
+        float CalcTexCoordComponent(float texSize, float vpSize, float notePos, float noteSize, float posOffset, bool tile, TexAnchorEnum anchor, bool u)
         {
             if (tile)
                 texSize *= TexTileScale;
@@ -482,37 +482,37 @@ namespace VisualMusic
     public abstract class Geo : IDisposable
     {
         public List<BoundingBoxEx> bboxes = new List<BoundingBoxEx>();
-        int refCount = 0;
+        int _refCount = 0;
 
         public Geo AddRef()
         {
-            refCount++;
+            _refCount++;
             return this;
         }
 
         public void Dispose()
         {
-            if (refCount-- == 0)
+            if (_refCount-- == 0)
                 throw new AccessViolationException("Object already disposed");
-            if (refCount > 0)
+            if (_refCount > 0)
                 return;
-            releaseResources();
+            ReleaseResources();
         }
 
-        protected abstract void releaseResources();
+        protected abstract void ReleaseResources();
 
-        public bool areObjectsInFrustum(BoundingFrustum frustum, float songPos, Project project, TrackProps trackProps)
+        public bool AreObjectsInFrustum(BoundingFrustum frustum, float songPos, Project project, TrackProps trackProps)
         {
             foreach (var bbox in bboxes)
             {
-                BoundingBoxEx bb = bbox.clone();
-                bb.scale(new Vector3(project.ViewWidthQnScale, 1, 1));
+                BoundingBoxEx bb = bbox.Clone();
+                bb.Scale(new Vector3(project.ViewWidthQnScale, 1, 1));
 
-                Vector3 posOffset = project.getSpatialNormPosOffset(trackProps);
+                Vector3 posOffset = project.GetSpatialNormPosOffset(trackProps);
                 posOffset.X -= songPos;
-                bb.translate(posOffset);
+                bb.Translate(posOffset);
 
-                if (bb.intersects(frustum))
+                if (bb.Intersects(frustum))
                     return true;
             }
             return false;
@@ -574,14 +574,14 @@ namespace VisualMusic
             _aabb = BoundingBox.CreateFromPoints(_corners);
         }
 
-        public BoundingBoxEx clone()
+        public BoundingBoxEx Clone()
         {
             var newBox = new BoundingBoxEx(_corners, _normals);
             newBox._aabb = _aabb;
             return newBox;
         }
 
-        public bool intersects(BoundingFrustum frustum)
+        public bool Intersects(BoundingFrustum frustum)
         {
             //A simple aabb test will discard most boxes
             if (!frustum.Intersects(_aabb))
@@ -592,7 +592,7 @@ namespace VisualMusic
             Vector3[] frustumCorners = frustum.GetCorners();
             foreach (var normal in _normals)
             {
-                if (!intersectsWhenProjected(_corners, frustumCorners, normal))
+                if (!IntersectsWhenProjected(_corners, frustumCorners, normal))
                     return false;
             }
 
@@ -600,7 +600,7 @@ namespace VisualMusic
             var frustumPlanes = frustum.GetPlanes();
             for (int i = 1; i < 6; i++) //Skip near plane since it's parallell to far plane
             {
-                if (!intersectsWhenProjected(_corners, frustumCorners, frustumPlanes[i].Normal))
+                if (!IntersectsWhenProjected(_corners, frustumCorners, frustumPlanes[i].Normal))
                     return false;
             }
 
@@ -619,7 +619,7 @@ namespace VisualMusic
                 foreach (var frustumEdge in frustumEdges)
                 {
                     Vector3 cross = Vector3.Cross(boxEdge, frustumEdge);
-                    if (!intersectsWhenProjected(_corners, frustumCorners, cross))
+                    if (!IntersectsWhenProjected(_corners, frustumCorners, cross))
                         return false;
                 }
             }
@@ -637,7 +637,7 @@ namespace VisualMusic
         //	return d < projLengthSum;
         //}
 
-        public void translate(Vector3 offset)
+        public void Translate(Vector3 offset)
         {
             _aabb.Min += offset;
             _aabb.Max += offset;
@@ -646,7 +646,7 @@ namespace VisualMusic
             //_center += offset;
         }
 
-        public void scale(Vector3 scale)
+        public void Scale(Vector3 scale)
         {
             _aabb.Min *= scale;
             _aabb.Max *= scale;
@@ -656,7 +656,7 @@ namespace VisualMusic
         }
 
         // aCorn and bCorn are arrays containing all corners (vertices) of the two OBBs
-        static bool intersectsWhenProjected(Vector3[] aCorn, Vector3[] bCorn, Vector3 axis)
+        static bool IntersectsWhenProjected(Vector3[] aCorn, Vector3[] bCorn, Vector3 axis)
         {
             // Handles the cross product = {0,0,0} case
             if (axis == Vector3.Zero)

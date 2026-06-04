@@ -18,51 +18,51 @@ namespace VisualMusic
         public event EventHandler ValueChanged;
         public event EventHandler CommitChanges;
 
-        int decimalScale;
+        int _decimalScale;
 
-        int decimals;
+        int _decimals;
         public int Decimals
         {
-            get { return decimals; }
+            get { return _decimals; }
             set
             {
-                decimals = value;
-                decimalScale = (int)Math.Pow(10, decimals);
-                trackBar1.Maximum = (int)((max - min) * decimalScale);
+                _decimals = value;
+                _decimalScale = (int)Math.Pow(10, _decimals);
+                trackBar1.Maximum = (int)((_max - _min) * _decimalScale);
             }
         }
-        int decimals2; //used if slider is exponential
+        int _decimals2; //used if slider is exponential
         public int Decimals2
         {
-            get { return decimals2; }
-            set { decimals2 = value; }
+            get { return _decimals2; }
+            set { _decimals2 = value; }
         }
 
-        double expBase;
+        double _expBase;
         public double ExpBase
         {
-            get { return expBase; }
-            set { expBase = value; }
+            get { return _expBase; }
+            set { _expBase = value; }
         }
 
-        double min;
+        double _min;
         public double Min
         {
-            get { return min; }
+            get { return _min; }
             set
             {
-                min = value;
-                trackBar1.Maximum = (int)((max - min) * decimalScale);
+                _min = value;
+                trackBar1.Maximum = (int)((_max - _min) * _decimalScale);
             }
         }
-        double max;
+        double _max;
         public double Max
         {
-            get { return max; }
+            get { return _max; }
             set
             {
-                max = value;
-                trackBar1.Maximum = (int)((max - min) * decimalScale);
+                _max = value;
+                trackBar1.Maximum = (int)((_max - _min) * _decimalScale);
             }
         }
         public double Value
@@ -70,7 +70,7 @@ namespace VisualMusic
             set
             {
                 if (value != Value)
-                    textBox1.Text = value.ToString("f" + (expBase >= 0 ? decimals2 : decimals));
+                    textBox1.Text = value.ToString("f" + (_expBase >= 0 ? _decimals2 : _decimals));
             }
             get
             {
@@ -89,11 +89,11 @@ namespace VisualMusic
         {
             get
             {
-                return trackBar1.TickFrequency / decimalScale;
+                return trackBar1.TickFrequency / _decimalScale;
             }
             set
             {
-                trackBar1.TickFrequency = (int)(value * decimalScale);
+                trackBar1.TickFrequency = (int)(value * _decimalScale);
             }
         }
         public int TbWidth
@@ -108,28 +108,28 @@ namespace VisualMusic
             }
         }
 
-        private void trackBar1_Scroll(object sender, EventArgs e)
+        private void TrackBar1_Scroll(object sender, EventArgs e)
         {
-            double value = (double)trackBar1.Value / decimalScale + min;
-            int d = decimals;
-            if (expBase >= 0)
+            double value = (double)trackBar1.Value / _decimalScale + _min;
+            int d = _decimals;
+            if (_expBase >= 0)
             {
-                value = Math.Pow(expBase, value);
-                d = decimals2;
+                value = Math.Pow(_expBase, value);
+                d = _decimals2;
             }
             textBox1.Text = value.ToString("f" + d);
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void TextBox1_TextChanged(object sender, EventArgs e)
         {
             int ivalue = 0;
             try
             {
                 double value = Convert.ToDouble(textBox1.Text);
-                if (expBase >= 0)
-                    ivalue = (int)(Math.Log(value, expBase) * decimalScale);
+                if (_expBase >= 0)
+                    ivalue = (int)(Math.Log(value, _expBase) * _decimalScale);
                 else
-                    ivalue = (int)(value * decimalScale);
+                    ivalue = (int)(value * _decimalScale);
             }
             catch
             {
@@ -146,18 +146,18 @@ namespace VisualMusic
                 ValueChanged(this, e);
         }
 
-        private void trackBar1_MouseUp(object sender, MouseEventArgs e)
+        private void TrackBar1_MouseUp(object sender, MouseEventArgs e)
         {
             OnCommitChanges(this, e);
         }
 
-        private void trackBar1_KeyDown(object sender, KeyEventArgs e)
+        private void TrackBar1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
                 OnCommitChanges(this, e);
         }
 
-        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        private void TextBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
                 OnCommitChanges(this, e);

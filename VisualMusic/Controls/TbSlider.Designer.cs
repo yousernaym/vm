@@ -39,8 +39,8 @@
 			this.textBox1.Name = "textBox1";
 			this.textBox1.Size = new System.Drawing.Size(50, 20);
 			this.textBox1.TabIndex = 1;
-			this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
-			this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
+			this.textBox1.TextChanged += new System.EventHandler(this.TextBox1_TextChanged);
+			this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox1_KeyDown);
 			// 
 			// trackBar1
 			// 
@@ -52,9 +52,9 @@
 			this.trackBar1.SmallChange = 10;
 			this.trackBar1.TabIndex = 0;
 			this.trackBar1.TickFrequency = 100;
-			this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
-			this.trackBar1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.trackBar1_KeyDown);
-			this.trackBar1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.trackBar1_MouseUp);
+			this.trackBar1.Scroll += new System.EventHandler(this.TrackBar1_Scroll);
+			this.trackBar1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TrackBar1_KeyDown);
+			this.trackBar1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TrackBar1_MouseUp);
 			// 
 			// TbSlider
 			// 

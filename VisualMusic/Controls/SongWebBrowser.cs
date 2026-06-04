@@ -14,8 +14,8 @@ namespace VisualMusic
 {
     public partial class SongWebBrowser : UserControl
     {
-        readonly ChromiumWebBrowser browser;
-        readonly Form1 mainForm;
+        readonly ChromiumWebBrowser _browser;
+        readonly Form1 _mainForm;
 
         public string[] SongFormats { get; set; }
         public string Url
@@ -31,7 +31,7 @@ namespace VisualMusic
                 {
                     if (Uri.IsWellFormedUriString(urlTextBox.Text, UriKind.RelativeOrAbsolute))
                     {
-                        browser.Load(urlTextBox.Text);
+                        _browser.Load(urlTextBox.Text);
                     }
                 }
                 catch (FormatException)
@@ -45,24 +45,24 @@ namespace VisualMusic
         {
             InitializeComponent();
 
-            mainForm = form1;
-            browser = new ChromiumWebBrowser("")
+            _mainForm = form1;
+            _browser = new ChromiumWebBrowser("")
             {
                 Dock = DockStyle.Fill,
-                KeyboardHandler = new KeyboardHandler(mainForm)
+                KeyboardHandler = new KeyboardHandler(_mainForm)
             };
 
             DownloadHandler downloadHandler = new DownloadHandler();
             downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
             downloadHandler.ShowDialog = false;
-            browser.DownloadHandler = downloadHandler;
-            toolStripContainer.ContentPanel.Controls.Add(browser);
+            _browser.DownloadHandler = downloadHandler;
+            toolStripContainer.ContentPanel.Controls.Add(_browser);
 
-            browser.LoadingStateChanged += OnLoadingStateChanged;
-            browser.ConsoleMessage += OnBrowserConsoleMessage;
-            browser.StatusMessage += OnBrowserStatusMessage;
-            browser.TitleChanged += OnBrowserTitleChanged;
-            browser.AddressChanged += OnBrowserAddressChanged;
+            _browser.LoadingStateChanged += OnLoadingStateChanged;
+            _browser.ConsoleMessage += OnBrowserConsoleMessage;
+            _browser.StatusMessage += OnBrowserStatusMessage;
+            _browser.TitleChanged += OnBrowserTitleChanged;
+            _browser.AddressChanged += OnBrowserAddressChanged;
 
             var bitness = Environment.Is64BitProcess ? "x64" : "x86";
             Url = urlString;
@@ -73,7 +73,7 @@ namespace VisualMusic
             e.IsCancelled = true;
             string fileName = e.SuggestedFileName;
 
-            SourceFileForm importForm = mainForm.getImportFormFromFileType(fileName);
+            SourceFileForm importForm = _mainForm.GetImportFormFromFileType(fileName);
             if (importForm != null)
             {
                 string url = new StringBuilder(e.Url).ToString(); //Make new instance
@@ -171,14 +171,14 @@ namespace VisualMusic
 
         private void BackButtonClick(object sender, EventArgs e)
         {
-            browser.Back();
+            _browser.Back();
             //browser.Load("http://www.prg.dtu.dk/HVSC/HVSC_68-all-of-them.zip");
 
         }
 
         private void ForwardButtonClick(object sender, EventArgs e)
         {
-            browser.Forward();
+            _browser.Forward();
         }
 
         private void UrlTextBoxKeyUp(object sender, KeyEventArgs e)
@@ -195,11 +195,11 @@ namespace VisualMusic
         {
             if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute))
             {
-                browser.Load(url);
+                _browser.Load(url);
             }
         }
 
-        private void toolStripContainer_ContentPanel_Enter(object sender, EventArgs e)
+        private void ToolStripContainer_ContentPanel_Enter(object sender, EventArgs e)
         {
             urlTextBox.Focus();
         }

@@ -29,7 +29,7 @@ namespace VisualMusic
             modGbox.Height = (int)((float)modEntryCombo.Height * 2.5f);
         }
 
-        public virtual void update(NoteStyle noteStyle)
+        public virtual void Update(NoteStyle noteStyle)
         {
             //modEntryBs.DataSource = noteStyle.ModEntries;
             modEntryCombo.DisplayMember = "Name";
@@ -55,62 +55,62 @@ namespace VisualMusic
             NoteStyleMod modEntry = noteStyle.SelectedModEntry;
             if (modEntry != null)
             {
-                Form1.setNumericUdValue(xOriginUd, modEntry.Origin.X);
-                Form1.setNumericUdValue(yOriginUd, modEntry.Origin.Y);
-                xOriginCb.CheckState = Form1.toCheckState(modEntry.XOriginEnable);
-                yOriginCb.CheckState = Form1.toCheckState(modEntry.YOriginEnable);
+                Form1.SetNumericUdValue(xOriginUd, modEntry.Origin.X);
+                Form1.SetNumericUdValue(yOriginUd, modEntry.Origin.Y);
+                xOriginCb.CheckState = Form1.ToCheckState(modEntry.XOriginEnable);
+                yOriginCb.CheckState = Form1.ToCheckState(modEntry.YOriginEnable);
                 if (modEntry.CombineXY == null)
                     combineXYCombo.SelectedIndex = -1;
                 else
                     combineXYCombo.SelectedIndex = (int)modEntry.CombineXY;
-                updateXYOriginEnabled();
-                squareAspectCb.CheckState = Form1.toCheckState(modEntry.SquareAspect);
-                colorDestCb.CheckState = Form1.toCheckState(modEntry.ColorDestEnable);
-                angleDestCb.CheckState = Form1.toCheckState(modEntry.AngleDestEnable);
-                colorDestBtn.BackColor = Form1.xnaToGdiCol(modEntry.ColorDest);
-                Form1.setNumericUdValue(angleDestUd, modEntry.AngleDest);
-                Form1.setNumericUdValue(startUd, modEntry.Start);
-                Form1.setNumericUdValue(stopUd, modEntry.Stop);
-                Form1.setNumericUdValue(fadeInUd, modEntry.FadeIn);
-                Form1.setNumericUdValue(fadeOutUd, modEntry.FadeOut);
-                Form1.setNumericUdValue(powerUd, modEntry.Power);
-                discardStopCb.CheckState = Form1.toCheckState(modEntry.DiscardAfterStop);
-                invertCb.CheckState = Form1.toCheckState(modEntry.Invert);
+                UpdateXYOriginEnabled();
+                squareAspectCb.CheckState = Form1.ToCheckState(modEntry.SquareAspect);
+                colorDestCb.CheckState = Form1.ToCheckState(modEntry.ColorDestEnable);
+                angleDestCb.CheckState = Form1.ToCheckState(modEntry.AngleDestEnable);
+                colorDestBtn.BackColor = Form1.XnaToGdiCol(modEntry.ColorDest);
+                Form1.SetNumericUdValue(angleDestUd, modEntry.AngleDest);
+                Form1.SetNumericUdValue(startUd, modEntry.Start);
+                Form1.SetNumericUdValue(stopUd, modEntry.Stop);
+                Form1.SetNumericUdValue(fadeInUd, modEntry.FadeIn);
+                Form1.SetNumericUdValue(fadeOutUd, modEntry.FadeOut);
+                Form1.SetNumericUdValue(powerUd, modEntry.Power);
+                discardStopCb.CheckState = Form1.ToCheckState(modEntry.DiscardAfterStop);
+                invertCb.CheckState = Form1.ToCheckState(modEntry.Invert);
             }
         }
 
-        private void bypassModEntryCb_CheckedChanged(object sender, EventArgs e)
+        private void BypassModEntryCb_CheckedChanged(object sender, EventArgs e)
         {
             //modEntryPanel.Enabled = !bypassModEntryCb.Checked;
         }
 
-        private void newMi_Click(object sender, EventArgs e)
+        private void NewMi_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.addModEntry(true);
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.AddModEntry(true);
             ParentForm.UpdateTrackPropsControls();
         }
 
-        private void deleteMi_Click(object sender, EventArgs e)
+        private void DeleteMi_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.deleteModEntry();
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.DeleteModEntry();
             ParentForm.UpdateTrackPropsControls();
         }
 
-        private void cloneMi_Click(object sender, EventArgs e)
+        private void CloneMi_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.cloneModEntry(true);
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.CloneModEntry(true);
             ParentForm.UpdateTrackPropsControls();
         }
 
-        private void modEntryCombo_SelectedIndexChanged(object sender, EventArgs e)
+        private void ModEntryCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
 
-        private void modEntryCombo_SelectedValueChanged(object sender, EventArgs e)
+        private void ModEntryCombo_SelectedValueChanged(object sender, EventArgs e)
         {
             bool itemSelected = modEntryCombo.SelectedIndex >= 0;
             cloneMi.Enabled = deleteMi.Enabled = ShowModEntryControls = itemSelected;
@@ -123,7 +123,7 @@ namespace VisualMusic
             ParentForm.UpdateTrackPropsControls();
         }
 
-        private void xOriginUd_ValueChanged(object sender, EventArgs e)
+        private void XOriginUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -131,7 +131,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.XOrigin = (float)xOriginUd.Value;
         }
 
-        private void yOriginUd_ValueChanged(object sender, EventArgs e)
+        private void YOriginUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -139,34 +139,34 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.YOrigin = (float)yOriginUd.Value;
         }
 
-        private void xOriginCb_CheckedChanged(object sender, EventArgs e)
+        private void XOriginCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
-            updateXYOriginEnabled();
+            UpdateXYOriginEnabled();
 
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.XOriginEnable = xOriginCb.Checked;
         }
 
-        private void yOriginCb_CheckedChanged(object sender, EventArgs e)
+        private void YOriginCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
-            updateXYOriginEnabled();
+            UpdateXYOriginEnabled();
 
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.YOriginEnable = yOriginCb.Checked;
         }
 
-        private void updateXYOriginEnabled()
+        private void UpdateXYOriginEnabled()
         {
             combineXYCombo.Enabled = xOriginCb.Checked && yOriginCb.Checked;
             xOriginUd.Enabled = xOriginCb.Checked;
             yOriginUd.Enabled = yOriginCb.Checked;
         }
 
-        private void combineXYCombo_SelectedIndexChanged(object sender, EventArgs e)
+        private void CombineXYCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -174,7 +174,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.CombineXY = combineXYCombo.SelectedIndex;
         }
 
-        private void squareAspectCb_CheckedChanged(object sender, EventArgs e)
+        private void SquareAspectCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -182,7 +182,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.SquareAspect = squareAspectCb.Checked;
         }
 
-        private void colorDestCb_CheckedChanged(object sender, EventArgs e)
+        private void ColorDestCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -190,16 +190,16 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.ColorDestEnable = colorDestCb.Checked;
         }
 
-        private void colorDestBtn_Click(object sender, EventArgs e)
+        private void ColorDestBtn_Click(object sender, EventArgs e)
         {
             if (colorDialog1.ShowDialog() != DialogResult.OK)
                 return;
             colorDestBtn.BackColor = colorDialog1.Color;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.ColorDest = Form1.gdiToXnaCol(colorDestBtn.BackColor);
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.ColorDest = Form1.GdiToXnaCol(colorDestBtn.BackColor);
         }
 
-        private void angleDestCb_CheckedChanged(object sender, EventArgs e)
+        private void AngleDestCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -207,7 +207,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.AngleDestEnable = angleDestCb.Checked;
         }
 
-        private void angleDestUd_ValueChanged(object sender, EventArgs e)
+        private void AngleDestUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -215,7 +215,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.AngleDest = (int)angleDestUd.Value;
         }
 
-        private void startUd_ValueChanged(object sender, EventArgs e)
+        private void StartUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -223,7 +223,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.Start = (float)startUd.Value;
         }
 
-        private void stopUd_ValueChanged(object sender, EventArgs e)
+        private void StopUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -231,7 +231,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.Stop = (float)stopUd.Value;
         }
 
-        private void fadeInUd_ValueChanged(object sender, EventArgs e)
+        private void FadeInUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -239,7 +239,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.FadeIn = (float)fadeInUd.Value;
         }
 
-        private void fadeOutUd_ValueChanged(object sender, EventArgs e)
+        private void FadeOutUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -247,7 +247,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.FadeOut = (float)fadeOutUd.Value;
         }
 
-        private void powerUd_ValueChanged(object sender, EventArgs e)
+        private void PowerUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -255,7 +255,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.Power = (float)powerUd.Value;
         }
 
-        private void discardStopCb_CheckedChanged(object sender, EventArgs e)
+        private void DiscardStopCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
@@ -263,7 +263,7 @@ namespace VisualMusic
                 TrackViews[TrackList.SelectedIndices[i]].TrackProps.ActiveNoteStyle.SelectedModEntry.DiscardAfterStop = discardStopCb.Checked;
         }
 
-        private void invertCb_CheckedChanged(object sender, EventArgs e)
+        private void InvertCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;

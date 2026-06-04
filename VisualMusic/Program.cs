@@ -25,8 +25,8 @@ namespace VisualMusic
         static public readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
         static public string FileVersion => FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileVersion;
 
-        static FileStream dirLock = null;
-        static string appGuid = ((GuidAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), true)[0]).Value;
+        static FileStream s_dirLock = null;
+        static string s_appGuid = ((GuidAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), true)[0]).Value;
 
         [STAThread]
         static void Main(string[] args)
@@ -35,7 +35,7 @@ namespace VisualMusic
             Semaphore semaphore = null;
             try
             {
-                semaphore = new Semaphore(semaphoreMaxCount, semaphoreMaxCount, "Global\\" + appGuid);
+                semaphore = new Semaphore(semaphoreMaxCount, semaphoreMaxCount, "Global\\" + s_appGuid);
                 if (!semaphore.WaitOne(0, false))
                 {
                     return;
@@ -43,13 +43,13 @@ namespace VisualMusic
 
                 try
                 {
-                    init();
+                    Init();
                     form1 = new Form1(args);
                     Application.Run(form1);
                 }
                 finally
                 {
-                    close();
+                    Close();
                 }
             }
             finally
@@ -57,46 +57,46 @@ namespace VisualMusic
                 if (semaphore != null)
                 {
                     if (semaphore.Release() == semaphoreMaxCount - 1)
-                        deleteTempDirs();
+                        DeleteTempDirs();
                 }
             }
         }
 
-        static void init()
+        static void Init()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Directory.SetCurrentDirectory(Dir);
-            MidMix.init();
-            if (!Media.initMF())
+            MidMix.Init();
+            if (!Media.InitMF())
             {
-                Form1.showErrorMsgBox(null, "Couldn't initialize Media library.");
+                Form1.ShowErrorMsgBox(null, "Couldn't initialize Media library.");
                 return;
             }
             Directory.CreateDirectory(TempDir);
-            dirLock = File.Create(Path.Combine(TempDir, "dontdeletefolder"));
-            initCefSharp();
+            s_dirLock = File.Create(Path.Combine(TempDir, "dontdeletefolder"));
+            InitCefSharp();
         }
 
-        static void initCefSharp()
+        static void InitCefSharp()
         {
             var settings = new CefSettings();
             Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
         }
 
-        public static void close()
+        public static void Close()
         {
             Cef.Shutdown();
-            MidMix.close();
-            Media.closeMF();
+            MidMix.Close();
+            Media.CloseMF();
         }
 
-        static void deleteTempDirs()
+        static void DeleteTempDirs()
         {
-            if (dirLock != null)
+            if (s_dirLock != null)
             {
-                dirLock.Close();
-                dirLock = null;
+                s_dirLock.Close();
+                s_dirLock = null;
             }
             try
             {

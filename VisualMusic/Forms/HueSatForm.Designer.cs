@@ -34,7 +34,7 @@
 			// okBtn
 			// 
 			this.okBtn.Location = new System.Drawing.Point(112, 247);
-			this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
+			this.okBtn.Click += new System.EventHandler(this.OkBtn_Click);
 			// 
 			// cancelBtn
 			// 
@@ -53,7 +53,7 @@
 			this.twoDHueSat1.SetSelectionColor = System.Drawing.Color.Black;
 			this.twoDHueSat1.Size = new System.Drawing.Size(280, 239);
 			this.twoDHueSat1.TabIndex = 3;
-			this.twoDHueSat1.SelectionChanged += new System.EventHandler(this.twoDHueSat1_SelectionChanged);
+			this.twoDHueSat1.SelectionChanged += new System.EventHandler(this.TwoDHueSat1_SelectionChanged);
 			// 
 			// HueSatForm
 			// 

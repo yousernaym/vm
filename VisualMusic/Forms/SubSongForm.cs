@@ -9,19 +9,19 @@ namespace VisualMusic.Forms
 {
     public partial class SubSongForm : VisualMusic.BaseDialog
     {
-        int defaultSong;
-        List<float> songLengthList;
-        int selectedSong;
+        int _defaultSong;
+        List<float> _songLengthList;
+        int _selectedSong;
         public int SelectedSong
         {
-            get => selectedSong;
+            get => _selectedSong;
             set
             {
-                selectedSong = Math.Max(value, 1);
-                selectedSong = Math.Min(selectedSong, NumSongs);
-                subSongsLB.SelectedIndex = selectedSong - 1;
-                if (selectedSong - 1 < songLengthList.Count)
-                    SongLengthS = songLengthList[selectedSong - 1];
+                _selectedSong = Math.Max(value, 1);
+                _selectedSong = Math.Min(_selectedSong, NumSongs);
+                subSongsLB.SelectedIndex = _selectedSong - 1;
+                if (_selectedSong - 1 < _songLengthList.Count)
+                    SongLengthS = _songLengthList[_selectedSong - 1];
                 else
                     SongLengthS = 0;
             }
@@ -29,7 +29,7 @@ namespace VisualMusic.Forms
         public float SongLengthS { get; private set; }
         public int NumSongs { get; private set; }
 
-        public void init(string songPath)
+        public void Init(string songPath)
         {
             if (string.IsNullOrWhiteSpace(songPath))
                 return;
@@ -39,27 +39,27 @@ namespace VisualMusic.Forms
                 NumSongs = (file.ReadByte() << 8) | file.ReadByte();
                 if (NumSongs < 1)
                     NumSongs = 1;
-                defaultSong = (file.ReadByte() << 8) | file.ReadByte();
-                if (defaultSong < 0 || defaultSong > NumSongs)
-                    defaultSong = 1;
+                _defaultSong = (file.ReadByte() << 8) | file.ReadByte();
+                if (_defaultSong < 0 || _defaultSong > NumSongs)
+                    _defaultSong = 1;
             }
 
             subSongsLB.Items.Clear();
-            string[] songLengthStrings = getSongLengths(songPath);
-            songLengthList = new List<float>();
+            string[] songLengthStrings = GetSongLengths(songPath);
+            _songLengthList = new List<float>();
             for (int i = 0; i < NumSongs; i++)
             {
-                string defaultSuffix = i == defaultSong - 1 ? " (default song)" : "";
+                string defaultSuffix = i == _defaultSong - 1 ? " (default song)" : "";
                 if (songLengthStrings != null && songLengthStrings.Length > i)
                 {
                     subSongsLB.Items.Add((i + 1) + " - " + songLengthStrings[i] + defaultSuffix);
                     string[] minsec = ((string)songLengthStrings[i]).Split(':');
-                    songLengthList.Add(float.Parse(minsec[0]) * 60 + float.Parse(minsec[1], CultureInfo.InvariantCulture));
+                    _songLengthList.Add(float.Parse(minsec[0]) * 60 + float.Parse(minsec[1], CultureInfo.InvariantCulture));
                 }
                 else
                     subSongsLB.Items.Add(i + " - unknown length" + defaultSuffix);
             }
-            SelectedSong = defaultSong;
+            SelectedSong = _defaultSong;
         }
 
         public SubSongForm()
@@ -68,7 +68,7 @@ namespace VisualMusic.Forms
             subSongsLB.AutoSize = true;
         }
 
-        string[] getSongLengths(string songPath)
+        string[] GetSongLengths(string songPath)
         {
             string songLengthsFilename = Form1.TpartyIntegrationForm.SongLengthsPath;
             if (!File.Exists(songLengthsFilename))
@@ -111,13 +111,13 @@ namespace VisualMusic.Forms
             return null;
         }
 
-        private void okBtn_Click(object sender, EventArgs e)
+        private void OkBtn_Click(object sender, EventArgs e)
         {
             SelectedSong = subSongsLB.SelectedIndex + 1;
             DialogResult = DialogResult.OK;
         }
 
-        private void subSongsLB_Resize(object sender, EventArgs e)
+        private void SubSongsLB_Resize(object sender, EventArgs e)
         {
             int buttonMargin = (Height - okBtn.Bottom);
             Height = subSongsLB.Bottom + okBtn.Height + 10 * DeviceDpi / 96 + buttonMargin;

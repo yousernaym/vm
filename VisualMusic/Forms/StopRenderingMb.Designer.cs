@@ -64,7 +64,7 @@
 			this.yesBtn.TabIndex = 5;
 			this.yesBtn.Text = "Yes";
 			this.yesBtn.UseVisualStyleBackColor = true;
-			this.yesBtn.Click += new System.EventHandler(this.yesBtn_Click);
+			this.yesBtn.Click += new System.EventHandler(this.YesBtn_Click);
 			// 
 			// noBtn
 			// 
@@ -76,7 +76,7 @@
 			this.noBtn.TabIndex = 4;
 			this.noBtn.Text = "No";
 			this.noBtn.UseVisualStyleBackColor = true;
-			this.noBtn.Click += new System.EventHandler(this.noBtn_Click);
+			this.noBtn.Click += new System.EventHandler(this.NoBtn_Click);
 			// 
 			// StopRenderingMb
 			// 

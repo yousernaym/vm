@@ -28,7 +28,7 @@ namespace VisualMusic
 
         // ---- Shared HttpClient (reuse across downloads) ----
 
-        static readonly HttpClient _http = new();
+        static readonly HttpClient s_http = new();
 
         // ---- Public API ----
 
@@ -76,7 +76,7 @@ namespace VisualMusic
             string tempPath = SongLengthsPath + "_";
             try
             {
-                using var response = await _http.GetAsync(
+                using var response = await s_http.GetAsync(
                     url, HttpCompletionOption.ResponseHeadersRead, ct);
                 response.EnsureSuccessStatusCode();
 

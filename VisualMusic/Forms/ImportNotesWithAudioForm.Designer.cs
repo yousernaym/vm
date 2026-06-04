@@ -84,7 +84,7 @@
 			this.existingAudioRbtn.TabStop = true;
 			this.existingAudioRbtn.Text = "Audio file";
 			this.existingAudioRbtn.UseVisualStyleBackColor = true;
-			this.existingAudioRbtn.CheckedChanged += new System.EventHandler(this.existingAudioRbtn_CheckedChanged);
+			this.existingAudioRbtn.CheckedChanged += new System.EventHandler(this.ExistingAudioRbtn_CheckedChanged);
 			// 
 			// thirdPartyMixdownRbtn
 			// 
@@ -178,7 +178,7 @@
 			this.browseTpartyOutputBtn.TabIndex = 10;
 			this.browseTpartyOutputBtn.Text = "...";
 			this.browseTpartyOutputBtn.UseVisualStyleBackColor = true;
-			this.browseTpartyOutputBtn.Click += new System.EventHandler(this.browseTpartyOutputBtn_Click);
+			this.browseTpartyOutputBtn.Click += new System.EventHandler(this.BrowseTpartyOutputBtn_Click);
 			// 
 			// browseTpartyExeBtn
 			// 
@@ -188,7 +188,7 @@
 			this.browseTpartyExeBtn.TabIndex = 7;
 			this.browseTpartyExeBtn.Text = "...";
 			this.browseTpartyExeBtn.UseVisualStyleBackColor = true;
-			this.browseTpartyExeBtn.Click += new System.EventHandler(this.browseTpartyExeBtn_Click);
+			this.browseTpartyExeBtn.Click += new System.EventHandler(this.BrowseTpartyExeBtn_Click);
 			// 
 			// openTpartyExeDlg
 			// 

@@ -51,7 +51,7 @@
             this.toolStripContainer.ContentPanel.Controls.Add(this.outputLabel);
             this.toolStripContainer.ContentPanel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(852, 540);
-            this.toolStripContainer.ContentPanel.Enter += new System.EventHandler(this.toolStripContainer_ContentPanel_Enter);
+            this.toolStripContainer.ContentPanel.Enter += new System.EventHandler(this.ToolStripContainer_ContentPanel_Enter);
             this.toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer.LeftToolStripPanelVisible = false;
             this.toolStripContainer.Location = new System.Drawing.Point(0, 0);

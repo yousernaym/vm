@@ -34,18 +34,18 @@ namespace VisualMusic
     {
         const int MaxLineVerts = 100000;
         const int MaxHLineVerts = 30000;
-        static VertexDeclaration lineVertDecl;
-        static LineVertex[] lineVerts = new LineVertex[MaxLineVerts];
-        static LineVertex[] hLineVerts = new LineVertex[MaxHLineVerts];
-        protected static LineHlVertex[] lineHlVerts = new LineHlVertex[4];
+        static VertexDeclaration s_lineVertDecl;
+        static LineVertex[] s_lineVerts = new LineVertex[MaxLineVerts];
+        static LineVertex[] s_hLineVerts = new LineVertex[MaxHLineVerts];
+        protected static LineHlVertex[] s_lineHlVerts = new LineHlVertex[4];
 
-        float VpLineWidth => Project.normalizeVpScalar((float)LineWidth);
+        float VpLineWidth => Project.NormalizeVpScalar((float)LineWidth);
         public float? LineWidth { get; set; } = 5;
         public float? Qn_gapThreshold { get; set; } = 3;
         public bool? Continuous { get; set; } = true;
         public LineType? LineType { get; set; } = VisualMusic.LineType.Standard;
         public LineHlType? HlType { get; set; } = LineHlType.Arrow;
-        float VpHlSize => Project.normalizeVpScalar((float)HlSize);
+        float VpHlSize => Project.NormalizeVpScalar((float)HlSize);
         public float? HlSize { get; set; } = 20;
         public bool? MovingHl { get; set; } = false;
         public bool? ShrinkingHl { get; set; } = false;
@@ -54,12 +54,12 @@ namespace VisualMusic
 
         public NoteStyle_Line()
         {
-            styleType = NoteStyleType.Line;
+            _styleType = NoteStyleType.Line;
         }
         public NoteStyle_Line(TrackProps tprops)
             : base(tprops)
         {
-            styleType = NoteStyleType.Line;
+            _styleType = NoteStyleType.Line;
         }
         public NoteStyle_Line(SerializationInfo info, StreamingContext ctxt)
             : base(info, ctxt)
@@ -102,12 +102,12 @@ namespace VisualMusic
             info.AddValue("hlBorder", HlBorder);
             info.AddValue("hlMovementPow", HlMovementPow);
         }
-        override public void loadFx()
+        override public void LoadFx()
         {
-            fx = Content.Load<Effect>("Line");
+            _fx = Content.Load<Effect>("Line");
         }
 
-        void getCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset, float step, float x, TrackProps trackProps, float lineWidth)
+        void GetCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset, float step, float x, TrackProps trackProps, float lineWidth)
         {
             Vector3[] points = new Vector3[3];
             Vector3[] tangents = new Vector3[2];
@@ -117,7 +117,7 @@ namespace VisualMusic
             {
                 points[i] = new Vector3();
                 points[i].X = x + i * step - step;
-                points[i].Y = Project.getCurveScreenY(points[i].X, trackProps.TrackView.Curve);
+                points[i].Y = Project.GetCurveScreenY(points[i].X, trackProps.TrackView.Curve);
                 points[i].Z = 0;
             }
 
@@ -141,15 +141,15 @@ namespace VisualMusic
             vertexOffset *= lineWidth / 2.0f;
         }
 
-        void calcTexCoords(out Vector2 vert1Tc, out Vector2 vert2Tc, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
+        void CalcTexCoords(out Vector2 vert1Tc, out Vector2 vert2Tc, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
         {
             double x1, y1, x2, y2;
-            calcTexCoords(out x1, out y1, out x2, out y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, false, false);
+            CalcTexCoords(out x1, out y1, out x2, out y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, false, false);
             vert1Tc = new Vector2((float)x1, (float)y1);
             vert2Tc = new Vector2((float)x2, (float)y2);
         }
 
-        void calcTexCoords(out double x1, out double y1, out double x2, out double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect, bool forceTiling)
+        void CalcTexCoords(out double x1, out double y1, out double x2, out double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect, bool forceTiling)
         {
             double vpSizeX = Project.Props.Camera.ViewportSize.X;
             double vpSizeY = Project.Props.Camera.ViewportSize.Y;
@@ -229,12 +229,12 @@ namespace VisualMusic
             else
                 throw new NotImplementedException();
             if (!adjustingAspect)
-                adjustAspect(ref x1, ref y1, ref x2, ref y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2);
+                AdjustAspect(ref x1, ref y1, ref x2, ref y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2);
             y1 *= -1;
             y2 *= -1;
         }
 
-        void adjustAspect(ref double x1, ref double y1, ref double x2, ref double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2)
+        void AdjustAspect(ref double x1, ref double y1, ref double x2, ref double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2)
         {
             if ((bool)texProps.KeepAspect)
             {
@@ -243,8 +243,8 @@ namespace VisualMusic
                 float intWorldPosX = (int)worldPos1.X;
                 worldPos1.X -= intWorldPosX;
                 worldPos2.X -= intWorldPosX;
-                calcTexCoords(out regularX1, out regularY1, out regularX2, out regularY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, false);
-                calcTexCoords(out tiledX1, out tiledY1, out tiledX2, out tiledY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, true);
+                CalcTexCoords(out regularX1, out regularY1, out regularX2, out regularY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, false);
+                CalcTexCoords(out tiledX1, out tiledY1, out tiledX2, out tiledY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, true);
                 double xDiff = regularX1 - regularX2, yDiff = regularY1 - regularY2;
                 double tiledXDiff = tiledX1 - tiledX2, tiledYDiff = tiledY1 - tiledY2;
 
@@ -267,14 +267,14 @@ namespace VisualMusic
             }
         }
 
-        void setHlCirclePos(Vector3 pos)
+        void SetHlCirclePos(Vector3 pos)
         {
-            fx.Parameters["WorldPos"].SetValue(pos);
+            _fx.Parameters["WorldPos"].SetValue(pos);
             float halfHlSize = VpHlSize / 2.0f;
-            lineHlVerts[0].pos = new Vector3(-halfHlSize, -halfHlSize, 0) + pos;
-            lineHlVerts[1].pos = new Vector3(halfHlSize, -halfHlSize, 0) + pos;
-            lineHlVerts[2].pos = new Vector3(-halfHlSize, halfHlSize, 0) + pos;
-            lineHlVerts[3].pos = new Vector3(halfHlSize, halfHlSize, 0) + pos;
+            s_lineHlVerts[0].pos = new Vector3(-halfHlSize, -halfHlSize, 0) + pos;
+            s_lineHlVerts[1].pos = new Vector3(halfHlSize, -halfHlSize, 0) + pos;
+            s_lineHlVerts[2].pos = new Vector3(-halfHlSize, halfHlSize, 0) + pos;
+            s_lineHlVerts[3].pos = new Vector3(halfHlSize, halfHlSize, 0) + pos;
         }
 
         //static string GetName<T>(T item) where T : class
@@ -282,7 +282,7 @@ namespace VisualMusic
         //	return typeof(T).GetProperties()[0].Name;
         //}
 
-        public override void createGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)
+        public override void CreateGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)
         {
             LineGeo lineGeo = new LineGeo();
             geo = lineGeo;
@@ -320,10 +320,10 @@ namespace VisualMusic
                 else
                     nextNote = note;
 
-                Vector2 noteStart = Project.getScreenPos(note.start, note.pitch);
-                float noteEnd = Project.getScreenPos(note.stop, note.pitch).X;
+                Vector2 noteStart = Project.GetScreenPos(note.start, note.pitch);
+                float noteEnd = Project.GetScreenPos(note.stop, note.pitch).X;
 
-                Vector2 nextNoteStart = Project.getScreenPos(nextNote.start, nextNote.pitch);
+                Vector2 nextNoteStart = Project.GetScreenPos(nextNote.start, nextNote.pitch);
                 if (noteEnd > nextNoteStart.X && completeNoteListIndex < midiTrack.Notes.Count - 1)
                     noteEnd = nextNoteStart.X;
 
@@ -343,7 +343,7 @@ namespace VisualMusic
                 if (startDraw == endDraw)
                     continue;
 
-                float curvature = calcLinearLineAngle(n, trackProps.TrackView.Curve);
+                float curvature = CalcLinearLineAngle(n, trackProps.TrackView.Curve);
                 //if (n > 0)
                 //{
                 //	float prevCurvature = calcLinearLineAngle(n - 1, trackProps.TrackView.Curve);
@@ -351,7 +351,7 @@ namespace VisualMusic
                 //		curvature = (prevCurvature + curvature) / 2;    //Prevent too big jumps between levels of tesselation which will cause sharp bends
                 //}
                 if (n < noteList.Count - 1)
-                    curvature = Math.Max(curvature, calcLinearLineAngle(n + 1, trackProps.TrackView.Curve));
+                    curvature = Math.Max(curvature, CalcLinearLineAngle(n + 1, trackProps.TrackView.Curve));
 
                 //curvature /= (float)Math.PI; //Map to [0,1]
                 curvature = Math.Min(curvature, 0.97f * (float)Math.PI); //Clip below 180 degrees to avoid extreme tesselation
@@ -374,9 +374,9 @@ namespace VisualMusic
                 for (float x = startDraw; x <= endDraw + 0.00001f; x += step)
                 {
                     Vector3 center, normal, vertexOffset;
-                    getCurvePoint(out center, out normal, out vertexOffset, step, x, trackProps, vpLineWidth);
+                    GetCurvePoint(out center, out normal, out vertexOffset, step, x, trackProps, vpLineWidth);
                     //normal.X = curvature/10f;
-                    lineVerts[vertIndex].normal = lineVerts[vertIndex + 1].normal = normal;
+                    s_lineVerts[vertIndex].normal = s_lineVerts[vertIndex + 1].normal = normal;
 
                     //Create vertices
                     //adjustCurvePoint(center, vertexOffset, -1, trackProps, lineVerts, vertIndex, step, vpLineWidth);
@@ -384,16 +384,16 @@ namespace VisualMusic
 
                     //curvature = trackProps.TrackView.Curve.EvaluateCurvature(Project.getTimeT(x));
                     //center.Y = curvature / 10;
-                    lineVerts[vertIndex].pos = center - vertexOffset;
-                    lineVerts[vertIndex + 1].pos = center + vertexOffset;
-                    lineVerts[vertIndex].center = lineVerts[vertIndex + 1].center = center;
+                    s_lineVerts[vertIndex].pos = center - vertexOffset;
+                    s_lineVerts[vertIndex + 1].pos = center + vertexOffset;
+                    s_lineVerts[vertIndex].center = s_lineVerts[vertIndex + 1].center = center;
                     float normStepFromNoteStart = (x - startDraw) / (nextNoteStart.X - noteStart.X);
                     //lineVerts[vertIndex].normStepFromNoteStart = lineVerts[vertIndex + 1].normStepFromNoteStart = normStepFromNoteStart;
-                    lineVerts[vertIndex].normPos = new Vector2(normStepFromNoteStart, 0);
-                    lineVerts[vertIndex + 1].normPos = new Vector2(normStepFromNoteStart, 1);
+                    s_lineVerts[vertIndex].normPos = new Vector2(normStepFromNoteStart, 0);
+                    s_lineVerts[vertIndex + 1].normPos = new Vector2(normStepFromNoteStart, 1);
 
                     if (texMaterial.TexProps.Texture != null)
-                        calcTexCoords(out lineVerts[vertIndex].texCoords, out lineVerts[vertIndex + 1].texCoords, texMaterial.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, lineVerts[vertIndex].pos, lineVerts[vertIndex + 1].pos);
+                        CalcTexCoords(out s_lineVerts[vertIndex].texCoords, out s_lineVerts[vertIndex + 1].texCoords, texMaterial.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, s_lineVerts[vertIndex].pos, s_lineVerts[vertIndex + 1].pos);
 
                     if (LineType == VisualMusic.LineType.Ribbon)
                     {
@@ -402,11 +402,11 @@ namespace VisualMusic
                         do
                         {
                             hLineEnd += step;
-                        } while ((int)center.Y == (int)Project.getCurveScreenY((float)hLineEnd + step, trackProps.TrackView.Curve) && hLineEnd < endDraw);
+                        } while ((int)center.Y == (int)Project.GetCurveScreenY((float)hLineEnd + step, trackProps.TrackView.Curve) && hLineEnd < endDraw);
                         if (hLineEnd > hLineStart + vpLineWidth / 2)
                         {
-                            hLineVerts[hLineVertIndex++] = lineVerts[vertIndex];
-                            hLineVerts[hLineVertIndex++] = lineVerts[vertIndex + 1];
+                            s_hLineVerts[hLineVertIndex++] = s_lineVerts[vertIndex];
+                            s_hLineVerts[hLineVertIndex++] = s_lineVerts[vertIndex + 1];
                         }
                         //float horizontalFactor = Math.Abs(normal.Y);
                         //float horizontalLimit = 0.98f;
@@ -420,18 +420,18 @@ namespace VisualMusic
 
                     if (x == startDraw && vertIndex > 3)
                     {
-                        lineVerts[vertIndex].pos = lineVerts[vertIndex - 2].pos;
-                        lineVerts[vertIndex + 1].pos = lineVerts[vertIndex - 1].pos;
+                        s_lineVerts[vertIndex].pos = s_lineVerts[vertIndex - 2].pos;
+                        s_lineVerts[vertIndex + 1].pos = s_lineVerts[vertIndex - 1].pos;
                     }
 
                     //Create bounding box
                     if (bboxStart == Vector3.Zero)
-                        bboxStart = lineVerts[vertIndex].center;
-                    Vector3 bboxEnd = lineVerts[vertIndex].center;
+                        bboxStart = s_lineVerts[vertIndex].center;
+                    Vector3 bboxEnd = s_lineVerts[vertIndex].center;
                     if (Vector3.DistanceSquared(bboxStart, bboxEnd) > bboxMinSqLength)
                     {
                         Vector3 bboxCenter = (bboxStart + bboxEnd) / 2;
-                        geo.bboxes.Add(new BoundingBoxEx(bboxCenter, bboxEnd - bboxCenter, bboxEnd - lineVerts[vertIndex].pos, new Vector3(0, 0, 0)));
+                        geo.bboxes.Add(new BoundingBoxEx(bboxCenter, bboxEnd - bboxCenter, bboxEnd - s_lineVerts[vertIndex].pos, new Vector3(0, 0, 0)));
                         bboxStart = bboxEnd;
                     }
 
@@ -439,7 +439,7 @@ namespace VisualMusic
 
                     if (vertIndex >= MaxLineVerts - 2 || hLineVertIndex >= MaxHLineVerts - 2)
                     {
-                        createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
+                        CreateLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
                         x -= step;
                     }
                     //break;
@@ -448,14 +448,14 @@ namespace VisualMusic
                 if (!(bool)Continuous)
                     endOfSegment = true; //One draw call per note. Can be used to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
                 if (endOfSegment)
-                    createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
+                    CreateLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
 
                 completeNoteListIndex++;
             }
-            createLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
+            CreateLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
         }
 
-        float calcLinearLineAngle(int noteIndex, Curve curve)
+        float CalcLinearLineAngle(int noteIndex, Curve curve)
         {
             Vector2 prevVec = Vector2.UnitX;
             if (noteIndex > 0)
@@ -465,13 +465,13 @@ namespace VisualMusic
                     prevVec = Vector2.UnitX;
             }
 
-            prevVec.X = Project.getScreenPosX((int)prevVec.X);
+            prevVec.X = Project.GetScreenPosX((int)prevVec.X);
             prevVec.Y = prevVec.Y * Project.Props.NoteHeight;
 
             Vector2 nextVec = curve.Keys[noteIndex].NextVector;
             if (nextVec == Vector2.Zero)
                 nextVec = Vector2.UnitX;
-            nextVec.X = Project.getScreenPosX((int)nextVec.X);
+            nextVec.X = Project.GetScreenPosX((int)nextVec.X);
             nextVec.Y = nextVec.Y * Project.Props.NoteHeight;
 
             nextVec.Normalize();
@@ -487,11 +487,11 @@ namespace VisualMusic
             return angle;
         }
 
-        void adjustCurvePoint(Vector3 center, Vector3 vertexOffset, int side, TrackProps trackProps, LineVertex[] lineVerts, int vertIndex, float step, float lineWidth)
+        void AdjustCurvePoint(Vector3 center, Vector3 vertexOffset, int side, TrackProps trackProps, LineVertex[] lineVerts, int vertIndex, float step, float lineWidth)
         {
             Vector3 curPos = center + vertexOffset * side;
             Vector3 dummyCenter, dummyNormal, newVerteexOffset;
-            getCurvePoint(out dummyCenter, out dummyNormal, out newVerteexOffset, step, curPos.X, trackProps, lineWidth);
+            GetCurvePoint(out dummyCenter, out dummyNormal, out newVerteexOffset, step, curPos.X, trackProps, lineWidth);
             float newPosX = curPos.X + newVerteexOffset.X * side;
 
             lineVerts[vertIndex].pos = curPos;
@@ -517,7 +517,7 @@ namespace VisualMusic
             lineVerts[vertIndex].normal.Normalize();
         }
 
-        public override void drawGeoChunk(Geo geo)
+        public override void DrawGeoChunk(Geo geo)
         {
             LineGeo lineGeo = (LineGeo)geo;
             foreach (var vb in lineGeo.lineVb)
@@ -533,7 +533,7 @@ namespace VisualMusic
 
         }
 
-        void createLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo, float lineWidth)
+        void CreateLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo, float lineWidth)
         {
             //Console.WriteLine(numVerts);
             if (lineWidth > 0)
@@ -542,15 +542,15 @@ namespace VisualMusic
                 {
                     if (numHLineVerts > 1)
                     {
-                        VertexBuffer vb = new VertexBuffer(GraphicsDevice, lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
-                        vb.SetData(hLineVerts, 0, numHLineVerts);
+                        VertexBuffer vb = new VertexBuffer(GraphicsDevice, s_lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
+                        vb.SetData(s_hLineVerts, 0, numHLineVerts);
                         geo.hLineVb.Add(vb);
                         numHLineVerts = 0;
                     }
                     if (numVerts > 5)
                     {
-                        VertexBuffer vb = new VertexBuffer(GraphicsDevice, lineVertDecl, numVerts, BufferUsage.WriteOnly);
-                        vb.SetData(lineVerts, 0, numVerts);
+                        VertexBuffer vb = new VertexBuffer(GraphicsDevice, s_lineVertDecl, numVerts, BufferUsage.WriteOnly);
+                        vb.SetData(s_lineVerts, 0, numVerts);
                         geo.lineVb.Add(vb);
                         numVerts = 3;
                     }
@@ -558,11 +558,11 @@ namespace VisualMusic
             }
         }
 
-        public override void drawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)
+        public override void DrawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)
         {
             float songPosP;
 
-            base.drawTrack(midiTrack, trackProps, texMaterial, out songPosP);
+            base.DrawTrack(midiTrack, trackProps, texMaterial, out songPosP);
             List<Midi.Note> noteList = midiTrack.Notes;
             //List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
             if (noteList.Count == 0)
@@ -570,27 +570,27 @@ namespace VisualMusic
 
             //this.trackProps = trackProps;
 
-            fx.Parameters["LineType"].SetValue((int)LineType);
-            fx.Parameters["HlSize"].SetValue(VpHlSize / 2.0f);
+            _fx.Parameters["LineType"].SetValue((int)LineType);
+            _fx.Parameters["HlSize"].SetValue(VpHlSize / 2.0f);
             float radius = (float)VpLineWidth / 2.0f;
-            fx.Parameters["Radius"].SetValue(radius);
-            fx.Parameters["InnerHlSize"].SetValue(0.0f);
+            _fx.Parameters["Radius"].SetValue(radius);
+            _fx.Parameters["InnerHlSize"].SetValue(0.0f);
 
-            fx.CurrentTechnique = fx.Techniques["Line"];
-            fx.Parameters["DiscardAtOnce"].SetValue(true);
-            fx.CurrentTechnique.Passes[0].Apply();
-            drawGeoChunk(trackProps.TrackView.Geo);
-            fx.Parameters["DiscardAtOnce"].SetValue(false);
-            fx.CurrentTechnique.Passes[0].Apply();
-            drawGeoChunk(trackProps.TrackView.Geo);
+            _fx.CurrentTechnique = _fx.Techniques["Line"];
+            _fx.Parameters["DiscardAtOnce"].SetValue(true);
+            _fx.CurrentTechnique.Passes[0].Apply();
+            DrawGeoChunk(trackProps.TrackView.Geo);
+            _fx.Parameters["DiscardAtOnce"].SetValue(false);
+            _fx.CurrentTechnique.Passes[0].Apply();
+            DrawGeoChunk(trackProps.TrackView.Geo);
 
             DepthStencilState oldDss = GraphicsDevice.DepthStencilState;
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
-            drawHighLights(midiTrack, trackProps, songPosP);
+            DrawHighLights(midiTrack, trackProps, songPosP);
             GraphicsDevice.DepthStencilState = oldDss;
         }
 
-        void drawHighLights(Midi.Track midiTrack, TrackProps trackProps, float songPosP)
+        void DrawHighLights(Midi.Track midiTrack, TrackProps trackProps, float songPosP)
         {
             List<Midi.Note> noteList = midiTrack.Notes;
             int hlNoteIndex = midiTrack.getLastNoteIndexAtTime((int)(Project.SongPosT - Project.PlaybackOffsetT));
@@ -605,10 +605,10 @@ namespace VisualMusic
             else
                 nextNote = note;
 
-            Vector3 noteStart = new Vector3(Project.getScreenPos(note.start, note.pitch), 0);
-            float noteEnd = Project.getScreenPos(note.stop, note.pitch).X;
+            Vector3 noteStart = new Vector3(Project.GetScreenPos(note.start, note.pitch), 0);
+            float noteEnd = Project.GetScreenPos(note.stop, note.pitch).X;
 
-            Vector3 nextNoteStart = new Vector3(Project.getScreenPos(nextNote.start, nextNote.pitch), 0);
+            Vector3 nextNoteStart = new Vector3(Project.GetScreenPos(nextNote.start, nextNote.pitch), 0);
             if (noteEnd > nextNoteStart.X && hlNoteIndex < noteList.Count - 1)
                 noteEnd = nextNoteStart.X;
 
@@ -626,7 +626,7 @@ namespace VisualMusic
             {
                 float poweredNormPos = (float)Math.Pow(normPos, (double)HlMovementPow);
                 hlPos.X = noteStart.X + poweredNormPos * noteLength;
-                hlPos.Y = Project.getScreenPosY(trackProps.TrackView.Curve.Evaluate((float)Project.pixelsToTicks(hlPos.X)));
+                hlPos.Y = Project.GetScreenPosY(trackProps.TrackView.Curve.Evaluate((float)Project.PixelsToTicks(hlPos.X)));
             }
 
             //Set common fx params---------------------
@@ -639,16 +639,16 @@ namespace VisualMusic
                 if ((bool)HlBorder)
                     shrinkPercent = 1;
             }
-            fx.Parameters["ClipPercent"].SetValue(shrinkPercent);
+            _fx.Parameters["ClipPercent"].SetValue(shrinkPercent);
             float innerHlSize = VpHlSize * 0.5f * (1 - shrinkPercent);
-            fx.Parameters["InnerHlSize"].SetValue(innerHlSize);
+            _fx.Parameters["InnerHlSize"].SetValue(innerHlSize);
 
             //Vector4 hlColor;
             //Texture2D hlTexture;
             //getMaterial(trackProps, true, out hlColor, out hlTexture);
             //Vector4 hlColor = fx.Parameters["HlColor"].GetValueVector4();
             //fx.Parameters["HlColor"].SetValue(SongPanel.HSLA2RGBA(hlColor).ToVector4());
-            fx.Parameters["Border"].SetValue((bool)HlBorder);
+            _fx.Parameters["Border"].SetValue((bool)HlBorder);
             //-----------------------------------------------
 
             if (HlType == LineHlType.Arrow)
@@ -667,8 +667,8 @@ namespace VisualMusic
                     float x1 = hlPos.X;
                     float y1 = hlPos.Y;
                     float x2 = x1 + 0.001f;
-                    float pitch2 = trackProps.TrackView.Curve.Evaluate((float)Project.pixelsToTicks(x2));
-                    float y2 = Project.getScreenPosY(pitch2);
+                    float pitch2 = trackProps.TrackView.Curve.Evaluate((float)Project.PixelsToTicks(x2));
+                    float y2 = Project.GetScreenPosY(pitch2);
                     arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
                     arrowLength = VpHlSize * 1.25f;  //Make arrow 25% longer than wide
                 }
@@ -678,54 +678,54 @@ namespace VisualMusic
 
                 float halfArrowWidth = VpHlSize * 0.5f;
 
-                lineHlVerts[0].pos = hlPos + arrowNormal * halfArrowWidth;
-                lineHlVerts[1].pos = hlPos - arrowNormal * halfArrowWidth;
-                lineHlVerts[2].pos = hlPos + arrowDir * arrowLength;
+                s_lineHlVerts[0].pos = hlPos + arrowNormal * halfArrowWidth;
+                s_lineHlVerts[1].pos = hlPos - arrowNormal * halfArrowWidth;
+                s_lineHlVerts[2].pos = hlPos + arrowDir * arrowLength;
 
-                fx.Parameters["ArrowDir"].SetValue(arrowDir);
+                _fx.Parameters["ArrowDir"].SetValue(arrowDir);
                 //lineFx.Parameters["ArrowLength"].SetValue(nextNoteOffsetLength);
-                fx.Parameters["ArrowStart"].SetValue(hlPos);
-                fx.Parameters["ArrowEnd"].SetValue(lineHlVerts[2].pos); //Is used to calc distance from the two "sides" of the triangle (not the bottom) since they share this point
-                Vector3 side1Tangent = lineHlVerts[2].pos - lineHlVerts[0].pos;
+                _fx.Parameters["ArrowStart"].SetValue(hlPos);
+                _fx.Parameters["ArrowEnd"].SetValue(s_lineHlVerts[2].pos); //Is used to calc distance from the two "sides" of the triangle (not the bottom) since they share this point
+                Vector3 side1Tangent = s_lineHlVerts[2].pos - s_lineHlVerts[0].pos;
                 Vector3 side1Normal = new Vector3(-side1Tangent.Y, side1Tangent.X, 0);
                 side1Normal.Normalize();
-                fx.Parameters["Side1Normal"].SetValue(side1Normal);
-                Vector3 side2Tangent = lineHlVerts[2].pos - lineHlVerts[1].pos;
+                _fx.Parameters["Side1Normal"].SetValue(side1Normal);
+                Vector3 side2Tangent = s_lineHlVerts[2].pos - s_lineHlVerts[1].pos;
                 Vector3 side2Normal = new Vector3(-side2Tangent.Y, side2Tangent.X, 0);
                 side2Normal.Normalize();
-                fx.Parameters["Side2Normal"].SetValue(side2Normal);
+                _fx.Parameters["Side2Normal"].SetValue(side2Normal);
 
                 //Calc shortest dist to incenter from border, ie. the inscribed circle's radius
-                float a = (lineHlVerts[0].pos - lineHlVerts[1].pos).Length();
-                float b = (lineHlVerts[0].pos - lineHlVerts[2].pos).Length();
-                float c = (lineHlVerts[1].pos - lineHlVerts[2].pos).Length();
+                float a = (s_lineHlVerts[0].pos - s_lineHlVerts[1].pos).Length();
+                float b = (s_lineHlVerts[0].pos - s_lineHlVerts[2].pos).Length();
+                float c = (s_lineHlVerts[1].pos - s_lineHlVerts[2].pos).Length();
                 float k = (a + b + c) / 2.0f;
                 float icRadius = (float)Math.Sqrt(k * (k - a) * (k - b) * (k - c)) / k;
-                fx.Parameters["DistToCenter"].SetValue(icRadius);
+                _fx.Parameters["DistToCenter"].SetValue(icRadius);
 
-                fx.CurrentTechnique = fx.Techniques["Arrow"];
-                fx.CurrentTechnique.Passes[0].Apply();
-                GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, lineHlVerts, 0, 1);
+                _fx.CurrentTechnique = _fx.Techniques["Arrow"];
+                _fx.CurrentTechnique.Passes[0].Apply();
+                GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, s_lineHlVerts, 0, 1);
             }
             else if (HlType == LineHlType.Circle)
             {
-                setHlCirclePos(hlPos);
+                SetHlCirclePos(hlPos);
 
-                fx.CurrentTechnique = fx.Techniques["Circle"];
-                fx.CurrentTechnique.Passes[0].Apply();
-                GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, lineHlVerts, 0, 2);
+                _fx.CurrentTechnique = _fx.Techniques["Circle"];
+                _fx.CurrentTechnique.Passes[0].Apply();
+                GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, s_lineHlVerts, 0, 2);
             }
         }
 
-        float calcLerpFactor(int x, int x1, int x2)
+        float CalcLerpFactor(int x, int x1, int x2)
         {
             float f = (float)(x - x1) / (float)(x2 - x1);
             return (1 - (float)Math.Cos((double)f * Math.PI)) * 0.5f;
         }
 
-        public static void sInit()
+        public static void SInit()
         {
-            lineVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Vector2, VertexElementUsage.Position, 2), new VertexElement(44, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
+            s_lineVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Vector2, VertexElementUsage.Position, 2), new VertexElement(44, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
             //for (short i = 0; i < lineInds.Length; i++)
             //lineInds[i] = i;
         }
@@ -735,7 +735,7 @@ namespace VisualMusic
     {
         public List<VertexBuffer> lineVb = new List<VertexBuffer>();
         public List<VertexBuffer> hLineVb = new List<VertexBuffer>();
-        protected override void releaseResources()
+        protected override void ReleaseResources()
         {
             foreach (var vb in lineVb)
                 vb.Dispose();

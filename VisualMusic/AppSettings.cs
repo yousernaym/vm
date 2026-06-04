@@ -13,15 +13,15 @@ namespace VisualMusic
     [DataContract]
     public class AppSettings
     {
-        static readonly string FilePath = Path.Combine(Program.AppDataDir, "appsettings.xml");
+        static readonly string s_filePath = Path.Combine(Program.AppDataDir, "appsettings.xml");
         
         // ---- Default theme - Also change in app.xaml.
         const string DefaultThemeBaseColor = "Dark";
         const string DefaultThemeColorScheme = "Teal";
 
         // ---- Singleton ----
-        static AppSettings _instance;
-        public static AppSettings Instance => _instance ??= Load();
+        static AppSettings s_instance;
+        public static AppSettings Instance => s_instance ??= Load();
 
         // ---- Scalar dialog folders ----
         [DataMember] public string ProjectFolder  { get; set; }
@@ -157,12 +157,12 @@ namespace VisualMusic
 
         static AppSettings Load()
         {
-            if (File.Exists(FilePath))
+            if (File.Exists(s_filePath))
             {
                 try
                 {
                     var dcs = new DataContractSerializer(typeof(AppSettings));
-                    using var stream = File.Open(FilePath, FileMode.Open);
+                    using var stream = File.Open(s_filePath, FileMode.Open);
                     return (AppSettings)dcs.ReadObject(stream);
                 }
                 catch { /* corrupt / version mismatch — start fresh */ }
@@ -176,7 +176,7 @@ namespace VisualMusic
             {
                 Directory.CreateDirectory(Program.AppDataDir);
                 var dcs = new DataContractSerializer(typeof(AppSettings));
-                using var stream = File.Open(FilePath, FileMode.Create);
+                using var stream = File.Open(s_filePath, FileMode.Create);
                 dcs.WriteObject(stream, this);
             }
             catch { /* best-effort */ }

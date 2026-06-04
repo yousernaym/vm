@@ -92,7 +92,7 @@
 			this.modEntryCombo.Size = new System.Drawing.Size(158, 21);
 			this.modEntryCombo.TabIndex = 10;
 			this.modEntryCombo.Tag = "Change Modulation Entry";
-			this.modEntryCombo.SelectedValueChanged += new System.EventHandler(this.modEntryCombo_SelectedValueChanged);
+			this.modEntryCombo.SelectedValueChanged += new System.EventHandler(this.ModEntryCombo_SelectedValueChanged);
 			// 
 			// modEntryCm
 			// 
@@ -111,7 +111,7 @@
 			this.newMi.Size = new System.Drawing.Size(210, 22);
 			this.newMi.Tag = "New Modulation Entry";
 			this.newMi.Text = "New entry";
-			this.newMi.Click += new System.EventHandler(this.newMi_Click);
+			this.newMi.Click += new System.EventHandler(this.NewMi_Click);
 			// 
 			// deleteMi
 			// 
@@ -121,7 +121,7 @@
 			this.deleteMi.Size = new System.Drawing.Size(210, 22);
 			this.deleteMi.Tag = "Delete Modulation Entry";
 			this.deleteMi.Text = "Delete entry";
-			this.deleteMi.Click += new System.EventHandler(this.deleteMi_Click);
+			this.deleteMi.Click += new System.EventHandler(this.DeleteMi_Click);
 			// 
 			// cloneMi
 			// 
@@ -132,7 +132,7 @@
 			this.cloneMi.Size = new System.Drawing.Size(210, 22);
 			this.cloneMi.Tag = "Clone Modulation Entry";
 			this.cloneMi.Text = "Clone entry";
-			this.cloneMi.Click += new System.EventHandler(this.cloneMi_Click);
+			this.cloneMi.Click += new System.EventHandler(this.CloneMi_Click);
 			// 
 			// modGbox
 			// 
@@ -190,7 +190,7 @@
 			this.invertCb.Tag = "Invert";
 			this.invertCb.Text = "Invert";
 			this.invertCb.UseVisualStyleBackColor = true;
-			this.invertCb.CheckedChanged += new System.EventHandler(this.invertCb_CheckedChanged);
+			this.invertCb.CheckedChanged += new System.EventHandler(this.InvertCb_CheckedChanged);
 			// 
 			// startUd
 			// 
@@ -205,7 +205,7 @@
 			this.startUd.Size = new System.Drawing.Size(76, 20);
 			this.startUd.TabIndex = 10;
 			this.startUd.Tag = "Edit Start";
-			this.startUd.ValueChanged += new System.EventHandler(this.startUd_ValueChanged);
+			this.startUd.ValueChanged += new System.EventHandler(this.StartUd_ValueChanged);
 			// 
 			// discardStopCb
 			// 
@@ -218,7 +218,7 @@
 			this.discardStopCb.Tag = "Discard after Stop";
 			this.discardStopCb.Text = "Discard after Stop";
 			this.discardStopCb.UseVisualStyleBackColor = true;
-			this.discardStopCb.CheckedChanged += new System.EventHandler(this.discardStopCb_CheckedChanged);
+			this.discardStopCb.CheckedChanged += new System.EventHandler(this.DiscardStopCb_CheckedChanged);
 			// 
 			// label2
 			// 
@@ -251,7 +251,7 @@
 			this.powerUd.Size = new System.Drawing.Size(76, 20);
 			this.powerUd.TabIndex = 50;
 			this.powerUd.Tag = "Edit Fade power";
-			this.powerUd.ValueChanged += new System.EventHandler(this.powerUd_ValueChanged);
+			this.powerUd.ValueChanged += new System.EventHandler(this.PowerUd_ValueChanged);
 			// 
 			// label19
 			// 
@@ -284,7 +284,7 @@
 			this.fadeOutUd.Size = new System.Drawing.Size(76, 20);
 			this.fadeOutUd.TabIndex = 40;
 			this.fadeOutUd.Tag = "Edit Fade out";
-			this.fadeOutUd.ValueChanged += new System.EventHandler(this.fadeOutUd_ValueChanged);
+			this.fadeOutUd.ValueChanged += new System.EventHandler(this.FadeOutUd_ValueChanged);
 			// 
 			// label42
 			// 
@@ -308,7 +308,7 @@
 			this.stopUd.Size = new System.Drawing.Size(76, 20);
 			this.stopUd.TabIndex = 20;
 			this.stopUd.Tag = "Edit Stop";
-			this.stopUd.ValueChanged += new System.EventHandler(this.stopUd_ValueChanged);
+			this.stopUd.ValueChanged += new System.EventHandler(this.StopUd_ValueChanged);
 			// 
 			// fadeInUd
 			// 
@@ -323,7 +323,7 @@
 			this.fadeInUd.Size = new System.Drawing.Size(76, 20);
 			this.fadeInUd.TabIndex = 30;
 			this.fadeInUd.Tag = "Edit Fade in";
-			this.fadeInUd.ValueChanged += new System.EventHandler(this.fadeInUd_ValueChanged);
+			this.fadeInUd.ValueChanged += new System.EventHandler(this.FadeInUd_ValueChanged);
 			// 
 			// destinationsGb
 			// 
@@ -349,7 +349,7 @@
 			this.angleDestCb.Tag = "Angle";
 			this.angleDestCb.Text = "Angle";
 			this.angleDestCb.UseVisualStyleBackColor = true;
-			this.angleDestCb.CheckedChanged += new System.EventHandler(this.angleDestCb_CheckedChanged);
+			this.angleDestCb.CheckedChanged += new System.EventHandler(this.AngleDestCb_CheckedChanged);
 			// 
 			// label5
 			// 
@@ -370,7 +370,7 @@
 			this.colorDestCb.Tag = "Color";
 			this.colorDestCb.Text = "Color";
 			this.colorDestCb.UseVisualStyleBackColor = true;
-			this.colorDestCb.CheckedChanged += new System.EventHandler(this.colorDestCb_CheckedChanged);
+			this.colorDestCb.CheckedChanged += new System.EventHandler(this.ColorDestCb_CheckedChanged);
 			// 
 			// colorDestBtn
 			// 
@@ -381,7 +381,7 @@
 			this.colorDestBtn.TabIndex = 20;
 			this.colorDestBtn.Tag = "Edit Color";
 			this.colorDestBtn.UseVisualStyleBackColor = false;
-			this.colorDestBtn.Click += new System.EventHandler(this.colorDestBtn_Click);
+			this.colorDestBtn.Click += new System.EventHandler(this.ColorDestBtn_Click);
 			// 
 			// angleDestUd
 			// 
@@ -400,7 +400,7 @@
             0,
             0,
             0});
-			this.angleDestUd.ValueChanged += new System.EventHandler(this.angleDestUd_ValueChanged);
+			this.angleDestUd.ValueChanged += new System.EventHandler(this.AngleDestUd_ValueChanged);
 			// 
 			// pixelPosGb
 			// 
@@ -429,7 +429,7 @@
 			this.squareAspectCb.Tag = "Square aspect";
 			this.squareAspectCb.Text = "Square aspect";
 			this.squareAspectCb.UseVisualStyleBackColor = true;
-			this.squareAspectCb.CheckedChanged += new System.EventHandler(this.squareAspectCb_CheckedChanged);
+			this.squareAspectCb.CheckedChanged += new System.EventHandler(this.SquareAspectCb_CheckedChanged);
 			// 
 			// yOriginCb
 			// 
@@ -441,7 +441,7 @@
 			this.yOriginCb.Tag = "Y Origin";
 			this.yOriginCb.Text = "Y";
 			this.yOriginCb.UseVisualStyleBackColor = true;
-			this.yOriginCb.CheckedChanged += new System.EventHandler(this.yOriginCb_CheckedChanged);
+			this.yOriginCb.CheckedChanged += new System.EventHandler(this.YOriginCb_CheckedChanged);
 			// 
 			// xOriginCb
 			// 
@@ -453,7 +453,7 @@
 			this.xOriginCb.Tag = "X Origin";
 			this.xOriginCb.Text = "X";
 			this.xOriginCb.UseVisualStyleBackColor = true;
-			this.xOriginCb.CheckedChanged += new System.EventHandler(this.xOriginCb_CheckedChanged);
+			this.xOriginCb.CheckedChanged += new System.EventHandler(this.XOriginCb_CheckedChanged);
 			// 
 			// label8
 			// 
@@ -494,7 +494,7 @@
             0,
             0,
             65536});
-			this.yOriginUd.ValueChanged += new System.EventHandler(this.yOriginUd_ValueChanged);
+			this.yOriginUd.ValueChanged += new System.EventHandler(this.YOriginUd_ValueChanged);
 			// 
 			// xOriginUd
 			// 
@@ -525,7 +525,7 @@
             0,
             0,
             65536});
-			this.xOriginUd.ValueChanged += new System.EventHandler(this.xOriginUd_ValueChanged);
+			this.xOriginUd.ValueChanged += new System.EventHandler(this.XOriginUd_ValueChanged);
 			// 
 			// combineXYCombo
 			// 
@@ -540,7 +540,7 @@
 			this.combineXYCombo.Size = new System.Drawing.Size(92, 21);
 			this.combineXYCombo.TabIndex = 50;
 			this.combineXYCombo.Tag = "Change Combine";
-			this.combineXYCombo.SelectedIndexChanged += new System.EventHandler(this.combineXYCombo_SelectedIndexChanged);
+			this.combineXYCombo.SelectedIndexChanged += new System.EventHandler(this.CombineXYCombo_SelectedIndexChanged);
 			// 
 			// label9
 			// 

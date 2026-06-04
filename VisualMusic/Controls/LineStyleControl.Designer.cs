@@ -87,7 +87,7 @@
 			this.hlBorderCb.Tag = "Border";
 			this.hlBorderCb.Text = "Border";
 			this.hlBorderCb.UseVisualStyleBackColor = true;
-			this.hlBorderCb.CheckedChanged += new System.EventHandler(this.hlBorderCb_CheckedChanged);
+			this.hlBorderCb.CheckedChanged += new System.EventHandler(this.HlBorderCb_CheckedChanged);
 			// 
 			// shrinkingHlCb
 			// 
@@ -99,7 +99,7 @@
 			this.shrinkingHlCb.Tag = "Shrinking";
 			this.shrinkingHlCb.Text = "Shrinking";
 			this.shrinkingHlCb.UseVisualStyleBackColor = true;
-			this.shrinkingHlCb.CheckedChanged += new System.EventHandler(this.shrinkingHlCb_CheckedChanged);
+			this.shrinkingHlCb.CheckedChanged += new System.EventHandler(this.ShrinkingHlCb_CheckedChanged);
 			// 
 			// lineHlTypeList
 			// 
@@ -112,7 +112,7 @@
 			this.lineHlTypeList.TabIndex = 10;
 			this.lineHlTypeList.Tag = "Change Highlight Type";
 			this.lineHlTypeList.ValueMember = "Value";
-			this.lineHlTypeList.SelectedIndexChanged += new System.EventHandler(this.lineHlTypeList_SelectedIndexChanged);
+			this.lineHlTypeList.SelectedIndexChanged += new System.EventHandler(this.LineHlTypeList_SelectedIndexChanged);
 			// 
 			// movingHlCb
 			// 
@@ -124,7 +124,7 @@
 			this.movingHlCb.Tag = "Moving";
 			this.movingHlCb.Text = "Moving";
 			this.movingHlCb.UseVisualStyleBackColor = true;
-			this.movingHlCb.CheckedChanged += new System.EventHandler(this.movingHlCb_CheckedChanged);
+			this.movingHlCb.CheckedChanged += new System.EventHandler(this.MovingHlCb_CheckedChanged);
 			// 
 			// label3
 			// 
@@ -162,7 +162,7 @@
             0,
             0,
             0});
-			this.hlMovementPowUd.ValueChanged += new System.EventHandler(this.hlMovementPowUd_ValueChanged);
+			this.hlMovementPowUd.ValueChanged += new System.EventHandler(this.HlMovementPowUd_ValueChanged);
 			// 
 			// hlSizeUpDown
 			// 
@@ -171,7 +171,7 @@
 			this.hlSizeUpDown.Size = new System.Drawing.Size(61, 20);
 			this.hlSizeUpDown.TabIndex = 20;
 			this.hlSizeUpDown.Tag = "Edit Highlight Size";
-			this.hlSizeUpDown.ValueChanged += new System.EventHandler(this.hlSizeUpDown_ValueChanged);
+			this.hlSizeUpDown.ValueChanged += new System.EventHandler(this.HlSizeUpDown_ValueChanged);
 			// 
 			// label27
 			// 
@@ -208,7 +208,7 @@
             0,
             0,
             0});
-			this.lineWidthUd.ValueChanged += new System.EventHandler(this.lineWidthUd_ValueChanged);
+			this.lineWidthUd.ValueChanged += new System.EventHandler(this.LineWidthUd_ValueChanged);
 			// 
 			// lineTypeList
 			// 
@@ -221,7 +221,7 @@
 			this.lineTypeList.TabIndex = 10;
 			this.lineTypeList.Tag = "Change Line Type";
 			this.lineTypeList.ValueMember = "Value";
-			this.lineTypeList.SelectedIndexChanged += new System.EventHandler(this.lineTypeList_SelectedIndexChanged);
+			this.lineTypeList.SelectedIndexChanged += new System.EventHandler(this.LineTypeList_SelectedIndexChanged);
 			// 
 			// label17
 			// 
@@ -249,7 +249,7 @@
 			this.qnGapFillUd.Size = new System.Drawing.Size(59, 20);
 			this.qnGapFillUd.TabIndex = 30;
 			this.qnGapFillUd.Tag = "Edit Fill gaps";
-			this.qnGapFillUd.ValueChanged += new System.EventHandler(this.qnGapFillUd_ValueChanged);
+			this.qnGapFillUd.ValueChanged += new System.EventHandler(this.QnGapFillUd_ValueChanged);
 			// 
 			// label12
 			// 
@@ -289,7 +289,7 @@
 			this.continuousCb.Tag = "Continuous";
 			this.continuousCb.Text = "Continuous";
 			this.continuousCb.UseVisualStyleBackColor = true;
-			this.continuousCb.CheckedChanged += new System.EventHandler(this.continuousCb_CheckedChanged);
+			this.continuousCb.CheckedChanged += new System.EventHandler(this.ContinuousCb_CheckedChanged);
 			// 
 			// LineStyleControl
 			// 

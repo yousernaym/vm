@@ -46,7 +46,7 @@
 			// 
 			this.okBtn.Location = new System.Drawing.Point(87, 188);
 			this.okBtn.TabIndex = 60;
-			this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
+			this.okBtn.Click += new System.EventHandler(this.OkBtn_Click);
 			// 
 			// cancelBtn
 			// 
@@ -62,7 +62,7 @@
 			this.sphereCb.TabIndex = 10;
 			this.sphereCb.Text = "Spherical";
 			this.sphereCb.UseVisualStyleBackColor = true;
-			this.sphereCb.CheckedChanged += new System.EventHandler(this.sphereCb_CheckedChanged);
+			this.sphereCb.CheckedChanged += new System.EventHandler(this.SphereCb_CheckedChanged);
 			// 
 			// stereoscopicCb
 			// 
@@ -85,7 +85,7 @@
 			this.sphericalMetadataCb.TabIndex = 20;
 			this.sphericalMetadataCb.Text = "Add spherical metadata";
 			this.sphericalMetadataCb.UseVisualStyleBackColor = true;
-			this.sphericalMetadataCb.CheckedChanged += new System.EventHandler(this.vrMetadataCb_CheckedChanged);
+			this.sphericalMetadataCb.CheckedChanged += new System.EventHandler(this.VrMetadataCb_CheckedChanged);
 			// 
 			// resoCombo
 			// 
@@ -94,9 +94,9 @@
 			this.resoCombo.Name = "resoCombo";
 			this.resoCombo.Size = new System.Drawing.Size(112, 21);
 			this.resoCombo.TabIndex = 40;
-			this.resoCombo.DropDown += new System.EventHandler(this.resoComboBox_DropDown);
-			this.resoCombo.DropDownClosed += new System.EventHandler(this.resoCombo_DropDownClosed);
-			this.resoCombo.TextChanged += new System.EventHandler(this.resoComboBox_TextChanged);
+			this.resoCombo.DropDown += new System.EventHandler(this.ResoComboBox_DropDown);
+			this.resoCombo.DropDownClosed += new System.EventHandler(this.ResoCombo_DropDownClosed);
+			this.resoCombo.TextChanged += new System.EventHandler(this.ResoComboBox_TextChanged);
 			// 
 			// label1
 			// 
@@ -120,7 +120,7 @@
 			this.ssFactorComboBox.Name = "ssFactorComboBox";
 			this.ssFactorComboBox.Size = new System.Drawing.Size(112, 21);
 			this.ssFactorComboBox.TabIndex = 50;
-			this.ssFactorComboBox.TextChanged += new System.EventHandler(this.ssFactorComboBox_TextChanged);
+			this.ssFactorComboBox.TextChanged += new System.EventHandler(this.SsFactorComboBox_TextChanged);
 			// 
 			// label2
 			// 
@@ -147,7 +147,7 @@
 			this.fpsUd.Name = "fpsUd";
 			this.fpsUd.Size = new System.Drawing.Size(62, 20);
 			this.fpsUd.TabIndex = 71;
-			this.fpsUd.ValueChanged += new System.EventHandler(this.fpsUd_ValueChanged);
+			this.fpsUd.ValueChanged += new System.EventHandler(this.FpsUd_ValueChanged);
 			// 
 			// label4
 			// 
@@ -166,7 +166,7 @@
 			this.videoQualityLossCombo.Name = "videoQualityLossCombo";
 			this.videoQualityLossCombo.Size = new System.Drawing.Size(112, 21);
 			this.videoQualityLossCombo.TabIndex = 50;
-			this.videoQualityLossCombo.SelectedIndexChanged += new System.EventHandler(this.videoQualityLossCombo_SelectedIndexChanged);
+			this.videoQualityLossCombo.SelectedIndexChanged += new System.EventHandler(this.VideoQualityLossCombo_SelectedIndexChanged);
 			// 
 			// VideoExportForm
 			// 

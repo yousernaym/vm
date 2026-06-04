@@ -11,7 +11,7 @@ namespace VisualMusic.ViewModels
     {
         public ObservableCollection<TrackItemViewModel> Items { get; } = new();
 
-        [ObservableProperty] TrackItemViewModel selectedItem;
+        [ObservableProperty] TrackItemViewModel _selectedItem;
 
         // Code-behind pushes the ListView.SelectedItems here (read-only on the ListView itself).
         public IList<TrackItemViewModel> SelectedItems { get; set; } = new List<TrackItemViewModel>();

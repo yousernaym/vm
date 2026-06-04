@@ -14,12 +14,12 @@ namespace VisualMusic
         public DialogResult ShowDialog(string searchDir, string fileName)
         {
             dirTb.Text = searchDir;
-            return base.ShowDialog(() => findFile(searchDir, fileName), "Searching in folder");
+            return base.ShowDialog(() => FindFile(searchDir, fileName), "Searching in folder");
         }
 
         //Search dir recursively
         //Return path to file if found, otherwise null
-        string findFile(string searchDir, string fileName)
+        string FindFile(string searchDir, string fileName)
         {
             WaitForTaskForm.CancellationToken.ThrowIfCancellationRequested();
             string[] paths = null;
@@ -62,14 +62,14 @@ namespace VisualMusic
                 var dirs = Directory.GetDirectories(searchDir);
                 foreach (var dir in dirs)
                 {
-                    var path = findFile(dir, fileName); // recursive call
+                    var path = FindFile(dir, fileName); // recursive call
                     if (path != null)
                         return path;
                 }
             }
             catch (PathTooLongException ex)
             {
-                Form1.showErrorMsgBox(ex.Message);
+                Form1.ShowErrorMsgBox(ex.Message);
             }
             return null;
         }

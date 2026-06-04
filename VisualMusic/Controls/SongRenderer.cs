@@ -19,45 +19,45 @@ namespace VisualMusic
     public class SongRenderer : ISongDrawHost
     {
         // --- Core rendering ---
-        GraphicsDevice graphicsDevice;
-        Action<int, int> resetDevice;
-        ServiceContainer services;
-        ContentManager content;
-        SpriteBatch spriteBatch;
-        BlendState blendState;
-        RasterizerState rastState;
-        Effect postProcessFx;
-        ScreenQuad quad;
-        Texture2D regionSelectTexture;
-        Texture2D backgroundTexture;
-        readonly object renderLock = new object();
+        GraphicsDevice _graphicsDevice;
+        Action<int, int> _resetDevice;
+        ServiceContainer _services;
+        ContentManager _content;
+        SpriteBatch _spriteBatch;
+        BlendState _blendState;
+        RasterizerState _rastState;
+        Effect _postProcessFx;
+        ScreenQuad _quad;
+        Texture2D _regionSelectTexture;
+        Texture2D _backgroundTexture;
+        readonly object _renderLock = new object();
 
         // --- Layout ---
-        int clientWidth = 1;
-        int clientHeight = 1;
+        int _clientWidth = 1;
+        int _clientHeight = 1;
 
         // --- Timing ---
-        Stopwatch stopwatch = new Stopwatch();
-        TimeSpan oldTime = new TimeSpan(0);
-        double deltaTimeS;
-        bool isRenderingVideo = false;
+        Stopwatch _stopwatch = new Stopwatch();
+        TimeSpan _oldTime = new TimeSpan(0);
+        double _deltaTimeS;
+        bool _isRenderingVideo = false;
         /// <summary>True while a background video export is using the GraphicsDevice. The live
         /// game loop must skip Draw() during this time to avoid corrupting device state.</summary>
-        public bool IsRenderingVideo => isRenderingVideo;
+        public bool IsRenderingVideo => _isRenderingVideo;
         const int CmFaceSide = 4096;
 
         // --- Input state ---
-        bool leftMbPressed;
-        bool rightMbPressed;
-        bool selectingRegion = false;
-        bool mergeRegionSelection = false;
-        bool mousePosScrollSong = false;
-        bool isPausingWhileScrolling = false;
-        Rectangle selectedScreenRegion;
-        bool forceDefaultNoteStyle = false;
+        bool _leftMbPressed;
+        bool _rightMbPressed;
+        bool _selectingRegion = false;
+        bool _mergeRegionSelection = false;
+        bool _mousePosScrollSong = false;
+        bool _isPausingWhileScrolling = false;
+        Rectangle _selectedScreenRegion;
+        bool _forceDefaultNoteStyle = false;
 
         // --- Dependencies ---
-        ITrackSelectionService trackSelection;
+        ITrackSelectionService _trackSelection;
 
         // --- Callbacks ---
         /// <summary>Sets the screen-space cursor position (x,y in host client coordinates).</summary>
@@ -90,19 +90,19 @@ namespace VisualMusic
         }
         public float NormMouseX { get; set; }
         public float NormMouseY { get; set; }
-        public bool LeftMbPressed => leftMbPressed;
-        public bool RightMbPressed => rightMbPressed;
-        public bool SelectingRegion => selectingRegion;
-        public SpriteBatch SpriteBatch => spriteBatch;
-        public GraphicsDevice GraphicsDevice => graphicsDevice;
-        public ContentManager Content => content;
+        public bool LeftMbPressed => _leftMbPressed;
+        public bool RightMbPressed => _rightMbPressed;
+        public bool SelectingRegion => _selectingRegion;
+        public SpriteBatch SpriteBatch => _spriteBatch;
+        public GraphicsDevice GraphicsDevice => _graphicsDevice;
+        public ContentManager Content => _content;
         public WaveformPanel WaveformPanel { get; private set; } = new WaveformPanel();
-        public TimeSpan TotalTimeElapsed => stopwatch.Elapsed;
+        public TimeSpan TotalTimeElapsed => _stopwatch.Elapsed;
 
         public bool ForceDefaultNoteStyle
         {
-            get => forceDefaultNoteStyle;
-            set => forceDefaultNoteStyle = value;
+            get => _forceDefaultNoteStyle;
+            set => _forceDefaultNoteStyle = value;
         }
 
         public const float SmallScrollStep = 1.0f / 16;
@@ -111,66 +111,66 @@ namespace VisualMusic
         public delegate void Delegate_songPosChanged();
         public Delegate_songPosChanged OnSongPosChanged { get; set; }
 
-        public void SetTrackSelectionService(ITrackSelectionService service) => trackSelection = service;
+        public void SetTrackSelectionService(ITrackSelectionService service) => _trackSelection = service;
 
         public void Initialize(GraphicsDevice gd, Action<int, int> resetDeviceCallback, ServiceContainer svc, int width, int height)
         {
-            graphicsDevice = gd;
-            resetDevice = resetDeviceCallback;
-            services = svc;
-            clientWidth = Math.Max(1, width);
-            clientHeight = Math.Max(1, height);
+            _graphicsDevice = gd;
+            _resetDevice = resetDeviceCallback;
+            _services = svc;
+            _clientWidth = Math.Max(1, width);
+            _clientHeight = Math.Max(1, height);
 
-            stopwatch.Start();
-            spriteBatch = new SpriteBatch(graphicsDevice);
-            blendState = BlendState.AlphaBlend;
-            rastState = new RasterizerState()
+            _stopwatch.Start();
+            _spriteBatch = new SpriteBatch(_graphicsDevice);
+            _blendState = BlendState.AlphaBlend;
+            _rastState = new RasterizerState()
             {
                 MultiSampleAntiAlias = true,
                 CullMode = CullMode.None
             };
 
-            content = new ContentManager(services, "Content");
-            NoteStyle.SetGraphicsDevice(graphicsDevice);
-            NoteStyle.SetContent(content);
-            NoteStyle.sInitAllStyles();
-            LyricsFont = content.Load<SpriteFont>("Font");
+            _content = new ContentManager(_services, "Content");
+            NoteStyle.SetGraphicsDevice(_graphicsDevice);
+            NoteStyle.SetContent(_content);
+            NoteStyle.SInitAllStyles();
+            LyricsFont = _content.Load<SpriteFont>("Font");
 
-            regionSelectTexture = new Texture2D(graphicsDevice, 1, 1);
-            regionSelectTexture.SetData(new[] { Color.White });
+            _regionSelectTexture = new Texture2D(_graphicsDevice, 1, 1);
+            _regionSelectTexture.SetData(new[] { Color.White });
 
-            quad = new ScreenQuad(graphicsDevice);
-            postProcessFx = content.Load<Effect>("PostProcess");
-            postProcessFx.CurrentTechnique = postProcessFx.Techniques["Technique1"];
+            _quad = new ScreenQuad(_graphicsDevice);
+            _postProcessFx = _content.Load<Effect>("PostProcess");
+            _postProcessFx.CurrentTechnique = _postProcessFx.Techniques["Technique1"];
 
-            WaveformPanel.Init(graphicsDevice, spriteBatch);
+            WaveformPanel.Init(_graphicsDevice, _spriteBatch);
         }
 
         public void Update(double dt)
         {
-            if (Project?.Notes == null || isRenderingVideo)
+            if (Project?.Notes == null || _isRenderingVideo)
                 return;
 
-            TimeSpan newTime = stopwatch.Elapsed;
-            deltaTimeS = (newTime - oldTime).TotalSeconds;
-            oldTime = newTime;
+            TimeSpan newTime = _stopwatch.Elapsed;
+            _deltaTimeS = (newTime - _oldTime).TotalSeconds;
+            _oldTime = newTime;
 
-            selectRegion();
+            SelectRegion();
             // No keyframe-selection UI in WPF yet: keep the playhead keyframe selected so camera
             // movement (WASD/RF) integrates and camera reset targets it.
-            Project.selectKeyFrameAtSongPos();
-            Project.update(deltaTimeS);
-            scrollSong();
+            Project.SelectKeyFrameAtSongPos();
+            Project.Update(_deltaTimeS);
+            ScrollSong();
         }
 
         // ---- Drawing ----
 
         public string BeginDraw()
         {
-            if (graphicsDevice == null)
+            if (_graphicsDevice == null)
                 return "No graphics device";
 
-            string err = handleDeviceReset();
+            string err = HandleDeviceReset();
             if (!string.IsNullOrEmpty(err))
                 return err;
 
@@ -178,57 +178,57 @@ namespace VisualMusic
             {
                 X = 0,
                 Y = 0,
-                Width = graphicsDevice.PresentationParameters.BackBufferWidth,
-                Height = graphicsDevice.PresentationParameters.BackBufferHeight,
+                Width = _graphicsDevice.PresentationParameters.BackBufferWidth,
+                Height = _graphicsDevice.PresentationParameters.BackBufferHeight,
                 MinDepth = 0,
                 MaxDepth = 1
             };
-            graphicsDevice.Viewport = vp;
+            _graphicsDevice.Viewport = vp;
             return null;
         }
 
         public void Draw()
         {
-            if (graphicsDevice == null) return;
-            graphicsDevice.BlendState = blendState;
-            graphicsDevice.Clear(Color.Black);
+            if (_graphicsDevice == null) return;
+            _graphicsDevice.BlendState = _blendState;
+            _graphicsDevice.Clear(Color.Black);
             if (Project == null) return;
 
-            Project.drawSong();
+            Project.DrawSong();
 
-            if (selectingRegion && selectedScreenRegion.Width != 0 && selectedScreenRegion.Height != 0)
+            if (_selectingRegion && _selectedScreenRegion.Width != 0 && _selectedScreenRegion.Height != 0)
             {
-                spriteBatch.Begin();
-                Rectangle normRect = normalizeRect(selectedScreenRegion);
-                spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
-                spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
-                spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
-                spriteBatch.Draw(regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
-                spriteBatch.End();
+                _spriteBatch.Begin();
+                Rectangle normRect = NormalizeRect(_selectedScreenRegion);
+                _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
+                _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
+                _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
+                _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
+                _spriteBatch.End();
             }
         }
 
         public void EndDraw()
         {
-            try { graphicsDevice.Present(); }
+            try { _graphicsDevice.Present(); }
             catch { }
         }
 
-        string handleDeviceReset()
+        string HandleDeviceReset()
         {
-            switch (graphicsDevice.GraphicsDeviceStatus)
+            switch (_graphicsDevice.GraphicsDeviceStatus)
             {
                 case GraphicsDeviceStatus.Lost:
                     return "Graphics device lost";
                 case GraphicsDeviceStatus.NotReset:
-                    try { resetDevice?.Invoke(clientWidth, clientHeight); }
+                    try { _resetDevice?.Invoke(_clientWidth, _clientHeight); }
                     catch (Exception e) { return "Graphics device reset failed\n\n" + e; }
                     break;
                 default:
-                    var pp = graphicsDevice.PresentationParameters;
-                    if (clientWidth != pp.BackBufferWidth || clientHeight != pp.BackBufferHeight)
+                    var pp = _graphicsDevice.PresentationParameters;
+                    if (_clientWidth != pp.BackBufferWidth || _clientHeight != pp.BackBufferHeight)
                     {
-                        try { resetDevice?.Invoke(clientWidth, clientHeight); }
+                        try { _resetDevice?.Invoke(_clientWidth, _clientHeight); }
                         catch (Exception e) { return "Graphics device reset failed\n\n" + e; }
                     }
                     break;
@@ -238,8 +238,8 @@ namespace VisualMusic
 
         public void OnResize(int width, int height)
         {
-            clientWidth = Math.Max(1, width);
-            clientHeight = Math.Max(1, height);
+            _clientWidth = Math.Max(1, width);
+            _clientHeight = Math.Max(1, height);
         }
 
         // ---- Input ----
@@ -252,26 +252,26 @@ namespace VisualMusic
             // In mouse-look mode the left button is used for roll; right button has no special action.
             if (Camera.MouseRot)
             {
-                if (isLeft) leftMbPressed = true;
+                if (isLeft) _leftMbPressed = true;
                 return;
             }
 
             if (isLeft)
             {
-                leftMbPressed = true;
+                _leftMbPressed = true;
                 if (isShiftHeld)
-                    mergeRegionSelection = true;
-                selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * clientWidth);
-                selectedScreenRegion.Y = (int)(NormMouseY * clientHeight);
+                    _mergeRegionSelection = true;
+                _selectedScreenRegion.X = (int)((NormMouseX * 0.5f + 0.5f) * _clientWidth);
+                _selectedScreenRegion.Y = (int)(NormMouseY * _clientHeight);
             }
             else
             {
-                rightMbPressed = true;
-                mousePosScrollSong = true;
+                _rightMbPressed = true;
+                _mousePosScrollSong = true;
                 if (Project.IsPlaying)
                 {
-                    isPausingWhileScrolling = true;
-                    Project.togglePlayback();
+                    _isPausingWhileScrolling = true;
+                    Project.TogglePlayback();
                 }
             }
         }
@@ -281,34 +281,34 @@ namespace VisualMusic
             // In mouse-look mode only track left button for roll; suppress normal scroll/select.
             if (Camera.MouseRot)
             {
-                if (isLeft) leftMbPressed = false;
+                if (isLeft) _leftMbPressed = false;
                 return;
             }
 
             if (isLeft)
             {
-                leftMbPressed = false;
-                mergeRegionSelection = false;
+                _leftMbPressed = false;
+                _mergeRegionSelection = false;
             }
             else
             {
-                rightMbPressed = false;
-                mousePosScrollSong = false;
-                if (isPausingWhileScrolling && Project != null && !Project.IsPlaying)
+                _rightMbPressed = false;
+                _mousePosScrollSong = false;
+                if (_isPausingWhileScrolling && Project != null && !Project.IsPlaying)
                 {
-                    Project.togglePlayback();
-                    isPausingWhileScrolling = false;
+                    Project.TogglePlayback();
+                    _isPausingWhileScrolling = false;
                 }
             }
         }
 
         public void HandleMouseMove(int x, int y, int workAreaHeight)
         {
-            int middleX = clientWidth / 2;
-            int middleY = clientHeight / 2;
+            int middleX = _clientWidth / 2;
+            int middleY = _clientHeight / 2;
 
-            NormMouseX = (float)(x - middleX) * 2 / clientWidth;
-            NormMouseY = (float)y / clientHeight;
+            NormMouseX = (float)(x - middleX) * 2 / _clientWidth;
+            NormMouseY = (float)y / _clientHeight;
 
             if (Camera.MouseRot)
             {
@@ -316,14 +316,14 @@ namespace VisualMusic
                 NormMouseY = (float)(y - middleY) * 2 / workAreaHeight;
                 SetCursorPosition?.Invoke(middleX, middleY);
                 // Hold left button to roll; otherwise yaw/pitch.
-                Project?.getKeyFrameAtSongPos()?.ProjProps.Camera.ApplyMouseRot(NormMouseX, NormMouseY, leftMbPressed);
+                Project?.GetKeyFrameAtSongPos()?.ProjProps.Camera.ApplyMouseRot(NormMouseX, NormMouseY, _leftMbPressed);
             }
         }
 
         /// <summary>Returns true if the key was fully handled (suppress further processing).</summary>
         public bool HandleKeyDown(int vkCode)
         {
-            var keyFrame = Project?.getKeyFrameAtSongPos();
+            var keyFrame = Project?.GetKeyFrameAtSongPos();
             if (keyFrame == null) return false;
 
             bool suppress = false;
@@ -337,7 +337,7 @@ namespace VisualMusic
                 return true;
             }
 
-            if (keyFrame.ProjProps.Camera.control(key, true, modifiers))
+            if (keyFrame.ProjProps.Camera.Control(key, true, modifiers))
             {
                 suppress = true;
                 foreach (var other in Project.KeyFrames.Values)
@@ -352,7 +352,7 @@ namespace VisualMusic
 
             if (key == WinKeys.Space)
             {
-                Project?.togglePlayback();
+                Project?.TogglePlayback();
                 suppress = true;
             }
 
@@ -368,7 +368,7 @@ namespace VisualMusic
                         if (tprops.ActiveNoteStyle.GetType() != typeof(NoteStyle_Bar))
                         {
                             tprops.StyleProps.Type = NoteStyleType.Bar;
-                            Project.TrackViews[t].createGeo(Project, Project.GlobalTrackProps);
+                            Project.TrackViews[t].CreateGeo(Project, Project.GlobalTrackProps);
                             tprops.StyleProps.Type = currentNoteStyle;
                         }
                     }
@@ -381,13 +381,13 @@ namespace VisualMusic
         /// <summary>Resets camera velocity when a movement/rotation key is released.</summary>
         public void HandleKeyUp(int vkCode)
         {
-            var keyFrame = Project?.getKeyFrameAtSongPos();
+            var keyFrame = Project?.GetKeyFrameAtSongPos();
             if (keyFrame == null) return;
 
             var key = (WinKeys)vkCode;
             var modifiers = System.Windows.Forms.Control.ModifierKeys;
 
-            if (keyFrame.ProjProps.Camera.control(key, false, modifiers))
+            if (keyFrame.ProjProps.Camera.Control(key, false, modifiers))
             {
                 foreach (var other in Project.KeyFrames.Values)
                 {
@@ -412,30 +412,30 @@ namespace VisualMusic
 
         // ---- Selection ----
 
-        void selectRegion()
+        void SelectRegion()
         {
-            if (trackSelection == null || trackSelection.TrackListCount == 0)
+            if (_trackSelection == null || _trackSelection.TrackListCount == 0)
                 return;
 
             // In mouse-look mode the left button rolls the camera, so it must not start a region selection.
-            if (leftMbPressed && !Camera.MouseRot)
+            if (_leftMbPressed && !Camera.MouseRot)
             {
-                selectingRegion = true;
+                _selectingRegion = true;
 
                 Point mousePos = new Point(
-                    (int)((NormMouseX * 0.5f + 0.5f) * clientWidth),
-                    (int)(NormMouseY * clientHeight));
-                selectedScreenRegion.Width = mousePos.X - selectedScreenRegion.X;
-                selectedScreenRegion.Height = mousePos.Y - selectedScreenRegion.Y;
+                    (int)((NormMouseX * 0.5f + 0.5f) * _clientWidth),
+                    (int)(NormMouseY * _clientHeight));
+                _selectedScreenRegion.Width = mousePos.X - _selectedScreenRegion.X;
+                _selectedScreenRegion.Height = mousePos.Y - _selectedScreenRegion.Y;
 
-                if (selectedScreenRegion.Width == 0 || selectedScreenRegion.Height == 0)
+                if (_selectedScreenRegion.Width == 0 || _selectedScreenRegion.Height == 0)
                     return;
 
                 RectangleF normScreenSelection = new RectangleF(
-                    (float)selectedScreenRegion.X / clientWidth,
-                    (float)selectedScreenRegion.Y / clientHeight,
-                    (float)selectedScreenRegion.Width / clientWidth,
-                    (float)selectedScreenRegion.Height / clientHeight);
+                    (float)_selectedScreenRegion.X / _clientWidth,
+                    (float)_selectedScreenRegion.Y / _clientHeight,
+                    (float)_selectedScreenRegion.Width / _clientWidth,
+                    (float)_selectedScreenRegion.Height / _clientHeight);
                 normScreenSelection.X *= 2; normScreenSelection.Y *= -2;
                 normScreenSelection.Width *= 2; normScreenSelection.Height *= -2;
                 normScreenSelection.Offset(-1, 1);
@@ -454,27 +454,27 @@ namespace VisualMusic
                 for (int i = 1; i < Project.TrackViews.Count; i++)
                 {
                     if (Project.TrackViews[i].MidiTrack.Notes.Count > 0 &&
-                        Project.TrackViews[i].Geo.areObjectsInFrustum(selectionFrustum, Project.SongPosP - Project.PlaybackOffsetP, Project, Project.TrackViews[i].TrackProps))
+                        Project.TrackViews[i].Geo.AreObjectsInFrustum(selectionFrustum, Project.SongPosP - Project.PlaybackOffsetP, Project, Project.TrackViews[i].TrackProps))
                     {
-                        trackSelection.SetTrackSelected(i, true);
+                        _trackSelection.SetTrackSelected(i, true);
                         selectedCount++;
                     }
-                    else if (!mergeRegionSelection && trackSelection.TrackListCount > 1)
-                        trackSelection.SetTrackSelected(i, false);
+                    else if (!_mergeRegionSelection && _trackSelection.TrackListCount > 1)
+                        _trackSelection.SetTrackSelected(i, false);
                 }
 
-                if (selectedCount == 0 && !mergeRegionSelection)
-                    trackSelection.SetTrackSelected(0, true);
+                if (selectedCount == 0 && !_mergeRegionSelection)
+                    _trackSelection.SetTrackSelected(0, true);
                 else if (selectedCount > 0)
-                    trackSelection.SetTrackSelected(0, false);
+                    _trackSelection.SetTrackSelected(0, false);
             }
-            else if (selectingRegion)
+            else if (_selectingRegion)
             {
-                selectingRegion = false;
+                _selectingRegion = false;
             }
         }
 
-        Rectangle normalizeRect(Rectangle r)
+        Rectangle NormalizeRect(Rectangle r)
         {
             if (r.Height < 0) { r.Y += r.Height; r.Height = -r.Height; }
             if (r.Width < 0) { r.X += r.Width; r.Width = -r.Width; }
@@ -483,10 +483,10 @@ namespace VisualMusic
 
         // ---- Scroll ----
 
-        public void scrollSong()
+        public void ScrollSong()
         {
-            if (mousePosScrollSong && !selectingRegion && Project != null)
-                Project.NormSongPos += (float)(Math.Pow(NormMouseX, 2) * Math.Sign(NormMouseX) * deltaTimeS * 0.3f);
+            if (_mousePosScrollSong && !_selectingRegion && Project != null)
+                Project.NormSongPos += (float)(Math.Pow(NormMouseX, 2) * Math.Sign(NormMouseX) * _deltaTimeS * 0.3f);
         }
 
         // ---- Background image ----
@@ -496,7 +496,7 @@ namespace VisualMusic
             UnloadBackgroundImage();
             if (!string.IsNullOrWhiteSpace(path))
             {
-                try { backgroundTexture = Texture2D.FromFile(graphicsDevice, path); }
+                try { _backgroundTexture = Texture2D.FromFile(_graphicsDevice, path); }
                 catch (Exception ex)
                 {
                     System.Windows.MessageBox.Show(
@@ -508,48 +508,48 @@ namespace VisualMusic
 
         public void UnloadBackgroundImage()
         {
-            backgroundTexture?.Dispose();
-            backgroundTexture = null;
+            _backgroundTexture?.Dispose();
+            _backgroundTexture = null;
         }
 
         public void DrawBackground()
         {
-            postProcessFx.Parameters["saturationLevel"].SetValue(Project.Props.BackgroundImageSaturation);
-            spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, postProcessFx, null);
-            if (backgroundTexture != null)
-                spriteBatch.Draw(backgroundTexture,
-                    new Rectangle(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height),
+            _postProcessFx.Parameters["saturationLevel"].SetValue(Project.Props.BackgroundImageSaturation);
+            _spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, _postProcessFx, null);
+            if (_backgroundTexture != null)
+                _spriteBatch.Draw(_backgroundTexture,
+                    new Rectangle(0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height),
                     new Color(Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity));
-            spriteBatch.End();
+            _spriteBatch.End();
         }
 
         public void InitFrame()
         {
-            graphicsDevice.RasterizerState = rastState;
+            _graphicsDevice.RasterizerState = _rastState;
         }
 
         // ---- ISongDrawHost extras ----
-        public int ClientWidth  => clientWidth;
-        public int ClientHeight => clientHeight;
+        public int ClientWidth  => _clientWidth;
+        public int ClientHeight => _clientHeight;
         // TotalTimeElapsed already declared above (line ~86).
         /// <summary>No-op: WPF render loop is continuous — no explicit invalidation needed.</summary>
         public void Invalidate() { }
         public void NotifySongPosChanged() => OnSongPosChanged?.Invoke();
 
-        public void updateTimeStamp()
+        public void UpdateTimeStamp()
         {
-            oldTime = stopwatch.Elapsed;
+            _oldTime = _stopwatch.Elapsed;
         }
 
         // ---- Video rendering ----
 
-        public void renderVideo(string videoFilePath, IRenderProgressCallback progress, VideoExportOptions options)
+        public void RenderVideo(string videoFilePath, IRenderProgressCallback progress, VideoExportOptions options)
         {
-            lock (renderLock)
+            lock (_renderLock)
             {
                 VideoFormat videoFormat = new VideoFormat((uint)options.Width, (uint)options.Height);
                 videoFormat.fps = options.Fps;
-                if (!Media.beginVideoEnc(videoFilePath, Project.AudioFilePath, videoFormat,
+                if (!Media.BeginVideoEnc(videoFilePath, Project.AudioFilePath, videoFormat,
                     Project.Props.AudioOffset + Project.Props.PlaybackOffsetS,
                     options.Sphere && options.SphericalMetadata, options.SphericalStereo,
                     options.VideoCodec, options.VideoCrf))
@@ -559,7 +559,7 @@ namespace VisualMusic
                     return;
                 }
 
-                isRenderingVideo = true;
+                _isRenderingVideo = true;
                 RenderTarget2D[] rt32 = new RenderTarget2D[2];
                 RenderTargetCube rtCube = null;
                 RenderTarget2D rt8 = null;
@@ -568,7 +568,7 @@ namespace VisualMusic
                 Effect ssFx = null;
                 uint[] frameData = null;
                 Project backup = Project;
-                Project = Project.clone();
+                Project = Project.Clone();
 
                 try
                 {
@@ -576,16 +576,16 @@ namespace VisualMusic
                     {
                         if (options.Sphere)
                         {
-                            rtCube = new RenderTargetCube(graphicsDevice, CmFaceSide, true,
+                            rtCube = new RenderTargetCube(_graphicsDevice, CmFaceSide, true,
                                 SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
-                            cubeToPlaneFx = content.Load<Effect>("CubeToPlane");
+                            cubeToPlaneFx = _content.Load<Effect>("CubeToPlane");
                             cubeToPlaneFx.Parameters["CubeMap"].SetValue(rtCube);
                             cubeToPlaneFx.Parameters["FrameSamples"].SetValue((float)1);
                         }
-                        rt8 = new RenderTarget2D(graphicsDevice, options.SSAAWidth, options.SSAAHeight,
+                        rt8 = new RenderTarget2D(_graphicsDevice, options.SSAAWidth, options.SSAAHeight,
                             options.SSAAEnabled, SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents);
                         rtFinal = options.SSAAEnabled
-                            ? new RenderTarget2D(graphicsDevice, options.Width, options.Height, false,
+                            ? new RenderTarget2D(_graphicsDevice, options.Width, options.Height, false,
                                 SurfaceFormat.Bgra32, DepthFormat.Depth24, 1, RenderTargetUsage.PreserveContents)
                             : rt8;
                         frameData = new uint[options.Width * options.Height];
@@ -597,28 +597,28 @@ namespace VisualMusic
                         return;
                     }
 
-                    ssFx = content.Load<Effect>("ss");
+                    ssFx = _content.Load<Effect>("ss");
                     Camera.InvertY = options.Sphere;
 
                     int frameSamples = 1;
                     double songPosS = 0;
-                    Project.setSongPosS(0, false);
+                    Project.SetSongPosS(0, false);
 
                     while (Project.NormSongPos < 1 && !progress.Cancel)
                     {
-                        Project.interpolateFrames();
-                        drawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, rtCube, rt32, rt8, cubeToPlaneFx);
+                        Project.InterpolateFrames();
+                        DrawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, rtCube, rt32, rt8, cubeToPlaneFx);
                         if (options.SSAAEnabled)
                         {
-                            graphicsDevice.SetRenderTarget(rtFinal);
-                            graphicsDevice.Clear(Color.Transparent);
+                            _graphicsDevice.SetRenderTarget(rtFinal);
+                            _graphicsDevice.Clear(Color.Transparent);
                             ssFx.Parameters["FrameTex"].SetValue(rt8);
                             ssFx.CurrentTechnique.Passes[0].Apply();
-                            quad.draw();
+                            _quad.Draw();
                         }
-                        graphicsDevice.SetRenderTarget(null);
+                        _graphicsDevice.SetRenderTarget(null);
                         rtFinal.GetData<uint>(frameData);
-                        if (!Media.writeFrame(frameData))
+                        if (!Media.WriteFrame(frameData))
                         {
                             progress.ShowMessage("Couldn't add frame");
                             break;
@@ -627,7 +627,7 @@ namespace VisualMusic
                         // seconds). songPosS is the running second-accumulator; the earlier code used a
                         // normalized [0,1] position here, which pinned every frame to the song start.
                         double frameTimeS = 1.0 / videoFormat.fps;
-                        Project.setSongPosS(songPosS + frameTimeS, false);
+                        Project.SetSongPosS(songPosS + frameTimeS, false);
                         songPosS += frameTimeS;
                         progress.UpdateProgress((float)Project.NormSongPos);
                     }
@@ -635,7 +635,7 @@ namespace VisualMusic
                 finally
                 {
                     Project = backup;
-                    endVideoRender();
+                    EndVideoRender();
                     rtCube?.Dispose();
                     for (int i = 0; i < 2; i++) rt32[i]?.Dispose();
                     rt8?.Dispose();
@@ -644,7 +644,7 @@ namespace VisualMusic
             }
         }
 
-        void drawVideoFrame(double songPosS, float fps, int frameSamples, VideoExportOptions options,
+        void DrawVideoFrame(double songPosS, float fps, int frameSamples, VideoExportOptions options,
             RenderTargetCube rtCube, RenderTarget2D[] rt32, RenderTarget2D rt8, Effect cubeToPlaneFx)
         {
             if (!options.Sphere) frameSamples = 1;
@@ -653,63 +653,63 @@ namespace VisualMusic
                 RenderTarget2D rt = null;
                 Texture2D prev = i > 0 ? rt32[(i + 1) % 2] : null;
                 if (i == frameSamples - 1) rt = rt8;
-                drawVideoFrameSample(options, rtCube, rt, prev, cubeToPlaneFx);
+                DrawVideoFrameSample(options, rtCube, rt, prev, cubeToPlaneFx);
                 double sampleTime = 1.0 / frameSamples / fps;
-                Project.setSongPosS(songPosS + sampleTime, false);
+                Project.SetSongPosS(songPosS + sampleTime, false);
                 songPosS += sampleTime;
             }
         }
 
-        void drawVideoFrameSample(VideoExportOptions options, RenderTargetCube rtCube, RenderTarget2D rt,
+        void DrawVideoFrameSample(VideoExportOptions options, RenderTargetCube rtCube, RenderTarget2D rt,
             Texture2D prevFrame, Effect cubeToPlaneFx)
         {
-            graphicsDevice.SetRenderTarget(rt);
-            graphicsDevice.Clear(Color.Transparent);
+            _graphicsDevice.SetRenderTarget(rt);
+            _graphicsDevice.Clear(Color.Transparent);
             if (options.Sphere)
             {
                 if (options.SphericalStereo)
                 {
-                    drawSphere(options, rtCube, rt, prevFrame, cubeToPlaneFx, -1);
-                    drawSphere(options, rtCube, rt, prevFrame, cubeToPlaneFx, 1);
+                    DrawSphere(options, rtCube, rt, prevFrame, cubeToPlaneFx, -1);
+                    DrawSphere(options, rtCube, rt, prevFrame, cubeToPlaneFx, 1);
                 }
                 else
-                    drawSphere(options, rtCube, rt, prevFrame, cubeToPlaneFx);
+                    DrawSphere(options, rtCube, rt, prevFrame, cubeToPlaneFx);
             }
             else
             {
-                Viewport vp = graphicsDevice.Viewport;
+                Viewport vp = _graphicsDevice.Viewport;
                 if (options.SphericalStereo)
                 {
                     Project.Props.Camera.Eye = -1;
-                    graphicsDevice.Viewport = new Viewport(0, 0, vp.Width / 2, vp.Height);
+                    _graphicsDevice.Viewport = new Viewport(0, 0, vp.Width / 2, vp.Height);
                 }
-                Project.drawSong();
+                Project.DrawSong();
                 if (options.SphericalStereo)
                 {
                     Project.Props.Camera.Eye = 1;
-                    graphicsDevice.Viewport = new Viewport(vp.Width / 2, 0, vp.Width / 2, vp.Height);
-                    Project.drawSong();
+                    _graphicsDevice.Viewport = new Viewport(vp.Width / 2, 0, vp.Width / 2, vp.Height);
+                    Project.DrawSong();
                 }
             }
         }
 
-        void drawSphere(VideoExportOptions options, RenderTargetCube rtCube, RenderTarget2D rt,
+        void DrawSphere(VideoExportOptions options, RenderTargetCube rtCube, RenderTarget2D rt,
             Texture2D prevFrame, Effect cubeToPlaneFx, int eye = 0)
         {
             Project.Props.Camera.Eye = eye;
             for (int i = 0; i < 6; i++)
             {
-                graphicsDevice.SetRenderTarget(rtCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
+                _graphicsDevice.SetRenderTarget(rtCube, (CubeMapFace)Enum.ToObject(typeof(CubeMapFace), i));
                 Project.Props.Camera.CubeMapFace = i;
-                graphicsDevice.Clear(Color.Transparent);
-                Project.drawSong();
+                _graphicsDevice.Clear(Color.Transparent);
+                Project.DrawSong();
             }
             Project.Props.Camera.CubeMapFace = -1;
             Project.Props.Camera.Eye = 0;
             cubeToPlaneFx.Parameters["PrevFrame"].SetValue(prevFrame);
             cubeToPlaneFx.Parameters["IsFirstFrame"].SetValue(prevFrame == null);
-            graphicsDevice.SetRenderTarget(rt);
-            Viewport vp = graphicsDevice.Viewport;
+            _graphicsDevice.SetRenderTarget(rt);
+            Viewport vp = _graphicsDevice.Viewport;
 
             Vector4 vpBounds;
             Vector2 prevFrameSO;
@@ -721,17 +721,17 @@ namespace VisualMusic
             cubeToPlaneFx.Parameters["ViewportSize"].SetValue(new Vector2(vpBounds.Z, vpBounds.W));
             cubeToPlaneFx.Parameters["PrevFrameScaleOffset"].SetValue(prevFrameSO);
             cubeToPlaneFx.Parameters["FovLimit"].SetValue(options.SphericalStereo ? (float)Math.Cos(150f / 360 * Math.PI) : -1);
-            graphicsDevice.Viewport = new Viewport((int)vpBounds.X, (int)vpBounds.Y, (int)vpBounds.Z, (int)vpBounds.W);
+            _graphicsDevice.Viewport = new Viewport((int)vpBounds.X, (int)vpBounds.Y, (int)vpBounds.Z, (int)vpBounds.W);
             cubeToPlaneFx.CurrentTechnique.Passes[0].Apply();
-            quad.draw();
+            _quad.Draw();
         }
 
-        void endVideoRender()
+        void EndVideoRender()
         {
-            graphicsDevice.SetRenderTarget(null);
-            Media.endVideoEnc();
+            _graphicsDevice.SetRenderTarget(null);
+            Media.EndVideoEnc();
             Camera.InvertY = false;
-            isRenderingVideo = false;
+            _isRenderingVideo = false;
         }
 
         public static Color HSLA2RGBA(Vector4 hsla)

@@ -45,7 +45,7 @@
 			this.findFileBtn.TabIndex = 4;
 			this.findFileBtn.Text = "Select file";
 			this.findFileBtn.UseVisualStyleBackColor = true;
-			this.findFileBtn.Click += new System.EventHandler(this.selectFileBtn_Click);
+			this.findFileBtn.Click += new System.EventHandler(this.SelectFileBtn_Click);
 			// 
 			// cancelBtn
 			// 
@@ -80,7 +80,7 @@
 			this.findInFolderBtn.TabIndex = 3;
 			this.findInFolderBtn.Text = "Find filename in folder";
 			this.findInFolderBtn.UseVisualStyleBackColor = true;
-			this.findInFolderBtn.Click += new System.EventHandler(this.findInFolderBtn_Click);
+			this.findInFolderBtn.Click += new System.EventHandler(this.FindInFolderBtn_Click);
 			// 
 			// retryBtn
 			// 
@@ -91,7 +91,7 @@
 			this.retryBtn.TabIndex = 2;
 			this.retryBtn.Text = "Retry";
 			this.retryBtn.UseVisualStyleBackColor = true;
-			this.retryBtn.Click += new System.EventHandler(this.retryBtn_Click);
+			this.retryBtn.Click += new System.EventHandler(this.RetryBtn_Click);
 			// 
 			// errorLabel
 			// 

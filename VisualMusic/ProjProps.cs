@@ -15,13 +15,13 @@ namespace VisualMusic
         public double AudioOffset { get; set; }
         public delegate void Delegate_PropertyChanged<T>(T value);
         public Action OnPlaybackOffsetSChanged;
-        float playbackOffsetS = 0;
+        float _playbackOffsetS = 0;
         public float PlaybackOffsetS
         {
-            get => playbackOffsetS;
+            get => _playbackOffsetS;
             set
             {
-                playbackOffsetS = value;
+                _playbackOffsetS = value;
                 OnPlaybackOffsetSChanged?.Invoke();
             }
         }
@@ -54,7 +54,7 @@ namespace VisualMusic
                 else if (entry.Name == "audioOffset")
                     AudioOffset = (double)entry.Value;
                 else if (entry.Name == "playbackOffsetS")
-                    playbackOffsetS = (float)entry.Value;
+                    _playbackOffsetS = (float)entry.Value;
                 else if (entry.Name == "fadeIn")
                     FadeIn = (float)entry.Value;
                 else if (entry.Name == "fadeOut")
@@ -81,7 +81,7 @@ namespace VisualMusic
         {
             info.AddValue("qn_viewWidth", ViewWidthQn);
             info.AddValue("audioOffset", AudioOffset);
-            info.AddValue("playbackOffsetS", playbackOffsetS);
+            info.AddValue("playbackOffsetS", _playbackOffsetS);
             info.AddValue("fadeIn", FadeIn);
             info.AddValue("fadeOut", FadeOut);
             info.AddValue("maxPitch", MaxPitch);

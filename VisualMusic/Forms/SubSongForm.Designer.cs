@@ -35,7 +35,7 @@
 			// 
 			this.okBtn.Location = new System.Drawing.Point(98, 68);
 			this.okBtn.Margin = new System.Windows.Forms.Padding(4);
-			this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
+			this.okBtn.Click += new System.EventHandler(this.OkBtn_Click);
 			// 
 			// cancelBtn
 			// 
@@ -51,7 +51,7 @@
 			this.subSongsLB.Name = "subSongsLB";
 			this.subSongsLB.Size = new System.Drawing.Size(269, 17);
 			this.subSongsLB.TabIndex = 3;
-			this.subSongsLB.Resize += new System.EventHandler(this.subSongsLB_Resize);
+			this.subSongsLB.Resize += new System.EventHandler(this.SubSongsLB_Resize);
 			// 
 			// SubSongForm
 			// 

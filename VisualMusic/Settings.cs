@@ -13,7 +13,7 @@ namespace VisualMusic
 
         //public bool DefaultInsTrack { get; set; } = true; //preserve latest import form setting instead
 
-        string getKeyName(Keys key)
+        string GetKeyName(Keys key)
         {
             return Enum.GetName(typeof(Keys), key);
         }
@@ -26,85 +26,85 @@ namespace VisualMusic
 
             foreach (SerializationEntry entry in info)
             {
-                if (entry.Name == getKeyName(Keys.DefaultInsTrack))
+                if (entry.Name == GetKeyName(Keys.DefaultInsTrack))
                     Form1.ImportModForm.InsTrack = (bool)entry.Value;
-                else if (entry.Name == getKeyName(Keys.MidiNoteFolder))
+                else if (entry.Name == GetKeyName(Keys.MidiNoteFolder))
                     Form1.ImportMidiForm.NoteFolder = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.ModNoteFolder))
+                else if (entry.Name == GetKeyName(Keys.ModNoteFolder))
                     Form1.ImportModForm.NoteFolder = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.SidNoteFolder))
+                else if (entry.Name == GetKeyName(Keys.SidNoteFolder))
                     Form1.ImportSidForm.NoteFolder = (string)entry.Value;
 
-                else if (entry.Name == getKeyName(Keys.MidiAudioFolder))
+                else if (entry.Name == GetKeyName(Keys.MidiAudioFolder))
                     Form1.ImportMidiForm.AudioFolder = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.ModAudioFolder))
+                else if (entry.Name == GetKeyName(Keys.ModAudioFolder))
                     Form1.ImportModForm.AudioFolder = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.SidAudioFolder))
+                else if (entry.Name == GetKeyName(Keys.SidAudioFolder))
                     Form1.ImportSidForm.AudioFolder = (string)entry.Value;
 
-                else if (entry.Name == getKeyName(Keys.VideoFolder))
+                else if (entry.Name == GetKeyName(Keys.VideoFolder))
                     form.saveVideoDlg.InitialDirectory = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.TextureFolder))
+                else if (entry.Name == GetKeyName(Keys.TextureFolder))
                     form.openTextureDlg.InitialDirectory = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.ProjectFolder))
+                else if (entry.Name == GetKeyName(Keys.ProjectFolder))
                     form.ProjectFolder = (string)entry.Value;
                 else if (entry.Name == "trackPropsFolder")
                     form.TrackPropsFolder = (string)entry.Value;
                 else if (entry.Name == "camFolder")
                     form.CamFolder = (string)entry.Value;
 
-                else if (entry.Name == getKeyName(Keys.ModTpartyApp))
+                else if (entry.Name == GetKeyName(Keys.ModTpartyApp))
                     Form1.ImportModForm.tpartyAppTb.Text = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.ModTpartyArgs))
+                else if (entry.Name == GetKeyName(Keys.ModTpartyArgs))
                     Form1.ImportModForm.tpartyArgsTb.Text = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.ModTpartyOutput))
+                else if (entry.Name == GetKeyName(Keys.ModTpartyOutput))
                     Form1.ImportModForm.tpartyOutputTb.Text = (string)entry.Value;
 
-                else if (entry.Name == getKeyName(Keys.SidTpartyApp))
+                else if (entry.Name == GetKeyName(Keys.SidTpartyApp))
                     Form1.ImportSidForm.tpartyAppTb.Text = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.SidTpartyArgs))
+                else if (entry.Name == GetKeyName(Keys.SidTpartyArgs))
                     Form1.ImportSidForm.tpartyArgsTb.Text = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.SidTpartyOutput))
+                else if (entry.Name == GetKeyName(Keys.SidTpartyOutput))
                     Form1.ImportSidForm.tpartyOutputTb.Text = (string)entry.Value;
 
-                else if (entry.Name == getKeyName(Keys.SongLengthsUrl))
+                else if (entry.Name == GetKeyName(Keys.SongLengthsUrl))
                     Form1.TpartyIntegrationForm.SongLengthsUrl = (string)entry.Value;
-                else if (entry.Name == getKeyName(Keys.TpartyModuleMixdown))
+                else if (entry.Name == GetKeyName(Keys.TpartyModuleMixdown))
                     Form1.TpartyIntegrationForm.ModuleMixdown = (bool)entry.Value;
                 else if (entry.Name == "videoExportOptions")
-                    Form1.VidExpForm.setOptions((VideoExportOptions)entry.Value);
+                    Form1.VidExpForm.SetOptions((VideoExportOptions)entry.Value);
                 else if (entry.Name == "backgroundImageFolder")
                     form.BackgroundImageFolder = (string)entry.Value;
                 else if (entry.Name == "trackAudioFolder")
                     form.TrackAudioFolder = (string)entry.Value;
             }
-            Form1.TpartyIntegrationForm.downloadSonglengths(true);
+            Form1.TpartyIntegrationForm.DownloadSonglengths(true);
         }
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             Form1 form = Program.form1;
-            info.AddValue(getKeyName(Keys.DefaultInsTrack), Form1.ImportModForm.InsTrack);
-            info.AddValue(getKeyName(Keys.MidiNoteFolder), Form1.ImportMidiForm.NoteFolder);
-            info.AddValue(getKeyName(Keys.ModNoteFolder), Form1.ImportModForm.NoteFolder);
-            info.AddValue(getKeyName(Keys.SidNoteFolder), Form1.ImportSidForm.NoteFolder);
-            info.AddValue(getKeyName(Keys.MidiAudioFolder), Form1.ImportMidiForm.AudioFolder);
-            info.AddValue(getKeyName(Keys.ModAudioFolder), Form1.ImportModForm.AudioFolder);
-            info.AddValue(getKeyName(Keys.SidAudioFolder), Form1.ImportSidForm.AudioFolder);
+            info.AddValue(GetKeyName(Keys.DefaultInsTrack), Form1.ImportModForm.InsTrack);
+            info.AddValue(GetKeyName(Keys.MidiNoteFolder), Form1.ImportMidiForm.NoteFolder);
+            info.AddValue(GetKeyName(Keys.ModNoteFolder), Form1.ImportModForm.NoteFolder);
+            info.AddValue(GetKeyName(Keys.SidNoteFolder), Form1.ImportSidForm.NoteFolder);
+            info.AddValue(GetKeyName(Keys.MidiAudioFolder), Form1.ImportMidiForm.AudioFolder);
+            info.AddValue(GetKeyName(Keys.ModAudioFolder), Form1.ImportModForm.AudioFolder);
+            info.AddValue(GetKeyName(Keys.SidAudioFolder), Form1.ImportSidForm.AudioFolder);
 
-            info.AddValue(getKeyName(Keys.VideoFolder), form.saveVideoDlg.InitialDirectory);
-            info.AddValue(getKeyName(Keys.TextureFolder), form.openTextureDlg.InitialDirectory);
-            info.AddValue(getKeyName(Keys.ProjectFolder), form.ProjectFolder);
+            info.AddValue(GetKeyName(Keys.VideoFolder), form.saveVideoDlg.InitialDirectory);
+            info.AddValue(GetKeyName(Keys.TextureFolder), form.openTextureDlg.InitialDirectory);
+            info.AddValue(GetKeyName(Keys.ProjectFolder), form.ProjectFolder);
             info.AddValue("trackPropsFolder", form.TrackPropsFolder);
             info.AddValue("camFolder", form.CamFolder);
 
-            info.AddValue(getKeyName(Keys.ModTpartyApp), Form1.ImportModForm.tpartyAppTb.Text);
-            info.AddValue(getKeyName(Keys.ModTpartyArgs), Form1.ImportModForm.tpartyArgsTb.Text);
-            info.AddValue(getKeyName(Keys.ModTpartyOutput), Form1.ImportModForm.tpartyOutputTb.Text);
-            info.AddValue(getKeyName(Keys.SidTpartyApp), Form1.ImportSidForm.tpartyAppTb.Text);
-            info.AddValue(getKeyName(Keys.SidTpartyArgs), Form1.ImportSidForm.tpartyArgsTb.Text);
-            info.AddValue(getKeyName(Keys.SidTpartyOutput), Form1.ImportSidForm.tpartyOutputTb.Text);
-            info.AddValue(getKeyName(Keys.SongLengthsUrl), Form1.TpartyIntegrationForm.SongLengthsUrl);
-            info.AddValue(getKeyName(Keys.TpartyModuleMixdown), Form1.TpartyIntegrationForm.ModuleMixdown);
+            info.AddValue(GetKeyName(Keys.ModTpartyApp), Form1.ImportModForm.tpartyAppTb.Text);
+            info.AddValue(GetKeyName(Keys.ModTpartyArgs), Form1.ImportModForm.tpartyArgsTb.Text);
+            info.AddValue(GetKeyName(Keys.ModTpartyOutput), Form1.ImportModForm.tpartyOutputTb.Text);
+            info.AddValue(GetKeyName(Keys.SidTpartyApp), Form1.ImportSidForm.tpartyAppTb.Text);
+            info.AddValue(GetKeyName(Keys.SidTpartyArgs), Form1.ImportSidForm.tpartyArgsTb.Text);
+            info.AddValue(GetKeyName(Keys.SidTpartyOutput), Form1.ImportSidForm.tpartyOutputTb.Text);
+            info.AddValue(GetKeyName(Keys.SongLengthsUrl), Form1.TpartyIntegrationForm.SongLengthsUrl);
+            info.AddValue(GetKeyName(Keys.TpartyModuleMixdown), Form1.TpartyIntegrationForm.ModuleMixdown);
             info.AddValue("videoExportOptions", Form1.VidExpForm.Options);
             info.AddValue("backgroundImageFolder", form.BackgroundImageFolder);
             info.AddValue("trackAudioFolder", form.TrackAudioFolder);

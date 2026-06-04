@@ -5,18 +5,18 @@ namespace VisualMusic.ViewModels
 {
     public partial class TrackItemViewModel : ObservableObject
     {
-        [ObservableProperty] string name;
-        [ObservableProperty] Color normalColor;
-        [ObservableProperty] Color hilitedColor;
+        [ObservableProperty] string _name;
+        [ObservableProperty] Color _normalColor;
+        [ObservableProperty] Color _hilitedColor;
 
         public TrackView TrackView { get; }
 
         public TrackItemViewModel(TrackView trackView, string name, Color normalColor, Color hilitedColor)
         {
             TrackView = trackView;
-            this.name = name;
-            this.normalColor = normalColor;
-            this.hilitedColor = hilitedColor;
+            this._name = name;
+            this._normalColor = normalColor;
+            this._hilitedColor = hilitedColor;
         }
 
         public static Color ToWpfColor(System.Drawing.Color c)

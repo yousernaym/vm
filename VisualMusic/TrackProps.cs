@@ -23,7 +23,7 @@ namespace VisualMusic
 
         internal NoteStyle ActiveNoteStyle
         {
-            get => StyleProps.getActiveStyle(TrackNumber, GlobalProps);
+            get => StyleProps.GetActiveStyle(TrackNumber, GlobalProps);
             //set => Style.setSelectedNoteStyle(value);
         }
 
@@ -72,9 +72,9 @@ namespace VisualMusic
             info.AddValue("typeFlags", TypeFlags);
         }
 
-        public void loadContent()
+        public void LoadContent()
         {
-            MaterialProps.loadContent();
+            MaterialProps.LoadContent();
         }
 
         public void ResetStyle()
@@ -112,23 +112,23 @@ namespace VisualMusic
             AudioProps = new AudioProps();
         }
 
-        public TrackProps clone(ISongDrawHost host = null)
+        public TrackProps Clone(ISongDrawHost host = null)
         {
             TrackProps newProps = new TrackProps(TrackView);
-            newProps.cloneFrom(this, (int)TrackPropsType.TPT_All, host);
+            newProps.CloneFrom(this, (int)TrackPropsType.TPT_All, host);
             return newProps;
         }
 
-        internal void cloneFrom(TrackProps source, int type, ISongDrawHost host = null)
+        internal void CloneFrom(TrackProps source, int type, ISongDrawHost host = null)
         {
             if ((type & (int)TrackPropsType.TPT_Style) > 0)
-                StyleProps = source.StyleProps.clone();
+                StyleProps = source.StyleProps.Clone();
             if ((type & (int)TrackPropsType.TPT_Material) > 0)
-                MaterialProps = source.MaterialProps.clone();
+                MaterialProps = source.MaterialProps.Clone();
             if ((type & (int)TrackPropsType.TPT_Light) > 0)
-                LightProps = source.LightProps.clone();
+                LightProps = source.LightProps.Clone();
             if ((type & (int)TrackPropsType.TPT_Spatial) > 0)
-                SpatialProps = source.SpatialProps.clone();
+                SpatialProps = source.SpatialProps.Clone();
             if ((type & (int)TrackPropsType.TPT_Audio) > 0)
                 AudioProps = source.AudioProps;
         }
@@ -140,41 +140,41 @@ namespace VisualMusic
         internal Texture2D Texture { get; set; } = null;
         public string Path { get; set; } = "";
 
-        SamplerState samplerState = new SamplerState();
-        SamplerState samplerStateBacking = new SamplerState();
-        bool dirtySamplerState = true;
+        SamplerState _samplerState = new SamplerState();
+        SamplerState _samplerStateBacking = new SamplerState();
+        bool _dirtySamplerState = true;
         public SamplerState SamplerStateBacking
         {
-            get { dirtySamplerState = true; return samplerStateBacking; }
+            get { _dirtySamplerState = true; return _samplerStateBacking; }
             //set { samplerStateBacking = value; }
         }
         public SamplerState SamplerState
         {
             get
             {
-                if (dirtySamplerState)
+                if (_dirtySamplerState)
                 {
-                    samplerState.Dispose();
-                    samplerState = new SamplerState();
-                    samplerState.AddressU = samplerStateBacking.AddressU;
-                    samplerState.AddressV = samplerStateBacking.AddressV;
-                    samplerState.Filter = samplerStateBacking.Filter;
-                    samplerState.MaxAnisotropy = samplerStateBacking.MaxAnisotropy;
-                    samplerState.MaxMipLevel = samplerStateBacking.MaxMipLevel;
-                    dirtySamplerState = false;
+                    _samplerState.Dispose();
+                    _samplerState = new SamplerState();
+                    _samplerState.AddressU = _samplerStateBacking.AddressU;
+                    _samplerState.AddressV = _samplerStateBacking.AddressV;
+                    _samplerState.Filter = _samplerStateBacking.Filter;
+                    _samplerState.MaxAnisotropy = _samplerStateBacking.MaxAnisotropy;
+                    _samplerState.MaxMipLevel = _samplerStateBacking.MaxMipLevel;
+                    _dirtySamplerState = false;
                 }
-                return samplerState;
+                return _samplerState;
             }
             //set { samplerState = value; }
         }
         public bool? DisableTexture { get; set; } = false;
-        bool? pointSmp = false;
+        bool? _pointSmp = false;
         public bool? PointSmp
         {
-            get => pointSmp;
+            get => _pointSmp;
             set
             {
-                pointSmp = value;
+                _pointSmp = value;
                 if (value != null)
                     SamplerStateBacking.Filter = (bool)value ? TextureFilter.Point : TextureFilter.Linear;
             }
@@ -182,23 +182,23 @@ namespace VisualMusic
 
         public bool? TexColBlend { get; set; } = false;
 
-        bool? uTile = false;
+        bool? _uTile = false;
         public bool? UTile
         {
-            get { return uTile; }
-            set { uTile = value; }
+            get { return _uTile; }
+            set { _uTile = value; }
         }
-        bool? vTile = false;
+        bool? _vTile = false;
         public bool? VTile
         {
-            get { return vTile; }
-            set { vTile = value; }
+            get { return _vTile; }
+            set { _vTile = value; }
         }
-        bool? keepAspect = false;
+        bool? _keepAspect = false;
         public bool? KeepAspect
         {
-            get { return keepAspect; }
-            set { keepAspect = value; }
+            get { return _keepAspect; }
+            set { _keepAspect = value; }
         }
         Point Anchor
         {
@@ -228,8 +228,8 @@ namespace VisualMusic
         //Methods----------------------
         public TrackPropsTex()
         {
-            samplerStateBacking.AddressU = TextureAddressMode.Wrap;
-            samplerStateBacking.AddressV = TextureAddressMode.Wrap;
+            _samplerStateBacking.AddressU = TextureAddressMode.Wrap;
+            _samplerStateBacking.AddressV = TextureAddressMode.Wrap;
         }
         public TrackPropsTex(SerializationInfo info, StreamingContext ctxt)
         {
@@ -244,11 +244,11 @@ namespace VisualMusic
                 else if (entry.Name == "texColBlend")
                     TexColBlend = (bool)entry.Value;
                 else if (entry.Name == "keepAspect")
-                    keepAspect = (bool)entry.Value;
+                    _keepAspect = (bool)entry.Value;
                 else if (entry.Name == "uTile")
-                    uTile = (bool)entry.Value;
+                    _uTile = (bool)entry.Value;
                 else if (entry.Name == "vTile")
-                    vTile = (bool)entry.Value;
+                    _vTile = (bool)entry.Value;
                 else if (entry.Name == "anchor")
                     Anchor = (Point)entry.Value;
                 else if (entry.Name == "scroll")
@@ -261,13 +261,13 @@ namespace VisualMusic
             info.AddValue("disableTexture", DisableTexture);
             info.AddValue("pointSmp", PointSmp);
             info.AddValue("texColBlend", TexColBlend);
-            info.AddValue("keepAspect", keepAspect);
-            info.AddValue("uTile", uTile);
-            info.AddValue("vTile", vTile);
+            info.AddValue("keepAspect", _keepAspect);
+            info.AddValue("uTile", _uTile);
+            info.AddValue("vTile", _vTile);
             info.AddValue("anchor", Anchor);
             info.AddValue("scroll", Scroll);
         }
-        Texture2D createMipLevels(Texture2D tex, GraphicsDevice gd, SpriteBatch sb)
+        Texture2D CreateMipLevels(Texture2D tex, GraphicsDevice gd, SpriteBatch sb)
         {
             RenderTarget2D renderTarget = new RenderTarget2D(gd, tex.Width, tex.Height, true, SurfaceFormat.Color, DepthFormat.None);
             gd.SetRenderTarget(renderTarget);
@@ -280,34 +280,34 @@ namespace VisualMusic
             return outTex;
         }
 
-        public bool loadTexture(string path, FileStream stream, SongPanel songPanel)
-            => loadTexture(path, stream, songPanel.GraphicsDevice, songPanel.SpriteBatch);
+        public bool LoadTexture(string path, FileStream stream, SongPanel songPanel)
+            => LoadTexture(path, stream, songPanel.GraphicsDevice, songPanel.SpriteBatch);
 
-        public bool loadTexture(string path, FileStream stream, ISongDrawHost host)
-            => loadTexture(path, stream, host.GraphicsDevice, host.SpriteBatch);
+        public bool LoadTexture(string path, FileStream stream, ISongDrawHost host)
+            => LoadTexture(path, stream, host.GraphicsDevice, host.SpriteBatch);
 
-        bool loadTexture(string path, FileStream stream, GraphicsDevice gd, SpriteBatch sb)
+        bool LoadTexture(string path, FileStream stream, GraphicsDevice gd, SpriteBatch sb)
         {
             Path = path;
             Texture2D tex = Texture;
             if (tex != null) { tex.Dispose(); tex = null; }
             tex = Texture2D.FromStream(gd, stream);
-            Texture = createMipLevels(tex, gd, sb);
+            Texture = CreateMipLevels(tex, gd, sb);
             return tex != null;
         }
 
-        public bool loadTexture(string path, SongPanel songPanel)
+        public bool LoadTexture(string path, SongPanel songPanel)
         {
             using (FileStream stream = File.Open(path, FileMode.Open))
-                return loadTexture(path, stream, songPanel);
+                return LoadTexture(path, stream, songPanel);
         }
 
-        public bool loadTexture(string path, ISongDrawHost host)
+        public bool LoadTexture(string path, ISongDrawHost host)
         {
             using var stream = File.Open(path, FileMode.Open);
-            return loadTexture(path, stream, host);
+            return LoadTexture(path, stream, host);
         }
-        public void unloadTexture()
+        public void UnloadTexture()
         {
             Path = "";
             if (Texture != null)
@@ -317,13 +317,13 @@ namespace VisualMusic
             }
         }
 
-        internal void loadContent()
+        internal void LoadContent()
         {
             //Deserialization inits Path but not Texture because Texture2D is not serializable, and you can't load texture before the device is created.
             try
             {
                 if (!string.IsNullOrEmpty(Path))
-                    loadTexture(Path, Project.StaticDrawHost);
+                    LoadTexture(Path, Project.StaticDrawHost);
             }
             catch (Exception)
             {
@@ -337,23 +337,23 @@ namespace VisualMusic
     public class NoteTypeMaterial : ISerializable
     {
         //TrackProps parent;
-        float? sat = 1;
+        float? _sat = 1;
         public float? Sat
         {
-            get { return sat; }
-            set { sat = value; }
+            get { return _sat; }
+            set { _sat = value; }
         }
-        float? lum = 1;
+        float? _lum = 1;
         public float? Lum
         {
-            get { return lum; }
-            set { lum = value; }
+            get { return _lum; }
+            set { _lum = value; }
         }
-        Texture2D texture = null;
+        Texture2D _texture = null;
         public Texture2D Texture
         {
-            get { return texture; }
-            set { texture = value; }
+            get { return _texture; }
+            set { _texture = value; }
         }
         //public Color color;
         //public Color Color
@@ -366,28 +366,28 @@ namespace VisualMusic
         //}
         public NoteTypeMaterial()
         {
-            sat = 1;
-            lum = 1;
-            texture = null;
+            _sat = 1;
+            _lum = 1;
+            _texture = null;
         }
         public NoteTypeMaterial(float _sat, float _lum, Texture2D tex = null)
         {
-            sat = _sat;
-            lum = _lum;
-            texture = tex;
+            _sat = _sat;
+            _lum = _lum;
+            _texture = tex;
         }
         public NoteTypeMaterial(SerializationInfo info, StreamingContext ctxt)
         {
-            sat = (float)info.GetValue("sat", typeof(float));
-            lum = (float)info.GetValue("lum", typeof(float));
-            texture = (Texture2D)info.GetValue("texture", typeof(Texture2D));
+            _sat = (float)info.GetValue("sat", typeof(float));
+            _lum = (float)info.GetValue("lum", typeof(float));
+            _texture = (Texture2D)info.GetValue("texture", typeof(Texture2D));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
-            info.AddValue("sat", sat);
-            info.AddValue("lum", lum);
-            info.AddValue("texture", texture);
+            info.AddValue("sat", _sat);
+            info.AddValue("lum", _lum);
+            info.AddValue("texture", _texture);
         }
     }
 
@@ -398,18 +398,18 @@ namespace VisualMusic
     public class StyleProps : ISerializable
     {
         public NoteStyleType? Type { get; set; }
-        NoteStyle[] styles = new NoteStyle[Enum.GetNames(typeof(NoteStyleType)).Length];
+        NoteStyle[] _styles = new NoteStyle[Enum.GetNames(typeof(NoteStyleType)).Length];
 
         public StyleProps(int trackNumber)
         {
             int[] styleTypes = (int[])Enum.GetValues(typeof(NoteStyleType));
             string[] styleNames = (string[])Enum.GetNames(typeof(NoteStyleType));
-            for (int i = 0; i < styles.Length; i++)
+            for (int i = 0; i < _styles.Length; i++)
             {
                 if ((NoteStyleType)styleTypes[i] != NoteStyleType.Default)
                 {
-                    styles[i] = (NoteStyle)Activator.CreateInstance(System.Type.GetType("VisualMusic.NoteStyle_" + styleNames[i]));
-                    styles[i].loadFx();
+                    _styles[i] = (NoteStyle)Activator.CreateInstance(System.Type.GetType("VisualMusic.NoteStyle_" + styleNames[i]));
+                    _styles[i].LoadFx();
                 }
             }
             if (trackNumber == 0)
@@ -430,7 +430,7 @@ namespace VisualMusic
             {
                 if (entry.Name == "noteStyles")
                 {
-                    styles = (NoteStyle[])entry.Value;
+                    _styles = (NoteStyle[])entry.Value;
                     LoadFx();
                 }
                 else if (entry.Name == "noteStyleType")
@@ -440,68 +440,68 @@ namespace VisualMusic
 
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
-            info.AddValue("noteStyles", styles);
+            info.AddValue("noteStyles", _styles);
             info.AddValue("noteStyleType", Type);
         }
 
-        public NoteStyle getActiveStyle(int trackNumber, TrackProps globalProps)
+        public NoteStyle GetActiveStyle(int trackNumber, TrackProps globalProps)
         {
             if (Type == NoteStyleType.Default)
             {
                 if (trackNumber == 0)  //Global track
-                    return getBarStyle();
+                    return GetBarStyle();
                 else
                     return globalProps.ActiveNoteStyle;
             }
             else
-                return getStyle(Type);
+                return GetStyle(Type);
         }
 
         internal NoteStyle SelectedStyle
         {
-            get => getStyle(Type);
+            get => GetStyle(Type);
             set
             {
                 if (value.GetType() == typeof(NoteStyle_Bar))
                 {
                     Type = NoteStyleType.Bar;
-                    styles[(int)NoteStyleType.Bar] = value;
+                    _styles[(int)NoteStyleType.Bar] = value;
                 }
                 else if (value.GetType() == typeof(NoteStyle_Line))
                 {
                     Type = NoteStyleType.Line;
-                    styles[(int)NoteStyleType.Line] = value;
+                    _styles[(int)NoteStyleType.Line] = value;
                 }
                 else if (value == null)
                     Type = NoteStyleType.Default;
             }
         }
 
-        public NoteStyle getStyle(NoteStyleType? type)
+        public NoteStyle GetStyle(NoteStyleType? type)
         {
-            return styles[(int)type];
+            return _styles[(int)type];
         }
-        public NoteStyle_Bar getBarStyle()
+        public NoteStyle_Bar GetBarStyle()
         {
-            return (NoteStyle_Bar)styles[(int)NoteStyleType.Bar];
+            return (NoteStyle_Bar)_styles[(int)NoteStyleType.Bar];
         }
-        public NoteStyle_Line getLineStyle()
+        public NoteStyle_Line GetLineStyle()
         {
-            return (NoteStyle_Line)styles[(int)NoteStyleType.Line];
+            return (NoteStyle_Line)_styles[(int)NoteStyleType.Line];
         }
 
         public void LoadFx()
         {
-            foreach (NoteStyle ns in styles)
+            foreach (NoteStyle ns in _styles)
             {
                 if (ns != null)
-                    ns.loadFx();
+                    ns.LoadFx();
             }
         }
 
-        public StyleProps clone()
+        public StyleProps Clone()
         {
-            StyleProps dest = Cloning.clone(this);
+            StyleProps dest = Cloning.Clone(this);
             //dest.loadFx();
             return dest;
         }
@@ -512,15 +512,15 @@ namespace VisualMusic
     {
         public float? Transp { get; set; }
         public float? Hue { get; set; }
-        NoteTypeMaterial normal;
-        public NoteTypeMaterial Normal { get => normal; set => normal = value; }
+        NoteTypeMaterial _normal;
+        public NoteTypeMaterial Normal { get => _normal; set => _normal = value; }
         public NoteTypeMaterial Hilited { get; set; }
         public TrackPropsTex TexProps { get; set; } = new TrackPropsTex();
         public TrackPropsTex HmapProps { get; set; } = new TrackPropsTex();
 
         public MaterialProps(int trackNumber, int numTracks)
         {
-            TexProps.unloadTexture();
+            TexProps.UnloadTexture();
             TexProps = new TrackPropsTex();
             if (trackNumber == 0)
             {
@@ -567,13 +567,13 @@ namespace VisualMusic
             info.AddValue("hmapProps", HmapProps);
         }
 
-        internal void loadContent()
+        internal void LoadContent()
         {
-            TexProps.loadContent();
-            HmapProps.loadContent();
+            TexProps.LoadContent();
+            HmapProps.LoadContent();
         }
 
-        public Texture2D getTexture(bool bhilited, MaterialProps globalMaterial)
+        public Texture2D GetTexture(bool bhilited, MaterialProps globalMaterial)
         {
             Texture2D tex;
             if (bhilited && Hilited.Texture != null)
@@ -589,18 +589,18 @@ namespace VisualMusic
 
                 }
                 else
-                    tex = globalMaterial.getTexture(bhilited, null);
+                    tex = globalMaterial.GetTexture(bhilited, null);
             }
             return tex;
         }
         public System.Drawing.Color GetSysColor(bool bhilited, MaterialProps globalMaterial)
         {
-            Vector4 hsla = getColor(bhilited, globalMaterial);
+            Vector4 hsla = GetColor(bhilited, globalMaterial);
             //hsla.Z *= 0.5f;
             Color rgba = SongPanel.HSLA2RGBA(hsla);
             return System.Drawing.Color.FromArgb(rgba.R, rgba.G, rgba.B);
         }
-        public Vector4 getColor(bool bhilited, MaterialProps globalMaterial)
+        public Vector4 GetColor(bool bhilited, MaterialProps globalMaterial)
         {
             if (Hue == null)
                 return new Vector4(0, 0, 0, 0);
@@ -634,16 +634,16 @@ namespace VisualMusic
             return new Vector4(h, s, l, (float)(Transp * globalMaterial.Transp));
         }
 
-        public TrackPropsTex getTexProps(int selector)
+        public TrackPropsTex GetTexProps(int selector)
         {
             if (selector == 0)
                 return TexProps;
             else
                 return HmapProps;
         }
-        public MaterialProps clone()
+        public MaterialProps Clone()
         {
-            MaterialProps dest = Cloning.clone(this);
+            MaterialProps dest = Cloning.Clone(this);
             return dest;
         }
     }

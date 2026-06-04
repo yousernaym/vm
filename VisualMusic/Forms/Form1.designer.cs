@@ -309,7 +309,7 @@
             audioOffsetS.Size = new System.Drawing.Size(52, 23);
             audioOffsetS.TabIndex = 1;
             audioOffsetS.Tag = "Edit Audio Offset";
-            audioOffsetS.ValueChanged += audioOffsetS_ValueChanged;
+            audioOffsetS.ValueChanged += AudioOffsetS_ValueChanged;
             // 
             // fileToolStripMenuItem
             // 
@@ -324,7 +324,7 @@
             importMidiToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M;
             importMidiToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             importMidiToolStripMenuItem.Text = "Import midi song...";
-            importMidiToolStripMenuItem.Click += importMidiSongToolStripMenuItem_Click;
+            importMidiToolStripMenuItem.Click += ImportMidiSongToolStripMenuItem_Click;
             // 
             // importModuleToolStripMenuItem
             // 
@@ -332,7 +332,7 @@
             importModuleToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.M;
             importModuleToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             importModuleToolStripMenuItem.Text = "Import module...";
-            importModuleToolStripMenuItem.Click += importModuleToolStripMenuItem_Click;
+            importModuleToolStripMenuItem.Click += ImportModuleToolStripMenuItem_Click;
             // 
             // importSidSongToolStripMenuItem
             // 
@@ -340,7 +340,7 @@
             importSidSongToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.S;
             importSidSongToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             importSidSongToolStripMenuItem.Text = "Import sid song...";
-            importSidSongToolStripMenuItem.Click += importSidSongToolStripMenuItem_Click;
+            importSidSongToolStripMenuItem.Click += ImportSidSongToolStripMenuItem_Click;
             // 
             // openSongToolStripMenuItem
             // 
@@ -348,7 +348,7 @@
             openSongToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O;
             openSongToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             openSongToolStripMenuItem.Text = "Open project...";
-            openSongToolStripMenuItem.Click += openSongToolStripMenuItem_Click;
+            openSongToolStripMenuItem.Click += OpenSongToolStripMenuItem_Click;
             // 
             // saveSongToolStripMenuItem
             // 
@@ -357,7 +357,7 @@
             saveSongToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
             saveSongToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             saveSongToolStripMenuItem.Text = "Save project";
-            saveSongToolStripMenuItem.Click += saveSongToolStripMenuItem_Click;
+            saveSongToolStripMenuItem.Click += SaveSongToolStripMenuItem_Click;
             // 
             // saveSongAsToolStripMenuItem
             // 
@@ -366,7 +366,7 @@
             saveSongAsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.S;
             saveSongAsToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             saveSongAsToolStripMenuItem.Text = "Save project as...";
-            saveSongAsToolStripMenuItem.Click += saveSongAsToolStripMenuItem_Click;
+            saveSongAsToolStripMenuItem.Click += SaveSongAsToolStripMenuItem_Click;
             // 
             // exportVideoToolStripMenuItem
             // 
@@ -375,7 +375,7 @@
             exportVideoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E;
             exportVideoToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             exportVideoToolStripMenuItem.Text = "Export video...";
-            exportVideoToolStripMenuItem.Click += exportVideoToolStripMenuItem_Click;
+            exportVideoToolStripMenuItem.Click += ExportVideoToolStripMenuItem_Click;
             // 
             // tpartyToolStripMenuItem
             // 
@@ -383,7 +383,7 @@
             tpartyToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T;
             tpartyToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             tpartyToolStripMenuItem.Text = "Third-party integration...";
-            tpartyToolStripMenuItem.Click += tpartyToolStripMenuItem_Click;
+            tpartyToolStripMenuItem.Click += TpartyToolStripMenuItem_Click;
             // 
             // menuStrip1
             // 
@@ -410,7 +410,7 @@
             undoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z;
             undoToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             undoToolStripMenuItem.Text = "Undo";
-            undoToolStripMenuItem.Click += undoToolStripMenuItem_Click;
+            undoToolStripMenuItem.Click += UndoToolStripMenuItem_Click;
             // 
             // redoToolStripMenuItem
             // 
@@ -419,7 +419,7 @@
             redoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Z;
             redoToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             redoToolStripMenuItem.Text = "Redo";
-            redoToolStripMenuItem.Click += redoToolStripMenuItem_Click;
+            redoToolStripMenuItem.Click += RedoToolStripMenuItem_Click;
             // 
             // cameraToolStripMenuItem
             // 
@@ -435,7 +435,7 @@
             resetCamToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             resetCamToolStripMenuItem.Tag = "Reset Camera";
             resetCamToolStripMenuItem.Text = "Reset";
-            resetCamToolStripMenuItem.Click += resetCamToolStripMenuItem_Click;
+            resetCamToolStripMenuItem.Click += ResetCamToolStripMenuItem_Click;
             // 
             // loadCamToolStripMenuItem
             // 
@@ -445,7 +445,7 @@
             loadCamToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             loadCamToolStripMenuItem.Tag = "";
             loadCamToolStripMenuItem.Text = "Load...";
-            loadCamToolStripMenuItem.Click += loadCamToolStripMenuItem_Click;
+            loadCamToolStripMenuItem.Click += LoadCamToolStripMenuItem_Click;
             // 
             // saveCamToolStripMenuItem
             // 
@@ -454,7 +454,7 @@
             saveCamToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.M;
             saveCamToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             saveCamToolStripMenuItem.Text = "Save...";
-            saveCamToolStripMenuItem.Click += saveCamToolStripMenuItem_Click;
+            saveCamToolStripMenuItem.Click += SaveCamToolStripMenuItem_Click;
             // 
             // tracksToolStripMenuItem
             // 
@@ -462,7 +462,7 @@
             tracksToolStripMenuItem.Name = "tracksToolStripMenuItem";
             tracksToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             tracksToolStripMenuItem.Text = "Tracks";
-            tracksToolStripMenuItem.EnabledChanged += tracksToolStripMenuItem_EnabledChanged;
+            tracksToolStripMenuItem.EnabledChanged += TracksToolStripMenuItem_EnabledChanged;
             // 
             // defaultPropertiesToolStripMenuItem1
             // 
@@ -471,7 +471,7 @@
             defaultPropertiesToolStripMenuItem1.Size = new System.Drawing.Size(236, 22);
             defaultPropertiesToolStripMenuItem1.Tag = "Default Track Properties";
             defaultPropertiesToolStripMenuItem1.Text = "Default Properties";
-            defaultPropertiesToolStripMenuItem1.Click += defaultPropertiesToolStripMenuItem1_Click;
+            defaultPropertiesToolStripMenuItem1.Click += DefaultPropertiesToolStripMenuItem1_Click;
             // 
             // loadPropertiesToolStripMenuItem
             // 
@@ -481,7 +481,7 @@
             loadPropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
             loadPropertiesToolStripMenuItem.Tag = "";
             loadPropertiesToolStripMenuItem.Text = "Load properties...";
-            loadPropertiesToolStripMenuItem.Click += loadPropertiesToolStripMenuItem_Click;
+            loadPropertiesToolStripMenuItem.Click += LoadPropertiesToolStripMenuItem_Click;
             // 
             // savePropertiesToolStripMenuItem
             // 
@@ -490,7 +490,7 @@
             savePropertiesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.P;
             savePropertiesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
             savePropertiesToolStripMenuItem.Text = "Save properties...";
-            savePropertiesToolStripMenuItem.Click += savePropertiesToolStripMenuItem_Click;
+            savePropertiesToolStripMenuItem.Click += SavePropertiesToolStripMenuItem_Click;
             // 
             // insertLyricsHereToolStripMenuItem
             // 
@@ -500,7 +500,7 @@
             insertLyricsHereToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             insertLyricsHereToolStripMenuItem.Tag = "Insert Lyrics";
             insertLyricsHereToolStripMenuItem.Text = "Insert Lyrics";
-            insertLyricsHereToolStripMenuItem.Click += insertLyricsHereToolStripMenuItem_Click;
+            insertLyricsHereToolStripMenuItem.Click += InsertLyricsHereToolStripMenuItem_Click;
             // 
             // insertKeyFrameToolStripMenuItem
             // 
@@ -510,7 +510,7 @@
             insertKeyFrameToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             insertKeyFrameToolStripMenuItem.Tag = "";
             insertKeyFrameToolStripMenuItem.Text = "Insert Key Frame";
-            insertKeyFrameToolStripMenuItem.Click += insertKeyFrameToolStripMenuItem_Click;
+            insertKeyFrameToolStripMenuItem.Click += InsertKeyFrameToolStripMenuItem_Click;
             // 
             // playbackToolStripMenuItem
             // 
@@ -526,7 +526,7 @@
             startStopToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Space;
             startStopToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             startStopToolStripMenuItem.Text = "Start/Stop";
-            startStopToolStripMenuItem.Click += startStopToolStripMenuItem_Click;
+            startStopToolStripMenuItem.Click += StartStopToolStripMenuItem_Click;
             // 
             // beginningToolStripMenuItem
             // 
@@ -534,7 +534,7 @@
             beginningToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Home;
             beginningToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             beginningToolStripMenuItem.Text = "Go to beginning";
-            beginningToolStripMenuItem.Click += beginningToolStripMenuItem_Click;
+            beginningToolStripMenuItem.Click += BeginningToolStripMenuItem_Click;
             // 
             // endToolStripMenuItem
             // 
@@ -542,7 +542,7 @@
             endToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End;
             endToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             endToolStripMenuItem.Text = "Go to end";
-            endToolStripMenuItem.Click += endToolStripMenuItem_Click;
+            endToolStripMenuItem.Click += EndToolStripMenuItem_Click;
             // 
             // nudgeBackwardsToolStripMenuItem
             // 
@@ -550,7 +550,7 @@
             nudgeBackwardsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Left;
             nudgeBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             nudgeBackwardsToolStripMenuItem.Text = "Nudge backwards";
-            nudgeBackwardsToolStripMenuItem.Click += nudgeBackwardsToolStripMenuItem_Click;
+            nudgeBackwardsToolStripMenuItem.Click += NudgeBackwardsToolStripMenuItem_Click;
             // 
             // nudgeForwardToolStripMenuItem
             // 
@@ -558,7 +558,7 @@
             nudgeForwardToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Right;
             nudgeForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             nudgeForwardToolStripMenuItem.Text = "Nudge forward";
-            nudgeForwardToolStripMenuItem.Click += nudgeForwardToolStripMenuItem_Click;
+            nudgeForwardToolStripMenuItem.Click += NudgeForwardToolStripMenuItem_Click;
             // 
             // jumpBackwardsToolStripMenuItem
             // 
@@ -566,7 +566,7 @@
             jumpBackwardsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Left;
             jumpBackwardsToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             jumpBackwardsToolStripMenuItem.Text = "Jump backwards";
-            jumpBackwardsToolStripMenuItem.Click += jumpBackwardsToolStripMenuItem_Click;
+            jumpBackwardsToolStripMenuItem.Click += JumpBackwardsToolStripMenuItem_Click;
             // 
             // jumpForwardToolStripMenuItem
             // 
@@ -574,7 +574,7 @@
             jumpForwardToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Right;
             jumpForwardToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             jumpForwardToolStripMenuItem.Text = "Jump forward";
-            jumpForwardToolStripMenuItem.Click += jumpForwardToolStripMenuItem_Click;
+            jumpForwardToolStripMenuItem.Click += JumpForwardToolStripMenuItem_Click;
             // 
             // viewToolStripMenuItem
             // 
@@ -589,7 +589,7 @@
             viewSongTSMI.ShortcutKeys = System.Windows.Forms.Keys.F1;
             viewSongTSMI.Size = new System.Drawing.Size(163, 22);
             viewSongTSMI.Text = "Song";
-            viewSongTSMI.Click += viewSongTSMI_Click;
+            viewSongTSMI.Click += ViewSongTSMI_Click;
             // 
             // viewModBrowserTSMI
             // 
@@ -597,7 +597,7 @@
             viewModBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F2;
             viewModBrowserTSMI.Size = new System.Drawing.Size(163, 22);
             viewModBrowserTSMI.Text = "Mod browser";
-            viewModBrowserTSMI.Click += viewModBrowserTSMI_Click;
+            viewModBrowserTSMI.Click += ViewModBrowserTSMI_Click;
             // 
             // viewSidBrowserTSMI
             // 
@@ -605,7 +605,7 @@
             viewSidBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F3;
             viewSidBrowserTSMI.Size = new System.Drawing.Size(163, 22);
             viewSidBrowserTSMI.Text = "Sid browser";
-            viewSidBrowserTSMI.Click += viewSidBrowserTSMI_Click;
+            viewSidBrowserTSMI.Click += ViewSidBrowserTSMI_Click;
             // 
             // viewMidiBrowserTSMI
             // 
@@ -613,7 +613,7 @@
             viewMidiBrowserTSMI.ShortcutKeys = System.Windows.Forms.Keys.F4;
             viewMidiBrowserTSMI.Size = new System.Drawing.Size(163, 22);
             viewMidiBrowserTSMI.Text = "Midi browser";
-            viewMidiBrowserTSMI.Click += viewMidiBrowserTSMI_Click;
+            viewMidiBrowserTSMI.Click += ViewMidiBrowserTSMI_Click;
             // 
             // label7
             // 
@@ -652,7 +652,7 @@
             trackPropsPanel.Size = new System.Drawing.Size(395, 4361);
             trackPropsPanel.TabIndex = 3;
             trackPropsPanel.Visible = false;
-            trackPropsPanel.VisibleChanged += trackPropsPanel_VisibleChanged;
+            trackPropsPanel.VisibleChanged += TrackPropsPanel_VisibleChanged;
             // 
             // trackList
             // 
@@ -669,12 +669,12 @@
             trackList.TabIndex = 0;
             trackList.UseCompatibleStateImageBehavior = false;
             trackList.View = System.Windows.Forms.View.Details;
-            trackList.ItemDrag += trackList_ItemDrag;
-            trackList.SelectedIndexChanged += trackList_SelectedIndexChanged;
-            trackList.DragDrop += trackList_DragDrop;
-            trackList.DragEnter += trackList_DragEnter;
-            trackList.DragOver += trackList_DragOver;
-            trackList.DragLeave += trackList_DragLeave;
+            trackList.ItemDrag += TrackList_ItemDrag;
+            trackList.SelectedIndexChanged += TrackList_SelectedIndexChanged;
+            trackList.DragDrop += TrackList_DragDrop;
+            trackList.DragEnter += TrackList_DragEnter;
+            trackList.DragOver += TrackList_DragOver;
+            trackList.DragLeave += TrackList_DragLeave;
             // 
             // trackColumn
             // 
@@ -699,7 +699,7 @@
             trackListCM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { selectAllToolStripMenuItem, invertSelectionToolStripMenuItem, toolStripSeparator1, defaultPropertiesToolStripMenuItem, loadTrackPropsToolStripMenuItem, saveTrackPropsToolStripMenuItem });
             trackListCM.Name = "trackListContextMenu";
             trackListCM.Size = new System.Drawing.Size(193, 120);
-            trackListCM.Opening += trackListCM_Opening;
+            trackListCM.Opening += TrackListCM_Opening;
             // 
             // selectAllToolStripMenuItem
             // 
@@ -707,7 +707,7 @@
             selectAllToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A;
             selectAllToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             selectAllToolStripMenuItem.Text = "Select All";
-            selectAllToolStripMenuItem.Click += selectAllToolStripMenuItem_Click;
+            selectAllToolStripMenuItem.Click += SelectAllToolStripMenuItem_Click;
             // 
             // invertSelectionToolStripMenuItem
             // 
@@ -715,7 +715,7 @@
             invertSelectionToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I;
             invertSelectionToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             invertSelectionToolStripMenuItem.Text = "Invert Selection";
-            invertSelectionToolStripMenuItem.Click += invertSelectionToolStripMenuItem_Click;
+            invertSelectionToolStripMenuItem.Click += InvertSelectionToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
@@ -727,21 +727,21 @@
             defaultPropertiesToolStripMenuItem.Name = "defaultPropertiesToolStripMenuItem";
             defaultPropertiesToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             defaultPropertiesToolStripMenuItem.Text = "Default Properties";
-            defaultPropertiesToolStripMenuItem.Click += defaultPropertiesToolStripMenuItem_Click;
+            defaultPropertiesToolStripMenuItem.Click += DefaultPropertiesToolStripMenuItem_Click;
             // 
             // loadTrackPropsToolStripMenuItem
             // 
             loadTrackPropsToolStripMenuItem.Name = "loadTrackPropsToolStripMenuItem";
             loadTrackPropsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             loadTrackPropsToolStripMenuItem.Text = "Load Properties";
-            loadTrackPropsToolStripMenuItem.Click += loadTrackPropsToolStripMenuItem_Click;
+            loadTrackPropsToolStripMenuItem.Click += LoadTrackPropsToolStripMenuItem_Click;
             // 
             // saveTrackPropsToolStripMenuItem
             // 
             saveTrackPropsToolStripMenuItem.Name = "saveTrackPropsToolStripMenuItem";
             saveTrackPropsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             saveTrackPropsToolStripMenuItem.Text = "Save Properties";
-            saveTrackPropsToolStripMenuItem.Click += saveTrackPropsToolStripMenuItem_Click;
+            saveTrackPropsToolStripMenuItem.Click += SaveTrackPropsToolStripMenuItem_Click;
             // 
             // selectedTrackPropsPanel
             // 
@@ -802,7 +802,7 @@
             defaultStyleBtn.Tag = "Default Style";
             defaultStyleBtn.Text = "Default Style";
             defaultStyleBtn.UseVisualStyleBackColor = true;
-            defaultStyleBtn.Click += defaultStyleBtn_Click;
+            defaultStyleBtn.Click += DefaultStyleBtn_Click;
             // 
             // styleList
             // 
@@ -815,7 +815,7 @@
             styleList.TabIndex = 1;
             styleList.Tag = "Change Note Style";
             styleList.ValueMember = "Value";
-            styleList.SelectedIndexChanged += styleList_SelectedIndexChanged;
+            styleList.SelectedIndexChanged += StyleList_SelectedIndexChanged;
             // 
             // label1
             // 
@@ -918,7 +918,7 @@
             texVScrollUD.Size = new System.Drawing.Size(55, 20);
             texVScrollUD.TabIndex = 51;
             texVScrollUD.Tag = "Edit Scroll V";
-            texVScrollUD.ValueChanged += texVScrollUD_ValueChanged;
+            texVScrollUD.ValueChanged += TexVScrollUD_ValueChanged;
             // 
             // label33
             // 
@@ -942,7 +942,7 @@
             texUScrollUD.Size = new System.Drawing.Size(55, 20);
             texUScrollUD.TabIndex = 50;
             texUScrollUD.Tag = "Edit Scroll U";
-            texUScrollUD.ValueChanged += texUScrollUD_ValueChanged;
+            texUScrollUD.ValueChanged += TexUScrollUD_ValueChanged;
             // 
             // tableLayoutPanel1
             // 
@@ -1014,7 +1014,7 @@
             songAnchorLabel.Tag = "Song anchor";
             songAnchorLabel.Text = "Song start";
             songAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            songAnchorLabel.Click += songAnchorLabel_Click;
+            songAnchorLabel.Click += SongAnchorLabel_Click;
             // 
             // noteAnchorLabel
             // 
@@ -1028,7 +1028,7 @@
             noteAnchorLabel.Tag = "Note anchor";
             noteAnchorLabel.Text = "Note";
             noteAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            noteAnchorLabel.Click += noteAnchorLabel_Click;
+            noteAnchorLabel.Click += NoteAnchorLabel_Click;
             // 
             // panel2
             // 
@@ -1054,7 +1054,7 @@
             songAnchorRb.TabStop = true;
             songAnchorRb.Tag = "Song anchor";
             songAnchorRb.UseVisualStyleBackColor = true;
-            songAnchorRb.Click += songAnchorRb_Click;
+            songAnchorRb.Click += SongAnchorRb_Click;
             // 
             // screenUAnchorRb
             // 
@@ -1066,7 +1066,7 @@
             screenUAnchorRb.TabStop = true;
             screenUAnchorRb.Tag = "Screen U anchor";
             screenUAnchorRb.UseVisualStyleBackColor = true;
-            screenUAnchorRb.Click += screenUAnchorRb_Click;
+            screenUAnchorRb.Click += ScreenUAnchorRb_Click;
             // 
             // noteUAnchorRb
             // 
@@ -1078,7 +1078,7 @@
             noteUAnchorRb.TabStop = true;
             noteUAnchorRb.Tag = "Note U anchor";
             noteUAnchorRb.UseVisualStyleBackColor = true;
-            noteUAnchorRb.Click += noteUAnchorRb_Click;
+            noteUAnchorRb.Click += NoteUAnchorRb_Click;
             // 
             // screenAnchorLabel
             // 
@@ -1092,7 +1092,7 @@
             screenAnchorLabel.Tag = "Screen anchor";
             screenAnchorLabel.Text = "Screen";
             screenAnchorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            screenAnchorLabel.Click += screenAnchorLabel_Click;
+            screenAnchorLabel.Click += ScreenAnchorLabel_Click;
             // 
             // panel1
             // 
@@ -1117,7 +1117,7 @@
             screenVAnchorRb.TabStop = true;
             screenVAnchorRb.Tag = "Screen V anchor";
             screenVAnchorRb.UseVisualStyleBackColor = true;
-            screenVAnchorRb.Click += screenVAnchorRb_Click;
+            screenVAnchorRb.Click += ScreenVAnchorRb_Click;
             // 
             // noteVAnchorRb
             // 
@@ -1129,7 +1129,7 @@
             noteVAnchorRb.TabStop = true;
             noteVAnchorRb.Tag = "Note V anchor";
             noteVAnchorRb.UseVisualStyleBackColor = true;
-            noteVAnchorRb.Click += noteVAnchorRb_Click;
+            noteVAnchorRb.Click += NoteVAnchorRb_Click;
             // 
             // texVTileCb
             // 
@@ -1142,7 +1142,7 @@
             texVTileCb.Tag = "V";
             texVTileCb.Text = "V";
             texVTileCb.UseVisualStyleBackColor = true;
-            texVTileCb.CheckedChanged += texVTileCb_CheckedChanged;
+            texVTileCb.CheckedChanged += TexVTileCb_CheckedChanged;
             // 
             // texUTileCb
             // 
@@ -1155,7 +1155,7 @@
             texUTileCb.Tag = "U";
             texUTileCb.Text = "U";
             texUTileCb.UseVisualStyleBackColor = true;
-            texUTileCb.CheckedChanged += texUTileCb_CheckedChanged;
+            texUTileCb.CheckedChanged += TexUTileCb_CheckedChanged;
             // 
             // texKeepAspectCb
             // 
@@ -1169,7 +1169,7 @@
             texKeepAspectCb.Tag = "Keep aspect ratio";
             texKeepAspectCb.Text = "Keep aspect ratio";
             texKeepAspectCb.UseVisualStyleBackColor = true;
-            texKeepAspectCb.CheckedChanged += texKeepAspect_CheckedChanged;
+            texKeepAspectCb.CheckedChanged += TexKeepAspect_CheckedChanged;
             // 
             // tileTexCb
             // 
@@ -1183,7 +1183,7 @@
             tileTexCb.Tag = "Tile";
             tileTexCb.Text = "Tile";
             tileTexCb.UseVisualStyleBackColor = true;
-            tileTexCb.CheckedChanged += tileTexCb_CheckedChanged;
+            tileTexCb.CheckedChanged += TileTexCb_CheckedChanged;
             // 
             // loadTexBtn
             // 
@@ -1195,7 +1195,7 @@
             loadTexBtn.Tag = "Load texture";
             loadTexBtn.Text = "&Load texture";
             loadTexBtn.UseVisualStyleBackColor = true;
-            loadTexBtn.Click += textureLoadBtn_Click;
+            loadTexBtn.Click += TextureLoadBtn_Click;
             // 
             // unloadTexBtn
             // 
@@ -1207,7 +1207,7 @@
             unloadTexBtn.Tag = "Unload texture";
             unloadTexBtn.Text = "&Unload texture";
             unloadTexBtn.UseVisualStyleBackColor = true;
-            unloadTexBtn.Click += unloadTexBtn_Click;
+            unloadTexBtn.Click += UnloadTexBtn_Click;
             // 
             // disableTextureCh
             // 
@@ -1221,7 +1221,7 @@
             disableTextureCh.Tag = "Disable texture";
             disableTextureCh.Text = "Disable texture";
             disableTextureCh.UseVisualStyleBackColor = true;
-            disableTextureCh.CheckedChanged += disableTextureCb_CheckedChanged;
+            disableTextureCh.CheckedChanged += DisableTextureCb_CheckedChanged;
             // 
             // texColBlendCb
             // 
@@ -1235,7 +1235,7 @@
             texColBlendCb.Tag = "Blend hue with track color";
             texColBlendCb.Text = "Blend hue with track color";
             texColBlendCb.UseVisualStyleBackColor = true;
-            texColBlendCb.CheckedChanged += texColBlendCb_CheckedChanged;
+            texColBlendCb.CheckedChanged += TexColBlendCb_CheckedChanged;
             // 
             // pointSmpCb
             // 
@@ -1249,7 +1249,7 @@
             pointSmpCb.Tag = "Point sampling";
             pointSmpCb.Text = "Point sampling";
             pointSmpCb.UseVisualStyleBackColor = true;
-            pointSmpCb.CheckedChanged += pointSmpCb_CheckedChanged;
+            pointSmpCb.CheckedChanged += PointSmpCb_CheckedChanged;
             // 
             // trackTexPb
             // 
@@ -1270,7 +1270,7 @@
             defaultMtrlBtn.Tag = "Default Material";
             defaultMtrlBtn.Text = "Default Material";
             defaultMtrlBtn.UseVisualStyleBackColor = true;
-            defaultMtrlBtn.Click += defaultMaterial_Click;
+            defaultMtrlBtn.Click += DefaultMaterial_Click;
             // 
             // alphaLbl
             // 
@@ -1292,7 +1292,7 @@
             transpSlider.TabIndex = 20;
             transpSlider.TickFrequency = 10;
             transpSlider.Value = 50;
-            transpSlider.Scroll += transpSlider_Scroll;
+            transpSlider.Scroll += TranspSlider_Scroll;
             // 
             // hueTb
             // 
@@ -1302,7 +1302,7 @@
             hueTb.TabIndex = 31;
             hueTb.Tag = "Edit Hue";
             hueTb.Text = "notset";
-            hueTb.TextChanged += hueTb_TextChanged;
+            hueTb.TextChanged += HueTb_TextChanged;
             // 
             // groupBox1
             // 
@@ -1330,7 +1330,7 @@
             normalLumTb.TabIndex = 21;
             normalLumTb.Tag = "Edit Normal Brightness";
             normalLumTb.Text = "notset";
-            normalLumTb.TextChanged += normalLumTb_TextChanged;
+            normalLumTb.TextChanged += NormalLumTb_TextChanged;
             // 
             // normalLumSlider
             // 
@@ -1342,7 +1342,7 @@
             normalLumSlider.TabIndex = 20;
             normalLumSlider.TickFrequency = 10;
             normalLumSlider.Value = 50;
-            normalLumSlider.Scroll += normalLumSlider_Scroll;
+            normalLumSlider.Scroll += NormalLumSlider_Scroll;
             // 
             // label
             // 
@@ -1363,7 +1363,7 @@
             normalSatTb.TabIndex = 11;
             normalSatTb.Tag = "Edit Normal Saturation";
             normalSatTb.Text = "notset";
-            normalSatTb.TextChanged += normalSatTb_TextChanged;
+            normalSatTb.TextChanged += NormalSatTb_TextChanged;
             // 
             // normalSatSlider
             // 
@@ -1375,7 +1375,7 @@
             normalSatSlider.TabIndex = 10;
             normalSatSlider.TickFrequency = 10;
             normalSatSlider.Value = 50;
-            normalSatSlider.Scroll += normalSatSlider_Scroll;
+            normalSatSlider.Scroll += NormalSatSlider_Scroll;
             // 
             // label3
             // 
@@ -1398,7 +1398,7 @@
             hueSlider.TabIndex = 30;
             hueSlider.TickFrequency = 10;
             hueSlider.Value = 50;
-            hueSlider.Scroll += hueSlider_Scroll;
+            hueSlider.Scroll += HueSlider_Scroll;
             // 
             // label2
             // 
@@ -1435,7 +1435,7 @@
             hiliteLumTb.TabIndex = 21;
             hiliteLumTb.Tag = "Edit Highlight Brightness";
             hiliteLumTb.Text = "notset";
-            hiliteLumTb.TextChanged += hiliteLumTb_TextChanged;
+            hiliteLumTb.TextChanged += HiliteLumTb_TextChanged;
             // 
             // hiliteLumSlider
             // 
@@ -1447,7 +1447,7 @@
             hiliteLumSlider.TabIndex = 20;
             hiliteLumSlider.TickFrequency = 10;
             hiliteLumSlider.Value = 50;
-            hiliteLumSlider.Scroll += hiliteLumSlider_Scroll;
+            hiliteLumSlider.Scroll += HiliteLumSlider_Scroll;
             // 
             // label5
             // 
@@ -1468,7 +1468,7 @@
             hiliteSatTb.TabIndex = 11;
             hiliteSatTb.Tag = "Edit Highlight Saturation";
             hiliteSatTb.Text = "notset";
-            hiliteSatTb.TextChanged += hiliteSatTb_TextChanged;
+            hiliteSatTb.TextChanged += HiliteSatTb_TextChanged;
             // 
             // hiliteSatSlider
             // 
@@ -1480,7 +1480,7 @@
             hiliteSatSlider.TabIndex = 10;
             hiliteSatSlider.TickFrequency = 10;
             hiliteSatSlider.Value = 50;
-            hiliteSatSlider.Scroll += hiliteSatSlider_Scroll;
+            hiliteSatSlider.Scroll += HiliteSatSlider_Scroll;
             // 
             // label6
             // 
@@ -1500,7 +1500,7 @@
             transpTb.TabIndex = 21;
             transpTb.Tag = "Edit Opacity";
             transpTb.Text = "notset";
-            transpTb.TextChanged += transpTb_TextChanged;
+            transpTb.TextChanged += TranspTb_TextChanged;
             // 
             // light
             // 
@@ -1525,7 +1525,7 @@
             defaultLightBtn.Tag = "Default Light";
             defaultLightBtn.Text = "Default Light";
             defaultLightBtn.UseVisualStyleBackColor = true;
-            defaultLightBtn.Click += defaultLightBtn_Click;
+            defaultLightBtn.Click += DefaultLightBtn_Click;
             // 
             // lightPanel
             // 
@@ -1569,7 +1569,7 @@
             masterLightHsBtn.TabIndex = 59;
             masterLightHsBtn.Tag = "Edit Master color";
             masterLightHsBtn.UseVisualStyleBackColor = true;
-            masterLightHsBtn.ColorChanged += masterLightHsBtn_ColorChanged;
+            masterLightHsBtn.ColorChanged += MasterLightHsBtn_ColorChanged;
             // 
             // specHsBtn
             // 
@@ -1583,7 +1583,7 @@
             specHsBtn.TabIndex = 59;
             specHsBtn.Tag = "Edit Specular color";
             specHsBtn.UseVisualStyleBackColor = true;
-            specHsBtn.ColorChanged += specHsBtn_ColorChanged;
+            specHsBtn.ColorChanged += SpecHsBtn_ColorChanged;
             // 
             // diffuseHsBtn
             // 
@@ -1597,7 +1597,7 @@
             diffuseHsBtn.TabIndex = 59;
             diffuseHsBtn.Tag = "Edit Diffuse  color";
             diffuseHsBtn.UseVisualStyleBackColor = true;
-            diffuseHsBtn.ColorChanged += diffuseHsBtn_ColorChanged;
+            diffuseHsBtn.ColorChanged += DiffuseHsBtn_ColorChanged;
             // 
             // ambientHsBtn
             // 
@@ -1611,7 +1611,7 @@
             ambientHsBtn.TabIndex = 59;
             ambientHsBtn.Tag = "Edit Ambient color";
             ambientHsBtn.UseVisualStyleBackColor = true;
-            ambientHsBtn.ColorChanged += ambientHsBtn_ColorChanged;
+            ambientHsBtn.ColorChanged += AmbientHsBtn_ColorChanged;
             // 
             // specPowUd
             // 
@@ -1622,7 +1622,7 @@
             specPowUd.Size = new System.Drawing.Size(51, 23);
             specPowUd.TabIndex = 56;
             specPowUd.Tag = "Edit Specular power";
-            specPowUd.ValueChanged += specPowUd_ValueChanged;
+            specPowUd.ValueChanged += SpecPowUd_ValueChanged;
             // 
             // ambientAmountUd
             // 
@@ -1634,7 +1634,7 @@
             ambientAmountUd.Size = new System.Drawing.Size(51, 23);
             ambientAmountUd.TabIndex = 53;
             ambientAmountUd.Tag = "Edit Ambient amount";
-            ambientAmountUd.ValueChanged += ambientAmountUd_ValueChanged;
+            ambientAmountUd.ValueChanged += AmbientAmountUd_ValueChanged;
             // 
             // diffuseAmountUd
             // 
@@ -1646,7 +1646,7 @@
             diffuseAmountUd.Size = new System.Drawing.Size(51, 23);
             diffuseAmountUd.TabIndex = 54;
             diffuseAmountUd.Tag = "Edit Diffuse amount";
-            diffuseAmountUd.ValueChanged += diffuseAmountUd_ValueChanged;
+            diffuseAmountUd.ValueChanged += DiffuseAmountUd_ValueChanged;
             // 
             // label24
             // 
@@ -1679,7 +1679,7 @@
             specAmountUd.Size = new System.Drawing.Size(51, 23);
             specAmountUd.TabIndex = 55;
             specAmountUd.Tag = "Edit Specular amount";
-            specAmountUd.ValueChanged += specAmountUd_ValueChanged;
+            specAmountUd.ValueChanged += SpecAmountUd_ValueChanged;
             // 
             // label15
             // 
@@ -1736,7 +1736,7 @@
             lightDirXUd.Size = new System.Drawing.Size(57, 23);
             lightDirXUd.TabIndex = 34;
             lightDirXUd.Tag = "Edit Light X Direction";
-            lightDirXUd.ValueChanged += lightDirXUd_ValueChanged;
+            lightDirXUd.ValueChanged += LightDirXUd_ValueChanged;
             // 
             // label11
             // 
@@ -1758,7 +1758,7 @@
             lightDirYUd.Size = new System.Drawing.Size(57, 23);
             lightDirYUd.TabIndex = 35;
             lightDirYUd.Tag = "Edit Light Y Direction";
-            lightDirYUd.ValueChanged += lightDirYUd_ValueChanged;
+            lightDirYUd.ValueChanged += LightDirYUd_ValueChanged;
             // 
             // lightDirZUd
             // 
@@ -1770,7 +1770,7 @@
             lightDirZUd.Size = new System.Drawing.Size(57, 23);
             lightDirZUd.TabIndex = 36;
             lightDirZUd.Tag = "Edit Light Z Direction";
-            lightDirZUd.ValueChanged += lightDirZUd_ValueChanged;
+            lightDirZUd.ValueChanged += LightDirZUd_ValueChanged;
             // 
             // label12
             // 
@@ -1804,7 +1804,7 @@
             globalLightCb.Tag = "Use global";
             globalLightCb.Text = "Use global";
             globalLightCb.UseVisualStyleBackColor = true;
-            globalLightCb.CheckedChanged += globalLightCb_CheckedChanged;
+            globalLightCb.CheckedChanged += GlobalLightCb_CheckedChanged;
             // 
             // spatial
             // 
@@ -1833,7 +1833,7 @@
             defaultSpatialBtn.Tag = "Default Spatial";
             defaultSpatialBtn.Text = "Default Spatial";
             defaultSpatialBtn.UseVisualStyleBackColor = true;
-            defaultSpatialBtn.Click += defaultSpatialBtn_Click;
+            defaultSpatialBtn.Click += DefaultSpatialBtn_Click;
             // 
             // label41
             // 
@@ -1880,7 +1880,7 @@
             zoffsetUd.Size = new System.Drawing.Size(57, 23);
             zoffsetUd.TabIndex = 40;
             zoffsetUd.Tag = "Edit Z Offset";
-            zoffsetUd.ValueChanged += zoffsetUd_ValueChanged;
+            zoffsetUd.ValueChanged += ZoffsetUd_ValueChanged;
             // 
             // yoffsetUd
             // 
@@ -1891,7 +1891,7 @@
             yoffsetUd.Size = new System.Drawing.Size(57, 23);
             yoffsetUd.TabIndex = 30;
             yoffsetUd.Tag = "Edit Y Offset";
-            yoffsetUd.ValueChanged += yoffsetUd_ValueChanged;
+            yoffsetUd.ValueChanged += YoffsetUd_ValueChanged;
             // 
             // xoffsetUd
             // 
@@ -1902,7 +1902,7 @@
             xoffsetUd.Size = new System.Drawing.Size(57, 23);
             xoffsetUd.TabIndex = 20;
             xoffsetUd.Tag = "Edit X Offset";
-            xoffsetUd.ValueChanged += xoffsetUd_ValueChanged;
+            xoffsetUd.ValueChanged += XoffsetUd_ValueChanged;
             // 
             // audio
             // 
@@ -1924,7 +1924,7 @@
             trackAudioFileTb.Name = "trackAudioFileTb";
             trackAudioFileTb.Size = new System.Drawing.Size(136, 23);
             trackAudioFileTb.TabIndex = 4;
-            trackAudioFileTb.TextChanged += trackAudioFileTb_TextChanged;
+            trackAudioFileTb.TextChanged += TrackAudioFileTb_TextChanged;
             // 
             // defaultAudioBtn
             // 
@@ -1952,7 +1952,7 @@
             browseTrackAudioBtn.TabIndex = 0;
             browseTrackAudioBtn.Text = "...";
             browseTrackAudioBtn.UseVisualStyleBackColor = true;
-            browseTrackAudioBtn.Click += browseTrackAudioBtn_Click;
+            browseTrackAudioBtn.Click += BrowseTrackAudioBtn_Click;
             // 
             // resetDefaultBtn
             // 
@@ -2004,7 +2004,7 @@
             songPropsPanel.Size = new System.Drawing.Size(216, 4361);
             songPropsPanel.TabIndex = 17;
             songPropsPanel.Visible = false;
-            songPropsPanel.VisibleChanged += songPropsPanel_VisibleChanged;
+            songPropsPanel.VisibleChanged += SongPropsPanel_VisibleChanged;
             // 
             // label28
             // 
@@ -2033,7 +2033,7 @@
             bkgSaturationUd.Name = "bkgSaturationUd";
             bkgSaturationUd.Size = new System.Drawing.Size(54, 23);
             bkgSaturationUd.TabIndex = 10;
-            bkgSaturationUd.ValueChanged += bkgSaturationUd_ValueChanged;
+            bkgSaturationUd.ValueChanged += BkgSaturationUd_ValueChanged;
             // 
             // bkgOpacityUd
             // 
@@ -2044,7 +2044,7 @@
             bkgOpacityUd.Name = "bkgOpacityUd";
             bkgOpacityUd.Size = new System.Drawing.Size(54, 23);
             bkgOpacityUd.TabIndex = 10;
-            bkgOpacityUd.ValueChanged += bkgOpacityUd_ValueChanged;
+            bkgOpacityUd.ValueChanged += BkgOpacityUd_ValueChanged;
             // 
             // unloadBkgBtn
             // 
@@ -2054,7 +2054,7 @@
             unloadBkgBtn.TabIndex = 9;
             unloadBkgBtn.Text = "Unload";
             unloadBkgBtn.UseVisualStyleBackColor = true;
-            unloadBkgBtn.Click += unloadBkgBtn_Click;
+            unloadBkgBtn.Click += UnloadBkgBtn_Click;
             // 
             // loadBkgBtn
             // 
@@ -2064,7 +2064,7 @@
             loadBkgBtn.TabIndex = 8;
             loadBkgBtn.Text = "Load background";
             loadBkgBtn.UseVisualStyleBackColor = true;
-            loadBkgBtn.Click += loadBkgBtn_Click;
+            loadBkgBtn.Click += LoadBkgBtn_Click;
             // 
             // camLabel
             // 
@@ -2083,7 +2083,7 @@
             camTb.Size = new System.Drawing.Size(111, 120);
             camTb.TabIndex = 6;
             camTb.Tag = "Edit Camera";
-            camTb.TextChanged += camTb_TextChanged;
+            camTb.TextChanged += CamTb_TextChanged;
             // 
             // defaultPitchesBtn
             // 
@@ -2094,7 +2094,7 @@
             defaultPitchesBtn.Tag = "Reset Pitches";
             defaultPitchesBtn.Text = "Reset pitches";
             defaultPitchesBtn.UseVisualStyleBackColor = true;
-            defaultPitchesBtn.Click += defaultPitchesBtn_Click;
+            defaultPitchesBtn.Click += DefaultPitchesBtn_Click;
             // 
             // minPitchUd
             // 
@@ -2105,7 +2105,7 @@
             minPitchUd.Size = new System.Drawing.Size(52, 23);
             minPitchUd.TabIndex = 3;
             minPitchUd.Tag = "Edit Min Pitch";
-            minPitchUd.ValueChanged += minPitchUd_ValueChanged;
+            minPitchUd.ValueChanged += MinPitchUd_ValueChanged;
             // 
             // maxPitchUd
             // 
@@ -2116,7 +2116,7 @@
             maxPitchUd.Size = new System.Drawing.Size(52, 23);
             maxPitchUd.TabIndex = 2;
             maxPitchUd.Tag = "Edit Max Pitch";
-            maxPitchUd.ValueChanged += maxPitchUd_ValueChanged;
+            maxPitchUd.ValueChanged += MaxPitchUd_ValueChanged;
             // 
             // label26
             // 
@@ -2202,7 +2202,7 @@
             fadeOutUd.Size = new System.Drawing.Size(52, 23);
             fadeOutUd.TabIndex = 1;
             fadeOutUd.Tag = "Edit Fade Out";
-            fadeOutUd.ValueChanged += fadeOutUd_ValueChanged;
+            fadeOutUd.ValueChanged += FadeOutUd_ValueChanged;
             // 
             // fadeInUd
             // 
@@ -2215,7 +2215,7 @@
             fadeInUd.Size = new System.Drawing.Size(52, 23);
             fadeInUd.TabIndex = 1;
             fadeInUd.Tag = "Edit Fade In";
-            fadeInUd.ValueChanged += fadeInUd_ValueChanged;
+            fadeInUd.ValueChanged += FadeInUd_ValueChanged;
             // 
             // playbackOffsetUd
             // 
@@ -2228,7 +2228,7 @@
             playbackOffsetUd.Size = new System.Drawing.Size(52, 23);
             playbackOffsetUd.TabIndex = 1;
             playbackOffsetUd.Tag = "Edit Playback Offset";
-            playbackOffsetUd.ValueChanged += playbackOffsetUd_ValueChanged;
+            playbackOffsetUd.ValueChanged += PlaybackOffsetUd_ValueChanged;
             // 
             // upDownVpWidth
             // 
@@ -2247,8 +2247,8 @@
             upDownVpWidth.TbWidth = 50;
             upDownVpWidth.TickFreq = 1D;
             upDownVpWidth.Value = 16D;
-            upDownVpWidth.ValueChanged += upDownVpWidth_ValueChanged;
-            upDownVpWidth.CommitChanges += upDownVpWidth_CommitChanges;
+            upDownVpWidth.ValueChanged += UpDownVpWidth_ValueChanged;
+            upDownVpWidth.CommitChanges += UpDownVpWidth_CommitChanges;
             // 
             // saveMixdownDialog
             // 
@@ -2276,14 +2276,14 @@
             loadTrackPropsTypeToolStripMenuItem.Name = "loadTrackPropsTypeToolStripMenuItem";
             loadTrackPropsTypeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             loadTrackPropsTypeToolStripMenuItem.Text = "Load properties";
-            loadTrackPropsTypeToolStripMenuItem.Click += loadTrackPropsTypeToolStripMenuItem_Click;
+            loadTrackPropsTypeToolStripMenuItem.Click += LoadTrackPropsTypeToolStripMenuItem_Click;
             // 
             // saveTrackPtopsTypeToolStripMenuItem
             // 
             saveTrackPtopsTypeToolStripMenuItem.Name = "saveTrackPtopsTypeToolStripMenuItem";
             saveTrackPtopsTypeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             saveTrackPtopsTypeToolStripMenuItem.Text = "Save properties";
-            saveTrackPtopsTypeToolStripMenuItem.Click += saveTrackPropsTypeToolStripMenuItem_Click;
+            saveTrackPtopsTypeToolStripMenuItem.Click += SaveTrackPropsTypeToolStripMenuItem_Click;
             // 
             // lyricsGridView
             // 
@@ -2297,11 +2297,11 @@
             lyricsGridView.TabIndex = 0;
             lyricsGridView.Tag = "Edit Lyrics";
             lyricsGridView.Visible = false;
-            lyricsGridView.CellEndEdit += lyricsGridView_CellEndEdit;
-            lyricsGridView.CellValidating += lyricsGridView_CellValidating;
-            lyricsGridView.DataError += lyricsGridView_DataError;
-            lyricsGridView.RowsRemoved += lyricsGridView_RowsRemoved;
-            lyricsGridView.Paint += lyricsGridView_Paint;
+            lyricsGridView.CellEndEdit += LyricsGridView_CellEndEdit;
+            lyricsGridView.CellValidating += LyricsGridView_CellValidating;
+            lyricsGridView.DataError += LyricsGridView_DataError;
+            lyricsGridView.RowsRemoved += LyricsGridView_RowsRemoved;
+            lyricsGridView.Paint += LyricsGridView_Paint;
             // 
             // TimeColumn
             // 
@@ -2333,15 +2333,15 @@
             keyFramesDGV.TabIndex = 23;
             keyFramesDGV.Tag = "Edit Key Frames";
             keyFramesDGV.Visible = false;
-            keyFramesDGV.CellEndEdit += keyFramesDGV_CellEndEdit;
-            keyFramesDGV.CellValidating += keyFramesDGV_CellValidating;
-            keyFramesDGV.CurrentCellChanged += keyFramesDGV_CurrentCellChanged;
-            keyFramesDGV.RowsAdded += keyFramesDGV_RowsAdded;
-            keyFramesDGV.RowsRemoved += keyFramesDGV_RowsRemoved;
-            keyFramesDGV.SelectionChanged += keyFramesDGV_SelectionChanged;
-            keyFramesDGV.UserDeletingRow += keyFramesDGV_UserDeletingRow;
-            keyFramesDGV.Paint += keyFramesDGV_Paint;
-            keyFramesDGV.KeyDown += keyFramesDGV_KeyDown;
+            keyFramesDGV.CellEndEdit += KeyFramesDGV_CellEndEdit;
+            keyFramesDGV.CellValidating += KeyFramesDGV_CellValidating;
+            keyFramesDGV.CurrentCellChanged += KeyFramesDGV_CurrentCellChanged;
+            keyFramesDGV.RowsAdded += KeyFramesDGV_RowsAdded;
+            keyFramesDGV.RowsRemoved += KeyFramesDGV_RowsRemoved;
+            keyFramesDGV.SelectionChanged += KeyFramesDGV_SelectionChanged;
+            keyFramesDGV.UserDeletingRow += KeyFramesDGV_UserDeletingRow;
+            keyFramesDGV.Paint += KeyFramesDGV_Paint;
+            keyFramesDGV.KeyDown += KeyFramesDGV_KeyDown;
             // 
             // Time
             // 
@@ -2382,7 +2382,7 @@
             songPropsCb.TabIndex = 0;
             songPropsCb.Text = "Pr&oject properties";
             songPropsCb.UseVisualStyleBackColor = true;
-            songPropsCb.CheckedChanged += songPropsCb_CheckedChanged;
+            songPropsCb.CheckedChanged += SongPropsCb_CheckedChanged;
             // 
             // trackPropsCb
             // 
@@ -2395,7 +2395,7 @@
             trackPropsCb.TabIndex = 1;
             trackPropsCb.Text = "&Track properties";
             trackPropsCb.UseVisualStyleBackColor = true;
-            trackPropsCb.CheckedChanged += trackPropsCb_CheckedChanged;
+            trackPropsCb.CheckedChanged += TrackPropsCb_CheckedChanged;
             // 
             // label4
             // 

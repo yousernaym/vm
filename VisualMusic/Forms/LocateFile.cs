@@ -8,21 +8,21 @@ namespace VisualMusic
     public partial class LocateFile : Form
     {
         public string FilePath { get; private set; }
-        CommonOpenFileDialog folderDialog = new CommonOpenFileDialog();
-        OpenFileDialog fileDialog = new OpenFileDialog();
-        WaitForFileSearchForm waitForFileSearchForm = new WaitForFileSearchForm();
+        CommonOpenFileDialog _folderDialog = new CommonOpenFileDialog();
+        OpenFileDialog _fileDialog = new OpenFileDialog();
+        WaitForFileSearchForm _waitForFileSearchForm = new WaitForFileSearchForm();
 
         public LocateFile()
         {
             InitializeComponent();
-            folderDialog.IsFolderPicker = true;
+            _folderDialog.IsFolderPicker = true;
         }
 
         public DialogResult ShowDialog(string filePath, string searchDir, ImportError error, ImportFileType fileType, bool criticalError)
         {
             bool isUrl = filePath.ToLower().StartsWith("http");
             findInFolderBtn.Visible = !isUrl;
-            folderDialog.InitialDirectory = searchDir;
+            _folderDialog.InitialDirectory = searchDir;
 
             string fileTypeString = fileType == ImportFileType.Note ? "Note" : "Audio";
             if (error == ImportError.Missing)
@@ -36,34 +36,34 @@ namespace VisualMusic
 
             if (isUrl)
             {
-                fileDialog.InitialDirectory = searchDir;
-                fileDialog.FileName = "";
+                _fileDialog.InitialDirectory = searchDir;
+                _fileDialog.FileName = "";
             }
             else
             {
-                fileDialog.InitialDirectory = Path.GetDirectoryName(FilePath);
-                fileDialog.FileName = FilePath;
+                _fileDialog.InitialDirectory = Path.GetDirectoryName(FilePath);
+                _fileDialog.FileName = FilePath;
             }
             return base.ShowDialog();
         }
 
-        private void selectFileBtn_Click(object sender, EventArgs e)
+        private void SelectFileBtn_Click(object sender, EventArgs e)
         {
-            if (fileDialog.ShowDialog() == DialogResult.OK)
+            if (_fileDialog.ShowDialog() == DialogResult.OK)
             {
-                FilePath = fileDialog.FileName;
+                FilePath = _fileDialog.FileName;
                 DialogResult = DialogResult.OK;
             }
         }
 
-        private void findInFolderBtn_Click(object sender, EventArgs e)
+        private void FindInFolderBtn_Click(object sender, EventArgs e)
         {
-            if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            if (_folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                string searchDir = folderDialog.FileName;
-                folderDialog.InitialDirectory = searchDir;
-                var dlgRes = waitForFileSearchForm.ShowDialog(searchDir, Path.GetFileName(FilePath));
-                string filePath = (string)waitForFileSearchForm.Result;
+                string searchDir = _folderDialog.FileName;
+                _folderDialog.InitialDirectory = searchDir;
+                var dlgRes = _waitForFileSearchForm.ShowDialog(searchDir, Path.GetFileName(FilePath));
+                string filePath = (string)_waitForFileSearchForm.Result;
                 if (filePath != null)
                 {
                     FilePath = filePath;
@@ -74,7 +74,7 @@ namespace VisualMusic
             }
         }
 
-        private void retryBtn_Click(object sender, EventArgs e)
+        private void RetryBtn_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
         }

@@ -17,105 +17,105 @@ namespace VisualMusic
                 lineHlTypeList.Items.Add(lse.ToString());
         }
 
-        public override void update(NoteStyle noteStyle)
+        public override void Update(NoteStyle noteStyle)
         {
-            base.update(noteStyle);
+            base.Update(noteStyle);
             NoteStyle_Line noteStyle_Line = (NoteStyle_Line)noteStyle;
             if (noteStyle_Line.LineType == null)
                 lineTypeList.SelectedIndex = -1;
             else
                 lineTypeList.SelectedIndex = (int)noteStyle_Line.LineType;
 
-            Form1.setNumericUdValue(lineWidthUd, noteStyle_Line.LineWidth);
-            Form1.setNumericUdValue(qnGapFillUd, noteStyle_Line.Qn_gapThreshold);
-            continuousCb.CheckState = Form1.toCheckState(noteStyle_Line.Continuous);
+            Form1.SetNumericUdValue(lineWidthUd, noteStyle_Line.LineWidth);
+            Form1.SetNumericUdValue(qnGapFillUd, noteStyle_Line.Qn_gapThreshold);
+            continuousCb.CheckState = Form1.ToCheckState(noteStyle_Line.Continuous);
             if (noteStyle_Line.HlType == null)
                 lineHlTypeList.SelectedIndex = -1;
             else
                 lineHlTypeList.SelectedIndex = (int)noteStyle_Line.HlType;
 
-            Form1.setNumericUdValue(hlSizeUpDown, noteStyle_Line.HlSize);
-            Form1.setNumericUdValue(hlMovementPowUd, noteStyle_Line.HlMovementPow);
-            movingHlCb.CheckState = Form1.toCheckState(noteStyle_Line.MovingHl);
-            shrinkingHlCb.CheckState = Form1.toCheckState(noteStyle_Line.ShrinkingHl);
-            hlBorderCb.CheckState = Form1.toCheckState(noteStyle_Line.HlBorder);
+            Form1.SetNumericUdValue(hlSizeUpDown, noteStyle_Line.HlSize);
+            Form1.SetNumericUdValue(hlMovementPowUd, noteStyle_Line.HlMovementPow);
+            movingHlCb.CheckState = Form1.ToCheckState(noteStyle_Line.MovingHl);
+            shrinkingHlCb.CheckState = Form1.ToCheckState(noteStyle_Line.ShrinkingHl);
+            hlBorderCb.CheckState = Form1.ToCheckState(noteStyle_Line.HlBorder);
         }
 
-        private void lineTypeList_SelectedIndexChanged(object sender, EventArgs e)
+        private void LineTypeList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             //SongPanel.Invalidate();
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().LineType = (LineType)lineTypeList.SelectedIndex;
-            SongPanel.Project.createGeos();
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().LineType = (LineType)lineTypeList.SelectedIndex;
+            SongPanel.Project.CreateGeos();
         }
 
-        private void lineWidthUd_ValueChanged(object sender, EventArgs e)
+        private void LineWidthUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().LineWidth = (float)lineWidthUd.Value;
-            SongPanel.Project.createGeos();
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().LineWidth = (float)lineWidthUd.Value;
+            SongPanel.Project.CreateGeos();
         }
 
-        private void qnGapFillUd_ValueChanged(object sender, EventArgs e)
+        private void QnGapFillUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().Qn_gapThreshold = (int)qnGapFillUd.Value;
-            SongPanel.Project.createGeos();
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold = (int)qnGapFillUd.Value;
+            SongPanel.Project.CreateGeos();
         }
 
-        private void lineHlTypeList_SelectedIndexChanged(object sender, EventArgs e)
+        private void LineHlTypeList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             //SongPanel.Invalidate();
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().HlType = (LineHlType)lineHlTypeList.SelectedIndex;
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().HlType = (LineHlType)lineHlTypeList.SelectedIndex;
         }
 
-        private void hlSizeUpDown_ValueChanged(object sender, EventArgs e)
+        private void HlSizeUpDown_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().HlSize = (float)hlSizeUpDown.Value;
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().HlSize = (float)hlSizeUpDown.Value;
         }
 
-        private void hlMovementPowUd_ValueChanged(object sender, EventArgs e)
+        private void HlMovementPowUd_ValueChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().HlMovementPow = (float)hlMovementPowUd.Value;
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().HlMovementPow = (float)hlMovementPowUd.Value;
         }
 
-        private void movingHlCb_CheckedChanged(object sender, EventArgs e)
+        private void MovingHlCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().MovingHl = ((CheckBox)sender).Checked;
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().MovingHl = ((CheckBox)sender).Checked;
         }
 
-        private void shrinkingHlCb_CheckedChanged(object sender, EventArgs e)
+        private void ShrinkingHlCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().ShrinkingHl = ((CheckBox)sender).Checked;
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().ShrinkingHl = ((CheckBox)sender).Checked;
         }
 
-        private void hlBorderCb_CheckedChanged(object sender, EventArgs e)
+        private void HlBorderCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().HlBorder = ((CheckBox)sender).Checked;
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().HlBorder = ((CheckBox)sender).Checked;
         }
 
         private void LineStyleControl_Load(object sender, EventArgs e)
@@ -123,12 +123,12 @@ namespace VisualMusic
 
         }
 
-        private void continuousCb_CheckedChanged(object sender, EventArgs e)
+        private void ContinuousCb_CheckedChanged(object sender, EventArgs e)
         {
             if (UpdatingControls)
                 return;
             for (int i = 0; i < TrackList.SelectedIndices.Count; i++)
-                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.getLineStyle().Continuous = ((CheckBox)sender).Checked;
+                TrackViews[TrackList.SelectedIndices[i]].TrackProps.StyleProps.GetLineStyle().Continuous = ((CheckBox)sender).Checked;
         }
     }
 }

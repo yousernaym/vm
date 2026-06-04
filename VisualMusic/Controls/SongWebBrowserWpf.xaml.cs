@@ -10,7 +10,7 @@ namespace VisualMusic.Controls
 {
     public partial class SongWebBrowserWpf : UserControl
     {
-        ChromiumWebBrowser browser;
+        ChromiumWebBrowser _browser;
         string _initialUrl;
 
         public IImportService ImportService { get; set; }
@@ -21,14 +21,14 @@ namespace VisualMusic.Controls
             set
             {
                 string url = value.Contains("://") ? value : "https://" + value;
-                if (browser == null)
+                if (_browser == null)
                 {
                     _initialUrl = url;
                     return;
                 }
                 urlTextBox.Text = url;
                 if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute))
-                    browser.Load(url);
+                    _browser.Load(url);
             }
         }
 
@@ -42,21 +42,21 @@ namespace VisualMusic.Controls
         {
             Loaded -= OnLoaded;
 
-            browser = new ChromiumWebBrowser(_initialUrl ?? "")
+            _browser = new ChromiumWebBrowser(_initialUrl ?? "")
             {
                 KeyboardHandler = new WpfBrowserKeyboardHandler(() => GetProject?.Invoke())
             };
 
             var downloadHandler = new DownloadHandler { ShowDialog = false };
             downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
-            browser.DownloadHandler = downloadHandler;
+            _browser.DownloadHandler = downloadHandler;
 
-            browser.LoadingStateChanged += OnLoadingStateChanged;
-            browser.StatusMessage       += OnBrowserStatusMessage;
+            _browser.LoadingStateChanged += OnLoadingStateChanged;
+            _browser.StatusMessage       += OnBrowserStatusMessage;
             // AddressChanged is a DependencyPropertyChangedEventHandler in CefSharp.Wpf
-            browser.AddressChanged += (_, e) => Dispatcher.InvokeAsync(() => urlTextBox.Text = (string)e.NewValue);
+            _browser.AddressChanged += (_, e) => Dispatcher.InvokeAsync(() => urlTextBox.Text = (string)e.NewValue);
 
-            browserContainer.Children.Add(browser);
+            browserContainer.Children.Add(_browser);
 
             if (_initialUrl != null)
                 urlTextBox.Text = _initialUrl;
@@ -82,8 +82,8 @@ namespace VisualMusic.Controls
             });
 
         void GoButtonClick(object sender, RoutedEventArgs e)    => LoadUrl(urlTextBox.Text);
-        void BackButtonClick(object sender, RoutedEventArgs e)  => browser?.Back();
-        void ForwardButtonClick(object sender, RoutedEventArgs e) => browser?.Forward();
+        void BackButtonClick(object sender, RoutedEventArgs e)  => _browser?.Back();
+        void ForwardButtonClick(object sender, RoutedEventArgs e) => _browser?.Forward();
 
         void UrlTextBoxKeyUp(object sender, KeyEventArgs e)
         {
@@ -94,7 +94,7 @@ namespace VisualMusic.Controls
         void LoadUrl(string url)
         {
             if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute))
-                browser?.Load(url);
+                _browser?.Load(url);
         }
 
         sealed class WpfBrowserKeyboardHandler : IKeyboardHandler
@@ -108,7 +108,7 @@ namespace VisualMusic.Controls
             {
                 if (windowsKeyCode == 179 && type == KeyType.RawKeyDown)
                 {
-                    Application.Current.Dispatcher.InvokeAsync(() => _getProject()?.togglePlayback());
+                    Application.Current.Dispatcher.InvokeAsync(() => _getProject()?.TogglePlayback());
                     return true;
                 }
                 return false;

@@ -6,42 +6,42 @@ namespace VisualMusic
 {
     public partial class VideoExportForm : BaseDialog
     {
-        readonly System.Drawing.Color validColor = System.Drawing.Color.Black;
-        readonly System.Drawing.Color errorColor = System.Drawing.Color.Red;
+        readonly System.Drawing.Color _validColor = System.Drawing.Color.Black;
+        readonly System.Drawing.Color _errorColor = System.Drawing.Color.Red;
         public VideoExportOptions Options { get; set; } = new VideoExportOptions();
         public VideoExportForm()
         {
             InitializeComponent();
-            updateResoItems();
+            UpdateResoItems();
 
             videoQualityLossCombo.Items.Add("0 - lossless");
             for (int i = 1; i < 10; i++)
                 videoQualityLossCombo.Items.Add(i);
             videoQualityLossCombo.Items.Add("10 - smallest file");
 
-            setOptions(Options);
+            SetOptions(Options);
         }
 
-        private void sphereCb_CheckedChanged(object sender, EventArgs e)
+        private void SphereCb_CheckedChanged(object sender, EventArgs e)
         {
             Options.Sphere = sphereCb.Checked;
             sphericalMetadataCb.Enabled = sphericalMetadataCb.Checked = sphereCb.Checked;
-            updateResoItems();
+            UpdateResoItems();
         }
 
-        private void resoComboBox_TextChanged(object sender, EventArgs e)
+        private void ResoComboBox_TextChanged(object sender, EventArgs e)
         {
             Options.ResoIndex = resoCombo.SelectedIndex;
-            updateResoTextColor();
+            UpdateResoTextColor();
         }
 
         private void StereoscopicCb_CheckedChanged(object sender, EventArgs e)
         {
             Options.SphericalStereo = stereoscopicCb.Checked;
-            updateResoItems();
+            UpdateResoItems();
         }
 
-        void updateResoItems()
+        void UpdateResoItems()
         {
             //Video reso
             resoCombo.Items.Clear();
@@ -67,7 +67,7 @@ namespace VisualMusic
             resoCombo.SelectedIndex = Options.ResoIndex;
         }
 
-        bool parseReso()
+        bool ParseReso()
         {
             string[] xy = resoCombo.Text.Split('x', 'X');
             if (xy.Length != 2)
@@ -89,22 +89,22 @@ namespace VisualMusic
             return true;
         }
 
-        void updateResoTextColor()
+        void UpdateResoTextColor()
         {
-            resoCombo.ForeColor = parseReso() ? validColor : errorColor;
+            resoCombo.ForeColor = ParseReso() ? _validColor : _errorColor;
         }
 
-        private void vrMetadataCb_CheckedChanged(object sender, EventArgs e)
+        private void VrMetadataCb_CheckedChanged(object sender, EventArgs e)
         {
             Options.SphericalMetadata = sphericalMetadataCb.Checked;
         }
 
-        private void ssFactorComboBox_TextChanged(object sender, EventArgs e)
+        private void SsFactorComboBox_TextChanged(object sender, EventArgs e)
         {
-            updateSsFactor();
+            UpdateSsFactor();
         }
 
-        void updateSsFactor()
+        void UpdateSsFactor()
         {
             if (string.IsNullOrEmpty(ssFactorComboBox.Text))
                 return;
@@ -118,7 +118,7 @@ namespace VisualMusic
                 Options.SSAAFactor = 1;
         }
 
-        internal void setOptions(VideoExportOptions options)
+        internal void SetOptions(VideoExportOptions options)
         {
             Options = options;
             sphereCb.Checked = options.Sphere;
@@ -135,12 +135,12 @@ namespace VisualMusic
 
         }
 
-        private void fpsUd_ValueChanged(object sender, EventArgs e)
+        private void FpsUd_ValueChanged(object sender, EventArgs e)
         {
             Options.Fps = (float)fpsUd.Value;
         }
 
-        private void videoQualityLossCombo_SelectedIndexChanged(object sender, EventArgs e)
+        private void VideoQualityLossCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
             Options.VideoQualityLoss = videoQualityLossCombo.SelectedIndex;
         }
@@ -153,19 +153,19 @@ namespace VisualMusic
         //		Options.VideoCodec = AVCodecID.AV_CODEC_ID_VP9;
         //}
 
-        private void resoComboBox_DropDown(object sender, EventArgs e)
+        private void ResoComboBox_DropDown(object sender, EventArgs e)
         {
-            resoCombo.ForeColor = validColor;
+            resoCombo.ForeColor = _validColor;
         }
 
-        private void resoCombo_DropDownClosed(object sender, EventArgs e)
+        private void ResoCombo_DropDownClosed(object sender, EventArgs e)
         {
-            updateResoTextColor();
+            UpdateResoTextColor();
         }
 
-        private void okBtn_Click(object sender, EventArgs e)
+        private void OkBtn_Click(object sender, EventArgs e)
         {
-            if (!parseReso())
+            if (!ParseReso())
                 MessageBox.Show(null, "Invalid resolution format", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else if (Options.Width % 2 != 0 || Options.Height % 2 != 0)
                 MessageBox.Show(null, "Resolution width and height must be even numbers", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -177,41 +177,41 @@ namespace VisualMusic
     [Serializable]
     public class VideoExportOptions : ISerializable
     {
-        int width;
+        int _width;
         public int Width
         {
-            get => width;
+            get => _width;
             set
             {
-                width = value;
-                updateSSAAReso();
+                _width = value;
+                UpdateSSAAReso();
             }
         }
-        int height;
+        int _height;
         public int Height
         {
-            get => height;
+            get => _height;
             set
             {
-                height = value;
-                updateSSAAReso();
+                _height = value;
+                UpdateSSAAReso();
             }
         }
 
         public int SSAAWidth { get; private set; }
         public int SSAAHeight { get; private set; }
 
-        int ssaaFactor = 4;
+        int _ssaaFactor = 4;
         public int SSAAFactor
         {
-            get => ssaaFactor;
+            get => _ssaaFactor;
             set
             {
-                ssaaFactor = value;
-                updateSSAAReso();
+                _ssaaFactor = value;
+                UpdateSSAAReso();
             }
         }
-        public bool SSAAEnabled => ssaaFactor > 1 && SSAAWidth > Width && SSAAHeight > Height;
+        public bool SSAAEnabled => _ssaaFactor > 1 && SSAAWidth > Width && SSAAHeight > Height;
         public bool Sphere;
         public bool SphericalStereo;
         public bool SphericalMetadata;
@@ -221,18 +221,18 @@ namespace VisualMusic
         public float Fps = 60;
         public int ResoIndex
         {
-            get => Sphere ? sphereResoIndex : nonSphereResoIndex;
+            get => Sphere ? _sphereResoIndex : _nonSphereResoIndex;
             set
             {
                 if (Sphere)
-                    sphereResoIndex = value;
+                    _sphereResoIndex = value;
                 else
-                    nonSphereResoIndex = value;
+                    _nonSphereResoIndex = value;
             }
         }
-        int sphereResoIndex = 1;
-        int nonSphereResoIndex = 1;
-        public int SsaaIndex => (int)Math.Log(ssaaFactor, 2);
+        int _sphereResoIndex = 1;
+        int _nonSphereResoIndex = 1;
+        public int SsaaIndex => (int)Math.Log(_ssaaFactor, 2);
 
         public VideoExportOptions()
         {
@@ -250,9 +250,9 @@ namespace VisualMusic
                 else if (entry.Name == "vrStereo")
                     SphericalStereo = (bool)entry.Value;
                 else if (entry.Name == "sphereResoIndex")
-                    sphereResoIndex = (int)entry.Value;
+                    _sphereResoIndex = (int)entry.Value;
                 else if (entry.Name == "nonSphereResoIndex")
-                    nonSphereResoIndex = (int)entry.Value;
+                    _nonSphereResoIndex = (int)entry.Value;
                 else if (entry.Name == "ssaaFactor")
                     SSAAFactor = (int)entry.Value;
                 else if (entry.Name == "videoQualityLoss")
@@ -268,18 +268,18 @@ namespace VisualMusic
             info.AddValue("sphere", Form1.VidExpForm.Options.Sphere);
             info.AddValue("vrMeta", Form1.VidExpForm.Options.SphericalMetadata);
             info.AddValue("vrStereo", Form1.VidExpForm.Options.SphericalStereo);
-            info.AddValue("sphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.sphereResoIndex));
-            info.AddValue("nonSphereResoIndex", Math.Max(0, Form1.VidExpForm.Options.nonSphereResoIndex));
+            info.AddValue("sphereResoIndex", Math.Max(0, Form1.VidExpForm.Options._sphereResoIndex));
+            info.AddValue("nonSphereResoIndex", Math.Max(0, Form1.VidExpForm.Options._nonSphereResoIndex));
             info.AddValue("ssaaFactor", Form1.VidExpForm.Options.SSAAFactor);
             info.AddValue("videoQualityLoss", VideoQualityLoss);
             //info.AddValue("videoCodec", VideoCodec);
             info.AddValue("fps", Fps);
         }
 
-        void updateSSAAReso()
+        void UpdateSSAAReso()
         {
-            SSAAWidth = Width * ssaaFactor;
-            SSAAHeight = Height * ssaaFactor;
+            SSAAWidth = Width * _ssaaFactor;
+            SSAAHeight = Height * _ssaaFactor;
             while ((SSAAWidth > 16384 || SSAAHeight > 16384))
             {
                 SSAAWidth /= 2;

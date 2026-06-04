@@ -36,7 +36,7 @@ namespace VisualMusic
     {
         public MidiImportOptions() : base(Midi.FileType.Midi)
         {
-            MixdownType = MidMix.sfLoaded() ? Midi.MixdownType.Internal : Midi.MixdownType.None;
+            MixdownType = MidMix.SfLoaded() ? Midi.MixdownType.Internal : Midi.MixdownType.None;
         }
 
         public MidiImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)

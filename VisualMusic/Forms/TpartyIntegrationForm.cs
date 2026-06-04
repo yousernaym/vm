@@ -30,9 +30,9 @@ namespace VisualMusic
             set => songLengthsUrlTb.Text = value;
         }
 
-        ProgressForm songLengthsDownloadForm;
-        bool silentSongLengthsDownload;
-        readonly string tempSongLengthDownloadPath;
+        ProgressForm _songLengthsDownloadForm;
+        bool _silentSongLengthsDownload;
+        readonly string _tempSongLengthDownloadPath;
 
         bool XmPlayInstalled { get => File.Exists(XmPlayPath); }
         public bool ModuleMixdown { get => modulesCb.Checked && XmPlayInstalled; set => modulesCb.Checked = XmPlayInstalled ? value : false; }
@@ -40,7 +40,7 @@ namespace VisualMusic
         public TpartyIntegrationForm()
         {
             InitializeComponent();
-            enableCheckboxes();
+            EnableCheckboxes();
             Directory.CreateDirectory(MixdownOutputDir);
             if (!File.Exists(XmPlayIniPath))
             {
@@ -49,22 +49,22 @@ namespace VisualMusic
             }
             if (!Directory.Exists(Path.GetDirectoryName(SongLengthsPath)))
                 Directory.CreateDirectory(Path.GetDirectoryName(SongLengthsPath));
-            setXmPlayIni_outputDir();
+            SetXmPlayIni_outputDir();
             SongLengthsUrl = DefaultSongLengthsUrl;
-            tempSongLengthDownloadPath = SongLengthsPath + "_";
+            _tempSongLengthDownloadPath = SongLengthsPath + "_";
         }
 
-        private void xmPlayLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void XmPlayLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("http://support.xmplay.com/");
         }
 
-        private void sidLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void SidLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("https://sourceforge.net/projects/sidplay-residfp/files/sidplayfp/1.4/");
         }
 
-        void importZip(string zipPath, string checkForEntry, string extractionDir, CancelEventArgs e, bool keepDirStructure = false)
+        void ImportZip(string zipPath, string checkForEntry, string extractionDir, CancelEventArgs e, bool keepDirStructure = false)
         {
             try
             {
@@ -113,21 +113,21 @@ namespace VisualMusic
             }
             catch (Exception ex)
             {
-                Form1.showErrorMsgBox(ex.Message);
+                Form1.ShowErrorMsgBox(ex.Message);
                 e.Cancel = true;
             }
-            enableCheckboxes();
+            EnableCheckboxes();
         }
-        private void importXmPlayBtn_Click(object sender, EventArgs e)
+        private void ImportXmPlayBtn_Click(object sender, EventArgs e)
         {
             if (openXmPlayDialog.ShowDialog() == DialogResult.OK)
             {
-                setXmPlayIni_outputDir();
+                SetXmPlayIni_outputDir();
                 Directory.CreateDirectory(MixdownOutputDir);
             }
         }
 
-        private void importSidBtn_Click(object sender, EventArgs e)
+        private void ImportSidBtn_Click(object sender, EventArgs e)
         {
             openSidPlayDialog.ShowDialog();
         }
@@ -142,49 +142,49 @@ namespace VisualMusic
             return base.ProcessDialogKey(keyData);
         }
 
-        private void openXmPlayDialog_FileOk(object sender, CancelEventArgs e)
+        private void OpenXmPlayDialog_FileOk(object sender, CancelEventArgs e)
         {
-            importZip(openXmPlayDialog.FileName, XmPlayFileName, XmPlayDir, e);
+            ImportZip(openXmPlayDialog.FileName, XmPlayFileName, XmPlayDir, e);
         }
 
-        private void openXmPlaySidPluginDialog_FileOk(object sender, CancelEventArgs e)
+        private void OpenXmPlaySidPluginDialog_FileOk(object sender, CancelEventArgs e)
         {
-            importZip(openSidPlayDialog.FileName, SidPlayFileName, SidPlayDir, e);
+            ImportZip(openSidPlayDialog.FileName, SidPlayFileName, SidPlayDir, e);
         }
 
-        void enableCheckboxes()
+        void EnableCheckboxes()
         {
             modulesCb.Enabled = XmPlayInstalled;
         }
 
         private void TpartyIntegrationForm_Load(object sender, EventArgs e)
         {
-            enableCheckboxes();
+            EnableCheckboxes();
         }
 
-        private void modulesCb_EnabledChanged(object sender, EventArgs e)
+        private void ModulesCb_EnabledChanged(object sender, EventArgs e)
         {
             CheckBox cb = (CheckBox)sender;
             cb.Checked = cb.Enabled;
         }
 
-        private void sidsCb_EnabledChanged(object sender, EventArgs e)
+        private void SidsCb_EnabledChanged(object sender, EventArgs e)
         {
             CheckBox cb = (CheckBox)sender;
             cb.Checked = cb.Enabled;
         }
 
-        private void songLengthCb_EnabledChanged(object sender, EventArgs e)
+        private void SongLengthCb_EnabledChanged(object sender, EventArgs e)
         {
             CheckBox cb = (CheckBox)sender;
             cb.Checked = cb.Enabled;
         }
 
-        void setXmPlayIni_outputDir()
+        void SetXmPlayIni_outputDir()
         {
-            setXmPlayIniValue("", "WritePath", MixdownOutputDir + "\\");
+            SetXmPlayIniValue("", "WritePath", MixdownOutputDir + "\\");
         }
-        static void setXmPlayIniValue(string section, string key, string value)
+        static void SetXmPlayIniValue(string section, string key, string value)
         {
             if (string.IsNullOrEmpty(section))
                 section = "XMPlay";
@@ -223,12 +223,12 @@ namespace VisualMusic
             File.WriteAllLines(XmPlayIniPath, iniLines);
         }
 
-        private void updateSongLengthsBtn_Click(object sender, EventArgs e)
+        private void UpdateSongLengthsBtn_Click(object sender, EventArgs e)
         {
-            downloadSonglengths(false);
+            DownloadSonglengths(false);
         }
 
-        public void downloadSonglengths(bool silent)
+        public void DownloadSonglengths(bool silent)
         {
             if (silent && File.Exists(SongLengthsPath))
             {
@@ -238,56 +238,56 @@ namespace VisualMusic
                 if (daysSinceDownload < 30)
                     return;
             }
-            silentSongLengthsDownload = silent;
+            _silentSongLengthsDownload = silent;
             WebClient webClient = new WebClient();
             webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(WebClient_SongLengthsDownloadCompleted);
             if (!silent)
                 webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
             try
             {
-                webClient.DownloadFileAsync(new Uri(SongLengthsUrl), tempSongLengthDownloadPath);
+                webClient.DownloadFileAsync(new Uri(SongLengthsUrl), _tempSongLengthDownloadPath);
             }
             catch (UriFormatException)
             {
                 if (!silent)
-                    Form1.showErrorMsgBox("Invalid url.");
+                    Form1.ShowErrorMsgBox("Invalid url.");
                 return;
             }
 
             if (!silent)
             {
-                songLengthsDownloadForm = new ProgressForm();
-                if (songLengthsDownloadForm.ShowDialog() == DialogResult.Cancel)
+                _songLengthsDownloadForm = new ProgressForm();
+                if (_songLengthsDownloadForm.ShowDialog() == DialogResult.Cancel)
                     webClient.CancelAsync();
             }
         }
 
         private void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            songLengthsDownloadForm.updateProgress(e.ProgressPercentage);
+            _songLengthsDownloadForm.UpdateProgress(e.ProgressPercentage);
         }
 
         private void WebClient_SongLengthsDownloadCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            if (!silentSongLengthsDownload)
-                songLengthsDownloadForm.DialogResult = DialogResult.OK;
+            if (!_silentSongLengthsDownload)
+                _songLengthsDownloadForm.DialogResult = DialogResult.OK;
             if (e.Cancelled)
             {
-                File.Delete(tempSongLengthDownloadPath);
-                if (!silentSongLengthsDownload)
+                File.Delete(_tempSongLengthDownloadPath);
+                if (!_silentSongLengthsDownload)
                     MessageBox.Show("Update cancelled.");
                 return;
             }
             else if (e.Error != null)
             {
-                File.Delete(tempSongLengthDownloadPath);
-                if (!silentSongLengthsDownload)
-                    Form1.showErrorMsgBox("Couldn't download file from the specified url.");
+                File.Delete(_tempSongLengthDownloadPath);
+                if (!_silentSongLengthsDownload)
+                    Form1.ShowErrorMsgBox("Couldn't download file from the specified url.");
                 return;
             }
 
             File.Delete(SongLengthsPath);
-            File.Move(tempSongLengthDownloadPath, SongLengthsPath);
+            File.Move(_tempSongLengthDownloadPath, SongLengthsPath);
             UpdateLastUpdatedLabel();
         }
 
@@ -297,7 +297,7 @@ namespace VisualMusic
             lastUpdatedLabel.Text = "Last updated: " + fi.LastWriteTime.ToString();
         }
 
-        private void defaultSongLengthsBtn_Click(object sender, EventArgs e)
+        private void DefaultSongLengthsBtn_Click(object sender, EventArgs e)
         {
             SongLengthsUrl = songLengthsUrlTb.Text = DefaultSongLengthsUrl;
         }

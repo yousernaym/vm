@@ -15,12 +15,12 @@ namespace VisualMusic
 
         }
 
-        private void yesBtn_Click(object sender, EventArgs e)
+        private void YesBtn_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Yes;
         }
 
-        private void noBtn_Click(object sender, EventArgs e)
+        private void NoBtn_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.No;
         }

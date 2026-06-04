@@ -10,7 +10,7 @@ namespace VisualMusic.ViewModels
 {
     public partial class TrackPropsViewModel : ObservableObject
     {
-        [ObservableProperty] int selectedTabIndex;
+        [ObservableProperty] int _selectedTabIndex;
 
         TrackProps _mergedProps;
         public TrackProps MergedProps
@@ -131,13 +131,13 @@ namespace VisualMusic.ViewModels
         // =====================================================================
 
         StyleProps SP => _mergedProps?.StyleProps;
-        NoteStyle_Line LineStyle => SP?.getLineStyle();
+        NoteStyle_Line LineStyle => SP?.GetLineStyle();
 
         // Non-null only when a concrete (Bar/Line) style is selected.
         // Deliberately avoids ActiveNoteStyle which would follow the Default→GlobalProps chain
         // on merged clones (where GlobalProps is null).
         NoteStyle AS => (SP == null || SP.Type == null || SP.Type == NoteStyleType.Default)
-                        ? null : SP.getStyle(SP.Type);
+                        ? null : SP.GetStyle(SP.Type);
         NoteStyleMod ME => AS?.SelectedModEntry;
 
         void ApplyMod(Action<NoteStyleMod> fn) =>
@@ -167,19 +167,19 @@ namespace VisualMusic.ViewModels
         public double? LineWidth
         {
             get => (double?)LineStyle?.LineWidth;
-            set { if (value != null) Rebuild(tp => tp.StyleProps.getLineStyle().LineWidth = (float)value); OnPropertyChanged(); }
+            set { if (value != null) Rebuild(tp => tp.StyleProps.GetLineStyle().LineWidth = (float)value); OnPropertyChanged(); }
         }
 
         public double? QnGapThreshold
         {
             get => (double?)LineStyle?.Qn_gapThreshold;
-            set { if (value != null) Rebuild(tp => tp.StyleProps.getLineStyle().Qn_gapThreshold = (float)value); OnPropertyChanged(); }
+            set { if (value != null) Rebuild(tp => tp.StyleProps.GetLineStyle().Qn_gapThreshold = (float)value); OnPropertyChanged(); }
         }
 
         public bool? Continuous
         {
             get => LineStyle?.Continuous;
-            set { Apply(tp => tp.StyleProps.getLineStyle().Continuous = value ?? false); OnPropertyChanged(); }
+            set { Apply(tp => tp.StyleProps.GetLineStyle().Continuous = value ?? false); OnPropertyChanged(); }
         }
 
         public int LineTypeIndex
@@ -189,7 +189,7 @@ namespace VisualMusic.ViewModels
             {
                 if (value < 0) return;
                 var lt = (LineType)value;
-                Rebuild(tp => tp.StyleProps.getLineStyle().LineType = lt);
+                Rebuild(tp => tp.StyleProps.GetLineStyle().LineType = lt);
                 OnPropertyChanged();
             }
         }
@@ -201,7 +201,7 @@ namespace VisualMusic.ViewModels
             {
                 if (value < 0) return;
                 var ht = (LineHlType)value;
-                Apply(tp => tp.StyleProps.getLineStyle().HlType = ht);
+                Apply(tp => tp.StyleProps.GetLineStyle().HlType = ht);
                 OnPropertyChanged();
             }
         }
@@ -209,31 +209,31 @@ namespace VisualMusic.ViewModels
         public double? HlSize
         {
             get => (double?)LineStyle?.HlSize;
-            set { if (value != null) Apply(tp => tp.StyleProps.getLineStyle().HlSize = (float)value); OnPropertyChanged(); }
+            set { if (value != null) Apply(tp => tp.StyleProps.GetLineStyle().HlSize = (float)value); OnPropertyChanged(); }
         }
 
         public double? HlMovementPow
         {
             get => (double?)LineStyle?.HlMovementPow;
-            set { if (value != null) Apply(tp => tp.StyleProps.getLineStyle().HlMovementPow = (float)value); OnPropertyChanged(); }
+            set { if (value != null) Apply(tp => tp.StyleProps.GetLineStyle().HlMovementPow = (float)value); OnPropertyChanged(); }
         }
 
         public bool? MovingHl
         {
             get => LineStyle?.MovingHl;
-            set { Apply(tp => tp.StyleProps.getLineStyle().MovingHl = value ?? false); OnPropertyChanged(); }
+            set { Apply(tp => tp.StyleProps.GetLineStyle().MovingHl = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? ShrinkingHl
         {
             get => LineStyle?.ShrinkingHl;
-            set { Apply(tp => tp.StyleProps.getLineStyle().ShrinkingHl = value ?? false); OnPropertyChanged(); }
+            set { Apply(tp => tp.StyleProps.GetLineStyle().ShrinkingHl = value ?? false); OnPropertyChanged(); }
         }
 
         public bool? HlBorder
         {
             get => LineStyle?.HlBorder;
-            set { Apply(tp => tp.StyleProps.getLineStyle().HlBorder = value ?? false); OnPropertyChanged(); }
+            set { Apply(tp => tp.StyleProps.GetLineStyle().HlBorder = value ?? false); OnPropertyChanged(); }
         }
 
         // ---- Default buttons ----

@@ -7,7 +7,7 @@ namespace VisualMusic
 {
     public partial class WaitForTaskForm : Form
     {
-        static CancellationTokenSource cancellationTokenSource;
+        static CancellationTokenSource s_cancellationTokenSource;
         public static CancellationToken CancellationToken;
         public object Result;
         public WaitForTaskForm()
@@ -19,8 +19,8 @@ namespace VisualMusic
         {
             messageLabel.Text = message;
             Result = null;
-            cancellationTokenSource = new CancellationTokenSource();
-            CancellationToken = cancellationTokenSource.Token;
+            s_cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken = s_cancellationTokenSource.Token;
             var task = Task<object>.Factory.StartNew(() =>
             {
                 object result;
@@ -38,7 +38,7 @@ namespace VisualMusic
 
             DialogResult = base.ShowDialog();
             Result = task.Result;
-            cancellationTokenSource.Dispose();
+            s_cancellationTokenSource.Dispose();
             return DialogResult;
         }
 
@@ -47,14 +47,14 @@ namespace VisualMusic
 
         }
 
-        private void cancelBtn_Click(object sender, EventArgs e)
+        private void CancelBtn_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
         }
 
         private void WaitForTaskForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            cancellationTokenSource.Cancel();
+            s_cancellationTokenSource.Cancel();
         }
     }
 }

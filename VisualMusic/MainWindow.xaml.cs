@@ -7,12 +7,12 @@ namespace VisualMusic
 {
     public partial class MainWindow : MetroWindow
     {
-        MainViewModel vm;
+        MainViewModel _vm;
 
         public MainWindow(string[] args = null)
         {
-            vm = new MainViewModel();
-            DataContext = vm;
+            _vm = new MainViewModel();
+            DataContext = _vm;
             InitializeComponent();
             Loaded += OnLoaded;
         }
@@ -24,13 +24,13 @@ namespace VisualMusic
         {
             if (e.Key == Key.Space && Keyboard.Modifiers == ModifierKeys.Control)
             {
-                if (vm.TogglePlaybackCommand.CanExecute(null))
-                    vm.TogglePlaybackCommand.Execute(null);
+                if (_vm.TogglePlaybackCommand.CanExecute(null))
+                    _vm.TogglePlaybackCommand.Execute(null);
                 e.Handled = true;
             }
 
             // Escape exits mouse-look mode even when WPF focus is outside the song panel.
-            if (e.Key == Key.Escape && vm.IsMouseLookMode)
+            if (e.Key == Key.Escape && _vm.IsMouseLookMode)
             {
                 monoGameHost.Renderer?.ToggleMouseLook();
                 e.Handled = true;
@@ -39,9 +39,9 @@ namespace VisualMusic
 
         void OnLoaded(object sender, RoutedEventArgs e)
         {
-            modBrowser.ImportService  = vm;
-            sidBrowser.ImportService  = vm;
-            midiBrowser.ImportService = vm;
+            modBrowser.ImportService  = _vm;
+            sidBrowser.ImportService  = _vm;
+            midiBrowser.ImportService = _vm;
 
             modBrowser.GetProject  = () => monoGameHost.Renderer?.Project;
             sidBrowser.GetProject  = () => monoGameHost.Renderer?.Project;
@@ -51,37 +51,37 @@ namespace VisualMusic
             sidBrowser.Url  = "https://www.exotica.org.uk/wiki/Special:HVSC";
             midiBrowser.Url = "https://bitmidi.com/";
 
-            vm.GetDrawHost = () => monoGameHost.Renderer;
+            _vm.GetDrawHost = () => monoGameHost.Renderer;
             monoGameHost.Renderer?.SetTrackSelectionService(trackListControl);
 
             // Wire mouse-look mode toggle to the view-model flag so the yellow label updates.
             if (monoGameHost.Renderer != null)
             {
                 monoGameHost.Renderer.OnCameraControlModeChanged =
-                    on => Dispatcher.InvokeAsync(() => vm.IsMouseLookMode = on);
+                    on => Dispatcher.InvokeAsync(() => _vm.IsMouseLookMode = on);
             }
 
-            vm.OnProjectLoaded = project =>
+            _vm.OnProjectLoaded = project =>
             {
                 if (monoGameHost.Renderer != null)
                 {
                     monoGameHost.Renderer.Project = project;
                     monoGameHost.Renderer.OnSongPosChanged = () =>
-                        Dispatcher.InvokeAsync(() => vm.NotifyScrollPositionChanged());
+                        Dispatcher.InvokeAsync(() => _vm.NotifyScrollPositionChanged());
                 }
             };
 
-            vm.OnLoadBackgroundImage = path =>
+            _vm.OnLoadBackgroundImage = path =>
                 monoGameHost.Renderer?.LoadBackgroundImage(path);
 
-            vm.OnUnloadBackgroundImage = () =>
+            _vm.OnUnloadBackgroundImage = () =>
                 monoGameHost.Renderer?.UnloadBackgroundImage();
 
-            vm.GetRendererWaveformPanel = () =>
+            _vm.GetRendererWaveformPanel = () =>
                 monoGameHost.Renderer?.WaveformPanel;
 
-            vm.RenderVideo = (file, cb, opts) =>
-                monoGameHost.Renderer?.renderVideo(file, cb, opts);
+            _vm.RenderVideo = (file, cb, opts) =>
+                monoGameHost.Renderer?.RenderVideo(file, cb, opts);
         }
     }
 }

@@ -49,7 +49,7 @@
             this.importXmPlayBtn.TabIndex = 1;
             this.importXmPlayBtn.Text = "Import XMPlay";
             this.importXmPlayBtn.UseVisualStyleBackColor = true;
-            this.importXmPlayBtn.Click += new System.EventHandler(this.importXmPlayBtn_Click);
+            this.importXmPlayBtn.Click += new System.EventHandler(this.ImportXmPlayBtn_Click);
             // 
             // xmPlayLink
             // 
@@ -61,7 +61,7 @@
             this.xmPlayLink.TabIndex = 2;
             this.xmPlayLink.TabStop = true;
             this.xmPlayLink.Text = "Download";
-            this.xmPlayLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.xmPlayLink_LinkClicked);
+            this.xmPlayLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.XmPlayLink_LinkClicked);
             // 
             // modulesCb
             // 
@@ -74,18 +74,18 @@
             this.modulesCb.TabIndex = 3;
             this.modulesCb.Text = "Use XMPlay for supported formats";
             this.modulesCb.UseVisualStyleBackColor = true;
-            this.modulesCb.EnabledChanged += new System.EventHandler(this.modulesCb_EnabledChanged);
+            this.modulesCb.EnabledChanged += new System.EventHandler(this.ModulesCb_EnabledChanged);
             // 
             // openXmPlayDialog
             // 
             this.openXmPlayDialog.Filter = "XMPlay (XMPlay*.zip)|xmplay*.zip|Zip files (*.zip)|*.zip|All files (*.*)|*.*";
-            this.openXmPlayDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openXmPlayDialog_FileOk);
+            this.openXmPlayDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.OpenXmPlayDialog_FileOk);
             // 
             // openSidPlayDialog
             // 
             this.openSidPlayDialog.Filter = "Sidplayfp (sidplayfp*.zip)|sidplayfp*.zip|Zip files (*.zip)|*.zip|All files (*.*)" +
     "|*.*";
-            this.openSidPlayDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openXmPlaySidPluginDialog_FileOk);
+            this.openSidPlayDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.OpenXmPlaySidPluginDialog_FileOk);
             // 
             // songLengthsUrlTb
             // 
@@ -116,7 +116,7 @@
             this.updateSongLengthsBtn.TabIndex = 11;
             this.updateSongLengthsBtn.Text = "&Update";
             this.updateSongLengthsBtn.UseVisualStyleBackColor = true;
-            this.updateSongLengthsBtn.Click += new System.EventHandler(this.updateSongLengthsBtn_Click);
+            this.updateSongLengthsBtn.Click += new System.EventHandler(this.UpdateSongLengthsBtn_Click);
             // 
             // defaultSongLengthsBtn
             // 
@@ -127,7 +127,7 @@
             this.defaultSongLengthsBtn.TabIndex = 12;
             this.defaultSongLengthsBtn.Text = "&Default URL";
             this.defaultSongLengthsBtn.UseVisualStyleBackColor = true;
-            this.defaultSongLengthsBtn.Click += new System.EventHandler(this.defaultSongLengthsBtn_Click);
+            this.defaultSongLengthsBtn.Click += new System.EventHandler(this.DefaultSongLengthsBtn_Click);
             // 
             // lastUpdatedLabel
             // 

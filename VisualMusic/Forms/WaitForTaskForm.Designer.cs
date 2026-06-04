@@ -44,7 +44,7 @@ namespace VisualMusic
 			this.cancelBtn.TabIndex = 0;
 			this.cancelBtn.Text = "Cancel";
 			this.cancelBtn.UseVisualStyleBackColor = true;
-			this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
+			this.cancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
 			// 
 			// messageLabel
 			// 

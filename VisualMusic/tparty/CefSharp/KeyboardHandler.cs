@@ -17,7 +17,7 @@ namespace CefSharp.WinForms.Example.Handlers
         {
             if (windowsKeyCode == 179) //Play/pause
             {
-                form1.BeginInvoke(new Action(() => form1.Project.togglePlayback()));
+                form1.BeginInvoke(new Action(() => form1.Project.TogglePlayback()));
                 return true;
             }
             //if (!(modifiers == CefEventFlags.ControlDown || modifiers == CefEventFlags.ShiftDown || modifiers == CefEventFlags.AltDown))

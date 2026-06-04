@@ -17,8 +17,8 @@ namespace VisualMusic
                 AppSettings.Instance.ThemeColorSchemeOrDefault);
 
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-            MidMix.init();
-            if (!Media.initMF())
+            MidMix.Init();
+            if (!Media.InitMF())
             {
                 MessageBox.Show("Couldn't initialize Media library.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown();
@@ -42,8 +42,8 @@ namespace VisualMusic
 
         protected override void OnExit(ExitEventArgs e)
         {
-            MidMix.close();
-            Media.closeMF();
+            MidMix.Close();
+            Media.CloseMF();
             base.OnExit(e);
         }
     }

@@ -9,15 +9,15 @@ namespace VisualMusic
     [Serializable]
     public class KeyFrames : ISerializable, IEnumerable<KeyValuePair<int, KeyFrame>>
     {
-        SortedList<int, KeyFrame> frameList;
+        SortedList<int, KeyFrame> _frameList;
         SongPanel SongPanel => Form1.SongPanel;
 
         public KeyFrames()
         {
-            frameList = new SortedList<int, KeyFrame>();
+            _frameList = new SortedList<int, KeyFrame>();
             var keyFrame0 = new KeyFrame();
             keyFrame0.Desc = "Key frame 0";
-            frameList.Add(0, keyFrame0);
+            _frameList.Add(0, keyFrame0);
         }
 
         public KeyFrames(SerializationInfo info, StreamingContext ctxt)
@@ -25,66 +25,66 @@ namespace VisualMusic
             foreach (SerializationEntry entry in info)
             {
                 if (entry.Name == "frameList")
-                    frameList = (SortedList<int, KeyFrame>)entry.Value;
+                    _frameList = (SortedList<int, KeyFrame>)entry.Value;
             }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("frameList", frameList);
+            info.AddValue("frameList", _frameList);
         }
 
-        public int insert(int songPosT)
+        public int Insert(int songPosT)
         {
-            if (!frameList.ContainsKey(songPosT))
+            if (!_frameList.ContainsKey(songPosT))
             {
-                frameList.Add(songPosT, createInterpolatedFrame(songPosT));
-                return frameList.IndexOfKey(songPosT);
+                _frameList.Add(songPosT, CreateInterpolatedFrame(songPosT));
+                return _frameList.IndexOfKey(songPosT);
             }
             else
                 return -1;
         }
 
-        public KeyFrame createInterpolatedFrame(int songPosT)
+        public KeyFrame CreateInterpolatedFrame(int songPosT)
         {
-            if (frameList.Count == 0)
+            if (_frameList.Count == 0)
                 return new KeyFrame();
-            if (frameList.Count == 1)
-                return frameList.Values[0].clone();
-            if (frameList.ContainsKey(songPosT))
-                return frameList[songPosT].clone();
-            int index1 = frameList.Count - 1;
-            for (int i = 0; i < frameList.Count; i++)
+            if (_frameList.Count == 1)
+                return _frameList.Values[0].Clone();
+            if (_frameList.ContainsKey(songPosT))
+                return _frameList[songPosT].Clone();
+            int index1 = _frameList.Count - 1;
+            for (int i = 0; i < _frameList.Count; i++)
             {
-                if (songPosT < frameList.Keys[i])
+                if (songPosT < _frameList.Keys[i])
                 {
                     index1 = i - 1;
                     break;
                 }
             }
             if (index1 < 0)
-                return frameList.Values[0].clone();
-            if (index1 == frameList.Count - 1)
-                return frameList.Values[index1].clone();
+                return _frameList.Values[0].Clone();
+            if (index1 == _frameList.Count - 1)
+                return _frameList.Values[index1].Clone();
 
-            KeyFrame frame1 = frameList.Values[index1];
-            KeyFrame frame2 = frameList.Values[index1 + 1];
+            KeyFrame frame1 = _frameList.Values[index1];
+            KeyFrame frame2 = _frameList.Values[index1 + 1];
 
-            KeyFrame outFrame = frame1.clone();
-            float interpolant = (float)(songPosT - frameList.Keys[index1]) / (frameList.Keys[index1 + 1] - frameList.Keys[index1]);
-            interpolateProjProps(outFrame.ProjProps, frame1.ProjProps, frame2.ProjProps, interpolant);
+            KeyFrame outFrame = frame1.Clone();
+            float interpolant = (float)(songPosT - _frameList.Keys[index1]) / (_frameList.Keys[index1 + 1] - _frameList.Keys[index1]);
+            InterpolateProjProps(outFrame.ProjProps, frame1.ProjProps, frame2.ProjProps, interpolant);
 
             return outFrame;
         }
 
-        private void interpolateProjProps(ProjProps outProjProps, ProjProps projProps1, ProjProps projProps2, float interpolant)
+        private void InterpolateProjProps(ProjProps outProjProps, ProjProps projProps1, ProjProps projProps2, float interpolant)
         {
             interpolant = interpolant * interpolant * (3f - 2f * interpolant);
-            outProjProps.ViewWidthQn = (float)Math.Pow(2, interpolate((float)Math.Log(projProps1.ViewWidthQn, 2), (float)Math.Log(projProps2.ViewWidthQn, 2), interpolant));
-            outProjProps.Camera.Pos = interpolate(projProps1.Camera.Pos, projProps2.Camera.Pos, interpolant);
-            outProjProps.Camera.Orientation = interpolate(projProps1.Camera.Orientation, projProps2.Camera.Orientation, interpolant);
-            outProjProps.BackgroundImageOpacity = interpolate(projProps1.BackgroundImageOpacity, projProps2.BackgroundImageOpacity, interpolant);
-            outProjProps.BackgroundImageSaturation = interpolate(projProps1.BackgroundImageSaturation, projProps2.BackgroundImageSaturation, interpolant);
+            outProjProps.ViewWidthQn = (float)Math.Pow(2, Interpolate((float)Math.Log(projProps1.ViewWidthQn, 2), (float)Math.Log(projProps2.ViewWidthQn, 2), interpolant));
+            outProjProps.Camera.Pos = Interpolate(projProps1.Camera.Pos, projProps2.Camera.Pos, interpolant);
+            outProjProps.Camera.Orientation = Interpolate(projProps1.Camera.Orientation, projProps2.Camera.Orientation, interpolant);
+            outProjProps.BackgroundImageOpacity = Interpolate(projProps1.BackgroundImageOpacity, projProps2.BackgroundImageOpacity, interpolant);
+            outProjProps.BackgroundImageSaturation = Interpolate(projProps1.BackgroundImageSaturation, projProps2.BackgroundImageSaturation, interpolant);
         }
 
         static bool HasProperties(Type type)
@@ -102,50 +102,50 @@ namespace VisualMusic
         {
             get
             {
-                if (frameList.Count == 0)
+                if (_frameList.Count == 0)
                     return null;
-                else if (frameList.ContainsKey(key))
-                    return frameList[key];
-                else if (frameList.Count == 1 || key < frameList.Keys[0])
-                    return frameList.Values[0];
-                else if (frameList.Keys[frameList.Count - 1] < key)
-                    return frameList.Values[frameList.Count - 1];
+                else if (_frameList.ContainsKey(key))
+                    return _frameList[key];
+                else if (_frameList.Count == 1 || key < _frameList.Keys[0])
+                    return _frameList.Values[0];
+                else if (_frameList.Keys[_frameList.Count - 1] < key)
+                    return _frameList.Values[_frameList.Count - 1];
                 else
                     return null;
             }
         }
 
-        private float interpolate(float value1, float value2, float interpolant)
+        private float Interpolate(float value1, float value2, float interpolant)
         {
             return value1 * (1 - interpolant) + value2 * interpolant;
         }
 
-        private Vector3 interpolate(Vector3 value1, Vector3 value2, float interpolant)
+        private Vector3 Interpolate(Vector3 value1, Vector3 value2, float interpolant)
         {
             return value1 * (1 - interpolant) + value2 * interpolant;
         }
 
-        private Quaternion interpolate(Quaternion value1, Quaternion value2, float interpolant)
+        private Quaternion Interpolate(Quaternion value1, Quaternion value2, float interpolant)
         {
             return Quaternion.Slerp(value1, value2, interpolant);
         }
 
-        public void removeIndex(int index)
+        public void RemoveIndex(int index)
         {
-            frameList.RemoveAt(index);
+            _frameList.RemoveAt(index);
         }
 
-        public int keyAtIndex(int index)
+        public int KeyAtIndex(int index)
         {
-            if (index < frameList.Count)
-                return frameList.Keys[index];
+            if (index < _frameList.Count)
+                return _frameList.Keys[index];
             else
                 return -1;
         }
 
         public IEnumerator<KeyValuePair<int, KeyFrame>> GetEnumerator()
         {
-            return frameList.GetEnumerator();
+            return _frameList.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -153,19 +153,19 @@ namespace VisualMusic
             return this.GetEnumerator();
         }
 
-        public int Count => frameList.Count;
-        public IList<int> Keys => frameList.Keys;
-        public IList<KeyFrame> Values => frameList.Values;
+        public int Count => _frameList.Count;
+        public IList<int> Keys => _frameList.Keys;
+        public IList<KeyFrame> Values => _frameList.Values;
 
-        internal int changeTimeOfFrame(int frameNumber, int time)
+        internal int ChangeTimeOfFrame(int frameNumber, int time)
         {
-            if (frameList.ContainsKey(time))
+            if (_frameList.ContainsKey(time))
                 return -1;
 
-            var frame = frameList.Values[frameNumber];
-            frameList.RemoveAt(frameNumber);
-            frameList.Add(time, frame);
-            return frameList.IndexOfKey(time);
+            var frame = _frameList.Values[frameNumber];
+            _frameList.RemoveAt(frameNumber);
+            _frameList.Add(time, frame);
+            return _frameList.IndexOfKey(time);
         }
     }
 
