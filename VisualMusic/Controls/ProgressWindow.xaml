@@ -25,7 +25,8 @@
         <Button Content="Cancel"
                 HorizontalAlignment="Right"
                 Padding="12,4"
-                Click="CancelButton_Click"/>
+                IsCancel="True"
+                IsDefault="True"/>
     </StackPanel>
 
 </mah:MetroWindow>

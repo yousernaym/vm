@@ -221,8 +221,6 @@ namespace VisualMusic.Controls
             // prevents a second confirm dialog.
         }
 
-        void CancelButton_Click(object sender, RoutedEventArgs e) => RequestCancel();
-
         void Window_Closing(object sender, CancelEventArgs e)
         {
             if (_finished) return;   // job done — allow close
