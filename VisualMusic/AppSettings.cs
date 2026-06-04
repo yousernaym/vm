@@ -29,6 +29,7 @@ namespace VisualMusic
         [DataMember] public string TrackPropsFolder { get; set; }
         [DataMember] public string TextureFolder  { get; set; }
         [DataMember] public string TrackAudioFolder { get; set; }
+        [DataMember] public string BackgroundFolder { get; set; }
 
         // ---- Per-file-type import folders ----
 

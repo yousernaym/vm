@@ -87,6 +87,7 @@ namespace VisualMusic.ViewModels
         {
             TrackList.SelectionChanged += OnTrackListSelectionChanged;
             WireTrackPropsCallbacks();
+            WireSongPropsCallbacks();
         }
 
         void WireTrackPropsCallbacks()
@@ -266,6 +267,55 @@ namespace VisualMusic.ViewModels
             SelectedTrackProps.MergedProps = project.mergeTrackProps(indices);
         }
 
+        void WireSongPropsCallbacks()
+        {
+            SongProps.CreateOcTrees = () => project?.createOcTrees();
+
+            SongProps.CommitViewWidth = () =>
+            {
+                project?.createOcTrees();
+                AddUndoItem("Edit Viewport Width");
+            };
+
+            SongProps.ResetPitches = () =>
+            {
+                project?.resetPitchLimits();
+                project?.createOcTrees();
+                SongProps.RefreshAll();
+            };
+
+            SongProps.NotesMinPitch = () => project?.Notes?.MinPitch;
+            SongProps.NotesMaxPitch = () => project?.Notes?.MaxPitch;
+
+            SongProps.SongLengthSWithoutPbOffset = () =>
+                project?.Notes != null
+                    ? (double?)project.ticksToSeconds(project.Notes.SongLengthT)
+                    : null;
+
+            SongProps.BrowseBackground = () =>
+            {
+                if (project == null) return;
+                var dlg = new Microsoft.Win32.OpenFileDialog
+                {
+                    Filter = "Image files|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.tiff|All files|*.*"
+                };
+                var bkgDir = AppSettings.Instance.BackgroundFolder;
+                if (!string.IsNullOrEmpty(bkgDir)) dlg.InitialDirectory = bkgDir;
+                if (dlg.ShowDialog() != true) return;
+                AppSettings.Instance.RememberFolder(dlg.FileName,
+                    dir => AppSettings.Instance.BackgroundFolder = dir);
+                project.Props.BackgroundImagePath = dlg.FileName;
+                OnLoadBackgroundImage?.Invoke(dlg.FileName);
+            };
+
+            SongProps.UnloadBackground = () =>
+            {
+                if (project == null) return;
+                project.Props.BackgroundImagePath = "";
+                OnUnloadBackgroundImage?.Invoke();
+            };
+        }
+
         // ---- Scrollbar binding ----
 
         public double ScrollPosition
@@ -274,12 +324,18 @@ namespace VisualMusic.ViewModels
             set { if (project != null) project.NormSongPos = value; }
         }
 
-        public void NotifyScrollPositionChanged() => OnPropertyChanged(nameof(ScrollPosition));
+        public void NotifyScrollPositionChanged()
+        {
+            OnPropertyChanged(nameof(ScrollPosition));
+            if (ShowSongProps)
+                SongProps.RefreshLiveValues();
+        }
 
         partial void OnProjectChanged(Project value)
         {
             ShowSongProps = false;
             ShowTrackProps = false;
+            SongProps.Project = value;
             TrackList.Rebuild(value);
             // Rebuild selects the global track (index 0), which drives MergedProps via the
             // selection event. Only clear the panel when there is nothing to select — otherwise
@@ -302,6 +358,8 @@ namespace VisualMusic.ViewModels
         public Action<Project> OnProjectLoaded { get; set; }
         /// <summary>Called to load the background image on the renderer.</summary>
         public Action<string> OnLoadBackgroundImage { get; set; }
+        /// <summary>Called to unload the background image from the renderer.</summary>
+        public Action OnUnloadBackgroundImage { get; set; }
         /// <summary>Returns the active draw host (SongRenderer) for wiring up Project.SetDrawHost.</summary>
         public Func<ISongDrawHost> GetDrawHost { get; set; }
         /// <summary>Invokes SongRenderer.renderVideo on the background thread supplied by the caller.</summary>

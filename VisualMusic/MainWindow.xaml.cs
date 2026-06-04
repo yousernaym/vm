@@ -74,6 +74,9 @@ namespace VisualMusic
             vm.OnLoadBackgroundImage = path =>
                 monoGameHost.Renderer?.LoadBackgroundImage(path);
 
+            vm.OnUnloadBackgroundImage = () =>
+                monoGameHost.Renderer?.UnloadBackgroundImage();
+
             vm.GetRendererWaveformPanel = () =>
                 monoGameHost.Renderer?.WaveformPanel;
 
