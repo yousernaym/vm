@@ -26,13 +26,18 @@ namespace VisualMusic
 
         /// <summary>
         /// Downloads <paramref name="url"/> to a file in the temp dir and returns the local path
-        /// (or null on failure). Uses WebClient rather than the embedded CefSharp browser so it
-        /// works in the WPF app, where the CefSharp.WinForms download client is never initialized.
-        /// The filename is taken from the server's Content-Disposition header when present
-        /// (matching the old CefSharp behavior), else derived from the URL.
+        /// (or null on failure/cancellation).  In the WPF build this shows a progress dialog; in
+        /// the legacy WinForms build the dispatcher is not available and it falls back to a
+        /// synchronous WebClient download.
         /// </summary>
         public static string downloadFile(this string url)
         {
+            // WPF path: show the unified progress window (runs download async off the UI thread).
+            var dispatcher = System.Windows.Application.Current?.Dispatcher;
+            if (dispatcher != null)
+                return Controls.ProgressWindow.RunDownload(url);
+
+            // Legacy WinForms fallback (Form1 path — no WPF Application).
             try
             {
                 using var webClient = new WebClient();
@@ -48,7 +53,7 @@ namespace VisualMusic
             }
         }
 
-        static string getDownloadFileName(WebHeaderCollection headers, string url)
+        internal static string getDownloadFileName(WebHeaderCollection headers, string url)
         {
             string contentDisposition = headers?["Content-Disposition"];
             if (!string.IsNullOrEmpty(contentDisposition))

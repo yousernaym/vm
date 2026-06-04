@@ -605,9 +605,7 @@ namespace VisualMusic.ViewModels
             AppSettings.Instance.RememberFolder(save.FileName, dir => AppSettings.Instance.VideoFolder = dir);
             AppSettings.Instance.SaveVideoExportOptions(dlg.Options);
 
-            var progress = new Controls.RenderProgressWindow(save.FileName, dlg.Options, RenderVideo)
-                { Owner = Application.Current.MainWindow };
-            progress.ShowDialog();
+            Controls.ProgressWindow.RunRender(save.FileName, dlg.Options, RenderVideo);
         }
 
         [RelayCommand]
