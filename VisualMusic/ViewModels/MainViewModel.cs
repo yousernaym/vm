@@ -417,14 +417,18 @@ namespace VisualMusic.ViewModels
             }
             catch (FileImportException ex)
             {
-                NoteStyle.SetProject(null);
+                // Loading failed (e.g. the referenced song file couldn't be downloaded). The renderer's
+                // animation loop is still drawing the previous live project (_project), and its note
+                // rendering reads the static NoteStyle.Project — so restore it to _project rather than
+                // null, otherwise the next Draw() dereferences a null Project (NoteStyle.DrawTrack).
+                NoteStyle.SetProject(_project);
                 MessageBox.Show($"Could not load project file: {ex.Message}\n\nMissing file: {ex.FileName}",
                     Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (Exception ex)
             {
-                NoteStyle.SetProject(null);
+                NoteStyle.SetProject(_project);
                 MessageBox.Show("Error loading project: " + ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
