@@ -69,6 +69,7 @@ namespace VisualMusic
                     monoGameHost.Renderer.OnSongPosChanged = () =>
                         Dispatcher.InvokeAsync(() => _vm.NotifyScrollPositionChanged());
                 }
+                keyframeListView.SetProject(project);
             };
 
             _vm.OnLoadBackgroundImage = path =>

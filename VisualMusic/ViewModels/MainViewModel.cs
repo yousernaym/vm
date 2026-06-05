@@ -64,6 +64,8 @@ namespace VisualMusic.ViewModels
         [NotifyCanExecuteChangedFor(nameof(InsertKeyFrameCommand))]
         [NotifyCanExecuteChangedFor(nameof(LoadTrackPropsCommand))]
         [NotifyCanExecuteChangedFor(nameof(SaveTrackPropsCommand))]
+        [NotifyCanExecuteChangedFor(nameof(GoToNextKeyFrameCommand))]
+        [NotifyCanExecuteChangedFor(nameof(GoToPrevKeyFrameCommand))]
         private Project _project;
 
         public bool HasProject => _project != null;
@@ -263,8 +265,12 @@ namespace VisualMusic.ViewModels
             if (_project == null) return;
             var indices = TrackList.SelectedItems
                 .Select(item => TrackList.Items.IndexOf(item))
-                .Where(i => i >= 0);
+                .Where(i => i >= 0)
+                .ToList();
             SelectedTrackProps.MergedProps = _project.MergeTrackProps(indices);
+            // Keep the keyframe service aware of the current selection
+            Keyframes.KeyframeService.SelectedTrackIndices = indices;
+            Keyframes.KeyframeService.RaiseKeyframesChanged();
         }
 
         void WireSongPropsCallbacks()
@@ -329,6 +335,8 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(ScrollPosition));
             if (ShowSongProps)
                 SongProps.RefreshLiveValues();
+            // Drive per-frame refresh for control coloring and the diamond panel
+            Keyframes.KeyframeService.RaiseRefresh();
         }
 
         partial void OnProjectChanged(Project value)
@@ -342,6 +350,9 @@ namespace VisualMusic.ViewModels
             // we'd wipe the global track's props (incl. its modulation selection) right after load.
             if (TrackList.Items.Count == 0)
                 SelectedTrackProps.MergedProps = null;
+            // Wire the per-property keyframe service to the new project
+            Keyframes.KeyframeService.Project = value;
+            Keyframes.KeyframeService.RaiseKeyframesChanged();
             NotifyScrollPositionChanged();
         }
 
@@ -740,6 +751,22 @@ namespace VisualMusic.ViewModels
                 _project.TogglePlayback();
                 _project.TogglePlayback();
             }
+        }
+
+        [RelayCommand(CanExecute = nameof(HasProject))]
+        void GoToNextKeyFrame()
+        {
+            if (_project == null) return;
+            Keyframes.KeyframeService.GoToNextAny();
+            ResyncPlaybackPosition();
+        }
+
+        [RelayCommand(CanExecute = nameof(HasProject))]
+        void GoToPrevKeyFrame()
+        {
+            if (_project == null) return;
+            Keyframes.KeyframeService.GoToPrevAny();
+            ResyncPlaybackPosition();
         }
 
         // ---- Edit commands ----

@@ -22,6 +22,7 @@ namespace VisualMusic
     public class Project : ISerializable, IDisposable
     {
         public KeyFrames KeyFrames;
+        public Keyframes.KeyframeSet PropertyKeyframes = new Keyframes.KeyframeSet();
         ProjProps _props = new ProjProps();
         public ProjProps Props
         {
@@ -175,6 +176,8 @@ namespace VisualMusic
 
                 else if (entry.Name == "keyFrames")
                     KeyFrames = (KeyFrames)entry.Value;
+                else if (entry.Name == "propertyKeyframes")
+                    PropertyKeyframes = (Keyframes.KeyframeSet)entry.Value ?? PropertyKeyframes;
                 else if (entry.Name == "props")
                     Props = (ProjProps)entry.Value;
                 else if (entry.Name == "vertWidthQn")
@@ -209,6 +212,7 @@ namespace VisualMusic
             info.AddValue("importOptions", ImportOptions);
             info.AddValue("trackViews", _trackViews);
             info.AddValue("keyFrames", KeyFrames);
+            info.AddValue("propertyKeyframes", PropertyKeyframes);
             info.AddValue("props", Props);
             info.AddValue("vertWidthQn", _vertViewWidthQn);
         }
@@ -962,6 +966,17 @@ namespace VisualMusic
                 NormSongPos = (newPosT + 0.5) / SongLengthT;
         }
 
+        /// <summary>
+        /// Seeks to <paramref name="tick"/> (absolute song position in ticks).
+        /// Used by the new per-property keyframe GUI.  Callers are responsible for
+        /// calling ResyncPlaybackPosition when audio is already playing.
+        /// </summary>
+        public void GoToTick(int tick)
+        {
+            if (SongLengthT > 0)
+                NormSongPos = Math.Max(0, Math.Min(1, (tick + 0.5) / SongLengthT));
+        }
+
         public KeyFrame GetKeyFrameAtSongPos()
         {
             return KeyFrames[(int)SongPosT];
@@ -1061,6 +1076,7 @@ namespace VisualMusic
                 //Skip AudioProps for more lightweight redos
             }
             KeyFrames = source.KeyFrames;
+            PropertyKeyframes = source.PropertyKeyframes;
             //source.Dispose();
         }
 
@@ -1068,6 +1084,8 @@ namespace VisualMusic
         {
             if (KeyFrames == null) //Old project file format
                 KeyFrames = new KeyFrames();
+            if (PropertyKeyframes == null)
+                PropertyKeyframes = new Keyframes.KeyframeSet();
             ImportOptions.UpdateImportForm();
             var wp = waveformPanel ?? DrawHost?.WaveformPanel;
             wp.ClearChannels();

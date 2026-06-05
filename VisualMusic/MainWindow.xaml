@@ -39,12 +39,15 @@
         <!-- Playback — Ctrl+Space handled via PreviewKeyDown in code-behind (tunneling) so it
              fires even when a focused panel control (CheckBox, ListBox, etc.) would otherwise
              swallow the Space activation key. -->
-        <KeyBinding Command="{Binding GoToBeginningCommand}"  Key="Home"  Modifiers="Control"/>
-        <KeyBinding Command="{Binding GoToEndCommand}"        Key="End"   Modifiers="Control"/>
-        <KeyBinding Command="{Binding NudgeBackCommand}"      Key="Left"  Modifiers="Control"/>
-        <KeyBinding Command="{Binding NudgeForwardCommand}"   Key="Right" Modifiers="Control"/>
-        <KeyBinding Command="{Binding JumpBackCommand}"       Key="Left"  Modifiers="Control+Shift"/>
-        <KeyBinding Command="{Binding JumpForwardCommand}"    Key="Right" Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding GoToBeginningCommand}"     Key="Home"   Modifiers="Control"/>
+        <KeyBinding Command="{Binding GoToEndCommand}"           Key="End"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding NudgeBackCommand}"         Key="Left"   Modifiers="Control"/>
+        <KeyBinding Command="{Binding NudgeForwardCommand}"      Key="Right"  Modifiers="Control"/>
+        <KeyBinding Command="{Binding JumpBackCommand}"          Key="Left"   Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding JumpForwardCommand}"       Key="Right"  Modifiers="Control+Shift"/>
+        <!-- Keyframe navigation -->
+        <KeyBinding Command="{Binding GoToNextKeyFrameCommand}"  Key="OemPeriod"  Modifiers="Control"/>
+        <KeyBinding Command="{Binding GoToPrevKeyFrameCommand}"  Key="OemComma"   Modifiers="Control"/>
         <!-- View -->
         <KeyBinding Command="{Binding ShowSongCommand}"       Key="F1"/>
         <KeyBinding Command="{Binding ShowModBrowserCommand}" Key="F2"/>
@@ -122,6 +125,9 @@
                 <MenuItem Header="Nudge _forwards"  Command="{Binding NudgeForwardCommand}" InputGestureText="Ctrl+Right"/>
                 <MenuItem Header="Jump b_ackwards"  Command="{Binding JumpBackCommand}"     InputGestureText="Ctrl+Shift+Left"/>
                 <MenuItem Header="Jump fo_rwards"   Command="{Binding JumpForwardCommand}"  InputGestureText="Ctrl+Shift+Right"/>
+                <Separator/>
+                <MenuItem Header="Go to _next keyframe"     Command="{Binding GoToNextKeyFrameCommand}" InputGestureText="Ctrl+."/>
+                <MenuItem Header="Go to _previous keyframe" Command="{Binding GoToPrevKeyFrameCommand}" InputGestureText="Ctrl+,"/>
             </MenuItem>
 
             <!-- VIEW -->
@@ -141,6 +147,12 @@
                                           RelativeSource={RelativeSource AncestorType=Window},
                                           Converter={StaticResource BoolVis}}"/>
 
+        <!-- Keyframe list — opens alongside the project properties panel -->
+        <ctrl:KeyframeListView x:Name="keyframeListView"
+                               DockPanel.Dock="Left" Width="200"
+                               Visibility="{Binding ShowSongProps,
+                                            Converter={StaticResource BoolVis}}"/>
+
         <!-- Right: track list (with splitter) + property tabs -->
         <Grid DockPanel.Dock="Right" Width="395"
               Visibility="{Binding ShowTrackProps,
@@ -155,8 +167,16 @@
             <ctrl:TrackPropsView Grid.Column="2" DataContext="{Binding SelectedTrackProps}"/>
         </Grid>
 
-        <!-- Center (LastChildFill): scrollbar + MonoGame + browser screens -->
+        <!-- Center (LastChildFill): keyframe strip + scrollbar + MonoGame + browser screens -->
         <DockPanel>
+            <!-- Keyframe diamond strip — thin black panel above the render surface.
+                 Must come before the Grid (LastChildFill) so it's docked Top.
+                 Only shown on the Song screen. -->
+            <ctrl:KeyframePanel DockPanel.Dock="Top"
+                                Visibility="{Binding CurrentScreen,
+                                             Converter={StaticResource ScreenVis},
+                                             ConverterParameter=Song}"/>
+
             <!-- Timeline scrollbar at bottom, confined to center column only -->
             <ScrollBar DockPanel.Dock="Bottom" Orientation="Horizontal"
                        Minimum="0" Maximum="1"

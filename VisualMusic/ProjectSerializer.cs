@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using VisualMusic.Keyframes;
 using XnaColor = Microsoft.Xna.Framework.Color;
 
 namespace VisualMusic
@@ -19,7 +20,15 @@ namespace VisualMusic
             typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions),typeof(HvlImportOptions),
             typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment),
             typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps),
-            typeof(List<TrackProps>), typeof(AudioProps)
+            typeof(List<TrackProps>), typeof(AudioProps),
+            // Per-property keyframe model
+            typeof(KeyframeSet),
+            typeof(Dictionary<string, PropertyKeyframeTrack>),
+            typeof(PropertyKeyframeTrack),
+            typeof(SortedList<int, PropertyKeyframe>),
+            typeof(PropertyKeyframe),
+            typeof(KfInterpolation),
+            typeof(Dictionary<int, string>),
         };
     }
 }
