@@ -237,26 +237,10 @@ namespace VisualMusic.Keyframes
             // Editing a keyframeable control stops playback so the edit lands at a stable position.
             KeyframeService.PausePlayback();
 
-            bool green = KeyframeService.HasKeyHereForAll(propId, scope);
-            bool blue  = !green && KeyframeService.HasAnyKeyForAny(propId, scope);
-            if (!blue) return; // only intercept blue controls
-
-            // Prompt
-            var displayName = GetDisplayName(fe);
-            var label       = string.IsNullOrEmpty(displayName) ? propId : displayName;
-            var result = System.Windows.MessageBox.Show(
-                $"There is no keyframe for \"{label}\" at the current playback position.\nCreate one?",
-                "Keyframe",
-                System.Windows.MessageBoxButton.YesNo,
-                System.Windows.MessageBoxImage.Question);
-
-            if (result == System.Windows.MessageBoxResult.Yes)
+            // Shared gate: proceeds for green / un-keyframed controls; prompts for blue ones.
+            if (!KeyframeService.EnsureKeyframeForEdit(propId, scope))
             {
-                KeyframeService.AddKey(propId, scope);
-            }
-            else
-            {
-                // Revert to the safe (pre-edit) value
+                // User declined → revert to the safe (pre-edit) value.
                 state.Reverting = true;
                 try { RevertValue(fe, state); }
                 finally { state.Reverting = false; }

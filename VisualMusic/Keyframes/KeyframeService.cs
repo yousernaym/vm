@@ -170,6 +170,36 @@ namespace VisualMusic.Keyframes
             return id == null ? null : kfs.GetInterpolation(id, CurrentTick);
         }
 
+        // ---- Edit gate (shared by control edits and camera input) ----
+
+        /// <summary>
+        /// Gates an edit to a keyframeable property. Returns true if the edit may proceed:
+        /// when the property is green (keyframe here) or has no keyframes at all. When the property is
+        /// blue (keyframes elsewhere but not here), prompts the user — Yes creates a keyframe and returns
+        /// true; No returns false (the caller should cancel/revert the edit).
+        /// </summary>
+        public static bool EnsureKeyframeForEdit(string propertyId, KfScope scope)
+        {
+            if (Project == null) return true;
+            if (HasKeyHereForAll(propertyId, scope)) return true;   // green → edit the existing keyframe
+            if (!HasAnyKeyForAny(propertyId, scope)) return true;   // no keyframes → edit freely
+
+            // blue → prompt
+            var label = GetDisplayNameForId(ResolveIds(propertyId, scope).FirstOrDefault() ?? propertyId);
+            var result = System.Windows.MessageBox.Show(
+                $"There is no keyframe for \"{label}\" at the current playback position.\nCreate one?",
+                "Keyframe",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Question);
+
+            if (result == System.Windows.MessageBoxResult.Yes)
+            {
+                AddKey(propertyId, scope);
+                return true;
+            }
+            return false;
+        }
+
         // ---- Navigation ----
 
         /// <summary>Seeks to the next tick that has a keyframe for ANY resolved property ID.</summary>
@@ -185,7 +215,10 @@ namespace VisualMusic.Keyframes
                 if (n.HasValue && (!best.HasValue || n.Value < best.Value)) best = n;
             }
             if (best.HasValue)
+            {
                 Project.GoToTick(best.Value);
+                RaiseTickSelected(best.Value);
+            }
         }
 
         /// <summary>Seeks to the previous tick that has a keyframe for ANY resolved property ID.</summary>
@@ -201,7 +234,10 @@ namespace VisualMusic.Keyframes
                 if (p.HasValue && (!best.HasValue || p.Value > best.Value)) best = p;
             }
             if (best.HasValue)
+            {
                 Project.GoToTick(best.Value);
+                RaiseTickSelected(best.Value);
+            }
         }
 
         /// <summary>Seeks to the next tick that has a keyframe for ANY property (Playback menu).</summary>
@@ -209,7 +245,7 @@ namespace VisualMusic.Keyframes
         {
             if (Project == null) return;
             var tick = Project.PropertyKeyframes.NextTick(CurrentTick);
-            if (tick.HasValue) Project.GoToTick(tick.Value);
+            if (tick.HasValue) { Project.GoToTick(tick.Value); RaiseTickSelected(tick.Value); }
         }
 
         /// <summary>Seeks to the previous tick that has a keyframe for ANY property (Playback menu).</summary>
@@ -217,7 +253,7 @@ namespace VisualMusic.Keyframes
         {
             if (Project == null) return;
             var tick = Project.PropertyKeyframes.PrevTick(CurrentTick);
-            if (tick.HasValue) Project.GoToTick(tick.Value);
+            if (tick.HasValue) { Project.GoToTick(tick.Value); RaiseTickSelected(tick.Value); }
         }
     }
 }

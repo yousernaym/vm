@@ -72,7 +72,11 @@
                      FontFamily="Consolas" FontSize="11"
                      VerticalScrollBarVisibility="Auto"
                      HorizontalScrollBarVisibility="Auto"
-                     Margin="0,0,0,8"/>
+                     Margin="0,0,0,8"
+                     kf:Keyframing.PropertyId="Camera"
+                     kf:Keyframing.DisplayName="Camera"
+                     kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                     kf:Keyframing.Interpolatable="True"/>
 
             <Button Content="Load background" HorizontalAlignment="Left"
                     Margin="0,0,0,4" Click="LoadBkg_Click"/>

@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using WinFormsGraphicsDevice;
+using VisualMusic.Keyframes;
 using WinKeys = System.Windows.Forms.Keys;
 
 namespace VisualMusic
@@ -320,6 +321,59 @@ namespace VisualMusic
             }
         }
 
+        // ---- Camera keyframe edit interception ----
+        // The camera is keyframeable in the new per-property model (id "Camera", project scope), but it is
+        // edited through movement keys / mouse-look rather than a WPF control, so the blue-control prompt is
+        // applied here at the input source.
+        const string CameraPropId = "Camera";
+        bool _cameraEditDenied;   // user answered "No" for the current key-hold; suppress until key-up
+        bool _cameraPromptOpen;   // re-entrancy guard so the modal prompt can't stack
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        static extern short GetAsyncKeyState(int vKey);
+
+        /// <summary>True if the key is currently physically held (used after a modal that ate the key-up).</summary>
+        static bool IsKeyPhysicallyDown(int vkCode) => (GetAsyncKeyState(vkCode) & 0x8000) != 0;
+
+        static bool IsCameraKey(WinKeys key)
+            => key is WinKeys.W or WinKeys.A or WinKeys.S or WinKeys.D
+                   or WinKeys.R or WinKeys.F or WinKeys.Q or WinKeys.E;
+
+        /// <summary>True if the key+modifiers form a camera move/rotate gesture (mirrors Camera.Control gating).</summary>
+        static bool IsCameraGesture(WinKeys key, WinKeys modifiers)
+        {
+            if (modifiers != 0 && modifiers != WinKeys.Shift) return false;
+            return IsCameraKey(key);
+        }
+
+        /// <summary>
+        /// Gate for a camera edit (movement key or mouse-look). Returns true if the edit may proceed.
+        /// When the camera is blue (keyframes elsewhere but not here) it pauses playback and prompts;
+        /// <paramref name="prompted"/> reports whether the modal dialog was shown.
+        /// </summary>
+        bool AllowCameraEdit(out bool prompted)
+        {
+            prompted = false;
+            if (_cameraEditDenied) return false;
+
+            var scope = KeyframeService.KfScope.Project;
+            if (KeyframeService.HasKeyHereForAll(CameraPropId, scope)) return true; // green
+            if (!KeyframeService.HasAnyKeyForAny(CameraPropId, scope)) return true; // no camera keyframes
+            if (_cameraPromptOpen) return false;                                    // re-entrant
+
+            // blue → pause and prompt
+            prompted = true;
+            KeyframeService.PausePlayback();
+            _cameraPromptOpen = true;
+            try
+            {
+                bool ok = KeyframeService.EnsureKeyframeForEdit(CameraPropId, scope);
+                if (!ok) _cameraEditDenied = true;  // remember "No" for the rest of this key-hold
+                return ok;
+            }
+            finally { _cameraPromptOpen = false; }
+        }
+
         /// <summary>Returns true if the key was fully handled (suppress further processing).</summary>
         public bool HandleKeyDown(int vkCode)
         {
@@ -335,6 +389,19 @@ namespace VisualMusic
             {
                 SetMouseLook(false);
                 return true;
+            }
+
+            // Intercept camera movement/rotation when the camera is keyframed but not at this position.
+            if (IsCameraGesture(key, modifiers))
+            {
+                if (!AllowCameraEdit(out bool prompted))
+                    return true;   // suppressed (declined, or re-entrant during the prompt)
+
+                // The modal prompt steals the key-up, so a key that was tapped (released while the dialog
+                // was open) would otherwise start velocity that never stops. Only begin movement if the
+                // key is still physically held after the prompt closes.
+                if (prompted && !IsKeyPhysicallyDown(vkCode))
+                    return true;
             }
 
             if (keyFrame.ProjProps.Camera.Control(key, true, modifiers))
@@ -387,6 +454,10 @@ namespace VisualMusic
             var key = (WinKeys)vkCode;
             var modifiers = System.Windows.Forms.Control.ModifierKeys;
 
+            // Releasing a camera key clears a prior "No" so the next press can prompt again.
+            if (IsCameraKey(key))
+                _cameraEditDenied = false;
+
             if (keyFrame.ProjProps.Camera.Control(key, false, modifiers))
             {
                 foreach (var other in Project.KeyFrames.Values)
@@ -406,6 +477,8 @@ namespace VisualMusic
         void SetMouseLook(bool on)
         {
             if (Camera.MouseRot == on) return;
+            // Entering mouse-look is a camera edit — gate it the same way as movement keys.
+            if (on && !AllowCameraEdit(out _)) return;
             Camera.MouseRot = on;
             OnCameraControlModeChanged?.Invoke(on);
         }

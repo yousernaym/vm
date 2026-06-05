@@ -170,10 +170,29 @@ namespace VisualMusic.Controls
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            if (!_dragging) return;
-            _dragCurrentX = e.GetPosition(this).X;
-            InvalidateVisual();
-            e.Handled = true;
+            if (_dragging)
+            {
+                _dragCurrentX = e.GetPosition(this).X;
+                InvalidateVisual();
+                e.Handled = true;
+                return;
+            }
+            UpdateCursor(e.GetPosition(this).X);
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
+            base.OnMouseLeave(e);
+            if (!_dragging) Cursor = Cursors.Arrow;
+        }
+
+        // Over a marker: SizeWE while Shift is held (drag), otherwise a hand (click-to-seek).
+        void UpdateCursor(double mouseX)
+        {
+            if (HitTest(mouseX).HasValue)
+                Cursor = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? Cursors.SizeWE : Cursors.Hand;
+            else
+                Cursor = Cursors.Arrow;
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)

@@ -823,7 +823,8 @@ namespace VisualMusic
         }
         public void TogglePlayback()
         {
-            if (Media.GetAudioLength() == 0 || Camera.MouseRot)
+            // Note: playback may be toggled while mouse-look is active (Ctrl+Space works when locked).
+            if (Media.GetAudioLength() == 0)
                 return;
             IsPlaying = !IsPlaying;
             //bAudioPlayback = !bAudioPlayback;
