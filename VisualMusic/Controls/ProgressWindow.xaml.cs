@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shell;
@@ -29,6 +30,9 @@ namespace VisualMusic.Controls
         // ---- IRenderProgressCallback ----
         public bool   Cancel     { get; private set; }
         public object CancelLock { get; } = new object();
+
+        readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        public CancellationToken CancelToken => _cts.Token;
 
         void IRenderProgressCallback.ShowMessage(string message)
         {
@@ -193,6 +197,7 @@ namespace VisualMusic.Controls
             taskbarInfo.ProgressState = TaskbarItemProgressState.None;
             if (_doneMessage != null && !Cancel)
                 MessageBox.Show(this, _doneMessage, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+            _cts.Dispose();
             Close();
         }
 
@@ -215,6 +220,7 @@ namespace VisualMusic.Controls
             }
 
             lock (CancelLock) { Cancel = true; }
+            _cts.Cancel();   // wake any job blocked on the token (e.g. a stalled download)
             // The job is responsible for detecting Cancel and returning; OnJobFinished then
             // dispatches CloseForm.  We set _finished=false guard so Window_Closing will try
             // to cancel again if the user closes before the job notices — but _cancelRequested
@@ -270,16 +276,13 @@ namespace VisualMusic.Controls
         {
             using var webClient = new WebClient();
 
-            // Observe cancellation from the progress window and relay it to WebClient.
-            // We poll on progress events rather than spinning a separate thread.
+            // Relay cancellation to WebClient the instant the user clicks Cancel. Registering on
+            // the token (rather than polling cb.Cancel inside DownloadProgressChanged) means cancel
+            // still works when the server is unresponsive and no progress events ever fire.
+            using var cancelReg = cb.CancelToken.Register(webClient.CancelAsync);
+
             webClient.DownloadProgressChanged += (_, e) =>
             {
-                if (cb.Cancel)
-                {
-                    webClient.CancelAsync();
-                    return;
-                }
-
                 bool indeterminate = e.TotalBytesToReceive < 0;
                 if (indeterminate)
                 {
