@@ -3,10 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              MinWidth="180">
     <DockPanel>
-        <TextBlock DockPanel.Dock="Top"
-                   Text="Keyframes"
-                   FontWeight="SemiBold"
-                   Margin="4,4,4,2"/>
+        <DockPanel DockPanel.Dock="Top" Margin="4,4,4,2" LastChildFill="True">
+            <!-- Right-aligned action buttons -->
+            <Button x:Name="removeBtn" DockPanel.Dock="Right"
+                    Width="22" Height="22" Padding="0" Margin="2,0,0,0"
+                    ToolTip="Remove selected keyframe"
+                    Click="RemoveBtn_Click"
+                    Content="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12"/>
+            <Button x:Name="addBtn" DockPanel.Dock="Right"
+                    Width="22" Height="22" Padding="0" Margin="2,0,0,0"
+                    ToolTip="Add empty keyframe at playback position"
+                    Click="AddBtn_Click"
+                    Content="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="12"/>
+            <TextBlock Text="Keyframes" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        </DockPanel>
         <DataGrid x:Name="grid"
                   ItemsSource="{Binding Rows}"
                   AutoGenerateColumns="False"
@@ -20,11 +30,15 @@
                   BorderThickness="0"
                   CellEditEnding="Grid_CellEditEnding"
                   SelectionChanged="Grid_SelectionChanged"
-                  PreviewKeyDown="Grid_PreviewKeyDown">
+                  PreviewKeyDown="Grid_PreviewKeyDown"
+                  ContextMenuOpening="Grid_ContextMenuOpening">
+            <DataGrid.ContextMenu>
+                <ContextMenu/>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Time"
-                                    Binding="{Binding TimeDisplay, Mode=OneWay}"
-                                    Width="70"
+                <DataGridTextColumn Header="Beat"
+                                    Binding="{Binding TimeDisplay, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                    Width="55"
                                     IsReadOnly="False"/>
                 <DataGridTextColumn Header="Description"
                                     Binding="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"

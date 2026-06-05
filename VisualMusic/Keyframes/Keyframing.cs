@@ -94,6 +94,8 @@ namespace VisualMusic.Keyframes
             public object SafeValue;
             /// <summary>Blocks re-entrant interception during revert.</summary>
             public bool Reverting;
+            /// <summary>True once event handlers have been attached (guards repeated Loaded events).</summary>
+            public bool Initialized;
         }
 
         static readonly ConditionalWeakTable<FrameworkElement, ElementState> _states = new();
@@ -119,11 +121,21 @@ namespace VisualMusic.Keyframes
         {
             var state = _states.GetOrCreateValue(fe);
 
+            // Guard: Loaded fires every time the element re-enters the visual tree (panel toggles).
+            // Without this guard, handlers (and the edit-interception prompt) accumulate, causing the
+            // "Create keyframe?" dialog to appear once per accumulated subscription.
+            if (state.Initialized) { Refresh(fe); return; }
+            state.Initialized = true;
+
+            // Register the friendly name so menus elsewhere (e.g. the keyframe list) can label this property.
+            KeyframeService.RegisterDisplayName(GetPropertyId(fe), GetDisplayName(fe));
+
             KeyframeService.RefreshRequested  += () => Refresh(fe);
             KeyframeService.KeyframesChanged  += () => Refresh(fe);
 
             AttachContextMenu(fe);
             AttachEditInterception(fe);
+            Refresh(fe);
         }
 
         static void Teardown(FrameworkElement fe)
@@ -222,6 +234,9 @@ namespace VisualMusic.Keyframes
             var state = _states.GetOrCreateValue(fe);
             if (state.Reverting) return;
 
+            // Editing a keyframeable control stops playback so the edit lands at a stable position.
+            KeyframeService.PausePlayback();
+
             bool green = KeyframeService.HasKeyHereForAll(propId, scope);
             bool blue  = !green && KeyframeService.HasAnyKeyForAny(propId, scope);
             if (!blue) return; // only intercept blue controls
@@ -267,7 +282,12 @@ namespace VisualMusic.Keyframes
         {
             var menu = new ContextMenu();
             fe.ContextMenu = menu;
-            fe.ContextMenuOpening += (_, _) => RebuildMenu(fe, menu);
+            fe.ContextMenuOpening += (_, _) =>
+            {
+                // Right-clicking a keyframeable control stops playback before showing the menu.
+                KeyframeService.PausePlayback();
+                RebuildMenu(fe, menu);
+            };
         }
 
         static void RebuildMenu(FrameworkElement fe, ContextMenu menu)

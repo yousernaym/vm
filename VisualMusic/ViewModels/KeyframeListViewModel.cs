@@ -71,7 +71,14 @@ namespace VisualMusic.ViewModels
         {
             if (tpb <= 0) return tick.ToString();
             double beats = tick / tpb;
-            return beats.ToString("F2") + " b";
+            return beats.ToString("F2");
+        }
+
+        public KeyframeRowViewModel FindRow(int tick)
+        {
+            foreach (var r in Rows)
+                if (r.Tick == tick) return r;
+            return null;
         }
 
         // ---- Row edits ----
@@ -96,11 +103,40 @@ namespace VisualMusic.ViewModels
             row.Description = newDesc;
         }
 
+        /// <summary>
+        /// Adds an empty keyframe marker (0 properties) at the current playback position.
+        /// Returns the tick it was placed at.
+        /// </summary>
+        public int AddEmptyAtPlayhead()
+        {
+            if (_project == null) return 0;
+            int tick = (int)_project.SongPosT;
+            _project.PropertyKeyframes.AddMarker(tick);
+            KeyframeService.RaiseKeyframesChanged();
+            return tick;
+        }
+
         /// <summary>Deletes a keyframe column (removes all properties at that tick).</summary>
         public void DeleteRow(KeyframeRowViewModel row)
         {
             if (_project == null) return;
             _project.PropertyKeyframes.DeleteColumn(row.Tick);
+            KeyframeService.RaiseKeyframesChanged();
+        }
+
+        /// <summary>Full property ids (with friendly labels) keyframed at a row's tick.</summary>
+        public System.Collections.Generic.IEnumerable<(string id, string display)> PropertiesAt(int tick)
+        {
+            if (_project == null) yield break;
+            foreach (var id in _project.PropertyKeyframes.PropertyIdsAt(tick))
+                yield return (id, KeyframeService.GetDisplayNameForId(id));
+        }
+
+        /// <summary>Removes a single property's keyframe at the row's tick.</summary>
+        public void RemoveProperty(KeyframeRowViewModel row, string fullId)
+        {
+            if (_project == null) return;
+            _project.PropertyKeyframes.RemovePropertyAt(fullId, row.Tick);
             KeyframeService.RaiseKeyframesChanged();
         }
 

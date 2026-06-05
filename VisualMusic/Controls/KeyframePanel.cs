@@ -200,9 +200,10 @@ namespace VisualMusic.Controls
         {
             var proj = KeyframeService.Project;
             if (proj == null) return;
+            proj.PausePlayback();
             proj.GoToTick(tick);
-            // The song-pos change event will bubble up to MainViewModel which will
-            // call ResyncPlaybackPosition if needed; we just need the seek here.
+            // Select the matching row in the keyframe list.
+            KeyframeService.RaiseTickSelected(tick);
         }
 
         // ---- Layout ----

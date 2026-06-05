@@ -36,8 +36,47 @@ namespace VisualMusic.Keyframes
         /// </summary>
         public static event Action KeyframesChanged;
 
-        internal static void RaiseRefresh()        => RefreshRequested?.Invoke();
+        /// <summary>
+        /// Fired when a keyframe at a given tick is picked in the UI (e.g. a diamond is clicked).
+        /// The list view selects the matching row in response.
+        /// </summary>
+        public static event Action<int> TickSelected;
+
+        internal static void RaiseRefresh()          => RefreshRequested?.Invoke();
         internal static void RaiseKeyframesChanged() => KeyframesChanged?.Invoke();
+        internal static void RaiseTickSelected(int tick) => TickSelected?.Invoke(tick);
+
+        // ---- Playback ----
+
+        /// <summary>Pauses playback at the current position (no-op if already paused).</summary>
+        public static void PausePlayback() => Project?.PausePlayback();
+
+        // ---- Display-name registry ----
+        // Maps the raw property name (last id segment, e.g. "LineWidth") to the friendly label
+        // shown in menus.  Populated by the Keyframing behavior as controls are set up.
+
+        static readonly Dictionary<string, string> _displayNames = new();
+
+        public static void RegisterDisplayName(string rawName, string displayName)
+        {
+            if (!string.IsNullOrEmpty(rawName) && !string.IsNullOrEmpty(displayName))
+                _displayNames[rawName] = displayName;
+        }
+
+        /// <summary>Returns a friendly label for a full property id (e.g. "track/2/LineWidth").</summary>
+        public static string GetDisplayNameForId(string fullId)
+        {
+            if (string.IsNullOrEmpty(fullId)) return fullId;
+            string raw = fullId.Substring(fullId.LastIndexOf('/') + 1);
+            string name = _displayNames.TryGetValue(raw, out var dn) ? dn : raw;
+            // Annotate track-scoped ids with their track index for disambiguation
+            if (fullId.StartsWith("track/"))
+            {
+                var parts = fullId.Split('/');
+                if (parts.Length >= 3) name += $" (track {parts[1]})";
+            }
+            return name;
+        }
 
         // ---- Property-ID helpers ----
 

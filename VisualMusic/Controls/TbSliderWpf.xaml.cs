@@ -146,7 +146,11 @@ namespace VisualMusic.Controls
         }
 
         void Slider_MouseUp(object sender, MouseButtonEventArgs e)
-            => CommitChanges?.Invoke(this, EventArgs.Empty);
+        {
+            // Only the left button commits a value edit; right-click is reserved for the context menu.
+            if (e.ChangedButton == MouseButton.Left)
+                CommitChanges?.Invoke(this, EventArgs.Empty);
+        }
 
         void Slider_KeyDown(object sender, KeyEventArgs e)
         {

@@ -126,6 +126,9 @@ namespace VisualMusic.Keyframes
         // Per-tick descriptions (shared across all properties at that tick, for the list view)
         Dictionary<int, string> _descriptions = new Dictionary<int, string>();
 
+        // Standalone keyframe positions that may have zero keyed properties (added via the list "+").
+        HashSet<int> _markers = new HashSet<int>();
+
         // ---- Query ----
 
         public bool HasKeyAt(string propertyId, int tick)
@@ -161,6 +164,9 @@ namespace VisualMusic.Keyframes
             else                            Add(propertyId, tick);
         }
 
+        /// <summary>Adds a standalone keyframe marker (possibly with zero properties) at a tick.</summary>
+        public void AddMarker(int tick) => _markers.Add(tick);
+
         public void ApplyInterpolation(string propertyId, int tick, KfInterpolation interp)
         {
             if (_tracks.TryGetValue(propertyId, out var t))
@@ -176,6 +182,7 @@ namespace VisualMusic.Keyframes
             foreach (var track in _tracks.Values)
                 track.Remove(tick);
             _descriptions.Remove(tick);
+            _markers.Remove(tick);
             // Clean up tracks that became empty
             var emptyKeys = _tracks.Where(kv => !kv.Value.HasAny).Select(kv => kv.Key).ToList();
             foreach (var key in emptyKeys)
@@ -195,23 +202,37 @@ namespace VisualMusic.Keyframes
                 _descriptions.Remove(oldTick);
                 _descriptions[newTick] = desc;
             }
+            if (_markers.Remove(oldTick))
+                _markers.Add(newTick);
         }
 
         // ---- Union across all tracks ----
 
-        /// <summary>Sorted set of all tick positions that have at least one keyed property.</summary>
+        /// <summary>
+        /// Sorted set of all keyframe tick positions: any tick with a keyed property, plus any
+        /// standalone marker (empty keyframe).
+        /// </summary>
         public IEnumerable<int> AllTicks()
         {
             var set = new SortedSet<int>();
             foreach (var track in _tracks.Values)
                 foreach (var k in track.Keys)
                     set.Add(k);
+            foreach (var m in _markers)
+                set.Add(m);
             return set;
         }
 
         /// <summary>Number of distinct properties that have a keyframe at <paramref name="tick"/>.</summary>
         public int PropertyCountAt(int tick)
             => _tracks.Count(kv => kv.Value.HasKeyAt(tick));
+
+        /// <summary>Full property ids that have a keyframe at <paramref name="tick"/>.</summary>
+        public IEnumerable<string> PropertyIdsAt(int tick)
+            => _tracks.Where(kv => kv.Value.HasKeyAt(tick)).Select(kv => kv.Key).ToList();
+
+        /// <summary>Removes the keyframe for a single property id at <paramref name="tick"/>.</summary>
+        public void RemovePropertyAt(string propertyId, int tick) => Remove(propertyId, tick);
 
         // ---- Navigation ----
 
@@ -223,6 +244,8 @@ namespace VisualMusic.Keyframes
                 var n = t.NextTick(after);
                 if (n.HasValue && (!best.HasValue || n.Value < best.Value)) best = n;
             }
+            foreach (var m in _markers)
+                if (m > after && (!best.HasValue || m < best.Value)) best = m;
             return best;
         }
 
@@ -234,6 +257,8 @@ namespace VisualMusic.Keyframes
                 var p = t.PrevTick(before);
                 if (p.HasValue && (!best.HasValue || p.Value > best.Value)) best = p;
             }
+            foreach (var m in _markers)
+                if (m < before && (!best.HasValue || m > best.Value)) best = m;
             return best;
         }
 
@@ -264,6 +289,7 @@ namespace VisualMusic.Keyframes
             {
                 if      (entry.Name == "tracks")       _tracks       = (Dictionary<string, PropertyKeyframeTrack>)entry.Value ?? _tracks;
                 else if (entry.Name == "descriptions") _descriptions = (Dictionary<int, string>)entry.Value ?? _descriptions;
+                else if (entry.Name == "markers")      _markers      = (HashSet<int>)entry.Value ?? _markers;
             }
         }
 
@@ -271,6 +297,7 @@ namespace VisualMusic.Keyframes
         {
             info.AddValue("tracks",       _tracks);
             info.AddValue("descriptions", _descriptions);
+            info.AddValue("markers",      _markers);
         }
     }
 }
