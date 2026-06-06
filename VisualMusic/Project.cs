@@ -30,9 +30,11 @@ namespace VisualMusic
             public readonly Action<double> Set;
             public readonly bool LogScale;
             public readonly bool NeedsRebuild;
+            /// <summary>Enum/bool props that must step (never blend) regardless of the keyframe's mode.</summary>
+            public readonly bool AlwaysHold;
             public PropAccessor(Func<double> get, Action<double> set,
-                                bool logScale = false, bool needsRebuild = false)
-            { Get = get; Set = set; LogScale = logScale; NeedsRebuild = needsRebuild; }
+                                bool logScale = false, bool needsRebuild = false, bool alwaysHold = false)
+            { Get = get; Set = set; LogScale = logScale; NeedsRebuild = needsRebuild; AlwaysHold = alwaysHold; }
         }
 
         readonly Dictionary<string, PropAccessor> _propAccessors = new Dictionary<string, PropAccessor>();
@@ -1061,7 +1063,7 @@ namespace VisualMusic
                 _propAccessors[$"track/{idx}/StyleTypeIndex"] = new PropAccessor(
                     () => { var t = _trackViews[idx].TrackProps.StyleProps.Type; return t == null ? 0 : (double)(int)t; },
                     v  => { _trackViews[idx].TrackProps.StyleProps.Type = (NoteStyleType)(int)Math.Round(v); },
-                    needsRebuild: true);
+                    needsRebuild: true, alwaysHold: true);
                 _propAccessors[$"track/{idx}/LineWidth"] = new PropAccessor(
                     () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineWidth ?? 0,
                     v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineWidth = (float)v; },
@@ -1079,23 +1081,27 @@ namespace VisualMusic
                 _propAccessors[$"track/{idx}/LineTypeIndex"] = new PropAccessor(
                     () => { var t = _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineType; return t == null ? 0 : (double)(int)t; },
                     v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineType = (LineType)(int)Math.Round(v); },
-                    needsRebuild: true);
+                    needsRebuild: true, alwaysHold: true);
                 _propAccessors[$"track/{idx}/LineHlTypeIndex"] = new PropAccessor(
                     () => { var t = _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlType; return t == null ? 0 : (double)(int)t; },
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlType = (LineHlType)(int)Math.Round(v); });
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlType = (LineHlType)(int)Math.Round(v); },
+                    alwaysHold: true);
                 _propAccessors[$"track/{idx}/Continuous"] = new PropAccessor(
                     () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Continuous == true ? 1.0 : 0.0,
                     v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Continuous = v >= 0.5; },
-                    needsRebuild: true);
+                    needsRebuild: true, alwaysHold: true);
                 _propAccessors[$"track/{idx}/MovingHl"] = new PropAccessor(
                     () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().MovingHl == true ? 1.0 : 0.0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().MovingHl = v >= 0.5; });
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().MovingHl = v >= 0.5; },
+                    alwaysHold: true);
                 _propAccessors[$"track/{idx}/ShrinkingHl"] = new PropAccessor(
                     () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().ShrinkingHl == true ? 1.0 : 0.0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().ShrinkingHl = v >= 0.5; });
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().ShrinkingHl = v >= 0.5; },
+                    alwaysHold: true);
                 _propAccessors[$"track/{idx}/HlBorder"] = new PropAccessor(
                     () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlBorder == true ? 1.0 : 0.0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlBorder = v >= 0.5; });
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlBorder = v >= 0.5; },
+                    alwaysHold: true);
             }
         }
 
@@ -1136,9 +1142,12 @@ namespace VisualMusic
                 else if (after == null || after.Value == null)
                     value = before.Value.Value;
                 else
+                {
+                    // Enum/bool props must step at the keyframe, never blend to a fractional value.
+                    var mode = acc.AlwaysHold ? Keyframes.KfInterpolation.Hold : before.Interpolation;
                     value = Keyframes.PropertyKeyframeTrack.InterpolateValue(
-                        before.Value.Value, after.Value.Value, t,
-                        before.Interpolation, acc.LogScale);
+                        before.Value.Value, after.Value.Value, t, mode, acc.LogScale);
+                }
 
                 double prev = acc.Get();
                 acc.Set(value);
