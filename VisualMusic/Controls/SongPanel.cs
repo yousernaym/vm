@@ -331,6 +331,7 @@ namespace VisualMusic
                     while (Project.NormSongPos < 1 && !progressForm.Cancel)
                     {
                         Project.InterpolateFrames();
+                        Project.InterpolatePropertyKeyframes();
                         DrawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, renderTargetCube, renderTarget2d32bit, renderTarget2d8bit, cubeToPlaneFx);
                         if (options.SSAAEnabled)
                         {

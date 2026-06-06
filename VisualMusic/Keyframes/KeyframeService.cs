@@ -133,7 +133,10 @@ namespace VisualMusic.Keyframes
             if (Project == null) return;
             int tick = CurrentTick;
             foreach (var id in ResolveIds(propertyId, scope))
-                Project.PropertyKeyframes.Add(id, tick);
+            {
+                double? value = Project.GetCurrentValue(id);
+                Project.PropertyKeyframes.Add(id, tick, KfInterpolation.Smooth, value);
+            }
             RaiseKeyframesChanged();
         }
 
@@ -150,6 +153,21 @@ namespace VisualMusic.Keyframes
         {
             if (HasKeyHereForAll(propertyId, scope)) RemoveKey(propertyId, scope);
             else                                     AddKey(propertyId, scope);
+        }
+
+        /// <summary>
+        /// Stores a freshly edited control value into the keyframe(s) at the current tick. Used after a
+        /// keyframeable control commits an edit: if a keyframe exists here (green, or just created via the
+        /// blue prompt) its stored value is updated so playback interpolates to the edited value. No-op for
+        /// properties with no keyframe at the current tick (free live edit).
+        /// </summary>
+        public static void SyncEditedValue(string propertyId, KfScope scope, double value)
+        {
+            if (Project == null) return;
+            int tick = CurrentTick;
+            foreach (var id in ResolveIds(propertyId, scope))
+                if (Project.PropertyKeyframes.HasKeyAt(id, tick))
+                    Project.PropertyKeyframes.SetValueAt(id, tick, value);
         }
 
         public static void SetInterpolation(string propertyId, KfScope scope, KfInterpolation interp)

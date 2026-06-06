@@ -21,6 +21,24 @@ namespace VisualMusic
     [Serializable()]
     public class Project : ISerializable, IDisposable
     {
+        // ---- Per-property interpolation accessor registry (not serialized) ----
+        // Populated by InitPropertyAccessors() after track views are created.
+
+        private sealed class PropAccessor
+        {
+            public readonly Func<double>  Get;
+            public readonly Action<double> Set;
+            public readonly bool LogScale;
+            public readonly bool NeedsRebuild;
+            public PropAccessor(Func<double> get, Action<double> set,
+                                bool logScale = false, bool needsRebuild = false)
+            { Get = get; Set = set; LogScale = logScale; NeedsRebuild = needsRebuild; }
+        }
+
+        readonly Dictionary<string, PropAccessor> _propAccessors = new Dictionary<string, PropAccessor>();
+
+        // ---- Fields ----
+
         public KeyFrames KeyFrames;
         public Keyframes.KeyframeSet PropertyKeyframes = new Keyframes.KeyframeSet();
         ProjProps _props = new ProjProps();
@@ -317,6 +335,7 @@ namespace VisualMusic
                 Props.ViewWidthQn = _vertViewWidthQn = ProjProps.DefaultViewWidthQn;
             }
             CreateTrackViews(_notes.Tracks.Count, options.EraseCurrent);
+            InitPropertyAccessors();
             return true;
         }
 
@@ -371,10 +390,17 @@ namespace VisualMusic
         public void InterpolateFrames()
         {
             var interpolatedFrame = KeyFrames.CreateInterpolatedFrame((int)SongPosT);
-            Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
+            // The old (Ctrl+K) keyframe system still owns these props *unless* the new per-property
+            // system has keyframes for them, in which case it hands off ownership (the new system writes
+            // them in InterpolatePropertyKeyframes). Without this hand-off the old system would overwrite
+            // the new interpolated value every frame.
+            if (!PropertyKeyframes.HasAny("proj/ViewWidthQn"))
+                Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
             Props.Camera = interpolatedFrame.ProjProps.Camera;
-            Props.BackgroundImageOpacity = interpolatedFrame.ProjProps.BackgroundImageOpacity;
-            _props.BackgroundImageSaturation = interpolatedFrame.ProjProps.BackgroundImageSaturation;
+            if (!PropertyKeyframes.HasAny("proj/BackgroundImageOpacity"))
+                Props.BackgroundImageOpacity = interpolatedFrame.ProjProps.BackgroundImageOpacity;
+            if (!PropertyKeyframes.HasAny("proj/BackgroundImageSaturation"))
+                _props.BackgroundImageSaturation = interpolatedFrame.ProjProps.BackgroundImageSaturation;
             //Props = interpolatedFrame.ProjProps;
         }
 
@@ -785,6 +811,11 @@ namespace VisualMusic
                     keyFrame.ProjProps.Camera.Update(deltaTimeS);
             }
             InterpolateFrames();
+            // Only drive property values from the new keyframe model during playback. When stopped the
+            // user authors values directly through the controls (editing pauses playback), so overriding
+            // every frame would fight the slider and prevent capturing a distinct value for a 2nd keyframe.
+            if (IsPlaying)
+                InterpolatePropertyKeyframes();
 
             //Scroll song depending on user input or playback position.
             if (IsPlaying)
@@ -978,6 +1009,148 @@ namespace VisualMusic
                 NormSongPos = Math.Max(0, Math.Min(1, (tick + 0.5) / SongLengthT));
         }
 
+        // ---- Property accessor registry for per-property keyframe interpolation ----
+
+        /// <summary>
+        /// Builds the map from property IDs to live getter/setter pairs so that
+        /// <see cref="InterpolatePropertyKeyframes"/> can apply interpolated values every frame.
+        /// Must be called after <c>_trackViews</c> is populated (end of ImportSong /
+        /// InitAfterDeserialization).
+        /// </summary>
+        public void InitPropertyAccessors()
+        {
+            _propAccessors.Clear();
+
+            // Project-scope
+            _propAccessors["proj/ViewWidthQn"] = new PropAccessor(
+                () => Props.ViewWidthQn,
+                v  => Props.ViewWidthQn = (float)v,
+                logScale: true);
+            _propAccessors["proj/AudioOffset"] = new PropAccessor(
+                () => Props.AudioOffset,
+                v  => Props.AudioOffset = v);
+            _propAccessors["proj/PlaybackOffsetS"] = new PropAccessor(
+                () => Props.PlaybackOffsetS,
+                v  => Props.PlaybackOffsetS = (float)v);
+            _propAccessors["proj/FadeIn"] = new PropAccessor(
+                () => Props.FadeIn,
+                v  => Props.FadeIn = (float)v);
+            _propAccessors["proj/FadeOut"] = new PropAccessor(
+                () => Props.FadeOut,
+                v  => Props.FadeOut = (float)v);
+            _propAccessors["proj/MaxPitch"] = new PropAccessor(
+                () => Props.MaxPitch,
+                v  => Props.MaxPitch = (int)Math.Round(v),
+                needsRebuild: true);
+            _propAccessors["proj/MinPitch"] = new PropAccessor(
+                () => Props.MinPitch,
+                v  => Props.MinPitch = (int)Math.Round(v),
+                needsRebuild: true);
+            _propAccessors["proj/BackgroundImageOpacity"] = new PropAccessor(
+                () => Props.BackgroundImageOpacity,
+                v  => Props.BackgroundImageOpacity = (float)v);
+            _propAccessors["proj/BackgroundImageSaturation"] = new PropAccessor(
+                () => Props.BackgroundImageSaturation,
+                v  => Props.BackgroundImageSaturation = (float)v);
+
+            // Track-scope — one entry per track view
+            if (_trackViews == null) return;
+            for (int i = 0; i < _trackViews.Count; i++)
+            {
+                int idx = i;  // capture for lambdas
+                _propAccessors[$"track/{idx}/StyleTypeIndex"] = new PropAccessor(
+                    () => { var t = _trackViews[idx].TrackProps.StyleProps.Type; return t == null ? 0 : (double)(int)t; },
+                    v  => { _trackViews[idx].TrackProps.StyleProps.Type = (NoteStyleType)(int)Math.Round(v); },
+                    needsRebuild: true);
+                _propAccessors[$"track/{idx}/LineWidth"] = new PropAccessor(
+                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineWidth ?? 0,
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineWidth = (float)v; },
+                    needsRebuild: true);
+                _propAccessors[$"track/{idx}/QnGapThreshold"] = new PropAccessor(
+                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold ?? 0,
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold = (float)v; },
+                    needsRebuild: true);
+                _propAccessors[$"track/{idx}/HlSize"] = new PropAccessor(
+                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlSize ?? 0,
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlSize = (float)v; });
+                _propAccessors[$"track/{idx}/HlMovementPow"] = new PropAccessor(
+                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlMovementPow ?? 0,
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlMovementPow = (float)v; });
+                _propAccessors[$"track/{idx}/LineTypeIndex"] = new PropAccessor(
+                    () => { var t = _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineType; return t == null ? 0 : (double)(int)t; },
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineType = (LineType)(int)Math.Round(v); },
+                    needsRebuild: true);
+                _propAccessors[$"track/{idx}/LineHlTypeIndex"] = new PropAccessor(
+                    () => { var t = _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlType; return t == null ? 0 : (double)(int)t; },
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlType = (LineHlType)(int)Math.Round(v); });
+                _propAccessors[$"track/{idx}/Continuous"] = new PropAccessor(
+                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Continuous == true ? 1.0 : 0.0,
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Continuous = v >= 0.5; },
+                    needsRebuild: true);
+                _propAccessors[$"track/{idx}/MovingHl"] = new PropAccessor(
+                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().MovingHl == true ? 1.0 : 0.0,
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().MovingHl = v >= 0.5; });
+                _propAccessors[$"track/{idx}/ShrinkingHl"] = new PropAccessor(
+                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().ShrinkingHl == true ? 1.0 : 0.0,
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().ShrinkingHl = v >= 0.5; });
+                _propAccessors[$"track/{idx}/HlBorder"] = new PropAccessor(
+                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlBorder == true ? 1.0 : 0.0,
+                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlBorder = v >= 0.5; });
+            }
+        }
+
+        /// <summary>Returns the live double value for a full property id, or null if unregistered.</summary>
+        public double? GetCurrentValue(string fullId)
+            => _propAccessors.TryGetValue(fullId, out var a) ? a.Get() : (double?)null;
+
+        /// <summary>True when the new keyframe set has any track-scoped keyframes.</summary>
+        public bool HasTrackKeyframes
+            => PropertyKeyframes?.AllTicks().Any() == true
+            && PropertyKeyframes.Tracks.Keys.Any(k => k.StartsWith("track/"));
+
+        /// <summary>
+        /// Applies the new per-property keyframe set by interpolating each tracked property to its
+        /// value at the current song position.  Called inside <see cref="Update"/> (during playback)
+        /// after <see cref="InterpolateFrames"/> so its writes win for any property both systems cover,
+        /// and from the video-export loop so exports animate too.
+        /// </summary>
+        public void InterpolatePropertyKeyframes()
+        {
+            if (PropertyKeyframes == null) return;
+            bool anyRebuildNeeded = false;
+
+            foreach (var kv in PropertyKeyframes.Tracks)
+            {
+                string id = kv.Key;
+                var track = kv.Value;
+                if (!_propAccessors.TryGetValue(id, out var acc)) continue;
+
+                var (before, after, t) = track.FindBrackets((int)SongPosT);
+
+                // Skip if neither surrounding keyframe carries a captured value
+                if (before?.Value == null && after?.Value == null) continue;
+
+                double value;
+                if (before == null || before.Value == null)
+                    value = after.Value.Value;
+                else if (after == null || after.Value == null)
+                    value = before.Value.Value;
+                else
+                    value = Keyframes.PropertyKeyframeTrack.InterpolateValue(
+                        before.Value.Value, after.Value.Value, t,
+                        before.Interpolation, acc.LogScale);
+
+                double prev = acc.Get();
+                acc.Set(value);
+                if (acc.NeedsRebuild && Math.Abs(value - prev) > 1e-6)
+                    anyRebuildNeeded = true;
+            }
+
+            if (anyRebuildNeeded) CreateGeos(resetVertScale: false);
+        }
+
+        // ---- End property-keyframe interpolation ----
+
         public KeyFrame GetKeyFrameAtSongPos()
         {
             return KeyFrames[(int)SongPosT];
@@ -1109,6 +1282,7 @@ namespace VisualMusic
             // `Props.PlaybackOffsetS = Props.PlaybackOffsetS`; do it explicitly here so
             // both WPF and WinForms paths get correct SongLengthS.
             OnPlaybackOffsetSChanged();
+            InitPropertyAccessors();
         }
     }
 

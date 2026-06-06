@@ -84,6 +84,7 @@ namespace VisualMusic.ViewModels
 
         string _currentProjectPath = "";
         UndoItems _undoItems = new UndoItems();
+        List<int> _lastSelectedIndices = new List<int>();
 
         public MainViewModel()
         {
@@ -267,6 +268,7 @@ namespace VisualMusic.ViewModels
                 .Select(item => TrackList.Items.IndexOf(item))
                 .Where(i => i >= 0)
                 .ToList();
+            _lastSelectedIndices = indices;
             SelectedTrackProps.MergedProps = _project.MergeTrackProps(indices);
             // Keep the keyframe service aware of the current selection
             Keyframes.KeyframeService.SelectedTrackIndices = indices;
@@ -333,8 +335,18 @@ namespace VisualMusic.ViewModels
         public void NotifyScrollPositionChanged()
         {
             OnPropertyChanged(nameof(ScrollPosition));
+            // Apply per-property keyframe interpolation for the new position. During playback Project.Update
+            // already did this; here it covers paused seeks/scrubs (this method fires on every position
+            // change, but NOT during a static control edit — so it never fights an in-progress edit).
+            if (_project != null && !_project.IsPlaying)
+                _project.InterpolatePropertyKeyframes();
             if (ShowSongProps)
                 SongProps.RefreshLiveValues();
+            if (ShowTrackProps && _project?.HasTrackKeyframes == true)
+            {
+                SelectedTrackProps.MergedProps = _project.MergeTrackProps(_lastSelectedIndices);
+                SelectedTrackProps.RefreshLiveValues();
+            }
             // Drive per-frame refresh for control coloring and the diamond panel
             Keyframes.KeyframeService.RaiseRefresh();
         }

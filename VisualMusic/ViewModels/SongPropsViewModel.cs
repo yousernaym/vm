@@ -57,6 +57,12 @@ namespace VisualMusic.ViewModels
         public void RefreshLiveValues()
         {
             OnPropertyChanged(nameof(ViewWidthQn));
+            OnPropertyChanged(nameof(AudioOffset));
+            OnPropertyChanged(nameof(PlaybackOffsetS));
+            OnPropertyChanged(nameof(FadeIn));
+            OnPropertyChanged(nameof(FadeOut));
+            OnPropertyChanged(nameof(MaxPitch));
+            OnPropertyChanged(nameof(MinPitch));
             OnPropertyChanged(nameof(CameraText));
             OnPropertyChanged(nameof(BackgroundImageOpacity));
             OnPropertyChanged(nameof(BackgroundImageSaturation));
@@ -72,6 +78,10 @@ namespace VisualMusic.ViewModels
             set
             {
                 if (value == null || _project == null) return;
+                // Write the live value directly (the new per-property system, once it owns this prop,
+                // reads/writes Props and InterpolateFrames no longer relays the old keyframe value here)
+                // and also into the old keyframe system (used when there are no new keyframes for it).
+                Props.ViewWidthQn = (float)value;
                 ApplyToSelectedKeyframes(pp => pp.ViewWidthQn = (float)value);
                 OnPropertyChanged();
             }
@@ -194,7 +204,8 @@ namespace VisualMusic.ViewModels
             get => (double?)Props?.BackgroundImageOpacity;
             set
             {
-                if (value == null) return;
+                if (value == null || Props == null) return;
+                Props.BackgroundImageOpacity = (float)value;
                 ApplyToSelectedKeyframes(pp => pp.BackgroundImageOpacity = (float)value);
                 OnPropertyChanged();
             }
@@ -209,7 +220,8 @@ namespace VisualMusic.ViewModels
             get => (double?)Props?.BackgroundImageSaturation;
             set
             {
-                if (value == null) return;
+                if (value == null || Props == null) return;
+                Props.BackgroundImageSaturation = (float)value;
                 ApplyToSelectedKeyframes(pp => pp.BackgroundImageSaturation = (float)value);
                 OnPropertyChanged();
             }

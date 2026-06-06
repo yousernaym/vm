@@ -244,8 +244,26 @@ namespace VisualMusic.Keyframes
                 state.Reverting = true;
                 try { RevertValue(fe, state); }
                 finally { state.Reverting = false; }
+                return;
             }
+
+            // Edit accepted. If a keyframe exists at the current position (green, or just created by the
+            // blue prompt), store the freshly edited value so playback interpolates to it. The control's
+            // scalar is in the same units the interpolation registry uses (slider value, combo index,
+            // checkbox 0/1).
+            if (ReadControlScalar(fe) is double scalar)
+                KeyframeService.SyncEditedValue(propId, scope, scalar);
         }
+
+        /// <summary>Reads a keyframeable control's value as a scalar in the property's native units,
+        /// or null for controls whose value isn't a scalar / is ambiguous (mixed/indeterminate).</summary>
+        static double? ReadControlScalar(FrameworkElement fe) => fe switch
+        {
+            TbSliderWpf s  => s.Value,
+            CheckBox    c  => c.IsChecked == null ? (double?)null : (c.IsChecked.Value ? 1.0 : 0.0),
+            ComboBox    cb => cb.SelectedIndex >= 0 ? cb.SelectedIndex : (double?)null,
+            _              => null,
+        };
 
         static void RevertValue(FrameworkElement fe, ElementState state)
         {

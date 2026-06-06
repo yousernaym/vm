@@ -52,10 +52,57 @@ namespace VisualMusic.Keyframes
 
         public bool HasKeyAt(int tick) => _frames.ContainsKey(tick);
 
-        public void Add(int tick, KfInterpolation interp = KfInterpolation.Smooth)
+        public void Add(int tick, KfInterpolation interp = KfInterpolation.Smooth, double? value = null)
         {
             if (!_frames.ContainsKey(tick))
-                _frames.Add(tick, new PropertyKeyframe(tick) { Interpolation = interp });
+                _frames.Add(tick, new PropertyKeyframe(tick) { Interpolation = interp, Value = value });
+        }
+
+        /// <summary>
+        /// Finds the two keyframes bracketing <paramref name="songPosT"/> and the linear interpolant
+        /// t∈[0,1] between them.  Before==null means the position is before all keyframes (snap to
+        /// first); After==null means it is past the last (snap to last).
+        /// </summary>
+        public (PropertyKeyframe Before, PropertyKeyframe After, double T) FindBrackets(int songPosT)
+        {
+            if (_frames.Count == 0) return (null, null, 0);
+
+            PropertyKeyframe before = null, after = null;
+            foreach (var kf in _frames.Values)
+            {
+                if (kf.Tick <= songPosT) before = kf;
+                else { after = kf; break; }
+            }
+
+            if (before == null) return (null, _frames.Values[0], 0);
+            if (after  == null) return (_frames.Values[_frames.Count - 1], null, 0);
+
+            double t = (after.Tick == before.Tick) ? 0.0
+                       : (double)(songPosT - before.Tick) / (after.Tick - before.Tick);
+            return (before, after, t);
+        }
+
+        /// <summary>
+        /// Interpolates between two scalar values according to the given mode.
+        /// When <paramref name="logScale"/> is true the interpolation is performed in log2 space
+        /// (matches the existing <see cref="KeyFrames"/> ViewWidthQn interpolation).
+        /// </summary>
+        public static double InterpolateValue(double a, double b, double t,
+                                              KfInterpolation mode, bool logScale)
+        {
+            if (mode == KfInterpolation.Hold) return a;
+
+            if (logScale)
+            {
+                a = Math.Log(a, 2);
+                b = Math.Log(b, 2);
+            }
+
+            if (mode == KfInterpolation.Smooth)
+                t = t * t * (3.0 - 2.0 * t);
+
+            double result = a + (b - a) * t;
+            return logScale ? Math.Pow(2, result) : result;
         }
 
         public bool Remove(int tick) => _frames.Remove(tick);
@@ -69,6 +116,11 @@ namespace VisualMusic.Keyframes
         public void SetInterpolation(int tick, KfInterpolation interp)
         {
             if (_frames.TryGetValue(tick, out var kf)) kf.Interpolation = interp;
+        }
+
+        public void SetValue(int tick, double? value)
+        {
+            if (_frames.TryGetValue(tick, out var kf)) kf.Value = value;
         }
 
         public int? NextTick(int after)
@@ -129,6 +181,10 @@ namespace VisualMusic.Keyframes
         // Standalone keyframe positions that may have zero keyed properties (added via the list "+").
         HashSet<int> _markers = new HashSet<int>();
 
+        // ---- Tracks access (read-only, for interpolation) ----
+
+        public IReadOnlyDictionary<string, PropertyKeyframeTrack> Tracks => _tracks;
+
         // ---- Query ----
 
         public bool HasKeyAt(string propertyId, int tick)
@@ -142,11 +198,11 @@ namespace VisualMusic.Keyframes
 
         // ---- Mutation ----
 
-        public void Add(string propertyId, int tick, KfInterpolation interp = KfInterpolation.Smooth)
+        public void Add(string propertyId, int tick, KfInterpolation interp = KfInterpolation.Smooth, double? value = null)
         {
             if (!_tracks.TryGetValue(propertyId, out var track))
                 _tracks[propertyId] = track = new PropertyKeyframeTrack();
-            track.Add(tick, interp);
+            track.Add(tick, interp, value);
         }
 
         public void Remove(string propertyId, int tick)
@@ -171,6 +227,13 @@ namespace VisualMusic.Keyframes
         {
             if (_tracks.TryGetValue(propertyId, out var t))
                 t.SetInterpolation(tick, interp);
+        }
+
+        /// <summary>Stores an edited value into an existing keyframe (no-op if none at that tick).</summary>
+        public void SetValueAt(string propertyId, int tick, double? value)
+        {
+            if (_tracks.TryGetValue(propertyId, out var t))
+                t.SetValue(tick, value);
         }
 
         /// <summary>

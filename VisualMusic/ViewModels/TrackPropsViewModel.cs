@@ -126,6 +126,26 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(AudioFilename));
         }
 
+        /// <summary>
+        /// Called every frame by <see cref="MainViewModel.NotifyScrollPositionChanged"/> while track
+        /// keyframes are active to push interpolated style values to the UI.
+        /// </summary>
+        public void RefreshLiveValues()
+        {
+            OnPropertyChanged(nameof(StyleTypeIndex));
+            OnPropertyChanged(nameof(LineStyleVisible));
+            OnPropertyChanged(nameof(LineWidth));
+            OnPropertyChanged(nameof(QnGapThreshold));
+            OnPropertyChanged(nameof(Continuous));
+            OnPropertyChanged(nameof(LineTypeIndex));
+            OnPropertyChanged(nameof(LineHlTypeIndex));
+            OnPropertyChanged(nameof(HlSize));
+            OnPropertyChanged(nameof(HlMovementPow));
+            OnPropertyChanged(nameof(MovingHl));
+            OnPropertyChanged(nameof(ShrinkingHl));
+            OnPropertyChanged(nameof(HlBorder));
+        }
+
         // =====================================================================
         // STYLE TAB
         // =====================================================================
