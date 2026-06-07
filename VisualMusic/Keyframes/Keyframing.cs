@@ -344,6 +344,25 @@ namespace VisualMusic.Keyframes
 
             menu.Items.Add(new Separator());
 
+            // Filter / remove-all actions (enabled when this property has any keyframes)
+            var filterItem = new MenuItem
+            {
+                Header    = "Show only _this property in keyframe list",
+                IsEnabled = hasAny,
+            };
+            filterItem.Click += (_, _) => KeyframeService.RequestFilterByProperty(propId, scope);
+            menu.Items.Add(filterItem);
+
+            var removeAllItem = new MenuItem
+            {
+                Header    = "Remove _all keyframes for this property",
+                IsEnabled = hasAny,
+            };
+            removeAllItem.Click += (_, _) => KeyframeService.RemoveAllKeysForProperty(propId, scope);
+            menu.Items.Add(removeAllItem);
+
+            menu.Items.Add(new Separator());
+
             // Next / Prev
             var prevItem = new MenuItem { Header = "Go to _previous keyframe", IsEnabled = hasPrev };
             var nextItem = new MenuItem { Header = "Go to _next keyframe",     IsEnabled = hasNext };

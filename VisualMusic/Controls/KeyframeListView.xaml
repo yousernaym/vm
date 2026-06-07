@@ -7,7 +7,7 @@
             <!-- Right-aligned action buttons -->
             <Button x:Name="removeBtn" DockPanel.Dock="Right"
                     Width="22" Height="22" Padding="0" Margin="2,0,0,0"
-                    ToolTip="Remove selected keyframe"
+                    ToolTip="Remove selected keyframe(s)"
                     Click="RemoveBtn_Click"
                     Content="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12"/>
             <Button x:Name="addBtn" DockPanel.Dock="Right"
@@ -17,6 +17,53 @@
                     Content="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="12"/>
             <TextBlock Text="Keyframes" FontWeight="SemiBold" VerticalAlignment="Center"/>
         </DockPanel>
+        <!-- Property filter row: searchable dropdown (TextBox + Popup + ListBox) -->
+        <Grid DockPanel.Dock="Top" Margin="4,0,4,2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="filterBox" Grid.Column="0"
+                     VerticalContentAlignment="Center"
+                     GotKeyboardFocus="FilterBox_GotKeyboardFocus"
+                     LostKeyboardFocus="FilterBox_LostKeyboardFocus"
+                     PreviewMouseLeftButtonDown="FilterBox_PreviewMouseLeftButtonDown"
+                     PreviewKeyDown="FilterBox_PreviewKeyDown"
+                     TextChanged="FilterBox_TextChanged"/>
+            <Button x:Name="clearFilterBtn" Grid.Column="1"
+                    Width="22" Height="22" Padding="0" Margin="2,0,0,0"
+                    ToolTip="Clear property filter (show all keyframes)"
+                    Click="ClearFilterBtn_Click"
+                    Content="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="11"/>
+            <Popup x:Name="filterPopup" Grid.Column="0"
+                   PlacementTarget="{Binding ElementName=filterBox}"
+                   Placement="Bottom"
+                   StaysOpen="False"
+                   AllowsTransparency="True"
+                   Width="{Binding ActualWidth, ElementName=filterBox}">
+                <Border Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+                        BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                        BorderThickness="1">
+                    <ListBox x:Name="filterList"
+                             ItemsSource="{Binding Properties}"
+                             DisplayMemberPath="Display"
+                             MaxHeight="240"
+                             Focusable="False"
+                             PreviewMouseLeftButtonUp="FilterList_PreviewMouseLeftButtonUp">
+                        <ListBox.Resources>
+                            <!-- Keep the highlight visible even though keyboard focus stays in the search box -->
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF3399FF"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
+                        </ListBox.Resources>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Focusable" Value="False"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </Border>
+            </Popup>
+        </Grid>
         <DataGrid x:Name="grid"
                   ItemsSource="{Binding Rows}"
                   AutoGenerateColumns="False"
@@ -24,7 +71,7 @@
                   CanUserDeleteRows="False"
                   CanUserReorderColumns="False"
                   CanUserResizeRows="False"
-                  SelectionMode="Single"
+                  SelectionMode="Extended"
                   HeadersVisibility="Column"
                   GridLinesVisibility="Horizontal"
                   BorderThickness="0"

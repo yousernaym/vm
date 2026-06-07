@@ -44,9 +44,16 @@ namespace VisualMusic.Keyframes
         /// </summary>
         public static event Action<int> TickSelected;
 
+        /// <summary>
+        /// Fired when a property's context menu requests that the keyframe list filter to that property.
+        /// The argument is the full property id to show (e.g. "track/2/LineWidth").
+        /// </summary>
+        public static event Action<string> FilterByPropertyRequested;
+
         internal static void RaiseRefresh()          => RefreshRequested?.Invoke();
         internal static void RaiseKeyframesChanged() => KeyframesChanged?.Invoke();
         internal static void RaiseTickSelected(int tick) => TickSelected?.Invoke(tick);
+        internal static void RaiseFilterByProperty(string id) => FilterByPropertyRequested?.Invoke(id);
 
         // ---- Playback ----
 
@@ -313,6 +320,48 @@ namespace VisualMusic.Keyframes
         public static void RemoveKeyframesWithPrefix(string prefix)
         {
             Project?.PropertyKeyframes?.RemovePropertiesWithPrefix(prefix);
+            RaiseKeyframesChanged();
+        }
+
+        // ---- Property-filter helpers (for the list-view dropdown) ----
+
+        /// <summary>
+        /// Requests the keyframe list to filter to this property's keyframes.
+        /// Picks the first resolved id that actually has any keyframes and fires
+        /// <see cref="FilterByPropertyRequested"/> so the list view can respond.
+        /// </summary>
+        public static void RequestFilterByProperty(string propertyId, KfScope scope)
+        {
+            var kfs = Project?.PropertyKeyframes;
+            if (kfs == null) return;
+            var id = ResolveIds(propertyId, scope).FirstOrDefault(i => kfs.HasAny(i));
+            if (id != null) RaiseFilterByProperty(id);
+        }
+
+        /// <summary>
+        /// After confirming with the user, removes ALL keyframe tracks for the given property/scope.
+        /// Other properties at the same ticks are not affected.
+        /// </summary>
+        public static void RemoveAllKeysForProperty(string propertyId, KfScope scope)
+        {
+            if (Project == null) return;
+            var ids = ResolveIds(propertyId, scope).ToList();
+            if (ids.Count == 0) return;
+
+            // Build a friendly label for the confirmation dialog
+            string label = GetDisplayNameForId(ids[0]);
+            if (ids.Count > 1) label += $" (+{ids.Count - 1} more)";
+
+            var result = System.Windows.MessageBox.Show(
+                $"Remove all keyframes for \"{label}\"?",
+                "Remove property keyframes",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Question);
+            if (result != System.Windows.MessageBoxResult.Yes) return;
+
+            var kfs = Project.PropertyKeyframes;
+            foreach (var id in ids)
+                kfs.RemoveProperty(id);
             RaiseKeyframesChanged();
         }
     }

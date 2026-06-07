@@ -383,6 +383,9 @@ namespace VisualMusic.Keyframes
         /// <summary>Removes the keyframe for a single property id at <paramref name="tick"/>.</summary>
         public void RemovePropertyAt(string propertyId, int tick) => Remove(propertyId, tick);
 
+        /// <summary>Removes an entire property track (all its keyframes at every tick).</summary>
+        public void RemoveProperty(string propertyId) => _tracks.Remove(propertyId);
+
         // ---- Navigation ----
 
         public int? NextTick(int after)

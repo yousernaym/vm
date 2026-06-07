@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using VisualMusic.Keyframes;
 
 namespace VisualMusic.ViewModels
@@ -31,12 +33,31 @@ namespace VisualMusic.ViewModels
     }
 
     // -------------------------------------------------------------------------
+    // Item for the property-filter dropdown
+    // -------------------------------------------------------------------------
+
+    public class KeyframePropertyViewModel
+    {
+        public string Id      { get; }   // full property id, e.g. "track/2/LineWidth"
+        public string Display { get; }
+
+        public KeyframePropertyViewModel(string id, string display) { Id = id; Display = display; }
+    }
+
+    // -------------------------------------------------------------------------
     // ViewModel for the full keyframe list panel
     // -------------------------------------------------------------------------
 
     public partial class KeyframeListViewModel : ObservableObject
     {
-        public ObservableCollection<KeyframeRowViewModel> Rows { get; } = new();
+        public ObservableCollection<KeyframeRowViewModel>     Rows       { get; } = new();
+        public ObservableCollection<KeyframePropertyViewModel> Properties { get; } = new();
+
+        /// <summary>
+        /// Full property id to filter the list by, or null to show all keyframes.
+        /// Set via <see cref="SetPropertyFilter"/>.
+        /// </summary>
+        public string PropertyFilterId { get; private set; }
 
         Project _project;
 
@@ -50,7 +71,38 @@ namespace VisualMusic.ViewModels
             }
         }
 
+        /// <summary>Full rebuild: refreshes both the dropdown property list and the rows.</summary>
         public void Rebuild()
+        {
+            RebuildProperties();
+            RebuildRows();
+        }
+
+        /// <summary>
+        /// Repopulates the dropdown's property list from the keyframe set. Called when the keyframe
+        /// SET changes (project load, add/remove) — NOT when the filter selection changes, so the
+        /// dropdown's ItemsSource is never mutated from within its own selection events.
+        /// </summary>
+        public void RebuildProperties()
+        {
+            Properties.Clear();
+            if (_project == null) return;
+
+            var kfs = _project.PropertyKeyframes;
+            var props = kfs.Tracks.Keys
+                .Select(id => new KeyframePropertyViewModel(id, KeyframeService.GetDisplayNameForId(id)))
+                .OrderBy(p => p.Display)
+                .ToList();
+            foreach (var p in props)
+                Properties.Add(p);
+
+            // If the active filter's property no longer exists, drop the filter.
+            if (PropertyFilterId != null && !kfs.Tracks.ContainsKey(PropertyFilterId))
+                PropertyFilterId = null;
+        }
+
+        /// <summary>Repopulates the row list, respecting any active property filter.</summary>
+        public void RebuildRows()
         {
             Rows.Clear();
             if (_project == null) return;
@@ -58,7 +110,13 @@ namespace VisualMusic.ViewModels
             var kfs    = _project.PropertyKeyframes;
             double tpb = _project.Notes?.TicksPerBeat ?? 480;
 
-            foreach (int tick in kfs.AllTicks())
+            IEnumerable<int> ticks = PropertyFilterId != null
+                ? kfs.Tracks.TryGetValue(PropertyFilterId, out var track)
+                    ? (IEnumerable<int>)track.Keys
+                    : Enumerable.Empty<int>()
+                : kfs.AllTicks();
+
+            foreach (int tick in ticks)
             {
                 int    count  = kfs.PropertyCountAt(tick);
                 string desc   = kfs.GetDescription(tick);
@@ -79,6 +137,16 @@ namespace VisualMusic.ViewModels
             foreach (var r in Rows)
                 if (r.Tick == tick) return r;
             return null;
+        }
+
+        /// <summary>
+        /// Sets the property filter and rebuilds only the rows. Pass null to show all keyframes.
+        /// The dropdown's property list is intentionally left untouched here.
+        /// </summary>
+        public void SetPropertyFilter(string fullId)
+        {
+            PropertyFilterId = fullId;
+            RebuildRows();
         }
 
         // ---- Row edits ----
@@ -116,16 +184,30 @@ namespace VisualMusic.ViewModels
             return tick;
         }
 
-        /// <summary>Deletes a keyframe column (removes all properties at that tick).</summary>
-        public void DeleteRow(KeyframeRowViewModel row)
+        /// <summary>
+        /// Deletes one or more keyframe rows. When a property filter is active, only that
+        /// property's keyframe is removed from each tick (other properties remain). When no
+        /// filter is active the entire tick column (all properties) is deleted.
+        /// </summary>
+        public void DeleteRows(IEnumerable<KeyframeRowViewModel> rows)
         {
             if (_project == null) return;
-            _project.PropertyKeyframes.DeleteColumn(row.Tick);
+            var kfs = _project.PropertyKeyframes;
+            foreach (var row in rows)
+            {
+                if (PropertyFilterId != null)
+                    kfs.RemovePropertyAt(PropertyFilterId, row.Tick);
+                else
+                    kfs.DeleteColumn(row.Tick);
+            }
             KeyframeService.RaiseKeyframesChanged();
         }
 
+        /// <summary>Deletes a single keyframe row (convenience wrapper for <see cref="DeleteRows"/>).</summary>
+        public void DeleteRow(KeyframeRowViewModel row) => DeleteRows(new[] { row });
+
         /// <summary>Full property ids (with friendly labels) keyframed at a row's tick.</summary>
-        public System.Collections.Generic.IEnumerable<(string id, string display)> PropertiesAt(int tick)
+        public IEnumerable<(string id, string display)> PropertiesAt(int tick)
         {
             if (_project == null) yield break;
             foreach (var id in _project.PropertyKeyframes.PropertyIdsAt(tick))
