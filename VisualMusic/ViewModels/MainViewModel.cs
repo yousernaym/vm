@@ -397,6 +397,7 @@ namespace VisualMusic.ViewModels
             Keyframes.KeyframeService.Project = value;
             Keyframes.KeyframeService.KeyframesChanged += OnKeyframesChangedRestoreBackground;
             Keyframes.KeyframeService.RaiseKeyframesChanged();
+            Camera.OnUserUpdating = () => value?.SyncLiveCameraEdit();
             NotifyScrollPositionChanged();
         }
 

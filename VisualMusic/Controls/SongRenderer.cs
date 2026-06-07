@@ -322,7 +322,7 @@ namespace VisualMusic
                 NormMouseY = (float)(y - middleY) * 2 / workAreaHeight;
                 SetCursorPosition?.Invoke(middleX, middleY);
                 // Hold left button to roll; otherwise yaw/pitch.
-                Project?.GetKeyFrameAtSongPos()?.ProjProps.Camera.ApplyMouseRot(NormMouseX, NormMouseY, _leftMbPressed);
+                Project?.Props.Camera.ApplyMouseRot(NormMouseX, NormMouseY, _leftMbPressed);
             }
         }
 
@@ -382,12 +382,12 @@ namespace VisualMusic
         /// <summary>Returns true if the key was fully handled (suppress further processing).</summary>
         public bool HandleKeyDown(int vkCode)
         {
-            var keyFrame = Project?.GetKeyFrameAtSongPos();
-            if (keyFrame == null) return false;
+            if (Project?.Notes == null) return false;
 
             bool suppress = false;
             var key = (WinKeys)vkCode;
             var modifiers = System.Windows.Forms.Control.ModifierKeys;
+            var camera = Project.Props.Camera;
 
             // Escape exits mouse-look mode.
             if (key == WinKeys.Escape && Camera.MouseRot)
@@ -409,15 +409,20 @@ namespace VisualMusic
                     return true;
             }
 
-            if (keyFrame.ProjProps.Camera.Control(key, true, modifiers))
+            if (camera.Control(key, true, modifiers))
             {
                 suppress = true;
-                foreach (var other in Project.KeyFrames.Values)
+                Project.SyncLiveCameraEdit();
+                var keyFrame = Project.GetKeyFrameAtSongPos();
+                if (keyFrame != null)
                 {
-                    if (keyFrame != other && other.Selected)
+                    foreach (var other in Project.KeyFrames.Values)
                     {
-                        other.ProjProps.Camera.Pos = keyFrame.ProjProps.Camera.Pos;
-                        other.ProjProps.Camera.Orientation = keyFrame.ProjProps.Camera.Orientation;
+                        if (keyFrame != other && other.Selected)
+                        {
+                            other.ProjProps.Camera.Pos = camera.Pos;
+                            other.ProjProps.Camera.Orientation = camera.Orientation;
+                        }
                     }
                 }
             }
@@ -453,24 +458,29 @@ namespace VisualMusic
         /// <summary>Resets camera velocity when a movement/rotation key is released.</summary>
         public void HandleKeyUp(int vkCode)
         {
-            var keyFrame = Project?.GetKeyFrameAtSongPos();
-            if (keyFrame == null) return;
+            if (Project?.Notes == null) return;
 
             var key = (WinKeys)vkCode;
             var modifiers = System.Windows.Forms.Control.ModifierKeys;
+            var camera = Project.Props.Camera;
 
             // Releasing a camera key clears a prior "No" so the next press can prompt again.
             if (IsCameraKey(key))
                 _cameraEditDenied = false;
 
-            if (keyFrame.ProjProps.Camera.Control(key, false, modifiers))
+            if (camera.Control(key, false, modifiers))
             {
-                foreach (var other in Project.KeyFrames.Values)
+                Project.SyncLiveCameraEdit();
+                var keyFrame = Project.GetKeyFrameAtSongPos();
+                if (keyFrame != null)
                 {
-                    if (keyFrame != other && other.Selected)
+                    foreach (var other in Project.KeyFrames.Values)
                     {
-                        other.ProjProps.Camera.Pos = keyFrame.ProjProps.Camera.Pos;
-                        other.ProjProps.Camera.Orientation = keyFrame.ProjProps.Camera.Orientation;
+                        if (keyFrame != other && other.Selected)
+                        {
+                            other.ProjProps.Camera.Pos = camera.Pos;
+                            other.ProjProps.Camera.Orientation = camera.Orientation;
+                        }
                     }
                 }
             }

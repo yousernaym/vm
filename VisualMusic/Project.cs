@@ -881,11 +881,8 @@ namespace VisualMusic
 
         public void Update(double deltaTimeS)
         {
-            foreach (var keyFrame in KeyFrames.Values)
-            {
-                if (keyFrame.Selected)
-                    keyFrame.ProjProps.Camera.Update(deltaTimeS);
-            }
+            // Integrate on the live render camera; keyframe stores are synced via SyncLiveCameraEdit.
+            Props.Camera.Update(deltaTimeS);
             InterpolateFrames();
             // Only drive property values from the new keyframe model during playback. When stopped the
             // user authors values directly through the controls (editing pauses playback), so overriding
@@ -1299,6 +1296,31 @@ namespace VisualMusic
         public KeyFrame GetKeyFrameAtSongPos()
         {
             return KeyFrames[(int)SongPosT];
+        }
+
+        /// <summary>
+        /// Writes the live <see cref="Props.Camera"/> into per-property and legacy keyframe stores after
+        /// user-driven movement (WASD, mouse-look). Rendering and property interpolation read Props;
+        /// without this, edits to legacy keyframe cameras are invisible once proj/Camera keyframes exist.
+        /// </summary>
+        public void SyncLiveCameraEdit()
+        {
+            var cam = Props.Camera;
+            if (PropertyKeyframes?.HasAny("proj/Camera") == true
+                && Keyframes.KeyframeService.HasKeyHereForAll("Camera", Keyframes.KeyframeService.KfScope.Project))
+            {
+                Keyframes.KeyframeService.SyncEditedValue("Camera", Keyframes.KeyframeService.KfScope.Project,
+                    new Keyframes.CameraKfValue(cam.Pos, cam.Orientation, cam.Fov));
+            }
+
+            int tick = (int)SongPosT;
+            if (KeyFrames != null && KeyFrames.Keys.Contains(tick))
+            {
+                var kf = KeyFrames[tick];
+                kf.ProjProps.Camera.Pos = cam.Pos;
+                kf.ProjProps.Camera.Orientation = cam.Orientation;
+                kf.ProjProps.Camera.Fov = cam.Fov;
+            }
         }
 
         /// <summary>
