@@ -217,7 +217,16 @@ namespace VisualMusic.Keyframes
                     cb.Click += (_, _) => OnCommit(cb);
                     break;
                 case ComboBox combo:
-                    combo.SelectionChanged += (_, _) => OnCommit(combo);
+                    // SelectionChanged fires for programmatic changes too (e.g. keyframe interpolation
+                    // pushing a new value through the binding during playback), unlike the slider's
+                    // CommitChanges or the checkbox's Click which are user-only. Treat it as an edit only
+                    // when the user is actually interacting with the control — dropdown open or focused —
+                    // otherwise a playback-driven update would raise the "Create keyframe?" prompt.
+                    combo.SelectionChanged += (_, _) =>
+                    {
+                        if (!combo.IsDropDownOpen && !combo.IsKeyboardFocusWithin) return;
+                        OnCommit(combo);
+                    };
                     break;
                 case HueSatButtonWpf hue:
                     hue.SelectionChanged += (_, _) => OnCommit(hue);
