@@ -36,6 +36,7 @@ namespace VisualMusic
         Texture2D _bkgTexA;   // "from" texture (or the single texture when no crossfade)
         Texture2D _bkgTexB;   // "to" texture (null when not crossfading)
         float     _bkgBlend;  // 0 = fully A, 1 = fully B
+        bool      _bkgFadeToEmpty; // true when crossfading from an image to no background
         readonly object _renderLock = new object();
 
         // --- Layout ---
@@ -604,6 +605,7 @@ namespace VisualMusic
             // Clear the crossfade pair; set the single base texture.
             _bkgTexB  = null;
             _bkgBlend = 0f;
+            _bkgFadeToEmpty = false;
             _bkgTexA  = GetOrLoadCachedTexture(path);
             // Purge cache entries that are no longer needed (keep only the active texture)
             PurgeCacheExcept(path);
@@ -614,6 +616,7 @@ namespace VisualMusic
             _bkgTexA  = null;
             _bkgTexB  = null;
             _bkgBlend = 0f;
+            _bkgFadeToEmpty = false;
             foreach (var tex in _bkgCache.Values) tex?.Dispose();
             _bkgCache.Clear();
         }
@@ -621,12 +624,15 @@ namespace VisualMusic
         /// <summary>
         /// Sets up a crossfade between two images for keyframe-driven transitions.
         /// Called every frame from <see cref="Project.InterpolatePropertyKeyframes"/>.
+        /// When <paramref name="pathB"/> is empty (but not null) the blend fades A out to transparent;
+        /// null pathB means no crossfade (hold / single image).
         /// </summary>
         public void SetBackgroundCrossfade(string pathA, string pathB, float blend)
         {
             _bkgTexA  = GetOrLoadCachedTexture(pathA);
             _bkgTexB  = string.IsNullOrWhiteSpace(pathB) ? null : GetOrLoadCachedTexture(pathB);
             _bkgBlend = blend;
+            _bkgFadeToEmpty = pathB != null && string.IsNullOrWhiteSpace(pathB);
         }
 
         void PurgeCacheExcept(string keepPath)
@@ -653,7 +659,9 @@ namespace VisualMusic
             // Draw texA (the "from" image, or the single static texture)
             if (_bkgTexA != null)
             {
-                float alphaA = opacity * (_bkgTexB != null ? (1f - _bkgBlend) : 1f);
+                float alphaA = opacity;
+                if (_bkgTexB != null || _bkgFadeToEmpty)
+                    alphaA = opacity * (1f - _bkgBlend);
                 int   ca     = (int)(alphaA * 255f + 0.5f);
                 _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, _postProcessFx, null);
                 _spriteBatch.Draw(_bkgTexA, viewport, new Color(ca, ca, ca, ca));
