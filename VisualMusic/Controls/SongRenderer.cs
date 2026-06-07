@@ -30,7 +30,12 @@ namespace VisualMusic
         Effect _postProcessFx;
         ScreenQuad _quad;
         Texture2D _regionSelectTexture;
-        Texture2D _backgroundTexture;
+        // Background texture(s) — single texture (LoadBackgroundImage) or crossfade pair (SetBackgroundCrossfade)
+        readonly System.Collections.Generic.Dictionary<string, Texture2D> _bkgCache
+            = new System.Collections.Generic.Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase);
+        Texture2D _bkgTexA;   // "from" texture (or the single texture when no crossfade)
+        Texture2D _bkgTexB;   // "to" texture (null when not crossfading)
+        float     _bkgBlend;  // 0 = fully A, 1 = fully B
         readonly object _renderLock = new object();
 
         // --- Layout ---
@@ -564,36 +569,96 @@ namespace VisualMusic
 
         // ---- Background image ----
 
+        /// <summary>Loads a texture from <paramref name="path"/> into the cache, or returns a cached copy.</summary>
+        Texture2D GetOrLoadCachedTexture(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return null;
+            if (_bkgCache.TryGetValue(path, out var cached)) return cached;
+            try
+            {
+                var tex = Texture2D.FromFile(_graphicsDevice, path);
+                _bkgCache[path] = tex;
+                return tex;
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(
+                    $"Could not load image \"{Path.GetFileName(path)}\". {ex.Message}",
+                    "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return null;
+            }
+        }
+
         public void LoadBackgroundImage(string path)
         {
-            UnloadBackgroundImage();
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                try { _backgroundTexture = Texture2D.FromFile(_graphicsDevice, path); }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show(
-                        $"Could not load image \"{Path.GetFileName(path)}\". {ex.Message}",
-                        "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-                }
-            }
+            // Clear the crossfade pair; set the single base texture.
+            _bkgTexB  = null;
+            _bkgBlend = 0f;
+            _bkgTexA  = GetOrLoadCachedTexture(path);
+            // Purge cache entries that are no longer needed (keep only the active texture)
+            PurgeCacheExcept(path);
         }
 
         public void UnloadBackgroundImage()
         {
-            _backgroundTexture?.Dispose();
-            _backgroundTexture = null;
+            _bkgTexA  = null;
+            _bkgTexB  = null;
+            _bkgBlend = 0f;
+            foreach (var tex in _bkgCache.Values) tex?.Dispose();
+            _bkgCache.Clear();
+        }
+
+        /// <summary>
+        /// Sets up a crossfade between two images for keyframe-driven transitions.
+        /// Called every frame from <see cref="Project.InterpolatePropertyKeyframes"/>.
+        /// </summary>
+        public void SetBackgroundCrossfade(string pathA, string pathB, float blend)
+        {
+            _bkgTexA  = GetOrLoadCachedTexture(pathA);
+            _bkgTexB  = string.IsNullOrWhiteSpace(pathB) ? null : GetOrLoadCachedTexture(pathB);
+            _bkgBlend = blend;
+        }
+
+        void PurgeCacheExcept(string keepPath)
+        {
+            var toRemove = new System.Collections.Generic.List<string>();
+            foreach (var kv in _bkgCache)
+            {
+                if (!string.Equals(kv.Key, keepPath, StringComparison.OrdinalIgnoreCase))
+                    toRemove.Add(kv.Key);
+            }
+            foreach (var key in toRemove)
+            {
+                _bkgCache[key]?.Dispose();
+                _bkgCache.Remove(key);
+            }
         }
 
         public void DrawBackground()
         {
             _postProcessFx.Parameters["saturationLevel"].SetValue(Project.Props.BackgroundImageSaturation);
-            _spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, _postProcessFx, null);
-            if (_backgroundTexture != null)
-                _spriteBatch.Draw(_backgroundTexture,
-                    new Rectangle(0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height),
-                    new Color(Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity, Project.Props.BackgroundImageOpacity));
-            _spriteBatch.End();
+            var viewport = new Rectangle(0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+            float opacity = Project.Props.BackgroundImageOpacity;
+
+            // Draw texA (the "from" image, or the single static texture)
+            if (_bkgTexA != null)
+            {
+                float alphaA = opacity * (_bkgTexB != null ? (1f - _bkgBlend) : 1f);
+                int   ca     = (int)(alphaA * 255f + 0.5f);
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, _postProcessFx, null);
+                _spriteBatch.Draw(_bkgTexA, viewport, new Color(ca, ca, ca, ca));
+                _spriteBatch.End();
+            }
+
+            // Draw texB (the "to" image) blended on top
+            if (_bkgTexB != null && _bkgBlend > 0f)
+            {
+                float alphaB = opacity * _bkgBlend;
+                int   cb     = (int)(alphaB * 255f + 0.5f);
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, _postProcessFx, null);
+                _spriteBatch.Draw(_bkgTexB, viewport, new Color(cb, cb, cb, cb));
+                _spriteBatch.End();
+            }
         }
 
         public void InitFrame()

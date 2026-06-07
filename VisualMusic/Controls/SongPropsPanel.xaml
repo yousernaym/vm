@@ -17,35 +17,19 @@
 
             <TextBlock Text="Audio offset (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding AudioOffset, Mode=TwoWay}"
-                              Min="-99" Max="99" Decimals="2" Margin="0,0,0,8"
-                              kf:Keyframing.PropertyId="AudioOffset"
-                              kf:Keyframing.DisplayName="Audio offset"
-                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
-                              kf:Keyframing.Interpolatable="True"/>
+                              Min="-99" Max="99" Decimals="2" Margin="0,0,0,8"/>
 
             <TextBlock Text="Playback offset (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding PlaybackOffsetS, Mode=TwoWay}"
-                              Min="-99" Max="99" Decimals="2" Margin="0,0,0,8"
-                              kf:Keyframing.PropertyId="PlaybackOffsetS"
-                              kf:Keyframing.DisplayName="Playback offset"
-                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
-                              kf:Keyframing.Interpolatable="True"/>
+                              Min="-99" Max="99" Decimals="2" Margin="0,0,0,8"/>
 
             <TextBlock Text="Fade in (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding FadeIn, Mode=TwoWay}"
-                              Min="-99" Max="99" Decimals="2" Margin="0,0,0,8"
-                              kf:Keyframing.PropertyId="FadeIn"
-                              kf:Keyframing.DisplayName="Fade in"
-                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
-                              kf:Keyframing.Interpolatable="True"/>
+                              Min="-99" Max="99" Decimals="2" Margin="0,0,0,8"/>
 
             <TextBlock Text="Fade out (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding FadeOut, Mode=TwoWay}"
-                              Min="-99" Max="99" Decimals="2" Margin="0,0,0,8"
-                              kf:Keyframing.PropertyId="FadeOut"
-                              kf:Keyframing.DisplayName="Fade out"
-                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
-                              kf:Keyframing.Interpolatable="True"/>
+                              Min="-99" Max="99" Decimals="2" Margin="0,0,0,8"/>
 
             <TextBlock Text="Max pitch" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding MaxPitch, Mode=TwoWay}"
@@ -79,9 +63,17 @@
                      kf:Keyframing.Interpolatable="True"/>
 
             <Button Content="Load background" HorizontalAlignment="Left"
-                    Margin="0,0,0,4" Click="LoadBkg_Click"/>
+                    Margin="0,0,0,4" Click="LoadBkg_Click"
+                    kf:Keyframing.PropertyId="BackgroundImagePath"
+                    kf:Keyframing.DisplayName="Background image"
+                    kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                    kf:Keyframing.Interpolatable="True"/>
             <Button Content="Unload" HorizontalAlignment="Left"
-                    Margin="0,0,0,8" Click="UnloadBkg_Click"/>
+                    Margin="0,0,0,8" Click="UnloadBkg_Click"
+                    kf:Keyframing.PropertyId="BackgroundImagePath"
+                    kf:Keyframing.DisplayName="Background image"
+                    kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                    kf:Keyframing.Interpolatable="True"/>
 
             <TextBlock Text="Background opacity" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding BackgroundImageOpacity, Mode=TwoWay}"

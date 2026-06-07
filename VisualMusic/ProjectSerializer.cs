@@ -33,6 +33,8 @@ namespace VisualMusic
             typeof(KfValue),
             typeof(ScalarKfValue),
             typeof(ColorKfValue),
+            typeof(CameraKfValue),
+            typeof(StringKfValue),
         };
     }
 }

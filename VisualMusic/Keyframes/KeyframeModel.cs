@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.Xna.Framework;
 using XnaColor = Microsoft.Xna.Framework.Color;
 
 namespace VisualMusic.Keyframes
@@ -72,6 +73,67 @@ namespace VisualMusic.Keyframes
                 (int)Math.Round(a.C.B + (b.C.B - a.C.B) * t),
                 (int)Math.Round(a.C.A + (b.C.A - a.C.A) * t)));
         }
+    }
+
+    /// <summary>Camera (position + orientation quaternion + FOV) keyframe value.</summary>
+    [Serializable]
+    public sealed class CameraKfValue : KfValue
+    {
+        public Vector3    Pos;
+        public Quaternion Orientation;
+        public float      Fov;
+
+        public CameraKfValue() { }
+        public CameraKfValue(Vector3 pos, Quaternion orientation, float fov)
+        { Pos = pos; Orientation = orientation; Fov = fov; }
+
+        public CameraKfValue(SerializationInfo info, StreamingContext ctxt) : base(info, ctxt)
+        {
+            foreach (SerializationEntry e in info)
+            {
+                if      (e.Name == "pos")  Pos         = (Vector3)e.Value;
+                else if (e.Name == "ori")  Orientation = (Quaternion)e.Value;
+                else if (e.Name == "fov")  Fov         = (float)e.Value;
+            }
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("pos", Pos);
+            info.AddValue("ori", Orientation);
+            info.AddValue("fov", Fov);
+        }
+
+        /// <summary>Interpolates between two camera keyframe values.</summary>
+        public static CameraKfValue Interpolate(CameraKfValue a, CameraKfValue b, double t, KfInterpolation mode)
+        {
+            if (mode == KfInterpolation.Hold) return a;
+            if (mode == KfInterpolation.Smooth) t = t * t * (3.0 - 2.0 * t);
+            float ft = (float)t;
+            return new CameraKfValue(
+                Vector3.Lerp(a.Pos, b.Pos, ft),
+                Quaternion.Slerp(a.Orientation, b.Orientation, ft),
+                a.Fov + (b.Fov - a.Fov) * ft);
+        }
+    }
+
+    /// <summary>String (e.g. file path) keyframe value.  No value blending — crossfade is handled by the renderer.</summary>
+    [Serializable]
+    public sealed class StringKfValue : KfValue
+    {
+        public string S;
+
+        public StringKfValue() { }
+        public StringKfValue(string s) { S = s; }
+
+        public StringKfValue(SerializationInfo info, StreamingContext ctxt) : base(info, ctxt)
+        {
+            foreach (SerializationEntry e in info)
+                if (e.Name == "s") S = (string)e.Value;
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+            => info.AddValue("s", S);
     }
 
     // ---------------------------------------------------------------------------

@@ -323,15 +323,35 @@ namespace VisualMusic.ViewModels
                 if (dlg.ShowDialog() != true) return;
                 AppSettings.Instance.RememberFolder(dlg.FileName,
                     dir => AppSettings.Instance.BackgroundFolder = dir);
+
+                // Gate: if background-path keyframes exist but not at this tick, prompt to create one.
+                if (!Keyframes.KeyframeService.EnsureKeyframeForEdit("BackgroundImagePath", Keyframes.KeyframeService.KfScope.Project))
+                    return;
+
                 _project.Props.BackgroundImagePath = dlg.FileName;
                 OnLoadBackgroundImage?.Invoke(dlg.FileName);
+
+                // Record the chosen path into a keyframe at the current tick (no-op when no keyframes exist).
+                Keyframes.KeyframeService.SyncEditedValue("BackgroundImagePath",
+                    Keyframes.KeyframeService.KfScope.Project,
+                    new Keyframes.StringKfValue(dlg.FileName));
             };
 
             SongProps.UnloadBackground = () =>
             {
                 if (_project == null) return;
+
+                // Gate: if background-path keyframes exist but not at this tick, prompt to create one.
+                if (!Keyframes.KeyframeService.EnsureKeyframeForEdit("BackgroundImagePath", Keyframes.KeyframeService.KfScope.Project))
+                    return;
+
                 _project.Props.BackgroundImagePath = "";
                 OnUnloadBackgroundImage?.Invoke();
+
+                // Record the empty path into a keyframe at the current tick (no-op when no keyframes exist).
+                Keyframes.KeyframeService.SyncEditedValue("BackgroundImagePath",
+                    Keyframes.KeyframeService.KfScope.Project,
+                    new Keyframes.StringKfValue(""));
             };
         }
 
@@ -375,8 +395,20 @@ namespace VisualMusic.ViewModels
                 SelectedTrackProps.MergedProps = null;
             // Wire the per-property keyframe service to the new project
             Keyframes.KeyframeService.Project = value;
+            Keyframes.KeyframeService.KeyframesChanged += OnKeyframesChangedRestoreBackground;
             Keyframes.KeyframeService.RaiseKeyframesChanged();
             NotifyScrollPositionChanged();
+        }
+
+        /// <summary>
+        /// When background-image keyframes are removed entirely, restore the renderer to the static
+        /// background path so it doesn't stay stuck on the last crossfade state.
+        /// </summary>
+        void OnKeyframesChangedRestoreBackground()
+        {
+            if (_project == null) return;
+            if (!_project.PropertyKeyframes.HasAny("proj/BackgroundImagePath"))
+                OnLoadBackgroundImage?.Invoke(_project.Props.BackgroundImagePath);
         }
 
         // The track list and property tabs live in a collapsed panel until ShowTrackProps turns on;

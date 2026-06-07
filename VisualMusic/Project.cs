@@ -59,6 +59,28 @@ namespace VisualMusic
                     (a, b, t, mode) => Keyframes.ColorKfValue.Lerp(
                         (Keyframes.ColorKfValue)a, (Keyframes.ColorKfValue)b, t, mode),
                     false, alwaysHold);
+
+            /// <summary>
+            /// Factory for a camera (pos + orientation quaternion + FOV) property.
+            /// Apply mutates the Camera object in-place (it is a reference type).
+            /// </summary>
+            public static PropAccessor Camera(Func<VisualMusic.Camera> get)
+                => new PropAccessor(
+                    () => { var c = get(); return new Keyframes.CameraKfValue(c.Pos, c.Orientation, c.Fov); },
+                    v  => { var c = get(); var cv = (Keyframes.CameraKfValue)v; c.Pos = cv.Pos; c.Orientation = cv.Orientation; c.Fov = cv.Fov; },
+                    (a, b, t, mode) => Keyframes.CameraKfValue.Interpolate(
+                        (Keyframes.CameraKfValue)a, (Keyframes.CameraKfValue)b, t, mode));
+
+            /// <summary>
+            /// Factory for a string (path) property. The value itself is not blended — interpolation
+            /// returns <paramref name="b"/> for Smooth/Linear (the renderer drives the visual crossfade)
+            /// and <paramref name="a"/> for Hold (snap/hard-cut).
+            /// </summary>
+            public static PropAccessor StringHold(Func<string> get, Action<string> set)
+                => new PropAccessor(
+                    () => new Keyframes.StringKfValue(get()),
+                    v  => set(((Keyframes.StringKfValue)v).S),
+                    (a, b, t, mode) => mode == Keyframes.KfInterpolation.Hold ? a : b);
         }
 
         readonly Dictionary<string, PropAccessor> _propAccessors = new Dictionary<string, PropAccessor>();
@@ -449,7 +471,8 @@ namespace VisualMusic
             // the new interpolated value every frame.
             if (!PropertyKeyframes.HasAny("proj/ViewWidthQn"))
                 Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
-            Props.Camera = interpolatedFrame.ProjProps.Camera;
+            if (!PropertyKeyframes.HasAny("proj/Camera"))
+                Props.Camera = interpolatedFrame.ProjProps.Camera;
             if (!PropertyKeyframes.HasAny("proj/BackgroundImageOpacity"))
                 Props.BackgroundImageOpacity = interpolatedFrame.ProjProps.BackgroundImageOpacity;
             if (!PropertyKeyframes.HasAny("proj/BackgroundImageSaturation"))
@@ -1079,18 +1102,7 @@ namespace VisualMusic
                 () => Props.ViewWidthQn,
                 v  => Props.ViewWidthQn = (float)v,
                 logScale: true);
-            _propAccessors["proj/AudioOffset"] = PropAccessor.Scalar(
-                () => Props.AudioOffset,
-                v  => Props.AudioOffset = v);
-            _propAccessors["proj/PlaybackOffsetS"] = PropAccessor.Scalar(
-                () => Props.PlaybackOffsetS,
-                v  => Props.PlaybackOffsetS = (float)v);
-            _propAccessors["proj/FadeIn"] = PropAccessor.Scalar(
-                () => Props.FadeIn,
-                v  => Props.FadeIn = (float)v);
-            _propAccessors["proj/FadeOut"] = PropAccessor.Scalar(
-                () => Props.FadeOut,
-                v  => Props.FadeOut = (float)v);
+            _propAccessors["proj/Camera"] = PropAccessor.Camera(() => Props.Camera);
             _propAccessors["proj/MaxPitch"] = PropAccessor.Scalar(
                 () => Props.MaxPitch,
                 v  => Props.MaxPitch = (int)Math.Round(v),
@@ -1105,6 +1117,9 @@ namespace VisualMusic
             _propAccessors["proj/BackgroundImageSaturation"] = PropAccessor.Scalar(
                 () => Props.BackgroundImageSaturation,
                 v  => Props.BackgroundImageSaturation = (float)v);
+            _propAccessors["proj/BackgroundImagePath"] = PropAccessor.StringHold(
+                () => Props.BackgroundImagePath,
+                v  => Props.BackgroundImagePath = v);
 
             // Track-scope — one entry per track view.
             // Key by TrackNumber (the MIDI track index, stable across list reorder) and capture the
@@ -1216,10 +1231,32 @@ namespace VisualMusic
             if (PropertyKeyframes == null) return;
             bool anyRebuildNeeded = false;
 
+            // ---- Background-image crossfade — special-cased because the crossfade needs both
+            // bracket values and the interpolant simultaneously, which the generic Apply can't express.
+            if (PropertyKeyframes.Tracks.TryGetValue("proj/BackgroundImagePath", out var bkgTrack))
+            {
+                var (bkgBefore, bkgAfter, bkgT) = bkgTrack.FindBrackets((int)SongPosT);
+                string pathA = (bkgBefore?.Value as Keyframes.StringKfValue)?.S ?? "";
+                string pathB = (bkgAfter?.Value  as Keyframes.StringKfValue)?.S ?? "";
+                bool   hold  = bkgBefore == null || bkgAfter == null
+                               || bkgBefore.Interpolation == Keyframes.KfInterpolation.Hold;
+                float  blend = hold ? 0f
+                               : bkgBefore.Interpolation == Keyframes.KfInterpolation.Smooth
+                                   ? (float)(bkgT * bkgT * (3.0 - 2.0 * bkgT))
+                                   : (float)bkgT;
+                string effectiveA = bkgBefore?.Value != null ? pathA : pathB;
+                string effectiveB = hold ? null : pathB;
+                DrawHost?.SetBackgroundCrossfade(effectiveA, effectiveB, blend);
+            }
+
             foreach (var kv in PropertyKeyframes.Tracks)
             {
                 string id    = kv.Key;
                 var    track = kv.Value;
+
+                // Background path is handled by the special-case block above (crossfade needs the brackets);
+                // skip it here to avoid overwriting Props.BackgroundImagePath with just the "after" value.
+                if (id == "proj/BackgroundImagePath") continue;
 
                 var acc = ResolveAccessor(id);
                 if (acc == null) continue;

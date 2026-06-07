@@ -13,6 +13,15 @@ namespace VisualMusic
         void DrawBackground();
         void InitFrame();
 
+        /// <summary>
+        /// Sets up a crossfade between two background images for keyframe-driven transitions.
+        /// <paramref name="pathA"/> is the "from" image, <paramref name="pathB"/> is the "to" image
+        /// (null or empty = no texture on that side), and <paramref name="blend"/> ∈ [0,1] is the
+        /// mix amount (0 = fully A, 1 = fully B).  Called every frame from
+        /// <see cref="Project.InterpolatePropertyKeyframes"/>.
+        /// </summary>
+        void SetBackgroundCrossfade(string pathA, string pathB, float blend);
+
         // ---- Graphics resources ----
         GraphicsDevice GraphicsDevice { get; }
         bool ForceDefaultNoteStyle { get; }

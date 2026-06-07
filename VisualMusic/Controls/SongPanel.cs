@@ -804,6 +804,10 @@ namespace VisualMusic
             SpriteBatch.End();
         }
 
+        /// <inheritdoc/>
+        /// Legacy WinForms renderer does not support keyframe-driven crossfades — no-op.
+        public void SetBackgroundCrossfade(string pathA, string pathB, float blend) { }
+
         public void InitFrame()
         {
             GraphicsDevice.RasterizerState = _rastState;
