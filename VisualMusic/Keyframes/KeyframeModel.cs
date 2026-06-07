@@ -2,10 +2,77 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using XnaColor = Microsoft.Xna.Framework.Color;
 
 namespace VisualMusic.Keyframes
 {
     public enum KfInterpolation { Smooth, Linear, Hold }
+
+    // ---------------------------------------------------------------------------
+    // KfValue — polymorphic keyframe value (scalar, color, quaternion, …)
+    // ---------------------------------------------------------------------------
+
+    /// <summary>
+    /// Base class for a keyframe value.  Each subclass carries its own type-specific
+    /// interpolation logic so callers need not switch on kind.
+    /// </summary>
+    [Serializable]
+    public abstract class KfValue : ISerializable
+    {
+        protected KfValue() { }
+        protected KfValue(SerializationInfo info, StreamingContext ctxt) { }
+        public abstract void GetObjectData(SerializationInfo info, StreamingContext context);
+    }
+
+    /// <summary>Scalar (double) keyframe value.</summary>
+    [Serializable]
+    public sealed class ScalarKfValue : KfValue
+    {
+        public double V;
+
+        public ScalarKfValue() { }
+        public ScalarKfValue(double v) { V = v; }
+
+        public ScalarKfValue(SerializationInfo info, StreamingContext ctxt) : base(info, ctxt)
+        {
+            foreach (SerializationEntry e in info)
+                if (e.Name == "v") V = (double)e.Value;
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+            => info.AddValue("v", V);
+    }
+
+    /// <summary>RGBA color keyframe value with per-channel interpolation.</summary>
+    [Serializable]
+    public sealed class ColorKfValue : KfValue
+    {
+        public XnaColor C;
+
+        public ColorKfValue() { }
+        public ColorKfValue(XnaColor c) { C = c; }
+
+        public ColorKfValue(SerializationInfo info, StreamingContext ctxt) : base(info, ctxt)
+        {
+            foreach (SerializationEntry e in info)
+                if (e.Name == "c") C = (XnaColor)e.Value;
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+            => info.AddValue("c", C);
+
+        /// <summary>Per-channel R/G/B/A lerp with the same smoothstep convention as scalar keyframes.</summary>
+        public static ColorKfValue Lerp(ColorKfValue a, ColorKfValue b, double t, KfInterpolation mode)
+        {
+            if (mode == KfInterpolation.Hold) return a;
+            if (mode == KfInterpolation.Smooth) t = t * t * (3.0 - 2.0 * t);
+            return new ColorKfValue(new XnaColor(
+                (int)Math.Round(a.C.R + (b.C.R - a.C.R) * t),
+                (int)Math.Round(a.C.G + (b.C.G - a.C.G) * t),
+                (int)Math.Round(a.C.B + (b.C.B - a.C.B) * t),
+                (int)Math.Round(a.C.A + (b.C.A - a.C.A) * t)));
+        }
+    }
 
     // ---------------------------------------------------------------------------
     // PropertyKeyframe — one keyed point on a single property track
@@ -14,8 +81,11 @@ namespace VisualMusic.Keyframes
     public class PropertyKeyframe : ISerializable
     {
         public int Tick { get; set; }
-        /// <summary>Stored for future interpolation; not yet applied during playback.</summary>
-        public double? Value { get; set; }
+        /// <summary>
+        /// Stored value for this keyframe.  Null means "value not captured yet".
+        /// May be a <see cref="ScalarKfValue"/> or a <see cref="ColorKfValue"/>.
+        /// </summary>
+        public KfValue Value { get; set; }
         public KfInterpolation Interpolation { get; set; } = KfInterpolation.Smooth;
 
         public PropertyKeyframe() { }
@@ -26,7 +96,12 @@ namespace VisualMusic.Keyframes
             foreach (SerializationEntry entry in info)
             {
                 if      (entry.Name == "tick")   Tick          = (int)entry.Value;
-                else if (entry.Name == "value")  Value         = (double?)entry.Value;
+                else if (entry.Name == "value")
+                {
+                    // New files write a KfValue; legacy files wrote a raw double.
+                    if (entry.Value is KfValue kfv)      Value = kfv;
+                    else if (entry.Value is double d)     Value = new ScalarKfValue(d);
+                }
                 else if (entry.Name == "interp") Interpolation = (KfInterpolation)entry.Value;
             }
         }
@@ -34,7 +109,7 @@ namespace VisualMusic.Keyframes
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("tick",   Tick);
-            if (Value.HasValue) info.AddValue("value", Value.Value);
+            if (Value != null) info.AddValue("value", Value);
             info.AddValue("interp", Interpolation);
         }
     }
@@ -52,7 +127,7 @@ namespace VisualMusic.Keyframes
 
         public bool HasKeyAt(int tick) => _frames.ContainsKey(tick);
 
-        public void Add(int tick, KfInterpolation interp = KfInterpolation.Smooth, double? value = null)
+        public void Add(int tick, KfInterpolation interp = KfInterpolation.Smooth, KfValue value = null)
         {
             if (!_frames.ContainsKey(tick))
                 _frames.Add(tick, new PropertyKeyframe(tick) { Interpolation = interp, Value = value });
@@ -118,7 +193,7 @@ namespace VisualMusic.Keyframes
             if (_frames.TryGetValue(tick, out var kf)) kf.Interpolation = interp;
         }
 
-        public void SetValue(int tick, double? value)
+        public void SetValue(int tick, KfValue value)
         {
             if (_frames.TryGetValue(tick, out var kf)) kf.Value = value;
         }
@@ -198,7 +273,7 @@ namespace VisualMusic.Keyframes
 
         // ---- Mutation ----
 
-        public void Add(string propertyId, int tick, KfInterpolation interp = KfInterpolation.Smooth, double? value = null)
+        public void Add(string propertyId, int tick, KfInterpolation interp = KfInterpolation.Smooth, KfValue value = null)
         {
             if (!_tracks.TryGetValue(propertyId, out var track))
                 _tracks[propertyId] = track = new PropertyKeyframeTrack();
@@ -230,10 +305,21 @@ namespace VisualMusic.Keyframes
         }
 
         /// <summary>Stores an edited value into an existing keyframe (no-op if none at that tick).</summary>
-        public void SetValueAt(string propertyId, int tick, double? value)
+        public void SetValueAt(string propertyId, int tick, KfValue value)
         {
             if (_tracks.TryGetValue(propertyId, out var t))
                 t.SetValue(tick, value);
+        }
+
+        /// <summary>
+        /// Removes every property whose full id starts with <paramref name="prefix"/>.
+        /// Used to purge orphaned keyframe tracks when a mod entry is deleted.
+        /// </summary>
+        public void RemovePropertiesWithPrefix(string prefix)
+        {
+            var keys = _tracks.Keys.Where(k => k.StartsWith(prefix, StringComparison.Ordinal)).ToList();
+            foreach (var key in keys)
+                _tracks.Remove(key);
         }
 
         /// <summary>

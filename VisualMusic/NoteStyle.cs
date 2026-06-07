@@ -30,6 +30,8 @@ namespace VisualMusic
     public class NoteStyleMod : ISerializable
     {
         public string Name { get; set; }
+        /// <summary>Stable identity for this mod entry (assigned once, survives reorder/delete of siblings).</summary>
+        public string Id { get; set; }
         internal Vector2 Origin
         {
             get => new Vector2((float)XOrigin, (float)YOrigin);
@@ -64,13 +66,16 @@ namespace VisualMusic
         public NoteStyleMod(string _name = "")
         {
             Name = _name;
+            Id = Guid.NewGuid().ToString("N");
         }
 
         public NoteStyleMod(SerializationInfo info, StreamingContext ctxt)
         {
             foreach (SerializationEntry entry in info)
             {
-                if (entry.Name == "name")
+                if (entry.Name == "id")
+                    Id = (string)entry.Value;
+                else if (entry.Name == "name")
                     Name = (string)entry.Value;
                 else if (entry.Name == "origin")
                     Origin = (Vector2)entry.Value;
@@ -108,10 +113,13 @@ namespace VisualMusic
                 else if (entry.Name == "invert")
                     Invert = (bool)entry.Value;
             }
+            // Old files have no "id" — generate a stable one now.
+            if (Id == null) Id = Guid.NewGuid().ToString("N");
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
+            info.AddValue("id", Id);
             info.AddValue("name", Name);
             info.AddValue("origin", Origin);
             info.AddValue("xOriginEnable", XOriginEnable);
@@ -139,6 +147,7 @@ namespace VisualMusic
             stream.Flush();
             stream.Position = 0;
             NoteStyleMod mod = (NoteStyleMod)dcs.ReadObject(stream);
+            mod.Id   = Guid.NewGuid().ToString("N");  // new entry → new stable id
             mod.Name += " clone";
             return mod;
         }

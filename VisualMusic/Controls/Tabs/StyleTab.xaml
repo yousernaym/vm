@@ -199,14 +199,14 @@
                                       IsThreeState="True" VerticalAlignment="Center" Margin="0,0,4,0"
                                       kf:Keyframing.PropertyId="ModXOriginEnable"
                                       kf:Keyframing.DisplayName="Mod origin X enable"
-                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                       kf:Keyframing.Interpolatable="False"/>
                             <ctrl:TbSliderWpf Value="{Binding ModXOrigin, Mode=TwoWay}"
                                               IsEnabled="{Binding ModXOriginEnabled}"
                                               Min="-10" Max="10" Decimals="2" Width="120"
                                               kf:Keyframing.PropertyId="ModXOrigin"
                                               kf:Keyframing.DisplayName="Mod origin X"
-                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                               kf:Keyframing.Interpolatable="True"/>
                         </StackPanel>
 
@@ -217,14 +217,14 @@
                                       IsThreeState="True" VerticalAlignment="Center" Margin="0,0,4,0"
                                       kf:Keyframing.PropertyId="ModYOriginEnable"
                                       kf:Keyframing.DisplayName="Mod origin Y enable"
-                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                       kf:Keyframing.Interpolatable="False"/>
                             <ctrl:TbSliderWpf Value="{Binding ModYOrigin, Mode=TwoWay}"
                                               IsEnabled="{Binding ModYOriginEnabled}"
                                               Min="-10" Max="10" Decimals="2" Width="120"
                                               kf:Keyframing.PropertyId="ModYOrigin"
                                               kf:Keyframing.DisplayName="Mod origin Y"
-                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                               kf:Keyframing.Interpolatable="True"/>
                         </StackPanel>
 
@@ -235,7 +235,7 @@
                                   SelectedIndex="{Binding ModCombineIndex, Mode=TwoWay}"
                                   kf:Keyframing.PropertyId="ModCombineIndex"
                                   kf:Keyframing.DisplayName="Mod combine"
-                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                   kf:Keyframing.Interpolatable="False">
                             <ComboBoxItem Content="x + y"/>
                             <ComboBoxItem Content="x² + y²"/>
@@ -249,7 +249,7 @@
                                   IsThreeState="True" Margin="0,4,0,0"
                                   kf:Keyframing.PropertyId="ModSquareAspect"
                                   kf:Keyframing.DisplayName="Square aspect"
-                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                   kf:Keyframing.Interpolatable="False"/>
                     </Grid>
 
@@ -272,14 +272,14 @@
                                   IsThreeState="True" VerticalAlignment="Center"
                                   kf:Keyframing.PropertyId="ModColorDestEnable"
                                   kf:Keyframing.DisplayName="Mod color dest enable"
-                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                   kf:Keyframing.Interpolatable="False"/>
                         <ctrl:HueSatButtonWpf Grid.Row="0" Grid.Column="1" Margin="2"
                                               SelectedXnaColor="{Binding ModColorDest, Mode=TwoWay}"
                                               kf:Keyframing.PropertyId="ModColorDest"
                                               kf:Keyframing.DisplayName="Mod color dest"
-                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
-                                              kf:Keyframing.Interpolatable="False"/>
+                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                              kf:Keyframing.Interpolatable="True"/>
 
                         <!-- Angle destination -->
                         <CheckBox Grid.Row="1" Grid.Column="0" Content="Angle"
@@ -287,14 +287,14 @@
                                   IsThreeState="True" VerticalAlignment="Center" Margin="0,4,0,0"
                                   kf:Keyframing.PropertyId="ModAngleDestEnable"
                                   kf:Keyframing.DisplayName="Mod angle dest enable"
-                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                   kf:Keyframing.Interpolatable="False"/>
                         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="2,4,0,0">
                             <ctrl:TbSliderWpf Value="{Binding ModAngleDest, Mode=TwoWay}"
                                               Min="0" Max="90" Decimals="0" Width="100"
                                               kf:Keyframing.PropertyId="ModAngleDest"
                                               kf:Keyframing.DisplayName="Mod angle dest"
-                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                               kf:Keyframing.Interpolatable="True"/>
                             <TextBlock Text="°" VerticalAlignment="Center" Margin="4,0,0,0"/>
                         </StackPanel>
@@ -324,7 +324,7 @@
                                           Min="0" Max="1" Decimals="2"
                                           kf:Keyframing.PropertyId="ModStart"
                                           kf:Keyframing.DisplayName="Mod start"
-                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Stop:" VerticalAlignment="Center"/>
@@ -333,7 +333,7 @@
                                           Min="0" Max="1" Decimals="2"
                                           kf:Keyframing.PropertyId="ModStop"
                                           kf:Keyframing.DisplayName="Mod stop"
-                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Fade in:" VerticalAlignment="Center"/>
@@ -342,7 +342,7 @@
                                           Min="0" Max="1" Decimals="2"
                                           kf:Keyframing.PropertyId="ModFadeIn"
                                           kf:Keyframing.DisplayName="Mod fade in"
-                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>
 
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Fade out:" VerticalAlignment="Center"/>
@@ -351,7 +351,7 @@
                                           Min="0" Max="1" Decimals="2"
                                           kf:Keyframing.PropertyId="ModFadeOut"
                                           kf:Keyframing.DisplayName="Mod fade out"
-                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>
 
                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Fade pow:" VerticalAlignment="Center"/>
@@ -360,7 +360,7 @@
                                           Min="0" Max="10" Decimals="2"
                                           kf:Keyframing.PropertyId="ModPower"
                                           kf:Keyframing.DisplayName="Mod fade power"
-                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>
 
                         <CheckBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
@@ -369,7 +369,7 @@
                                   IsThreeState="True" Margin="0,4,0,0"
                                   kf:Keyframing.PropertyId="ModDiscardAfterStop"
                                   kf:Keyframing.DisplayName="Discard after stop"
-                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                   kf:Keyframing.Interpolatable="False"/>
 
                         <CheckBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
@@ -378,7 +378,7 @@
                                   IsThreeState="True" Margin="0,2,0,0"
                                   kf:Keyframing.PropertyId="ModInvert"
                                   kf:Keyframing.DisplayName="Mod invert"
-                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                   kf:Keyframing.Interpolatable="False"/>
                     </Grid>
 

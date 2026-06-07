@@ -132,6 +132,7 @@ namespace VisualMusic.ViewModels
         /// </summary>
         public void RefreshLiveValues()
         {
+            // Style
             OnPropertyChanged(nameof(StyleTypeIndex));
             OnPropertyChanged(nameof(LineStyleVisible));
             OnPropertyChanged(nameof(LineWidth));
@@ -144,6 +145,30 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(MovingHl));
             OnPropertyChanged(nameof(ShrinkingHl));
             OnPropertyChanged(nameof(HlBorder));
+
+            // Modulation values (raised every frame while track keyframes exist so live
+            // playback drives the sliders and checkboxes in the Mod section).
+            // Structural properties (ModEntries, ModEntryIndex) are intentionally excluded.
+            OnPropertyChanged(nameof(ModXOrigin));
+            OnPropertyChanged(nameof(ModYOrigin));
+            OnPropertyChanged(nameof(ModXOriginEnable));
+            OnPropertyChanged(nameof(ModYOriginEnable));
+            OnPropertyChanged(nameof(ModXOriginEnabled));
+            OnPropertyChanged(nameof(ModYOriginEnabled));
+            OnPropertyChanged(nameof(ModCombineEnabled));
+            OnPropertyChanged(nameof(ModCombineIndex));
+            OnPropertyChanged(nameof(ModSquareAspect));
+            OnPropertyChanged(nameof(ModColorDestEnable));
+            OnPropertyChanged(nameof(ModColorDest));
+            OnPropertyChanged(nameof(ModAngleDestEnable));
+            OnPropertyChanged(nameof(ModAngleDest));
+            OnPropertyChanged(nameof(ModStart));
+            OnPropertyChanged(nameof(ModStop));
+            OnPropertyChanged(nameof(ModFadeIn));
+            OnPropertyChanged(nameof(ModFadeOut));
+            OnPropertyChanged(nameof(ModPower));
+            OnPropertyChanged(nameof(ModDiscardAfterStop));
+            OnPropertyChanged(nameof(ModInvert));
         }
 
         // =====================================================================

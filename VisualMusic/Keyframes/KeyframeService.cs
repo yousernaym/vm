@@ -15,10 +15,12 @@ namespace VisualMusic.Keyframes
         public static Project Project { get; set; }
 
         /// <summary>
-        /// Indices of the currently selected tracks (0 = global track).
+        /// TrackNumbers of the currently selected tracks (0 = global track).
         /// Updated by MainViewModel whenever the track-list selection changes.
+        /// Values are <see cref="TrackView.TrackNumber"/> (stable MIDI track indices),
+        /// NOT list positions.
         /// </summary>
-        public static IReadOnlyList<int> SelectedTrackIndices { get; set; } = Array.Empty<int>();
+        public static IReadOnlyList<int> SelectedTrackIds { get; set; } = Array.Empty<int>();
 
         public static int CurrentTick => (int)(Project?.SongPosT ?? 0);
 
@@ -67,9 +69,9 @@ namespace VisualMusic.Keyframes
         public static string GetDisplayNameForId(string fullId)
         {
             if (string.IsNullOrEmpty(fullId)) return fullId;
-            string raw = fullId.Substring(fullId.LastIndexOf('/') + 1);
+            string raw  = fullId.Substring(fullId.LastIndexOf('/') + 1);
             string name = _displayNames.TryGetValue(raw, out var dn) ? dn : raw;
-            // Annotate track-scoped ids with their track index for disambiguation
+            // Annotate track-scoped ids with their track number for disambiguation
             if (fullId.StartsWith("track/"))
             {
                 var parts = fullId.Split('/');
@@ -80,11 +82,17 @@ namespace VisualMusic.Keyframes
 
         // ---- Property-ID helpers ----
 
-        public enum KfScope { Project, Track }
+        public enum KfScope { Project, Track, TrackMod }
 
         /// <summary>
         /// Returns the full property IDs for a given <paramref name="propertyId"/> and scope.
-        /// For project scope returns a single "proj/id"; for track scope returns one per selected track.
+        /// <list type="bullet">
+        ///   <item><c>Project</c> — emits a single <c>"proj/{id}"</c></item>
+        ///   <item><c>Track</c>   — emits one <c>"track/{trackNumber}/{id}"</c> per selected track</item>
+        ///   <item><c>TrackMod</c>— emits one <c>"track/{trackNumber}/mod/{entryId}/{id}"</c> per selected
+        ///     track that has an active style with a selected modulation entry; emits nothing otherwise
+        ///     so adorners stay dark and Add is inert when nothing is selected.</item>
+        /// </list>
         /// </summary>
         public static IEnumerable<string> ResolveIds(string propertyId, KfScope scope)
         {
@@ -92,14 +100,35 @@ namespace VisualMusic.Keyframes
             {
                 yield return $"proj/{propertyId}";
             }
-            else
+            else if (scope == KfScope.Track)
             {
-                var indices = SelectedTrackIndices;
-                if (indices.Count == 0)
+                var ids = SelectedTrackIds;
+                if (ids.Count == 0)
                     yield return $"track/0/{propertyId}";
                 else
-                    foreach (var idx in indices)
-                        yield return $"track/{idx}/{propertyId}";
+                    foreach (var tn in ids)
+                        yield return $"track/{tn}/{propertyId}";
+            }
+            else  // TrackMod
+            {
+                var ids = SelectedTrackIds;
+                var trackViews = Project?.TrackViews;
+                if (trackViews == null) yield break;
+
+                var tns = ids.Count == 0 ? new[] { 0 } : ids.ToArray();
+                foreach (var tn in tns)
+                {
+                    // Find TrackView by TrackNumber
+                    TrackView tv = null;
+                    foreach (var t in trackViews)
+                        if (t.TrackNumber == tn) { tv = t; break; }
+                    if (tv == null) continue;
+
+                    var entry = tv.TrackProps.ActiveNoteStyle?.SelectedModEntry;
+                    if (entry == null) continue;          // no entry selected → stay inert
+
+                    yield return $"track/{tn}/mod/{entry.Id}/{propertyId}";
+                }
             }
         }
 
@@ -134,7 +163,7 @@ namespace VisualMusic.Keyframes
             int tick = CurrentTick;
             foreach (var id in ResolveIds(propertyId, scope))
             {
-                double? value = Project.GetCurrentValue(id);
+                KfValue value = Project.GetCurrentValue(id);
                 Project.PropertyKeyframes.Add(id, tick, KfInterpolation.Smooth, value);
             }
             RaiseKeyframesChanged();
@@ -161,7 +190,7 @@ namespace VisualMusic.Keyframes
         /// blue prompt) its stored value is updated so playback interpolates to the edited value. No-op for
         /// properties with no keyframe at the current tick (free live edit).
         /// </summary>
-        public static void SyncEditedValue(string propertyId, KfScope scope, double value)
+        public static void SyncEditedValue(string propertyId, KfScope scope, KfValue value)
         {
             if (Project == null) return;
             int tick = CurrentTick;
@@ -272,6 +301,19 @@ namespace VisualMusic.Keyframes
             if (Project == null) return;
             var tick = Project.PropertyKeyframes.PrevTick(CurrentTick);
             if (tick.HasValue) { Project.GoToTick(tick.Value); RaiseTickSelected(tick.Value); }
+        }
+
+        // ---- Orphan cleanup ----
+
+        /// <summary>
+        /// Removes all keyframe tracks whose property id starts with <paramref name="prefix"/>.
+        /// Call this when a modulation entry is deleted, passing <c>"track/{tn}/mod/{entryId}/"</c>
+        /// as the prefix, so the deleted entry's keyframes are purged rather than left as inert orphans.
+        /// </summary>
+        public static void RemoveKeyframesWithPrefix(string prefix)
+        {
+            Project?.PropertyKeyframes?.RemovePropertiesWithPrefix(prefix);
+            RaiseKeyframesChanged();
         }
     }
 }

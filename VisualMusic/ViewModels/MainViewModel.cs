@@ -216,7 +216,14 @@ namespace VisualMusic.ViewModels
                 {
                     var ns = item.TrackView.TrackProps.ActiveNoteStyle;
                     if (ns?.SelectedModEntryIndex >= 0 && ns.ModEntries?.Count > 0)
+                    {
+                        // Capture the stable ids before deleting so we can purge the orphaned keyframes.
+                        int    tn  = item.TrackView.TrackNumber;
+                        string eid = ns.SelectedModEntry?.Id;
                         ns.DeleteModEntry();
+                        if (eid != null)
+                            Keyframes.KeyframeService.RemoveKeyframesWithPrefix($"track/{tn}/mod/{eid}/");
+                    }
                 }
                 OnTrackListSelectionChanged();
             };
@@ -264,14 +271,18 @@ namespace VisualMusic.ViewModels
         void OnTrackListSelectionChanged()
         {
             if (_project == null) return;
+            // List positions for MergeTrackProps (which indexes TrackViews[] by position).
             var indices = TrackList.SelectedItems
                 .Select(item => TrackList.Items.IndexOf(item))
                 .Where(i => i >= 0)
                 .ToList();
             _lastSelectedIndices = indices;
             SelectedTrackProps.MergedProps = _project.MergeTrackProps(indices);
-            // Keep the keyframe service aware of the current selection
-            Keyframes.KeyframeService.SelectedTrackIndices = indices;
+            // TrackNumbers (stable MIDI track indices) for the keyframe service.
+            var trackNumbers = TrackList.SelectedItems
+                .Select(item => item.TrackView.TrackNumber)
+                .ToList();
+            Keyframes.KeyframeService.SelectedTrackIds = trackNumbers;
             Keyframes.KeyframeService.RaiseKeyframesChanged();
         }
 

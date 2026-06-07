@@ -26,18 +26,69 @@ namespace VisualMusic
 
         private sealed class PropAccessor
         {
-            public readonly Func<double>  Get;
-            public readonly Action<double> Set;
-            public readonly bool LogScale;
+            public readonly Func<Keyframes.KfValue>  Capture;
+            public readonly Action<Keyframes.KfValue> Apply;
+            public readonly Func<Keyframes.KfValue, Keyframes.KfValue, double, Keyframes.KfInterpolation, Keyframes.KfValue> Interp;
             public readonly bool NeedsRebuild;
             /// <summary>Enum/bool props that must step (never blend) regardless of the keyframe's mode.</summary>
             public readonly bool AlwaysHold;
-            public PropAccessor(Func<double> get, Action<double> set,
-                                bool logScale = false, bool needsRebuild = false, bool alwaysHold = false)
-            { Get = get; Set = set; LogScale = logScale; NeedsRebuild = needsRebuild; AlwaysHold = alwaysHold; }
+
+            PropAccessor(Func<Keyframes.KfValue> capture, Action<Keyframes.KfValue> apply,
+                         Func<Keyframes.KfValue, Keyframes.KfValue, double, Keyframes.KfInterpolation, Keyframes.KfValue> interp,
+                         bool needsRebuild = false, bool alwaysHold = false)
+            { Capture = capture; Apply = apply; Interp = interp; NeedsRebuild = needsRebuild; AlwaysHold = alwaysHold; }
+
+            /// <summary>Factory for a scalar (double) property.  <paramref name="logScale"/> interpolates in log2 space.</summary>
+            public static PropAccessor Scalar(Func<double> get, Action<double> set,
+                                              bool logScale = false, bool needsRebuild = false, bool alwaysHold = false)
+                => new PropAccessor(
+                    () => new Keyframes.ScalarKfValue(get()),
+                    v  => set(((Keyframes.ScalarKfValue)v).V),
+                    (a, b, t, mode) => new Keyframes.ScalarKfValue(
+                        Keyframes.PropertyKeyframeTrack.InterpolateValue(
+                            ((Keyframes.ScalarKfValue)a).V, ((Keyframes.ScalarKfValue)b).V, t, mode, logScale)),
+                    needsRebuild, alwaysHold);
+
+            /// <summary>Factory for an RGBA color property.  Always interpolated per-channel.</summary>
+            public static PropAccessor Color(Func<Microsoft.Xna.Framework.Color> get,
+                                             Action<Microsoft.Xna.Framework.Color> set,
+                                             bool alwaysHold = false)
+                => new PropAccessor(
+                    () => new Keyframes.ColorKfValue(get()),
+                    v  => set(((Keyframes.ColorKfValue)v).C),
+                    (a, b, t, mode) => Keyframes.ColorKfValue.Lerp(
+                        (Keyframes.ColorKfValue)a, (Keyframes.ColorKfValue)b, t, mode),
+                    false, alwaysHold);
         }
 
         readonly Dictionary<string, PropAccessor> _propAccessors = new Dictionary<string, PropAccessor>();
+
+        // ---- Static mod-property table (name → factory that creates a bound PropAccessor for a given entry) ----
+        // Evaluated once per class (not per project instance) so it's cheap.
+
+        static readonly Dictionary<string, Func<NoteStyleMod, PropAccessor>> _modPropTable =
+            new Dictionary<string, Func<NoteStyleMod, PropAccessor>>
+            {
+                ["ModXOrigin"]    = m => PropAccessor.Scalar(() => m.XOrigin   ?? 0.5f, v => m.XOrigin   = (float)v),
+                ["ModYOrigin"]    = m => PropAccessor.Scalar(() => m.YOrigin   ?? 0.5f, v => m.YOrigin   = (float)v),
+                ["ModStart"]      = m => PropAccessor.Scalar(() => m.Start     ?? 0f,   v => m.Start     = (float)v),
+                ["ModStop"]       = m => PropAccessor.Scalar(() => m.Stop      ?? 1f,   v => m.Stop      = (float)v),
+                ["ModFadeIn"]     = m => PropAccessor.Scalar(() => m.FadeIn    ?? 0f,   v => m.FadeIn    = (float)v),
+                ["ModFadeOut"]    = m => PropAccessor.Scalar(() => m.FadeOut   ?? 0f,   v => m.FadeOut   = (float)v),
+                ["ModPower"]      = m => PropAccessor.Scalar(() => m.Power     ?? 1f,   v => m.Power     = (float)v),
+                ["ModAngleDest"]  = m => PropAccessor.Scalar(() => m.AngleDest ?? 45,   v => m.AngleDest = (int)Math.Round(v)),
+                ["ModCombineIndex"] = m => PropAccessor.Scalar(() => m.CombineXY ?? 0, v => m.CombineXY = (int)Math.Round(v), alwaysHold: true),
+                ["ModColorDest"]  = m => PropAccessor.Color(
+                    () => m.ColorDest ?? Microsoft.Xna.Framework.Color.White,
+                    c  => m.ColorDest = c),
+                ["ModXOriginEnable"]    = m => PropAccessor.Scalar(() => m.XOriginEnable    == true ? 1.0 : 0.0, v => m.XOriginEnable    = v >= 0.5, alwaysHold: true),
+                ["ModYOriginEnable"]    = m => PropAccessor.Scalar(() => m.YOriginEnable    == true ? 1.0 : 0.0, v => m.YOriginEnable    = v >= 0.5, alwaysHold: true),
+                ["ModSquareAspect"]     = m => PropAccessor.Scalar(() => m.SquareAspect     == true ? 1.0 : 0.0, v => m.SquareAspect     = v >= 0.5, alwaysHold: true),
+                ["ModColorDestEnable"]  = m => PropAccessor.Scalar(() => m.ColorDestEnable  == true ? 1.0 : 0.0, v => m.ColorDestEnable  = v >= 0.5, alwaysHold: true),
+                ["ModAngleDestEnable"]  = m => PropAccessor.Scalar(() => m.AngleDestEnable  == true ? 1.0 : 0.0, v => m.AngleDestEnable  = v >= 0.5, alwaysHold: true),
+                ["ModDiscardAfterStop"] = m => PropAccessor.Scalar(() => m.DiscardAfterStop == true ? 1.0 : 0.0, v => m.DiscardAfterStop = v >= 0.5, alwaysHold: true),
+                ["ModInvert"]           = m => PropAccessor.Scalar(() => m.Invert           == true ? 1.0 : 0.0, v => m.Invert           = v >= 0.5, alwaysHold: true),
+            };
 
         // ---- Fields ----
 
@@ -1024,90 +1075,130 @@ namespace VisualMusic
             _propAccessors.Clear();
 
             // Project-scope
-            _propAccessors["proj/ViewWidthQn"] = new PropAccessor(
+            _propAccessors["proj/ViewWidthQn"] = PropAccessor.Scalar(
                 () => Props.ViewWidthQn,
                 v  => Props.ViewWidthQn = (float)v,
                 logScale: true);
-            _propAccessors["proj/AudioOffset"] = new PropAccessor(
+            _propAccessors["proj/AudioOffset"] = PropAccessor.Scalar(
                 () => Props.AudioOffset,
                 v  => Props.AudioOffset = v);
-            _propAccessors["proj/PlaybackOffsetS"] = new PropAccessor(
+            _propAccessors["proj/PlaybackOffsetS"] = PropAccessor.Scalar(
                 () => Props.PlaybackOffsetS,
                 v  => Props.PlaybackOffsetS = (float)v);
-            _propAccessors["proj/FadeIn"] = new PropAccessor(
+            _propAccessors["proj/FadeIn"] = PropAccessor.Scalar(
                 () => Props.FadeIn,
                 v  => Props.FadeIn = (float)v);
-            _propAccessors["proj/FadeOut"] = new PropAccessor(
+            _propAccessors["proj/FadeOut"] = PropAccessor.Scalar(
                 () => Props.FadeOut,
                 v  => Props.FadeOut = (float)v);
-            _propAccessors["proj/MaxPitch"] = new PropAccessor(
+            _propAccessors["proj/MaxPitch"] = PropAccessor.Scalar(
                 () => Props.MaxPitch,
                 v  => Props.MaxPitch = (int)Math.Round(v),
                 needsRebuild: true);
-            _propAccessors["proj/MinPitch"] = new PropAccessor(
+            _propAccessors["proj/MinPitch"] = PropAccessor.Scalar(
                 () => Props.MinPitch,
                 v  => Props.MinPitch = (int)Math.Round(v),
                 needsRebuild: true);
-            _propAccessors["proj/BackgroundImageOpacity"] = new PropAccessor(
+            _propAccessors["proj/BackgroundImageOpacity"] = PropAccessor.Scalar(
                 () => Props.BackgroundImageOpacity,
                 v  => Props.BackgroundImageOpacity = (float)v);
-            _propAccessors["proj/BackgroundImageSaturation"] = new PropAccessor(
+            _propAccessors["proj/BackgroundImageSaturation"] = PropAccessor.Scalar(
                 () => Props.BackgroundImageSaturation,
                 v  => Props.BackgroundImageSaturation = (float)v);
 
-            // Track-scope — one entry per track view
+            // Track-scope — one entry per track view.
+            // Key by TrackNumber (the MIDI track index, stable across list reorder) and capture the
+            // TrackView reference directly so lambdas remain bound after a reorder.
             if (_trackViews == null) return;
             for (int i = 0; i < _trackViews.Count; i++)
             {
-                int idx = i;  // capture for lambdas
-                _propAccessors[$"track/{idx}/StyleTypeIndex"] = new PropAccessor(
-                    () => { var t = _trackViews[idx].TrackProps.StyleProps.Type; return t == null ? 0 : (double)(int)t; },
-                    v  => { _trackViews[idx].TrackProps.StyleProps.Type = (NoteStyleType)(int)Math.Round(v); },
+                var tv  = _trackViews[i];     // capture reference, not index
+                int tn  = tv.TrackNumber;     // stable id, never changes
+                _propAccessors[$"track/{tn}/StyleTypeIndex"] = PropAccessor.Scalar(
+                    () => { var t = tv.TrackProps.StyleProps.Type; return t == null ? 0 : (double)(int)t; },
+                    v  => { tv.TrackProps.StyleProps.Type = (NoteStyleType)(int)Math.Round(v); },
                     needsRebuild: true, alwaysHold: true);
-                _propAccessors[$"track/{idx}/LineWidth"] = new PropAccessor(
-                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineWidth ?? 0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineWidth = (float)v; },
+                _propAccessors[$"track/{tn}/LineWidth"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().LineWidth ?? 0,
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().LineWidth = (float)v; },
                     needsRebuild: true);
-                _propAccessors[$"track/{idx}/QnGapThreshold"] = new PropAccessor(
-                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold ?? 0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold = (float)v; },
+                _propAccessors[$"track/{tn}/QnGapThreshold"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold ?? 0,
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold = (float)v; },
                     needsRebuild: true);
-                _propAccessors[$"track/{idx}/HlSize"] = new PropAccessor(
-                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlSize ?? 0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlSize = (float)v; });
-                _propAccessors[$"track/{idx}/HlMovementPow"] = new PropAccessor(
-                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlMovementPow ?? 0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlMovementPow = (float)v; });
-                _propAccessors[$"track/{idx}/LineTypeIndex"] = new PropAccessor(
-                    () => { var t = _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineType; return t == null ? 0 : (double)(int)t; },
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().LineType = (LineType)(int)Math.Round(v); },
+                _propAccessors[$"track/{tn}/HlSize"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().HlSize ?? 0,
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().HlSize = (float)v; });
+                _propAccessors[$"track/{tn}/HlMovementPow"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().HlMovementPow ?? 0,
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().HlMovementPow = (float)v; });
+                _propAccessors[$"track/{tn}/LineTypeIndex"] = PropAccessor.Scalar(
+                    () => { var t = tv.TrackProps.StyleProps.GetLineStyle().LineType; return t == null ? 0 : (double)(int)t; },
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().LineType = (LineType)(int)Math.Round(v); },
                     needsRebuild: true, alwaysHold: true);
-                _propAccessors[$"track/{idx}/LineHlTypeIndex"] = new PropAccessor(
-                    () => { var t = _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlType; return t == null ? 0 : (double)(int)t; },
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlType = (LineHlType)(int)Math.Round(v); },
+                _propAccessors[$"track/{tn}/LineHlTypeIndex"] = PropAccessor.Scalar(
+                    () => { var t = tv.TrackProps.StyleProps.GetLineStyle().HlType; return t == null ? 0 : (double)(int)t; },
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().HlType = (LineHlType)(int)Math.Round(v); },
                     alwaysHold: true);
-                _propAccessors[$"track/{idx}/Continuous"] = new PropAccessor(
-                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Continuous == true ? 1.0 : 0.0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().Continuous = v >= 0.5; },
+                _propAccessors[$"track/{tn}/Continuous"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().Continuous == true ? 1.0 : 0.0,
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().Continuous = v >= 0.5; },
                     needsRebuild: true, alwaysHold: true);
-                _propAccessors[$"track/{idx}/MovingHl"] = new PropAccessor(
-                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().MovingHl == true ? 1.0 : 0.0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().MovingHl = v >= 0.5; },
+                _propAccessors[$"track/{tn}/MovingHl"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().MovingHl == true ? 1.0 : 0.0,
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().MovingHl = v >= 0.5; },
                     alwaysHold: true);
-                _propAccessors[$"track/{idx}/ShrinkingHl"] = new PropAccessor(
-                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().ShrinkingHl == true ? 1.0 : 0.0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().ShrinkingHl = v >= 0.5; },
+                _propAccessors[$"track/{tn}/ShrinkingHl"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().ShrinkingHl == true ? 1.0 : 0.0,
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().ShrinkingHl = v >= 0.5; },
                     alwaysHold: true);
-                _propAccessors[$"track/{idx}/HlBorder"] = new PropAccessor(
-                    () => _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlBorder == true ? 1.0 : 0.0,
-                    v  => { _trackViews[idx].TrackProps.StyleProps.GetLineStyle().HlBorder = v >= 0.5; },
+                _propAccessors[$"track/{tn}/HlBorder"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().HlBorder == true ? 1.0 : 0.0,
+                    v  => { tv.TrackProps.StyleProps.GetLineStyle().HlBorder = v >= 0.5; },
                     alwaysHold: true);
             }
         }
 
-        /// <summary>Returns the live double value for a full property id, or null if unregistered.</summary>
-        public double? GetCurrentValue(string fullId)
-            => _propAccessors.TryGetValue(fullId, out var a) ? a.Get() : (double?)null;
+        /// <summary>
+        /// Resolves a full property id to a live accessor.  Pre-registered ids (proj/*, non-mod track/*)
+        /// are returned directly.  Modulation ids of the form <c>track/{tn}/mod/{eid}/{name}</c> are
+        /// resolved dynamically by finding the TrackView and entry on demand (robust to add/delete/reorder).
+        /// Returns null if the id is unresolvable (orphan, wrong track type, etc.).
+        /// </summary>
+        PropAccessor ResolveAccessor(string id)
+        {
+            if (_propAccessors.TryGetValue(id, out var a)) return a;
+
+            // Modulation: track/{tn}/mod/{eid}/{name}
+            var parts = id.Split('/');
+            if (parts.Length != 5 || parts[0] != "track" || parts[2] != "mod") return null;
+            if (!int.TryParse(parts[1], out int tn)) return null;
+            string eid  = parts[3];
+            string name = parts[4];
+
+            if (!_modPropTable.TryGetValue(name, out var factory)) return null;
+
+            // Find the TrackView by stable TrackNumber
+            TrackView tv = null;
+            if (_trackViews != null)
+                foreach (var t in _trackViews)
+                    if (t.TrackNumber == tn) { tv = t; break; }
+            if (tv == null) return null;
+
+            // Find the mod entry by stable Id
+            NoteStyleMod entry = null;
+            var modEntries = tv.TrackProps.ActiveNoteStyle?.ModEntries;
+            if (modEntries != null)
+                foreach (var m in modEntries)
+                    if (m.Id == eid) { entry = m; break; }
+            if (entry == null) return null;
+
+            return factory(entry);
+        }
+
+        /// <summary>Returns the live value for a full property id, or null if unresolvable.</summary>
+        public Keyframes.KfValue GetCurrentValue(string fullId)
+            => ResolveAccessor(fullId)?.Capture();
 
         /// <summary>True when the new keyframe set has any track-scoped keyframes.</summary>
         public bool HasTrackKeyframes
@@ -1127,32 +1218,40 @@ namespace VisualMusic
 
             foreach (var kv in PropertyKeyframes.Tracks)
             {
-                string id = kv.Key;
-                var track = kv.Value;
-                if (!_propAccessors.TryGetValue(id, out var acc)) continue;
+                string id    = kv.Key;
+                var    track = kv.Value;
+
+                var acc = ResolveAccessor(id);
+                if (acc == null) continue;
 
                 var (before, after, t) = track.FindBrackets((int)SongPosT);
 
                 // Skip if neither surrounding keyframe carries a captured value
                 if (before?.Value == null && after?.Value == null) continue;
 
-                double value;
+                Keyframes.KfValue value;
                 if (before == null || before.Value == null)
-                    value = after.Value.Value;
+                    value = after.Value;
                 else if (after == null || after.Value == null)
-                    value = before.Value.Value;
+                    value = before.Value;
                 else
                 {
                     // Enum/bool props must step at the keyframe, never blend to a fractional value.
                     var mode = acc.AlwaysHold ? Keyframes.KfInterpolation.Hold : before.Interpolation;
-                    value = Keyframes.PropertyKeyframeTrack.InterpolateValue(
-                        before.Value.Value, after.Value.Value, t, mode, acc.LogScale);
+                    value = acc.Interp(before.Value, after.Value, t, mode);
                 }
 
-                double prev = acc.Get();
-                acc.Set(value);
-                if (acc.NeedsRebuild && Math.Abs(value - prev) > 1e-6)
-                    anyRebuildNeeded = true;
+                if (acc.NeedsRebuild && value is Keyframes.ScalarKfValue sv)
+                {
+                    var prevKv = acc.Capture() as Keyframes.ScalarKfValue;
+                    acc.Apply(value);
+                    if (prevKv == null || Math.Abs(sv.V - prevKv.V) > 1e-6)
+                        anyRebuildNeeded = true;
+                }
+                else
+                {
+                    acc.Apply(value);
+                }
             }
 
             if (anyRebuildNeeded) CreateGeos(resetVertScale: false);
