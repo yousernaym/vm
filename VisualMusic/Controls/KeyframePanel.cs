@@ -41,6 +41,8 @@ namespace VisualMusic.Controls
 
         // ---- Constructor ----
 
+        Window _window;
+
         public KeyframePanel()
         {
             ClipToBounds = true;
@@ -48,6 +50,30 @@ namespace VisualMusic.Controls
 
             KeyframeService.RefreshRequested  += OnRefresh;
             KeyframeService.KeyframesChanged  += OnRefresh;
+            Loaded   += OnLoaded;
+            Unloaded += OnUnloaded;
+        }
+
+        void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            _window = Window.GetWindow(this);
+            if (_window == null) return;
+            _window.PreviewMouseMove += OnWindowPreviewMouseMove;
+            _window.PreviewKeyDown   += OnWindowPreviewKeyDown;
+            _window.PreviewKeyUp     += OnWindowPreviewKeyUp;
+        }
+
+        void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            if (_window != null)
+            {
+                _window.PreviewMouseMove -= OnWindowPreviewMouseMove;
+                _window.PreviewKeyDown   -= OnWindowPreviewKeyDown;
+                _window.PreviewKeyUp     -= OnWindowPreviewKeyUp;
+                _window = null;
+            }
+            if (!_dragging)
+                Mouse.OverrideCursor = null;
         }
 
         void OnRefresh() => InvalidateVisual();
@@ -156,6 +182,7 @@ namespace VisualMusic.Controls
                     _dragging       = true;
                     _dragSourceTick = hit.Value;
                     _dragCurrentX   = pos.X;
+                    Mouse.OverrideCursor = Cursors.SizeWE;
                     CaptureMouse();
                 }
                 else
@@ -177,22 +204,62 @@ namespace VisualMusic.Controls
                 e.Handled = true;
                 return;
             }
-            UpdateCursor(e.GetPosition(this).X);
+            UpdateCursorFromMousePosition(e.GetPosition(this));
         }
 
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
-            if (!_dragging) Cursor = Cursors.Arrow;
+            if (!_dragging)
+                Mouse.OverrideCursor = null;
+        }
+
+        // HwndHost (MonoGame) does not raise WPF MouseLeave when the pointer moves straight down
+        // off the strip, so track cursor state at window level too.
+        void OnWindowPreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!IsVisible)
+            {
+                if (!_dragging) Mouse.OverrideCursor = null;
+                return;
+            }
+            UpdateCursorFromMousePosition(e.GetPosition(this));
+        }
+
+        void OnWindowPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (!IsVisible) return;
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+                UpdateCursorFromMousePosition(Mouse.GetPosition(this));
+        }
+
+        void OnWindowPreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (!IsVisible) return;
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+                UpdateCursorFromMousePosition(Mouse.GetPosition(this));
+        }
+
+        void UpdateCursorFromMousePosition(Point pos)
+        {
+            if (_dragging)
+            {
+                Mouse.OverrideCursor = Cursors.SizeWE;
+                return;
+            }
+            if (IsVisible && pos.X >= 0 && pos.X <= ActualWidth && pos.Y >= 0 && pos.Y <= ActualHeight)
+                UpdateCursor(pos.X);
+            else
+                Mouse.OverrideCursor = null;
         }
 
         // Over a marker: SizeWE while Shift is held (drag), otherwise a hand (click-to-seek).
         void UpdateCursor(double mouseX)
         {
             if (HitTest(mouseX).HasValue)
-                Cursor = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? Cursors.SizeWE : Cursors.Hand;
+                Mouse.OverrideCursor = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? Cursors.SizeWE : Cursors.Hand;
             else
-                Cursor = Cursors.Arrow;
+                Mouse.OverrideCursor = null;
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -202,6 +269,7 @@ namespace VisualMusic.Controls
 
             ReleaseMouseCapture();
             _dragging = false;
+            UpdateCursorFromMousePosition(Mouse.GetPosition(this));
 
             double newTickD = ScreenXToTick(_dragCurrentX);
             int newTick = Math.Max(0, (int)Math.Round(newTickD));
