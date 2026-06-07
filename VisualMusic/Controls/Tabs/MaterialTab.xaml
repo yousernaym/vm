@@ -89,10 +89,12 @@
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="U scroll:" VerticalAlignment="Center" Margin="0,2"/>
                     <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
-                                      Value="{Binding UScroll, Mode=TwoWay}" Min="-5" Max="5" Decimals="2"/>
+                                      Value="{Binding UScroll, Mode=TwoWay}"
+                                      Min="-1" Max="1" Decimals="3" SmallChange="0.005"/>
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="V scroll:" VerticalAlignment="Center" Margin="0,2"/>
                     <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
-                                      Value="{Binding VScroll, Mode=TwoWay}" Min="-5" Max="5" Decimals="2"/>
+                                      Value="{Binding VScroll, Mode=TwoWay}"
+                                      Min="-1" Max="1" Decimals="3" SmallChange="0.005"/>
                 </Grid>
             </StackPanel>
 

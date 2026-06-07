@@ -203,7 +203,7 @@
                                       kf:Keyframing.Interpolatable="False"/>
                             <ctrl:TbSliderWpf Value="{Binding ModXOrigin, Mode=TwoWay}"
                                               IsEnabled="{Binding ModXOriginEnabled}"
-                                              Min="-10" Max="10" Decimals="2" Width="120"
+                                              Min="0" Max="1" Decimals="2" Width="120"
                                               kf:Keyframing.PropertyId="ModXOrigin"
                                               kf:Keyframing.DisplayName="Mod origin X"
                                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
@@ -221,7 +221,7 @@
                                       kf:Keyframing.Interpolatable="False"/>
                             <ctrl:TbSliderWpf Value="{Binding ModYOrigin, Mode=TwoWay}"
                                               IsEnabled="{Binding ModYOriginEnabled}"
-                                              Min="-10" Max="10" Decimals="2" Width="120"
+                                              Min="0" Max="1" Decimals="2" Width="120"
                                               kf:Keyframing.PropertyId="ModYOrigin"
                                               kf:Keyframing.DisplayName="Mod origin Y"
                                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"

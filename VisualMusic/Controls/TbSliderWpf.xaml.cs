@@ -88,6 +88,17 @@ namespace VisualMusic.Controls
             set => SetValue(ExpBaseProperty, value);
         }
 
+        public static readonly DependencyProperty SmallChangeProperty = DependencyProperty.Register(
+            nameof(SmallChange), typeof(double), typeof(TbSliderWpf),
+            new PropertyMetadata(0.01));
+
+        /// <summary>Keyboard/slider fine step (maps to the inner Slider.SmallChange).</summary>
+        public double SmallChange
+        {
+            get => (double)GetValue(SmallChangeProperty);
+            set => SetValue(SmallChangeProperty, value);
+        }
+
         // ---- Events ----
 
         public event EventHandler ValueChanged;
