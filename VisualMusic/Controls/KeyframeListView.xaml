@@ -38,7 +38,7 @@
             <Popup x:Name="filterPopup" Grid.Column="0"
                    PlacementTarget="{Binding ElementName=filterBox}"
                    Placement="Bottom"
-                   StaysOpen="False"
+                   StaysOpen="True"
                    AllowsTransparency="True"
                    Width="{Binding ActualWidth, ElementName=filterBox}">
                 <Border Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"

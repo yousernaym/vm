@@ -49,6 +49,34 @@ namespace VisualMusic.Controls
                 var item = _vm.Properties.FirstOrDefault(p => p.Id == fullId);
                 if (item != null) CommitSelection(item);
             };
+
+            // Close the filter popup on any click elsewhere in the window (incl. non-focusable
+            // empty areas that never raise LostKeyboardFocus).
+            Loaded += (_, _) =>
+            {
+                var w = Window.GetWindow(this);
+                if (w != null)
+                {
+                    w.PreviewMouseDown -= Window_PreviewMouseDown;
+                    w.PreviewMouseDown += Window_PreviewMouseDown;
+                }
+            };
+            Unloaded += (_, _) =>
+            {
+                var w = Window.GetWindow(this);
+                if (w != null) w.PreviewMouseDown -= Window_PreviewMouseDown;
+            };
+        }
+
+        void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!filterPopup.IsOpen) return;
+            if (filterList.IsMouseOver) return;   // clicking inside the popup list
+            // Clicks inside the search box are handled by its own (toggle) handler.
+            if (IsDescendantOf(e.OriginalSource as DependencyObject, filterBox)) return;
+
+            filterPopup.IsOpen = false;
+            UpdateFilterBoxText();
         }
 
         /// <summary>Call this when a project is loaded / replaced.</summary>
@@ -92,32 +120,39 @@ namespace VisualMusic.Controls
                 e.Handled = true;
                 filterBox.Focus();
             }
-            else if (!filterPopup.IsOpen)
+            else if (filterPopup.IsOpen)
             {
-                OpenFilterPopupDeferred();
+                // Already focused and open → clicking again closes it.
+                filterPopup.IsOpen = false;
+                UpdateFilterBoxText();
+            }
+            else
+            {
+                OpenFilterPopup();
             }
         }
 
         void FilterBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             filterBox.SelectAll();   // typing replaces the shown property name
-            OpenFilterPopupDeferred();
-        }
-
-        /// <summary>
-        /// Opens the popup after the current input (the click that triggered it) has finished.
-        /// Opening a StaysOpen=False popup during the mouse-down makes the following mouse-up look
-        /// like an outside click, which would close it again immediately.
-        /// </summary>
-        void OpenFilterPopupDeferred()
-        {
-            Dispatcher.BeginInvoke(
-                new Action(OpenFilterPopup),
-                System.Windows.Threading.DispatcherPriority.Background);
+            OpenFilterPopup();
         }
 
         void FilterBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
+            // Defer the close: clicking a popup item momentarily steals focus from the search box,
+            // and we must let the item-click commit (on mouse-up) run first. A genuine outside click
+            // (e.g. the render surface) leaves no commit, so the deferred close still fires.
+            Dispatcher.BeginInvoke(
+                new Action(CloseFilterPopupIfIdle),
+                System.Windows.Threading.DispatcherPriority.Background);
+        }
+
+        void CloseFilterPopupIfIdle()
+        {
+            if (!filterPopup.IsOpen) return;
+            if (filterList.IsMouseOver) return;            // still interacting with the list
+            if (filterBox.IsKeyboardFocusWithin) return;   // focus returned to the search box
             filterPopup.IsOpen = false;
             // Discard any uncommitted search text by restoring the committed selection's label.
             UpdateFilterBoxText();
@@ -252,6 +287,16 @@ namespace VisualMusic.Controls
             while (d != null && d is not T)
                 d = VisualTreeHelper.GetParent(d);
             return d as T;
+        }
+
+        static bool IsDescendantOf(DependencyObject node, DependencyObject ancestor)
+        {
+            while (node != null)
+            {
+                if (ReferenceEquals(node, ancestor)) return true;
+                node = node is Visual ? VisualTreeHelper.GetParent(node) : LogicalTreeHelper.GetParent(node);
+            }
+            return false;
         }
 
         // ---- DataGrid events ----
