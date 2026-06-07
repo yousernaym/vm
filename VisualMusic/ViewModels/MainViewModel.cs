@@ -164,8 +164,11 @@ namespace VisualMusic.ViewModels
 
             SelectedTrackProps.ResetStyle = () =>
             {
+                if (!Keyframes.KeyframeService.ConfirmDefaultStyleReset(out var affected))
+                    return;
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.ResetStyle();
+                Keyframes.KeyframeService.CaptureDefaultStyleAtCurrentTick(affected);
                 _project?.CreateGeos();
                 OnTrackListSelectionChanged();
             };
@@ -298,7 +301,10 @@ namespace VisualMusic.ViewModels
 
             SongProps.ResetPitches = () =>
             {
+                if (!Keyframes.KeyframeService.ConfirmPitchReset(out var affected))
+                    return;
                 _project?.ResetPitchLimits();
+                Keyframes.KeyframeService.CapturePitchResetAtCurrentTick(affected);
                 _project?.CreateGeos();
                 SongProps.RefreshAll();
             };

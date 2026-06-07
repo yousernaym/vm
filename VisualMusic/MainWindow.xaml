@@ -140,18 +140,14 @@
         </Menu>
         </DockPanel>
 
-        <!-- Left: project-wide properties placeholder -->
-        <ctrl:SongPropsPanel DockPanel.Dock="Left" Width="216"
-                             DataContext="{Binding SongProps}"
-                             Visibility="{Binding DataContext.ShowSongProps,
-                                          RelativeSource={RelativeSource AncestorType=Window},
-                                          Converter={StaticResource BoolVis}}"/>
-
-        <!-- Keyframe list — opens alongside the project properties panel -->
-        <ctrl:KeyframeListView x:Name="keyframeListView"
-                               DockPanel.Dock="Left" Width="200"
-                               Visibility="{Binding ShowSongProps,
-                                            Converter={StaticResource BoolVis}}"/>
+        <!-- Left: keyframe list + project properties (shown/hidden together) -->
+        <DockPanel DockPanel.Dock="Left"
+                   Visibility="{Binding ShowSongProps, Converter={StaticResource BoolVis}}">
+            <ctrl:KeyframeListView x:Name="keyframeListView"
+                                   DockPanel.Dock="Left" Width="200"/>
+            <ctrl:SongPropsPanel DockPanel.Dock="Left" Width="216"
+                                 DataContext="{Binding SongProps}"/>
+        </DockPanel>
 
         <!-- Right: track list (with splitter) + property tabs -->
         <Grid DockPanel.Dock="Right" Width="395"

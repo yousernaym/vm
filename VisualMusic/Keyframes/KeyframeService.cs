@@ -206,6 +206,215 @@ namespace VisualMusic.Keyframes
                     Project.PropertyKeyframes.SetValueAt(id, tick, value);
         }
 
+        /// <summary>
+        /// Writes each resolved property's live value into its keyframe at the current tick.
+        /// Unlike <see cref="SyncEditedValue"/>, reads a separate value per full property id
+        /// (needed for multi-track edits).
+        /// </summary>
+        public static void SyncCurrentValues(string propertyId, KfScope scope)
+        {
+            if (Project == null) return;
+            int tick = CurrentTick;
+            foreach (var id in ResolveIds(propertyId, scope))
+            {
+                if (!Project.PropertyKeyframes.HasKeyAt(id, tick)) continue;
+                var val = Project.GetCurrentValue(id);
+                if (val != null)
+                    Project.PropertyKeyframes.SetValueAt(id, tick, val);
+            }
+        }
+
+        // ---- Style-tab default reset ----
+
+        /// <summary>All keyframeable properties exposed on the Style tab (id + scope + label).</summary>
+        static readonly (string Id, KfScope Scope, string DisplayName)[] StyleTabKeyframeProperties =
+        {
+            ("StyleTypeIndex",   KfScope.Track,    "Note style"),
+            ("LineTypeIndex",    KfScope.Track,    "Line type"),
+            ("LineWidth",        KfScope.Track,    "Line width"),
+            ("QnGapThreshold",   KfScope.Track,    "Gap fill"),
+            ("Continuous",       KfScope.Track,    "Continuous"),
+            ("LineHlTypeIndex",  KfScope.Track,    "Highlight type"),
+            ("HlSize",           KfScope.Track,    "Highlight size"),
+            ("HlMovementPow",    KfScope.Track,    "Movement power"),
+            ("MovingHl",         KfScope.Track,    "Moving highlight"),
+            ("ShrinkingHl",      KfScope.Track,    "Shrinking highlight"),
+            ("HlBorder",         KfScope.Track,    "Highlight border"),
+            ("ModXOriginEnable", KfScope.TrackMod, "Mod origin X enable"),
+            ("ModXOrigin",       KfScope.TrackMod, "Mod origin X"),
+            ("ModYOriginEnable", KfScope.TrackMod, "Mod origin Y enable"),
+            ("ModYOrigin",       KfScope.TrackMod, "Mod origin Y"),
+            ("ModCombineIndex",  KfScope.TrackMod, "Mod combine"),
+            ("ModSquareAspect",  KfScope.TrackMod, "Square aspect"),
+            ("ModColorDestEnable", KfScope.TrackMod, "Mod color dest enable"),
+            ("ModColorDest",     KfScope.TrackMod, "Mod color dest"),
+            ("ModAngleDestEnable", KfScope.TrackMod, "Mod angle dest enable"),
+            ("ModAngleDest",     KfScope.TrackMod, "Mod angle dest"),
+            ("ModStart",         KfScope.TrackMod, "Mod start"),
+            ("ModStop",          KfScope.TrackMod, "Mod stop"),
+            ("ModFadeIn",        KfScope.TrackMod, "Mod fade in"),
+            ("ModFadeOut",       KfScope.TrackMod, "Mod fade out"),
+            ("ModPower",         KfScope.TrackMod, "Mod fade power"),
+            ("ModDiscardAfterStop", KfScope.TrackMod, "Discard after stop"),
+            ("ModInvert",        KfScope.TrackMod, "Mod invert"),
+        };
+
+        /// <summary>
+        /// Style-tab properties (for the selected tracks) that already have keyframes anywhere.
+        /// </summary>
+        public static List<(string Id, KfScope Scope)> GetStylePropertiesWithKeyframes()
+        {
+            var list = new List<(string, KfScope)>();
+            if (Project == null) return list;
+            foreach (var (id, scope, _) in StyleTabKeyframeProperties)
+            {
+                if (HasAnyKeyForAny(id, scope))
+                    list.Add((id, scope));
+            }
+            return list;
+        }
+
+        static List<string> GetKeyframeLabels(IEnumerable<(string Id, KfScope Scope)> properties,
+            bool onlyNotAtCurrentTick = false)
+        {
+            var kfs = Project?.PropertyKeyframes;
+            var labels = new List<string>();
+            if (kfs == null) return labels;
+            int tick = CurrentTick;
+            foreach (var (propId, scope) in properties)
+            {
+                foreach (var fullId in ResolveIds(propId, scope))
+                {
+                    if (!kfs.HasAny(fullId)) continue;
+                    if (onlyNotAtCurrentTick && kfs.HasKeyAt(fullId, tick)) continue;
+                    labels.Add(GetDisplayNameForId(fullId));
+                }
+            }
+            labels.Sort(StringComparer.OrdinalIgnoreCase);
+            return labels;
+        }
+
+        static void CapturePropertiesAtCurrentTick(IEnumerable<(string Id, KfScope Scope)> affected)
+        {
+            if (Project == null || affected == null) return;
+            foreach (var (propId, scope) in affected)
+            {
+                if (!HasKeyHereForAll(propId, scope))
+                    AddKey(propId, scope);
+                SyncCurrentValues(propId, scope);
+            }
+            RaiseKeyframesChanged();
+        }
+
+        /// <summary>
+        /// When Style-tab properties have keyframes, prompts if any of them lack a keyframe at the
+        /// current playback position. Returns false if the user declines. On acceptance, pauses
+        /// playback and returns true (caller should reset style, then call
+        /// <see cref="CaptureDefaultStyleAtCurrentTick"/>).
+        /// </summary>
+        public static bool ConfirmDefaultStyleReset(out List<(string Id, KfScope Scope)> affected)
+        {
+            affected = GetStylePropertiesWithKeyframes();
+            if (affected.Count == 0) return true;
+
+            var labels = GetKeyframeLabels(affected, onlyNotAtCurrentTick: true);
+            if (labels.Count > 0)
+            {
+                string body = "The following style properties have keyframes elsewhere "
+                            + "but not at the current playback position:\n\n"
+                            + string.Join("\n", labels.Select(l => "• " + l))
+                            + "\n\nReset to default will create keyframes at the current playback position "
+                            + "for these properties.\n\nContinue?";
+
+                var result = System.Windows.MessageBox.Show(
+                    body,
+                    "Default style",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Question);
+
+                if (result != System.Windows.MessageBoxResult.Yes)
+                {
+                    affected = null;
+                    return false;
+                }
+            }
+
+            PausePlayback();
+            return true;
+        }
+
+        /// <summary>
+        /// After <see cref="TrackProps.ResetStyle"/> has run, stores default values into keyframes
+        /// at the current tick for every property returned by <see cref="ConfirmDefaultStyleReset"/>.
+        /// </summary>
+        public static void CaptureDefaultStyleAtCurrentTick(IEnumerable<(string Id, KfScope Scope)> affected)
+            => CapturePropertiesAtCurrentTick(affected);
+
+        // ---- Pitch reset ----
+
+        static readonly (string Id, KfScope Scope)[] PitchKeyframeProperties =
+        {
+            ("MaxPitch", KfScope.Project),
+            ("MinPitch", KfScope.Project),
+        };
+
+        /// <summary>Min/max pitch properties that already have keyframes anywhere.</summary>
+        public static List<(string Id, KfScope Scope)> GetPitchPropertiesWithKeyframes()
+        {
+            var list = new List<(string, KfScope)>();
+            if (Project == null) return list;
+            foreach (var (id, scope) in PitchKeyframeProperties)
+            {
+                if (HasAnyKeyForAny(id, scope))
+                    list.Add((id, scope));
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// When min or max pitch has keyframes, prompts if either lacks a keyframe at the current
+        /// playback position. Returns false if the user declines. On acceptance, pauses playback
+        /// and returns true (caller should reset pitches, then call
+        /// <see cref="CapturePitchResetAtCurrentTick"/>).
+        /// </summary>
+        public static bool ConfirmPitchReset(out List<(string Id, KfScope Scope)> affected)
+        {
+            affected = GetPitchPropertiesWithKeyframes();
+            if (affected.Count == 0) return true;
+
+            var labels = GetKeyframeLabels(affected, onlyNotAtCurrentTick: true);
+            if (labels.Count > 0)
+            {
+                string body = "The following pitch properties have keyframes elsewhere "
+                            + "but not at the current playback position:\n\n"
+                            + string.Join("\n", labels.Select(l => "• " + l))
+                            + "\n\nReset pitches will create keyframes at the current playback position "
+                            + "for these properties.\n\nContinue?";
+
+                var result = System.Windows.MessageBox.Show(
+                    body,
+                    "Reset pitches",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Question);
+
+                if (result != System.Windows.MessageBoxResult.Yes)
+                {
+                    affected = null;
+                    return false;
+                }
+            }
+
+            PausePlayback();
+            return true;
+        }
+
+        /// <summary>
+        /// After <see cref="Project.ResetPitchLimits"/> has run, stores the reset values into
+        /// keyframes at the current tick for every property returned by <see cref="ConfirmPitchReset"/>.
+        /// </summary>
+        public static void CapturePitchResetAtCurrentTick(IEnumerable<(string Id, KfScope Scope)> affected)
+            => CapturePropertiesAtCurrentTick(affected);
+
         public static void SetInterpolation(string propertyId, KfScope scope, KfInterpolation interp)
         {
             if (Project == null) return;
