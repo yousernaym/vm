@@ -259,7 +259,9 @@ namespace VisualMusic.Keyframes
         // ---- Style-tab default reset ----
 
         /// <summary>
-        /// Style-tab properties (for the selected tracks) that already have keyframes anywhere.
+        /// Non-mod Style-tab properties (for the selected tracks) that already have keyframes anywhere.
+        /// Mod properties are excluded: the reset deletes every mod entry, so their keyframes are
+        /// purged (see <see cref="PurgeModKeyframesForSelectedTracks"/>) rather than re-captured.
         /// </summary>
         public static List<(string Id, KfScope Scope)> GetStylePropertiesWithKeyframes()
         {
@@ -267,11 +269,48 @@ namespace VisualMusic.Keyframes
             if (Project == null) return list;
             foreach (var (id, scope, _) in AllKeyframeProperties)
             {
-                if (scope != KfScope.Track && scope != KfScope.TrackMod) continue;
+                if (scope != KfScope.Track) continue;
                 if (HasAnyKeyForAny(id, scope))
                     list.Add((id, scope));
             }
             return list;
+        }
+
+        /// <summary>Track numbers a Style-tab action applies to (same fallback as <see cref="ResolveIds"/>).</summary>
+        static int[] EffectiveTrackNumbers()
+            => SelectedTrackIds.Count == 0 ? new[] { 0 } : SelectedTrackIds.ToArray();
+
+        /// <summary>
+        /// Full keyframe-set ids under <c>track/{tn}/mod/</c> for the selected tracks. Scans the
+        /// keyframe set directly so it covers ALL mod entries (not just the selected one) and orphans.
+        /// </summary>
+        static List<string> GetModKeyframeIds()
+        {
+            var result = new List<string>();
+            var kfs = Project?.PropertyKeyframes;
+            if (kfs == null) return result;
+            foreach (var tn in EffectiveTrackNumbers())
+            {
+                string prefix = $"track/{tn}/mod/";
+                foreach (var id in kfs.Tracks.Keys)
+                    if (id.StartsWith(prefix, StringComparison.Ordinal))
+                        result.Add(id);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Removes every mod-entry keyframe track (<c>track/{tn}/mod/…</c>) for the selected tracks.
+        /// Called after a Default Style reset, which deletes all mod entries, so their keyframes
+        /// don't linger as orphans.
+        /// </summary>
+        public static void PurgeModKeyframesForSelectedTracks()
+        {
+            var kfs = Project?.PropertyKeyframes;
+            if (kfs == null) return;
+            foreach (var tn in EffectiveTrackNumbers())
+                kfs.RemovePropertiesWithPrefix($"track/{tn}/mod/");
+            RaiseKeyframesChanged();
         }
 
         static List<string> GetKeyframeLabels(IEnumerable<(string Id, KfScope Scope)> properties,
@@ -307,24 +346,37 @@ namespace VisualMusic.Keyframes
         }
 
         /// <summary>
-        /// When Style-tab properties have keyframes, prompts if any of them lack a keyframe at the
-        /// current playback position. Returns false if the user declines. On acceptance, pauses
-        /// playback and returns true (caller should reset style, then call
+        /// Prompts before a Default Style reset when it would touch existing keyframes: non-mod style
+        /// properties with keyframes elsewhere get new keyframes at the current playback position, and
+        /// ALL mod-entry keyframes for the selected tracks are deleted (the reset removes every mod
+        /// entry). Returns false if the user declines. On acceptance, pauses playback and returns true
+        /// (caller should reset style, call <see cref="PurgeModKeyframesForSelectedTracks"/>, then
         /// <see cref="CaptureDefaultStyleAtCurrentTick"/>).
         /// </summary>
         public static bool ConfirmDefaultStyleReset(out List<(string Id, KfScope Scope)> affected)
         {
             affected = GetStylePropertiesWithKeyframes();
-            if (affected.Count == 0) return true;
+            var modIds = GetModKeyframeIds();
+            if (affected.Count == 0 && modIds.Count == 0) return true;
 
             var labels = GetKeyframeLabels(affected, onlyNotAtCurrentTick: true);
-            if (labels.Count > 0)
+            var modLabels = modIds.Select(GetDisplayNameForId).Distinct().ToList();
+            modLabels.Sort(StringComparer.OrdinalIgnoreCase);
+
+            if (labels.Count > 0 || modLabels.Count > 0)
             {
-                string body = "The following style properties have keyframes elsewhere "
-                            + "but not at the current playback position:\n\n"
-                            + string.Join("\n", labels.Select(l => "• " + l))
-                            + "\n\nReset to default will create keyframes at the current playback position "
-                            + "for these properties.\n\nContinue?";
+                var sections = new List<string>();
+                if (labels.Count > 0)
+                    sections.Add("The following style properties have keyframes elsewhere "
+                               + "but not at the current playback position:\n\n"
+                               + string.Join("\n", labels.Select(l => "• " + l))
+                               + "\n\nReset to default will create keyframes at the current playback "
+                               + "position for these properties.");
+                if (modLabels.Count > 0)
+                    sections.Add("The following modulation properties will be deleted "
+                               + "along with all their keyframes:\n\n"
+                               + string.Join("\n", modLabels.Select(l => "• " + l)));
+                string body = string.Join("\n\n", sections) + "\n\nContinue?";
 
                 var result = System.Windows.MessageBox.Show(
                     body,

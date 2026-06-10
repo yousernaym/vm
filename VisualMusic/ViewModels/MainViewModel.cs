@@ -168,6 +168,7 @@ namespace VisualMusic.ViewModels
                     return;
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.ResetStyle();
+                Keyframes.KeyframeService.PurgeModKeyframesForSelectedTracks();
                 Keyframes.KeyframeService.CaptureDefaultStyleAtCurrentTick(affected);
                 _project?.CreateGeos();
                 OnTrackListSelectionChanged();
