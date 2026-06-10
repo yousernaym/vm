@@ -60,25 +60,57 @@ namespace VisualMusic.Keyframes
         /// <summary>Pauses playback at the current position (no-op if already paused).</summary>
         public static void PausePlayback() => Project?.PausePlayback();
 
-        // ---- Display-name registry ----
-        // Maps the raw property name (last id segment, e.g. "LineWidth") to the friendly label
-        // shown in menus.  Populated by the Keyframing behavior as controls are set up.
+        // ---- Unified property table ----
+        // Single source of truth: raw id, scope, and friendly display name for every keyframeable property.
 
-        static readonly Dictionary<string, string> _displayNames = new();
-
-        public static void RegisterDisplayName(string rawName, string displayName)
+        public static readonly (string Id, KfScope Scope, string DisplayName)[] AllKeyframeProperties =
         {
-            if (!string.IsNullOrEmpty(rawName) && !string.IsNullOrEmpty(displayName))
-                _displayNames[rawName] = displayName;
-        }
+            ("ViewWidthQn",               KfScope.Project,  "Viewport width"),
+            ("MaxPitch",                  KfScope.Project,  "Max pitch"),
+            ("MinPitch",                  KfScope.Project,  "Min pitch"),
+            ("Camera",                    KfScope.Project,  "Camera"),
+            ("BackgroundImagePath",       KfScope.Project,  "Background image"),
+            ("BackgroundImageOpacity",    KfScope.Project,  "Background opacity"),
+            ("BackgroundImageSaturation", KfScope.Project,  "Background saturation"),
+            ("StyleTypeIndex",            KfScope.Track,    "Note style"),
+            ("LineTypeIndex",             KfScope.Track,    "Line type"),
+            ("LineWidth",                 KfScope.Track,    "Line width"),
+            ("QnGapThreshold",            KfScope.Track,    "Gap fill"),
+            ("Continuous",                KfScope.Track,    "Continuous"),
+            ("LineHlTypeIndex",           KfScope.Track,    "Highlight type"),
+            ("HlSize",                    KfScope.Track,    "Highlight size"),
+            ("HlMovementPow",             KfScope.Track,    "Movement power"),
+            ("MovingHl",                  KfScope.Track,    "Moving highlight"),
+            ("ShrinkingHl",               KfScope.Track,    "Shrinking highlight"),
+            ("HlBorder",                  KfScope.Track,    "Highlight border"),
+            ("ModXOriginEnable",          KfScope.TrackMod, "Mod origin X enable"),
+            ("ModXOrigin",                KfScope.TrackMod, "Mod origin X"),
+            ("ModYOriginEnable",          KfScope.TrackMod, "Mod origin Y enable"),
+            ("ModYOrigin",                KfScope.TrackMod, "Mod origin Y"),
+            ("ModCombineIndex",           KfScope.TrackMod, "Mod combine"),
+            ("ModSquareAspect",           KfScope.TrackMod, "Square aspect"),
+            ("ModColorDestEnable",        KfScope.TrackMod, "Mod color dest enable"),
+            ("ModColorDest",              KfScope.TrackMod, "Mod color dest"),
+            ("ModAngleDestEnable",        KfScope.TrackMod, "Mod angle dest enable"),
+            ("ModAngleDest",              KfScope.TrackMod, "Mod angle dest"),
+            ("ModStart",                  KfScope.TrackMod, "Mod start"),
+            ("ModStop",                   KfScope.TrackMod, "Mod stop"),
+            ("ModFadeIn",                 KfScope.TrackMod, "Mod fade in"),
+            ("ModFadeOut",                KfScope.TrackMod, "Mod fade out"),
+            ("ModPower",                  KfScope.TrackMod, "Mod fade power"),
+            ("ModDiscardAfterStop",       KfScope.TrackMod, "Discard after stop"),
+            ("ModInvert",                 KfScope.TrackMod, "Mod invert"),
+        };
+
+        static readonly Dictionary<string, string> _displayNameLookup =
+            AllKeyframeProperties.ToDictionary(e => e.Id, e => e.DisplayName);
 
         /// <summary>Returns a friendly label for a full property id (e.g. "track/2/LineWidth").</summary>
         public static string GetDisplayNameForId(string fullId)
         {
             if (string.IsNullOrEmpty(fullId)) return fullId;
             string raw  = fullId.Substring(fullId.LastIndexOf('/') + 1);
-            string name = _displayNames.TryGetValue(raw, out var dn) ? dn : raw;
-            // Annotate track-scoped ids with their track number for disambiguation
+            string name = _displayNameLookup.TryGetValue(raw, out var dn) ? dn : raw;
             if (fullId.StartsWith("track/"))
             {
                 var parts = fullId.Split('/');
@@ -226,39 +258,6 @@ namespace VisualMusic.Keyframes
 
         // ---- Style-tab default reset ----
 
-        /// <summary>All keyframeable properties exposed on the Style tab (id + scope + label).</summary>
-        static readonly (string Id, KfScope Scope, string DisplayName)[] StyleTabKeyframeProperties =
-        {
-            ("StyleTypeIndex",   KfScope.Track,    "Note style"),
-            ("LineTypeIndex",    KfScope.Track,    "Line type"),
-            ("LineWidth",        KfScope.Track,    "Line width"),
-            ("QnGapThreshold",   KfScope.Track,    "Gap fill"),
-            ("Continuous",       KfScope.Track,    "Continuous"),
-            ("LineHlTypeIndex",  KfScope.Track,    "Highlight type"),
-            ("HlSize",           KfScope.Track,    "Highlight size"),
-            ("HlMovementPow",    KfScope.Track,    "Movement power"),
-            ("MovingHl",         KfScope.Track,    "Moving highlight"),
-            ("ShrinkingHl",      KfScope.Track,    "Shrinking highlight"),
-            ("HlBorder",         KfScope.Track,    "Highlight border"),
-            ("ModXOriginEnable", KfScope.TrackMod, "Mod origin X enable"),
-            ("ModXOrigin",       KfScope.TrackMod, "Mod origin X"),
-            ("ModYOriginEnable", KfScope.TrackMod, "Mod origin Y enable"),
-            ("ModYOrigin",       KfScope.TrackMod, "Mod origin Y"),
-            ("ModCombineIndex",  KfScope.TrackMod, "Mod combine"),
-            ("ModSquareAspect",  KfScope.TrackMod, "Square aspect"),
-            ("ModColorDestEnable", KfScope.TrackMod, "Mod color dest enable"),
-            ("ModColorDest",     KfScope.TrackMod, "Mod color dest"),
-            ("ModAngleDestEnable", KfScope.TrackMod, "Mod angle dest enable"),
-            ("ModAngleDest",     KfScope.TrackMod, "Mod angle dest"),
-            ("ModStart",         KfScope.TrackMod, "Mod start"),
-            ("ModStop",          KfScope.TrackMod, "Mod stop"),
-            ("ModFadeIn",        KfScope.TrackMod, "Mod fade in"),
-            ("ModFadeOut",       KfScope.TrackMod, "Mod fade out"),
-            ("ModPower",         KfScope.TrackMod, "Mod fade power"),
-            ("ModDiscardAfterStop", KfScope.TrackMod, "Discard after stop"),
-            ("ModInvert",        KfScope.TrackMod, "Mod invert"),
-        };
-
         /// <summary>
         /// Style-tab properties (for the selected tracks) that already have keyframes anywhere.
         /// </summary>
@@ -266,8 +265,9 @@ namespace VisualMusic.Keyframes
         {
             var list = new List<(string, KfScope)>();
             if (Project == null) return list;
-            foreach (var (id, scope, _) in StyleTabKeyframeProperties)
+            foreach (var (id, scope, _) in AllKeyframeProperties)
             {
+                if (scope != KfScope.Track && scope != KfScope.TrackMod) continue;
                 if (HasAnyKeyForAny(id, scope))
                     list.Add((id, scope));
             }

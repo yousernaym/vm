@@ -52,8 +52,7 @@ namespace VisualMusic.Keyframes
     /// <summary>
     /// Attached behaviour that wires a WPF control to the per-property keyframe model.
     /// Set <see cref="PropertyIdProperty"/> (required), <see cref="ScopeProperty"/>,
-    /// <see cref="DisplayNameProperty"/>, and <see cref="InterpolatableProperty"/> in XAML
-    /// to activate the behaviour.
+    /// and <see cref="InterpolatableProperty"/> in XAML to activate the behaviour.
     /// </summary>
     public static class Keyframing
     {
@@ -62,10 +61,6 @@ namespace VisualMusic.Keyframes
         public static readonly DependencyProperty PropertyIdProperty =
             DependencyProperty.RegisterAttached("PropertyId", typeof(string), typeof(Keyframing),
                 new PropertyMetadata(null, OnPropertyIdChanged));
-
-        public static readonly DependencyProperty DisplayNameProperty =
-            DependencyProperty.RegisterAttached("DisplayName", typeof(string), typeof(Keyframing),
-                new PropertyMetadata(""));
 
         public static readonly DependencyProperty ScopeProperty =
             DependencyProperty.RegisterAttached("Scope", typeof(KfScope), typeof(Keyframing),
@@ -78,8 +73,6 @@ namespace VisualMusic.Keyframes
         // Getters / setters required by XAML
         public static string  GetPropertyId  (DependencyObject d) => (string) d.GetValue(PropertyIdProperty);
         public static void    SetPropertyId  (DependencyObject d, string v)  => d.SetValue(PropertyIdProperty,  v);
-        public static string  GetDisplayName (DependencyObject d) => (string) d.GetValue(DisplayNameProperty);
-        public static void    SetDisplayName (DependencyObject d, string v)  => d.SetValue(DisplayNameProperty, v);
         public static KfScope GetScope       (DependencyObject d) => (KfScope)d.GetValue(ScopeProperty);
         public static void    SetScope       (DependencyObject d, KfScope v) => d.SetValue(ScopeProperty,       v);
         public static bool    GetInterpolatable(DependencyObject d) => (bool) d.GetValue(InterpolatableProperty);
@@ -126,9 +119,6 @@ namespace VisualMusic.Keyframes
             // "Create keyframe?" dialog to appear once per accumulated subscription.
             if (state.Initialized) { Refresh(fe); return; }
             state.Initialized = true;
-
-            // Register the friendly name so menus elsewhere (e.g. the keyframe list) can label this property.
-            KeyframeService.RegisterDisplayName(GetPropertyId(fe), GetDisplayName(fe));
 
             KeyframeService.RefreshRequested  += () => Refresh(fe);
             KeyframeService.KeyframesChanged  += () => Refresh(fe);
@@ -313,7 +303,6 @@ namespace VisualMusic.Keyframes
         {
             var propId        = GetPropertyId(fe);
             var scope         = GetScope(fe);
-            var displayName   = GetDisplayName(fe);
             var interpolatable= GetInterpolatable(fe);
             if (string.IsNullOrEmpty(propId)) return;
 

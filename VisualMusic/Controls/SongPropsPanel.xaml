@@ -11,7 +11,6 @@
                               Margin="0,0,0,8"
                               CommitChanges="VpWidth_CommitChanges"
                               kf:Keyframing.PropertyId="ViewWidthQn"
-                              kf:Keyframing.DisplayName="Viewport width"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="True"/>
 
@@ -35,7 +34,6 @@
             <ctrl:TbSliderWpf Value="{Binding MaxPitch, Mode=TwoWay}"
                               Min="0" Max="128" Decimals="0" Margin="0,0,0,8"
                               kf:Keyframing.PropertyId="MaxPitch"
-                              kf:Keyframing.DisplayName="Max pitch"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="False"/>
 
@@ -43,7 +41,6 @@
             <ctrl:TbSliderWpf Value="{Binding MinPitch, Mode=TwoWay}"
                               Min="0" Max="128" Decimals="0" Margin="0,0,0,4"
                               kf:Keyframing.PropertyId="MinPitch"
-                              kf:Keyframing.DisplayName="Min pitch"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="False"/>
             <Button Content="Reset pitches" HorizontalAlignment="Left"
@@ -58,19 +55,16 @@
                      HorizontalScrollBarVisibility="Auto"
                      Margin="0,0,0,8"
                      kf:Keyframing.PropertyId="Camera"
-                     kf:Keyframing.DisplayName="Camera"
                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                      kf:Keyframing.Interpolatable="True"/>
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                 <Button Content="Load background" Click="LoadBkg_Click"
                         kf:Keyframing.PropertyId="BackgroundImagePath"
-                        kf:Keyframing.DisplayName="Background image"
                         kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                         kf:Keyframing.Interpolatable="True"/>
                 <Button Content="Unload" Margin="4,0,0,0" Click="UnloadBkg_Click"
                         kf:Keyframing.PropertyId="BackgroundImagePath"
-                        kf:Keyframing.DisplayName="Background image"
                         kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                         kf:Keyframing.Interpolatable="True"/>
             </StackPanel>
@@ -79,7 +73,6 @@
             <ctrl:TbSliderWpf Value="{Binding BackgroundImageOpacity, Mode=TwoWay}"
                               Min="0" Max="1" Decimals="2" Margin="0,0,0,8"
                               kf:Keyframing.PropertyId="BackgroundImageOpacity"
-                              kf:Keyframing.DisplayName="Background opacity"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="True"/>
 
@@ -87,7 +80,6 @@
             <ctrl:TbSliderWpf Value="{Binding BackgroundImageSaturation, Mode=TwoWay}"
                               Min="0" Max="1" Decimals="2" Margin="0,0,0,4"
                               kf:Keyframing.PropertyId="BackgroundImageSaturation"
-                              kf:Keyframing.DisplayName="Background saturation"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="True"/>
         </StackPanel>
