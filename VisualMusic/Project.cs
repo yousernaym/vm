@@ -454,6 +454,8 @@ namespace VisualMusic
             if (options.EraseCurrent)
             {
                 KeyFrames = new KeyFrames();
+                PropertyKeyframes = new Keyframes.KeyframeSet();
+                Keyframes.KeyframeService.RaiseKeyframesChanged();
                 Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
                 NormSongPos = 0;
                 ResetPitchLimits();
@@ -472,7 +474,15 @@ namespace VisualMusic
             if (!PropertyKeyframes.HasAny("proj/ViewWidthQn"))
                 Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
             if (!PropertyKeyframes.HasAny("proj/Camera"))
-                Props.Camera = interpolatedFrame.ProjProps.Camera;
+            {
+                // Copy values instead of replacing the object: the keyframe camera is a serializer-based
+                // clone without the (non-serialized) movement/rotation velocities, so swapping the object
+                // would kill WASD velocity every frame and movement would only advance on key auto-repeat.
+                var interpCam = interpolatedFrame.ProjProps.Camera;
+                Props.Camera.Pos = interpCam.Pos;
+                Props.Camera.Orientation = interpCam.Orientation;
+                Props.Camera.Fov = interpCam.Fov;
+            }
             if (!PropertyKeyframes.HasAny("proj/BackgroundImageOpacity"))
                 Props.BackgroundImageOpacity = interpolatedFrame.ProjProps.BackgroundImageOpacity;
             if (!PropertyKeyframes.HasAny("proj/BackgroundImageSaturation"))
@@ -1313,10 +1323,13 @@ namespace VisualMusic
                     new Keyframes.CameraKfValue(cam.Pos, cam.Orientation, cam.Fov));
             }
 
-            int tick = (int)SongPosT;
-            if (KeyFrames != null && KeyFrames.Keys.Contains(tick))
+            // Use the clamping indexer (exact match, or the single/first/last frame) rather than an
+            // exact-tick lookup: InterpolateFrames rewrites Props.Camera from KeyFrames every frame when
+            // no proj/Camera property keyframes exist, so without a write-back here the camera would be
+            // frozen everywhere except exactly on a legacy keyframe tick.
+            var kf = KeyFrames?[(int)SongPosT];
+            if (kf != null)
             {
-                var kf = KeyFrames[tick];
                 kf.ProjProps.Camera.Pos = cam.Pos;
                 kf.ProjProps.Camera.Orientation = cam.Orientation;
                 kf.ProjProps.Camera.Fov = cam.Fov;
