@@ -93,9 +93,11 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(UTile));
             OnPropertyChanged(nameof(VTile));
             OnPropertyChanged(nameof(KeepAspect));
+            OnPropertyChanged(nameof(UAnchorIndex));
             OnPropertyChanged(nameof(UAnchorNote));
             OnPropertyChanged(nameof(UAnchorScreen));
             OnPropertyChanged(nameof(UAnchorSong));
+            OnPropertyChanged(nameof(VAnchorIndex));
             OnPropertyChanged(nameof(VAnchorNote));
             OnPropertyChanged(nameof(VAnchorScreen));
             OnPropertyChanged(nameof(UScroll));
@@ -170,6 +172,46 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(ModPower));
             OnPropertyChanged(nameof(ModDiscardAfterStop));
             OnPropertyChanged(nameof(ModInvert));
+
+            // Material
+            OnPropertyChanged(nameof(Transp));
+            OnPropertyChanged(nameof(MaterialHue));
+            OnPropertyChanged(nameof(NormalSat));
+            OnPropertyChanged(nameof(NormalLum));
+            OnPropertyChanged(nameof(HiliteSat));
+            OnPropertyChanged(nameof(HiliteLum));
+            OnPropertyChanged(nameof(DisableTexture));
+            OnPropertyChanged(nameof(PointSmp));
+            OnPropertyChanged(nameof(TexColBlend));
+            OnPropertyChanged(nameof(UTile));
+            OnPropertyChanged(nameof(VTile));
+            OnPropertyChanged(nameof(KeepAspect));
+            OnPropertyChanged(nameof(UAnchorIndex));
+            OnPropertyChanged(nameof(VAnchorIndex));
+            OnPropertyChanged(nameof(UScroll));
+            OnPropertyChanged(nameof(VScroll));
+            OnPropertyChanged(nameof(TexturePath));
+            OnPropertyChanged(nameof(TextureThumbnail));
+
+            // Light
+            OnPropertyChanged(nameof(UseGlobalLight));
+            OnPropertyChanged(nameof(LightDirX));
+            OnPropertyChanged(nameof(LightDirY));
+            OnPropertyChanged(nameof(LightDirZ));
+            OnPropertyChanged(nameof(AmbientAmount));
+            OnPropertyChanged(nameof(AmbientXnaColor));
+            OnPropertyChanged(nameof(DiffuseAmount));
+            OnPropertyChanged(nameof(DiffuseXnaColor));
+            OnPropertyChanged(nameof(SpecAmount));
+            OnPropertyChanged(nameof(SpecXnaColor));
+            OnPropertyChanged(nameof(SpecPower));
+            OnPropertyChanged(nameof(MasterAmount));
+            OnPropertyChanged(nameof(MasterXnaColor));
+
+            // Spatial
+            OnPropertyChanged(nameof(XOffset));
+            OnPropertyChanged(nameof(YOffset));
+            OnPropertyChanged(nameof(ZOffset));
         }
 
         // =====================================================================
@@ -528,6 +570,35 @@ namespace VisualMusic.ViewModels
             set { Rebuild(tp => tp.MaterialProps.TexProps.KeepAspect = value ?? false); OnPropertyChanged(); }
         }
 
+        public int UAnchorIndex
+        {
+            get => TexProps?.UAnchor == null ? -1 : (int)TexProps.UAnchor;
+            set
+            {
+                if (value < 0) return;
+                Rebuild(tp => tp.MaterialProps.TexProps.UAnchor =
+                    (TexAnchorEnum)Math.Clamp(value, 0, 2));
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(UAnchorNote));
+                OnPropertyChanged(nameof(UAnchorScreen));
+                OnPropertyChanged(nameof(UAnchorSong));
+            }
+        }
+
+        public int VAnchorIndex
+        {
+            get => TexProps?.VAnchor == null ? -1 : (int)TexProps.VAnchor;
+            set
+            {
+                if (value < 0) return;
+                Rebuild(tp => tp.MaterialProps.TexProps.VAnchor =
+                    (TexAnchorEnum)Math.Clamp(value, 0, 1));
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(VAnchorNote));
+                OnPropertyChanged(nameof(VAnchorScreen));
+            }
+        }
+
         public bool UAnchorNote
         {
             get => TexProps?.UAnchor == TexAnchorEnum.Note;
@@ -535,6 +606,7 @@ namespace VisualMusic.ViewModels
             {
                 if (value) Rebuild(tp => tp.MaterialProps.TexProps.UAnchor = TexAnchorEnum.Note);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(UAnchorIndex));
                 OnPropertyChanged(nameof(UAnchorScreen));
                 OnPropertyChanged(nameof(UAnchorSong));
             }
@@ -546,6 +618,7 @@ namespace VisualMusic.ViewModels
             {
                 if (value) Rebuild(tp => tp.MaterialProps.TexProps.UAnchor = TexAnchorEnum.Screen);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(UAnchorIndex));
                 OnPropertyChanged(nameof(UAnchorNote));
                 OnPropertyChanged(nameof(UAnchorSong));
             }
@@ -557,6 +630,7 @@ namespace VisualMusic.ViewModels
             {
                 if (value) Rebuild(tp => tp.MaterialProps.TexProps.UAnchor = TexAnchorEnum.Song);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(UAnchorIndex));
                 OnPropertyChanged(nameof(UAnchorNote));
                 OnPropertyChanged(nameof(UAnchorScreen));
             }
@@ -568,6 +642,7 @@ namespace VisualMusic.ViewModels
             {
                 if (value) Rebuild(tp => tp.MaterialProps.TexProps.VAnchor = TexAnchorEnum.Note);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(VAnchorIndex));
                 OnPropertyChanged(nameof(VAnchorScreen));
             }
         }
@@ -578,6 +653,7 @@ namespace VisualMusic.ViewModels
             {
                 if (value) Rebuild(tp => tp.MaterialProps.TexProps.VAnchor = TexAnchorEnum.Screen);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(VAnchorIndex));
                 OnPropertyChanged(nameof(VAnchorNote));
             }
         }
@@ -598,9 +674,18 @@ namespace VisualMusic.ViewModels
 
         public BitmapSource TextureThumbnail => BuildTextureThumbnail();
 
+        string _textureThumbnailPath;
+        BitmapSource _textureThumbnailCache;
+
         BitmapSource BuildTextureThumbnail()
         {
-            var path = TexProps?.Path;
+            var path = TexProps?.Path ?? "";
+            if (path == _textureThumbnailPath)
+                return _textureThumbnailCache;
+
+            _textureThumbnailPath = path;
+            _textureThumbnailCache = null;
+
             if (string.IsNullOrEmpty(path) || !File.Exists(path)) return null;
             try
             {
@@ -610,7 +695,8 @@ namespace VisualMusic.ViewModels
                 bmp.UriSource = new Uri(path, UriKind.Absolute);
                 bmp.EndInit();
                 bmp.Freeze();
-                return bmp;
+                _textureThumbnailCache = bmp;
+                return _textureThumbnailCache;
             }
             catch { return null; }
         }

@@ -83,6 +83,39 @@ namespace VisualMusic.Keyframes
             ("MovingHl",                  KfScope.Track,    "Moving highlight"),
             ("ShrinkingHl",               KfScope.Track,    "Shrinking highlight"),
             ("HlBorder",                  KfScope.Track,    "Highlight border"),
+            ("Transp",                    KfScope.Track,    "Transparency"),
+            ("MaterialHue",               KfScope.Track,    "Material hue"),
+            ("NormalSat",                 KfScope.Track,    "Normal saturation"),
+            ("NormalLum",                 KfScope.Track,    "Normal luminance"),
+            ("HiliteSat",                 KfScope.Track,    "Highlight saturation"),
+            ("HiliteLum",                 KfScope.Track,    "Highlight luminance"),
+            ("TexturePath",               KfScope.Track,    "Texture"),
+            ("DisableTexture",            KfScope.Track,    "Disable texture"),
+            ("PointSmp",                  KfScope.Track,    "Point sampling"),
+            ("TexColBlend",               KfScope.Track,    "Texture color blend"),
+            ("UTile",                     KfScope.Track,    "U tile"),
+            ("VTile",                     KfScope.Track,    "V tile"),
+            ("KeepAspect",                KfScope.Track,    "Keep aspect"),
+            ("UAnchorIndex",              KfScope.Track,    "U anchor"),
+            ("VAnchorIndex",              KfScope.Track,    "V anchor"),
+            ("UScroll",                   KfScope.Track,    "U scroll"),
+            ("VScroll",                   KfScope.Track,    "V scroll"),
+            ("UseGlobalLight",            KfScope.Track,    "Use global light"),
+            ("LightDirX",                 KfScope.Track,    "Light direction X"),
+            ("LightDirY",                 KfScope.Track,    "Light direction Y"),
+            ("LightDirZ",                 KfScope.Track,    "Light direction Z"),
+            ("AmbientAmount",             KfScope.Track,    "Ambient amount"),
+            ("AmbientColor",              KfScope.Track,    "Ambient color"),
+            ("DiffuseAmount",             KfScope.Track,    "Diffuse amount"),
+            ("DiffuseColor",              KfScope.Track,    "Diffuse color"),
+            ("SpecAmount",                KfScope.Track,    "Specular amount"),
+            ("SpecColor",                 KfScope.Track,    "Specular color"),
+            ("SpecPower",                 KfScope.Track,    "Specular power"),
+            ("MasterAmount",              KfScope.Track,    "Master light amount"),
+            ("MasterColor",               KfScope.Track,    "Master light color"),
+            ("XOffset",                   KfScope.Track,    "X offset"),
+            ("YOffset",                   KfScope.Track,    "Y offset"),
+            ("ZOffset",                   KfScope.Track,    "Z offset"),
             ("ModXOriginEnable",          KfScope.TrackMod, "Mod origin X enable"),
             ("ModXOrigin",                KfScope.TrackMod, "Mod origin X"),
             ("ModYOriginEnable",          KfScope.TrackMod, "Mod origin Y enable"),
@@ -104,6 +137,66 @@ namespace VisualMusic.Keyframes
 
         static readonly Dictionary<string, string> _displayNameLookup =
             AllKeyframeProperties.ToDictionary(e => e.Id, e => e.DisplayName);
+
+        static readonly (string Id, KfScope Scope)[] StyleKeyframeProperties =
+        {
+            ("StyleTypeIndex",  KfScope.Track),
+            ("LineTypeIndex",   KfScope.Track),
+            ("LineWidth",       KfScope.Track),
+            ("QnGapThreshold",  KfScope.Track),
+            ("Continuous",      KfScope.Track),
+            ("LineHlTypeIndex", KfScope.Track),
+            ("HlSize",          KfScope.Track),
+            ("HlMovementPow",   KfScope.Track),
+            ("MovingHl",        KfScope.Track),
+            ("ShrinkingHl",     KfScope.Track),
+            ("HlBorder",        KfScope.Track),
+        };
+
+        static readonly (string Id, KfScope Scope)[] MaterialKeyframeProperties =
+        {
+            ("Transp",         KfScope.Track),
+            ("MaterialHue",    KfScope.Track),
+            ("NormalSat",      KfScope.Track),
+            ("NormalLum",      KfScope.Track),
+            ("HiliteSat",      KfScope.Track),
+            ("HiliteLum",      KfScope.Track),
+            ("TexturePath",    KfScope.Track),
+            ("DisableTexture", KfScope.Track),
+            ("PointSmp",       KfScope.Track),
+            ("TexColBlend",    KfScope.Track),
+            ("UTile",          KfScope.Track),
+            ("VTile",          KfScope.Track),
+            ("KeepAspect",     KfScope.Track),
+            ("UAnchorIndex",   KfScope.Track),
+            ("VAnchorIndex",   KfScope.Track),
+            ("UScroll",        KfScope.Track),
+            ("VScroll",        KfScope.Track),
+        };
+
+        static readonly (string Id, KfScope Scope)[] LightKeyframeProperties =
+        {
+            ("UseGlobalLight", KfScope.Track),
+            ("LightDirX",      KfScope.Track),
+            ("LightDirY",      KfScope.Track),
+            ("LightDirZ",      KfScope.Track),
+            ("AmbientAmount",  KfScope.Track),
+            ("AmbientColor",   KfScope.Track),
+            ("DiffuseAmount",  KfScope.Track),
+            ("DiffuseColor",   KfScope.Track),
+            ("SpecAmount",     KfScope.Track),
+            ("SpecColor",      KfScope.Track),
+            ("SpecPower",      KfScope.Track),
+            ("MasterAmount",   KfScope.Track),
+            ("MasterColor",    KfScope.Track),
+        };
+
+        static readonly (string Id, KfScope Scope)[] SpatialKeyframeProperties =
+        {
+            ("XOffset", KfScope.Track),
+            ("YOffset", KfScope.Track),
+            ("ZOffset", KfScope.Track),
+        };
 
         /// <summary>Returns a friendly label for a full property id (e.g. "track/2/LineWidth").</summary>
         public static string GetDisplayNameForId(string fullId)
@@ -264,12 +357,15 @@ namespace VisualMusic.Keyframes
         /// purged (see <see cref="PurgeModKeyframesForSelectedTracks"/>) rather than re-captured.
         /// </summary>
         public static List<(string Id, KfScope Scope)> GetStylePropertiesWithKeyframes()
+            => GetPropertiesWithKeyframes(StyleKeyframeProperties);
+
+        static List<(string Id, KfScope Scope)> GetPropertiesWithKeyframes(
+            IEnumerable<(string Id, KfScope Scope)> properties)
         {
             var list = new List<(string, KfScope)>();
             if (Project == null) return list;
-            foreach (var (id, scope, _) in AllKeyframeProperties)
+            foreach (var (id, scope) in properties)
             {
-                if (scope != KfScope.Track) continue;
                 if (HasAnyKeyForAny(id, scope))
                     list.Add((id, scope));
             }
@@ -451,6 +547,63 @@ namespace VisualMusic.Keyframes
         /// at the current tick for every property returned by <see cref="ConfirmDefaultStyleReset"/>.
         /// </summary>
         public static void CaptureDefaultStyleAtCurrentTick(IEnumerable<(string Id, KfScope Scope)> affected)
+            => CapturePropertiesAtCurrentTick(affected);
+
+        static bool ConfirmDefaultTrackTabReset(string tabName, string caption,
+            IEnumerable<(string Id, KfScope Scope)> properties,
+            out List<(string Id, KfScope Scope)> affected)
+        {
+            affected = GetPropertiesWithKeyframes(properties);
+            if (affected.Count == 0) return true;
+
+            var labels = GetKeyframeLabels(affected, onlyNotAtCurrentTick: true);
+            if (labels.Count > 0)
+            {
+                string body = $"The following {tabName} properties have keyframes elsewhere "
+                            + "but not at the current playback position:\n\n"
+                            + string.Join("\n", labels.Select(l => " - " + l))
+                            + "\n\nReset to default will create keyframes at the current playback "
+                            + "position for these properties.\n\nContinue?";
+
+                var result = System.Windows.MessageBox.Show(
+                    body,
+                    caption,
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Question);
+
+                if (result != System.Windows.MessageBoxResult.Yes)
+                {
+                    affected = null;
+                    return false;
+                }
+            }
+
+            PausePlayback();
+            return true;
+        }
+
+        public static bool ConfirmDefaultMaterialReset(out List<(string Id, KfScope Scope)> affected)
+            => ConfirmDefaultTrackTabReset("material", "Default material",
+                MaterialKeyframeProperties, out affected);
+
+        public static void CaptureDefaultMaterialAtCurrentTick(
+            IEnumerable<(string Id, KfScope Scope)> affected)
+            => CapturePropertiesAtCurrentTick(affected);
+
+        public static bool ConfirmDefaultLightReset(out List<(string Id, KfScope Scope)> affected)
+            => ConfirmDefaultTrackTabReset("light", "Default light",
+                LightKeyframeProperties, out affected);
+
+        public static void CaptureDefaultLightAtCurrentTick(
+            IEnumerable<(string Id, KfScope Scope)> affected)
+            => CapturePropertiesAtCurrentTick(affected);
+
+        public static bool ConfirmDefaultSpatialReset(out List<(string Id, KfScope Scope)> affected)
+            => ConfirmDefaultTrackTabReset("spatial", "Default spatial",
+                SpatialKeyframeProperties, out affected);
+
+        public static void CaptureDefaultSpatialAtCurrentTick(
+            IEnumerable<(string Id, KfScope Scope)> affected)
             => CapturePropertiesAtCurrentTick(affected);
 
         // ---- Pitch reset ----

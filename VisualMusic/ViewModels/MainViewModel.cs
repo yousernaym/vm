@@ -114,6 +114,10 @@ namespace VisualMusic.ViewModels
                 if (_project == null) return;
                 var drawHost = GetDrawHost?.Invoke();
                 if (drawHost == null) return;
+                if (!Keyframes.KeyframeService.EnsureKeyframeForEdit("TexturePath",
+                    Keyframes.KeyframeService.KfScope.Track))
+                    return;
+
                 try
                 {
                     foreach (var item in TrackList.SelectedItems)
@@ -123,16 +127,28 @@ namespace VisualMusic.ViewModels
                 {
                     MessageBox.Show(ex.Message, Program.AppName,
                         MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
                 _project.CreateGeos();
+                Keyframes.KeyframeService.SyncEditedValue("TexturePath",
+                    Keyframes.KeyframeService.KfScope.Track,
+                    new Keyframes.StringKfValue(path));
                 OnTrackListSelectionChanged();
             };
 
             SelectedTrackProps.UnloadTexture = () =>
             {
+                if (_project == null) return;
+                if (!Keyframes.KeyframeService.EnsureKeyframeForEdit("TexturePath",
+                    Keyframes.KeyframeService.KfScope.Track))
+                    return;
+
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.MaterialProps.TexProps.UnloadTexture();
-                _project?.CreateGeos();
+                _project.CreateGeos();
+                Keyframes.KeyframeService.SyncEditedValue("TexturePath",
+                    Keyframes.KeyframeService.KfScope.Track,
+                    new Keyframes.StringKfValue(""));
                 OnTrackListSelectionChanged();
             };
 
@@ -176,23 +192,32 @@ namespace VisualMusic.ViewModels
 
             SelectedTrackProps.ResetMaterial = () =>
             {
+                if (!Keyframes.KeyframeService.ConfirmDefaultMaterialReset(out var affected))
+                    return;
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.ResetMaterial();
+                Keyframes.KeyframeService.CaptureDefaultMaterialAtCurrentTick(affected);
                 _project?.CreateGeos();
                 OnTrackListSelectionChanged();
             };
 
             SelectedTrackProps.ResetLight = () =>
             {
+                if (!Keyframes.KeyframeService.ConfirmDefaultLightReset(out var affected))
+                    return;
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.ResetLight();
+                Keyframes.KeyframeService.CaptureDefaultLightAtCurrentTick(affected);
                 OnTrackListSelectionChanged();
             };
 
             SelectedTrackProps.ResetSpatial = () =>
             {
+                if (!Keyframes.KeyframeService.ConfirmDefaultSpatialReset(out var affected))
+                    return;
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.ResetSpatial();
+                Keyframes.KeyframeService.CaptureDefaultSpatialAtCurrentTick(affected);
                 OnTrackListSelectionChanged();
             };
 

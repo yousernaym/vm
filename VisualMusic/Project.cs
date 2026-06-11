@@ -76,11 +76,22 @@ namespace VisualMusic
             /// returns <paramref name="b"/> for Smooth/Linear (the renderer drives the visual crossfade)
             /// and <paramref name="a"/> for Hold (snap/hard-cut).
             /// </summary>
-            public static PropAccessor StringHold(Func<string> get, Action<string> set)
+            public static PropAccessor StringHold(Func<string> get, Action<string> set,
+                                                  bool alwaysHold = false)
                 => new PropAccessor(
                     () => new Keyframes.StringKfValue(get()),
                     v  => set(((Keyframes.StringKfValue)v).S),
-                    (a, b, t, mode) => mode == Keyframes.KfInterpolation.Hold ? a : b);
+                    (a, b, t, mode) => mode == Keyframes.KfInterpolation.Hold ? a : b,
+                    alwaysHold: alwaysHold);
+
+            /// <summary>Factory for a bool property. Bool keyframes always step instead of blending.</summary>
+            public static PropAccessor Bool(Func<bool?> get, Action<bool> set,
+                                            bool needsRebuild = false)
+                => Scalar(
+                    () => get() == true ? 1.0 : 0.0,
+                    v  => set(v >= 0.5),
+                    needsRebuild: needsRebuild,
+                    alwaysHold: true);
         }
 
         readonly Dictionary<string, PropAccessor> _propAccessors = new Dictionary<string, PropAccessor>();
@@ -1136,6 +1147,9 @@ namespace VisualMusic
             {
                 var tv  = _trackViews[i];     // capture reference, not index
                 int tn  = tv.TrackNumber;     // stable id, never changes
+                string prefix = $"track/{tn}";
+
+                // Style
                 _propAccessors[$"track/{tn}/StyleTypeIndex"] = PropAccessor.Scalar(
                     () => { var t = tv.TrackProps.StyleProps.Type; return t == null ? 0 : (double)(int)t; },
                     v  => { tv.TrackProps.StyleProps.Type = (NoteStyleType)(int)Math.Round(v); },
@@ -1178,7 +1192,149 @@ namespace VisualMusic
                     () => tv.TrackProps.StyleProps.GetLineStyle().HlBorder == true ? 1.0 : 0.0,
                     v  => { tv.TrackProps.StyleProps.GetLineStyle().HlBorder = v >= 0.5; },
                     alwaysHold: true);
+
+                // Material
+                _propAccessors[$"{prefix}/Transp"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Transp ?? 0,
+                    v  => tv.TrackProps.MaterialProps.Transp = (float)v);
+                _propAccessors[$"{prefix}/MaterialHue"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Hue ?? 0,
+                    v  => tv.TrackProps.MaterialProps.Hue = (float)v);
+                _propAccessors[$"{prefix}/NormalSat"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Normal.Sat ?? 0,
+                    v  => tv.TrackProps.MaterialProps.Normal.Sat = (float)v);
+                _propAccessors[$"{prefix}/NormalLum"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Normal.Lum ?? 0,
+                    v  => tv.TrackProps.MaterialProps.Normal.Lum = (float)v);
+                _propAccessors[$"{prefix}/HiliteSat"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Hilited.Sat ?? 0,
+                    v  => tv.TrackProps.MaterialProps.Hilited.Sat = (float)v);
+                _propAccessors[$"{prefix}/HiliteLum"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Hilited.Lum ?? 0,
+                    v  => tv.TrackProps.MaterialProps.Hilited.Lum = (float)v);
+                _propAccessors[$"{prefix}/TexturePath"] = PropAccessor.StringHold(
+                    () => tv.TrackProps.MaterialProps.TexProps.Path ?? "",
+                    v  => ApplyTrackTexturePath(tv, v),
+                    alwaysHold: true);
+                _propAccessors[$"{prefix}/DisableTexture"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.DisableTexture,
+                    v  => tv.TrackProps.MaterialProps.TexProps.DisableTexture = v);
+                _propAccessors[$"{prefix}/PointSmp"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.PointSmp,
+                    v  => tv.TrackProps.MaterialProps.TexProps.PointSmp = v);
+                _propAccessors[$"{prefix}/TexColBlend"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.TexColBlend,
+                    v  => tv.TrackProps.MaterialProps.TexProps.TexColBlend = v);
+                _propAccessors[$"{prefix}/UTile"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.UTile,
+                    v  => tv.TrackProps.MaterialProps.TexProps.UTile = v,
+                    needsRebuild: true);
+                _propAccessors[$"{prefix}/VTile"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.VTile,
+                    v  => tv.TrackProps.MaterialProps.TexProps.VTile = v,
+                    needsRebuild: true);
+                _propAccessors[$"{prefix}/KeepAspect"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.KeepAspect,
+                    v  => tv.TrackProps.MaterialProps.TexProps.KeepAspect = v,
+                    needsRebuild: true);
+                _propAccessors[$"{prefix}/UAnchorIndex"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.TexProps.UAnchor == null
+                        ? 0 : (double)(int)tv.TrackProps.MaterialProps.TexProps.UAnchor.Value,
+                    v  => tv.TrackProps.MaterialProps.TexProps.UAnchor =
+                        (TexAnchorEnum)Math.Clamp((int)Math.Round(v), 0, 2),
+                    needsRebuild: true, alwaysHold: true);
+                _propAccessors[$"{prefix}/VAnchorIndex"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.TexProps.VAnchor == null
+                        ? 0 : (double)(int)tv.TrackProps.MaterialProps.TexProps.VAnchor.Value,
+                    v  => tv.TrackProps.MaterialProps.TexProps.VAnchor =
+                        (TexAnchorEnum)Math.Clamp((int)Math.Round(v), 0, 1),
+                    needsRebuild: true, alwaysHold: true);
+                _propAccessors[$"{prefix}/UScroll"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.TexProps.UScroll ?? 0,
+                    v  => tv.TrackProps.MaterialProps.TexProps.UScroll = (float)v);
+                _propAccessors[$"{prefix}/VScroll"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.TexProps.VScroll ?? 0,
+                    v  => tv.TrackProps.MaterialProps.TexProps.VScroll = (float)v);
+
+                // Light
+                _propAccessors[$"{prefix}/UseGlobalLight"] = PropAccessor.Bool(
+                    () => tv.TrackProps.LightProps.UseGlobalLight,
+                    v  => tv.TrackProps.LightProps.UseGlobalLight = v);
+                _propAccessors[$"{prefix}/LightDirX"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.DirX ?? 0,
+                    v  => tv.TrackProps.LightProps.DirX = (float)v);
+                _propAccessors[$"{prefix}/LightDirY"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.DirY ?? 0,
+                    v  => tv.TrackProps.LightProps.DirY = (float)v);
+                _propAccessors[$"{prefix}/LightDirZ"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.DirZ ?? 0,
+                    v  => tv.TrackProps.LightProps.DirZ = (float)v);
+                _propAccessors[$"{prefix}/AmbientAmount"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.AmbientAmount ?? 0,
+                    v  => tv.TrackProps.LightProps.AmbientAmount = (float)v);
+                _propAccessors[$"{prefix}/AmbientColor"] = PropAccessor.Color(
+                    () => tv.TrackProps.LightProps.AmbientColor ?? Color.White,
+                    v  => tv.TrackProps.LightProps.AmbientColor = v);
+                _propAccessors[$"{prefix}/DiffuseAmount"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.DiffuseAmount ?? 0,
+                    v  => tv.TrackProps.LightProps.DiffuseAmount = (float)v);
+                _propAccessors[$"{prefix}/DiffuseColor"] = PropAccessor.Color(
+                    () => tv.TrackProps.LightProps.DiffuseColor ?? Color.White,
+                    v  => tv.TrackProps.LightProps.DiffuseColor = v);
+                _propAccessors[$"{prefix}/SpecAmount"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.SpecAmount ?? 0,
+                    v  => tv.TrackProps.LightProps.SpecAmount = (float)v);
+                _propAccessors[$"{prefix}/SpecColor"] = PropAccessor.Color(
+                    () => tv.TrackProps.LightProps.SpecColor ?? Color.White,
+                    v  => tv.TrackProps.LightProps.SpecColor = v);
+                _propAccessors[$"{prefix}/SpecPower"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.SpecPower ?? 1,
+                    v  => tv.TrackProps.LightProps.SpecPower = (float)v);
+                _propAccessors[$"{prefix}/MasterAmount"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.MasterAmount ?? 0,
+                    v  => tv.TrackProps.LightProps.MasterAmount = (float)v);
+                _propAccessors[$"{prefix}/MasterColor"] = PropAccessor.Color(
+                    () => tv.TrackProps.LightProps.MasterColor ?? Color.White,
+                    v  => tv.TrackProps.LightProps.MasterColor = v);
+
+                // Spatial
+                _propAccessors[$"{prefix}/XOffset"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.SpatialProps.XOffset ?? 0,
+                    v  => tv.TrackProps.SpatialProps.XOffset = (float)v);
+                _propAccessors[$"{prefix}/YOffset"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.SpatialProps.YOffset ?? 0,
+                    v  => tv.TrackProps.SpatialProps.YOffset = (float)v);
+                _propAccessors[$"{prefix}/ZOffset"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.SpatialProps.ZOffset ?? 0,
+                    v  => tv.TrackProps.SpatialProps.ZOffset = (float)v);
             }
+        }
+
+        void ApplyTrackTexturePath(TrackView tv, string path)
+        {
+            if (tv == null) return;
+            var texProps = tv.TrackProps.MaterialProps.TexProps;
+            path ??= "";
+            if (string.Equals(texProps.Path ?? "", path, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            try
+            {
+                if (string.IsNullOrEmpty(path))
+                    texProps.UnloadTexture();
+                else if (DrawHost != null)
+                    texProps.LoadTexture(path, DrawHost);
+                else
+                    texProps.Path = path;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to apply texture keyframe '{path}': {ex.Message}");
+                texProps.UnloadTexture();
+                texProps.Path = path;
+            }
+
+            CreateGeos(resetVertScale: false);
         }
 
         /// <summary>
