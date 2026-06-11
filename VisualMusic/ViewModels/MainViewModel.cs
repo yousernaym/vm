@@ -216,6 +216,8 @@ namespace VisualMusic.ViewModels
 
             SelectedTrackProps.DeleteModEntry = () =>
             {
+                if (!Keyframes.KeyframeService.ConfirmModEntryDelete())
+                    return;
                 foreach (var item in TrackList.SelectedItems)
                 {
                     var ns = item.TrackView.TrackProps.ActiveNoteStyle;

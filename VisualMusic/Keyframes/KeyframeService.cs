@@ -313,6 +313,57 @@ namespace VisualMusic.Keyframes
             RaiseKeyframesChanged();
         }
 
+        /// <summary>
+        /// Keyframe-set ids belonging to the selected mod entry of each selected track
+        /// (prefix <c>track/{tn}/mod/{eid}/</c>) — the entries a Delete-mod-entry action removes.
+        /// </summary>
+        static List<string> GetSelectedModEntryKeyframeIds()
+        {
+            var result = new List<string>();
+            var kfs = Project?.PropertyKeyframes;
+            var trackViews = Project?.TrackViews;
+            if (kfs == null || trackViews == null) return result;
+            foreach (var tn in EffectiveTrackNumbers())
+            {
+                TrackView tv = null;
+                foreach (var t in trackViews)
+                    if (t.TrackNumber == tn) { tv = t; break; }
+                var entry = tv?.TrackProps.ActiveNoteStyle?.SelectedModEntry;
+                if (entry == null) continue;
+                string prefix = $"track/{tn}/mod/{entry.Id}/";
+                foreach (var id in kfs.Tracks.Keys)
+                    if (id.StartsWith(prefix, StringComparison.Ordinal))
+                        result.Add(id);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Prompts before deleting the selected mod entry when any of its properties have keyframes.
+        /// Returns false if the user declines; true without prompting when there is nothing to warn about.
+        /// </summary>
+        public static bool ConfirmModEntryDelete()
+        {
+            var ids = GetSelectedModEntryKeyframeIds();
+            if (ids.Count == 0) return true;
+
+            var labels = ids.Select(GetDisplayNameForId).Distinct().ToList();
+            labels.Sort(StringComparer.OrdinalIgnoreCase);
+
+            string body = "The following modulation properties will be deleted "
+                        + "along with all their keyframes:\n\n"
+                        + string.Join("\n", labels.Select(l => "• " + l))
+                        + "\n\nContinue?";
+
+            var result = System.Windows.MessageBox.Show(
+                body,
+                "Delete mod entry",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Question);
+
+            return result == System.Windows.MessageBoxResult.Yes;
+        }
+
         static List<string> GetKeyframeLabels(IEnumerable<(string Id, KfScope Scope)> properties,
             bool onlyNotAtCurrentTick = false)
         {
