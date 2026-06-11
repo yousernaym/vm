@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -292,7 +293,12 @@ namespace VisualMusic.ViewModels
 
         public bool ModulationVisible => SP?.Type == NoteStyleType.Bar || SP?.Type == NoteStyleType.Line;
 
-        public System.Collections.IEnumerable ModEntries => AS?.ModEntries;
+        // Snapshot the live List<NoteStyleMod> so each OnPropertyChanged(nameof(ModEntries)) hands the
+        // ComboBox a fresh collection reference. AddModEntry/CloneModEntry/DeleteModEntry mutate the
+        // model list in place without CollectionChanged notifications; binding ItemsSource to that live
+        // list lets WPF reuse a stale collection view, which shows blank entries and eventually throws
+        // "ItemsControl is inconsistent with its items source". A new list forces a clean rebuild.
+        public System.Collections.IEnumerable ModEntries => AS?.ModEntries?.ToList();
 
         public bool ModEntryComboEnabled => AS?.ModEntries != null;
 
