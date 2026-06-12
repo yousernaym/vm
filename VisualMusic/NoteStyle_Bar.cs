@@ -21,10 +21,12 @@ namespace VisualMusic
     {
         public Vector4 destRect;
         public Vector4 srcRect;
+        public Vector4 srcRect2;
         public BarInstanceVertex(Vector4 _destRect, Vector4 _srcRect, Color _color)
         {
             destRect = _destRect;
             srcRect = _srcRect;
+            srcRect2 = _srcRect;
         }
     }
 
@@ -92,14 +94,28 @@ namespace VisualMusic
                 Vector2 topLeft_tex = topLeft_world;
                 Vector2 size_tex = size_world;
 
-                Texture2D texture = texMaterial.TexProps.CoordTexture;
+                Texture2D texture = texMaterial.TexProps.Texture ?? texMaterial.TexProps.TransitionTexture;
+                Texture2D texture2 = texMaterial.TexProps.TransitionTexture;
+                Vector2 topLeft_tex2 = topLeft_tex;
+                Vector2 size_tex2 = size_tex;
                 if (texture != null)
                 {
                     Vector2 texSize = new Vector2(texture.Width, texture.Height);
                     CalcRectTexCoords(out topLeft_tex, out size_tex, texSize, topLeft_world, size_world, texMaterial);
                 }
+                if (texture2 != null)
+                {
+                    Vector2 texSize2 = new Vector2(texture2.Width, texture2.Height);
+                    CalcRectTexCoords(out topLeft_tex2, out size_tex2, texSize2, topLeft_world, size_world, texMaterial);
+                }
+                else
+                {
+                    topLeft_tex2 = topLeft_tex;
+                    size_tex2 = size_tex;
+                }
                 s_instanceVerts[instanceIndex].destRect = new Vector4(topLeft_world.X, topLeft_world.Y, size_world.X, size_world.Y);
                 s_instanceVerts[instanceIndex].srcRect = new Vector4(topLeft_tex.X, topLeft_tex.Y, size_tex.X, size_tex.Y);
+                s_instanceVerts[instanceIndex].srcRect2 = new Vector4(topLeft_tex2.X, topLeft_tex2.Y, size_tex2.X, size_tex2.Y);
                 if (++instanceIndex >= MaxInstances - 1)
                     CreateVb(ref instanceIndex, barGeo);
             }
@@ -142,7 +158,7 @@ namespace VisualMusic
             s_meshVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0));
             s_meshVb = new VertexBuffer(GraphicsDevice, s_meshVertDecl, 4, BufferUsage.WriteOnly);
             //Instance vb
-            s_instanceVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.Position, 1), new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 0));
+            s_instanceVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.Position, 1), new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 0), new VertexElement(32, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 1));
             //instanceVb = new DynamicVertexBuffer(GraphicsDevice, instanceVertDecl, NumDynamicVerts, BufferUsage.WriteOnly);
             BarMeshVertex[] meshVerts =
             {

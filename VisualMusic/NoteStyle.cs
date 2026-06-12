@@ -347,7 +347,8 @@ namespace VisualMusic
             bool useTexture2 = transitionTexture != null && !(bool)trackProps.MaterialProps.GetTexProps(0).DisableTexture && !(bool)Project.GlobalTrackProps.MaterialProps.GetTexProps(0).DisableTexture;
             bool supportsTextureBlend = HasEffectParameter("Texture2")
                 && HasEffectParameter("UseTexture2")
-                && HasEffectParameter("TextureBlend");
+                && HasEffectParameter("TextureBlend")
+                && HasEffectParameter("TexScrollOffset2");
             if (supportsTextureBlend && useTexture2)
                 _fx.Parameters["Texture2"].SetValue(transitionTexture);
             _fx.Parameters["UseTexture"].SetValue(useTexture);
@@ -383,28 +384,38 @@ namespace VisualMusic
             _fx.Parameters["CamPos"].SetValue(Project.Props.Camera.Pos);
 
             //Texture scrolling including adjustment for screen anchoring
-            Texture2D coordTexture = texMaterial.TexProps.CoordTexture;
-            if (coordTexture != null)
+            Texture2D coordTexture = texMaterial.TexProps.Texture ?? texMaterial.TexProps.TransitionTexture;
+            Texture2D coordTexture2 = transitionTexture ?? coordTexture;
+            _fx.Parameters["TexScrollOffset"].SetValue(coordTexture != null
+                ? CalcTexScrollOffset(texMaterial.TexProps, coordTexture, songPosP)
+                : Vector2.Zero);
+            if (HasEffectParameter("TexScrollOffset2"))
             {
-                TrackPropsTex texProps = texMaterial.TexProps;
-                Vector2 texScrollOffset = (float)Project.SongPosB * texProps.Scroll;
-                if (texProps.UAnchor == TexAnchorEnum.Screen)
-                {
-                    Vector2 texSize = new Vector2(coordTexture.Width, coordTexture.Height) * TexTileScale;
-                    float xOffset = songPosP + Project.Props.Camera.ViewportSize.X / 2;
-                    if ((bool)texProps.UTile)
-                    {
-                        if ((bool)texProps.KeepAspect)
-                            texSize.X /= texSize.Y * Project.Props.Camera.XYRatio;
-                        xOffset /= texSize.X; ;
-                    }
-                    else
-                        xOffset /= Project.Props.Camera.ViewportSize.X;
-
-                    texScrollOffset.X += xOffset;
-                }
-                _fx.Parameters["TexScrollOffset"].SetValue(texScrollOffset);
+                _fx.Parameters["TexScrollOffset2"].SetValue(coordTexture2 != null
+                    ? CalcTexScrollOffset(texMaterial.TexProps, coordTexture2, songPosP)
+                    : Vector2.Zero);
             }
+        }
+
+        Vector2 CalcTexScrollOffset(TrackPropsTex texProps, Texture2D texture, float songPosP)
+        {
+            Vector2 texScrollOffset = (float)Project.SongPosB * texProps.Scroll;
+            if (texProps.UAnchor == TexAnchorEnum.Screen)
+            {
+                Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
+                float xOffset = songPosP + Project.Props.Camera.ViewportSize.X / 2;
+                if ((bool)texProps.UTile)
+                {
+                    if ((bool)texProps.KeepAspect)
+                        texSize.X /= texSize.Y * Project.Props.Camera.XYRatio;
+                    xOffset /= texSize.X;
+                }
+                else
+                    xOffset /= Project.Props.Camera.ViewportSize.X;
+
+                texScrollOffset.X += xOffset;
+            }
+            return texScrollOffset;
         }
 
         //public abstract void createGeoChunk(BoundingBox bbox, Midi.Track midiTrack, SongDrawProps songDrawProps, TrackProps trackProps, TrackProps globalTrackProps, Material texMaterial);

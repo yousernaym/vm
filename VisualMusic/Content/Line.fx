@@ -16,6 +16,7 @@ struct VSInput
 	float3 center : POSITION1;
 	float2 normPos : POSITION2;
 	float2 texCoords : TEXCOORD0;
+	float2 texCoords2 : TEXCOORD1;
 };
 
 struct VSOutput
@@ -27,6 +28,7 @@ struct VSOutput
 	float2 normPos : POSITION3;
 	float2 worldSize : POSITION4;
 	float2 texCoords : TEXCOORD0;
+	float2 texCoords2 : TEXCOORD2;
 };
 
 void VS(in VSInput IN, out VSOutput OUT)
@@ -38,6 +40,7 @@ void VS(in VSInput IN, out VSOutput OUT)
 	OUT.pos = float4(IN.pos.xy, 0, 1);
 	OUT.pos = wvpTransform(OUT.pos, VertWidthScale);
 	OUT.texCoords = IN.texCoords - TexScrollOffset;
+	OUT.texCoords2 = IN.texCoords2 - TexScrollOffset2;
 }
 
 float4 PS(in VSOutput IN) : COLOR0
@@ -55,7 +58,7 @@ float4 PS(in VSOutput IN) : COLOR0
 		lightingNormal = float3(0, 0, 1);
 				
 	lightingNormal = normalize(lightingNormal);
-    float4 color = getPixelColor(Color, IN.texCoords);
+    float4 color = getPixelColor(Color, IN.texCoords, IN.texCoords2);
 		
 	float3 normal = normalize(IN.normal);
 	float3 tPos = IN.rawPos - IN.center;

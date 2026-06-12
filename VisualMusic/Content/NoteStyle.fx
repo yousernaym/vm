@@ -10,6 +10,7 @@ bool TexColBlend;
 float TextureBlend;
 float SongPos;
 float2 TexScrollOffset;
+float2 TexScrollOffset2;
 float VertWidthScale;
 float TexWidthScale;
 float4 HlColor;
@@ -443,7 +444,7 @@ float4 applyTextureColor(float4 hslaColor, float4 texColor)
 	}
 }
 
-float4 getPixelColor(float4 color, float2 texCoords)
+float4 getPixelColor(float4 color, float2 texCoords, float2 texCoords2)
 {
 	float4 baseColor = HslaToRgba(color);
 	float4 color1 = UseTexture
@@ -455,7 +456,7 @@ float4 getPixelColor(float4 color, float2 texCoords)
 		return color1;
 
 	float4 color2 = UseTexture2
-		? applyTextureColor(color, tex2D(TextureSampler2, texCoords))
+		? applyTextureColor(color, tex2D(TextureSampler2, texCoords2))
 		: baseColor;
 
     return lerp(color1, color2, blend);

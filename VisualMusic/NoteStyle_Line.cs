@@ -27,6 +27,7 @@ namespace VisualMusic
         //public float normStepFromNoteStart;
         public Vector2 normPos;
         public Vector2 texCoords;
+        public Vector2 texCoords2;
     }
 
     [Serializable()]
@@ -141,20 +142,19 @@ namespace VisualMusic
             vertexOffset *= lineWidth / 2.0f;
         }
 
-        void CalcTexCoords(out Vector2 vert1Tc, out Vector2 vert2Tc, TrackPropsTex texProps, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
+        void CalcTexCoords(out Vector2 vert1Tc, out Vector2 vert2Tc, TrackPropsTex texProps, Texture2D texture, float stepFromNoteStart, float normStepFromNoteStart, float lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect = false)
         {
             double x1, y1, x2, y2;
-            CalcTexCoords(out x1, out y1, out x2, out y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, false, false);
+            CalcTexCoords(out x1, out y1, out x2, out y2, texProps, texture, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, false, false);
             vert1Tc = new Vector2((float)x1, (float)y1);
             vert2Tc = new Vector2((float)x2, (float)y2);
         }
 
-        void CalcTexCoords(out double x1, out double y1, out double x2, out double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect, bool forceTiling)
+        void CalcTexCoords(out double x1, out double y1, out double x2, out double y2, TrackPropsTex texProps, Texture2D texture, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2, bool adjustingAspect, bool forceTiling)
         {
             double vpSizeX = Project.Props.Camera.ViewportSize.X;
             double vpSizeY = Project.Props.Camera.ViewportSize.Y;
 
-            Texture2D texture = texProps.CoordTexture;
             double texSizeX = (double)texture.Width * TexTileScale;
             double texSizeY = (double)texture.Height * TexTileScale;
             TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;
@@ -230,12 +230,12 @@ namespace VisualMusic
             else
                 throw new NotImplementedException();
             if (!adjustingAspect)
-                AdjustAspect(ref x1, ref y1, ref x2, ref y2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2);
+                AdjustAspect(ref x1, ref y1, ref x2, ref y2, texProps, texture, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2);
             y1 *= -1;
             y2 *= -1;
         }
 
-        void AdjustAspect(ref double x1, ref double y1, ref double x2, ref double y2, TrackPropsTex texProps, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2)
+        void AdjustAspect(ref double x1, ref double y1, ref double x2, ref double y2, TrackPropsTex texProps, Texture2D texture, double stepFromNoteStart, double normStepFromNoteStart, double lineWidth, Vector3 worldPos1, Vector3 worldPos2)
         {
             if ((bool)texProps.KeepAspect)
             {
@@ -244,8 +244,8 @@ namespace VisualMusic
                 float intWorldPosX = (int)worldPos1.X;
                 worldPos1.X -= intWorldPosX;
                 worldPos2.X -= intWorldPosX;
-                CalcTexCoords(out regularX1, out regularY1, out regularX2, out regularY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, false);
-                CalcTexCoords(out tiledX1, out tiledY1, out tiledX2, out tiledY2, texProps, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, true);
+                CalcTexCoords(out regularX1, out regularY1, out regularX2, out regularY2, texProps, texture, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, false);
+                CalcTexCoords(out tiledX1, out tiledY1, out tiledX2, out tiledY2, texProps, texture, stepFromNoteStart, normStepFromNoteStart, lineWidth, worldPos1, worldPos2, true, true);
                 double xDiff = regularX1 - regularX2, yDiff = regularY1 - regularY2;
                 double tiledXDiff = tiledX1 - tiledX2, tiledYDiff = tiledY1 - tiledY2;
 
@@ -393,8 +393,19 @@ namespace VisualMusic
                     s_lineVerts[vertIndex].normPos = new Vector2(normStepFromNoteStart, 0);
                     s_lineVerts[vertIndex + 1].normPos = new Vector2(normStepFromNoteStart, 1);
 
-                    if (texMaterial.TexProps.CoordTexture != null)
-                        CalcTexCoords(out s_lineVerts[vertIndex].texCoords, out s_lineVerts[vertIndex + 1].texCoords, texMaterial.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, s_lineVerts[vertIndex].pos, s_lineVerts[vertIndex + 1].pos);
+                    Texture2D texture = texMaterial.TexProps.Texture ?? texMaterial.TexProps.TransitionTexture;
+                    Texture2D texture2 = texMaterial.TexProps.TransitionTexture;
+                    if (texture != null)
+                    {
+                        CalcTexCoords(out s_lineVerts[vertIndex].texCoords, out s_lineVerts[vertIndex + 1].texCoords, texMaterial.TexProps, texture, x - startDraw, normStepFromNoteStart, vpLineWidth, s_lineVerts[vertIndex].pos, s_lineVerts[vertIndex + 1].pos);
+                        if (texture2 != null)
+                            CalcTexCoords(out s_lineVerts[vertIndex].texCoords2, out s_lineVerts[vertIndex + 1].texCoords2, texMaterial.TexProps, texture2, x - startDraw, normStepFromNoteStart, vpLineWidth, s_lineVerts[vertIndex].pos, s_lineVerts[vertIndex + 1].pos);
+                        else
+                        {
+                            s_lineVerts[vertIndex].texCoords2 = s_lineVerts[vertIndex].texCoords;
+                            s_lineVerts[vertIndex + 1].texCoords2 = s_lineVerts[vertIndex + 1].texCoords;
+                        }
+                    }
 
                     if (LineType == VisualMusic.LineType.Ribbon)
                     {
@@ -726,7 +737,7 @@ namespace VisualMusic
 
         public static void SInit()
         {
-            s_lineVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Vector2, VertexElementUsage.Position, 2), new VertexElement(44, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
+            s_lineVertDecl = new VertexDeclaration(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0), new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1), new VertexElement(36, VertexElementFormat.Vector2, VertexElementUsage.Position, 2), new VertexElement(44, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0), new VertexElement(52, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1));
             //for (short i = 0; i < lineInds.Length; i++)
             //lineInds[i] = i;
         }
