@@ -154,8 +154,9 @@ namespace VisualMusic
             double vpSizeX = Project.Props.Camera.ViewportSize.X;
             double vpSizeY = Project.Props.Camera.ViewportSize.Y;
 
-            double texSizeX = (double)texProps.Texture.Width * TexTileScale;
-            double texSizeY = (double)texProps.Texture.Height * TexTileScale;
+            Texture2D texture = texProps.CoordTexture;
+            double texSizeX = (double)texture.Width * TexTileScale;
+            double texSizeY = (double)texture.Height * TexTileScale;
             TexAnchorEnum texUAnchor = (TexAnchorEnum)texProps.UAnchor;
             TexAnchorEnum texVAnchor = (TexAnchorEnum)texProps.VAnchor;
             bool uTile = true, vTile = true;
@@ -392,7 +393,7 @@ namespace VisualMusic
                     s_lineVerts[vertIndex].normPos = new Vector2(normStepFromNoteStart, 0);
                     s_lineVerts[vertIndex + 1].normPos = new Vector2(normStepFromNoteStart, 1);
 
-                    if (texMaterial.TexProps.Texture != null)
+                    if (texMaterial.TexProps.CoordTexture != null)
                         CalcTexCoords(out s_lineVerts[vertIndex].texCoords, out s_lineVerts[vertIndex + 1].texCoords, texMaterial.TexProps, x - startDraw, normStepFromNoteStart, vpLineWidth, s_lineVerts[vertIndex].pos, s_lineVerts[vertIndex + 1].pos);
 
                     if (LineType == VisualMusic.LineType.Ribbon)

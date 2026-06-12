@@ -75,11 +75,11 @@
                 <Button Content="Load..."   Width="56" Margin="0,0,4,0" Click="LoadTexBtn_Click"
                         kf:Keyframing.PropertyId="TexturePath"
                         kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
-                        kf:Keyframing.Interpolatable="False"/>
+                        kf:Keyframing.Interpolatable="True"/>
                 <Button Content="Unload"    Width="56" Click="UnloadTexBtn_Click"
                         kf:Keyframing.PropertyId="TexturePath"
                         kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
-                        kf:Keyframing.Interpolatable="False"/>
+                        kf:Keyframing.Interpolatable="True"/>
             </StackPanel>
 
             <WrapPanel>

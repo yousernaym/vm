@@ -87,6 +87,15 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(SolutionDir)Dependencies\Remuxer\Remuxer\bin\$(ConfigurationName)\&quot; &quot;$(TargetDir)Remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /Y /D&#xD;&#xA;&#xD;&#xA;" />
   </Target>
+  <Target Name="BuildMonoGameContent" BeforeTargets="BeforeBuild" Condition="'$(MSBuildProjectFile)' == 'VisualMusic.csproj' and '$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Content\Content.mgcb')">
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\Content" Command="dotnet tool run mgcb -- /@:Content.mgcb /platform:Windows" />
+  </Target>
+  <Target Name="CopyMonoGameContent" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(MSBuildProjectFile)' == 'VisualMusic.csproj' and '$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Content\bin\Windows')">
+    <ItemGroup>
+      <BuiltMonoGameContent Include="$(MSBuildProjectDirectory)\Content\bin\Windows\*.xnb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BuiltMonoGameContent)" DestinationFolder="$(TargetDir)Content\" SkipUnchangedFiles="true" />
+  </Target>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High" />
         <Exec Command="dotnet tool restore" />

@@ -1214,8 +1214,7 @@ namespace VisualMusic
                     v  => tv.TrackProps.MaterialProps.Hilited.Lum = (float)v);
                 _propAccessors[$"{prefix}/TexturePath"] = PropAccessor.StringHold(
                     () => tv.TrackProps.MaterialProps.TexProps.Path ?? "",
-                    v  => ApplyTrackTexturePath(tv, v),
-                    alwaysHold: true);
+                    v  => ApplyTrackTexturePath(tv, v));
                 _propAccessors[$"{prefix}/DisableTexture"] = PropAccessor.Bool(
                     () => tv.TrackProps.MaterialProps.TexProps.DisableTexture,
                     v  => tv.TrackProps.MaterialProps.TexProps.DisableTexture = v);
@@ -1310,13 +1309,13 @@ namespace VisualMusic
             }
         }
 
-        void ApplyTrackTexturePath(TrackView tv, string path)
+        bool ApplyTrackTexturePath(TrackView tv, string path, bool rebuild = true)
         {
-            if (tv == null) return;
+            if (tv == null) return false;
             var texProps = tv.TrackProps.MaterialProps.TexProps;
             path ??= "";
             if (string.Equals(texProps.Path ?? "", path, StringComparison.OrdinalIgnoreCase))
-                return;
+                return false;
 
             try
             {
@@ -1334,7 +1333,58 @@ namespace VisualMusic
                 texProps.Path = path;
             }
 
-            CreateGeos(resetVertScale: false);
+            if (rebuild)
+                CreateGeos(resetVertScale: false);
+            return true;
+        }
+
+        TrackView FindTrackViewByTrackNumber(int trackNumber)
+        {
+            if (_trackViews == null) return null;
+            foreach (var t in _trackViews)
+                if (t.TrackNumber == trackNumber) return t;
+            return null;
+        }
+
+        bool ApplyMaterialTexturePathKeyframes(string id, Keyframes.PropertyKeyframeTrack track)
+        {
+            var parts = id.Split('/');
+            if (parts.Length != 3 || parts[0] != "track" || parts[2] != "TexturePath")
+                return false;
+            if (!int.TryParse(parts[1], out int tn)) return false;
+
+            var tv = FindTrackViewByTrackNumber(tn);
+            if (tv == null) return false;
+
+            var (before, after, t) = track.FindBrackets((int)SongPosT);
+            if (before?.Value == null && after?.Value == null) return false;
+
+            string pathA = (before?.Value as Keyframes.StringKfValue)?.S ?? "";
+            string pathB = (after?.Value  as Keyframes.StringKfValue)?.S ?? "";
+            var texProps = tv.TrackProps.MaterialProps.TexProps;
+
+            bool changed = false;
+            if (before == null || before.Value == null)
+            {
+                changed |= ApplyTrackTexturePath(tv, pathB, rebuild: false);
+                changed |= texProps.SetTextureTransition("", 0f, DrawHost);
+            }
+            else if (after == null || after.Value == null
+                     || before.Interpolation == Keyframes.KfInterpolation.Hold)
+            {
+                changed |= ApplyTrackTexturePath(tv, pathA, rebuild: false);
+                changed |= texProps.SetTextureTransition("", 0f, DrawHost);
+            }
+            else
+            {
+                float blend = before.Interpolation == Keyframes.KfInterpolation.Smooth
+                    ? (float)(t * t * (3.0 - 2.0 * t))
+                    : (float)t;
+                changed |= ApplyTrackTexturePath(tv, pathA, rebuild: false);
+                changed |= texProps.SetTextureTransition(pathB, blend, DrawHost);
+            }
+
+            return changed;
         }
 
         /// <summary>
@@ -1357,10 +1407,7 @@ namespace VisualMusic
             if (!_modPropTable.TryGetValue(name, out var factory)) return null;
 
             // Find the TrackView by stable TrackNumber
-            TrackView tv = null;
-            if (_trackViews != null)
-                foreach (var t in _trackViews)
-                    if (t.TrackNumber == tn) { tv = t; break; }
+            TrackView tv = FindTrackViewByTrackNumber(tn);
             if (tv == null) return null;
 
             // Find the mod entry by stable Id
@@ -1420,6 +1467,14 @@ namespace VisualMusic
                 // Background path is handled by the special-case block above (crossfade needs the brackets);
                 // skip it here to avoid overwriting Props.BackgroundImagePath with just the "after" value.
                 if (id == "proj/BackgroundImagePath") continue;
+
+                if (id.StartsWith("track/", StringComparison.Ordinal)
+                    && id.EndsWith("/TexturePath", StringComparison.Ordinal))
+                {
+                    if (ApplyMaterialTexturePathKeyframes(id, track))
+                        anyRebuildNeeded = true;
+                    continue;
+                }
 
                 var acc = ResolveAccessor(id);
                 if (acc == null) continue;

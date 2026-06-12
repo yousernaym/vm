@@ -118,7 +118,7 @@ namespace VisualMusic
         {
             if (_midiTrack?.Notes?.Count == 0)
                 return;
-            MaterialProps texMaterial = TrackProps.MaterialProps.GetTexture(false, null) != null ? TrackProps.MaterialProps : globalTrackProps.MaterialProps;
+            MaterialProps texMaterial = TrackProps.MaterialProps.HasLocalTextureForRender(false) ? TrackProps.MaterialProps : globalTrackProps.MaterialProps;
             if (defaultStyle)
                 TrackProps.StyleProps.GetStyle(NoteStyleType.Bar).DrawTrack(_midiTrack, TrackProps, texMaterial);
             else
@@ -137,7 +137,7 @@ namespace VisualMusic
             //Todo: use posOffset.z for z-component
             Vector3 minPos = new Vector3(minPos2d.X, minPos2d.Y, 0);
             Vector3 maxPos = new Vector3(maxPos2d.X, maxPos2d.Y, 0);
-            MaterialProps texMaterial = TrackProps.MaterialProps.GetTexture(false, null) != null ? TrackProps.MaterialProps : globalTrackProps.MaterialProps;
+            MaterialProps texMaterial = TrackProps.MaterialProps.HasLocalTextureForRender(false) ? TrackProps.MaterialProps : globalTrackProps.MaterialProps;
 
             NoteStyle noteStyle = TrackProps.ActiveNoteStyle;
             noteStyle.CreateGeoChunk(out Geo newGeo, new BoundingBox(minPos, maxPos), _midiTrack, TrackProps, texMaterial);

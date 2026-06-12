@@ -138,7 +138,11 @@ namespace VisualMusic
     public class TrackPropsTex : ISerializable
     {
         internal Texture2D Texture { get; set; } = null;
+        internal Texture2D TransitionTexture { get; private set; } = null;
+        internal Texture2D CoordTexture => Texture ?? TransitionTexture;
+        internal float TextureBlend { get; private set; } = 0;
         public string Path { get; set; } = "";
+        string _transitionPath = "";
 
         SamplerState _samplerState = new SamplerState();
         SamplerState _samplerStateBacking = new SamplerState();
@@ -288,6 +292,7 @@ namespace VisualMusic
 
         bool LoadTexture(string path, FileStream stream, GraphicsDevice gd, SpriteBatch sb)
         {
+            ClearTextureTransition();
             Path = path;
             Texture2D tex = Texture;
             if (tex != null) { tex.Dispose(); tex = null; }
@@ -305,15 +310,82 @@ namespace VisualMusic
         public bool LoadTexture(string path, ISongDrawHost host)
         {
             using var stream = File.Open(path, FileMode.Open);
+            ClearTextureTransition();
             return LoadTexture(path, stream, host);
         }
         public void UnloadTexture()
         {
+            ClearTextureTransition();
             Path = "";
             if (Texture != null)
             {
                 Texture.Dispose();
                 Texture = null;
+            }
+        }
+
+        internal bool SetTextureTransition(string path, float blend, ISongDrawHost host)
+        {
+            path ??= "";
+            blend = Math.Clamp(blend, 0f, 1f);
+
+            if (blend <= 0 || string.Equals(path, Path ?? "", StringComparison.OrdinalIgnoreCase))
+            {
+                bool changed = TransitionTexture != null || !string.IsNullOrEmpty(_transitionPath);
+                ClearTextureTransition();
+                return changed;
+            }
+
+            bool sourceChanged = !string.Equals(path, _transitionPath, StringComparison.OrdinalIgnoreCase);
+            TextureBlend = blend;
+
+            if (string.IsNullOrEmpty(path))
+            {
+                if (TransitionTexture != null)
+                {
+                    TransitionTexture.Dispose();
+                    TransitionTexture = null;
+                }
+                _transitionPath = "";
+                return sourceChanged;
+            }
+
+            if (!sourceChanged && TransitionTexture != null)
+                return false;
+
+            bool hadTransitionTexture = TransitionTexture != null;
+            if (TransitionTexture != null)
+            {
+                TransitionTexture.Dispose();
+                TransitionTexture = null;
+            }
+
+            _transitionPath = path;
+            if (host == null)
+                return sourceChanged;
+
+            try
+            {
+                using var stream = File.Open(path, FileMode.Open);
+                Texture2D tex = Texture2D.FromStream(host.GraphicsDevice, stream);
+                TransitionTexture = CreateMipLevels(tex, host.GraphicsDevice, host.SpriteBatch);
+            }
+            catch
+            {
+                TransitionTexture = null;
+            }
+
+            return sourceChanged || hadTransitionTexture != (TransitionTexture != null);
+        }
+
+        internal void ClearTextureTransition()
+        {
+            TextureBlend = 0;
+            _transitionPath = "";
+            if (TransitionTexture != null)
+            {
+                TransitionTexture.Dispose();
+                TransitionTexture = null;
             }
         }
 
@@ -593,6 +665,16 @@ namespace VisualMusic
             }
             return tex;
         }
+
+        public bool HasLocalTextureForRender(bool bhilited)
+        {
+            if (bhilited && Hilited.Texture != null)
+                return true;
+            if (!bhilited && Normal.Texture != null)
+                return true;
+            return TexProps.Texture != null || TexProps.TransitionTexture != null;
+        }
+
         public System.Drawing.Color GetSysColor(bool bhilited, MaterialProps globalMaterial)
         {
             Vector4 hsla = GetColor(bhilited, globalMaterial);

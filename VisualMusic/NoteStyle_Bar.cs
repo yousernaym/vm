@@ -92,7 +92,7 @@ namespace VisualMusic
                 Vector2 topLeft_tex = topLeft_world;
                 Vector2 size_tex = size_world;
 
-                Texture2D texture = texMaterial.TexProps.Texture;
+                Texture2D texture = texMaterial.TexProps.CoordTexture;
                 if (texture != null)
                 {
                     Vector2 texSize = new Vector2(texture.Width, texture.Height);

@@ -166,6 +166,8 @@ namespace VisualMusic
 
         protected Effect _fx;
 
+        bool HasEffectParameter(string name) => _fx?.Parameters[name] != null;
+
         //protected TrackProps trackProps = null;
         //public TrackProps TrackProps
         //{
@@ -334,14 +336,28 @@ namespace VisualMusic
 
             //Material
             GraphicsDevice.SamplerStates[0] = texMaterial.TexProps.SamplerState;
-            GraphicsDevice.SamplerStates[1] = texMaterial.HmapProps.SamplerState;
+            GraphicsDevice.SamplerStates[1] = texMaterial.TexProps.SamplerState;
             Texture2D texture;
             Vector4 color;
             GetMaterial(trackProps, false, out color, out texture);
             bool useTexture = texture != null && !(bool)trackProps.MaterialProps.GetTexProps(0).DisableTexture && !(bool)Project.GlobalTrackProps.MaterialProps.GetTexProps(0).DisableTexture;
             if (useTexture)
                 _fx.Parameters["Texture"].SetValue(texture);
+            Texture2D transitionTexture = texMaterial.TexProps.TransitionTexture;
+            bool useTexture2 = transitionTexture != null && !(bool)trackProps.MaterialProps.GetTexProps(0).DisableTexture && !(bool)Project.GlobalTrackProps.MaterialProps.GetTexProps(0).DisableTexture;
+            bool supportsTextureBlend = HasEffectParameter("Texture2")
+                && HasEffectParameter("UseTexture2")
+                && HasEffectParameter("TextureBlend");
+            if (supportsTextureBlend && useTexture2)
+                _fx.Parameters["Texture2"].SetValue(transitionTexture);
             _fx.Parameters["UseTexture"].SetValue(useTexture);
+            if (supportsTextureBlend)
+            {
+                _fx.Parameters["UseTexture2"].SetValue(useTexture2);
+                _fx.Parameters["TextureBlend"].SetValue((useTexture || useTexture2)
+                    ? texMaterial.TexProps.TextureBlend
+                    : 0f);
+            }
             _fx.Parameters["Color"].SetValue(color);
             Vector4 hlColor = trackProps.MaterialProps.GetColor(true, Project.GlobalTrackProps.MaterialProps);
             _fx.Parameters["HlColor"].SetValue(hlColor);
@@ -367,13 +383,14 @@ namespace VisualMusic
             _fx.Parameters["CamPos"].SetValue(Project.Props.Camera.Pos);
 
             //Texture scrolling including adjustment for screen anchoring
-            if (texture != null)
+            Texture2D coordTexture = texMaterial.TexProps.CoordTexture;
+            if (coordTexture != null)
             {
                 TrackPropsTex texProps = texMaterial.TexProps;
                 Vector2 texScrollOffset = (float)Project.SongPosB * texProps.Scroll;
                 if (texProps.UAnchor == TexAnchorEnum.Screen)
                 {
-                    Vector2 texSize = new Vector2(texture.Width, texture.Height) * TexTileScale;
+                    Vector2 texSize = new Vector2(coordTexture.Width, coordTexture.Height) * TexTileScale;
                     float xOffset = songPosP + Project.Props.Camera.ViewportSize.X / 2;
                     if ((bool)texProps.UTile)
                     {
