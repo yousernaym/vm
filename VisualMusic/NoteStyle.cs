@@ -507,7 +507,7 @@ namespace VisualMusic
             }
             else //Anchor at song start. Can only be true for U
             {
-                float x = Project.SongPosP + notePos + posOffset;
+                float x = notePos + posOffset;
                 if (!tile)
                     return x / Project.SongLengthP;
                 else
