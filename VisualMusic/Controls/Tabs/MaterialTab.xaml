@@ -44,7 +44,7 @@
                                   kf:Keyframing.Interpolatable="True"/>
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Normal lum:" VerticalAlignment="Center" Margin="0,1"/>
                 <ctrl:TbSliderWpf Grid.Row="3" Grid.Column="1" Margin="2"
-                                  Value="{Binding NormalLum, Mode=TwoWay}" Min="0" Max="4" Decimals="2"
+                                  Value="{Binding NormalLum, Mode=TwoWay}" Min="0" Max="2" Decimals="2"
                                   kf:Keyframing.PropertyId="NormalLum"
                                   kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                                   kf:Keyframing.Interpolatable="True"/>
@@ -56,7 +56,7 @@
                                   kf:Keyframing.Interpolatable="True"/>
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="Hilite lum:" VerticalAlignment="Center" Margin="0,1"/>
                 <ctrl:TbSliderWpf Grid.Row="5" Grid.Column="1" Margin="2"
-                                  Value="{Binding HiliteLum, Mode=TwoWay}" Min="0" Max="4" Decimals="2"
+                                  Value="{Binding HiliteLum, Mode=TwoWay}" Min="0" Max="2" Decimals="2"
                                   kf:Keyframing.PropertyId="HiliteLum"
                                   kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                                   kf:Keyframing.Interpolatable="True"/>
