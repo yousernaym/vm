@@ -334,7 +334,6 @@ namespace VisualMusic.ViewModels
             SongProps.CommitViewWidth = () =>
             {
                 _project?.CreateGeos();
-                AddUndoItem("Edit Viewport Width");
             };
 
             SongProps.ResetPitches = () =>

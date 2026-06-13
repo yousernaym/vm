@@ -19,7 +19,7 @@ namespace VisualMusic.ViewModels
 
         public Action CreateGeos { get; set; }
 
-        /// <summary>Called on slider release — rebuilds track geometry and adds an undo entry.</summary>
+        /// <summary>Called on slider release to rebuild track geometry. Undo is handled by keyframing.</summary>
         public Action CommitViewWidth { get; set; }
 
         public Action ResetPitches { get; set; }

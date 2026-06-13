@@ -1633,7 +1633,7 @@ namespace VisualMusic
             for (int i = 0; i < TrackViews.Count; i++)
             {
                 var destProps = TrackViews[i].TrackProps;
-                var sourceProps = TrackViews[i].TrackProps;
+                var sourceProps = source.TrackViews[i].TrackProps;
                 destProps.StyleProps = sourceProps.StyleProps;
                 destProps.MaterialProps = sourceProps.MaterialProps;
                 destProps.LightProps = sourceProps.LightProps;
