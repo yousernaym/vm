@@ -16,19 +16,23 @@
 
             <TextBlock Text="Audio offset (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding AudioOffset, Mode=TwoWay}"
-                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"/>
+                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"
+                              CommitChanges="AudioOffset_CommitChanges"/>
 
             <TextBlock Text="Playback offset (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding PlaybackOffsetS, Mode=TwoWay}"
-                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"/>
+                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"
+                              CommitChanges="PlaybackOffset_CommitChanges"/>
 
             <TextBlock Text="Fade in (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding FadeIn, Mode=TwoWay}"
-                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"/>
+                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"
+                              CommitChanges="FadeIn_CommitChanges"/>
 
             <TextBlock Text="Fade out (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding FadeOut, Mode=TwoWay}"
-                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"/>
+                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"
+                              CommitChanges="FadeOut_CommitChanges"/>
 
             <TextBlock Text="Max pitch" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding MaxPitch, Mode=TwoWay}"

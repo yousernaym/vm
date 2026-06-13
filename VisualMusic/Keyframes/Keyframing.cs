@@ -251,6 +251,9 @@ namespace VisualMusic.Keyframes
             var kfVal = ReadControlValue(fe);
             if (kfVal != null)
                 KeyframeService.SyncEditedValue(propId, scope, kfVal);
+
+            // Push an undo snapshot so the user can revert this committed property edit.
+            KeyframeService.RaiseUndoSnapshot($"Edit {KeyframeService.GetDisplayName(propId, scope)}");
         }
 
         /// <summary>
@@ -326,8 +329,8 @@ namespace VisualMusic.Keyframes
             // Add / Remove
             var addItem = new MenuItem { Header = "_Add keyframe at playback position",    IsEnabled = !hasHere };
             var remItem = new MenuItem { Header = "_Remove keyframe at playback position",  IsEnabled = hasHere  };
-            addItem.Click += (_, _) => { KeyframeService.AddKey(propId, scope);    };
-            remItem.Click += (_, _) => { KeyframeService.RemoveKey(propId, scope); };
+            addItem.Click += (_, _) => { KeyframeService.AddKey(propId, scope);    KeyframeService.RaiseUndoSnapshot("Add keyframe"); };
+            remItem.Click += (_, _) => { KeyframeService.RemoveKey(propId, scope); KeyframeService.RaiseUndoSnapshot("Remove keyframe"); };
             menu.Items.Add(addItem);
             menu.Items.Add(remItem);
 
@@ -381,7 +384,7 @@ namespace VisualMusic.Keyframes
                         IsCheckable = true,
                         IsChecked   = curInterp == mode,
                     };
-                    modeItem.Click += (_, _) => KeyframeService.SetInterpolation(propId, scope, capturedMode);
+                    modeItem.Click += (_, _) => { KeyframeService.SetInterpolation(propId, scope, capturedMode); KeyframeService.RaiseUndoSnapshot("Change interpolation"); };
                     interpMenu.Items.Add(modeItem);
                 }
                 menu.Items.Add(interpMenu);

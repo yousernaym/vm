@@ -24,6 +24,17 @@ namespace VisualMusic.Keyframes
 
         public static int CurrentTick => (int)(Project?.SongPosT ?? 0);
 
+        // ---- Undo hook ----
+
+        /// <summary>
+        /// Requests a whole-project undo snapshot with the given description.
+        /// Wired by <see cref="MainViewModel"/> to <c>AddUndoItem</c> after a project loads;
+        /// null before the first project is opened.
+        /// </summary>
+        public static Action<string> RequestUndoSnapshot { get; set; }
+
+        internal static void RaiseUndoSnapshot(string desc) => RequestUndoSnapshot?.Invoke(desc);
+
         // ---- Events (fired on the WPF UI thread) ----
 
         /// <summary>
@@ -211,6 +222,13 @@ namespace VisualMusic.Keyframes
             }
             return name;
         }
+
+        /// <summary>
+        /// Returns the friendly display name for a raw property id (e.g. "LineWidth" → "Line width").
+        /// The <paramref name="scope"/> parameter is accepted for API symmetry but is not used.
+        /// </summary>
+        public static string GetDisplayName(string propId, KfScope scope)
+            => _displayNameLookup.TryGetValue(propId, out var dn) ? dn : propId;
 
         // ---- Property-ID helpers ----
 
@@ -828,6 +846,7 @@ namespace VisualMusic.Keyframes
             foreach (var id in ids)
                 kfs.RemoveProperty(id);
             RaiseKeyframesChanged();
+            RaiseUndoSnapshot("Remove all keyframes");
         }
     }
 }

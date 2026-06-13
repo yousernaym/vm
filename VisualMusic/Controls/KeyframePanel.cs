@@ -278,6 +278,7 @@ namespace VisualMusic.Controls
             {
                 KeyframeService.Project.PropertyKeyframes.MoveColumn(_dragSourceTick, newTick);
                 KeyframeService.RaiseKeyframesChanged();
+                KeyframeService.RaiseUndoSnapshot("Move keyframe");
             }
             InvalidateVisual();
             e.Handled = true;

@@ -134,6 +134,7 @@ namespace VisualMusic.ViewModels
                     Keyframes.KeyframeService.KfScope.Track,
                     new Keyframes.StringKfValue(path));
                 OnTrackListSelectionChanged();
+                AddUndoItem("Load texture");
             };
 
             SelectedTrackProps.UnloadTexture = () =>
@@ -150,6 +151,7 @@ namespace VisualMusic.ViewModels
                     Keyframes.KeyframeService.KfScope.Track,
                     new Keyframes.StringKfValue(""));
                 OnTrackListSelectionChanged();
+                AddUndoItem("Unload texture");
             };
 
             SelectedTrackProps.BrowseAudioFile = () =>
@@ -163,6 +165,7 @@ namespace VisualMusic.ViewModels
                 if (dlg.ShowDialog() != true) return;
                 AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TrackAudioFolder = dir);
                 SelectedTrackProps.AudioFilename = dlg.FileName;
+                AddUndoItem("Set track audio");
             };
 
             SelectedTrackProps.LoadSelectedTracksAudio = async () =>
@@ -188,6 +191,7 @@ namespace VisualMusic.ViewModels
                 Keyframes.KeyframeService.CaptureDefaultStyleAtCurrentTick(affected);
                 _project?.CreateGeos();
                 OnTrackListSelectionChanged();
+                AddUndoItem("Reset style");
             };
 
             SelectedTrackProps.ResetMaterial = () =>
@@ -199,6 +203,7 @@ namespace VisualMusic.ViewModels
                 Keyframes.KeyframeService.CaptureDefaultMaterialAtCurrentTick(affected);
                 _project?.CreateGeos();
                 OnTrackListSelectionChanged();
+                AddUndoItem("Reset material");
             };
 
             SelectedTrackProps.ResetLight = () =>
@@ -209,6 +214,7 @@ namespace VisualMusic.ViewModels
                     item.TrackView.TrackProps.ResetLight();
                 Keyframes.KeyframeService.CaptureDefaultLightAtCurrentTick(affected);
                 OnTrackListSelectionChanged();
+                AddUndoItem("Reset light");
             };
 
             SelectedTrackProps.ResetSpatial = () =>
@@ -219,6 +225,7 @@ namespace VisualMusic.ViewModels
                     item.TrackView.TrackProps.ResetSpatial();
                 Keyframes.KeyframeService.CaptureDefaultSpatialAtCurrentTick(affected);
                 OnTrackListSelectionChanged();
+                AddUndoItem("Reset spatial");
             };
 
             SelectedTrackProps.AddModEntry = () =>
@@ -226,6 +233,7 @@ namespace VisualMusic.ViewModels
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.ActiveNoteStyle?.AddModEntry(true);
                 OnTrackListSelectionChanged();
+                AddUndoItem("Add modulation");
             };
 
             SelectedTrackProps.CloneModEntry = () =>
@@ -237,6 +245,7 @@ namespace VisualMusic.ViewModels
                         ns.CloneModEntry(true);
                 }
                 OnTrackListSelectionChanged();
+                AddUndoItem("Clone modulation");
             };
 
             SelectedTrackProps.DeleteModEntry = () =>
@@ -257,6 +266,7 @@ namespace VisualMusic.ViewModels
                     }
                 }
                 OnTrackListSelectionChanged();
+                AddUndoItem("Delete modulation");
             };
 
             SelectedTrackProps.SelectModEntry = idx =>
@@ -335,6 +345,7 @@ namespace VisualMusic.ViewModels
                 Keyframes.KeyframeService.CapturePitchResetAtCurrentTick(affected);
                 _project?.CreateGeos();
                 SongProps.RefreshAll();
+                AddUndoItem("Reset pitches");
             };
 
             SongProps.NotesMinPitch = () => _project?.Notes?.MinPitch;
@@ -369,6 +380,7 @@ namespace VisualMusic.ViewModels
                 Keyframes.KeyframeService.SyncEditedValue("BackgroundImagePath",
                     Keyframes.KeyframeService.KfScope.Project,
                     new Keyframes.StringKfValue(dlg.FileName));
+                AddUndoItem("Load background");
             };
 
             SongProps.UnloadBackground = () =>
@@ -386,6 +398,7 @@ namespace VisualMusic.ViewModels
                 Keyframes.KeyframeService.SyncEditedValue("BackgroundImagePath",
                     Keyframes.KeyframeService.KfScope.Project,
                     new Keyframes.StringKfValue(""));
+                AddUndoItem("Unload background");
             };
         }
 
@@ -429,9 +442,11 @@ namespace VisualMusic.ViewModels
                 SelectedTrackProps.MergedProps = null;
             // Wire the per-property keyframe service to the new project
             Keyframes.KeyframeService.Project = value;
+            Keyframes.KeyframeService.RequestUndoSnapshot = AddUndoItem;
             Keyframes.KeyframeService.KeyframesChanged += OnKeyframesChangedRestoreBackground;
             Keyframes.KeyframeService.RaiseKeyframesChanged();
             Camera.OnUserUpdating = () => value?.SyncLiveCameraEdit();
+            Camera.OnUserUpdated  = () => AddUndoItem("Edit Camera");
             NotifyScrollPositionChanged();
         }
 
@@ -884,6 +899,13 @@ namespace VisualMusic.ViewModels
         {
             if (_undoItems.Current == null) return;
             _project?.CopyPropsFrom(_undoItems.Current.Project);
+            // Rebuild geometry for any style/material/spatial changes in the restored snapshot.
+            _project?.CreateGeos();
+            // Refresh the Song and Track property panels so they reflect restored values.
+            SongProps.RefreshAll();
+            OnTrackListSelectionChanged();
+            // Refresh keyframe panel and list.
+            Keyframes.KeyframeService.RaiseKeyframesChanged();
         }
 
         void UpdateUndoRedo()

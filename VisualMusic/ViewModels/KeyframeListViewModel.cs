@@ -161,6 +161,7 @@ namespace VisualMusic.ViewModels
 
             _project.PropertyKeyframes.MoveColumn(row.Tick, newTick);
             KeyframeService.RaiseKeyframesChanged();
+            KeyframeService.RaiseUndoSnapshot("Move keyframe");
         }
 
         /// <summary>Commits an in-place description edit.</summary>
@@ -169,6 +170,7 @@ namespace VisualMusic.ViewModels
             if (_project == null) return;
             _project.PropertyKeyframes.SetDescription(row.Tick, newDesc);
             row.Description = newDesc;
+            KeyframeService.RaiseUndoSnapshot("Edit keyframe label");
         }
 
         /// <summary>
@@ -181,6 +183,7 @@ namespace VisualMusic.ViewModels
             int tick = (int)_project.SongPosT;
             _project.PropertyKeyframes.AddMarker(tick);
             KeyframeService.RaiseKeyframesChanged();
+            KeyframeService.RaiseUndoSnapshot("Add keyframe");
             return tick;
         }
 
@@ -201,6 +204,7 @@ namespace VisualMusic.ViewModels
                     kfs.DeleteColumn(row.Tick);
             }
             KeyframeService.RaiseKeyframesChanged();
+            KeyframeService.RaiseUndoSnapshot("Delete keyframe");
         }
 
         /// <summary>Deletes a single keyframe row (convenience wrapper for <see cref="DeleteRows"/>).</summary>
@@ -220,6 +224,7 @@ namespace VisualMusic.ViewModels
             if (_project == null) return;
             _project.PropertyKeyframes.RemovePropertyAt(fullId, row.Tick);
             KeyframeService.RaiseKeyframesChanged();
+            KeyframeService.RaiseUndoSnapshot("Remove keyframe property");
         }
 
         /// <summary>Seeks to the keyframe at the given row's tick position.</summary>

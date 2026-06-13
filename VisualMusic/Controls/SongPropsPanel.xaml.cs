@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using VisualMusic.Keyframes;
 using VisualMusic.ViewModels;
 
 namespace VisualMusic.Controls
@@ -14,6 +15,18 @@ namespace VisualMusic.Controls
 
         void VpWidth_CommitChanges(object sender, EventArgs e)
             => (DataContext as SongPropsViewModel)?.CommitViewWidth?.Invoke();
+
+        void AudioOffset_CommitChanges(object sender, EventArgs e)
+            => KeyframeService.RaiseUndoSnapshot("Edit Audio offset");
+
+        void PlaybackOffset_CommitChanges(object sender, EventArgs e)
+            => KeyframeService.RaiseUndoSnapshot("Edit Playback offset");
+
+        void FadeIn_CommitChanges(object sender, EventArgs e)
+            => KeyframeService.RaiseUndoSnapshot("Edit Fade in");
+
+        void FadeOut_CommitChanges(object sender, EventArgs e)
+            => KeyframeService.RaiseUndoSnapshot("Edit Fade out");
 
         void ResetPitches_Click(object sender, RoutedEventArgs e)
             => (DataContext as SongPropsViewModel)?.ResetPitches?.Invoke();
