@@ -1,6 +1,5 @@
 ﻿Todo:
 - Fix viewport width change for lines
-- Keyframe interpolation of all/most properties
 - Use hardware tesselation for lines (when Monogame supports it)
 - Individual world matrices  for different tracks
 - Normal/parallax mapping.

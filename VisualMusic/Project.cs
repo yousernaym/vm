@@ -411,16 +411,18 @@ namespace VisualMusic
                 options.AudioPath = audioPath;
             }
 
-            OpenNoteFile(options);
+            bool resetProject = options.EraseCurrent || _notes == null;
+
+            OpenNoteFile(options, resetProject);
             OpenAudioFile(options);
 
             ImportOptions = options;
-            if (options.EraseCurrent)
+            if (resetProject)
             {
                 DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + "." + DefaultFileExt;
                 Props.ViewWidthQn = _vertViewWidthQn = ProjProps.DefaultViewWidthQn;
             }
-            CreateTrackViews(_notes.Tracks.Count, options.EraseCurrent);
+            CreateTrackViews(_notes.Tracks.Count, resetProject);
             InitPropertyAccessors();
             return true;
         }
@@ -429,8 +431,10 @@ namespace VisualMusic
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool IsIconic(IntPtr hWnd);
 
-        public bool OpenNoteFile(ImportOptions options)
+        public bool OpenNoteFile(ImportOptions options, bool? resetProjectOverride = null)
         {
+            bool resetProject = resetProjectOverride ?? options.EraseCurrent;
+
             DrawHost?.Invalidate();
             StopPlayback();
             _pbTempoEvent = 0;
@@ -462,7 +466,7 @@ namespace VisualMusic
                 SplitTracksByChannel(_notes);
             _notes.CreateNoteBsp();
 
-            if (options.EraseCurrent)
+            if (resetProject)
             {
                 KeyFrames = new KeyFrames();
                 PropertyKeyframes = new Keyframes.KeyframeSet();

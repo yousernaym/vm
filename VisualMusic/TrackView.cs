@@ -47,11 +47,11 @@ namespace VisualMusic
             set { _midiTrack = value; }
         }
 
-        public TrackView(int _trackNumber, int _numTracks, Midi.Song song)
+        public TrackView(int trackNumber, int numTracks, Midi.Song song)
         {
-            _trackNumber = _trackNumber;
-            s_numTracks = _numTracks;
-            _midiTrack = song.Tracks[_trackNumber];
+            _trackNumber = trackNumber;
+            s_numTracks = numTracks;
+            _midiTrack = song.Tracks[trackNumber];
             TrackProps = new TrackProps(this);
             CreateCurve();
         }
