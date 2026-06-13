@@ -411,7 +411,7 @@ namespace VisualMusic
                 options.AudioPath = audioPath;
             }
 
-            bool resetProject = options.EraseCurrent || _notes == null;
+            bool resetProject = options.EraseCurrent || (_notes == null && (_trackViews == null || _trackViews.Count == 0));
 
             OpenNoteFile(options, resetProject);
             OpenAudioFile(options);

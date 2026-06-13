@@ -32,8 +32,16 @@ namespace VisualMusic.ViewModels
         /// <summary>Apply + rebuild track geometry (needed for style/geometry changes).</summary>
         public Action<Action<TrackProps>> ApplyAndRebuild { get; set; }
 
+        /// <summary>Refreshes track-list color swatches after material color edits.</summary>
+        public Action RefreshTrackColors { get; set; }
+
         void Apply(Action<TrackProps> fn) => ApplyToSelected?.Invoke(fn);
         void Rebuild(Action<TrackProps> fn) => ApplyAndRebuild?.Invoke(fn);
+        void ApplyMaterial(Action<TrackProps> fn)
+        {
+            Apply(fn);
+            RefreshTrackColors?.Invoke();
+        }
 
         // ---- RefreshAll: raise PropertyChanged for every derived property ----
 
@@ -504,31 +512,31 @@ namespace VisualMusic.ViewModels
         public double? MaterialHue
         {
             get => (double?)MP?.Hue;
-            set { if (value != null) Apply(tp => tp.MaterialProps.Hue = (float)value); OnPropertyChanged(); }
+            set { if (value != null) ApplyMaterial(tp => tp.MaterialProps.Hue = (float)value); OnPropertyChanged(); }
         }
 
         public double? NormalSat
         {
             get => (double?)MP?.Normal.Sat;
-            set { if (value != null) Apply(tp => tp.MaterialProps.Normal.Sat = (float)value); OnPropertyChanged(); }
+            set { if (value != null) ApplyMaterial(tp => tp.MaterialProps.Normal.Sat = (float)value); OnPropertyChanged(); }
         }
 
         public double? NormalLum
         {
             get => (double?)MP?.Normal.Lum;
-            set { if (value != null) Apply(tp => tp.MaterialProps.Normal.Lum = (float)value); OnPropertyChanged(); }
+            set { if (value != null) ApplyMaterial(tp => tp.MaterialProps.Normal.Lum = (float)value); OnPropertyChanged(); }
         }
 
         public double? HiliteSat
         {
             get => (double?)MP?.Hilited.Sat;
-            set { if (value != null) Apply(tp => tp.MaterialProps.Hilited.Sat = (float)value); OnPropertyChanged(); }
+            set { if (value != null) ApplyMaterial(tp => tp.MaterialProps.Hilited.Sat = (float)value); OnPropertyChanged(); }
         }
 
         public double? HiliteLum
         {
             get => (double?)MP?.Hilited.Lum;
-            set { if (value != null) Apply(tp => tp.MaterialProps.Hilited.Lum = (float)value); OnPropertyChanged(); }
+            set { if (value != null) ApplyMaterial(tp => tp.MaterialProps.Hilited.Lum = (float)value); OnPropertyChanged(); }
         }
 
         TrackPropsTex TexProps => MP?.TexProps;

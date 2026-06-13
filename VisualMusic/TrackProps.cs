@@ -442,10 +442,10 @@ namespace VisualMusic
             _lum = 1;
             _texture = null;
         }
-        public NoteTypeMaterial(float _sat, float _lum, Texture2D tex = null)
+        public NoteTypeMaterial(float sat, float lum, Texture2D tex = null)
         {
-            _sat = _sat;
-            _lum = _lum;
+            _sat = sat;
+            _lum = lum;
             _texture = tex;
         }
         public NoteTypeMaterial(SerializationInfo info, StreamingContext ctxt)

@@ -109,6 +109,8 @@ namespace VisualMusic.ViewModels
                 _project?.CreateGeos();
             };
 
+            SelectedTrackProps.RefreshTrackColors = TrackList.RefreshColors;
+
             SelectedTrackProps.LoadTexture = path =>
             {
                 if (_project == null) return;
@@ -903,6 +905,7 @@ namespace VisualMusic.ViewModels
             // Refresh the Song and Track property panels so they reflect restored values.
             SongProps.RefreshAll();
             OnTrackListSelectionChanged();
+            TrackList.RefreshColors();
             // Refresh keyframe panel and list.
             Keyframes.KeyframeService.RaiseKeyframesChanged();
         }
