@@ -58,7 +58,7 @@ namespace VisualMusic.Controls
             // mouse-down — defer it to mouse-up so the user can drag the whole selection and see
             // it highlighted while dragging. Without Ctrl a plain click keeps the other selected
             // rows; with Ctrl the clicked row isn't toggled off. (Shift = range select, left alone.)
-            bool ctrl  = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+            bool ctrl = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
             bool shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
             bool itemSelected = _dragItem != null && trackListView.SelectedItems.Contains(_dragItem);
             if (!shift && itemSelected && (ctrl || trackListView.SelectedItems.Count > 1))

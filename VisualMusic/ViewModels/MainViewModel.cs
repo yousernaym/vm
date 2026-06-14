@@ -260,7 +260,7 @@ namespace VisualMusic.ViewModels
                     if (ns?.SelectedModEntryIndex >= 0 && ns.ModEntries?.Count > 0)
                     {
                         // Capture the stable ids before deleting so we can purge the orphaned keyframes.
-                        int    tn  = item.TrackView.TrackNumber;
+                        int tn = item.TrackView.TrackNumber;
                         string eid = ns.SelectedModEntry?.Id;
                         ns.DeleteModEntry();
                         if (eid != null)
@@ -447,7 +447,7 @@ namespace VisualMusic.ViewModels
             Keyframes.KeyframeService.KeyframesChanged += OnKeyframesChangedRestoreBackground;
             Keyframes.KeyframeService.RaiseKeyframesChanged();
             Camera.OnUserUpdating = () => value?.SyncLiveCameraEdit();
-            Camera.OnUserUpdated  = () => AddUndoItem("Edit Camera");
+            Camera.OnUserUpdated = () => AddUndoItem("Edit Camera");
             NotifyScrollPositionChanged();
         }
 
@@ -665,7 +665,7 @@ namespace VisualMusic.ViewModels
 
             var subWin = new SubSongWindow(options.NotePath) { Owner = Application.Current.MainWindow };
             if (subWin.NumSongs > 1 && subWin.ShowDialog() != true) return false;
-            options.SubSong     = subWin.SelectedSong;
+            options.SubSong = subWin.SelectedSong;
             options.SongLengthS = subWin.SongLengthS;
             return true;
         }
@@ -677,22 +677,22 @@ namespace VisualMusic.ViewModels
             switch (fileType)
             {
                 case FileType.Midi: options = new MidiImportOptions(); break;
-                case FileType.Mod:  options = new ModImportOptions();  break;
-                case FileType.Hvl:  options = new HvlImportOptions();  break;
-                default:                 options = new SidImportOptions();  break;
+                case FileType.Mod: options = new ModImportOptions(); break;
+                case FileType.Hvl: options = new HvlImportOptions(); break;
+                default: options = new SidImportOptions(); break;
             }
 
-            options.RawNotePath  = dlg.NoteFilePath;
+            options.RawNotePath = dlg.NoteFilePath;
             try { options.SetNotePath(); } catch (FileImportException) { }
 
             if (!string.IsNullOrWhiteSpace(dlg.AudioFilePath))
             {
-                options.AudioPath   = dlg.AudioFilePath;
+                options.AudioPath = dlg.AudioFilePath;
                 options.MixdownType = MixdownType.None;
             }
 
             options.EraseCurrent = dlg.EraseCurrent;
-            options.InsTrack     = dlg.InsTrack;
+            options.InsTrack = dlg.InsTrack;
             return options;
         }
 
@@ -776,7 +776,7 @@ namespace VisualMusic.ViewModels
             var save = new SaveFileDialog
             {
                 Filter = "Mkv files (*.mkv)|*.mkv",
-                Title  = "Save video file",
+                Title = "Save video file",
                 InitialDirectory = AppSettings.Instance.VideoFolderOrDefault
             };
             if (save.ShowDialog() != true) return;
@@ -1097,11 +1097,11 @@ namespace VisualMusic.ViewModels
             switch (fileType.Value)
             {
                 case FileType.Midi: options = new MidiImportOptions(); break;
-                case FileType.Mod:  options = new ModImportOptions();  break;
-                case FileType.Hvl:  options = new HvlImportOptions();  break;
-                default:                 options = new SidImportOptions();  break;
+                case FileType.Mod: options = new ModImportOptions(); break;
+                case FileType.Hvl: options = new HvlImportOptions(); break;
+                default: options = new SidImportOptions(); break;
             }
-            options.RawNotePath  = url;       // preserve original URL for project save and dialog display
+            options.RawNotePath = url;       // preserve original URL for project save and dialog display
             try { options.SetNotePath(); }    // downloads the URL to a temp file (WebClient)
             catch (FileImportException)
             {
@@ -1110,7 +1110,7 @@ namespace VisualMusic.ViewModels
                 return;
             }
             options.EraseCurrent = true;
-            options.InsTrack     = AppSettings.Instance.GetInsTrack(fileType.Value);
+            options.InsTrack = AppSettings.Instance.GetInsTrack(fileType.Value);
             ImportSongWindow.UpdateSession(fileType.Value, erase: true, notePath: url, audioPath: "",
                 insTrack: AppSettings.Instance.GetInsTrack(fileType.Value));
 

@@ -147,7 +147,7 @@ namespace VisualMusic
             stream.Flush();
             stream.Position = 0;
             NoteStyleMod mod = (NoteStyleMod)dcs.ReadObject(stream);
-            mod.Id   = Guid.NewGuid().ToString("N");  // new entry → new stable id
+            mod.Id = Guid.NewGuid().ToString("N");  // new entry → new stable id
             mod.Name += " clone";
             return mod;
         }
@@ -189,7 +189,7 @@ namespace VisualMusic
 
         //Serializable----------
         protected NoteStyleType _styleType; //Set in constructor of inherited class
-                                           //public BindingList<NoteStyleMod> ModEntries { get; set; } = new BindingList<NoteStyleMod>();
+                                            //public BindingList<NoteStyleMod> ModEntries { get; set; } = new BindingList<NoteStyleMod>();
         internal List<NoteStyleMod> ModEntries { get; set; } = new List<NoteStyleMod>();
         public int? SelectedModEntryIndex { get; set; } = -1;
         internal NoteStyleMod SelectedModEntry

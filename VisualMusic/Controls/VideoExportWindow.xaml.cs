@@ -44,10 +44,10 @@ namespace VisualMusic.Controls
         {
             Options = options;
 
-            sphereCb.IsChecked            = options.Sphere;
+            sphereCb.IsChecked = options.Sphere;
             sphericalMetadataCb.IsChecked = options.SphericalMetadata;
             sphericalMetadataCb.IsEnabled = options.Sphere;
-            stereoscopicCb.IsChecked      = options.SphericalStereo;
+            stereoscopicCb.IsChecked = options.SphericalStereo;
 
             UpdateResoItems();
 
@@ -99,7 +99,7 @@ namespace VisualMusic.Controls
                 int w = int.Parse(xy[0].Trim());
                 int h = int.Parse(xy[1].Trim());
                 if (w <= 0 || h <= 0) return false;
-                Options.Width  = w;
+                Options.Width = w;
                 Options.Height = h;
                 return true;
             }

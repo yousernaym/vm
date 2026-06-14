@@ -15,8 +15,8 @@ namespace VisualMusic
     {
         // ---- Paths ----
 
-        public static readonly string TpartyDir      = Path.Combine(Program.AppDataDir, "tparty");
-        public static readonly string HvscDir        = Path.Combine(TpartyDir, "hvsc");
+        public static readonly string TpartyDir = Path.Combine(Program.AppDataDir, "tparty");
+        public static readonly string HvscDir = Path.Combine(TpartyDir, "hvsc");
 
         /// <summary>Canonical target path for the downloaded song-lengths DB.</summary>
         public static readonly string SongLengthsPath = Path.Combine(HvscDir, "Songlengths.md5");

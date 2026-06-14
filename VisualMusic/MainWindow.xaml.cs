@@ -38,16 +38,16 @@ namespace VisualMusic
 
         void OnLoaded(object sender, RoutedEventArgs e)
         {
-            modBrowser.ImportService  = _vm;
-            sidBrowser.ImportService  = _vm;
+            modBrowser.ImportService = _vm;
+            sidBrowser.ImportService = _vm;
             midiBrowser.ImportService = _vm;
 
-            modBrowser.GetProject  = () => monoGameHost.Renderer?.Project;
-            sidBrowser.GetProject  = () => monoGameHost.Renderer?.Project;
+            modBrowser.GetProject = () => monoGameHost.Renderer?.Project;
+            sidBrowser.GetProject = () => monoGameHost.Renderer?.Project;
             midiBrowser.GetProject = () => monoGameHost.Renderer?.Project;
 
-            modBrowser.Url  = "https://modarchive.org/index.php?request=view_searchbox";
-            sidBrowser.Url  = "https://www.exotica.org.uk/wiki/Special:HVSC";
+            modBrowser.Url = "https://modarchive.org/index.php?request=view_searchbox";
+            sidBrowser.Url = "https://www.exotica.org.uk/wiki/Special:HVSC";
             midiBrowser.Url = "https://bitmidi.com/";
 
             _vm.GetDrawHost = () => monoGameHost.Renderer;

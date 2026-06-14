@@ -12,9 +12,9 @@ namespace VisualMusic.ViewModels
 
     public partial class KeyframeRowViewModel : ObservableObject
     {
-        [ObservableProperty] int    _tick;
+        [ObservableProperty] int _tick;
         [ObservableProperty] string _description = "";
-        [ObservableProperty] int    _propertyCount;
+        [ObservableProperty] int _propertyCount;
 
         /// <summary>
         /// Beat position string derived from the tick, used as the display label.
@@ -25,10 +25,10 @@ namespace VisualMusic.ViewModels
         public KeyframeRowViewModel() { }
         public KeyframeRowViewModel(int tick, string desc, int propCount, string timeDisplay)
         {
-            _tick          = tick;
-            _description   = desc;
+            _tick = tick;
+            _description = desc;
             _propertyCount = propCount;
-            _timeDisplay   = timeDisplay;
+            _timeDisplay = timeDisplay;
         }
     }
 
@@ -38,7 +38,7 @@ namespace VisualMusic.ViewModels
 
     public class KeyframePropertyViewModel
     {
-        public string Id      { get; }   // full property id, e.g. "track/2/LineWidth"
+        public string Id { get; }   // full property id, e.g. "track/2/LineWidth"
         public string Display { get; }
 
         public KeyframePropertyViewModel(string id, string display) { Id = id; Display = display; }
@@ -50,7 +50,7 @@ namespace VisualMusic.ViewModels
 
     public partial class KeyframeListViewModel : ObservableObject
     {
-        public ObservableCollection<KeyframeRowViewModel>     Rows       { get; } = new();
+        public ObservableCollection<KeyframeRowViewModel> Rows { get; } = new();
         public ObservableCollection<KeyframePropertyViewModel> Properties { get; } = new();
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace VisualMusic.ViewModels
             Rows.Clear();
             if (_project == null) return;
 
-            var kfs    = _project.PropertyKeyframes;
+            var kfs = _project.PropertyKeyframes;
             double tpb = _project.Notes?.TicksPerBeat ?? 480;
 
             IEnumerable<int> ticks = PropertyFilterId != null
@@ -118,9 +118,9 @@ namespace VisualMusic.ViewModels
 
             foreach (int tick in ticks)
             {
-                int    count  = kfs.PropertyCountAt(tick);
-                string desc   = kfs.GetDescription(tick);
-                string time   = FormatTime(tick, tpb);
+                int count = kfs.PropertyCountAt(tick);
+                string desc = kfs.GetDescription(tick);
+                string time = FormatTime(tick, tpb);
                 Rows.Add(new KeyframeRowViewModel(tick, desc, count, time));
             }
         }

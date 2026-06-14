@@ -29,7 +29,7 @@ namespace VisualMusic
         WaveformPanel WaveformPanel { get; }
 
         // ---- Viewport size ----
-        int ClientWidth  { get; }
+        int ClientWidth { get; }
         int ClientHeight { get; }
 
         // ---- Input state ----

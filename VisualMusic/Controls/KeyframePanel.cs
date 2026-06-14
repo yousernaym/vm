@@ -19,23 +19,23 @@ namespace VisualMusic.Controls
     public sealed class KeyframePanel : FrameworkElement
     {
         // ---- Appearance constants ----
-        const double DiamondRadius   = 5.0;
-        const double HitRadius       = 8.0;
-        const double PlayheadHalfW   = 1.0;
+        const double DiamondRadius = 5.0;
+        const double HitRadius = 8.0;
+        const double PlayheadHalfW = 1.0;
 
-        static readonly Brush BackBrush         = Brushes.Black;
-        static readonly Brush DiamondFill       = Brushes.White;
-        static readonly Brush DiamondFillAt     = Brushes.Yellow;   // keyframe at current tick
-        static readonly Pen   DiamondPen        = Freeze(new Pen(Brushes.Gray,   1.0));
-        static readonly Pen   DiamondPenAt      = Freeze(new Pen(Brushes.White,  1.0));
-        static readonly Pen   PlayheadPen       = Freeze(new Pen(Brushes.White,  1.5));
+        static readonly Brush BackBrush = Brushes.Black;
+        static readonly Brush DiamondFill = Brushes.White;
+        static readonly Brush DiamondFillAt = Brushes.Yellow;   // keyframe at current tick
+        static readonly Pen DiamondPen = Freeze(new Pen(Brushes.Gray, 1.0));
+        static readonly Pen DiamondPenAt = Freeze(new Pen(Brushes.White, 1.0));
+        static readonly Pen PlayheadPen = Freeze(new Pen(Brushes.White, 1.5));
 
         static T Freeze<T>(T obj) where T : Freezable { obj.Freeze(); return obj; }
 
         // ---- Drag state ----
 
         bool _dragging;
-        int  _dragSourceTick;
+        int _dragSourceTick;
         double _dragCurrentX;          // last mouse X during drag
         List<(int tick, double cx)> _hitTargets = new();  // populated during render
 
@@ -48,9 +48,9 @@ namespace VisualMusic.Controls
             ClipToBounds = true;
             // Background is painted directly in OnRender (FrameworkElement has no Background property)
 
-            KeyframeService.RefreshRequested  += OnRefresh;
-            KeyframeService.KeyframesChanged  += OnRefresh;
-            Loaded   += OnLoaded;
+            KeyframeService.RefreshRequested += OnRefresh;
+            KeyframeService.KeyframesChanged += OnRefresh;
+            Loaded += OnLoaded;
             Unloaded += OnUnloaded;
         }
 
@@ -59,8 +59,8 @@ namespace VisualMusic.Controls
             _window = Window.GetWindow(this);
             if (_window == null) return;
             _window.PreviewMouseMove += OnWindowPreviewMouseMove;
-            _window.PreviewKeyDown   += OnWindowPreviewKeyDown;
-            _window.PreviewKeyUp     += OnWindowPreviewKeyUp;
+            _window.PreviewKeyDown += OnWindowPreviewKeyDown;
+            _window.PreviewKeyUp += OnWindowPreviewKeyUp;
         }
 
         void OnUnloaded(object sender, RoutedEventArgs e)
@@ -68,8 +68,8 @@ namespace VisualMusic.Controls
             if (_window != null)
             {
                 _window.PreviewMouseMove -= OnWindowPreviewMouseMove;
-                _window.PreviewKeyDown   -= OnWindowPreviewKeyDown;
-                _window.PreviewKeyUp     -= OnWindowPreviewKeyUp;
+                _window.PreviewKeyDown -= OnWindowPreviewKeyDown;
+                _window.PreviewKeyUp -= OnWindowPreviewKeyUp;
                 _window = null;
             }
             if (!_dragging)
@@ -82,16 +82,16 @@ namespace VisualMusic.Controls
 
         protected override void OnRender(DrawingContext dc)
         {
-            double w   = ActualWidth;
-            double h   = ActualHeight;
-            double cy  = h / 2.0;
+            double w = ActualWidth;
+            double h = ActualHeight;
+            double cy = h / 2.0;
 
             dc.DrawRectangle(BackBrush, null, new Rect(0, 0, w, h));
 
             var proj = KeyframeService.Project;
             if (proj == null || proj.SongLengthT <= 0) return;
 
-            double songPosT  = proj.SongPosT;
+            double songPosT = proj.SongPosT;
             double viewWidthT = proj.ViewWidthT;
             if (viewWidthT <= 0) return;
 
@@ -109,7 +109,7 @@ namespace VisualMusic.Controls
 
                 bool atCurrentTick = (tick == (int)songPosT);
                 var fill = atCurrentTick ? DiamondFillAt : DiamondFill;
-                var pen  = atCurrentTick ? DiamondPenAt  : DiamondPen;
+                var pen = atCurrentTick ? DiamondPenAt : DiamondPen;
 
                 // Diamond shape (rotated square)
                 double r = DiamondRadius;
@@ -130,7 +130,7 @@ namespace VisualMusic.Controls
             {
                 double dragCx = _dragCurrentX;
                 double r = DiamondRadius + 1;
-                var dragPen  = new Pen(Brushes.Orange, 1.5);
+                var dragPen = new Pen(Brushes.Orange, 1.5);
                 var points = new PathFigure(new Point(dragCx, cy - r), new PathSegment[]
                 {
                     new LineSegment(new Point(dragCx + r, cy    ), true),
@@ -170,18 +170,18 @@ namespace VisualMusic.Controls
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
-            var pos   = e.GetPosition(this);
+            var pos = e.GetPosition(this);
             bool shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
-            int? hit  = HitTest(pos.X);
+            int? hit = HitTest(pos.X);
 
             if (hit.HasValue)
             {
                 if (shift)
                 {
                     // Begin shift-drag
-                    _dragging       = true;
+                    _dragging = true;
                     _dragSourceTick = hit.Value;
-                    _dragCurrentX   = pos.X;
+                    _dragCurrentX = pos.X;
                     Mouse.OverrideCursor = Cursors.SizeWE;
                     CaptureMouse();
                 }

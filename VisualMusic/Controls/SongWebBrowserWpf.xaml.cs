@@ -52,7 +52,7 @@ namespace VisualMusic.Controls
             _browser.DownloadHandler = downloadHandler;
 
             _browser.LoadingStateChanged += OnLoadingStateChanged;
-            _browser.StatusMessage       += OnBrowserStatusMessage;
+            _browser.StatusMessage += OnBrowserStatusMessage;
             // AddressChanged is a DependencyPropertyChangedEventHandler in CefSharp.Wpf
             _browser.AddressChanged += (_, e) => Dispatcher.InvokeAsync(() => urlTextBox.Text = (string)e.NewValue);
 
@@ -76,13 +76,13 @@ namespace VisualMusic.Controls
         void OnLoadingStateChanged(object sender, LoadingStateChangedEventArgs args) =>
             Dispatcher.InvokeAsync(() =>
             {
-                backButton.IsEnabled    = args.CanGoBack;
+                backButton.IsEnabled = args.CanGoBack;
                 forwardButton.IsEnabled = args.CanGoForward;
-                goButton.Content        = args.IsLoading ? "Stop" : "Go";
+                goButton.Content = args.IsLoading ? "Stop" : "Go";
             });
 
-        void GoButtonClick(object sender, RoutedEventArgs e)    => LoadUrl(urlTextBox.Text);
-        void BackButtonClick(object sender, RoutedEventArgs e)  => _browser?.Back();
+        void GoButtonClick(object sender, RoutedEventArgs e) => LoadUrl(urlTextBox.Text);
+        void BackButtonClick(object sender, RoutedEventArgs e) => _browser?.Back();
         void ForwardButtonClick(object sender, RoutedEventArgs e) => _browser?.Forward();
 
         void UrlTextBoxKeyUp(object sender, KeyEventArgs e)

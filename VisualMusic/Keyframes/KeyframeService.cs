@@ -61,7 +61,7 @@ namespace VisualMusic.Keyframes
         /// </summary>
         public static event Action<string> FilterByPropertyRequested;
 
-        internal static void RaiseRefresh()          => RefreshRequested?.Invoke();
+        internal static void RaiseRefresh() => RefreshRequested?.Invoke();
         internal static void RaiseKeyframesChanged() => KeyframesChanged?.Invoke();
         internal static void RaiseTickSelected(int tick) => TickSelected?.Invoke(tick);
         internal static void RaiseFilterByProperty(string id) => FilterByPropertyRequested?.Invoke(id);
@@ -213,7 +213,7 @@ namespace VisualMusic.Keyframes
         public static string GetDisplayNameForId(string fullId)
         {
             if (string.IsNullOrEmpty(fullId)) return fullId;
-            string raw  = fullId.Substring(fullId.LastIndexOf('/') + 1);
+            string raw = fullId.Substring(fullId.LastIndexOf('/') + 1);
             string name = _displayNameLookup.TryGetValue(raw, out var dn) ? dn : raw;
             if (fullId.StartsWith("track/"))
             {
@@ -331,7 +331,7 @@ namespace VisualMusic.Keyframes
         public static void ToggleKey(string propertyId, KfScope scope)
         {
             if (HasKeyHereForAll(propertyId, scope)) RemoveKey(propertyId, scope);
-            else                                     AddKey(propertyId, scope);
+            else AddKey(propertyId, scope);
         }
 
         /// <summary>

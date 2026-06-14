@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Media;
 using VisualMusic.Controls;
@@ -17,10 +14,10 @@ namespace VisualMusic.Keyframes
 
     internal sealed class KeyframeAdorner : Adorner
     {
-        static readonly Brush FillGreen  = Freeze(new SolidColorBrush(Color.FromArgb(45, 0, 230, 80)));
-        static readonly Brush FillBlue   = Freeze(new SolidColorBrush(Color.FromArgb(45, 60, 140, 255)));
-        static readonly Pen   PenGreen   = FreezePen(new SolidColorBrush(Color.FromArgb(200, 0, 200, 70)),  1.5);
-        static readonly Pen   PenBlue    = FreezePen(new SolidColorBrush(Color.FromArgb(200, 60, 130, 255)), 1.5);
+        static readonly Brush FillGreen = Freeze(new SolidColorBrush(Color.FromArgb(45, 0, 230, 80)));
+        static readonly Brush FillBlue = Freeze(new SolidColorBrush(Color.FromArgb(45, 60, 140, 255)));
+        static readonly Pen PenGreen = FreezePen(new SolidColorBrush(Color.FromArgb(200, 0, 200, 70)), 1.5);
+        static readonly Pen PenBlue = FreezePen(new SolidColorBrush(Color.FromArgb(200, 60, 130, 255)), 1.5);
 
         static T Freeze<T>(T obj) where T : Freezable { obj.Freeze(); return obj; }
         static Pen FreezePen(Brush b, double t) { var p = new Pen(b, t); p.Freeze(); return p; }
@@ -36,7 +33,7 @@ namespace VisualMusic.Keyframes
 
         protected override void OnRender(DrawingContext dc)
         {
-            var fe  = (FrameworkElement)AdornedElement;
+            var fe = (FrameworkElement)AdornedElement;
             var rect = new Rect(0, 0, fe.ActualWidth, fe.ActualHeight);
             if (Current == State.Green)
                 dc.DrawRectangle(FillGreen, PenGreen, rect);
@@ -71,12 +68,12 @@ namespace VisualMusic.Keyframes
                 new PropertyMetadata(true));
 
         // Getters / setters required by XAML
-        public static string  GetPropertyId  (DependencyObject d) => (string) d.GetValue(PropertyIdProperty);
-        public static void    SetPropertyId  (DependencyObject d, string v)  => d.SetValue(PropertyIdProperty,  v);
-        public static KfScope GetScope       (DependencyObject d) => (KfScope)d.GetValue(ScopeProperty);
-        public static void    SetScope       (DependencyObject d, KfScope v) => d.SetValue(ScopeProperty,       v);
-        public static bool    GetInterpolatable(DependencyObject d) => (bool) d.GetValue(InterpolatableProperty);
-        public static void    SetInterpolatable(DependencyObject d, bool v) => d.SetValue(InterpolatableProperty, v);
+        public static string GetPropertyId(DependencyObject d) => (string)d.GetValue(PropertyIdProperty);
+        public static void SetPropertyId(DependencyObject d, string v) => d.SetValue(PropertyIdProperty, v);
+        public static KfScope GetScope(DependencyObject d) => (KfScope)d.GetValue(ScopeProperty);
+        public static void SetScope(DependencyObject d, KfScope v) => d.SetValue(ScopeProperty, v);
+        public static bool GetInterpolatable(DependencyObject d) => (bool)d.GetValue(InterpolatableProperty);
+        public static void SetInterpolatable(DependencyObject d, bool v) => d.SetValue(InterpolatableProperty, v);
 
         // ---- Per-element runtime state ----
 
@@ -100,7 +97,7 @@ namespace VisualMusic.Keyframes
             if (d is not FrameworkElement fe) return;
             if (e.NewValue is not string propId || string.IsNullOrEmpty(propId)) return;
 
-            fe.Loaded   += OnLoaded;
+            fe.Loaded += OnLoaded;
             fe.Unloaded += OnUnloaded;
 
             // If already loaded, run setup now (handles XAML DataTemplate recycling)
@@ -120,8 +117,8 @@ namespace VisualMusic.Keyframes
             if (state.Initialized) { Refresh(fe); return; }
             state.Initialized = true;
 
-            KeyframeService.RefreshRequested  += () => Refresh(fe);
-            KeyframeService.KeyframesChanged  += () => Refresh(fe);
+            KeyframeService.RefreshRequested += () => Refresh(fe);
+            KeyframeService.KeyframesChanged += () => Refresh(fe);
 
             AttachContextMenu(fe);
             AttachEditInterception(fe);
@@ -145,12 +142,12 @@ namespace VisualMusic.Keyframes
 
         static void Refresh(FrameworkElement fe)
         {
-            var propId       = GetPropertyId(fe);
-            var scope        = GetScope(fe);
+            var propId = GetPropertyId(fe);
+            var scope = GetScope(fe);
             if (string.IsNullOrEmpty(propId)) return;
 
             bool green = KeyframeService.HasKeyHereForAll(propId, scope);
-            bool blue  = !green && KeyframeService.HasAnyKeyForAny(propId, scope);
+            bool blue = !green && KeyframeService.HasAnyKeyForAny(propId, scope);
 
             var state = _states.GetOrCreateValue(fe);
 
@@ -187,8 +184,8 @@ namespace VisualMusic.Keyframes
             state.SafeValue = fe switch
             {
                 TbSliderWpf s => s.Value,
-                CheckBox    c => c.IsChecked,
-                ComboBox    cb=> cb.SelectedIndex,
+                CheckBox c => c.IsChecked,
+                ComboBox cb => cb.SelectedIndex,
                 HueSatButtonWpf h => h.SelectedXnaColor,
                 _ => null
             };
@@ -227,7 +224,7 @@ namespace VisualMusic.Keyframes
         static void OnCommit(FrameworkElement fe)
         {
             var propId = GetPropertyId(fe);
-            var scope  = GetScope(fe);
+            var scope = GetScope(fe);
             if (string.IsNullOrEmpty(propId)) return;
 
             var state = _states.GetOrCreateValue(fe);
@@ -262,17 +259,17 @@ namespace VisualMusic.Keyframes
         /// </summary>
         static KfValue ReadControlValue(FrameworkElement fe) => fe switch
         {
-            TbSliderWpf      s  => s.Value is double sv ? new ScalarKfValue(sv) : null,
-            CheckBox         c  => c.IsChecked == null
+            TbSliderWpf s => s.Value is double sv ? new ScalarKfValue(sv) : null,
+            CheckBox c => c.IsChecked == null
                                     ? null
                                     : new ScalarKfValue(c.IsChecked.Value ? 1.0 : 0.0),
-            ComboBox         cb => cb.SelectedIndex >= 0
+            ComboBox cb => cb.SelectedIndex >= 0
                                     ? new ScalarKfValue(cb.SelectedIndex)
                                     : null,
-            HueSatButtonWpf  h  => h.SelectedXnaColor is Microsoft.Xna.Framework.Color col
+            HueSatButtonWpf h => h.SelectedXnaColor is Microsoft.Xna.Framework.Color col
                                     ? new ColorKfValue(col)
                                     : null,
-            _                   => null,
+            _ => null,
         };
 
         static void RevertValue(FrameworkElement fe, ElementState state)
@@ -280,11 +277,11 @@ namespace VisualMusic.Keyframes
             if (state.SafeValue == null) return;
             switch (fe)
             {
-                case TbSliderWpf s  when state.SafeValue is double d:   s.Value          = d;   break;
-                case CheckBox    c  when state.SafeValue is bool   b:   c.IsChecked      = b;   break;
-                case ComboBox    cb when state.SafeValue is int    i:   cb.SelectedIndex = i;   break;
+                case TbSliderWpf s when state.SafeValue is double d: s.Value = d; break;
+                case CheckBox c when state.SafeValue is bool b: c.IsChecked = b; break;
+                case ComboBox cb when state.SafeValue is int i: cb.SelectedIndex = i; break;
                 case HueSatButtonWpf h:
-                    h.SelectedXnaColor = (Microsoft.Xna.Framework.Color?)state.SafeValue;       break;
+                    h.SelectedXnaColor = (Microsoft.Xna.Framework.Color?)state.SafeValue; break;
             }
         }
 
@@ -304,13 +301,13 @@ namespace VisualMusic.Keyframes
 
         static void RebuildMenu(FrameworkElement fe, ContextMenu menu)
         {
-            var propId        = GetPropertyId(fe);
-            var scope         = GetScope(fe);
-            var interpolatable= GetInterpolatable(fe);
+            var propId = GetPropertyId(fe);
+            var scope = GetScope(fe);
+            var interpolatable = GetInterpolatable(fe);
             if (string.IsNullOrEmpty(propId)) return;
 
             bool hasHere = KeyframeService.HasKeyHereForAll(propId, scope);
-            bool hasAny  = KeyframeService.HasAnyKeyForAny(propId, scope);
+            bool hasAny = KeyframeService.HasAnyKeyForAny(propId, scope);
             bool hasPrev = false, hasNext = false;
 
             if (KeyframeService.Project != null)
@@ -327,9 +324,9 @@ namespace VisualMusic.Keyframes
             menu.Items.Clear();
 
             // Add / Remove
-            var addItem = new MenuItem { Header = "_Add keyframe at playback position",    IsEnabled = !hasHere };
-            var remItem = new MenuItem { Header = "_Remove keyframe at playback position",  IsEnabled = hasHere  };
-            addItem.Click += (_, _) => { KeyframeService.AddKey(propId, scope);    KeyframeService.RaiseUndoSnapshot("Add keyframe"); };
+            var addItem = new MenuItem { Header = "_Add keyframe at playback position", IsEnabled = !hasHere };
+            var remItem = new MenuItem { Header = "_Remove keyframe at playback position", IsEnabled = hasHere };
+            addItem.Click += (_, _) => { KeyframeService.AddKey(propId, scope); KeyframeService.RaiseUndoSnapshot("Add keyframe"); };
             remItem.Click += (_, _) => { KeyframeService.RemoveKey(propId, scope); KeyframeService.RaiseUndoSnapshot("Remove keyframe"); };
             menu.Items.Add(addItem);
             menu.Items.Add(remItem);
@@ -339,7 +336,7 @@ namespace VisualMusic.Keyframes
             // Filter / remove-all actions (enabled when this property has any keyframes)
             var filterItem = new MenuItem
             {
-                Header    = "Show only _this property in keyframe list",
+                Header = "Show only _this property in keyframe list",
                 IsEnabled = hasAny,
             };
             filterItem.Click += (_, _) => KeyframeService.RequestFilterByProperty(propId, scope);
@@ -347,7 +344,7 @@ namespace VisualMusic.Keyframes
 
             var removeAllItem = new MenuItem
             {
-                Header    = "Remove _all keyframes for this property",
+                Header = "Remove _all keyframes for this property",
                 IsEnabled = hasAny,
             };
             removeAllItem.Click += (_, _) => KeyframeService.RemoveAllKeysForProperty(propId, scope);
@@ -357,7 +354,7 @@ namespace VisualMusic.Keyframes
 
             // Next / Prev
             var prevItem = new MenuItem { Header = "Go to _previous keyframe", IsEnabled = hasPrev };
-            var nextItem = new MenuItem { Header = "Go to _next keyframe",     IsEnabled = hasNext };
+            var nextItem = new MenuItem { Header = "Go to _next keyframe", IsEnabled = hasNext };
             prevItem.Click += (_, _) => KeyframeService.GoToPrev(propId, scope);
             nextItem.Click += (_, _) => KeyframeService.GoToNext(propId, scope);
             menu.Items.Add(prevItem);
@@ -368,7 +365,7 @@ namespace VisualMusic.Keyframes
             {
                 menu.Items.Add(new Separator());
                 var interpMenu = new MenuItem { Header = "_Interpolation", IsEnabled = hasHere };
-                var curInterp  = hasHere ? KeyframeService.GetInterpolation(propId, scope) : null;
+                var curInterp = hasHere ? KeyframeService.GetInterpolation(propId, scope) : null;
 
                 foreach (var (label, mode) in new[]
                 {
@@ -380,9 +377,9 @@ namespace VisualMusic.Keyframes
                     var capturedMode = mode;
                     var modeItem = new MenuItem
                     {
-                        Header      = label,
+                        Header = label,
                         IsCheckable = true,
-                        IsChecked   = curInterp == mode,
+                        IsChecked = curInterp == mode,
                     };
                     modeItem.Click += (_, _) => { KeyframeService.SetInterpolation(propId, scope, capturedMode); KeyframeService.RaiseUndoSnapshot("Change interpolation"); };
                     interpMenu.Items.Add(modeItem);

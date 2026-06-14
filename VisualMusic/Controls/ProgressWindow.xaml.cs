@@ -28,7 +28,7 @@ namespace VisualMusic.Controls
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         // ---- IRenderProgressCallback ----
-        public bool   Cancel     { get; private set; }
+        public bool Cancel { get; private set; }
         public object CancelLock { get; } = new object();
 
         readonly CancellationTokenSource _cts = new CancellationTokenSource();
@@ -97,7 +97,7 @@ namespace VisualMusic.Controls
 
         // ---- Job wiring ----
         readonly Func<IRenderProgressCallback, Task<object>> _job;
-        readonly bool   _confirmCancel;
+        readonly bool _confirmCancel;
         readonly string _doneMessage;
 
         bool _finished;
@@ -114,11 +114,11 @@ namespace VisualMusic.Controls
             bool confirmCancel = false,
             string doneMessage = null)
         {
-            _titlePrefix   = titlePrefix;
-            _titleText     = titlePrefix;
-            _job           = job;
+            _titlePrefix = titlePrefix;
+            _titleText = titlePrefix;
+            _job = job;
             _confirmCancel = confirmCancel;
-            _doneMessage   = doneMessage;
+            _doneMessage = doneMessage;
 
             DataContext = this;
             InitializeComponent();
@@ -157,24 +157,24 @@ namespace VisualMusic.Controls
             // Record sample in circular buffer
             _progressBuf[_progressBufIndex1] = new ProgressAtTime
             {
-                time         = _stopwatch.Elapsed.TotalSeconds,
+                time = _stopwatch.Elapsed.TotalSeconds,
                 normProgress = normProgress
             };
 
-            double deltaTime     = _progressBuf[_progressBufIndex1].time         - _progressBuf[_progressBufIndex0].time;
+            double deltaTime = _progressBuf[_progressBufIndex1].time - _progressBuf[_progressBufIndex0].time;
             double deltaProgress = _progressBuf[_progressBufIndex1].normProgress - _progressBuf[_progressBufIndex0].normProgress;
-            double progressLeft  = 1.0 - normProgress;
+            double progressLeft = 1.0 - normProgress;
 
             if (deltaProgress > 0)
             {
                 var timeLeft = TimeSpan.FromSeconds(deltaTime * progressLeft / deltaProgress);
-                var elapsed  = _stopwatch.Elapsed;
-                ElapsedText   = $"Elapsed time: {elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}";
+                var elapsed = _stopwatch.Elapsed;
+                ElapsedText = $"Elapsed time: {elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}";
                 RemainingText = $"Estimated time remaining: {timeLeft.Hours:D2}:{timeLeft.Minutes:D2}:{timeLeft.Seconds:D2}";
             }
             else
             {
-                ElapsedText   = "";
+                ElapsedText = "";
                 RemainingText = "";
             }
 
@@ -248,7 +248,7 @@ namespace VisualMusic.Controls
                 cb => Task.Run(() => { render(file, cb, opts); return (object)null; }),
                 confirmCancel: true,
                 doneMessage: "Done!")
-                { Owner = Application.Current?.MainWindow };
+            { Owner = Application.Current?.MainWindow };
             w.ShowDialog();
         }
 
@@ -266,7 +266,7 @@ namespace VisualMusic.Controls
                 cb => DownloadJobAsync(url, cb),
                 confirmCancel: false,
                 doneMessage: null)
-                { Owner = Application.Current?.MainWindow };
+            { Owner = Application.Current?.MainWindow };
             w.ShowDialog();
             return w.Result as string;
         }
@@ -292,7 +292,7 @@ namespace VisualMusic.Controls
                         pw.Dispatcher.InvokeAsync(() =>
                         {
                             pw.IsIndeterminate = true;
-                            pw.ElapsedText   = "";
+                            pw.ElapsedText = "";
                             pw.RemainingText = "";
                         });
                 }

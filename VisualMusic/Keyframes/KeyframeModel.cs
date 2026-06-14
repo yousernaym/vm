@@ -1,8 +1,8 @@
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Microsoft.Xna.Framework;
 using XnaColor = Microsoft.Xna.Framework.Color;
 
 namespace VisualMusic.Keyframes
@@ -79,9 +79,9 @@ namespace VisualMusic.Keyframes
     [Serializable]
     public sealed class CameraKfValue : KfValue
     {
-        public Vector3    Pos;
+        public Vector3 Pos;
         public Quaternion Orientation;
-        public float      Fov;
+        public float Fov;
 
         public CameraKfValue() { }
         public CameraKfValue(Vector3 pos, Quaternion orientation, float fov)
@@ -91,9 +91,9 @@ namespace VisualMusic.Keyframes
         {
             foreach (SerializationEntry e in info)
             {
-                if      (e.Name == "pos")  Pos         = (Vector3)e.Value;
-                else if (e.Name == "ori")  Orientation = (Quaternion)e.Value;
-                else if (e.Name == "fov")  Fov         = (float)e.Value;
+                if (e.Name == "pos") Pos = (Vector3)e.Value;
+                else if (e.Name == "ori") Orientation = (Quaternion)e.Value;
+                else if (e.Name == "fov") Fov = (float)e.Value;
             }
         }
 
@@ -157,12 +157,12 @@ namespace VisualMusic.Keyframes
         {
             foreach (SerializationEntry entry in info)
             {
-                if      (entry.Name == "tick")   Tick          = (int)entry.Value;
+                if (entry.Name == "tick") Tick = (int)entry.Value;
                 else if (entry.Name == "value")
                 {
                     // New files write a KfValue; legacy files wrote a raw double.
-                    if (entry.Value is KfValue kfv)      Value = kfv;
-                    else if (entry.Value is double d)     Value = new ScalarKfValue(d);
+                    if (entry.Value is KfValue kfv) Value = kfv;
+                    else if (entry.Value is double d) Value = new ScalarKfValue(d);
                 }
                 else if (entry.Name == "interp") Interpolation = (KfInterpolation)entry.Value;
             }
@@ -170,7 +170,7 @@ namespace VisualMusic.Keyframes
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("tick",   Tick);
+            info.AddValue("tick", Tick);
             if (Value != null) info.AddValue("value", Value);
             info.AddValue("interp", Interpolation);
         }
@@ -212,7 +212,7 @@ namespace VisualMusic.Keyframes
             }
 
             if (before == null) return (null, _frames.Values[0], 0);
-            if (after  == null) return (_frames.Values[_frames.Count - 1], null, 0);
+            if (after == null) return (_frames.Values[_frames.Count - 1], null, 0);
 
             double t = (after.Tick == before.Tick) ? 0.0
                        : (double)(songPosT - before.Tick) / (after.Tick - before.Tick);
@@ -354,7 +354,7 @@ namespace VisualMusic.Keyframes
         public void Toggle(string propertyId, int tick)
         {
             if (HasKeyAt(propertyId, tick)) Remove(propertyId, tick);
-            else                            Add(propertyId, tick);
+            else Add(propertyId, tick);
         }
 
         /// <summary>Adds a standalone keyframe marker (possibly with zero properties) at a tick.</summary>
@@ -490,7 +490,7 @@ namespace VisualMusic.Keyframes
         public void SetDescription(int tick, string desc)
         {
             if (string.IsNullOrEmpty(desc)) _descriptions.Remove(tick);
-            else                             _descriptions[tick] = desc;
+            else _descriptions[tick] = desc;
         }
 
         // ---- Serialization ----
@@ -501,17 +501,17 @@ namespace VisualMusic.Keyframes
         {
             foreach (SerializationEntry entry in info)
             {
-                if      (entry.Name == "tracks")       _tracks       = (Dictionary<string, PropertyKeyframeTrack>)entry.Value ?? _tracks;
+                if (entry.Name == "tracks") _tracks = (Dictionary<string, PropertyKeyframeTrack>)entry.Value ?? _tracks;
                 else if (entry.Name == "descriptions") _descriptions = (Dictionary<int, string>)entry.Value ?? _descriptions;
-                else if (entry.Name == "markers")      _markers      = (HashSet<int>)entry.Value ?? _markers;
+                else if (entry.Name == "markers") _markers = (HashSet<int>)entry.Value ?? _markers;
             }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("tracks",       _tracks);
+            info.AddValue("tracks", _tracks);
             info.AddValue("descriptions", _descriptions);
-            info.AddValue("markers",      _markers);
+            info.AddValue("markers", _markers);
         }
     }
 }

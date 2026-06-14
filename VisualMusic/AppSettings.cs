@@ -13,7 +13,7 @@ namespace VisualMusic
     public class AppSettings
     {
         static readonly string s_filePath = Path.Combine(Program.AppDataDir, "appsettings.xml");
-        
+
         // ---- Default theme - Also change in app.xaml.
         const string DefaultThemeBaseColor = "Dark";
         const string DefaultThemeColorScheme = "Teal";
@@ -23,16 +23,16 @@ namespace VisualMusic
         public static AppSettings Instance => s_instance ??= Load();
 
         // ---- Scalar dialog folders ----
-        [DataMember] public string ProjectFolder  { get; set; }
-        [DataMember] public string CamFolder      { get; set; }
+        [DataMember] public string ProjectFolder { get; set; }
+        [DataMember] public string CamFolder { get; set; }
         [DataMember] public string TrackPropsFolder { get; set; }
-        [DataMember] public string TextureFolder  { get; set; }
+        [DataMember] public string TextureFolder { get; set; }
         [DataMember] public string TrackAudioFolder { get; set; }
         [DataMember] public string BackgroundFolder { get; set; }
 
         // ---- Per-file-type import folders ----
 
-        [DataMember] Dictionary<FileType, string> _noteFolders  = new();
+        [DataMember] Dictionary<FileType, string> _noteFolders = new();
         [DataMember] Dictionary<FileType, string> _audioFolders = new();
 
         public string GetNoteFolder(FileType type)
@@ -49,11 +49,11 @@ namespace VisualMusic
 
         // ---- Theme ----
 
-        [DataMember] public string ThemeBaseColor   { get; set; }  // e.g. "Dark" or "Light"
+        [DataMember] public string ThemeBaseColor { get; set; }  // e.g. "Dark" or "Light"
         [DataMember] public string ThemeColorScheme { get; set; }  // e.g. "Steel", "Blue", ...
 
         public string ThemeBaseColorOrDefault
-            => string.IsNullOrEmpty(ThemeBaseColor)   ? DefaultThemeBaseColor  : ThemeBaseColor;
+            => string.IsNullOrEmpty(ThemeBaseColor) ? DefaultThemeBaseColor : ThemeBaseColor;
         public string ThemeColorSchemeOrDefault
             => string.IsNullOrEmpty(ThemeColorScheme) ? DefaultThemeColorScheme : ThemeColorScheme;
 
@@ -68,15 +68,15 @@ namespace VisualMusic
 
         // ---- Video export ----
 
-        [DataMember] public string VideoFolder         { get; set; }
-        [DataMember] public bool   VideoSphere         { get; set; }
-        [DataMember] public bool   VideoSphericalMetadata { get; set; }
-        [DataMember] public bool   VideoSphericalStereo   { get; set; }
-        [DataMember] public int    VideoSphereResoIndex    { get; set; }
-        [DataMember] public int    VideoNonSphereResoIndex { get; set; }
-        [DataMember] public int    VideoSsaaFactor    { get; set; }
-        [DataMember] public int?   VideoQualityLoss   { get; set; }
-        [DataMember] public float  VideoFps           { get; set; }
+        [DataMember] public string VideoFolder { get; set; }
+        [DataMember] public bool VideoSphere { get; set; }
+        [DataMember] public bool VideoSphericalMetadata { get; set; }
+        [DataMember] public bool VideoSphericalStereo { get; set; }
+        [DataMember] public int VideoSphereResoIndex { get; set; }
+        [DataMember] public int VideoNonSphereResoIndex { get; set; }
+        [DataMember] public int VideoSsaaFactor { get; set; }
+        [DataMember] public int? VideoQualityLoss { get; set; }
+        [DataMember] public float VideoFps { get; set; }
 
         public string VideoFolderOrDefault
             => string.IsNullOrEmpty(VideoFolder)
@@ -89,29 +89,29 @@ namespace VisualMusic
             var o = new VideoExportOptions();
             // ResoIndex setter routes by Sphere, so set the non-sphere index first.
             o.Sphere = false; o.ResoIndex = VideoNonSphereResoIndex;
-            o.Sphere = true;  o.ResoIndex = VideoSphereResoIndex;
-            o.Sphere            = VideoSphere;
+            o.Sphere = true; o.ResoIndex = VideoSphereResoIndex;
+            o.Sphere = VideoSphere;
             o.SphericalMetadata = VideoSphericalMetadata;
-            o.SphericalStereo   = VideoSphericalStereo;
-            o.SSAAFactor        = VideoSsaaFactor > 0 ? VideoSsaaFactor : 4;
-            o.VideoQualityLoss  = VideoQualityLoss ?? 1;
-            o.Fps               = VideoFps > 0 ? VideoFps : 60f;
+            o.SphericalStereo = VideoSphericalStereo;
+            o.SSAAFactor = VideoSsaaFactor > 0 ? VideoSsaaFactor : 4;
+            o.VideoQualityLoss = VideoQualityLoss ?? 1;
+            o.Fps = VideoFps > 0 ? VideoFps : 60f;
             return o;
         }
 
         /// <summary>Persist <paramref name="o"/> as scalars and save to disk.</summary>
         public void SaveVideoExportOptions(VideoExportOptions o)
         {
-            VideoSphere             = o.Sphere;
-            VideoSphericalMetadata  = o.SphericalMetadata;
-            VideoSphericalStereo    = o.SphericalStereo;
+            VideoSphere = o.Sphere;
+            VideoSphericalMetadata = o.SphericalMetadata;
+            VideoSphericalStereo = o.SphericalStereo;
             bool origSphere = o.Sphere;
-            o.Sphere = true;  VideoSphereResoIndex    = o.ResoIndex;
+            o.Sphere = true; VideoSphereResoIndex = o.ResoIndex;
             o.Sphere = false; VideoNonSphereResoIndex = o.ResoIndex;
             o.Sphere = origSphere;
-            VideoSsaaFactor    = o.SSAAFactor;
-            VideoQualityLoss   = o.VideoQualityLoss;
-            VideoFps           = o.Fps;
+            VideoSsaaFactor = o.SSAAFactor;
+            VideoQualityLoss = o.VideoQualityLoss;
+            VideoFps = o.Fps;
             Save();
         }
 
@@ -147,9 +147,9 @@ namespace VisualMusic
         [OnDeserialized]
         void OnDeserialized(StreamingContext _)
         {
-            _noteFolders  ??= new();
+            _noteFolders ??= new();
             _audioFolders ??= new();
-            _insTrack     ??= new();
+            _insTrack ??= new();
         }
 
         // ---- Persistence ----

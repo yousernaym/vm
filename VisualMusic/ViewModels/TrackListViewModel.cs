@@ -38,7 +38,7 @@ namespace VisualMusic.ViewModels
             {
                 int trackNumber = p.TrackViews[i].TrackNumber;
                 string name = trackNumber + " - " + p.Notes.Tracks[trackNumber].Name;
-                Color normal  = TrackItemViewModel.ToWpfColor(
+                Color normal = TrackItemViewModel.ToWpfColor(
                     p.TrackViews[i].TrackProps.MaterialProps.GetSysColor(false, globalMat));
                 Color hilited = TrackItemViewModel.ToWpfColor(
                     p.TrackViews[i].TrackProps.MaterialProps.GetSysColor(true, globalMat));
@@ -103,8 +103,8 @@ namespace VisualMusic.ViewModels
             for (int i = 1; i < Items.Count; i++)
             {
                 var mp = _project.TrackViews[i].TrackProps.MaterialProps;
-                Items[i].NormalColor  = TrackItemViewModel.ToWpfColor(mp.GetSysColor(false, globalMat));
-                Items[i].HilitedColor = TrackItemViewModel.ToWpfColor(mp.GetSysColor(true,  globalMat));
+                Items[i].NormalColor = TrackItemViewModel.ToWpfColor(mp.GetSysColor(false, globalMat));
+                Items[i].HilitedColor = TrackItemViewModel.ToWpfColor(mp.GetSysColor(true, globalMat));
             }
         }
 

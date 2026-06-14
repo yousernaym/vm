@@ -105,7 +105,7 @@ namespace VisualMusic.Controls
         public ImportSongWindow(FileType fileType)
         {
             _fileType = fileType;
-            _noteFolder  = AppSettings.Instance.GetNoteFolder(fileType);
+            _noteFolder = AppSettings.Instance.GetNoteFolder(fileType);
             _audioFolder = AppSettings.Instance.GetAudioFolder(fileType);
 
             DataContext = this;
@@ -117,10 +117,10 @@ namespace VisualMusic.Controls
             // Restore in-memory session values (resets to defaults after app restart)
             if (s_session.TryGetValue(fileType, out var s))
             {
-                EraseCurrent  = s.Erase;
-                NoteFilePath  = s.NotePath;
+                EraseCurrent = s.Erase;
+                NoteFilePath = s.NotePath;
                 AudioFilePath = s.AudioPath;
-                InsTrack      = s.InsTrack;
+                InsTrack = s.InsTrack;
             }
 
             switch (fileType)
@@ -129,7 +129,7 @@ namespace VisualMusic.Controls
                     Title = "Import MIDI Song";
                     _noteFilter = BuildFilter("MIDI files", ImportFileFormats.Midi);
                     PerInstrumentLabel = "One track per MIDI track";
-                    PerChannelLabel    = "One track per MIDI channel";
+                    PerChannelLabel = "One track per MIDI channel";
                     break;
                 case FileType.Mod:
                     Title = "Import Module";

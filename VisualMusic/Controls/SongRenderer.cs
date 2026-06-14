@@ -5,8 +5,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Input;
-using VisualMusic.MonoGameInterop;
 using VisualMusic.Keyframes;
+using VisualMusic.MonoGameInterop;
 
 namespace VisualMusic
 {
@@ -34,8 +34,8 @@ namespace VisualMusic
             = new System.Collections.Generic.Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase);
         Texture2D _bkgTexA;   // "from" texture (or the single texture when no crossfade)
         Texture2D _bkgTexB;   // "to" texture (null when not crossfading)
-        float     _bkgBlend;  // 0 = fully A, 1 = fully B
-        bool      _bkgFadeToEmpty; // true when crossfading from an image to no background
+        float _bkgBlend;  // 0 = fully A, 1 = fully B
+        bool _bkgFadeToEmpty; // true when crossfading from an image to no background
         readonly object _renderLock = new object();
 
         // --- Layout ---
@@ -602,18 +602,18 @@ namespace VisualMusic
         public void LoadBackgroundImage(string path)
         {
             // Clear the crossfade pair; set the single base texture.
-            _bkgTexB  = null;
+            _bkgTexB = null;
             _bkgBlend = 0f;
             _bkgFadeToEmpty = false;
-            _bkgTexA  = GetOrLoadCachedTexture(path);
+            _bkgTexA = GetOrLoadCachedTexture(path);
             // Purge cache entries that are no longer needed (keep only the active texture)
             PurgeCacheExcept(path);
         }
 
         public void UnloadBackgroundImage()
         {
-            _bkgTexA  = null;
-            _bkgTexB  = null;
+            _bkgTexA = null;
+            _bkgTexB = null;
             _bkgBlend = 0f;
             _bkgFadeToEmpty = false;
             foreach (var tex in _bkgCache.Values) tex?.Dispose();
@@ -628,8 +628,8 @@ namespace VisualMusic
         /// </summary>
         public void SetBackgroundCrossfade(string pathA, string pathB, float blend)
         {
-            _bkgTexA  = GetOrLoadCachedTexture(pathA);
-            _bkgTexB  = string.IsNullOrWhiteSpace(pathB) ? null : GetOrLoadCachedTexture(pathB);
+            _bkgTexA = GetOrLoadCachedTexture(pathA);
+            _bkgTexB = string.IsNullOrWhiteSpace(pathB) ? null : GetOrLoadCachedTexture(pathB);
             _bkgBlend = blend;
             _bkgFadeToEmpty = pathB != null && string.IsNullOrWhiteSpace(pathB);
         }
@@ -661,7 +661,7 @@ namespace VisualMusic
                 float alphaA = opacity;
                 if (_bkgTexB != null || _bkgFadeToEmpty)
                     alphaA = opacity * (1f - _bkgBlend);
-                int   ca     = (int)(alphaA * 255f + 0.5f);
+                int ca = (int)(alphaA * 255f + 0.5f);
                 _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, _postProcessFx, null);
                 _spriteBatch.Draw(_bkgTexA, viewport, new Color(ca, ca, ca, ca));
                 _spriteBatch.End();
@@ -671,7 +671,7 @@ namespace VisualMusic
             if (_bkgTexB != null && _bkgBlend > 0f)
             {
                 float alphaB = opacity * _bkgBlend;
-                int   cb     = (int)(alphaB * 255f + 0.5f);
+                int cb = (int)(alphaB * 255f + 0.5f);
                 _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, _postProcessFx, null);
                 _spriteBatch.Draw(_bkgTexB, viewport, new Color(cb, cb, cb, cb));
                 _spriteBatch.End();
@@ -684,7 +684,7 @@ namespace VisualMusic
         }
 
         // ---- ISongDrawHost extras ----
-        public int ClientWidth  => _clientWidth;
+        public int ClientWidth => _clientWidth;
         public int ClientHeight => _clientHeight;
         // TotalTimeElapsed already declared above (line ~86).
         /// <summary>No-op: WPF render loop is continuous — no explicit invalidation needed.</summary>

@@ -319,8 +319,8 @@ namespace VisualMusic
             const float maxStep = 0.03f;
             if (Math.Abs(x) > maxStep) x *= maxStep / Math.Abs(x);
             if (Math.Abs(y) > maxStep) y *= maxStep / Math.Abs(y);
-            float yaw  = roll ?  0 : -x;
-            float rollZ = roll ? -x :  0;
+            float yaw = roll ? 0 : -x;
+            float rollZ = roll ? -x : 0;
             Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(yaw, -y, rollZ);
             OnUserUpdating?.Invoke();
         }

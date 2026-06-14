@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using XnaColor = Microsoft.Xna.Framework.Color;
 

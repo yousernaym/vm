@@ -27,7 +27,7 @@ namespace VisualMusic.Controls
 
         // ---- Bindable collections ----
 
-        public IEnumerable<string> BaseColors   => ThemeManager.Current.BaseColors;
+        public IEnumerable<string> BaseColors => ThemeManager.Current.BaseColors;
         public IEnumerable<string> ColorSchemes => ThemeManager.Current.ColorSchemes;
 
         // ---- Bindable selections ----
@@ -68,12 +68,12 @@ namespace VisualMusic.Controls
             // Open the dropdowns on the currently-applied theme. DetectTheme reflects the live
             // theme; fall back to saved settings if detection fails.
             var current = ThemeManager.Current.DetectTheme(Application.Current);
-            _originalBase   = current?.BaseColorScheme ?? AppSettings.Instance.ThemeBaseColorOrDefault;
-            _originalScheme = current?.ColorScheme     ?? AppSettings.Instance.ThemeColorSchemeOrDefault;
+            _originalBase = current?.BaseColorScheme ?? AppSettings.Instance.ThemeBaseColorOrDefault;
+            _originalScheme = current?.ColorScheme ?? AppSettings.Instance.ThemeColorSchemeOrDefault;
 
             // Assign the backing fields directly (no ApplyTheme — the theme is already applied),
             // then notify so the bound ComboBoxes show the current selection.
-            _selectedBaseColor   = _originalBase;
+            _selectedBaseColor = _originalBase;
             _selectedColorScheme = _originalScheme;
             Notify(nameof(SelectedBaseColor));
             Notify(nameof(SelectedColorScheme));
@@ -91,7 +91,7 @@ namespace VisualMusic.Controls
 
         void Ok_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.Instance.ThemeBaseColor   = _selectedBaseColor;
+            AppSettings.Instance.ThemeBaseColor = _selectedBaseColor;
             AppSettings.Instance.ThemeColorScheme = _selectedColorScheme;
             AppSettings.Instance.Save();
             DialogResult = true;

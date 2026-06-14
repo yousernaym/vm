@@ -14,9 +14,9 @@ namespace VisualMusic.Controls
     /// </summary>
     public partial class SubSongWindow : MetroWindow
     {
-        public int SelectedSong  { get; private set; } = 1;
+        public int SelectedSong { get; private set; } = 1;
         public float SongLengthS { get; private set; }
-        public int NumSongs      { get; private set; }
+        public int NumSongs { get; private set; }
 
         readonly List<float> _lengths = new();
 
@@ -31,7 +31,7 @@ namespace VisualMusic.Controls
             {
                 f.Seek(0x0e, SeekOrigin.Begin);
                 NumSongs = (f.ReadByte() << 8) | f.ReadByte();
-                defSong  = (f.ReadByte() << 8) | f.ReadByte();
+                defSong = (f.ReadByte() << 8) | f.ReadByte();
             }
             if (NumSongs < 1) NumSongs = 1;
             if (defSong < 1 || defSong > NumSongs) defSong = 1;
@@ -60,7 +60,7 @@ namespace VisualMusic.Controls
 
             subSongList.SelectedIndex = Math.Max(0, defSong - 1);
             SelectedSong = defSong;
-            SongLengthS  = _lengths.Count > defSong - 1 ? _lengths[defSong - 1] : 0;
+            SongLengthS = _lengths.Count > defSong - 1 ? _lengths[defSong - 1] : 0;
 
             // Scroll the default sub-song into view once the list is laid out.
             Loaded += (_, _) =>
@@ -78,9 +78,9 @@ namespace VisualMusic.Controls
         {
             int idx = subSongList.SelectedIndex;
             if (idx < 0) idx = 0;
-            SelectedSong  = idx + 1;
-            SongLengthS   = idx < _lengths.Count ? _lengths[idx] : 0;
-            DialogResult  = true;
+            SelectedSong = idx + 1;
+            SongLengthS = idx < _lengths.Count ? _lengths[idx] : 0;
+            DialogResult = true;
         }
 
         void SubSongList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
