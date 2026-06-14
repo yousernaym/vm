@@ -443,7 +443,7 @@ namespace VisualMusic
         public void InterpolateFrames()
         {
             var interpolatedFrame = KeyFrames.CreateInterpolatedFrame((int)SongPosT);
-            // The old (Ctrl+K) keyframe system still owns these props *unless* the new per-property
+            // The old legacy keyframe system still owns these props *unless* the new per-property
             // system has keyframes for them, in which case it hands off ownership (the new system writes
             // them in InterpolatePropertyKeyframes). Without this hand-off the old system would overwrite
             // the new interpolated value every frame.

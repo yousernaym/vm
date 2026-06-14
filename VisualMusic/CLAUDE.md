@@ -186,7 +186,7 @@ From `todo.txt`:
 - **CTRL-Space** or media play key — Start/stop playback
 - **Camera move:** `W A S D R F`
 - **Camera rotate:** `Shift + W A S D Q E`
-- **CTRL-K** — Insert keyframe at current playback position
+- **Keyframes** — Right-click a keyframeable property control to add/remove a property keyframe; select rows in the keyframe list and press Delete to remove them
 
 ## Testing
 

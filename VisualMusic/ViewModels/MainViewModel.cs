@@ -62,7 +62,6 @@ namespace VisualMusic.ViewModels
         [NotifyCanExecuteChangedFor(nameof(LoadCameraCommand))]
         [NotifyCanExecuteChangedFor(nameof(SaveCameraCommand))]
         [NotifyCanExecuteChangedFor(nameof(InsertLyricsCommand))]
-        [NotifyCanExecuteChangedFor(nameof(InsertKeyFrameCommand))]
         [NotifyCanExecuteChangedFor(nameof(LoadTrackPropsCommand))]
         [NotifyCanExecuteChangedFor(nameof(SaveTrackPropsCommand))]
         [NotifyCanExecuteChangedFor(nameof(GoToNextKeyFrameCommand))]
@@ -1094,19 +1093,6 @@ namespace VisualMusic.ViewModels
         {
             _project.InsertLyrics();
             AddUndoItem("Insert Lyrics");
-        }
-
-        [RelayCommand(CanExecute = nameof(HasProject))]
-        void InsertKeyFrame()
-        {
-            int row = _project.InsertKeyFrameAtSongPos();
-            if (row < 0)
-            {
-                MessageBox.Show("A key frame already exists at this position.", Program.AppName,
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            AddUndoItem("Insert Key Frame");
         }
 
         // ---- Renderer WaveformPanel accessor (set by MainWindow) ----

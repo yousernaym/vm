@@ -4,18 +4,6 @@
              MinWidth="180">
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" Margin="4,4,4,2" LastChildFill="True">
-            <!-- Right-aligned action buttons -->
-            <Button x:Name="removeBtn" DockPanel.Dock="Right"
-                    Width="22" Height="22" Padding="0" Margin="2,0,0,0"
-                    IsEnabled="False"
-                    ToolTip="Remove selected keyframe(s)"
-                    Click="RemoveBtn_Click"
-                    Content="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12"/>
-            <Button x:Name="addBtn" DockPanel.Dock="Right"
-                    Width="22" Height="22" Padding="0" Margin="2,0,0,0"
-                    ToolTip="Add empty keyframe at playback position"
-                    Click="AddBtn_Click"
-                    Content="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="12"/>
             <TextBlock Text="Keyframes" FontWeight="SemiBold" VerticalAlignment="Center"/>
         </DockPanel>
         <!-- Property filter row: searchable dropdown (TextBox + Popup + ListBox) -->

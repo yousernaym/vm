@@ -87,21 +87,6 @@ namespace VisualMusic.Controls
             UpdateFilterBoxText();
         }
 
-        // ---- Header buttons ----
-
-        void AddBtn_Click(object sender, RoutedEventArgs e)
-        {
-            int tick = _vm.AddEmptyAtPlayhead();
-            // Select the newly added (or existing) row at that tick
-            var row = _vm.FindRow(tick);
-            if (row != null) { grid.SelectedItem = row; grid.ScrollIntoView(row); }
-        }
-
-        void RemoveBtn_Click(object sender, RoutedEventArgs e)
-        {
-            DeleteSelectedRows();
-        }
-
         // ---- Filter search box ----
 
         void FilterBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -295,7 +280,6 @@ namespace VisualMusic.Controls
 
         void Grid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UpdateRemoveButtonState();
             if (_preservingEditSelection) return; // ignore transient moves while an edit is finishing
             if (_selectingFromService) return;   // don't re-seek when set by the diamond
             // Only seek when exactly one row is selected (avoid spurious seeks during multi-select)
@@ -405,7 +389,6 @@ namespace VisualMusic.Controls
             finally
             {
                 _selectingFromService = wasSelecting;
-                UpdateRemoveButtonState();
             }
         }
 
@@ -441,7 +424,6 @@ namespace VisualMusic.Controls
             {
                 grid.UnselectAll();
                 grid.CurrentCell = default(DataGridCellInfo);
-                UpdateRemoveButtonState();
                 return;
             }
 
@@ -451,7 +433,6 @@ namespace VisualMusic.Controls
             if (grid.Columns.Count > 0)
                 grid.CurrentCell = new DataGridCellInfo(row, grid.Columns[0]);
             grid.ScrollIntoView(row);
-            UpdateRemoveButtonState();
         }
 
         void BeginEditSelectionRestore(Func<int> commitEdit)
@@ -483,7 +464,6 @@ namespace VisualMusic.Controls
                     {
                         _selectingFromService = wasSelecting;
                         _preservingEditSelection = false;
-                        UpdateRemoveButtonState();
                     }
                 }), System.Windows.Threading.DispatcherPriority.ContextIdle);
             }), System.Windows.Threading.DispatcherPriority.Background);
@@ -501,13 +481,7 @@ namespace VisualMusic.Controls
 
             _vm.DeleteRows(selected);
             grid.UnselectAll();
-            UpdateRemoveButtonState();
             return true;
-        }
-
-        void UpdateRemoveButtonState()
-        {
-            removeBtn.IsEnabled = grid.SelectedItems.Count > 0;
         }
 
         bool IsGridTextEditing()

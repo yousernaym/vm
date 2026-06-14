@@ -34,7 +34,6 @@
         <KeyBinding Command="{Binding LoadTrackPropsCommand}" Key="T"    Modifiers="Control"/>
         <KeyBinding Command="{Binding SaveTrackPropsCommand}" Key="T"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding InsertLyricsCommand}"   Key="L"    Modifiers="Control"/>
-        <KeyBinding Command="{Binding InsertKeyFrameCommand}" Key="K"    Modifiers="Control"/>
         <KeyBinding Command="{Binding PreferencesCommand}"    Key="P"    Modifiers="Control"/>
         <!-- Playback — Ctrl+Space handled via PreviewKeyDown in code-behind (tunneling) so it
              fires even when a focused panel control (CheckBox, ListBox, etc.) would otherwise
@@ -110,7 +109,6 @@
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Insert _Lyrics"    Command="{Binding InsertLyricsCommand}"   InputGestureText="Ctrl+L"/>
-                <MenuItem Header="Insert _Key Frame" Command="{Binding InsertKeyFrameCommand}" InputGestureText="Ctrl+K"/>
                 <Separator/>
                 <MenuItem Header="_Preferences..."   Command="{Binding PreferencesCommand}" InputGestureText="Ctrl+P"/>
             </MenuItem>

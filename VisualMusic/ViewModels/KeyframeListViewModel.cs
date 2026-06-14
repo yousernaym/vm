@@ -175,20 +175,6 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// Adds an empty keyframe marker (0 properties) at the current playback position.
-        /// Returns the tick it was placed at.
-        /// </summary>
-        public int AddEmptyAtPlayhead()
-        {
-            if (_project == null) return 0;
-            int tick = (int)_project.SongPosT;
-            _project.PropertyKeyframes.AddMarker(tick);
-            KeyframeService.RaiseKeyframesChanged();
-            KeyframeService.RaiseUndoSnapshot("Add keyframe");
-            return tick;
-        }
-
-        /// <summary>
         /// Deletes one or more keyframe rows. When a property filter is active, only that
         /// property's keyframe is removed from each tick (other properties remain). When no
         /// filter is active the entire tick column (all properties) is deleted.
