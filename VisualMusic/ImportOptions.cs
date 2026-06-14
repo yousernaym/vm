@@ -8,7 +8,6 @@ using VisualMusic.Controls;
 
 namespace VisualMusic
 {
-    [DataContract(Name = "FileType", Namespace = "http://schemas.datacontract.org/2004/07/Midi")]
     public enum FileType
     {
         [EnumMember] Midi,
@@ -17,7 +16,6 @@ namespace VisualMusic
         [EnumMember] Hvl
     }
 
-    [DataContract(Name = "MixdownType", Namespace = "http://schemas.datacontract.org/2004/07/Midi")]
     public enum MixdownType
     {
         [EnumMember] None,
