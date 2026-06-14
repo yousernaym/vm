@@ -107,7 +107,7 @@ namespace VisualMusic
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("rawNotePath", RawNotePath);
-            if (MixdownType == global::VisualMusic.MixdownType.None)
+            if (MixdownType == MixdownType.None)
                 info.AddValue("audioPath", AudioPath);
             info.AddValue("mixdownType", MixdownType);
             info.AddValue("insTrack", InsTrack);
@@ -128,7 +128,7 @@ namespace VisualMusic
                 NoteFileType,
                 erase: false,
                 notePath: RawNotePath,
-                audioPath: MixdownType == global::VisualMusic.MixdownType.None ? AudioPath : "",
+                audioPath: MixdownType == MixdownType.None ? AudioPath : "",
                 insTrack: InsTrack);
         }
 
@@ -182,7 +182,7 @@ namespace VisualMusic
     {
         public MidiImportOptions() : base(FileType.Midi)
         {
-            MixdownType = MidMix.SfLoaded() ? global::VisualMusic.MixdownType.Internal : global::VisualMusic.MixdownType.None;
+            MixdownType = MidMix.SfLoaded() ? MixdownType.Internal : MixdownType.None;
         }
 
         public MidiImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
@@ -195,7 +195,7 @@ namespace VisualMusic
     {
         public ModImportOptions() : base(FileType.Mod)
         {
-            MixdownType = global::VisualMusic.MixdownType.Internal;
+            MixdownType = MixdownType.Internal;
         }
 
         public ModImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
@@ -208,7 +208,7 @@ namespace VisualMusic
     {
         public SidImportOptions() : base(FileType.Sid)
         {
-            MixdownType = global::VisualMusic.MixdownType.Internal;
+            MixdownType = MixdownType.Internal;
         }
 
         public SidImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
@@ -221,7 +221,7 @@ namespace VisualMusic
     {
         public HvlImportOptions() : base(FileType.Hvl)
         {
-            MixdownType = global::VisualMusic.MixdownType.Internal;
+            MixdownType = MixdownType.Internal;
         }
 
         public HvlImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)

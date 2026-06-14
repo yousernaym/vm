@@ -45,6 +45,7 @@ namespace VisualMusic.ViewModels
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasProject))]
         [NotifyPropertyChangedFor(nameof(HasAudio))]
+        [NotifyPropertyChangedFor(nameof(HasUnsavedChanges))]
         [NotifyCanExecuteChangedFor(nameof(SaveProjectCommand))]
         [NotifyCanExecuteChangedFor(nameof(SaveProjectAsCommand))]
         [NotifyCanExecuteChangedFor(nameof(ExportVideoCommand))]
@@ -70,6 +71,7 @@ namespace VisualMusic.ViewModels
 
         public bool HasProject => _project != null;
         public bool HasAudio => _project != null && Media.GetAudioLength() > 0;
+        public bool HasUnsavedChanges => HasProject && _undoItems.Current != null && !_undoItems.IsCurrentSaved;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(UndoMenuHeader))]
@@ -502,6 +504,7 @@ namespace VisualMusic.ViewModels
             if (dlg.ShowDialog() != true) return;
 
             string path = dlg.FileName;
+            if (!ConfirmSaveChangesBefore("opening another project")) return;
             AppSettings.Instance.RememberFolder(path, dir => AppSettings.Instance.ProjectFolder = dir);
 
             Project tempProject;
@@ -572,6 +575,7 @@ namespace VisualMusic.ViewModels
 
             _undoItems.Clear();
             _undoItems.Add("", tempProject);
+            _undoItems.MarkSaved();
             UpdateUndoRedo();
             WindowTitle = $"{Program.AppName} — {Path.GetFileName(path)}";
         }
@@ -579,12 +583,23 @@ namespace VisualMusic.ViewModels
         [RelayCommand(CanExecute = nameof(HasProject))]
         void SaveProject()
         {
-            if (string.IsNullOrEmpty(_currentProjectPath)) { SaveProjectAs(); return; }
-            SaveToPath(_currentProjectPath);
+            SaveProjectCore();
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void SaveProjectAs()
+        {
+            SaveProjectAsCore();
+        }
+
+        bool SaveProjectCore()
+        {
+            if (_project == null) return false;
+            if (string.IsNullOrEmpty(_currentProjectPath)) return SaveProjectAsCore();
+            return SaveToPath(_currentProjectPath);
+        }
+
+        bool SaveProjectAsCore()
         {
             var dlg = new SaveFileDialog
             {
@@ -592,13 +607,15 @@ namespace VisualMusic.ViewModels
                 InitialDirectory = AppSettings.Instance.ProjectFolderOrDefault,
                 FileName = _project.DefaultFileName
             };
-            if (dlg.ShowDialog() != true) return;
+            if (dlg.ShowDialog() != true) return false;
             AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.ProjectFolder = dir);
+            if (!SaveToPath(dlg.FileName)) return false;
             _currentProjectPath = dlg.FileName;
-            SaveToPath(_currentProjectPath);
+            _project.DefaultFileName = Path.GetFileName(dlg.FileName);
+            return true;
         }
 
-        void SaveToPath(string path)
+        bool SaveToPath(string path)
         {
             try
             {
@@ -607,12 +624,31 @@ namespace VisualMusic.ViewModels
                 using (var stream = File.Open(tmp, FileMode.Create))
                     dcs.WriteObject(stream, _project);
                 File.Copy(tmp, path, true);
+                _undoItems.MarkSaved();
+                OnPropertyChanged(nameof(HasUnsavedChanges));
                 WindowTitle = $"{Program.AppName} — {Path.GetFileName(path)}";
+                return true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
+        }
+
+        public bool ConfirmSaveChangesBefore(string action)
+        {
+            if (!HasUnsavedChanges) return true;
+
+            var result = MessageBox.Show(
+                $"Save changes to the current project before {action}?",
+                Program.AppName,
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Cancel) return false;
+            if (result == MessageBoxResult.No) return true;
+            return SaveProjectCore();
         }
 
         [RelayCommand]
@@ -699,6 +735,9 @@ namespace VisualMusic.ViewModels
         /// <summary>Shared post-dialog import logic.</summary>
         async Task DoImport(ImportOptions options)
         {
+            if (options.EraseCurrent && !ConfirmSaveChangesBefore("importing a new song"))
+                return;
+
             // Ensure a project object exists to import into.
             if (_project == null)
             {
@@ -916,6 +955,7 @@ namespace VisualMusic.ViewModels
             RedoDescription = _undoItems.RedoDesc;
             UndoCommand.NotifyCanExecuteChanged();
             RedoCommand.NotifyCanExecuteChanged();
+            OnPropertyChanged(nameof(HasUnsavedChanges));
         }
 
         public void AddUndoItem(string desc)

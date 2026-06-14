@@ -1,4 +1,5 @@
 using MahApps.Metro.Controls;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using VisualMusic.ViewModels;
@@ -15,6 +16,13 @@ namespace VisualMusic
             DataContext = _vm;
             InitializeComponent();
             Loaded += OnLoaded;
+            Closing += OnClosing;
+        }
+
+        void OnClosing(object sender, CancelEventArgs e)
+        {
+            if (!_vm.ConfirmSaveChangesBefore("exiting"))
+                e.Cancel = true;
         }
 
         // Tunneling PreviewKeyDown ensures Ctrl+Space reaches us before focusable panel controls

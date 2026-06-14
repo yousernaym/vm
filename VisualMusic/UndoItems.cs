@@ -17,12 +17,14 @@ namespace VisualMusic
 
         LinkedList<Item> _items = new LinkedList<Item>();
         LinkedListNode<Item> _currentItem;
+        LinkedListNode<Item> _savedItem;
 
         public Item Current => _currentItem == null ? null : _currentItem.Value;
         public Item Previous => _currentItem?.Previous == null ? null : _currentItem.Previous.Value;
         public Item Next => _currentItem?.Next == null ? null : _currentItem.Next.Value;
         public string UndoDesc => Current == null ? "" : Current.Desc;
         public string RedoDesc => Next == null ? "" : Next.Desc;
+        public bool IsCurrentSaved => _currentItem != null && _currentItem == _savedItem;
 
         public void Clear()
         {
@@ -30,6 +32,12 @@ namespace VisualMusic
                 item.Project.Dispose();
             _items.Clear();
             _currentItem = null;
+            _savedItem = null;
+        }
+
+        public void MarkSaved()
+        {
+            _savedItem = _currentItem;
         }
 
         public void Add(string desc, Project project)
@@ -47,6 +55,8 @@ namespace VisualMusic
             {
                 var next = node.Next;
                 node.Value.Project.Dispose();
+                if (node == _savedItem)
+                    _savedItem = null;
                 _items.Remove(node);
                 node = next;
             }
