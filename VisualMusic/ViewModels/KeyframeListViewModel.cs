@@ -152,16 +152,17 @@ namespace VisualMusic.ViewModels
         // ---- Row edits ----
 
         /// <summary>Commits an in-place time edit (from the DataGrid).</summary>
-        public void CommitTimeEdit(KeyframeRowViewModel row, string newTimeText)
+        public int? CommitTimeEdit(KeyframeRowViewModel row, string newTimeText)
         {
-            if (_project == null) return;
+            if (_project == null) return null;
             if (!TryParseTime(newTimeText, _project.Notes?.TicksPerBeat ?? 480, out int newTick))
-                return;
-            if (newTick == row.Tick) return;
+                return null;
+            if (newTick == row.Tick) return null;
 
             _project.PropertyKeyframes.MoveColumn(row.Tick, newTick);
             KeyframeService.RaiseKeyframesChanged();
             KeyframeService.RaiseUndoSnapshot("Move keyframe");
+            return newTick;
         }
 
         /// <summary>Commits an in-place description edit.</summary>

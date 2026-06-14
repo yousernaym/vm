@@ -16,6 +16,7 @@ namespace VisualMusic.Controls
     {
         KeyframeListViewModel _vm;
         bool _selectingFromService;   // guards re-entrant seek when selecting programmatically
+        bool _preservingEditSelection; // guards DataGrid's post-edit navigation until we restore the row
         bool _settingTextFromCode;    // guards FilterBox_TextChanged when we set the text in code
         ICollectionView _propsView;   // filtered view over _vm.Properties for the search popup
 
@@ -29,18 +30,18 @@ namespace VisualMusic.Controls
 
             KeyframeService.KeyframesChanged += () =>
             {
-                _vm.Project = _vm.Project; // triggers Rebuild() (properties + rows)
+                RebuildPreservingSelection();
                 UpdateFilterBoxText();     // reflect the committed selection (if any)
             };
 
             // A diamond click (or any tick pick) selects the matching row.
             KeyframeService.TickSelected += tick =>
             {
-                var row = _vm.FindRow(tick);
-                if (row == null) return;
+                if (_vm.FindRow(tick) == null) return;
+                bool wasSelecting = _selectingFromService;
                 _selectingFromService = true;
-                try { grid.SelectedItem = row; grid.ScrollIntoView(row); }
-                finally { _selectingFromService = false; }
+                try { SelectSingleRowAtTick(tick); }
+                finally { _selectingFromService = wasSelecting; }
             };
 
             // A property's context menu requested the list be filtered to that property.
@@ -98,16 +99,7 @@ namespace VisualMusic.Controls
 
         void RemoveBtn_Click(object sender, RoutedEventArgs e)
         {
-            var selected = grid.SelectedItems.OfType<KeyframeRowViewModel>().ToList();
-            if (selected.Count == 0) return;
-
-            string msg = BuildDeleteMessage(selected.Count);
-            var result = MessageBox.Show(msg, "Delete keyframe(s)",
-                MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (result != MessageBoxResult.Yes) return;
-
-            _vm.DeleteRows(selected);
-            grid.UnselectAll();
+            DeleteSelectedRows();
         }
 
         // ---- Filter search box ----
@@ -303,6 +295,8 @@ namespace VisualMusic.Controls
 
         void Grid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            UpdateRemoveButtonState();
+            if (_preservingEditSelection) return; // ignore transient moves while an edit is finishing
             if (_selectingFromService) return;   // don't re-seek when set by the diamond
             // Only seek when exactly one row is selected (avoid spurious seeks during multi-select)
             if (grid.SelectedItems.Count == 1 && grid.SelectedItem is KeyframeRowViewModel row)
@@ -319,41 +313,43 @@ namespace VisualMusic.Controls
 
             string colHeader = (e.Column.Header as string) ?? "";
             string text = tb.Text;
+            int originalTick = row.Tick;
+
             if (colHeader == "Beat")
+            {
                 // Defer: committing a time edit moves the column and rebuilds the list, which can't
-                // happen while the DataGrid is still finishing this edit.
-                Dispatcher.BeginInvoke(new System.Action(() => _vm.CommitTimeEdit(row, text)));
+                // happen while the DataGrid is still finishing this edit. Restore one dispatcher
+                // turn later so WPF's Enter/tab navigation cannot leave selection on the next row.
+                BeginEditSelectionRestore(() => _vm.CommitTimeEdit(row, text) ?? originalTick);
+            }
             else if (colHeader == "Description")
-                _vm.CommitDescriptionEdit(row, text);
+            {
+                BeginEditSelectionRestore(() =>
+                {
+                    _vm.CommitDescriptionEdit(row, text);
+                    return originalTick;
+                });
+            }
         }
 
         void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             // Ctrl-A: select all (DataGrid handles this natively with Extended mode, but handle
-            // the case where focus is in a read-only cell so it doesn't start an edit)
+            // the case where focus is on the grid itself so it doesn't start an edit)
             if (e.Key == Key.A && (Keyboard.Modifiers & ModifierKeys.Control) != 0
-                && grid.CurrentCell.Column?.IsReadOnly != false)
+                && !IsGridTextEditing())
             {
                 grid.SelectAll();
                 e.Handled = true;
                 return;
             }
 
-            // Delete key removes the selected keyframe row(s)
-            if (e.Key == Key.Delete && grid.CurrentCell.Column?.IsReadOnly != false)
+            // Delete key removes selected row(s) when the grid has focus. If a cell TextBox is
+            // actively editing, leave Delete to the editor so normal text editing still works.
+            if (e.Key == Key.Delete && !IsGridTextEditing())
             {
-                var selected = grid.SelectedItems.OfType<KeyframeRowViewModel>().ToList();
-                if (selected.Count == 0) return;
-
-                string msg = BuildDeleteMessage(selected.Count);
-                var result = MessageBox.Show(msg, "Delete keyframe(s)",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
-                {
-                    _vm.DeleteRows(selected);
-                    grid.UnselectAll();
+                if (DeleteSelectedRows())
                     e.Handled = true;
-                }
             }
         }
 
@@ -390,6 +386,135 @@ namespace VisualMusic.Controls
         }
 
         // ---- Helpers ----
+
+        void RebuildPreservingSelection()
+        {
+            var selectedTicks = grid.SelectedItems
+                .OfType<KeyframeRowViewModel>()
+                .Select(r => r.Tick)
+                .Distinct()
+                .ToList();
+
+            bool wasSelecting = _selectingFromService;
+            _selectingFromService = true;
+            try
+            {
+                _vm.Project = _vm.Project; // triggers Rebuild() (properties + rows)
+                RestoreSelectionByTicks(selectedTicks);
+            }
+            finally
+            {
+                _selectingFromService = wasSelecting;
+                UpdateRemoveButtonState();
+            }
+        }
+
+        void RestoreSelectionByTicks(IEnumerable<int> ticks)
+        {
+            grid.UnselectAll();
+
+            KeyframeRowViewModel first = null;
+            foreach (int tick in ticks)
+            {
+                var row = _vm.FindRow(tick);
+                if (row == null) continue;
+                grid.SelectedItems.Add(row);
+                first ??= row;
+            }
+
+            if (first == null)
+            {
+                grid.CurrentCell = default(DataGridCellInfo);
+                return;
+            }
+
+            grid.CurrentItem = first;
+            if (grid.Columns.Count > 0)
+                grid.CurrentCell = new DataGridCellInfo(first, grid.Columns[0]);
+            grid.ScrollIntoView(first);
+        }
+
+        void SelectSingleRowAtTick(int tick)
+        {
+            var row = _vm.FindRow(tick);
+            if (row == null)
+            {
+                grid.UnselectAll();
+                grid.CurrentCell = default(DataGridCellInfo);
+                UpdateRemoveButtonState();
+                return;
+            }
+
+            grid.UnselectAll();
+            grid.SelectedItem = row;
+            grid.CurrentItem = row;
+            if (grid.Columns.Count > 0)
+                grid.CurrentCell = new DataGridCellInfo(row, grid.Columns[0]);
+            grid.ScrollIntoView(row);
+            UpdateRemoveButtonState();
+        }
+
+        void BeginEditSelectionRestore(Func<int> commitEdit)
+        {
+            _preservingEditSelection = true;
+
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                int targetTick;
+                try
+                {
+                    targetTick = commitEdit();
+                }
+                catch
+                {
+                    _preservingEditSelection = false;
+                    throw;
+                }
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    bool wasSelecting = _selectingFromService;
+                    _selectingFromService = true;
+                    try
+                    {
+                        SelectSingleRowAtTick(targetTick);
+                    }
+                    finally
+                    {
+                        _selectingFromService = wasSelecting;
+                        _preservingEditSelection = false;
+                        UpdateRemoveButtonState();
+                    }
+                }), System.Windows.Threading.DispatcherPriority.ContextIdle);
+            }), System.Windows.Threading.DispatcherPriority.Background);
+        }
+
+        bool DeleteSelectedRows()
+        {
+            var selected = grid.SelectedItems.OfType<KeyframeRowViewModel>().ToList();
+            if (selected.Count == 0) return false;
+
+            string msg = BuildDeleteMessage(selected.Count);
+            var result = MessageBox.Show(msg, "Delete keyframe(s)",
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return true;
+
+            _vm.DeleteRows(selected);
+            grid.UnselectAll();
+            UpdateRemoveButtonState();
+            return true;
+        }
+
+        void UpdateRemoveButtonState()
+        {
+            removeBtn.IsEnabled = grid.SelectedItems.Count > 0;
+        }
+
+        bool IsGridTextEditing()
+        {
+            if (Keyboard.FocusedElement is not DependencyObject focused) return false;
+            return IsDescendantOf(focused, grid) && FindAncestor<TextBox>(focused) != null;
+        }
 
         string BuildDeleteMessage(int count)
         {
