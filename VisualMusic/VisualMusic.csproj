@@ -64,11 +64,6 @@
     <ProjectReference Include="..\Dependencies\midilib\midilib.csproj" />
     <ProjectReference Include="..\Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Update="xmplay.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(SolutionDir)Dependencies\Remuxer\Remuxer\bin\$(ConfigurationName)\&quot; &quot;$(TargetDir)Remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /Y /D&#xD;&#xA;&#xD;&#xA;" />
   </Target>

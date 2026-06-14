@@ -317,7 +317,7 @@ namespace VisualMusic
             if (options.NoteFileType != FileType.Midi)
             {
                 string noteFile = Path.GetFileName(options.NotePath);
-                string midiPath = null, midiArg = null, audioPath = null, audioArg = null;
+                string midiPath = null, midiArg = null, generatedAudioPath = null, audioArg = null;
 
                 //Should midi file be created?
                 if (!options.SavedMidi)
@@ -329,15 +329,13 @@ namespace VisualMusic
                 else
                     midiPath = options.MidiOutputPath;
 
-                //Should audio file be created?
-                if (options.MixdownType == MixdownType.Internal)
+                // Generate audio unless the user supplied a separate audio file.
+                if (!options.HasSuppliedAudio)
                 {
-                    audioPath = Path.Combine(Program.TempDir, noteFile) + ".wav";
-                    audioArg = $"-a\"{audioPath}\"";
-                    File.Delete(audioPath);
+                    generatedAudioPath = Path.Combine(Program.TempDir, noteFile) + ".wav";
+                    audioArg = $"-a\"{generatedAudioPath}\"";
+                    File.Delete(generatedAudioPath);
                 }
-                else if (options.MixdownType == MixdownType.None)
-                    audioPath = options.AudioPath;
 
                 //Does either midi or audio need to be created?
                 if (midiArg != null || audioArg != null)
@@ -358,17 +356,17 @@ namespace VisualMusic
                     if (process.ExitCode != 0)
                         throw new FileImportException(null, ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
 
-                    if (!File.Exists(midiPath) && !File.Exists(audioPath))
+                    if (!File.Exists(midiPath) && !File.Exists(generatedAudioPath))
                         return false;
                 }
                 options.MidiOutputPath = midiPath;
-                options.AudioPath = audioPath;
+                options.GeneratedAudioPath = generatedAudioPath;
             }
-            else if (options.MixdownType == MixdownType.Internal)
+            else if (!options.HasSuppliedAudio)
             {
                 string audioPath = Path.Combine(Program.TempDir, Path.GetFileName(options.NotePath)) + ".wav";
                 MidMix.Mixdown(options.NotePath, audioPath);
-                options.AudioPath = audioPath;
+                options.GeneratedAudioPath = audioPath;
             }
 
             bool resetProject = options.EraseCurrent || (_notes == null && (_trackViews == null || _trackViews.Count == 0));
@@ -438,11 +436,7 @@ namespace VisualMusic
         public void OpenAudioFile(ImportOptions options)
         {
             Media.CloseAudioFile();
-            string file = options.AudioPath;
-
-            //Third-party mixdown needed?
-            if (options.MixdownType == MixdownType.Tparty)
-                file = ExternalMixdown.Run(options);
+            string file = options.HasSuppliedAudio ? options.AudioPath : options.GeneratedAudioPath;
 
             if (string.IsNullOrWhiteSpace(file))
                 return;

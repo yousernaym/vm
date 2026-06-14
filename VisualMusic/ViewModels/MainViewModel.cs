@@ -560,10 +560,8 @@ namespace VisualMusic.ViewModels
             var io = tempProject.ImportOptions;
             if (io != null)
             {
-                // Only show the audio path if it was an explicit user-provided file, not an internal mixdown.
-                string audioPath = io.MixdownType == MixdownType.None ? (io.AudioPath ?? "") : "";
                 ImportSongWindow.UpdateSession(io.NoteFileType, erase: true,
-                    notePath: io.RawNotePath ?? "", audioPath: audioPath, insTrack: io.InsTrack);
+                    notePath: io.RawNotePath ?? "", audioPath: io.AudioPath ?? "", insTrack: io.InsTrack);
             }
 
             _currentProjectPath = path;
@@ -723,7 +721,6 @@ namespace VisualMusic.ViewModels
             if (!string.IsNullOrWhiteSpace(dlg.AudioFilePath))
             {
                 options.AudioPath = dlg.AudioFilePath;
-                options.MixdownType = MixdownType.None;
             }
 
             options.EraseCurrent = dlg.EraseCurrent;

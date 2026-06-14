@@ -98,7 +98,6 @@ Source: "{#BinFolder}\{#MyAppAssemblyName}.dll"; DestDir: "{app}"; Flags: ignore
 Source: "{#BinFolder}\{#MyAppAssemblyName}.dll.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinFolder}\{#MyAppAssemblyName}.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinFolder}\{#MyAppAssemblyName}.deps.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\VisualMusic\xmplay.ini"; DestDir: "{#MyAppDataDir}\tparty\xmplay"; Flags: ignoreversion
 Source: "{#BinFolder}\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinFolder}\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Files\songlengths.md5"; DestDir: "{#MyAppDataDir}\tparty\hvsc"; Flags: ignoreversion

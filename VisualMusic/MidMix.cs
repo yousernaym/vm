@@ -6,8 +6,6 @@ namespace VisualMusic
     {
         [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "init")]
         public static extern void Init();
-        [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "sfLoaded")]
-        public static extern bool SfLoaded();
         [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "mixdown")]
         public static extern void Mixdown(string midiPath, string mixdownPath);
         [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "close")]

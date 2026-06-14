@@ -13,7 +13,6 @@ namespace VisualMusic
         public static readonly string DefaultUserFilesDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), AppName);
         public static readonly string TempDirRoot = Path.Combine(Path.GetTempPath(), AppName).ToLowerInvariant();
         public static readonly string TempDir = Path.Combine(TempDirRoot, Path.GetRandomFileName());
-        public static readonly string MixdownPath = Path.Combine(TempDir, "mixdown.wav");
         public static string FileVersion => FileVersionInfo.GetVersionInfo(Environment.ProcessPath ?? Assembly.GetExecutingAssembly().Location).FileVersion;
 
         static FileStream s_dirLock;
