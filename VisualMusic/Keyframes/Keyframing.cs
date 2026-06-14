@@ -230,8 +230,12 @@ namespace VisualMusic.Keyframes
             var state = _states.GetOrCreateValue(fe);
             if (state.Reverting) return;
 
-            // Editing a keyframeable control stops playback so the edit lands at a stable position.
-            KeyframeService.PausePlayback();
+            bool hasAnyKeyframe = KeyframeService.HasAnyKeyForAny(propId, scope);
+            if (hasAnyKeyframe)
+            {
+                // Keyframed edits land at the current tick, so pause before prompting or syncing.
+                KeyframeService.PausePlayback();
+            }
 
             // Shared gate: proceeds for green / un-keyframed controls; prompts for blue ones.
             if (!KeyframeService.EnsureKeyframeForEdit(propId, scope))
