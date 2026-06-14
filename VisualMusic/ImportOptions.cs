@@ -8,14 +8,27 @@ using VisualMusic.Controls;
 
 namespace VisualMusic
 {
-    [Serializable]
-    public class ImportOptions : Midi.ImportOptions, ISerializable
+    [DataContract(Name = "FileType", Namespace = "http://schemas.datacontract.org/2004/07/Midi")]
+    public enum FileType
     {
-        new public Midi.FileType NoteFileType
-        {
-            get => base.NoteFileType;
-            set => base.NoteFileType = value;
-        }
+        [EnumMember] Midi,
+        [EnumMember] Mod,
+        [EnumMember] Sid,
+        [EnumMember] Hvl
+    }
+
+    [DataContract(Name = "MixdownType", Namespace = "http://schemas.datacontract.org/2004/07/Midi")]
+    public enum MixdownType
+    {
+        [EnumMember] None,
+        [EnumMember] Tparty,
+        [EnumMember] Internal
+    }
+
+    [Serializable]
+    public class ImportOptions : ISerializable
+    {
+        public FileType NoteFileType { get; set; }
 
         string _rawNotePath;
         public string RawNotePath
@@ -24,11 +37,18 @@ namespace VisualMusic
             set => _rawNotePath = value;
         }
 
-        new public string NotePath
+        public string NotePath
         {
-            get => base.NotePath;
-            private set => base.NotePath = value;
+            get;
+            private set;
         }
+
+        public string AudioPath;
+        public MixdownType MixdownType;
+        public bool InsTrack;
+        public int SubSong;
+        public int NumSubSongs;
+        public float SongLengthS;
 
         public bool EraseCurrent { get; set; }
         public string MixdownAppPath { get; set; }
@@ -37,7 +57,7 @@ namespace VisualMusic
         public string MidiOutputPath { get; set; }
         public bool SavedMidi { get; set; }
 
-        public ImportOptions(Midi.FileType noteFileType)
+        public ImportOptions(FileType noteFileType)
         {
             NoteFileType = noteFileType;
         }
@@ -51,11 +71,11 @@ namespace VisualMusic
                 else if (entry.Name == "audioPath")
                     AudioPath = (string)entry.Value;
                 else if (entry.Name == "mixdownType")
-                    MixdownType = (Midi.MixdownType)entry.Value;
+                    MixdownType = (MixdownType)entry.Value;
                 else if (entry.Name == "insTrack")
                     InsTrack = (bool)entry.Value;
                 else if (entry.Name == "noteFileType")
-                    NoteFileType = (Midi.FileType)entry.Value;
+                    NoteFileType = (FileType)entry.Value;
                 else if (entry.Name == "subSong")
                     SubSong = (int)entry.Value;
                 else if (entry.Name == "numSubSong")
@@ -87,7 +107,7 @@ namespace VisualMusic
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("rawNotePath", RawNotePath);
-            if (MixdownType == Midi.MixdownType.None)
+            if (MixdownType == global::VisualMusic.MixdownType.None)
                 info.AddValue("audioPath", AudioPath);
             info.AddValue("mixdownType", MixdownType);
             info.AddValue("insTrack", InsTrack);
@@ -108,7 +128,7 @@ namespace VisualMusic
                 NoteFileType,
                 erase: false,
                 notePath: RawNotePath,
-                audioPath: MixdownType == Midi.MixdownType.None ? AudioPath : "",
+                audioPath: MixdownType == global::VisualMusic.MixdownType.None ? AudioPath : "",
                 insTrack: InsTrack);
         }
 
@@ -160,9 +180,9 @@ namespace VisualMusic
     [Serializable]
     class MidiImportOptions : ImportOptions
     {
-        public MidiImportOptions() : base(Midi.FileType.Midi)
+        public MidiImportOptions() : base(FileType.Midi)
         {
-            MixdownType = MidMix.SfLoaded() ? Midi.MixdownType.Internal : Midi.MixdownType.None;
+            MixdownType = MidMix.SfLoaded() ? global::VisualMusic.MixdownType.Internal : global::VisualMusic.MixdownType.None;
         }
 
         public MidiImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
@@ -173,9 +193,9 @@ namespace VisualMusic
     [Serializable]
     class ModImportOptions : ImportOptions
     {
-        public ModImportOptions() : base(Midi.FileType.Mod)
+        public ModImportOptions() : base(FileType.Mod)
         {
-            MixdownType = Midi.MixdownType.Internal;
+            MixdownType = global::VisualMusic.MixdownType.Internal;
         }
 
         public ModImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
@@ -186,9 +206,9 @@ namespace VisualMusic
     [Serializable]
     class SidImportOptions : ImportOptions
     {
-        public SidImportOptions() : base(Midi.FileType.Sid)
+        public SidImportOptions() : base(FileType.Sid)
         {
-            MixdownType = Midi.MixdownType.Internal;
+            MixdownType = global::VisualMusic.MixdownType.Internal;
         }
 
         public SidImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
@@ -199,9 +219,9 @@ namespace VisualMusic
     [Serializable]
     class HvlImportOptions : ImportOptions
     {
-        public HvlImportOptions() : base(Midi.FileType.Hvl)
+        public HvlImportOptions() : base(FileType.Hvl)
         {
-            MixdownType = Midi.MixdownType.Internal;
+            MixdownType = global::VisualMusic.MixdownType.Internal;
         }
 
         public HvlImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)

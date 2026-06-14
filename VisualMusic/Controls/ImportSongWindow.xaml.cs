@@ -21,17 +21,17 @@ namespace VisualMusic.Controls
         void Notify([CallerMemberName] string name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-        Midi.FileType _fileType;
+        FileType _fileType;
 
         // ---- In-memory session cache (resets to defaults after app restart) ----
-        static readonly Dictionary<Midi.FileType, (bool Erase, string NotePath, string AudioPath, bool InsTrack)> s_session = new();
+        static readonly Dictionary<FileType, (bool Erase, string NotePath, string AudioPath, bool InsTrack)> s_session = new();
 
         /// <summary>
         /// Update the session cache for <paramref name="type"/> without opening the dialog.
         /// Call this after a silent import or project load so the dialog is pre-filled correctly
         /// if the user opens it manually afterward.
         /// </summary>
-        internal static void UpdateSession(Midi.FileType type, bool erase, string notePath, string audioPath, bool insTrack)
+        internal static void UpdateSession(FileType type, bool erase, string notePath, string audioPath, bool insTrack)
             => s_session[type] = (erase, notePath, audioPath, insTrack);
 
         // ---- Bound properties ----
@@ -102,7 +102,7 @@ namespace VisualMusic.Controls
 
         // ---- Constructor ----
 
-        public ImportSongWindow(Midi.FileType fileType)
+        public ImportSongWindow(FileType fileType)
         {
             _fileType = fileType;
             _noteFolder  = AppSettings.Instance.GetNoteFolder(fileType);
@@ -125,22 +125,22 @@ namespace VisualMusic.Controls
 
             switch (fileType)
             {
-                case Midi.FileType.Midi:
+                case FileType.Midi:
                     Title = "Import MIDI Song";
                     _noteFilter = BuildFilter("MIDI files", ImportFileFormats.Midi);
                     PerInstrumentLabel = "One track per MIDI track";
                     PerChannelLabel    = "One track per MIDI channel";
                     break;
-                case Midi.FileType.Mod:
+                case FileType.Mod:
                     Title = "Import Module";
                     _noteFilter = BuildFilter("Module files", ImportFileFormats.Mod);
                     break;
-                case Midi.FileType.Sid:
+                case FileType.Sid:
                     Title = "Import SID Song";
                     _noteFilter = BuildFilter("SID files", ImportFileFormats.Sid);
                     AudioLabel = "Audio file (leave empty for SID audio):";
                     break;
-                case Midi.FileType.Hvl:
+                case FileType.Hvl:
                     Title = "Import HVL Song";
                     _noteFilter = BuildFilter("HVL files", ImportFileFormats.Hvl);
                     break;

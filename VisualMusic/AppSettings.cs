@@ -32,19 +32,19 @@ namespace VisualMusic
 
         // ---- Per-file-type import folders ----
 
-        [DataMember] Dictionary<Midi.FileType, string> _noteFolders  = new();
-        [DataMember] Dictionary<Midi.FileType, string> _audioFolders = new();
+        [DataMember] Dictionary<FileType, string> _noteFolders  = new();
+        [DataMember] Dictionary<FileType, string> _audioFolders = new();
 
-        public string GetNoteFolder(Midi.FileType type)
+        public string GetNoteFolder(FileType type)
             => _noteFolders.TryGetValue(type, out var v) ? v : "";
 
-        public void SetNoteFolder(Midi.FileType type, string dir)
+        public void SetNoteFolder(FileType type, string dir)
             => _noteFolders[type] = dir;
 
-        public string GetAudioFolder(Midi.FileType type)
+        public string GetAudioFolder(FileType type)
             => _audioFolders.TryGetValue(type, out var v) ? v : "";
 
-        public void SetAudioFolder(Midi.FileType type, string dir)
+        public void SetAudioFolder(FileType type, string dir)
             => _audioFolders[type] = dir;
 
         // ---- Theme ----
@@ -119,10 +119,10 @@ namespace VisualMusic
 
         // true = one track per instrument (MIDI: per track chunk).
         // false = one track per channel (MIDI: per MIDI channel)
-        [DataMember] Dictionary<Midi.FileType, bool> _insTrack = new();
+        [DataMember] Dictionary<FileType, bool> _insTrack = new();
 
-        public bool GetInsTrack(Midi.FileType type) => _insTrack.TryGetValue(type, out var v) ? v : true;
-        public void SetInsTrack(Midi.FileType type, bool v) => _insTrack[type] = v;
+        public bool GetInsTrack(FileType type) => _insTrack.TryGetValue(type, out var v) ? v : true;
+        public void SetInsTrack(FileType type, bool v) => _insTrack[type] = v;
 
         // ---- Defaults (applied when a stored value is null/empty) ----
 

@@ -319,7 +319,7 @@ namespace VisualMusic
         { //`Open project` and `import files` meet here
             options.CheckSourceFile();
             //Convert mod/sid files to mid/wav
-            if (options.NoteFileType != Midi.FileType.Midi)
+            if (options.NoteFileType != FileType.Midi)
             {
                 string noteFile = Path.GetFileName(options.NotePath);
                 string midiPath = null, midiArg = null, audioPath = null, audioArg = null;
@@ -335,13 +335,13 @@ namespace VisualMusic
                     midiPath = options.MidiOutputPath;
 
                 //Should audio file be created?
-                if (options.MixdownType == Midi.MixdownType.Internal)
+                if (options.MixdownType == MixdownType.Internal)
                 {
                     audioPath = Path.Combine(Program.TempDir, noteFile) + ".wav";
                     audioArg = $"-a\"{audioPath}\"";
                     File.Delete(audioPath);
                 }
-                else if (options.MixdownType == Midi.MixdownType.None)
+                else if (options.MixdownType == MixdownType.None)
                     audioPath = options.AudioPath;
 
                 //Does either midi or audio need to be created?
@@ -369,7 +369,7 @@ namespace VisualMusic
                 options.MidiOutputPath = midiPath;
                 options.AudioPath = audioPath;
             }
-            else if (options.MixdownType == Midi.MixdownType.Internal)
+            else if (options.MixdownType == MixdownType.Internal)
             {
                 string audioPath = Path.Combine(Program.TempDir, Path.GetFileName(options.NotePath)) + ".wav";
                 MidMix.Mixdown(options.NotePath, audioPath);
@@ -423,7 +423,7 @@ namespace VisualMusic
                 throw new FileImportException("No notes found.", ImportError.Corrupt, ImportFileType.Note, errorPath);
 
             _notes = newNotes;
-            if (options.NoteFileType == Midi.FileType.Midi && !options.InsTrack)
+            if (options.NoteFileType == FileType.Midi && !options.InsTrack)
                 SplitTracksByChannel(_notes);
             _notes.CreateNoteBsp();
 
@@ -472,7 +472,7 @@ namespace VisualMusic
             string file = options.AudioPath;
 
             //Third-party mixdown needed?
-            if (options.MixdownType == Midi.MixdownType.Tparty)
+            if (options.MixdownType == MixdownType.Tparty)
                 file = ExternalMixdown.Run(options);
 
             if (string.IsNullOrWhiteSpace(file))

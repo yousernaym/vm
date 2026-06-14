@@ -10,22 +10,22 @@ namespace VisualMusic
         public static readonly string[] Sid = { "sid", "psid", "dat", "rsid", "mus" };
         public static readonly string[] Hvl = { "hvl", "ahx" };
 
-        public static string[] For(global::Midi.FileType fileType) => fileType switch
+        public static string[] For(FileType fileType) => fileType switch
         {
-            global::Midi.FileType.Midi => Midi,
-            global::Midi.FileType.Mod => Mod,
-            global::Midi.FileType.Sid => Sid,
-            global::Midi.FileType.Hvl => Hvl,
+            FileType.Midi => Midi,
+            FileType.Mod => Mod,
+            FileType.Sid => Sid,
+            FileType.Hvl => Hvl,
             _ => Array.Empty<string>(),
         };
 
-        public static global::Midi.FileType? FromExtension(string extension)
+        public static FileType? FromExtension(string extension)
         {
             string ext = (extension ?? "").TrimStart('.').ToLowerInvariant();
-            if (Midi.Contains(ext)) return global::Midi.FileType.Midi;
-            if (Mod.Contains(ext)) return global::Midi.FileType.Mod;
-            if (Hvl.Contains(ext)) return global::Midi.FileType.Hvl;
-            if (Sid.Contains(ext)) return global::Midi.FileType.Sid;
+            if (Midi.Contains(ext)) return FileType.Midi;
+            if (Mod.Contains(ext)) return FileType.Mod;
+            if (Hvl.Contains(ext)) return FileType.Hvl;
+            if (Sid.Contains(ext)) return FileType.Sid;
             return null;
         }
     }

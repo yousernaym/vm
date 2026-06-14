@@ -559,7 +559,7 @@ namespace VisualMusic.ViewModels
             if (io != null)
             {
                 // Only show the audio path if it was an explicit user-provided file, not an internal mixdown.
-                string audioPath = io.MixdownType == Midi.MixdownType.None ? (io.AudioPath ?? "") : "";
+                string audioPath = io.MixdownType == MixdownType.None ? (io.AudioPath ?? "") : "";
                 ImportSongWindow.UpdateSession(io.NoteFileType, erase: true,
                     notePath: io.RawNotePath ?? "", audioPath: audioPath, insTrack: io.InsTrack);
             }
@@ -618,34 +618,34 @@ namespace VisualMusic.ViewModels
         [RelayCommand]
         async Task ImportMidi()
         {
-            var dlg = new ImportSongWindow(Midi.FileType.Midi) { Owner = Application.Current.MainWindow };
+            var dlg = new ImportSongWindow(FileType.Midi) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
-            await DoImport(BuildOptions(Midi.FileType.Midi, dlg));
+            await DoImport(BuildOptions(FileType.Midi, dlg));
         }
 
         [RelayCommand]
         async Task ImportMod()
         {
-            var dlg = new ImportSongWindow(Midi.FileType.Mod) { Owner = Application.Current.MainWindow };
+            var dlg = new ImportSongWindow(FileType.Mod) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
-            await DoImport(BuildOptions(Midi.FileType.Mod, dlg));
+            await DoImport(BuildOptions(FileType.Mod, dlg));
         }
 
         [RelayCommand]
         async Task ImportHvl()
         {
-            var dlg = new ImportSongWindow(Midi.FileType.Hvl) { Owner = Application.Current.MainWindow };
+            var dlg = new ImportSongWindow(FileType.Hvl) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
-            await DoImport(BuildOptions(Midi.FileType.Hvl, dlg));
+            await DoImport(BuildOptions(FileType.Hvl, dlg));
         }
 
         [RelayCommand]
         async Task ImportSid()
         {
-            var dlg = new ImportSongWindow(Midi.FileType.Sid) { Owner = Application.Current.MainWindow };
+            var dlg = new ImportSongWindow(FileType.Sid) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
 
-            var options = BuildOptions(Midi.FileType.Sid, dlg);
+            var options = BuildOptions(FileType.Sid, dlg);
 
             // SID files may contain multiple sub-songs — let the user pick.
             if (!SelectSidSubSong(options)) return;
@@ -671,14 +671,14 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>Build an ImportOptions from the dialog fields (WPF path).</summary>
-        static ImportOptions BuildOptions(Midi.FileType fileType, ImportSongWindow dlg)
+        static ImportOptions BuildOptions(FileType fileType, ImportSongWindow dlg)
         {
             ImportOptions options;
             switch (fileType)
             {
-                case Midi.FileType.Midi: options = new MidiImportOptions(); break;
-                case Midi.FileType.Mod:  options = new ModImportOptions();  break;
-                case Midi.FileType.Hvl:  options = new HvlImportOptions();  break;
+                case FileType.Midi: options = new MidiImportOptions(); break;
+                case FileType.Mod:  options = new ModImportOptions();  break;
+                case FileType.Hvl:  options = new HvlImportOptions();  break;
                 default:                 options = new SidImportOptions();  break;
             }
 
@@ -688,7 +688,7 @@ namespace VisualMusic.ViewModels
             if (!string.IsNullOrWhiteSpace(dlg.AudioFilePath))
             {
                 options.AudioPath   = dlg.AudioFilePath;
-                options.MixdownType = Midi.MixdownType.None;
+                options.MixdownType = MixdownType.None;
             }
 
             options.EraseCurrent = dlg.EraseCurrent;
@@ -1079,7 +1079,7 @@ namespace VisualMusic.ViewModels
         {
             string ext = suggestedFileName.Split('.').Last().ToLower();
 
-            Midi.FileType? fileType = ImportFileFormats.FromExtension(ext);
+            FileType? fileType = ImportFileFormats.FromExtension(ext);
 
             if (fileType == null)
             {
@@ -1096,9 +1096,9 @@ namespace VisualMusic.ViewModels
             ImportOptions options;
             switch (fileType.Value)
             {
-                case Midi.FileType.Midi: options = new MidiImportOptions(); break;
-                case Midi.FileType.Mod:  options = new ModImportOptions();  break;
-                case Midi.FileType.Hvl:  options = new HvlImportOptions();  break;
+                case FileType.Midi: options = new MidiImportOptions(); break;
+                case FileType.Mod:  options = new ModImportOptions();  break;
+                case FileType.Hvl:  options = new HvlImportOptions();  break;
                 default:                 options = new SidImportOptions();  break;
             }
             options.RawNotePath  = url;       // preserve original URL for project save and dialog display
