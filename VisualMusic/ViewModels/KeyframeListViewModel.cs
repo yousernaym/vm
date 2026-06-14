@@ -1,5 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Collections.ObjectModel;
 using System.Linq;
 using VisualMusic.Keyframes;
@@ -45,6 +48,147 @@ namespace VisualMusic.ViewModels
     }
 
     // -------------------------------------------------------------------------
+    // Row model for the lyrics list
+    // -------------------------------------------------------------------------
+
+    public partial class LyricsRowViewModel : ObservableObject
+    {
+        public LyricsSegment Segment { get; }
+
+        [ObservableProperty] string _beatDisplay = "";
+        [ObservableProperty] string _text = "";
+
+        public LyricsRowViewModel(LyricsSegment segment)
+        {
+            Segment = segment;
+            BeatDisplay = FormatBeat(segment.Beat);
+            Text = segment.Lyrics ?? "";
+        }
+
+        internal static string FormatBeat(double beat)
+            => beat.ToString("F2", CultureInfo.CurrentCulture);
+    }
+
+    // -------------------------------------------------------------------------
+    // ViewModel for the lyrics list panel
+    // -------------------------------------------------------------------------
+
+    public partial class LyricsListViewModel : ObservableObject
+    {
+        public ObservableCollection<LyricsRowViewModel> Rows { get; } = new();
+
+        Project _project;
+        BindingList<LyricsSegment> _segments;
+
+        public Project Project
+        {
+            get => _project;
+            set
+            {
+                if (_segments != null)
+                    _segments.ListChanged -= Segments_ListChanged;
+
+                _project = value;
+                _segments = _project?.Props?.LyricsSegments;
+
+                if (_segments != null)
+                    _segments.ListChanged += Segments_ListChanged;
+
+                Rebuild();
+            }
+        }
+
+        void Segments_ListChanged(object sender, ListChangedEventArgs e) => Rebuild();
+
+        public void Rebuild()
+        {
+            Rows.Clear();
+            if (_segments == null) return;
+
+            foreach (var segment in _segments.OrderBy(s => s.Beat))
+                Rows.Add(new LyricsRowViewModel(segment));
+        }
+
+        public LyricsRowViewModel FindRow(LyricsSegment segment)
+        {
+            if (segment == null) return null;
+            foreach (var row in Rows)
+                if (ReferenceEquals(row.Segment, segment)) return row;
+            return null;
+        }
+
+        public LyricsSegment CommitBeatEdit(LyricsRowViewModel row, string newBeatText)
+        {
+            if (_project == null || row?.Segment == null)
+                return row?.Segment;
+            if (!TryParseBeat(newBeatText, out double beat))
+                return row.Segment;
+
+            beat = Math.Max(0, beat);
+            if (Math.Abs(row.Segment.Beat - beat) < 0.0001)
+                return row.Segment;
+
+            row.Segment.Beat = (float)beat;
+            row.BeatDisplay = LyricsRowViewModel.FormatBeat(beat);
+            _project.SortLyrics();
+            KeyframeService.RaiseUndoSnapshot("Move lyric");
+            return row.Segment;
+        }
+
+        public LyricsSegment CommitTextEdit(LyricsRowViewModel row, string newText)
+        {
+            if (_project == null || row?.Segment == null)
+                return row?.Segment;
+
+            newText ??= "";
+            if (row.Segment.Lyrics == newText)
+                return row.Segment;
+
+            row.Segment.Lyrics = newText;
+            row.Text = newText;
+            KeyframeService.RaiseUndoSnapshot("Edit lyric");
+            VisualMusic.Project.StaticDrawHost?.Invalidate();
+            return row.Segment;
+        }
+
+        public void DeleteRows(IEnumerable<LyricsRowViewModel> rows)
+        {
+            if (_project == null || _segments == null) return;
+
+            var selected = rows
+                .Where(r => r?.Segment != null)
+                .Select(r => r.Segment)
+                .Distinct()
+                .ToList();
+            if (selected.Count == 0) return;
+
+            foreach (var segment in selected)
+                _segments.Remove(segment);
+
+            KeyframeService.RaiseUndoSnapshot("Delete lyric");
+            VisualMusic.Project.StaticDrawHost?.Invalidate();
+        }
+
+        public void DeleteRow(LyricsRowViewModel row) => DeleteRows(new[] { row });
+
+        public void SeekToRow(LyricsRowViewModel row)
+        {
+            if (_project == null || row?.Segment == null) return;
+            _project.GoToTick(_project.LyricsBeatToTimelineTick(row.Segment.Beat));
+        }
+
+        static bool TryParseBeat(string text, out double beat)
+        {
+            beat = 0;
+            if (string.IsNullOrWhiteSpace(text)) return false;
+
+            string cleaned = text.Replace("b", "", StringComparison.OrdinalIgnoreCase).Trim();
+            return double.TryParse(cleaned, NumberStyles.Float, CultureInfo.CurrentCulture, out beat)
+                || double.TryParse(cleaned, NumberStyles.Float, CultureInfo.InvariantCulture, out beat);
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // ViewModel for the full keyframe list panel
     // -------------------------------------------------------------------------
 
@@ -52,6 +196,7 @@ namespace VisualMusic.ViewModels
     {
         public ObservableCollection<KeyframeRowViewModel> Rows { get; } = new();
         public ObservableCollection<KeyframePropertyViewModel> Properties { get; } = new();
+        public LyricsListViewModel Lyrics { get; } = new();
 
         /// <summary>
         /// Full property id to filter the list by, or null to show all keyframes.
@@ -67,6 +212,7 @@ namespace VisualMusic.ViewModels
             set
             {
                 _project = value;
+                Lyrics.Project = value;
                 Rebuild();
             }
         }

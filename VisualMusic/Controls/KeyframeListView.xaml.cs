@@ -17,6 +17,8 @@ namespace VisualMusic.Controls
         KeyframeListViewModel _vm;
         bool _selectingFromService;   // guards re-entrant seek when selecting programmatically
         bool _preservingEditSelection; // guards DataGrid's post-edit navigation until we restore the row
+        bool _selectingLyricFromCode;  // guards re-entrant seek when selecting lyric rows programmatically
+        bool _preservingLyricEditSelection; // guards lyric grid post-edit navigation
         bool _settingTextFromCode;    // guards FilterBox_TextChanged when we set the text in code
         ICollectionView _propsView;   // filtered view over _vm.Properties for the search popup
 
@@ -31,6 +33,7 @@ namespace VisualMusic.Controls
             KeyframeService.KeyframesChanged += () =>
             {
                 RebuildPreservingSelection();
+                RebuildLyricsPreservingSelection();
                 UpdateFilterBoxText();     // reflect the committed selection (if any)
             };
 
@@ -337,6 +340,68 @@ namespace VisualMusic.Controls
             }
         }
 
+        void LyricsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_preservingLyricEditSelection) return;
+            if (_selectingLyricFromCode) return;
+            if (lyricsGrid.SelectedItems.Count == 1 && lyricsGrid.SelectedItem is LyricsRowViewModel row)
+                _vm.Lyrics.SeekToRow(row);
+        }
+
+        void LyricsGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.EditAction != DataGridEditAction.Commit) return;
+            if (e.Row.Item is not LyricsRowViewModel row) return;
+
+            var tb = e.EditingElement as TextBox;
+            if (tb == null) return;
+
+            string colHeader = (e.Column.Header as string) ?? "";
+            string text = tb.Text;
+
+            if (colHeader == "Beat")
+            {
+                BeginLyricEditSelectionRestore(() => _vm.Lyrics.CommitBeatEdit(row, text));
+            }
+            else if (colHeader == "Text")
+            {
+                BeginLyricEditSelectionRestore(() => _vm.Lyrics.CommitTextEdit(row, text));
+            }
+        }
+
+        void LyricsGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.A && (Keyboard.Modifiers & ModifierKeys.Control) != 0
+                && !IsGridTextEditing(lyricsGrid))
+            {
+                lyricsGrid.SelectAll();
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.Delete && !IsGridTextEditing(lyricsGrid))
+            {
+                if (DeleteSelectedLyricsRows())
+                    e.Handled = true;
+            }
+        }
+
+        void LyricsGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (lyricsGrid.SelectedItem is not LyricsRowViewModel row)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            var menu = new ContextMenu();
+            var remove = new MenuItem { Header = "_Delete lyric" };
+            remove.Click += (_, _) => _vm.Lyrics.DeleteRow(row);
+            menu.Items.Add(remove);
+
+            lyricsGrid.ContextMenu = menu;
+        }
+
         // ---- Row context menu (built dynamically per row) ----
 
         void Grid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -383,12 +448,33 @@ namespace VisualMusic.Controls
             _selectingFromService = true;
             try
             {
-                _vm.Project = _vm.Project; // triggers Rebuild() (properties + rows)
+                _vm.Rebuild();
                 RestoreSelectionByTicks(selectedTicks);
             }
             finally
             {
                 _selectingFromService = wasSelecting;
+            }
+        }
+
+        void RebuildLyricsPreservingSelection()
+        {
+            var selectedSegments = lyricsGrid.SelectedItems
+                .OfType<LyricsRowViewModel>()
+                .Select(r => r.Segment)
+                .Distinct()
+                .ToList();
+
+            bool wasSelecting = _selectingLyricFromCode;
+            _selectingLyricFromCode = true;
+            try
+            {
+                _vm.Lyrics.Project = _vm.Project;
+                RestoreLyricsSelectionBySegments(selectedSegments);
+            }
+            finally
+            {
+                _selectingLyricFromCode = wasSelecting;
             }
         }
 
@@ -435,6 +521,49 @@ namespace VisualMusic.Controls
             grid.ScrollIntoView(row);
         }
 
+        void RestoreLyricsSelectionBySegments(IEnumerable<LyricsSegment> segments)
+        {
+            lyricsGrid.UnselectAll();
+
+            LyricsRowViewModel first = null;
+            foreach (var segment in segments)
+            {
+                var row = _vm.Lyrics.FindRow(segment);
+                if (row == null) continue;
+                lyricsGrid.SelectedItems.Add(row);
+                first ??= row;
+            }
+
+            if (first == null)
+            {
+                lyricsGrid.CurrentCell = default(DataGridCellInfo);
+                return;
+            }
+
+            lyricsGrid.CurrentItem = first;
+            if (lyricsGrid.Columns.Count > 0)
+                lyricsGrid.CurrentCell = new DataGridCellInfo(first, lyricsGrid.Columns[0]);
+            lyricsGrid.ScrollIntoView(first);
+        }
+
+        void SelectSingleLyricsRow(LyricsSegment segment)
+        {
+            var row = _vm.Lyrics.FindRow(segment);
+            if (row == null)
+            {
+                lyricsGrid.UnselectAll();
+                lyricsGrid.CurrentCell = default(DataGridCellInfo);
+                return;
+            }
+
+            lyricsGrid.UnselectAll();
+            lyricsGrid.SelectedItem = row;
+            lyricsGrid.CurrentItem = row;
+            if (lyricsGrid.Columns.Count > 0)
+                lyricsGrid.CurrentCell = new DataGridCellInfo(row, lyricsGrid.Columns[0]);
+            lyricsGrid.ScrollIntoView(row);
+        }
+
         void BeginEditSelectionRestore(Func<int> commitEdit)
         {
             _preservingEditSelection = true;
@@ -469,6 +598,40 @@ namespace VisualMusic.Controls
             }), System.Windows.Threading.DispatcherPriority.Background);
         }
 
+        void BeginLyricEditSelectionRestore(Func<LyricsSegment> commitEdit)
+        {
+            _preservingLyricEditSelection = true;
+
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                LyricsSegment target;
+                try
+                {
+                    target = commitEdit();
+                }
+                catch
+                {
+                    _preservingLyricEditSelection = false;
+                    throw;
+                }
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    bool wasSelecting = _selectingLyricFromCode;
+                    _selectingLyricFromCode = true;
+                    try
+                    {
+                        SelectSingleLyricsRow(target);
+                    }
+                    finally
+                    {
+                        _selectingLyricFromCode = wasSelecting;
+                        _preservingLyricEditSelection = false;
+                    }
+                }), System.Windows.Threading.DispatcherPriority.ContextIdle);
+            }), System.Windows.Threading.DispatcherPriority.Background);
+        }
+
         bool DeleteSelectedRows()
         {
             var selected = grid.SelectedItems.OfType<KeyframeRowViewModel>().ToList();
@@ -484,10 +647,30 @@ namespace VisualMusic.Controls
             return true;
         }
 
+        bool DeleteSelectedLyricsRows()
+        {
+            var selected = lyricsGrid.SelectedItems.OfType<LyricsRowViewModel>().ToList();
+            if (selected.Count == 0) return false;
+
+            string msg = selected.Count == 1
+                ? "Delete this lyric?"
+                : $"Delete {selected.Count} selected lyrics?";
+            var result = MessageBox.Show(msg, "Delete lyric(s)",
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return true;
+
+            _vm.Lyrics.DeleteRows(selected);
+            lyricsGrid.UnselectAll();
+            return true;
+        }
+
         bool IsGridTextEditing()
+            => IsGridTextEditing(grid);
+
+        bool IsGridTextEditing(DataGrid ownerGrid)
         {
             if (Keyboard.FocusedElement is not DependencyObject focused) return false;
-            return IsDescendantOf(focused, grid) && FindAncestor<TextBox>(focused) != null;
+            return IsDescendantOf(focused, ownerGrid) && FindAncestor<TextBox>(focused) != null;
         }
 
         string BuildDeleteMessage(int count)

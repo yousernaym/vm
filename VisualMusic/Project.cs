@@ -425,6 +425,7 @@ namespace VisualMusic
             if (resetProject)
             {
                 PropertyKeyframes = new Keyframes.KeyframeSet();
+                Props.LyricsSegments.Clear();
                 Keyframes.KeyframeService.RaiseKeyframesChanged();
                 Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
                 NormSongPos = 0;
@@ -620,28 +621,41 @@ namespace VisualMusic
             }
             host.GraphicsDevice.DepthStencilState = oldDss;
 
-            var effect = new BasicEffect(host.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                VertexColorEnabled = true,
-            };
-            Viewport viewport = host.GraphicsDevice.Viewport;
-            effect.Projection = Props.Camera.ProjMat;
-            effect.View = Matrix.CreateTranslation(new Vector3(0, 0, -Props.Camera.ProjMat.M11 / 2));
-            Vector2 songPanelSize = new Vector2(host.ClientWidth, host.ClientHeight);
-            Vector2 scale = new Vector2(Props.Camera.ViewportSize.X / songPanelSize.X, -Props.Camera.ViewportSize.Y / songPanelSize.Y);
+            DrawLyrics(host);
+            host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS);
+        }
 
-            host.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
+        void DrawLyrics(ISongDrawHost host)
+        {
+            if (Props.LyricsSegments.Count == 0 || ViewWidthT <= 0 || host.LyricsFont == null)
+                return;
+
+            var viewport = host.GraphicsDevice.Viewport;
+            float width = Math.Max(1, viewport.Width);
+            float height = Math.Max(1, viewport.Height);
+            var oldDepth = host.GraphicsDevice.DepthStencilState;
+
+            host.GraphicsDevice.DepthStencilState = DepthStencilState.None;
+            host.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+
             foreach (var lyricsSegment in Props.LyricsSegments)
             {
-                if (string.IsNullOrWhiteSpace(lyricsSegment.Lyrics))
+                string lyrics = lyricsSegment.Lyrics;
+                if (string.IsNullOrWhiteSpace(lyrics))
                     continue;
-                float textHeight = -host.LyricsFont.MeasureString(lyricsSegment.Lyrics).Y * scale.Y;
-                host.SpriteBatch.DrawString(host.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP + GetScreenPosX(SecondsToTicks(lyricsSegment.Time) + PlaybackOffsetT), -Props.Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+
+                double tick = LyricsBeatToTimelineTick(lyricsSegment.Beat);
+                float x = (float)(width * 0.5 + (tick - SongPosT) / ViewWidthT * width);
+                Vector2 size = host.LyricsFont.MeasureString(lyrics);
+                if (x > width || x + size.X < 0)
+                    continue;
+
+                float y = Math.Max(0, height - size.Y - 4);
+                host.SpriteBatch.DrawString(host.LyricsFont, lyrics, new Vector2(x, y), Color.White);
             }
 
             host.SpriteBatch.End();
-            host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS);
+            host.GraphicsDevice.DepthStencilState = oldDepth;
         }
 
         public int ScreenPosToSongPos(float normScreenPos)
@@ -970,17 +984,66 @@ namespace VisualMusic
             return value * Props.Camera.ViewportSize.X / Props.UserViewWidth;
         }
 
+        public double CurrentLyricsBeat
+        {
+            get
+            {
+                if (Notes == null || Notes.TicksPerBeat <= 0)
+                    return 0;
+                return Math.Max(0, (SongPosT - PlaybackOffsetT) / Notes.TicksPerBeat);
+            }
+        }
+
+        public int LyricsBeatToTimelineTick(double beat)
+        {
+            double tpb = Notes?.TicksPerBeat ?? 480;
+            return (int)Math.Round(Math.Max(0, beat) * tpb + PlaybackOffsetT);
+        }
+
+        public double TimelineTickToLyricsBeat(double tick)
+        {
+            double tpb = Notes?.TicksPerBeat ?? 480;
+            if (tpb <= 0) return 0;
+            return Math.Max(0, (tick - PlaybackOffsetT) / tpb);
+        }
+
+        public void SortLyrics()
+        {
+            if (Props.LyricsSegments.Count <= 1)
+                return;
+
+            var sorted = Props.LyricsSegments
+                .OrderBy(s => s.Beat)
+                .ToList();
+
+            Props.LyricsSegments.RaiseListChangedEvents = false;
+            try
+            {
+                Props.LyricsSegments.Clear();
+                foreach (var segment in sorted)
+                    Props.LyricsSegments.Add(segment);
+            }
+            finally
+            {
+                Props.LyricsSegments.RaiseListChangedEvents = true;
+                Props.LyricsSegments.ResetBindings();
+            }
+        }
+
         public int InsertLyrics()
         {
+            float beat = (float)CurrentLyricsBeat;
             for (int i = 0; i < Props.LyricsSegments.Count; i++)
             {
-                if (Props.LyricsSegments[i].Time >= SongPosS)
+                if (Props.LyricsSegments[i].Beat >= beat)
                 {
-                    Props.LyricsSegments.Insert(i, new LyricsSegment((float)SongPosS));
+                    Props.LyricsSegments.Insert(i, new LyricsSegment(beat));
+                    DrawHost?.Invalidate();
                     return i;
                 }
             }
-            Props.LyricsSegments.Add(new LyricsSegment((float)SongPosS));
+            Props.LyricsSegments.Add(new LyricsSegment(beat));
+            DrawHost?.Invalidate();
             return Props.LyricsSegments.Count - 1;
         }
 
@@ -1528,7 +1591,40 @@ namespace VisualMusic
             // playback-offset callback fired with notes==null and returned early.
             // Do this explicitly so loaded projects get the correct SongLengthS.
             OnPlaybackOffsetSChanged();
+            MigrateLegacyLyricTimes();
             InitPropertyAccessors();
+        }
+
+        void MigrateLegacyLyricTimes()
+        {
+            if (Notes == null || Notes.TicksPerBeat <= 0)
+                return;
+
+            int savedTempoEvent = _pbTempoEvent;
+            double savedTimeT = _pbTimeT;
+            double savedTimeS = _pbTimeS;
+            bool changed = false;
+            try
+            {
+                foreach (var segment in Props.LyricsSegments)
+                {
+                    if (!segment.TimeWasSerializedAsSeconds)
+                        continue;
+
+                    segment.Beat = (float)(SecondsToTicks(segment.Beat) / Notes.TicksPerBeat);
+                    segment.TimeWasSerializedAsSeconds = false;
+                    changed = true;
+                }
+
+                if (changed)
+                    SortLyrics();
+            }
+            finally
+            {
+                _pbTempoEvent = savedTempoEvent;
+                _pbTimeT = savedTimeT;
+                _pbTimeS = savedTimeS;
+            }
         }
     }
 
@@ -1541,28 +1637,54 @@ namespace VisualMusic
     [Serializable]
     public class LyricsSegment : ISerializable
     {
-        public float Time { get; set; }
-        public string Lyrics { get; set; }
-        public LyricsSegment(float time)
+        public float Beat { get; set; }
+        public string Lyrics { get; set; } = "";
+
+        public float Time
         {
-            Time = time;
+            get => Beat;
+            set => Beat = value;
+        }
+
+        internal bool TimeWasSerializedAsSeconds { get; set; }
+
+        public LyricsSegment(float beat)
+        {
+            Beat = beat;
         }
 
         public LyricsSegment(SerializationInfo info, StreamingContext ctxt)
         {
+            bool hasBeat = false;
+            bool hasLegacyTime = false;
+            float legacyTime = 0;
             foreach (SerializationEntry entry in info)
             {
-                if (entry.Name == "time")
-                    Time = (float)entry.Value;
+                if (entry.Name == "beat")
+                {
+                    Beat = (float)entry.Value;
+                    hasBeat = true;
+                }
+                else if (entry.Name == "time")
+                {
+                    legacyTime = (float)entry.Value;
+                    hasLegacyTime = true;
+                }
                 else if (entry.Name == "lyrics")
-                    Lyrics = (string)entry.Value;
+                    Lyrics = (string)entry.Value ?? "";
+            }
+
+            if (!hasBeat && hasLegacyTime)
+            {
+                Beat = legacyTime;
+                TimeWasSerializedAsSeconds = true;
             }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
-            info.AddValue("time", Time);
-            info.AddValue("lyrics", Lyrics);
+            info.AddValue("beat", Beat);
+            info.AddValue("lyrics", Lyrics ?? "");
         }
     }
 }
