@@ -4,17 +4,16 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
 using System.IO;
-using WinFormsGraphicsDevice;
+using System.Windows.Input;
+using VisualMusic.MonoGameInterop;
 using VisualMusic.Keyframes;
-using WinKeys = System.Windows.Forms.Keys;
 
 namespace VisualMusic
 {
     using RectangleF = System.Drawing.RectangleF;
 
     /// <summary>
-    /// WPF-compatible MonoGame renderer extracted from SongPanel.
-    /// Has no dependency on WinForms Control or GraphicsDeviceControl.
+    /// MonoGame renderer hosted by MonoGameHost.
     /// Hosted by MonoGameHost (HwndHost).
     /// </summary>
     public class SongRenderer : ISongDrawHost
@@ -341,14 +340,14 @@ namespace VisualMusic
         /// <summary>True if the key is currently physically held (used after a modal that ate the key-up).</summary>
         static bool IsKeyPhysicallyDown(int vkCode) => (GetAsyncKeyState(vkCode) & 0x8000) != 0;
 
-        static bool IsCameraKey(WinKeys key)
-            => key is WinKeys.W or WinKeys.A or WinKeys.S or WinKeys.D
-                   or WinKeys.R or WinKeys.F or WinKeys.Q or WinKeys.E;
+        static bool IsCameraKey(Key key)
+            => key is Key.W or Key.A or Key.S or Key.D
+                   or Key.R or Key.F or Key.Q or Key.E;
 
         /// <summary>True if the key+modifiers form a camera move/rotate gesture (mirrors Camera.Control gating).</summary>
-        static bool IsCameraGesture(WinKeys key, WinKeys modifiers)
+        static bool IsCameraGesture(Key key, ModifierKeys modifiers)
         {
-            if (modifiers != 0 && modifiers != WinKeys.Shift) return false;
+            if (modifiers != ModifierKeys.None && modifiers != ModifierKeys.Shift) return false;
             return IsCameraKey(key);
         }
 
@@ -386,12 +385,12 @@ namespace VisualMusic
             if (Project?.Notes == null) return false;
 
             bool suppress = false;
-            var key = (WinKeys)vkCode;
-            var modifiers = System.Windows.Forms.Control.ModifierKeys;
+            var key = KeyInterop.KeyFromVirtualKey(vkCode);
+            var modifiers = Keyboard.Modifiers;
             var camera = Project.Props.Camera;
 
             // Escape exits mouse-look mode.
-            if (key == WinKeys.Escape && Camera.MouseRot)
+            if (key == Key.Escape && Camera.MouseRot)
             {
                 SetMouseLook(false);
                 return true;
@@ -428,13 +427,13 @@ namespace VisualMusic
                 }
             }
 
-            if (key == WinKeys.Space)
+            if (key == Key.Space)
             {
                 Project?.TogglePlayback();
                 suppress = true;
             }
 
-            if (key == WinKeys.Z)
+            if (key == Key.Z)
             {
                 ForceDefaultNoteStyle = true;
                 if (Project != null)
@@ -461,8 +460,8 @@ namespace VisualMusic
         {
             if (Project?.Notes == null) return;
 
-            var key = (WinKeys)vkCode;
-            var modifiers = System.Windows.Forms.Control.ModifierKeys;
+            var key = KeyInterop.KeyFromVirtualKey(vkCode);
+            var modifiers = Keyboard.Modifiers;
             var camera = Project.Props.Camera;
 
             // Releasing a camera key clears a prior "No" so the next press can prompt again.
@@ -748,7 +747,7 @@ namespace VisualMusic
                     }
                     catch (Exception e)
                     {
-                        System.Windows.Forms.MessageBox.Show(e.Message);
+                        System.Windows.MessageBox.Show(e.Message);
                         lock (progress.CancelLock) { }
                         return;
                     }

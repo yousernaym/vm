@@ -18,8 +18,7 @@ namespace VisualMusic
         }
 
         // Tunneling PreviewKeyDown ensures Ctrl+Space reaches us before focusable panel controls
-        // (CheckBox, RadioButton, ListView items) can swallow the Space activation key — mirrors
-        // the old WinForms KeyPreview = true behavior.
+        // (CheckBox, RadioButton, ListView items) can swallow the Space activation key.
         void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space && Keyboard.Modifiers == ModifierKeys.Control)

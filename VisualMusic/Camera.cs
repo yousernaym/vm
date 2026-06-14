@@ -3,7 +3,7 @@ using System;
 using System.Runtime.Serialization;
 //using Microsoft.Xna.Framework.Input;
 
-using WinKeys = System.Windows.Forms.Keys;
+using System.Windows.Input;
 
 namespace VisualMusic
 {
@@ -25,8 +25,7 @@ namespace VisualMusic
             {
                 if (!_pos.Equals(value))
                 {
-                    if (SongPanel != null)
-                        SongPanel.Invalidate();
+                    Project.StaticDrawHost?.Invalidate();
                     _pos = value;
                 }
             }
@@ -39,8 +38,7 @@ namespace VisualMusic
             {
                 if (!_orientation.Equals(value))
                 {
-                    if (SongPanel != null)
-                        SongPanel.Invalidate();
+                    Project.StaticDrawHost?.Invalidate();
                     _orientation = value;
                 }
             }
@@ -158,7 +156,6 @@ namespace VisualMusic
 
         public Matrix VpMat => ViewMat * ProjMat;
         public bool RenderingToCubemap => CubeMapFace >= 0;
-        public static SongPanel SongPanel => Form1.SongPanel;
         public static bool MouseRot { get; set; } = false;
 
         //Methods/////////////////////////////////
@@ -168,8 +165,7 @@ namespace VisualMusic
             Vector3 newPos = _pos;
             newPos.Z = Math.Abs(ProjMat.M11) / 2;
             Pos = newPos;
-            if (SongPanel != null)
-                SongPanel.Invalidate();
+            Project.StaticDrawHost?.Invalidate();
         }
 
         public Camera(SerializationInfo info, StreamingContext ctxt)
@@ -204,9 +200,9 @@ namespace VisualMusic
             Vector3 mouseRotVel = new Vector3();
             if (MouseRot)
             {
-                if (SongPanel.LeftMbPressed)
+                if (Project.StaticDrawHost?.LeftMbPressed == true)
                     mouseRotVel.Z = rotSpeed;
-                if (SongPanel.RightMbPressed)
+                if (Project.StaticDrawHost?.RightMbPressed == true)
                     mouseRotVel.Z = -rotSpeed;
             }
             Pos += Vector3.Transform(_moveVel, RotMat) * (float)deltaTime;
@@ -216,24 +212,11 @@ namespace VisualMusic
                 OnUserUpdating?.Invoke();
         }
 
-        public bool Control(WinKeys key, bool keyDown, WinKeys modifiers)
+        public bool Control(Key key, bool keyDown, ModifierKeys modifiers)
         {
-            bool shifting = modifiers == WinKeys.Shift;
-            if (modifiers != 0 && !shifting)
+            bool shifting = modifiers == ModifierKeys.Shift;
+            if (modifiers != ModifierKeys.None && !shifting)
                 return false;
-            if (key == WinKeys.ShiftKey)
-            {
-                //shiftPressed = keyDown;
-                //MouseRot = keyDown;
-                //if (keyDown)
-                //{
-                //	SongPanel.NormMouseX = SongPanel.NormMouseY = 0;
-                //	Cursor.Position = SongPanel.PointToScreen(new GdiPoint(SongPanel.ClientRectangle.Width / 2, SongPanel.ClientRectangle.Height / 2));
-                //}
-                //else
-                //	OnUserUpdated?.Invoke();
-            }
-
             _controlScale = keyDown ? 1 : 0;
             bool keyMatch = false;
             float scaledRotSpeed = rotSpeed * _controlScale;
@@ -242,22 +225,22 @@ namespace VisualMusic
             //Rotation, requiring shifting
             if (shifting || !keyDown)
             {
-                if (key == WinKeys.A)
+                if (key == Key.A)
                 {
                     _rotVel.Y = scaledRotSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.D)
+                if (key == Key.D)
                 {
                     _rotVel.Y = -scaledRotSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.W)
+                if (key == Key.W)
                 {
                     _rotVel.X = -scaledRotSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.S)
+                if (key == Key.S)
                 {
                     _rotVel.X = scaledRotSpeed;
                     keyMatch = true;
@@ -267,22 +250,22 @@ namespace VisualMusic
             //Movement, requiring not shifting
             if (!shifting || !keyDown)
             {
-                if (key == WinKeys.W)
+                if (key == Key.W)
                 {
                     _moveVel.Z = -scaledMoveSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.S)
+                if (key == Key.S)
                 {
                     _moveVel.Z = scaledMoveSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.A)
+                if (key == Key.A)
                 {
                     _moveVel.X = -scaledMoveSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.D)
+                if (key == Key.D)
                 {
                     _moveVel.X = scaledMoveSpeed;
                     keyMatch = true;
@@ -290,22 +273,22 @@ namespace VisualMusic
             }
 
             //Keys exclusively for either movement or rotation, shifting optional
-            if (key == WinKeys.R)
+            if (key == Key.R)
             {
                 _moveVel.Y = scaledMoveSpeed;
                 keyMatch = true;
             }
-            if (key == WinKeys.F)
+            if (key == Key.F)
             {
                 _moveVel.Y = -scaledMoveSpeed;
                 keyMatch = true;
             }
-            if (key == WinKeys.Q)
+            if (key == Key.Q)
             {
                 _rotVel.Z = scaledRotSpeed;
                 keyMatch = true;
             }
-            if (key == WinKeys.E)
+            if (key == Key.E)
             {
                 _rotVel.Z = -scaledRotSpeed;
                 keyMatch = true;

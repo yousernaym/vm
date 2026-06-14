@@ -6,9 +6,8 @@ using System.Runtime.Serialization;
 namespace VisualMusic
 {
     /// <summary>
-    /// WPF-path persistent settings (file-dialog folders, etc.).
+    /// Persistent settings (file-dialog folders, etc.).
     /// Serialized to %AppData%\Visual Music\appsettings.xml via DataContractSerializer.
-    /// Leave legacy Settings.cs / Form1 untouched.
     /// </summary>
     [DataContract]
     public class AppSettings
@@ -118,7 +117,7 @@ namespace VisualMusic
 
         // ---- Per-file-type track-split preference ----
 
-        // true = one track per instrument (MIDI: per track chunk) — the default, matching old WinForms
+        // true = one track per instrument (MIDI: per track chunk).
         // false = one track per channel (MIDI: per MIDI channel)
         [DataMember] Dictionary<Midi.FileType, bool> _insTrack = new();
 

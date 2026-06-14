@@ -4,7 +4,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## Project Overview
 
-**Visual Music** is a Windows desktop application that visualizes note-based music files (MIDI, tracker modules, SID files) in real-time 3D. The application is undergoing a migration from WinForms to WPF (currently on `feature/wpf-migration` branch).
+**Visual Music** is a WPF Windows desktop application that visualizes note-based music files (MIDI, tracker modules, SID files) in real-time 3D.
 
 Key characteristics:
 - Produces video exports (MKV format, including 360-degree video support)
@@ -63,7 +63,7 @@ Open and run in Visual Studio 2022, or launch `VM.exe` directly from the bin fol
 
 ### High-Level Design
 
-The application follows an **MVVM pattern** (in progress) with:
+The application follows an **MVVM-based WPF architecture** with:
 - **MainWindow.xaml** — WPF host window using MahApps.Metro styling
 - **MainViewModel** — Command routing, project lifecycle, screen switching (via MVVM Toolkit)
 - **MonoGameHost** — HwndHost child window for MonoGame rendering at ~120 fps
@@ -74,8 +74,8 @@ The application follows an **MVVM pattern** (in progress) with:
 ### Key Patterns
 
 **ISongDrawHost Interface** (`ISongDrawHost.cs`)
-- Abstracts the drawing surface so the same rendering code works with both WinForms (legacy) and WPF (current)
-- Implemented by `SongRenderer` (WPF) and `SongPanel` (WinForms, deprecated)
+- Abstracts the drawing surface used by the WPF MonoGame renderer
+- Implemented by `SongRenderer`
 - Provides graphics resources, viewport info, timing, and invalidation callbacks
 - Used by `Project.drawSong()` for frame rendering
 
@@ -84,11 +84,10 @@ The application follows an **MVVM pattern** (in progress) with:
 - Called by web browser controls (CefSharp) when user downloads a song file
 - Handles MIDI, MOD, and SID file imports with user-selectable options
 
-**Dual-UI Migration Strategy**
-- Legacy code path uses **Form1** (WinForms)
-- New code path uses **MainWindow** (WPF)
-- Both share core rendering via `ISongDrawHost`
-- MonoGameHost bridges WPF and Win32 for MonoGame integration (custom HwndHost with P/Invoke)
+**WPF Rendering Host**
+- `MainWindow` hosts the app shell and browser/song views
+- `MonoGameHost` bridges WPF and Win32 for MonoGame integration (custom HwndHost with P/Invoke)
+- `SongRenderer` owns rendering, input routing, and `ISongDrawHost` services
 
 ### Rendering Pipeline
 
@@ -145,21 +144,15 @@ The application follows an **MVVM pattern** (in progress) with:
 - Uses `DataContractSerializer` with known types from `ProjectSerializer.KnownTypes`
 - Saves to temp file first, then copied atomically to avoid corruption on crash
 
-## WPF Migration Status
+## WPF Application Status
 
-**Current state (feature/wpf-migration):**
-- Phase 5 complete: All 5 property tabs (Style, Material, Light, Spatial, Audio) are WPF UserControls
-- Main UI now WPF-based (MetroWindow, MahApps styling)
-- Core rendering abstracted via `ISongDrawHost` ✓
-- MonoGameHost bridge complete ✓
-- Menu commands and keyboard bindings mapped ✓
-- Web browsers (MOD, SID, MIDI) functional ✓
-- TbSliderWpf, TwoDHueSatWpf, HueSatButtonWpf custom controls complete ✓
-- TrackPropsViewModel exposes all per-tab properties with write-back callbacks ✓
-
-**Legacy WinForms code:**
-- Still present (Form1, SongPanel) for backwards compatibility
-- Can be removed once migration completes
+- Main UI is WPF-based (MetroWindow, MahApps styling)
+- All 5 property tabs (Style, Material, Light, Spatial, Audio) are WPF UserControls
+- Rendering is hosted by `MonoGameHost` and `SongRenderer`
+- Menu commands and keyboard bindings are mapped through WPF/MVVM
+- Web browsers (MOD, SID, MIDI) use CefSharp WPF controls
+- TbSliderWpf, TwoDHueSatWpf, HueSatButtonWpf custom controls are active
+- TrackPropsViewModel exposes all per-tab properties with write-back callbacks
 
 ## Important Dependencies & P/Invoke
 

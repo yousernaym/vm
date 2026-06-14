@@ -36,7 +36,7 @@ namespace VisualMusic.Controls
 
         void IRenderProgressCallback.ShowMessage(string message)
         {
-            // Block the job thread until the user dismisses the dialog (mirrors WinForms Invoke).
+            // Block the job thread until the user dismisses the dialog.
             Dispatcher.Invoke(() =>
                 MessageBox.Show(this, message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Warning));
         }
@@ -87,7 +87,7 @@ namespace VisualMusic.Controls
 
         public object Result { get; private set; }
 
-        // ---- Timing / estimation (ported from WinForms ProgressForm) ----
+        // ---- Timing / estimation ----
         readonly Stopwatch _stopwatch = new Stopwatch();
         readonly ProgressAtTime[] _progressBuf = new ProgressAtTime[100];
         int _progressBufIndex0 = 1;   // trails index1 by ~100 frames → smoothed sliding window

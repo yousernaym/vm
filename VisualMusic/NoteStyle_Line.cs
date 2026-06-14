@@ -658,8 +658,6 @@ namespace VisualMusic
             //Vector4 hlColor;
             //Texture2D hlTexture;
             //getMaterial(trackProps, true, out hlColor, out hlTexture);
-            //Vector4 hlColor = fx.Parameters["HlColor"].GetValueVector4();
-            //fx.Parameters["HlColor"].SetValue(SongPanel.HSLA2RGBA(hlColor).ToVector4());
             _fx.Parameters["Border"].SetValue((bool)HlBorder);
             //-----------------------------------------------
 

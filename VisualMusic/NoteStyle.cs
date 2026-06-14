@@ -175,8 +175,6 @@ namespace VisualMusic
         //	set { trackProps = value; }
         //}
 
-        protected static SongPanel SongPanel => Form1.SongPanel;
-
         static GraphicsDevice s_graphicsDeviceOverride;
         static Project s_projectOverride;
         static Microsoft.Xna.Framework.Content.ContentManager s_contentOverride;
@@ -185,9 +183,9 @@ namespace VisualMusic
         public static void SetProject(Project p) => s_projectOverride = p;
         public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm) => s_contentOverride = cm;
 
-        protected static GraphicsDevice GraphicsDevice => s_graphicsDeviceOverride ?? SongPanel?.GraphicsDevice;
-        protected static Project Project => s_projectOverride ?? SongPanel?.Project;
-        protected static Microsoft.Xna.Framework.Content.ContentManager Content => s_contentOverride ?? SongPanel?.Content;
+        protected static GraphicsDevice GraphicsDevice => s_graphicsDeviceOverride;
+        protected static Project Project => s_projectOverride;
+        protected static Microsoft.Xna.Framework.Content.ContentManager Content => s_contentOverride;
 
         //Serializable----------
         protected NoteStyleType _styleType; //Set in constructor of inherited class

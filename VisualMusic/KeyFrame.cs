@@ -10,7 +10,6 @@ namespace VisualMusic
     public class KeyFrames : ISerializable, IEnumerable<KeyValuePair<int, KeyFrame>>
     {
         SortedList<int, KeyFrame> _frameList;
-        SongPanel SongPanel => Form1.SongPanel;
 
         public KeyFrames()
         {

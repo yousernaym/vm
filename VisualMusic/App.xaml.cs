@@ -24,7 +24,7 @@ namespace VisualMusic
                 Shutdown();
                 return;
             }
-            Directory.CreateDirectory(Program.TempDir);
+            Program.InitTempDir();
 
             // CefSharp.Wpf auto-initializes on first ChromiumWebBrowser creation
             // and registers an Application.Exit handler for shutdown.
@@ -44,6 +44,7 @@ namespace VisualMusic
         {
             MidMix.Close();
             Media.CloseMF();
+            Program.CloseTempDir();
             base.OnExit(e);
         }
     }

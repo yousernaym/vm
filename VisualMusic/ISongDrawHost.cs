@@ -4,8 +4,7 @@ using System;
 namespace VisualMusic
 {
     /// <summary>
-    /// Abstracts the drawing surface used by Project.drawSong(), so the same
-    /// drawing code works with both the WinForms SongPanel and the WPF SongRenderer.
+    /// Abstracts the drawing surface used by Project.drawSong().
     /// </summary>
     public interface ISongDrawHost
     {
@@ -32,6 +31,10 @@ namespace VisualMusic
         // ---- Viewport size ----
         int ClientWidth  { get; }
         int ClientHeight { get; }
+
+        // ---- Input state ----
+        bool LeftMbPressed { get; }
+        bool RightMbPressed { get; }
 
         // ---- Timing (for playback sync) ----
         TimeSpan TotalTimeElapsed { get; }

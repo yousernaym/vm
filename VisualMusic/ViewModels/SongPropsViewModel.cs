@@ -180,7 +180,7 @@ namespace VisualMusic.ViewModels
         }
 
         // =====================================================================
-        // CAMERA  (read-only display — same format as WinForms updateCamControls)
+        // CAMERA  (read-only display)
         // =====================================================================
 
         public string CameraText

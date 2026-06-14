@@ -721,7 +721,7 @@ namespace VisualMusic.ViewModels
 
             try
             {
-                if (!await _project.ImportSong(options, null)) return;
+                if (!await _project.ImportSong(options)) return;
             }
             catch (FileImportException ex)
             {
@@ -851,7 +851,7 @@ namespace VisualMusic.ViewModels
 
         void ResyncPlaybackPosition()
         {
-            // When playing, restart audio at the new position (same as WinForms logic)
+            // When playing, restart audio at the new position.
             if (_project?.IsPlaying == true)
             {
                 _project.TogglePlayback();
@@ -1079,11 +1079,7 @@ namespace VisualMusic.ViewModels
         {
             string ext = suggestedFileName.Split('.').Last().ToLower();
 
-            Midi.FileType? fileType = null;
-            if (ImportMidiForm.Formats.Contains(ext))       fileType = Midi.FileType.Midi;
-            else if (ImportModForm.Formats.Contains(ext))  fileType = Midi.FileType.Mod;
-            else if (ImportHvlForm.Formats.Contains(ext))  fileType = Midi.FileType.Hvl;
-            else if (ImportSidForm.Formats.Contains(ext))  fileType = Midi.FileType.Sid;
+            Midi.FileType? fileType = ImportFileFormats.FromExtension(ext);
 
             if (fileType == null)
             {

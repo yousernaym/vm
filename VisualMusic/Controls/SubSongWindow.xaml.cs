@@ -9,7 +9,7 @@ using System.Windows.Input;
 namespace VisualMusic.Controls
 {
     /// <summary>
-    /// WPF replacement for the WinForms SubSongForm.
+    /// Dialog for choosing a SID sub-song.
     /// Shows a list of sub-songs read from the SID file header; lets the user pick one.
     /// </summary>
     public partial class SubSongWindow : MetroWindow

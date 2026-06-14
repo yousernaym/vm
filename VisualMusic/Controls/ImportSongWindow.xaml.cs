@@ -9,7 +9,7 @@ using System.Windows;
 namespace VisualMusic.Controls
 {
     /// <summary>
-    /// WPF replacement for the WinForms SourceFileForm / ImportNotesWithAudioForm hierarchy.
+    /// Dialog for importing MIDI, module, SID, and HVL files.
     /// Parameterised by file type; title is set in the constructor switch (not via binding).
     /// Caller reads NoteFilePath, AudioFilePath, EraseCurrent, InsTrack.
     /// InsTrack: true = one track per instrument (MIDI: per track chunk), false = per channel.
@@ -127,22 +127,22 @@ namespace VisualMusic.Controls
             {
                 case Midi.FileType.Midi:
                     Title = "Import MIDI Song";
-                    _noteFilter = BuildFilter("MIDI files", ImportMidiForm.Formats);
+                    _noteFilter = BuildFilter("MIDI files", ImportFileFormats.Midi);
                     PerInstrumentLabel = "One track per MIDI track";
                     PerChannelLabel    = "One track per MIDI channel";
                     break;
                 case Midi.FileType.Mod:
                     Title = "Import Module";
-                    _noteFilter = BuildFilter("Module files", ImportModForm.Formats);
+                    _noteFilter = BuildFilter("Module files", ImportFileFormats.Mod);
                     break;
                 case Midi.FileType.Sid:
                     Title = "Import SID Song";
-                    _noteFilter = BuildFilter("SID files", ImportSidForm.Formats);
+                    _noteFilter = BuildFilter("SID files", ImportFileFormats.Sid);
                     AudioLabel = "Audio file (leave empty for SID audio):";
                     break;
                 case Midi.FileType.Hvl:
                     Title = "Import HVL Song";
-                    _noteFilter = BuildFilter("HVL files", ImportHvlForm.Formats);
+                    _noteFilter = BuildFilter("HVL files", ImportFileFormats.Hvl);
                     break;
                 default:
                     Title = "Import Song";

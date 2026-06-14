@@ -5,13 +5,12 @@ using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Sources;
-using System.Windows.Forms;
 
 
 namespace VisualMusic
 {
     public enum TexAnchorEnum { Note = 0, Screen, Song };
+    enum TrackPropsType { TPT_Style = 1, TPT_Material = 2, TPT_Light = 4, TPT_Spatial = 8, TPT_Audio = 16, TPT_All = 255 }
 
     [Serializable()]
     public class TrackProps : ISerializable
@@ -106,7 +105,7 @@ namespace VisualMusic
             ResetAudio();
         }
 
-        async void ResetAudio()
+        void ResetAudio()
         {
             AudioProps?.Dispose();
             AudioProps = new AudioProps();
@@ -284,9 +283,6 @@ namespace VisualMusic
             return outTex;
         }
 
-        public bool LoadTexture(string path, FileStream stream, SongPanel songPanel)
-            => LoadTexture(path, stream, songPanel.GraphicsDevice, songPanel.SpriteBatch);
-
         public bool LoadTexture(string path, FileStream stream, ISongDrawHost host)
             => LoadTexture(path, stream, host.GraphicsDevice, host.SpriteBatch);
 
@@ -299,12 +295,6 @@ namespace VisualMusic
             tex = Texture2D.FromStream(gd, stream);
             Texture = CreateMipLevels(tex, gd, sb);
             return tex != null;
-        }
-
-        public bool LoadTexture(string path, SongPanel songPanel)
-        {
-            using (FileStream stream = File.Open(path, FileMode.Open))
-                return LoadTexture(path, stream, songPanel);
         }
 
         public bool LoadTexture(string path, ISongDrawHost host)
@@ -399,7 +389,7 @@ namespace VisualMusic
             }
             catch (Exception)
             {
-                MessageBox.Show("Failed to load texture " + Path);
+                System.Windows.MessageBox.Show("Failed to load texture " + Path);
             }
         }
     }
@@ -679,7 +669,7 @@ namespace VisualMusic
         {
             Vector4 hsla = GetColor(bhilited, globalMaterial);
             //hsla.Z *= 0.5f;
-            Color rgba = SongPanel.HSLA2RGBA(hsla);
+            Color rgba = SongRenderer.HSLA2RGBA(hsla);
             return System.Drawing.Color.FromArgb(rgba.R, rgba.G, rgba.B);
         }
         public Vector4 GetColor(bool bhilited, MaterialProps globalMaterial)

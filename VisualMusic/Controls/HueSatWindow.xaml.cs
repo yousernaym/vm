@@ -1,7 +1,7 @@
 using MahApps.Metro.Controls;
 using System.Windows;
 
-namespace VisualMusic.Forms
+namespace VisualMusic.Controls
 {
     public partial class HueSatWindow : MetroWindow
     {

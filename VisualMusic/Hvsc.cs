@@ -158,7 +158,7 @@ namespace VisualMusic
 
         /// <summary>
         /// Finds whichever local DB file exists: the canonical name first, then the
-        /// legacy misspelled name used by old WinForms builds ("songlenghts.md5").
+        /// legacy misspelled name ("songlenghts.md5").
         /// Returns null if neither exists.
         /// </summary>
         static string ResolveDbPath()

@@ -7,11 +7,8 @@ using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace VisualMusic
 {
@@ -140,7 +137,7 @@ namespace VisualMusic
         }
         static ISongDrawHost s_drawHostOverride;
         public static void SetDrawHost(ISongDrawHost host) => s_drawHostOverride = host;
-        public static ISongDrawHost StaticDrawHost => s_drawHostOverride ?? Form1.SongPanel;
+        public static ISongDrawHost StaticDrawHost => s_drawHostOverride;
         ISongDrawHost DrawHost => StaticDrawHost;
 
         TimeSpan _pbStartSysTime = new TimeSpan(0);
@@ -233,17 +230,14 @@ namespace VisualMusic
             Props.OnPlaybackOffsetSChanged = OnPlaybackOffsetSChanged;
         }
 
-
-        public Task LoadContent() => LoadContent(null);
-
-        async public Task LoadContent(Form parentForm)
+        async public Task LoadContent()
         {
             if (ImportOptions == null)
                 return;
 
             ImportOptions.SetNotePath();
             ImportOptions.EraseCurrent = false;
-            await ImportSong(ImportOptions, parentForm);
+            await ImportSong(ImportOptions);
         }
 
         public void NudgeSongPos(float stepFraction)
@@ -321,7 +315,7 @@ namespace VisualMusic
             info.AddValue("vertWidthQn", _vertViewWidthQn);
         }
 
-        async public Task<bool> ImportSong(ImportOptions options, Form parentForm)
+        async public Task<bool> ImportSong(ImportOptions options)
         { //`Open project` and `import files` meet here
             options.CheckSourceFile();
             //Convert mod/sid files to mid/wav
@@ -359,42 +353,13 @@ namespace VisualMusic
                     string supressErrorFlag = "-e";
                     string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag} {supressErrorFlag}";
                     var workingDir = Path.Combine(Program.Dir, "remuxer");
-                    var startInfo = new ProcessStartInfo(Path.Combine(workingDir, "remuxer.exe"), cmdLine);
-                    startInfo.WorkingDirectory = workingDir;
-                    var process = Process.Start(startInfo);
-                    Form1.RemuxerProcess = process;
-                    if (parentForm != null)
-                        parentForm.Enabled = false;
-                    try
+                    var startInfo = new ProcessStartInfo(Path.Combine(workingDir, "remuxer.exe"), cmdLine)
                     {
-                        FormWindowState initialWindowState = Program.form1?.WindowState ?? FormWindowState.Normal;
-                        await Task.Run(() =>
-                        {
-                            bool wasMinimized = false;
-                            while (!process.HasExited)
-                            {
-                                if (Program.form1 != null)
-                                {
-                                    bool isMinimized = IsIconic(process.MainWindowHandle);
-                                    if (isMinimized && !wasMinimized)
-                                        Program.form1.Invoke(new Action(() => Program.form1.WindowState = FormWindowState.Minimized));
-                                    else if (!isMinimized && wasMinimized)
-                                    {
-                                        Program.form1.Invoke(new Action(() => Program.form1.WindowState = initialWindowState));
-                                        Form1.RegainFocus(process);
-                                    }
-                                    wasMinimized = isMinimized;
-                                }
-                                Thread.Sleep(200);
-                            }
-                        });
-                    }
-                    finally
-                    {
-                        if (parentForm != null)
-                            parentForm.Enabled = true;
-                        Program.form1?.Activate();
-                    }
+                        WorkingDirectory = workingDir,
+                    };
+                    using var process = Process.Start(startInfo)
+                        ?? throw new IOException("Couldn't start remuxer.");
+                    await process.WaitForExitAsync();
                     if (process.ExitCode != 0)
                         throw new FileImportException(null, ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
 
@@ -426,10 +391,6 @@ namespace VisualMusic
             InitPropertyAccessors();
             return true;
         }
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool IsIconic(IntPtr hWnd);
 
         public bool OpenNoteFile(ImportOptions options, bool? resetProjectOverride = null)
         {
@@ -512,7 +473,7 @@ namespace VisualMusic
 
             //Third-party mixdown needed?
             if (options.MixdownType == Midi.MixdownType.Tparty)
-                file = ImportNotesWithAudioForm.RunTpartyProcess(options);
+                file = ExternalMixdown.Run(options);
 
             if (string.IsNullOrWhiteSpace(file))
                 return;
@@ -745,22 +706,6 @@ namespace VisualMusic
             return outProps;
         }
 
-        public TrackProps MergeTrackProps(ListView.SelectedIndexCollection listIndices)
-        {
-            if (listIndices.Count == 0)
-                return null;
-            TrackProps outProps = TrackViews[listIndices[0]].TrackProps;
-            if (listIndices.Count == 1)
-                return outProps;
-            outProps = outProps.Clone(DrawHost);
-            // TrackProps.cloneFrom shares the AudioProps reference with the source track.
-            // Detach it here so mergeObjects can null out Filename without corrupting the source.
-            outProps.AudioProps = new AudioProps { Filename = outProps.AudioProps.Filename, LineColor = outProps.AudioProps.LineColor };
-            for (int i = 1; i < listIndices.Count; i++)
-                outProps = (TrackProps)MergeObjects(outProps, TrackViews[listIndices[i]].TrackProps);
-            return outProps;
-        }
-
         public object MergeObjects(object first, object second)
         {
             if (first == null || second == null)
@@ -800,18 +745,6 @@ namespace VisualMusic
                 return first;
             else
                 return null;
-        }
-
-        public void ResetTrackProps(ListView.SelectedIndexCollection indices)
-        {
-            if (indices != null)
-            {
-                foreach (int index in indices)
-                    _trackViews[index].TrackProps.ResetProps();
-            }
-            else
-                _trackViews[0].TrackProps.ResetProps();
-            CreateGeos();
         }
 
         public double TicksToSeconds(double ticks)
@@ -1553,7 +1486,7 @@ namespace VisualMusic
 
         /// <summary>
         /// Selects only the keyframe at the current song position, deselecting all others.
-        /// The WPF build has no keyframe-selection grid (unlike the legacy WinForms UI), so camera
+        /// The current UI has no keyframe-selection grid, so camera
         /// movement (<see cref="update"/> integrates only selected keyframes) and reset need the
         /// keyframe under the playhead to be marked selected. Safe to call every frame.
         /// </summary>
@@ -1673,9 +1606,7 @@ namespace VisualMusic
             // Force recalculation of derived state (SongLengthS, playbackOffsetT, etc).
             // During deserialization, Props was set BEFORE notes were loaded, so the
             // playback-offset callback fired with notes==null and returned early.
-            // In WinForms this is done indirectly via UpdateProjPropsControls() doing
-            // `Props.PlaybackOffsetS = Props.PlaybackOffsetS`; do it explicitly here so
-            // both WPF and WinForms paths get correct SongLengthS.
+            // Do this explicitly so loaded projects get the correct SongLengthS.
             OnPlaybackOffsetSChanged();
             InitPropertyAccessors();
         }

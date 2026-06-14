@@ -7,7 +7,7 @@ using System.Windows.Media;
 namespace VisualMusic.Controls
 {
     /// <summary>
-    /// WPF replacement for the WinForms VideoExportForm.
+    /// Dialog for choosing video export settings.
     /// Edits a <see cref="VideoExportOptions"/> in-place; caller reads <see cref="Options"/>
     /// after ShowDialog() returns true.
     /// </summary>

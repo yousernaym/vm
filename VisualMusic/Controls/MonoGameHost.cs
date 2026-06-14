@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using WinFormsGraphicsDevice;
+using VisualMusic.MonoGameInterop;
 
 namespace VisualMusic
 {
@@ -30,6 +30,9 @@ namespace VisualMusic
 
         [DllImport("user32.dll")]
         static extern bool ReleaseCapture();
+
+        [DllImport("user32.dll")]
+        static extern bool SetCursorPos(int x, int y);
 
         [DllImport("user32.dll")]
         static extern IntPtr SetFocus(IntPtr hWnd);
@@ -313,8 +316,7 @@ namespace VisualMusic
             try
             {
                 System.Windows.Point screenPt = PointToScreen(new System.Windows.Point(clientX, clientY));
-                System.Windows.Forms.Cursor.Position =
-                    new System.Drawing.Point((int)screenPt.X, (int)screenPt.Y);
+                SetCursorPos((int)screenPt.X, (int)screenPt.Y);
             }
             catch { }
         }
