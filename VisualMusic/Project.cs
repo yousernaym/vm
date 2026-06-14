@@ -1591,40 +1591,7 @@ namespace VisualMusic
             // playback-offset callback fired with notes==null and returned early.
             // Do this explicitly so loaded projects get the correct SongLengthS.
             OnPlaybackOffsetSChanged();
-            MigrateLegacyLyricTimes();
             InitPropertyAccessors();
-        }
-
-        void MigrateLegacyLyricTimes()
-        {
-            if (Notes == null || Notes.TicksPerBeat <= 0)
-                return;
-
-            int savedTempoEvent = _pbTempoEvent;
-            double savedTimeT = _pbTimeT;
-            double savedTimeS = _pbTimeS;
-            bool changed = false;
-            try
-            {
-                foreach (var segment in Props.LyricsSegments)
-                {
-                    if (!segment.TimeWasSerializedAsSeconds)
-                        continue;
-
-                    segment.Beat = (float)(SecondsToTicks(segment.Beat) / Notes.TicksPerBeat);
-                    segment.TimeWasSerializedAsSeconds = false;
-                    changed = true;
-                }
-
-                if (changed)
-                    SortLyrics();
-            }
-            finally
-            {
-                _pbTempoEvent = savedTempoEvent;
-                _pbTimeT = savedTimeT;
-                _pbTimeS = savedTimeS;
-            }
         }
     }
 
@@ -1640,14 +1607,6 @@ namespace VisualMusic
         public float Beat { get; set; }
         public string Lyrics { get; set; } = "";
 
-        public float Time
-        {
-            get => Beat;
-            set => Beat = value;
-        }
-
-        internal bool TimeWasSerializedAsSeconds { get; set; }
-
         public LyricsSegment(float beat)
         {
             Beat = beat;
@@ -1655,29 +1614,12 @@ namespace VisualMusic
 
         public LyricsSegment(SerializationInfo info, StreamingContext ctxt)
         {
-            bool hasBeat = false;
-            bool hasLegacyTime = false;
-            float legacyTime = 0;
             foreach (SerializationEntry entry in info)
             {
                 if (entry.Name == "beat")
-                {
                     Beat = (float)entry.Value;
-                    hasBeat = true;
-                }
-                else if (entry.Name == "time")
-                {
-                    legacyTime = (float)entry.Value;
-                    hasLegacyTime = true;
-                }
                 else if (entry.Name == "lyrics")
                     Lyrics = (string)entry.Value ?? "";
-            }
-
-            if (!hasBeat && hasLegacyTime)
-            {
-                Beat = legacyTime;
-                TimeWasSerializedAsSeconds = true;
             }
         }
 
