@@ -211,8 +211,8 @@ namespace VisualMusic.Controls
             if (_confirmCancel)
             {
                 var result = MessageBox.Show(this, "Stop?", Program.AppName,
-                    MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result != MessageBoxResult.Yes)
+                    MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                if (result != MessageBoxResult.OK)
                 {
                     _cancelRequested = false;   // let the user try again later
                     return;

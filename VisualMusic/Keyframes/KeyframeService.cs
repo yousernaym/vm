@@ -472,10 +472,10 @@ namespace VisualMusic.Keyframes
             var result = System.Windows.MessageBox.Show(
                 body,
                 "Delete mod entry",
-                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxButton.OKCancel,
                 System.Windows.MessageBoxImage.Question);
 
-            return result == System.Windows.MessageBoxResult.Yes;
+            return result == System.Windows.MessageBoxResult.OK;
         }
 
         static List<string> GetKeyframeLabels(IEnumerable<(string Id, KfScope Scope)> properties,
@@ -546,10 +546,10 @@ namespace VisualMusic.Keyframes
                 var result = System.Windows.MessageBox.Show(
                     body,
                     "Default style",
-                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxButton.OKCancel,
                     System.Windows.MessageBoxImage.Question);
 
-                if (result != System.Windows.MessageBoxResult.Yes)
+                if (result != System.Windows.MessageBoxResult.OK)
                 {
                     affected = null;
                     return false;
@@ -586,10 +586,10 @@ namespace VisualMusic.Keyframes
                 var result = System.Windows.MessageBox.Show(
                     body,
                     caption,
-                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxButton.OKCancel,
                     System.Windows.MessageBoxImage.Question);
 
-                if (result != System.Windows.MessageBoxResult.Yes)
+                if (result != System.Windows.MessageBoxResult.OK)
                 {
                     affected = null;
                     return false;
@@ -668,10 +668,10 @@ namespace VisualMusic.Keyframes
                 var result = System.Windows.MessageBox.Show(
                     body,
                     "Reset pitches",
-                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxButton.OKCancel,
                     System.Windows.MessageBoxImage.Question);
 
-                if (result != System.Windows.MessageBoxResult.Yes)
+                if (result != System.Windows.MessageBoxResult.OK)
                 {
                     affected = null;
                     return false;
@@ -726,10 +726,10 @@ namespace VisualMusic.Keyframes
             var result = System.Windows.MessageBox.Show(
                 $"There is no keyframe for \"{label}\" at the current playback position.\nCreate one?",
                 "Keyframe",
-                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxButton.OKCancel,
                 System.Windows.MessageBoxImage.Question);
 
-            if (result == System.Windows.MessageBoxResult.Yes)
+            if (result == System.Windows.MessageBoxResult.OK)
             {
                 AddKey(propertyId, scope);
                 return true;
@@ -838,9 +838,9 @@ namespace VisualMusic.Keyframes
             var result = System.Windows.MessageBox.Show(
                 $"Remove all keyframes for \"{label}\"?",
                 "Remove property keyframes",
-                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxButton.OKCancel,
                 System.Windows.MessageBoxImage.Question);
-            if (result != System.Windows.MessageBoxResult.Yes) return;
+            if (result != System.Windows.MessageBoxResult.OK) return;
 
             var kfs = Project.PropertyKeyframes;
             foreach (var id in ids)

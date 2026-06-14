@@ -20,7 +20,7 @@ namespace VisualMusic.Controls.Tabs
             if (vm?.LoadTexture == null) return;
             var dlg = new OpenFileDialog
             {
-                Filter = "Image files|*.png;*.jpg;*.jpeg;*.bmp;*.dds|All files|*.*"
+                Filter = "Image files|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.dds|All files|*.*"
             };
             var texDir = AppSettings.Instance.TextureFolder;
             if (!string.IsNullOrEmpty(texDir)) dlg.InitialDirectory = texDir;

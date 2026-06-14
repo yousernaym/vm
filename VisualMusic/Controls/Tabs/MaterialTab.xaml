@@ -82,7 +82,7 @@
                         kf:Keyframing.Interpolatable="True"/>
             </StackPanel>
 
-            <WrapPanel>
+            <StackPanel>
                 <CheckBox Content="Disable"    IsChecked="{Binding DisableTexture, Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
                           kf:Keyframing.PropertyId="DisableTexture"
                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
@@ -95,19 +95,21 @@
                           kf:Keyframing.PropertyId="TexColBlend"
                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                           kf:Keyframing.Interpolatable="False"/>
-                <CheckBox Content="U tile"     IsChecked="{Binding UTile,          Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
-                          kf:Keyframing.PropertyId="UTile"
-                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
-                          kf:Keyframing.Interpolatable="False"/>
-                <CheckBox Content="V tile"     IsChecked="{Binding VTile,          Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
-                          kf:Keyframing.PropertyId="VTile"
-                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
-                          kf:Keyframing.Interpolatable="False"/>
-                <CheckBox Content="Keep aspect" IsChecked="{Binding KeepAspect,    Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
+				<StackPanel Orientation="Horizontal">
+				    <CheckBox Content="U tile"     IsChecked="{Binding UTile,          Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
+                              kf:Keyframing.PropertyId="UTile"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                              kf:Keyframing.Interpolatable="False"/>
+					<CheckBox Content="V tile"     IsChecked="{Binding VTile,          Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
+                              kf:Keyframing.PropertyId="VTile"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                              kf:Keyframing.Interpolatable="False"/>
+				</StackPanel>
+				<CheckBox Content="Keep aspect" IsChecked="{Binding KeepAspect,    Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
                           kf:Keyframing.PropertyId="KeepAspect"
                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                           kf:Keyframing.Interpolatable="False"/>
-            </WrapPanel>
+            </StackPanel>
 
             <StackPanel Margin="0,6,0,0">
                 <TextBlock Text="U anchor:" Margin="0,0,0,2"/>

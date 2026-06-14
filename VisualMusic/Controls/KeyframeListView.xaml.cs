@@ -639,8 +639,8 @@ namespace VisualMusic.Controls
 
             string msg = BuildDeleteMessage(selected.Count);
             var result = MessageBox.Show(msg, "Delete keyframe(s)",
-                MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (result != MessageBoxResult.Yes) return true;
+                MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            if (result != MessageBoxResult.OK) return true;
 
             _vm.DeleteRows(selected);
             grid.UnselectAll();
@@ -656,8 +656,8 @@ namespace VisualMusic.Controls
                 ? "Delete this lyric?"
                 : $"Delete {selected.Count} selected lyrics?";
             var result = MessageBox.Show(msg, "Delete lyric(s)",
-                MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (result != MessageBoxResult.Yes) return true;
+                MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            if (result != MessageBoxResult.OK) return true;
 
             _vm.Lyrics.DeleteRows(selected);
             lyricsGrid.UnselectAll();
