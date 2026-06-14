@@ -968,13 +968,11 @@ namespace VisualMusic.ViewModels
         void ResetCamera()
         {
             if (_project == null) return;
-            _project.SelectKeyFrameAtSongPos();
-            foreach (var kf in _project.KeyFrames.Values)
-            {
-                if (kf.Selected)
-                    kf.ProjProps.Camera = new Camera();
-            }
-            _project.InterpolateFrames();
+            if (!EnsureCameraEditKeyframe()) return;
+            ApplyCamera(new Camera());
+            _project.SyncLiveCameraEdit();
+            SongProps.RefreshLiveValues();
+            Keyframes.KeyframeService.RaiseRefresh();
             AddUndoItem("Reset Camera");
         }
 
@@ -993,9 +991,11 @@ namespace VisualMusic.ViewModels
                 var dcs = new DataContractSerializer(typeof(Camera), ProjectSerializer.KnownTypes);
                 using var stream = File.Open(dlg.FileName, FileMode.Open);
                 var cam = (Camera)dcs.ReadObject(stream);
-                var kf = _project?.GetKeyFrameAtSongPos();
-                if (kf != null)
-                    kf.ProjProps.Camera = cam;
+                if (!EnsureCameraEditKeyframe()) return;
+                ApplyCamera(cam);
+                _project.SyncLiveCameraEdit();
+                SongProps.RefreshLiveValues();
+                Keyframes.KeyframeService.RaiseRefresh();
                 AddUndoItem("Load Camera");
             }
             catch (Exception ex)
@@ -1014,12 +1014,30 @@ namespace VisualMusic.ViewModels
             {
                 var dcs = new DataContractSerializer(typeof(Camera), ProjectSerializer.KnownTypes);
                 using var stream = File.Open(dlg.FileName, FileMode.Create);
-                dcs.WriteObject(stream, _project?.GetKeyFrameAtSongPos()?.ProjProps.Camera);
+                dcs.WriteObject(stream, _project?.Props.Camera);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        bool EnsureCameraEditKeyframe()
+        {
+            if (_project == null) return false;
+
+            var scope = Keyframes.KeyframeService.KfScope.Project;
+            if (Keyframes.KeyframeService.HasAnyKeyForAny("Camera", scope))
+                Keyframes.KeyframeService.PausePlayback();
+            return Keyframes.KeyframeService.EnsureKeyframeForEdit("Camera", scope);
+        }
+
+        void ApplyCamera(Camera source)
+        {
+            var dest = _project.Props.Camera;
+            dest.Pos = source.Pos;
+            dest.Orientation = source.Orientation;
+            dest.Fov = source.Fov;
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]

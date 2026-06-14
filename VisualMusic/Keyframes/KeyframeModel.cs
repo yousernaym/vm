@@ -222,7 +222,7 @@ namespace VisualMusic.Keyframes
         /// <summary>
         /// Interpolates between two scalar values according to the given mode.
         /// When <paramref name="logScale"/> is true the interpolation is performed in log2 space
-        /// (matches the existing <see cref="KeyFrames"/> ViewWidthQn interpolation).
+        /// (used by project viewport-width keyframes).
         /// </summary>
         public static double InterpolateValue(double a, double b, double t,
                                               KfInterpolation mode, bool logScale)
@@ -315,7 +315,8 @@ namespace VisualMusic.Keyframes
         // Per-tick descriptions (shared across all properties at that tick, for the list view)
         Dictionary<int, string> _descriptions = new Dictionary<int, string>();
 
-        // Standalone keyframe positions that may have zero keyed properties (added via the list "+").
+        // Standalone keyframe positions that may have zero keyed properties.
+        // Retained so existing project files with empty keyframe-list rows still load cleanly.
         HashSet<int> _markers = new HashSet<int>();
 
         // ---- Tracks access (read-only, for interpolation) ----
@@ -356,9 +357,6 @@ namespace VisualMusic.Keyframes
             if (HasKeyAt(propertyId, tick)) Remove(propertyId, tick);
             else Add(propertyId, tick);
         }
-
-        /// <summary>Adds a standalone keyframe marker (possibly with zero properties) at a tick.</summary>
-        public void AddMarker(int tick) => _markers.Add(tick);
 
         public void ApplyInterpolation(string propertyId, int tick, KfInterpolation interp)
         {

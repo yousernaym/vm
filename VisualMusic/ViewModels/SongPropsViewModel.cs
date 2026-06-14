@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using System.Linq;
 
 namespace VisualMusic.ViewModels
 {
@@ -28,13 +27,6 @@ namespace VisualMusic.ViewModels
         public Func<int?> NotesMinPitch { get; set; }
         public Func<int?> NotesMaxPitch { get; set; }
         public Func<double?> SongLengthSWithoutPbOffset { get; set; }
-
-        void ApplyToSelectedKeyframes(Action<ProjProps> fn)
-        {
-            if (_project == null) return;
-            foreach (var kf in _project.KeyFrames.Values.Where(kf => kf.Selected))
-                fn(kf.ProjProps);
-        }
 
         public void RefreshAll()
         {
@@ -69,7 +61,7 @@ namespace VisualMusic.ViewModels
         }
 
         // =====================================================================
-        // VIEWPORT WIDTH  (keyframe-bound — written to selected keyframe)
+        // VIEWPORT WIDTH
         // =====================================================================
 
         public double? ViewWidthQn
@@ -78,11 +70,7 @@ namespace VisualMusic.ViewModels
             set
             {
                 if (value == null || _project == null) return;
-                // Write the live value directly (the new per-property system, once it owns this prop,
-                // reads/writes Props and InterpolateFrames no longer relays the old keyframe value here)
-                // and also into the old keyframe system (used when there are no new keyframes for it).
                 Props.ViewWidthQn = (float)value;
-                ApplyToSelectedKeyframes(pp => pp.ViewWidthQn = (float)value);
                 OnPropertyChanged();
             }
         }
@@ -196,7 +184,7 @@ namespace VisualMusic.ViewModels
         }
 
         // =====================================================================
-        // BACKGROUND OPACITY  (keyframe-bound)
+        // BACKGROUND OPACITY
         // =====================================================================
 
         public double? BackgroundImageOpacity
@@ -206,13 +194,12 @@ namespace VisualMusic.ViewModels
             {
                 if (value == null || Props == null) return;
                 Props.BackgroundImageOpacity = (float)value;
-                ApplyToSelectedKeyframes(pp => pp.BackgroundImageOpacity = (float)value);
                 OnPropertyChanged();
             }
         }
 
         // =====================================================================
-        // BACKGROUND SATURATION  (keyframe-bound)
+        // BACKGROUND SATURATION
         // =====================================================================
 
         public double? BackgroundImageSaturation
@@ -222,7 +209,6 @@ namespace VisualMusic.ViewModels
             {
                 if (value == null || Props == null) return;
                 Props.BackgroundImageSaturation = (float)value;
-                ApplyToSelectedKeyframes(pp => pp.BackgroundImageSaturation = (float)value);
                 OnPropertyChanged();
             }
         }

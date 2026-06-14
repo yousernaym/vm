@@ -122,7 +122,6 @@ namespace VisualMusic
 
         // ---- Fields ----
 
-        public KeyFrames KeyFrames;
         public Keyframes.KeyframeSet PropertyKeyframes = new Keyframes.KeyframeSet();
         ProjProps _props = new ProjProps();
         public ProjProps Props
@@ -225,8 +224,7 @@ namespace VisualMusic
 
         public Project()
         {
-            KeyFrames = new KeyFrames();
-            Props.ViewWidthQn = KeyFrames[0].ProjProps.ViewWidthQn;
+            Props.ViewWidthQn = ProjProps.DefaultViewWidthQn;
             Props.OnPlaybackOffsetSChanged = OnPlaybackOffsetSChanged;
         }
 
@@ -272,8 +270,6 @@ namespace VisualMusic
                     }
                 }
 
-                else if (entry.Name == "keyFrames")
-                    KeyFrames = (KeyFrames)entry.Value;
                 else if (entry.Name == "propertyKeyframes")
                     PropertyKeyframes = (Keyframes.KeyframeSet)entry.Value ?? PropertyKeyframes;
                 else if (entry.Name == "props")
@@ -298,7 +294,7 @@ namespace VisualMusic
                 else if (entry.Name == "minPitch")
                     Props.MinPitch = (int)entry.Value;
                 else if (entry.Name == "camera")
-                    KeyFrames[0].ProjProps.Camera = (Camera)entry.Value;
+                    Props.Camera = (Camera)entry.Value;
                 else if (entry.Name == "userViewWidth")
                     Props.UserViewWidth = (float)entry.Value;
             }
@@ -309,7 +305,6 @@ namespace VisualMusic
             info.AddValue("version", SongFormat.writeVersion);
             info.AddValue("importOptions", ImportOptions);
             info.AddValue("trackViews", _trackViews);
-            info.AddValue("keyFrames", KeyFrames);
             info.AddValue("propertyKeyframes", PropertyKeyframes);
             info.AddValue("props", Props);
             info.AddValue("vertWidthQn", _vertViewWidthQn);
@@ -429,7 +424,6 @@ namespace VisualMusic
 
             if (resetProject)
             {
-                KeyFrames = new KeyFrames();
                 PropertyKeyframes = new Keyframes.KeyframeSet();
                 Keyframes.KeyframeService.RaiseKeyframesChanged();
                 Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
@@ -438,32 +432,6 @@ namespace VisualMusic
             }
             //viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
             return true;
-        }
-
-        public void InterpolateFrames()
-        {
-            var interpolatedFrame = KeyFrames.CreateInterpolatedFrame((int)SongPosT);
-            // The old legacy keyframe system still owns these props *unless* the new per-property
-            // system has keyframes for them, in which case it hands off ownership (the new system writes
-            // them in InterpolatePropertyKeyframes). Without this hand-off the old system would overwrite
-            // the new interpolated value every frame.
-            if (!PropertyKeyframes.HasAny("proj/ViewWidthQn"))
-                Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
-            if (!PropertyKeyframes.HasAny("proj/Camera"))
-            {
-                // Copy values instead of replacing the object: the keyframe camera is a serializer-based
-                // clone without the (non-serialized) movement/rotation velocities, so swapping the object
-                // would kill WASD velocity every frame and movement would only advance on key auto-repeat.
-                var interpCam = interpolatedFrame.ProjProps.Camera;
-                Props.Camera.Pos = interpCam.Pos;
-                Props.Camera.Orientation = interpCam.Orientation;
-                Props.Camera.Fov = interpCam.Fov;
-            }
-            if (!PropertyKeyframes.HasAny("proj/BackgroundImageOpacity"))
-                Props.BackgroundImageOpacity = interpolatedFrame.ProjProps.BackgroundImageOpacity;
-            if (!PropertyKeyframes.HasAny("proj/BackgroundImageSaturation"))
-                _props.BackgroundImageSaturation = interpolatedFrame.ProjProps.BackgroundImageSaturation;
-            //Props = interpolatedFrame.ProjProps;
         }
 
         public void OpenAudioFile(ImportOptions options)
@@ -839,9 +807,8 @@ namespace VisualMusic
 
         public void Update(double deltaTimeS)
         {
-            // Integrate on the live render camera; keyframe stores are synced via SyncLiveCameraEdit.
+            // Integrate on the live render camera; per-property camera keyframes are synced via SyncLiveCameraEdit.
             Props.Camera.Update(deltaTimeS);
-            InterpolateFrames();
             // Only drive property values from the new keyframe model during playback. When stopped the
             // user authors values directly through the controls (editing pauses playback), so overriding
             // every frame would fight the slider and prevent capturing a distinct value for a 2nd keyframe.
@@ -1015,18 +982,6 @@ namespace VisualMusic
             }
             Props.LyricsSegments.Add(new LyricsSegment((float)SongPosS));
             return Props.LyricsSegments.Count - 1;
-        }
-
-        public int InsertKeyFrameAtSongPos()
-        {
-            return KeyFrames.Insert((int)SongPosT);
-        }
-
-        public void GoToKeyFrame(int index)
-        {
-            int newPosT = KeyFrames.KeyAtIndex(index);
-            if (SongLengthT > 0 && newPosT >= 0)
-                NormSongPos = (newPosT + 0.5) / SongLengthT;
         }
 
         /// <summary>
@@ -1370,7 +1325,6 @@ namespace VisualMusic
         /// <summary>
         /// Applies the new per-property keyframe set by interpolating each tracked property to its
         /// value at the current song position.  Called inside <see cref="Update"/> (during playback)
-        /// after <see cref="InterpolateFrames"/> so its writes win for any property both systems cover,
         /// and from the video-export loop so exports animate too.
         /// </summary>
         public void InterpolatePropertyKeyframes()
@@ -1451,15 +1405,9 @@ namespace VisualMusic
 
         // ---- End property-keyframe interpolation ----
 
-        public KeyFrame GetKeyFrameAtSongPos()
-        {
-            return KeyFrames[(int)SongPosT];
-        }
-
         /// <summary>
-        /// Writes the live <see cref="Props.Camera"/> into per-property and legacy keyframe stores after
-        /// user-driven movement (WASD, mouse-look). Rendering and property interpolation read Props;
-        /// without this, edits to legacy keyframe cameras are invisible once proj/Camera keyframes exist.
+        /// Writes the live <see cref="Props.Camera"/> into the per-property camera keyframe at the
+        /// current tick after user-driven movement (WASD, mouse-look).
         /// </summary>
         public void SyncLiveCameraEdit()
         {
@@ -1470,31 +1418,6 @@ namespace VisualMusic
                 Keyframes.KeyframeService.SyncEditedValue("Camera", Keyframes.KeyframeService.KfScope.Project,
                     new Keyframes.CameraKfValue(cam.Pos, cam.Orientation, cam.Fov));
             }
-
-            // Use the clamping indexer (exact match, or the single/first/last frame) rather than an
-            // exact-tick lookup: InterpolateFrames rewrites Props.Camera from KeyFrames every frame when
-            // no proj/Camera property keyframes exist, so without a write-back here the camera would be
-            // frozen everywhere except exactly on a legacy keyframe tick.
-            var kf = KeyFrames?[(int)SongPosT];
-            if (kf != null)
-            {
-                kf.ProjProps.Camera.Pos = cam.Pos;
-                kf.ProjProps.Camera.Orientation = cam.Orientation;
-                kf.ProjProps.Camera.Fov = cam.Fov;
-            }
-        }
-
-        /// <summary>
-        /// Selects only the keyframe at the current song position, deselecting all others.
-        /// The current UI has no keyframe-selection grid, so camera
-        /// movement (<see cref="update"/> integrates only selected keyframes) and reset need the
-        /// keyframe under the playhead to be marked selected. Safe to call every frame.
-        /// </summary>
-        public void SelectKeyFrameAtSongPos()
-        {
-            var current = GetKeyFrameAtSongPos();
-            foreach (var keyFrame in KeyFrames.Values)
-                keyFrame.Selected = (keyFrame == current);
         }
 
         void OnPlaybackOffsetSChanged()
@@ -1577,15 +1500,12 @@ namespace VisualMusic
                 destProps.SpatialProps = sourceProps.SpatialProps;
                 //Skip AudioProps for more lightweight redos
             }
-            KeyFrames = source.KeyFrames;
             PropertyKeyframes = source.PropertyKeyframes;
             //source.Dispose();
         }
 
         internal void InitAfterDeserialization(WaveformPanel waveformPanel = null)
         {
-            if (KeyFrames == null) //Old project file format
-                KeyFrames = new KeyFrames();
             if (PropertyKeyframes == null)
                 PropertyKeyframes = new Keyframes.KeyframeSet();
             ImportOptions.UpdateImportForm();

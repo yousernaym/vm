@@ -9,7 +9,6 @@ namespace VisualMusic
     {
         public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen with default camera
         public BindingList<LyricsSegment> LyricsSegments { get; private set; } = new BindingList<LyricsSegment>();
-        [KeyframeLogInterpolation]
         public float ViewWidthQn { get; set; }
 
         public double AudioOffset { get; set; }

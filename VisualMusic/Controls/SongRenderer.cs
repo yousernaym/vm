@@ -162,9 +162,6 @@ namespace VisualMusic
             _oldTime = newTime;
 
             SelectRegion();
-            // No keyframe-selection UI in WPF yet: keep the playhead keyframe selected so camera
-            // movement (WASD/RF) integrates and camera reset targets it.
-            Project.SelectKeyFrameAtSongPos();
             Project.Update(_deltaTimeS);
             ScrollSong();
         }
@@ -413,18 +410,6 @@ namespace VisualMusic
             {
                 suppress = true;
                 Project.SyncLiveCameraEdit();
-                var keyFrame = Project.GetKeyFrameAtSongPos();
-                if (keyFrame != null)
-                {
-                    foreach (var other in Project.KeyFrames.Values)
-                    {
-                        if (keyFrame != other && other.Selected)
-                        {
-                            other.ProjProps.Camera.Pos = camera.Pos;
-                            other.ProjProps.Camera.Orientation = camera.Orientation;
-                        }
-                    }
-                }
             }
 
             if (key == Key.Space)
@@ -471,18 +456,6 @@ namespace VisualMusic
             if (camera.Control(key, false, modifiers))
             {
                 Project.SyncLiveCameraEdit();
-                var keyFrame = Project.GetKeyFrameAtSongPos();
-                if (keyFrame != null)
-                {
-                    foreach (var other in Project.KeyFrames.Values)
-                    {
-                        if (keyFrame != other && other.Selected)
-                        {
-                            other.ProjProps.Camera.Pos = camera.Pos;
-                            other.ProjProps.Camera.Orientation = camera.Orientation;
-                        }
-                    }
-                }
             }
         }
 
@@ -761,7 +734,6 @@ namespace VisualMusic
 
                     while (Project.NormSongPos < 1 && !progress.Cancel)
                     {
-                        Project.InterpolateFrames();
                         Project.InterpolatePropertyKeyframes();
                         DrawVideoFrame(songPosS, videoFormat.fps, frameSamples, options, rtCube, rt32, rt8, cubeToPlaneFx);
                         if (options.SSAAEnabled)

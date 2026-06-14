@@ -19,7 +19,7 @@ namespace VisualMusic
             typeof(MixdownType), typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType),
             typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions),typeof(HvlImportOptions),
             typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment),
-            typeof(KeyFrames), typeof(SortedList<int, KeyFrame>), typeof(KeyFrame), typeof(ProjProps),
+            typeof(ProjProps),
             typeof(List<TrackProps>), typeof(AudioProps),
             // Per-property keyframe model
             typeof(KeyframeSet),
