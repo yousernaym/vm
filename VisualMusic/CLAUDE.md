@@ -10,7 +10,7 @@ Key characteristics:
 - Produces video exports (MKV format, including 360-degree video support)
 - Uses MonoGame for 3D graphics rendering
 - Supports auto-generated audio from MIDI via Fluidsynth or user-supplied audio
-- Multi-platform music source support via libRemuxer (OpenMPT, libmikmod, libsidplayfp)
+- Multi-platform music source support via libRemuxer (OpenMPT, libsidplayfp)
 
 ## Build & Development
 
@@ -56,7 +56,7 @@ Open and run in Visual Studio 2022, or launch `VM.exe` directly from the bin fol
   - `MidMix/` (C++ MIDI audio synthesis via Fluidsynth)
   - `Remuxer/` (C++ tool + C# wrapper for module/SID conversion via libRemuxer)
   - `MonoGame/` (forked graphics library for rendering)
-  - `MonoGame/` dependencies: libsidplayfp, libmikmod, libopenmpt (audio format libraries)
+  - `MonoGame/` dependencies: libsidplayfp, libopenmpt (audio format libraries)
 - `InnoSetup/` — Windows installer script
 
 ## Architecture

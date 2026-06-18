@@ -58,7 +58,7 @@ Optional at runtime: place a `soundfont.sf2` next to `VM.exe` for MIDI audio syn
 `Dependencies/midiLib`, `Media`, `MidMix`, `Remuxer`, and `MonoGame` are independent git repos (see
 [.gitmodules](.gitmodules)); `Remuxer` itself nests `libRemuxer`. Edits inside a submodule are commits in
 *that* repo — this repo only tracks the submodule commit pointer. **MonoGame** is a large upstream fork and
-most of `Remuxer/libRemuxer` (openmpt, mikmod, sidplayfp) is vendored third-party code: treat both as
+most of `Remuxer/libRemuxer` (openmpt, sidplayfp) is vendored third-party code: treat both as
 upstream and change only what Visual Music requires.
 
 ## Testing
