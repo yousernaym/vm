@@ -91,7 +91,7 @@ namespace VisualMusic
         {
             ImportSongWindow.UpdateSession(
                 NoteFileType,
-                erase: false,
+                erase: EraseCurrent,
                 notePath: RawNotePath,
                 audioPath: AudioPath ?? "",
                 insTrack: InsTrack);

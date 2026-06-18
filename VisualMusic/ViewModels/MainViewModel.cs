@@ -793,6 +793,8 @@ namespace VisualMusic.ViewModels
 
             _undoItems.Clear();
             _undoItems.Add("", _project);
+            if (options.EraseCurrent)
+                _undoItems.MarkSaved();
             UpdateUndoRedo();
 
             string name = Path.GetFileName(options.RawNotePath ?? options.NotePath ?? "");
