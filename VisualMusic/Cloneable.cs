@@ -5,9 +5,9 @@ namespace VisualMusic
 {
     static public class Cloning
     {
-        static public T clone<T>(this T obj)
+        static public T Clone<T>(this T obj)
         {
-            DataContractSerializer dcs = new DataContractSerializer(typeof(T), Form1.projectSerializationTypes);
+            DataContractSerializer dcs = new DataContractSerializer(typeof(T), ProjectSerializer.KnownTypes);
             MemoryStream stream = new MemoryStream();
             dcs.WriteObject(stream, obj);
             stream.Flush();

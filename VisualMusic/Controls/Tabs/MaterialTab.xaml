@@ -1,0 +1,160 @@
+<UserControl x:Class="VisualMusic.Controls.Tabs.MaterialTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrl="clr-namespace:VisualMusic.Controls"
+             xmlns:kf="clr-namespace:VisualMusic.Keyframes">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="4">
+
+            <Button Content="Default Material" HorizontalAlignment="Left"
+                    Margin="0,0,0,6" Click="DefaultMaterialBtn_Click"/>
+
+            <!-- Color -->
+            <TextBlock Text="Color" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Transparency:" VerticalAlignment="Center" Margin="0,1"/>
+                <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
+                                  Value="{Binding Transp, Mode=TwoWay}" Min="0" Max="1" Decimals="2"
+                                  kf:Keyframing.PropertyId="Transp"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Interpolatable="True"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Hue:" VerticalAlignment="Center" Margin="0,1"/>
+                <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
+                                  Value="{Binding MaterialHue, Mode=TwoWay}" Min="0" Max="1" Decimals="2"
+                                  kf:Keyframing.PropertyId="MaterialHue"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Interpolatable="True"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Normal sat:" VerticalAlignment="Center" Margin="0,1"/>
+                <ctrl:TbSliderWpf Grid.Row="2" Grid.Column="1" Margin="2"
+                                  Value="{Binding NormalSat, Mode=TwoWay}" Min="0" Max="2" Decimals="2"
+                                  kf:Keyframing.PropertyId="NormalSat"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Interpolatable="True"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Normal lum:" VerticalAlignment="Center" Margin="0,1"/>
+                <ctrl:TbSliderWpf Grid.Row="3" Grid.Column="1" Margin="2"
+                                  Value="{Binding NormalLum, Mode=TwoWay}" Min="0" Max="2" Decimals="2"
+                                  kf:Keyframing.PropertyId="NormalLum"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Interpolatable="True"/>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Hilite sat:" VerticalAlignment="Center" Margin="0,1"/>
+                <ctrl:TbSliderWpf Grid.Row="4" Grid.Column="1" Margin="2"
+                                  Value="{Binding HiliteSat, Mode=TwoWay}" Min="0" Max="2" Decimals="2"
+                                  kf:Keyframing.PropertyId="HiliteSat"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Interpolatable="True"/>
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Hilite lum:" VerticalAlignment="Center" Margin="0,1"/>
+                <ctrl:TbSliderWpf Grid.Row="5" Grid.Column="1" Margin="2"
+                                  Value="{Binding HiliteLum, Mode=TwoWay}" Min="0" Max="2" Decimals="2"
+                                  kf:Keyframing.PropertyId="HiliteLum"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Interpolatable="True"/>
+            </Grid>
+
+            <Separator Margin="0,6,0,6"/>
+
+            <!-- Texture -->
+            <TextBlock Text="Texture" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <Image x:Name="texThumb" Source="{Binding TextureThumbnail}"
+                   Height="64" Stretch="Uniform"
+                   HorizontalAlignment="Left" Margin="0,0,0,4"/>
+            <TextBlock Text="{Binding TexturePath}" TextTrimming="CharacterEllipsis"
+                       Margin="0,0,0,4" FontSize="10"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Content="Load..."   Width="56" Margin="0,0,4,0" Click="LoadTexBtn_Click"
+                        kf:Keyframing.PropertyId="TexturePath"
+                        kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                        kf:Keyframing.Interpolatable="True"/>
+                <Button Content="Unload"    Width="56" Click="UnloadTexBtn_Click"
+                        kf:Keyframing.PropertyId="TexturePath"
+                        kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                        kf:Keyframing.Interpolatable="True"/>
+            </StackPanel>
+
+            <StackPanel>
+                <CheckBox Content="Disable"    IsChecked="{Binding DisableTexture, Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
+                          kf:Keyframing.PropertyId="DisableTexture"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="False"/>
+                <CheckBox Content="Point smp"  IsChecked="{Binding PointSmp,       Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
+                          kf:Keyframing.PropertyId="PointSmp"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="False"/>
+                <CheckBox Content="Blend col"  IsChecked="{Binding TexColBlend,    Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
+                          kf:Keyframing.PropertyId="TexColBlend"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="False"/>
+				<StackPanel Orientation="Horizontal">
+				    <CheckBox Content="U tile"     IsChecked="{Binding UTile,          Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
+                              kf:Keyframing.PropertyId="UTile"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                              kf:Keyframing.Interpolatable="False"/>
+					<CheckBox Content="V tile"     IsChecked="{Binding VTile,          Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
+                              kf:Keyframing.PropertyId="VTile"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                              kf:Keyframing.Interpolatable="False"/>
+				</StackPanel>
+				<CheckBox Content="Keep aspect" IsChecked="{Binding KeepAspect,    Mode=TwoWay}" IsThreeState="True" Margin="0,0,6,2"
+                          kf:Keyframing.PropertyId="KeepAspect"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="False"/>
+            </StackPanel>
+
+            <StackPanel Margin="0,6,0,0">
+                <TextBlock Text="U anchor:" Margin="0,0,0,2"/>
+                <ComboBox SelectedIndex="{Binding UAnchorIndex, Mode=TwoWay}" Margin="0,0,0,4"
+                          kf:Keyframing.PropertyId="UAnchorIndex"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="False">
+                    <ComboBoxItem Content="Note"/>
+                    <ComboBoxItem Content="Screen"/>
+                    <ComboBoxItem Content="Song"/>
+                </ComboBox>
+                <TextBlock Text="V anchor:" Margin="0,0,0,2"/>
+                <ComboBox SelectedIndex="{Binding VAnchorIndex, Mode=TwoWay}" Margin="0,0,0,6"
+                          kf:Keyframing.PropertyId="VAnchorIndex"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="False">
+                    <ComboBoxItem Content="Note"/>
+                    <ComboBoxItem Content="Screen"/>
+                </ComboBox>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="U scroll:" VerticalAlignment="Center" Margin="0,2"/>
+                    <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
+                                      Value="{Binding UScroll, Mode=TwoWay}"
+                                      Min="-1" Max="1" Decimals="3" SmallChange="0.005"
+                                      kf:Keyframing.PropertyId="UScroll"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                      kf:Keyframing.Interpolatable="True"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="V scroll:" VerticalAlignment="Center" Margin="0,2"/>
+                    <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
+                                      Value="{Binding VScroll, Mode=TwoWay}"
+                                      Min="-1" Max="1" Decimals="3" SmallChange="0.005"
+                                      kf:Keyframing.PropertyId="VScroll"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                      kf:Keyframing.Interpolatable="True"/>
+                </Grid>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

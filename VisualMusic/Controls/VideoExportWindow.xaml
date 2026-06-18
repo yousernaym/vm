@@ -1,0 +1,65 @@
+<mah:MetroWindow x:Class="VisualMusic.Controls.VideoExportWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 Title="Export Video"
+                 ResizeMode="NoResize"
+                 SizeToContent="WidthAndHeight"
+                 WindowStartupLocation="CenterOwner"
+                 ShowMinButton="False"
+                 ShowMaxRestoreButton="False">
+    <StackPanel Margin="16">
+
+        <!-- Spherical / metadata / stereoscopic checkboxes -->
+        <CheckBox x:Name="sphereCb" Content="Spherical" Margin="0,0,0,4"
+                  Click="SphereCb_Click"/>
+        <CheckBox x:Name="sphericalMetadataCb" Content="Add spherical metadata"
+                  Margin="16,0,0,4" Click="SphericalMetadataCb_Click"/>
+        <CheckBox x:Name="stereoscopicCb" Content="Stereoscopic (experimental)"
+                  Margin="0,0,0,12" Click="StereoscopicCb_Click"/>
+
+        <!-- Settings: resolution / SSAA / quality / FPS -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="6"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="6"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="6"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Resolution:" VerticalAlignment="Center"/>
+            <ComboBox  Grid.Row="0" Grid.Column="1" x:Name="resoCombo" IsEditable="True"
+                       SelectionChanged="ResoCombo_SelectionChanged"
+                       KeyUp="ResoCombo_KeyUp"
+                       DropDownOpened="ResoCombo_DropDownOpened"
+                       DropDownClosed="ResoCombo_DropDownClosed"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="SSAA:" VerticalAlignment="Center"/>
+            <ComboBox  Grid.Row="2" Grid.Column="1" x:Name="ssFactorCombo"
+                       SelectionChanged="SsFactorCombo_SelectionChanged"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Video quality loss:" VerticalAlignment="Center"/>
+            <ComboBox  Grid.Row="4" Grid.Column="1" x:Name="qualityLossCombo"
+                       SelectionChanged="QualityLossCombo_SelectionChanged"/>
+
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="FPS:" VerticalAlignment="Center"/>
+            <mah:NumericUpDown Grid.Row="6" Grid.Column="1" x:Name="fpsUd"
+                               Minimum="1" Maximum="240" StringFormat="F2"
+                               ValueChanged="FpsUd_ValueChanged"/>
+        </Grid>
+
+        <!-- OK / Cancel -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="OK"     Width="80" IsDefault="True" Click="Ok_Click" Margin="0,0,8,0"/>
+            <Button Content="Cancel" Width="80" IsCancel="True"  Click="Cancel_Click"/>
+        </StackPanel>
+
+    </StackPanel>
+</mah:MetroWindow>

@@ -4,20 +4,32 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Drawing;
-using System.Drawing.Design;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Windows.Forms.Design;
 
 namespace LibSidWiz
 {
+    public struct Padding
+    {
+        public int Left { get; set; }
+        public int Top { get; set; }
+        public int Right { get; set; }
+        public int Bottom { get; set; }
+
+        public Padding(int left, int top, int right, int bottom)
+        {
+            Left = left;
+            Top = top;
+            Right = right;
+            Bottom = bottom;
+        }
+    }
+
     /// <summary>
     /// Wraps a single "voice", and also deals with loading the data into memory
     /// </summary>
@@ -179,7 +191,6 @@ namespace LibSidWiz
         public string ErrorMessage { get; private set; }
 
         [Category("Data")]
-        [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
         [Description("The filename to be rendered")]
         public string Filename
         {
@@ -197,7 +208,6 @@ namespace LibSidWiz
         }
 
         [Category("Triggering")]
-        [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
         [Description("The filename to use for oscilloscope triggering. Leave blank to use the channel's sound data.")]
         public string ExternalTriggerFilename
         {
@@ -420,7 +430,6 @@ namespace LibSidWiz
 
         [Category("Appearance")]
         [Description("The label for the channel")]
-        [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         public string Label
         {
             get => _label;

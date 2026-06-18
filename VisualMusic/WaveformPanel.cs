@@ -1,9 +1,7 @@
 ﻿using LibSidWiz;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace VisualMusic
 {
@@ -42,11 +40,13 @@ namespace VisualMusic
             };
 
 
-            // Create the GPU texture for the overlay
-            _waveTex = new Texture2D(gfxDevice, _renderer.Width, _renderer.Height, false, SurfaceFormat.Color);
-
-            // Reuse a CPU buffer for pixel copy each frame
-            _framePixels = new byte[_renderer.Width * _renderer.Height * 4];
+            // Defer texture creation if the viewport is not yet sized (e.g. HwndHost init fires at 1×1).
+            // Draw() will trigger lazy Resize() once the real dimensions are available.
+            if (_overlayRect.Width > 0 && _overlayRect.Height > 0)
+            {
+                _waveTex = new Texture2D(gfxDevice, _renderer.Width, _renderer.Height, false, SurfaceFormat.Color);
+                _framePixels = new byte[_renderer.Width * _renderer.Height * 4];
+            }
         }
 
         public void Resize()
@@ -54,13 +54,12 @@ namespace VisualMusic
             var vp = _gfxDevice.Viewport;
 
             _overlayRect = new Rectangle(0, 0, (int)(vp.Width * NormalizedWidth), vp.Height); // leftmost 25%
-            if (_renderer != null)
+            if (_renderer != null && _overlayRect.Width > 0 && _overlayRect.Height > 0)
             {
                 _renderer.Width = _overlayRect.Width;
                 _renderer.Height = _overlayRect.Height;
-                _renderer.RenderingBounds = new System.Drawing.Rectangle(0, 0, _overlayRect.Width, _overlayRect.Height); // local in overlay. :contentReference[oaicite:9]{index=9}
+                _renderer.RenderingBounds = new System.Drawing.Rectangle(0, 0, _overlayRect.Width, _overlayRect.Height);
                 _renderer.Init();
-                // Recreate texture if size changes
                 _waveTex?.Dispose();
                 _waveTex = new Texture2D(_gfxDevice, _renderer.Width, _renderer.Height, false, SurfaceFormat.Color);
                 _framePixels = new byte[_renderer.Width * _renderer.Height * 4];
@@ -69,10 +68,14 @@ namespace VisualMusic
 
         internal void Draw(double songPosS)
         {
-            if (_waveTex == null || songPosS < 0 || _renderer.ChannelCount == 0)
+            if (songPosS < 0 || _renderer.ChannelCount == 0)
                 return;
-            if (_renderer.Width != (int)(_gfxDevice.Viewport.Width * NormalizedWidth) || _renderer.Height != (int)(_gfxDevice.Viewport.Height))
+            if (!_channels.Exists(c => !string.IsNullOrEmpty(c.Filename)))
+                return;
+            if (_waveTex == null || _renderer.Width != (int)(_gfxDevice.Viewport.Width * NormalizedWidth) || _renderer.Height != (int)(_gfxDevice.Viewport.Height))
                 Resize();
+            if (_waveTex == null)
+                return;
             var pixels = _renderer.RenderFrame(songPosS);
             _waveTex.SetData(pixels);
 
@@ -83,14 +86,14 @@ namespace VisualMusic
 
         internal void ClearChannels()
         {
-            _renderer.ClearChannels();
+            _channels.Clear();
+            _renderer?.ClearChannels();
         }
 
         public void AddChannel(Channel channel)
         {
-            if (_renderer == null)
-                throw new InvalidOperationException("Renderer not initialized. Call Init() first.");
-            _renderer.AddChannel(channel);
+            _channels.Add(channel);
+            _renderer?.AddChannel(channel);
         }
 
         public void Dispose()
@@ -101,6 +104,7 @@ namespace VisualMusic
 
         internal void RemoveChannel(Channel sidWizChannel)
         {
+            _channels.Remove(sidWizChannel);
             _renderer.RemoveChannel(sidWizChannel);
         }
     }

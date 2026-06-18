@@ -9,19 +9,18 @@ namespace VisualMusic
     {
         public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen with default camera
         public BindingList<LyricsSegment> LyricsSegments { get; private set; } = new BindingList<LyricsSegment>();
-        [KeyframeLogInterpolation]
         public float ViewWidthQn { get; set; }
 
         public double AudioOffset { get; set; }
         public delegate void Delegate_PropertyChanged<T>(T value);
         public Action OnPlaybackOffsetSChanged;
-        float playbackOffsetS = 0;
+        float _playbackOffsetS = 0;
         public float PlaybackOffsetS
         {
-            get => playbackOffsetS;
+            get => _playbackOffsetS;
             set
             {
-                playbackOffsetS = value;
+                _playbackOffsetS = value;
                 OnPlaybackOffsetSChanged?.Invoke();
             }
         }
@@ -54,7 +53,7 @@ namespace VisualMusic
                 else if (entry.Name == "audioOffset")
                     AudioOffset = (double)entry.Value;
                 else if (entry.Name == "playbackOffsetS")
-                    playbackOffsetS = (float)entry.Value;
+                    _playbackOffsetS = (float)entry.Value;
                 else if (entry.Name == "fadeIn")
                     FadeIn = (float)entry.Value;
                 else if (entry.Name == "fadeOut")
@@ -81,7 +80,7 @@ namespace VisualMusic
         {
             info.AddValue("qn_viewWidth", ViewWidthQn);
             info.AddValue("audioOffset", AudioOffset);
-            info.AddValue("playbackOffsetS", playbackOffsetS);
+            info.AddValue("playbackOffsetS", _playbackOffsetS);
             info.AddValue("fadeIn", FadeIn);
             info.AddValue("fadeOut", FadeOut);
             info.AddValue("maxPitch", MaxPitch);
@@ -93,37 +92,5 @@ namespace VisualMusic
             info.AddValue("backgroundImageOpacity", BackgroundImageOpacity);
             info.AddValue("backgroundImageSaturation", BackgroundImageSaturation);
         }
-
-        //internal void readOldProjectFile(SerializationEntry entry)
-        //{
-        //	if (entry.Name == "qn_viewWidth")
-        //		ViewWidthQn = (float)entry.Value;
-        //	else if (entry.Name == "audioOffset")
-        //		AudioOffset = (double)entry.Value;
-        //	else if (entry.Name == "playbackOffsetS")
-        //		playbackOffsetS = (float)entry.Value;
-        //	else if (entry.Name == "fadeIn")
-        //		FadeIn = (float)entry.Value;
-        //	else if (entry.Name == "fadeOut")
-        //		FadeOut = (float)entry.Value;
-        //	else if (entry.Name == "maxPitch")
-        //		MaxPitch = (int)entry.Value;
-        //	else if (entry.Name == "minPitch")
-        //		MinPitch = (int)entry.Value;
-        //	else if (entry.Name == "lyrics")
-        //		LyricsSegments = (BindingList<LyricsSegment>)entry.Value;
-        //	else if (entry.Name == "camera")
-        //		Camera = (Camera)entry.Value;
-        //	else if (entry.Name == "userViewWidth")
-        //		UserViewWidth = (float)entry.Value;
-        //}
-
-        //public ProjProps clone()
-        //{
-        //	var dest = Cloning.clone(this);
-        //	dest.OnPlaybackOffsetSChanged = OnPlaybackOffsetSChanged;
-        //	dest.OnPlaybackOffsetSChanged?.Invoke();
-        //	return dest;
-        //}
     }
 }

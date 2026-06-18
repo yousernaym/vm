@@ -3,45 +3,43 @@ using System;
 using System.Runtime.Serialization;
 //using Microsoft.Xna.Framework.Input;
 
-using WinKeys = System.Windows.Forms.Keys;
+using System.Windows.Input;
 
 namespace VisualMusic
 {
     [Serializable]
     public class Camera : ISerializable
     {
-        float controlScale = 0;
+        float _controlScale = 0;
         public BoundingFrustum Frustum => new BoundingFrustum(VpMat);
         public int Eye { get; set; } = 0;   //Stereoscopic rendering: -1 = left, 0 = center(monoscopic), 1 = right
         public float EyeOffset { get; set; } = 0.01f;   //1 = 100% of viewport width, ie. 0.5 will put the center at the edge of an eye's view.
         public static bool InvertY { get; set; } = false;
         public int CubeMapFace { get; set; } = -1; //-1 = normal rendering
         public float Fov { get; set; } = (float)Math.PI / 4.0f;
-        Vector3 pos = new Vector3();
+        Vector3 _pos = new Vector3();
         public Vector3 Pos
         {
-            get => pos;
+            get => _pos;
             set
             {
-                if (!pos.Equals(value))
+                if (!_pos.Equals(value))
                 {
-                    if (SongPanel != null)
-                        SongPanel.Invalidate();
-                    pos = value;
+                    Project.StaticDrawHost?.Invalidate();
+                    _pos = value;
                 }
             }
         }
-        Quaternion orientation = Quaternion.Identity;
+        Quaternion _orientation = Quaternion.Identity;
         public Quaternion Orientation
         {
-            get => orientation;
+            get => _orientation;
             set
             {
-                if (!orientation.Equals(value))
+                if (!_orientation.Equals(value))
                 {
-                    if (SongPanel != null)
-                        SongPanel.Invalidate();
-                    orientation = value;
+                    Project.StaticDrawHost?.Invalidate();
+                    _orientation = value;
                 }
             }
         }
@@ -50,12 +48,12 @@ namespace VisualMusic
         public static Action OnUserUpdating;
         public static Action OnUserUpdated;
 
-        public Vector3 ViewportPos => getViewportPos(pos);
+        public Vector3 ViewportPos => GetViewportPos(_pos);
 
-        Vector3 rotVel = new Vector3();
-        Vector3 moveVel = new Vector3();
-        Vector3 rotVelAcc = new Vector3();
-        Vector3 moveVelAcc = new Vector3();
+        Vector3 _rotVel = new Vector3();
+        Vector3 _moveVel = new Vector3();
+        Vector3 _rotVelAcc = new Vector3();
+        Vector3 _moveVelAcc = new Vector3();
 
         const float rotSpeed = 0.15f;
         const float moveSpeed = 0.5f;
@@ -102,35 +100,35 @@ namespace VisualMusic
             {
                 //Vector3 rotCenter = pos - NonCubeRotMat.Forward * 1;
                 //Vector3 newPos = Vector3.Transform(pos - rotCenter, RotMat) + rotCenter;
-                Vector3 newPos = pos;
+                Vector3 newPos = _pos;
                 Vector3 LeftOffset = NonCubeRotMat.Left * EyeOffset;
                 if (Eye == -1)
                     newPos += LeftOffset;
                 else if (Eye == 1)
                     newPos -= LeftOffset;
-                newPos = getViewportPos(newPos);
+                newPos = GetViewportPos(newPos);
                 Matrix transMat = Matrix.CreateTranslation(newPos);
                 return Matrix.Invert(RotMat * transMat);
             }
         }
-        float xyRatio;
+        float _xyRatio;
         public float XYRatio
         {
-            get => xyRatio;
+            get => _xyRatio;
             set
             {
-                xyRatio = value;
-                viewportSize = new Vector2(1, 1 / xyRatio);
+                _xyRatio = value;
+                _viewportSize = new Vector2(1, 1 / _xyRatio);
             }
         }
-        Vector2 viewportSize;
+        Vector2 _viewportSize;
         public Vector2 ViewportSize
         {
-            get => viewportSize;
+            get => _viewportSize;
             set
             {
-                viewportSize = value;
-                xyRatio = viewportSize.X / viewportSize.Y;
+                _viewportSize = value;
+                _xyRatio = _viewportSize.X / _viewportSize.Y;
             }
         }
         public Matrix ProjMat
@@ -158,18 +156,16 @@ namespace VisualMusic
 
         public Matrix VpMat => ViewMat * ProjMat;
         public bool RenderingToCubemap => CubeMapFace >= 0;
-        public static SongPanel SongPanel => Form1.SongPanel;
         public static bool MouseRot { get; set; } = false;
 
         //Methods/////////////////////////////////
         public Camera()
         {
             XYRatio = 16.0f / 9;
-            Vector3 newPos = pos;
+            Vector3 newPos = _pos;
             newPos.Z = Math.Abs(ProjMat.M11) / 2;
             Pos = newPos;
-            if (SongPanel != null)
-                SongPanel.Invalidate();
+            Project.StaticDrawHost?.Invalidate();
         }
 
         public Camera(SerializationInfo info, StreamingContext ctxt)
@@ -194,72 +190,59 @@ namespace VisualMusic
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
             info.AddValue("fov", Fov);
-            info.AddValue("pos", pos);
-            info.AddValue("orientation", orientation);
+            info.AddValue("pos", _pos);
+            info.AddValue("orientation", _orientation);
             info.AddValue("viewportSize", ViewportSize);
         }
 
-        public void update(double deltaTime)
+        public void Update(double deltaTime)
         {
             Vector3 mouseRotVel = new Vector3();
             if (MouseRot)
             {
-                if (SongPanel.LeftMbPressed)
+                if (Project.StaticDrawHost?.LeftMbPressed == true)
                     mouseRotVel.Z = rotSpeed;
-                if (SongPanel.RightMbPressed)
+                if (Project.StaticDrawHost?.RightMbPressed == true)
                     mouseRotVel.Z = -rotSpeed;
             }
-            Pos += Vector3.Transform(moveVel, RotMat) * (float)deltaTime;
-            Vector3 scaledRotVel = (rotVel + mouseRotVel) * (float)deltaTime;
+            Pos += Vector3.Transform(_moveVel, RotMat) * (float)deltaTime;
+            Vector3 scaledRotVel = (_rotVel + mouseRotVel) * (float)deltaTime;
             Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(scaledRotVel.Y, scaledRotVel.X, scaledRotVel.Z);
-            if (Vector3.Zero != moveVel || Vector3.Zero != scaledRotVel)
+            if (Vector3.Zero != _moveVel || Vector3.Zero != scaledRotVel)
                 OnUserUpdating?.Invoke();
         }
 
-        public bool control(WinKeys key, bool keyDown, WinKeys modifiers)
+        public bool Control(Key key, bool keyDown, ModifierKeys modifiers)
         {
-            bool shifting = modifiers == WinKeys.Shift;
-            if (modifiers != 0 && !shifting)
+            bool shifting = modifiers == ModifierKeys.Shift;
+            if (modifiers != ModifierKeys.None && !shifting)
                 return false;
-            if (key == WinKeys.ShiftKey)
-            {
-                //shiftPressed = keyDown;
-                //MouseRot = keyDown;
-                //if (keyDown)
-                //{
-                //	SongPanel.NormMouseX = SongPanel.NormMouseY = 0;
-                //	Cursor.Position = SongPanel.PointToScreen(new GdiPoint(SongPanel.ClientRectangle.Width / 2, SongPanel.ClientRectangle.Height / 2));
-                //}
-                //else
-                //	OnUserUpdated?.Invoke();
-            }
-
-            controlScale = keyDown ? 1 : 0;
+            _controlScale = keyDown ? 1 : 0;
             bool keyMatch = false;
-            float scaledRotSpeed = rotSpeed * controlScale;
-            float scaledMoveSpeed = moveSpeed * controlScale;
+            float scaledRotSpeed = rotSpeed * _controlScale;
+            float scaledMoveSpeed = moveSpeed * _controlScale;
 
             //Rotation, requiring shifting
             if (shifting || !keyDown)
             {
-                if (key == WinKeys.A)
+                if (key == Key.A)
                 {
-                    rotVel.Y = scaledRotSpeed;
+                    _rotVel.Y = scaledRotSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.D)
+                if (key == Key.D)
                 {
-                    rotVel.Y = -scaledRotSpeed;
+                    _rotVel.Y = -scaledRotSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.W)
+                if (key == Key.W)
                 {
-                    rotVel.X = -scaledRotSpeed;
+                    _rotVel.X = -scaledRotSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.S)
+                if (key == Key.S)
                 {
-                    rotVel.X = scaledRotSpeed;
+                    _rotVel.X = scaledRotSpeed;
                     keyMatch = true;
                 }
             }
@@ -267,47 +250,47 @@ namespace VisualMusic
             //Movement, requiring not shifting
             if (!shifting || !keyDown)
             {
-                if (key == WinKeys.W)
+                if (key == Key.W)
                 {
-                    moveVel.Z = -scaledMoveSpeed;
+                    _moveVel.Z = -scaledMoveSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.S)
+                if (key == Key.S)
                 {
-                    moveVel.Z = scaledMoveSpeed;
+                    _moveVel.Z = scaledMoveSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.A)
+                if (key == Key.A)
                 {
-                    moveVel.X = -scaledMoveSpeed;
+                    _moveVel.X = -scaledMoveSpeed;
                     keyMatch = true;
                 }
-                if (key == WinKeys.D)
+                if (key == Key.D)
                 {
-                    moveVel.X = scaledMoveSpeed;
+                    _moveVel.X = scaledMoveSpeed;
                     keyMatch = true;
                 }
             }
 
             //Keys exclusively for either movement or rotation, shifting optional
-            if (key == WinKeys.R)
+            if (key == Key.R)
             {
-                moveVel.Y = scaledMoveSpeed;
+                _moveVel.Y = scaledMoveSpeed;
                 keyMatch = true;
             }
-            if (key == WinKeys.F)
+            if (key == Key.F)
             {
-                moveVel.Y = -scaledMoveSpeed;
+                _moveVel.Y = -scaledMoveSpeed;
                 keyMatch = true;
             }
-            if (key == WinKeys.Q)
+            if (key == Key.Q)
             {
-                rotVel.Z = scaledRotSpeed;
+                _rotVel.Z = scaledRotSpeed;
                 keyMatch = true;
             }
-            if (key == WinKeys.E)
+            if (key == Key.E)
             {
-                rotVel.Z = -scaledRotSpeed;
+                _rotVel.Z = -scaledRotSpeed;
                 keyMatch = true;
             }
 
@@ -320,19 +303,25 @@ namespace VisualMusic
             return keyMatch;
         }
 
-        public Vector3 getViewportPos(Vector3 _pos)
+        public Vector3 GetViewportPos(Vector3 _pos)
         {
             return _pos * ViewportSize.X;
         }
 
-        internal void ApplyMouseRot(float x, float y)
+        /// <summary>
+        /// Applies a mouse-movement rotation to the camera orientation.
+        /// When <paramref name="roll"/> is false (default), horizontal movement yaws and
+        /// vertical movement pitches.  When <paramref name="roll"/> is true (left button held),
+        /// horizontal movement rolls and vertical movement still pitches.
+        /// </summary>
+        internal void ApplyMouseRot(float x, float y, bool roll = false)
         {
             const float maxStep = 0.03f;
-            if (Math.Abs(x) > maxStep)
-                x *= maxStep / Math.Abs(x);
-            if (Math.Abs(y) > maxStep)
-                y *= maxStep / Math.Abs(y);
-            Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(-x, -y, 0);
+            if (Math.Abs(x) > maxStep) x *= maxStep / Math.Abs(x);
+            if (Math.Abs(y) > maxStep) y *= maxStep / Math.Abs(y);
+            float yaw = roll ? 0 : -x;
+            float rollZ = roll ? -x : 0;
+            Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(yaw, -y, rollZ);
             OnUserUpdating?.Invoke();
         }
     }

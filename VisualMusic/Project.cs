@@ -5,12 +5,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace VisualMusic
 {
@@ -20,121 +18,231 @@ namespace VisualMusic
     [Serializable()]
     public class Project : ISerializable, IDisposable
     {
-        public KeyFrames KeyFrames;
-        ProjProps props = new ProjProps();
+        // ---- Per-property interpolation accessor registry (not serialized) ----
+        // Populated by InitPropertyAccessors() after track views are created.
+
+        private sealed class PropAccessor
+        {
+            public readonly Func<Keyframes.KfValue> Capture;
+            public readonly Action<Keyframes.KfValue> Apply;
+            public readonly Func<Keyframes.KfValue, Keyframes.KfValue, double, Keyframes.KfInterpolation, Keyframes.KfValue> Interp;
+            public readonly bool NeedsRebuild;
+            /// <summary>Enum/bool props that must step (never blend) regardless of the keyframe's mode.</summary>
+            public readonly bool AlwaysHold;
+
+            PropAccessor(Func<Keyframes.KfValue> capture, Action<Keyframes.KfValue> apply,
+                         Func<Keyframes.KfValue, Keyframes.KfValue, double, Keyframes.KfInterpolation, Keyframes.KfValue> interp,
+                         bool needsRebuild = false, bool alwaysHold = false)
+            { Capture = capture; Apply = apply; Interp = interp; NeedsRebuild = needsRebuild; AlwaysHold = alwaysHold; }
+
+            /// <summary>Factory for a scalar (double) property.  <paramref name="logScale"/> interpolates in log2 space.</summary>
+            public static PropAccessor Scalar(Func<double> get, Action<double> set,
+                                              bool logScale = false, bool needsRebuild = false, bool alwaysHold = false)
+                => new PropAccessor(
+                    () => new Keyframes.ScalarKfValue(get()),
+                    v => set(((Keyframes.ScalarKfValue)v).V),
+                    (a, b, t, mode) => new Keyframes.ScalarKfValue(
+                        Keyframes.PropertyKeyframeTrack.InterpolateValue(
+                            ((Keyframes.ScalarKfValue)a).V, ((Keyframes.ScalarKfValue)b).V, t, mode, logScale)),
+                    needsRebuild, alwaysHold);
+
+            /// <summary>Factory for an RGBA color property.  Always interpolated per-channel.</summary>
+            public static PropAccessor Color(Func<Microsoft.Xna.Framework.Color> get,
+                                             Action<Microsoft.Xna.Framework.Color> set,
+                                             bool alwaysHold = false)
+                => new PropAccessor(
+                    () => new Keyframes.ColorKfValue(get()),
+                    v => set(((Keyframes.ColorKfValue)v).C),
+                    (a, b, t, mode) => Keyframes.ColorKfValue.Lerp(
+                        (Keyframes.ColorKfValue)a, (Keyframes.ColorKfValue)b, t, mode),
+                    false, alwaysHold);
+
+            /// <summary>
+            /// Factory for a camera (pos + orientation quaternion + FOV) property.
+            /// Apply mutates the Camera object in-place (it is a reference type).
+            /// </summary>
+            public static PropAccessor Camera(Func<VisualMusic.Camera> get)
+                => new PropAccessor(
+                    () => { var c = get(); return new Keyframes.CameraKfValue(c.Pos, c.Orientation, c.Fov); },
+                    v => { var c = get(); var cv = (Keyframes.CameraKfValue)v; c.Pos = cv.Pos; c.Orientation = cv.Orientation; c.Fov = cv.Fov; },
+                    (a, b, t, mode) => Keyframes.CameraKfValue.Interpolate(
+                        (Keyframes.CameraKfValue)a, (Keyframes.CameraKfValue)b, t, mode));
+
+            /// <summary>
+            /// Factory for a string (path) property. The value itself is not blended — interpolation
+            /// returns <paramref name="b"/> for Smooth/Linear (the renderer drives the visual crossfade)
+            /// and <paramref name="a"/> for Hold (snap/hard-cut).
+            /// </summary>
+            public static PropAccessor StringHold(Func<string> get, Action<string> set,
+                                                  bool alwaysHold = false)
+                => new PropAccessor(
+                    () => new Keyframes.StringKfValue(get()),
+                    v => set(((Keyframes.StringKfValue)v).S),
+                    (a, b, t, mode) => mode == Keyframes.KfInterpolation.Hold ? a : b,
+                    alwaysHold: alwaysHold);
+
+            /// <summary>Factory for a bool property. Bool keyframes always step instead of blending.</summary>
+            public static PropAccessor Bool(Func<bool?> get, Action<bool> set,
+                                            bool needsRebuild = false)
+                => Scalar(
+                    () => get() == true ? 1.0 : 0.0,
+                    v => set(v >= 0.5),
+                    needsRebuild: needsRebuild,
+                    alwaysHold: true);
+        }
+
+        readonly Dictionary<string, PropAccessor> _propAccessors = new Dictionary<string, PropAccessor>();
+
+        // ---- Static mod-property table (name → factory that creates a bound PropAccessor for a given entry) ----
+        // Evaluated once per class (not per project instance) so it's cheap.
+
+        static readonly Dictionary<string, Func<NoteStyleMod, PropAccessor>> _modPropTable =
+            new Dictionary<string, Func<NoteStyleMod, PropAccessor>>
+            {
+                ["ModXOrigin"] = m => PropAccessor.Scalar(() => m.XOrigin ?? 0.5f, v => m.XOrigin = (float)v),
+                ["ModYOrigin"] = m => PropAccessor.Scalar(() => m.YOrigin ?? 0.5f, v => m.YOrigin = (float)v),
+                ["ModStart"] = m => PropAccessor.Scalar(() => m.Start ?? 0f, v => m.Start = (float)v),
+                ["ModStop"] = m => PropAccessor.Scalar(() => m.Stop ?? 1f, v => m.Stop = (float)v),
+                ["ModFadeIn"] = m => PropAccessor.Scalar(() => m.FadeIn ?? 0f, v => m.FadeIn = (float)v),
+                ["ModFadeOut"] = m => PropAccessor.Scalar(() => m.FadeOut ?? 0f, v => m.FadeOut = (float)v),
+                ["ModPower"] = m => PropAccessor.Scalar(() => m.Power ?? 1f, v => m.Power = (float)v),
+                ["ModAngleDest"] = m => PropAccessor.Scalar(() => m.AngleDest ?? 45, v => m.AngleDest = (int)Math.Round(v)),
+                ["ModCombineIndex"] = m => PropAccessor.Scalar(() => m.CombineXY ?? 0, v => m.CombineXY = (int)Math.Round(v), alwaysHold: true),
+                ["ModColorDest"] = m => PropAccessor.Color(
+                    () => m.ColorDest ?? Microsoft.Xna.Framework.Color.White,
+                    c => m.ColorDest = c),
+                ["ModXOriginEnable"] = m => PropAccessor.Scalar(() => m.XOriginEnable == true ? 1.0 : 0.0, v => m.XOriginEnable = v >= 0.5, alwaysHold: true),
+                ["ModYOriginEnable"] = m => PropAccessor.Scalar(() => m.YOriginEnable == true ? 1.0 : 0.0, v => m.YOriginEnable = v >= 0.5, alwaysHold: true),
+                ["ModSquareAspect"] = m => PropAccessor.Scalar(() => m.SquareAspect == true ? 1.0 : 0.0, v => m.SquareAspect = v >= 0.5, alwaysHold: true),
+                ["ModColorDestEnable"] = m => PropAccessor.Scalar(() => m.ColorDestEnable == true ? 1.0 : 0.0, v => m.ColorDestEnable = v >= 0.5, alwaysHold: true),
+                ["ModAngleDestEnable"] = m => PropAccessor.Scalar(() => m.AngleDestEnable == true ? 1.0 : 0.0, v => m.AngleDestEnable = v >= 0.5, alwaysHold: true),
+                ["ModDiscardAfterStop"] = m => PropAccessor.Scalar(() => m.DiscardAfterStop == true ? 1.0 : 0.0, v => m.DiscardAfterStop = v >= 0.5, alwaysHold: true),
+                ["ModInvert"] = m => PropAccessor.Scalar(() => m.Invert == true ? 1.0 : 0.0, v => m.Invert = v >= 0.5, alwaysHold: true),
+            };
+
+        // ---- Fields ----
+
+        public Keyframes.KeyframeSet PropertyKeyframes = new Keyframes.KeyframeSet();
+        ProjProps _props = new ProjProps();
         public ProjProps Props
         {
-            get => props;
+            get => _props;
             set
             {
-                props = value;
-                props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
+                _props = value;
+                _props.OnPlaybackOffsetSChanged = OnPlaybackOffsetSChanged;
                 Props.OnPlaybackOffsetSChanged();
             }
         }
-        SongPanel SongPanel => Form1.SongPanel;
+        static ISongDrawHost s_drawHostOverride;
+        public static void SetDrawHost(ISongDrawHost host) => s_drawHostOverride = host;
+        public static ISongDrawHost StaticDrawHost => s_drawHostOverride;
+        ISongDrawHost DrawHost => StaticDrawHost;
 
-        TimeSpan pbStartSysTime = new TimeSpan(0);
-        double pbStartSongTimeS;
-        public float ViewWidthT => notes == null ? 0 : Props.ViewWidthQn * notes.TicksPerBeat; //Number of ticks that fits on screen
-        float vertViewWidthQn;
-        public float ViewWidthQnScale => vertViewWidthQn / Props.ViewWidthQn;
+        TimeSpan _pbStartSysTime = new TimeSpan(0);
+        double _pbStartSongTimeS;
+        public float ViewWidthT => _notes == null ? 0 : Props.ViewWidthQn * _notes.TicksPerBeat; //Number of ticks that fits on screen
+        float _vertViewWidthQn;
+        public float ViewWidthQnScale => _vertViewWidthQn / Props.ViewWidthQn;
 
         public ImportOptions ImportOptions { get; set; }
 
-        List<TrackView> trackViews;
+        List<TrackView> _trackViews;
         public List<TrackView> TrackViews
         {
-            get { return trackViews; }
+            get { return _trackViews; }
             set
             {
-                foreach (var tv in trackViews)
-                    tv.OcTree?.Dispose();
-                trackViews = value;
+                foreach (var tv in _trackViews)
+                    tv.Geo?.Dispose();
+                _trackViews = value;
             }
         }
 
-        int firstTempoEvent = 0;
+        int _firstTempoEvent = 0;
 
         //Current playback position to seek from
-        int pbTempoEvent = 0;
-        double pbTimeT = 0;
-        double pbTimeS = 0;
+        int _pbTempoEvent = 0;
+        double _pbTimeT = 0;
+        double _pbTimeS = 0;
 
         //public Camera DefaultCamera { get; } = new Camera();
         //----------------------------------------------------
 
         public TrackProps GlobalTrackProps
         {
-            get { return trackViews[0].TrackProps; }
-            set { trackViews[0].TrackProps = value; }
+            get { return _trackViews[0].TrackProps; }
+            set { _trackViews[0].TrackProps = value; }
         }
 
-        Midi.Song notes;
+        Midi.Song _notes;
         public Midi.Song Notes
         {
-            get => notes;
-            set => notes = value;
+            get => _notes;
+            set => _notes = value;
         }
 
-        public double SongLengthT => (notes != null ? notes.SongLengthT : 0) + playbackOffsetT; //Song length in ticks
+        public double SongLengthT => (_notes != null ? _notes.SongLengthT : 0) + _playbackOffsetT; //Song length in ticks
         public double SongLengthS { get; private set; }
-        public double SongPosT => (int)(normSongPos * SongLengthT); //Current song position in ticks
+        public double SongPosT => (int)(_normSongPos * SongLengthT); //Current song position in ticks
         public double SongPosB => (float)SongPosT / Notes.TicksPerBeat; //Current song position in beats
-        public float SongPosP => getScreenPosX(SongPosT); //Current song position in pixels
-        public double SongPosS => normSongPosToSeconds(normSongPos); //Current song position in seconds
-        double normSongPos; //Song position normalized to [0,1]
+        public float SongPosP => GetScreenPosX(SongPosT); //Current song position in pixels
+        public double SongPosS => NormSongPosToSeconds(_normSongPos); //Current song position in seconds
+        double _normSongPos; //Song position normalized to [0,1]
         public double NormSongPos
         {
-            get => normSongPos;
+            get => _normSongPos;
             set
             {
-                if (normSongPos != value)
+                if (_normSongPos != value)
                 {
-                    normSongPos = value;
-                    normSongPos = Math.Max(0, normSongPos);
-                    normSongPos = Math.Min(1, normSongPos);
-                    //SongPanel.paint();
-                    SongPanel.Invalidate();
-                    if (SongPanel.OnSongPosChanged != null)
-                        SongPanel.OnSongPosChanged();
+                    _normSongPos = value;
+                    _normSongPos = Math.Max(0, _normSongPos);
+                    _normSongPos = Math.Min(1, _normSongPos);
+                    DrawHost?.Invalidate();
+                    DrawHost?.NotifySongPosChanged();
                 }
             }
         }
-        float playbackOffsetT = 0;
-        public float PlaybackOffsetT => playbackOffsetT;
-        public float PlaybackOffsetP => getScreenPosX(playbackOffsetT);
+        float _playbackOffsetT = 0;
+        public float PlaybackOffsetT => _playbackOffsetT;
+        public float PlaybackOffsetP => GetScreenPosX(_playbackOffsetT);
 
-        bool isPlaying;
+        bool _isPlaying;
         public bool IsPlaying
         {
-            get => isPlaying;
+            get => _isPlaying;
             private set
             {
-                isPlaying = value;
+                _isPlaying = value;
                 if (!value)
                     AudioHasStarted = false;
             }
         }
-        bool tempPausing;
+        bool _tempPausing;
         public bool AudioHasStarted { get; set; }
 
         public Project()
         {
-            KeyFrames = new KeyFrames();
-            Props.ViewWidthQn = KeyFrames[0].ProjProps.ViewWidthQn;
-            Props.OnPlaybackOffsetSChanged = onPlaybackOffsetSChanged;
+            Props.ViewWidthQn = ProjProps.DefaultViewWidthQn;
+            Props.OnPlaybackOffsetSChanged = OnPlaybackOffsetSChanged;
         }
 
-
-        async public Task loadContent(Form parentForm)
+        async public Task LoadContent()
         {
             if (ImportOptions == null)
                 return;
 
-            ImportOptions.setNotePath();
+            ImportOptions.SetNotePath();
             ImportOptions.EraseCurrent = false;
-            await ImportSong(ImportOptions, parentForm);
+            await ImportSong(ImportOptions);
+        }
+
+        public void NudgeSongPos(float stepFraction)
+        {
+            if (Notes == null) return;
+            float newPos = (float)(NormSongPos - (double)ViewWidthT * stepFraction / SongLengthT);
+            NormSongPos = Math.Max(0, Math.Min(1, newPos));
         }
 
         public Project(SerializationInfo info, StreamingContext ctxt) : this()
@@ -148,11 +256,11 @@ namespace VisualMusic
                     ImportOptions = (ImportOptions)entry.Value;
                 else if (entry.Name == "trackViews")
                 {
-                    trackViews = (List<TrackView>)entry.Value;
+                    _trackViews = (List<TrackView>)entry.Value;
                     TrackView.NumTracks = TrackViews.Count;
-                    for (int i = 0; i < trackViews.Count; i++)
+                    for (int i = 0; i < _trackViews.Count; i++)
                     {
-                        var tv = trackViews[i];
+                        var tv = _trackViews[i];
                         tv.TrackProps.TrackView = tv;
                         tv.TrackProps.GlobalProps = TrackViews[0].TrackProps;
                         if (i > 0)
@@ -162,18 +270,18 @@ namespace VisualMusic
                     }
                 }
 
-                else if (entry.Name == "keyFrames")
-                    KeyFrames = (KeyFrames)entry.Value;
+                else if (entry.Name == "propertyKeyframes")
+                    PropertyKeyframes = (Keyframes.KeyframeSet)entry.Value ?? PropertyKeyframes;
                 else if (entry.Name == "props")
                     Props = (ProjProps)entry.Value;
                 else if (entry.Name == "vertWidthQn")
-                    vertViewWidthQn = (float)entry.Value;
+                    _vertViewWidthQn = (float)entry.Value;
 
                 //Compatibility
                 else if (entry.Name == "qn_viewWidth")
                 {
                     Props.ViewWidthQn = (float)entry.Value;
-                    vertViewWidthQn = Props.ViewWidthQn;
+                    _vertViewWidthQn = Props.ViewWidthQn;
                 }
                 else if (entry.Name == "audioOffset")
                     Props.AudioOffset = (double)entry.Value;
@@ -186,7 +294,7 @@ namespace VisualMusic
                 else if (entry.Name == "minPitch")
                     Props.MinPitch = (int)entry.Value;
                 else if (entry.Name == "camera")
-                    KeyFrames[0].ProjProps.Camera = (Camera)entry.Value;
+                    Props.Camera = (Camera)entry.Value;
                 else if (entry.Name == "userViewWidth")
                     Props.UserViewWidth = (float)entry.Value;
             }
@@ -196,20 +304,20 @@ namespace VisualMusic
         {
             info.AddValue("version", SongFormat.writeVersion);
             info.AddValue("importOptions", ImportOptions);
-            info.AddValue("trackViews", trackViews);
-            info.AddValue("keyFrames", KeyFrames);
+            info.AddValue("trackViews", _trackViews);
+            info.AddValue("propertyKeyframes", PropertyKeyframes);
             info.AddValue("props", Props);
-            info.AddValue("vertWidthQn", vertViewWidthQn);
+            info.AddValue("vertWidthQn", _vertViewWidthQn);
         }
 
-        async public Task<bool> ImportSong(ImportOptions options, Form parentForm)
+        async public Task<bool> ImportSong(ImportOptions options)
         { //`Open project` and `import files` meet here
             options.CheckSourceFile();
             //Convert mod/sid files to mid/wav
-            if (options.NoteFileType != Midi.FileType.Midi)
+            if (options.NoteFileType != FileType.Midi)
             {
                 string noteFile = Path.GetFileName(options.NotePath);
-                string midiPath = null, midiArg = null, audioPath = null, audioArg = null;
+                string midiPath = null, midiArg = null, generatedAudioPath = null, audioArg = null;
 
                 //Should midi file be created?
                 if (!options.SavedMidi)
@@ -221,15 +329,13 @@ namespace VisualMusic
                 else
                     midiPath = options.MidiOutputPath;
 
-                //Should audio file be created?
-                if (options.MixdownType == Midi.MixdownType.Internal)
+                // Generate audio unless the user supplied a separate audio file.
+                if (!options.HasSuppliedAudio)
                 {
-                    audioPath = Path.Combine(Program.TempDir, noteFile) + ".wav";
-                    audioArg = $"-a\"{audioPath}\"";
-                    File.Delete(audioPath);
+                    generatedAudioPath = Path.Combine(Program.TempDir, noteFile) + ".wav";
+                    audioArg = $"-a\"{generatedAudioPath}\"";
+                    File.Delete(generatedAudioPath);
                 }
-                else if (options.MixdownType == Midi.MixdownType.None)
-                    audioPath = options.AudioPath;
 
                 //Does either midi or audio need to be created?
                 if (midiArg != null || audioArg != null)
@@ -240,80 +346,54 @@ namespace VisualMusic
                     string supressErrorFlag = "-e";
                     string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag} {supressErrorFlag}";
                     var workingDir = Path.Combine(Program.Dir, "remuxer");
-                    var startInfo = new ProcessStartInfo(Path.Combine(workingDir, "remuxer.exe"), cmdLine);
-                    startInfo.WorkingDirectory = workingDir;
-                    var process = Process.Start(startInfo);
-                    Form1.RemuxerProcess = process;
-                    parentForm.Enabled = false;
-                    try
+                    var startInfo = new ProcessStartInfo(Path.Combine(workingDir, "remuxer.exe"), cmdLine)
                     {
-                        FormWindowState initialWindowState = Program.form1.WindowState;
-                        await Task.Run(() =>
-                        {
-                            //Minimize parent form when process form is minimized,
-                            //and restore parent form when process form is restored
-                            //Process form also needs to be restored if parent form is restored, which is done in Form1.Form1_Activated event handler
-                            bool wasMinimized = false;
-                            while (!process.HasExited)
-                            {
-                                bool isMinimized = IsIconic(process.MainWindowHandle);
-                                if (isMinimized && !wasMinimized)
-                                    Program.form1.Invoke(new Action(() => Program.form1.WindowState = FormWindowState.Minimized));
-                                else if (!isMinimized && wasMinimized)
-                                {
-                                    Program.form1.Invoke(new Action(() => Program.form1.WindowState = initialWindowState));
-                                    Form1.regainFocus(process); //Prevent parentForm to steal focus from process when its initial window state is restored
-                                }
-                                wasMinimized = isMinimized;
-                                Thread.Sleep(200); //Free cpu cycles
-                            }
-                        });
-                    }
-                    finally
-                    {
-                        parentForm.Enabled = true;
-                        Program.form1.Activate();
-                    }
+                        WorkingDirectory = workingDir,
+                    };
+                    using var process = Process.Start(startInfo)
+                        ?? throw new IOException("Couldn't start remuxer.");
+                    await process.WaitForExitAsync();
                     if (process.ExitCode != 0)
                         throw new FileImportException(null, ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
 
-                    if (!File.Exists(midiPath) && !File.Exists(audioPath))
+                    if (!File.Exists(midiPath) && !File.Exists(generatedAudioPath))
                         return false;
                 }
                 options.MidiOutputPath = midiPath;
-                options.AudioPath = audioPath;
+                options.GeneratedAudioPath = generatedAudioPath;
             }
-            else if (options.MixdownType == Midi.MixdownType.Internal)
+            else if (!options.HasSuppliedAudio)
             {
                 string audioPath = Path.Combine(Program.TempDir, Path.GetFileName(options.NotePath)) + ".wav";
-                MidMix.mixdown(options.NotePath, audioPath);
-                options.AudioPath = audioPath;
+                MidMix.Mixdown(options.NotePath, audioPath);
+                options.GeneratedAudioPath = audioPath;
             }
 
-            OpenNoteFile(options);
+            bool resetProject = options.EraseCurrent || (_notes == null && (_trackViews == null || _trackViews.Count == 0));
+
+            OpenNoteFile(options, resetProject);
             OpenAudioFile(options);
 
             ImportOptions = options;
-            if (options.EraseCurrent)
+            if (resetProject)
             {
                 DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + "." + DefaultFileExt;
-                Props.ViewWidthQn = vertViewWidthQn = ProjProps.DefaultViewWidthQn;
+                Props.ViewWidthQn = _vertViewWidthQn = ProjProps.DefaultViewWidthQn;
             }
-            CreateTrackViews(notes.Tracks.Count, options.EraseCurrent);
+            CreateTrackViews(_notes.Tracks.Count, resetProject);
+            InitPropertyAccessors();
             return true;
         }
 
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool IsIconic(IntPtr hWnd);
-
-        public bool OpenNoteFile(ImportOptions options)
+        public bool OpenNoteFile(ImportOptions options, bool? resetProjectOverride = null)
         {
-            SongPanel.Invalidate();
-            stopPlayback();
-            pbTempoEvent = 0;
-            pbTimeT = 0;
-            pbTimeS = 0;
+            bool resetProject = resetProjectOverride ?? options.EraseCurrent;
+
+            DrawHost?.Invalidate();
+            StopPlayback();
+            _pbTempoEvent = 0;
+            _pbTimeT = 0;
+            _pbTimeS = 0;
 
             Midi.Song newNotes = new Midi.Song();
             string path = options.MidiOutputPath;
@@ -326,7 +406,7 @@ namespace VisualMusic
 
             try
             {
-                newNotes.openFile(path);
+                newNotes.OpenFile(path);
             }
             catch (FileFormatException ex)
             {
@@ -335,57 +415,80 @@ namespace VisualMusic
             if (newNotes.Tracks == null || newNotes.Tracks.Count == 0 || newNotes.SongLengthT == 0)
                 throw new FileImportException("No notes found.", ImportError.Corrupt, ImportFileType.Note, errorPath);
 
-            notes = newNotes;
-            notes.createNoteBsp();
+            _notes = newNotes;
+            if (options.NoteFileType == FileType.Midi && !options.InsTrack)
+                SplitTracksByChannel(_notes);
+            _notes.CreateNoteBsp();
 
-            if (options.EraseCurrent)
+            if (resetProject)
             {
-                KeyFrames = new KeyFrames();
+                PropertyKeyframes = new Keyframes.KeyframeSet();
+                Props.LyricsSegments.Clear();
+                Keyframes.KeyframeService.RaiseKeyframesChanged();
                 Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
                 NormSongPos = 0;
-                resetPitchLimits();
+                ResetPitchLimits();
             }
             //viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
             return true;
         }
 
-        public void interpolateFrames()
-        {
-            var interpolatedFrame = KeyFrames.createInterpolatedFrame((int)SongPosT);
-            Props.ViewWidthQn = interpolatedFrame.ProjProps.ViewWidthQn;
-            Props.Camera = interpolatedFrame.ProjProps.Camera;
-            Props.BackgroundImageOpacity = interpolatedFrame.ProjProps.BackgroundImageOpacity;
-            props.BackgroundImageSaturation = interpolatedFrame.ProjProps.BackgroundImageSaturation;
-            //Props = interpolatedFrame.ProjProps;
-        }
-
         public void OpenAudioFile(ImportOptions options)
         {
-            Media.closeAudioFile();
-            string file = options.AudioPath;
-
-            //Third-party mixdown needed?
-            if (options.MixdownType == Midi.MixdownType.Tparty)
-                file = ImportNotesWithAudioForm.runTpartyProcess(options);
+            Media.CloseAudioFile();
+            string file = options.HasSuppliedAudio ? options.AudioPath : options.GeneratedAudioPath;
 
             if (string.IsNullOrWhiteSpace(file))
                 return;
 
-            if (!Media.openAudioFile(file))
+            if (!Media.OpenAudioFile(file))
                 throw new IOException("Unexpected error while opening audio file:\r\n" + file);
 
-            if (notes != null)
-                notes.SongLengthT = (int)secondsToTicks((float)(Media.getAudioLength() + Props.AudioOffset));
+            if (_notes != null)
+                _notes.SongLengthT = (int)SecondsToTicks((float)(Media.GetAudioLength() + Props.AudioOffset));
             AudioFilePath = file;
         }
 
-        public void resetPitchLimits()
+        /// <summary>
+        /// Regroup all MIDI notes by channel so each MIDI channel becomes its own app track.
+        /// Track 0 is left empty (the global/master track — <see cref="CreateTrackViews"/> starts
+        /// assigning visuals from index 1 and <see cref="AddTrackView"/> sets GlobalProps from
+        /// Tracks[0], mirroring the MOD/SID Remuxer convention).
+        /// </summary>
+        static void SplitTracksByChannel(Midi.Song song)
+        {
+            var byChannel = new SortedDictionary<int, List<Midi.Note>>();
+            foreach (var track in song.Tracks)
+                foreach (var note in track.Notes)
+                {
+                    if (!byChannel.TryGetValue(note.channel, out var list))
+                        byChannel[note.channel] = list = new List<Midi.Note>();
+                    list.Add(note);
+                }
+
+            // Index 0: empty global/master track (not rendered)
+            var newTracks = new List<Midi.Track> { new Midi.Track { Length = song.SongLengthT } };
+            foreach (var kv in byChannel)
+            {
+                var t = new Midi.Track
+                {
+                    Length = song.SongLengthT,
+                    Name = $"Channel {kv.Key + 1}"
+                };
+                kv.Value.Sort((a, b) => a.start.CompareTo(b.start));
+                t.Notes = kv.Value;
+                newTracks.Add(t);
+            }
+            song.Tracks = newTracks;
+        }
+
+        public void ResetPitchLimits()
         {
             Props.MaxPitch = Notes.MaxPitch;
             Props.MinPitch = Notes.MinPitch;
         }
 
-        public void showNoteInfo(GdiPoint location)
+        public void ShowNoteInfo(GdiPoint location)
         {
             //if (noteMap != null)
             //{
@@ -415,135 +518,150 @@ namespace VisualMusic
         {
             TrackView.NumTracks = numTracks;
             int startTrack; //At which index to start creating new (default) track props
-            if (eraseCurrent || trackViews == null)
+            if (eraseCurrent || _trackViews == null)
             {
                 startTrack = 0;
-                trackViews = new List<TrackView>(numTracks);
-                SongPanel.WaveformPanel.ClearChannels();
+                _trackViews = new List<TrackView>(numTracks);
+                DrawHost?.WaveformPanel?.ClearChannels();
             }
             else
             {
-                startTrack = trackViews.Count; //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props at current song's track count and up.
+                startTrack = _trackViews.Count; //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props at current song's track count and up.
             }
 
-            for (int i = 0; i < trackViews.Count; i++)
+            for (int i = 0; i < _trackViews.Count; i++)
             {
                 //No need to update visual props
                 // Update notes
 
-                if (trackViews[i].TrackNumber >= notes.Tracks.Count) //The new note file has fewer tracks than the currently loaded
+                if (_trackViews[i].TrackNumber >= _notes.Tracks.Count) //The new note file has fewer tracks than the currently loaded
                 {
-                    SongPanel.WaveformPanel.RemoveChannel(trackViews[i].TrackProps.AudioProps.SidWizChannel);
+                    DrawHost?.WaveformPanel?.RemoveChannel(_trackViews[i].TrackProps.AudioProps.SidWizChannel);
                     continue;
                 }
 
                 // Update note information
-                trackViews[i].MidiTrack = notes.Tracks[trackViews[i].TrackNumber];
-                trackViews[i].createCurve();
-                
+                _trackViews[i].MidiTrack = _notes.Tracks[_trackViews[i].TrackNumber];
+                _trackViews[i].CreateCurve();
+
                 // If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
-                trackViews[i].TrackProps.StyleProps.LoadFx();
+                _trackViews[i].TrackProps.StyleProps.LoadFx();
             }
             for (int i = startTrack; i < numTracks; i++)
             {
                 //New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
-                TrackView view = new TrackView(i, numTracks, notes);
+                TrackView view = new TrackView(i, numTracks, _notes);
                 AddTrackView(view);
             }
             //if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
             //trackViews.RemoveRange(numTracks, startTrack - numTracks);
             List<TrackView> tvCopy = new List<TrackView>();
-            for (int i = 0; i < trackViews.Count; i++)
+            for (int i = 0; i < _trackViews.Count; i++)
             {
-                if (trackViews[i].TrackNumber < numTracks)
-                    tvCopy.Add(trackViews[i]);
+                if (_trackViews[i].TrackNumber < numTracks)
+                    tvCopy.Add(_trackViews[i]);
             }
-            trackViews = tvCopy;
-            createOcTrees(false);
+            _trackViews = tvCopy;
+            CreateGeos(false);
         }
 
         void AddTrackView(TrackView view)
         {
-            trackViews.Add(view);
+            _trackViews.Add(view);
             view.TrackProps.GlobalProps = TrackViews[0].TrackProps;
             view.TrackProps.AudioProps.LineColor = view.TrackProps.MaterialProps.GetSysColor(true, view.TrackProps.GlobalProps.MaterialProps);
             view.TrackProps.AudioProps.SidWizChannel.Filename = "";
-            SongPanel.WaveformPanel.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
+            DrawHost?.WaveformPanel?.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
             if (view.TrackNumber == 1)
                 view.TrackProps.AudioProps.SidWizChannel.LoadDataAsync();
         }
 
-        public void createOcTrees(bool resetVertScale = true)
+        public void CreateGeos(bool resetVertScale = true)
         {
-            if (trackViews == null || Props.ViewWidthQn == 0 || Notes == null)
+            if (_trackViews == null || Props.ViewWidthQn == 0 || Notes == null)
                 return;
             float viewWidthQnBackup = Props.ViewWidthQn;
             if (resetVertScale)
-                vertViewWidthQn = Props.ViewWidthQn;
+                _vertViewWidthQn = Props.ViewWidthQn;
             else
-                Props.ViewWidthQn = vertViewWidthQn;
-            for (int i = 1; i < trackViews.Count; i++)
-                TrackViews[i].createOcTree(this, GlobalTrackProps);
+                Props.ViewWidthQn = _vertViewWidthQn;
+            for (int i = 1; i < _trackViews.Count; i++)
+                TrackViews[i].CreateGeo(this, GlobalTrackProps);
             Props.ViewWidthQn = viewWidthQnBackup;
         }
 
-        public void drawSong()
+        public void DrawSong()
         {
-            SongPanel.DrawBackground();
+            var host = DrawHost;
+            if (host == null) return;
 
-            if (notes == null || trackViews == null)
+            host.DrawBackground();
+
+            if (_notes == null || _trackViews == null)
                 return;
 
-            SongPanel.InitFrame();
-            DepthStencilState oldDss = SongPanel.GraphicsDevice.DepthStencilState;
+            host.InitFrame();
+            DepthStencilState oldDss = host.GraphicsDevice.DepthStencilState;
             DepthStencilState dss = new DepthStencilState();
             dss.StencilEnable = true;
             dss.StencilFunction = CompareFunction.Greater;
             dss.StencilPass = StencilOperation.Replace;
             dss.ReferenceStencil = 1;
-            SongPanel.GraphicsDevice.DepthStencilState = dss;
-            for (int t = 1; t < trackViews.Count; t++)
+            host.GraphicsDevice.DepthStencilState = dss;
+            for (int t = 1; t < _trackViews.Count; t++)
             {
-                SongPanel.GraphicsDevice.Clear(ClearOptions.Stencil | ClearOptions.DepthBuffer, Color.AliceBlue, 1, 0);
-                trackViews[t].drawTrack(GlobalTrackProps, SongPanel.ForceDefaultNoteStyle);
+                host.GraphicsDevice.Clear(ClearOptions.Stencil | ClearOptions.DepthBuffer, Color.AliceBlue, 1, 0);
+                _trackViews[t].DrawTrack(GlobalTrackProps, host.ForceDefaultNoteStyle);
             }
-            SongPanel.GraphicsDevice.DepthStencilState = oldDss;
+            host.GraphicsDevice.DepthStencilState = oldDss;
 
-            var effect = new BasicEffect(SongPanel.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                VertexColorEnabled = true,
-            };
-            Viewport viewport = SongPanel.GraphicsDevice.Viewport;
-            //effect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
-            effect.Projection = Props.Camera.ProjMat;
-            effect.View = Matrix.CreateTranslation(new Vector3(0, 0, -Props.Camera.ProjMat.M11 / 2));
-            Vector2 songPanelSize = new Vector2(SongPanel.ClientRectangle.Width, SongPanel.ClientRectangle.Height);
-            Vector2 scale = new Vector2(Props.Camera.ViewportSize.X / songPanelSize.X, -Props.Camera.ViewportSize.Y / songPanelSize.Y);
-
-            SongPanel.SpriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, RasterizerState.CullNone, effect, null);
-            foreach (var lyricsSegment in Props.LyricsSegments)
-            {
-                if (string.IsNullOrWhiteSpace(lyricsSegment.Lyrics))
-                    continue;
-                float textHeight = -SongPanel.LyricsFont.MeasureString(lyricsSegment.Lyrics).Y * scale.Y;
-                SongPanel.SpriteBatch.DrawString(SongPanel.LyricsFont, lyricsSegment.Lyrics, new Vector2(-SongPosP + getScreenPosX(secondsToTicks(lyricsSegment.Time) + PlaybackOffsetT), -Props.Camera.ViewportSize.Y / 2 + textHeight), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-            }
-
-            SongPanel.SpriteBatch.End();
-            SongPanel.WaveformPanel.Draw(SongPosS - Props.PlaybackOffsetS);
+            DrawLyrics(host);
+            host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS);
         }
 
-        public int screenPosToSongPos(float normScreenPos)
+        void DrawLyrics(ISongDrawHost host)
+        {
+            if (Props.LyricsSegments.Count == 0 || ViewWidthT <= 0 || host.LyricsFont == null)
+                return;
+
+            var viewport = host.GraphicsDevice.Viewport;
+            float width = Math.Max(1, viewport.Width);
+            float height = Math.Max(1, viewport.Height);
+            var oldDepth = host.GraphicsDevice.DepthStencilState;
+
+            host.GraphicsDevice.DepthStencilState = DepthStencilState.None;
+            host.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+
+            foreach (var lyricsSegment in Props.LyricsSegments)
+            {
+                string lyrics = lyricsSegment.Lyrics;
+                if (string.IsNullOrWhiteSpace(lyrics))
+                    continue;
+
+                double tick = LyricsBeatToTimelineTick(lyricsSegment.Beat);
+                float x = (float)(width * 0.5 + (tick - SongPosT) / ViewWidthT * width);
+                Vector2 size = host.LyricsFont.MeasureString(lyrics);
+                if (x > width || x + size.X < 0)
+                    continue;
+
+                float y = Math.Max(0, height - size.Y - 4);
+                host.SpriteBatch.DrawString(host.LyricsFont, lyrics, new Vector2(x, y), Color.White);
+            }
+
+            host.SpriteBatch.End();
+            host.GraphicsDevice.DepthStencilState = oldDepth;
+        }
+
+        public int ScreenPosToSongPos(float normScreenPos)
         {
             return (int)(NormSongPos * SongLengthT + (double)normScreenPos * ViewWidthT * 0.5f);
         }
-        Point getVisibleSongPortionT(double normPos)
+        Point GetVisibleSongPortionT(double normPos)
         {
             double posT = normPos * SongLengthT;
             return new Point((int)(posT - ViewWidthT), (int)(posT + ViewWidthT));
         }
-        public int getPitch(float normPosY)
+        public int GetPitch(float normPosY)
         {
             normPosY = 1 - normPosY;
             float height = 1 - ProjProps.NormPitchMargin * 2;
@@ -551,23 +669,20 @@ namespace VisualMusic
             float pos = normPosY - ProjProps.NormPitchMargin;
             return Props.MinPitch + (int)(pos / noteHeight);
         }
-        public TrackProps mergeTrackProps(ListView.SelectedIndexCollection listIndices)
+        public TrackProps MergeTrackProps(IEnumerable<int> indices)
         {
-            if (listIndices.Count == 0)
-                return null;
-            TrackProps outProps = TrackViews[listIndices[0]].TrackProps;
-            if (listIndices.Count == 1)
-                return outProps;
-            outProps = outProps.clone(SongPanel);
-            // TrackProps.cloneFrom shares the AudioProps reference with the source track.
-            // Detach it here so mergeObjects can null out Filename without corrupting the source.
+            var list = indices.ToList();
+            if (list.Count == 0) return null;
+            TrackProps outProps = TrackViews[list[0]].TrackProps;
+            if (list.Count == 1) return outProps;
+            outProps = outProps.Clone(DrawHost);
             outProps.AudioProps = new AudioProps { Filename = outProps.AudioProps.Filename, LineColor = outProps.AudioProps.LineColor };
-            for (int i = 1; i < listIndices.Count; i++)
-                outProps = (TrackProps)mergeObjects(outProps, TrackViews[listIndices[i]].TrackProps);
+            for (int i = 1; i < list.Count; i++)
+                outProps = (TrackProps)MergeObjects(outProps, TrackViews[list[i]].TrackProps);
             return outProps;
         }
 
-        public object mergeObjects(object first, object second)
+        public object MergeObjects(object first, object second)
         {
             if (first == null || second == null)
                 return null;
@@ -585,7 +700,7 @@ namespace VisualMusic
                     firstValue = propertyInfo.GetValue(first, null);
                     secondValue = propertyInfo.GetValue(second, null);
 
-                    object subMerge = mergeObjects(firstValue, secondValue);
+                    object subMerge = MergeObjects(firstValue, secondValue);
                     propertyInfo.SetValue(first, subMerge);
                     if (propertyInfo.Name == "Type" && subMerge != null && (NoteStyleType)subMerge != NoteStyleType.Default)
                     {
@@ -598,7 +713,7 @@ namespace VisualMusic
                         }
                     }
                     else if (propertyInfo.Name == "SelectedModEntryIndex" && subMerge != null && (int)subMerge != -1)
-                        ((NoteStyle)first).SelectedModEntry = (NoteStyleMod)mergeObjects(((NoteStyle)first).SelectedModEntry, ((NoteStyle)second).SelectedModEntry);
+                        ((NoteStyle)first).SelectedModEntry = (NoteStyleMod)MergeObjects(((NoteStyle)first).SelectedModEntry, ((NoteStyle)second).SelectedModEntry);
                 }
             }
 
@@ -608,116 +723,105 @@ namespace VisualMusic
                 return null;
         }
 
-        public void resetTrackProps(ListView.SelectedIndexCollection indices)
+        public double TicksToSeconds(double ticks)
         {
-            if (indices != null)
+            if (_pbTimeT > ticks)
             {
-                foreach (int index in indices)
-                    trackViews[index].TrackProps.ResetProps();
+                _pbTimeT = _pbTimeS = 0;
+                _pbTempoEvent = _firstTempoEvent;
             }
-            else
-                trackViews[0].TrackProps.ResetProps();
-            createOcTrees();
-        }
+            else if (_pbTimeT == ticks)
+                return _pbTimeS;
 
-        public double ticksToSeconds(double ticks)
-        {
-            if (pbTimeT > ticks)
-            {
-                pbTimeT = pbTimeS = 0;
-                pbTempoEvent = firstTempoEvent;
-            }
-            else if (pbTimeT == ticks)
-                return pbTimeS;
-
-            int nextTempoEvent = pbTempoEvent;
-            while (pbTimeT < ticks)
+            int nextTempoEvent = _pbTempoEvent;
+            while (_pbTimeT < ticks)
             {
                 double nextTimeStepT;
-                double currentBps = notes.TempoEvents[pbTempoEvent].Tempo / 60; //beats per seconds
-                if (pbTempoEvent + 1 >= notes.TempoEvents.Count)
+                double currentBps = _notes.TempoEvents[_pbTempoEvent].Tempo / 60; //beats per seconds
+                if (_pbTempoEvent + 1 >= _notes.TempoEvents.Count)
                     nextTimeStepT = ticks;
                 else
                 {
                     nextTempoEvent++;
-                    nextTimeStepT = notes.TempoEvents[nextTempoEvent].Time + playbackOffsetT;
+                    nextTimeStepT = _notes.TempoEvents[nextTempoEvent].Time + _playbackOffsetT;
                     //if (nextTimeStepT < pbTimeT || nextTimeStepT == pbTimeT && bLastTempoEvent)
                     //	throw new Exception("nextTimeStepT < pbTimeT || nextTimeStepT == pbTimeT && bLastTempoEvent");
                     if (nextTimeStepT > ticks)
                         nextTimeStepT = ticks; //always causes loop to exit
                     else
-                        pbTempoEvent = nextTempoEvent;
+                        _pbTempoEvent = nextTempoEvent;
                 }
-                pbTimeS += (nextTimeStepT - pbTimeT) / (notes.TicksPerBeat * currentBps);
-                pbTimeT = nextTimeStepT;
+                _pbTimeS += (nextTimeStepT - _pbTimeT) / (_notes.TicksPerBeat * currentBps);
+                _pbTimeT = nextTimeStepT;
             }
-            return pbTimeS;
+            return _pbTimeS;
         }
-        double secondsToTicks(double seconds)
+        double SecondsToTicks(double seconds)
         {
-            if (pbTimeS > seconds) //Reset seek position
+            if (_pbTimeS > seconds) //Reset seek position
             {
-                pbTimeS = pbTimeT = 0;
-                pbTempoEvent = firstTempoEvent;
+                _pbTimeS = _pbTimeT = 0;
+                _pbTempoEvent = _firstTempoEvent;
             }
 
-            int nextTempoEvent = pbTempoEvent;
-            while (pbTimeS < seconds)
+            int nextTempoEvent = _pbTempoEvent;
+            while (_pbTimeS < seconds)
             {
                 double nextTimeStepS;
-                double currentBps = notes.TempoEvents[pbTempoEvent].Tempo / 60; //beats per seconds
-                if (pbTempoEvent + 1 >= notes.TempoEvents.Count)
+                double currentBps = _notes.TempoEvents[_pbTempoEvent].Tempo / 60; //beats per seconds
+                if (_pbTempoEvent + 1 >= _notes.TempoEvents.Count)
                     nextTimeStepS = seconds;
                 else
                 {
                     nextTempoEvent++;
-                    double nextTempoTimeS = (notes.TempoEvents[nextTempoEvent].Time + playbackOffsetT - pbTimeT) / (notes.TicksPerBeat * currentBps) + pbTimeS;
+                    double nextTempoTimeS = (_notes.TempoEvents[nextTempoEvent].Time + _playbackOffsetT - _pbTimeT) / (_notes.TicksPerBeat * currentBps) + _pbTimeS;
                     nextTimeStepS = nextTempoTimeS;
                     if (nextTimeStepS > seconds)
                         nextTimeStepS = seconds; //always causes loop to exit
                     else
-                        pbTempoEvent = nextTempoEvent;
+                        _pbTempoEvent = nextTempoEvent;
                 }
-                pbTimeT += (nextTimeStepS - pbTimeS) * currentBps * notes.TicksPerBeat;
-                pbTimeS = nextTimeStepS;
+                _pbTimeT += (nextTimeStepS - _pbTimeS) * currentBps * _notes.TicksPerBeat;
+                _pbTimeS = nextTimeStepS;
             }
-            return pbTimeT;
+            return _pbTimeT;
         }
 
-        public void setSongPosS(double newTimeS, bool updateScreen)
+        public void SetSongPosS(double newTimeS, bool updateScreen)
         {
             double offsetS = 0, offsetT = 0;
             if (Props.PlaybackOffsetS < 0)
             {
                 offsetS = -Props.PlaybackOffsetS;
-                offsetT = -playbackOffsetT;
+                offsetT = -_playbackOffsetT;
             }
-            pbTimeT = secondsToTicks(newTimeS);
-            double newSongPos = pbTimeT / (double)SongLengthT;
+            _pbTimeT = SecondsToTicks(newTimeS);
+            double newSongPos = _pbTimeT / (double)SongLengthT;
             if (updateScreen)
                 NormSongPos = newSongPos;
             else
-                normSongPos = newSongPos;
+                _normSongPos = newSongPos;
         }
 
         //Converts normalized song pos to seconds
         //0 as input returns 0 seconds, 1 returns song length in seconds
-        public double normSongPosToSeconds(double norm)
+        public double NormSongPosToSeconds(double norm)
         {
-            if (notes == null)
+            if (_notes == null)
                 return 0;
 
-            return ticksToSeconds(norm * SongLengthT);
+            return TicksToSeconds(norm * SongLengthT);
         }
 
-        public void update(double deltaTimeS)
+        public void Update(double deltaTimeS)
         {
-            foreach (var keyFrame in KeyFrames.Values)
-            {
-                if (keyFrame.Selected)
-                    keyFrame.ProjProps.Camera.update(deltaTimeS);
-            }
-            interpolateFrames();
+            // Integrate on the live render camera; per-property camera keyframes are synced via SyncLiveCameraEdit.
+            Props.Camera.Update(deltaTimeS);
+            // Only drive property values from the new keyframe model during playback. When stopped the
+            // user authors values directly through the controls (editing pauses playback), so overriding
+            // every frame would fight the slider and prevent capturing a distinct value for a 2nd keyframe.
+            if (IsPlaying)
+                InterpolatePropertyKeyframes();
 
             //Scroll song depending on user input or playback position.
             if (IsPlaying)
@@ -725,27 +829,27 @@ namespace VisualMusic
                 double timeS;
                 if (!AudioHasStarted)
                 {
-                    timeS = (SongPanel.TotalTimeElapsed - pbStartSysTime).TotalSeconds + pbStartSongTimeS;
+                    timeS = ((DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero) - _pbStartSysTime).TotalSeconds + _pbStartSongTimeS;
                     if (timeS > Props.AudioOffset + Props.PlaybackOffsetS)
                     {
                         AudioHasStarted = true;
-                        Media.startPlaybackAtTime(0);
+                        Media.StartPlaybackAtTime(0);
                     }
                 }
                 else
                 {
-                    if (!Media.playbackIsRunning()) //playback reached end of song
+                    if (!Media.PlaybackIsRunning()) //playback reached end of song
                     {
                         IsPlaying = false;
                         timeS = SongPosS;
                     }
                     else
-                        timeS = Media.getPlaybackPos() + Props.AudioOffset + Props.PlaybackOffsetS;
+                        timeS = Media.GetPlaybackPos() + Props.AudioOffset + Props.PlaybackOffsetS;
                 }
 
-                setSongPosS(timeS, true);
+                SetSongPosS(timeS, true);
                 if (NormSongPos > 1)
-                    togglePlayback();
+                    TogglePlayback();
             }
             //else
 
@@ -754,15 +858,16 @@ namespace VisualMusic
             if (NormSongPos > 1)
                 NormSongPos = 1;
         }
-        public void togglePlayback()
+        public void TogglePlayback()
         {
-            if (Media.getAudioLength() == 0 || Camera.MouseRot)
+            // Note: playback may be toggled while mouse-look is active (Ctrl+Space works when locked).
+            if (Media.GetAudioLength() == 0)
                 return;
             IsPlaying = !IsPlaying;
             //bAudioPlayback = !bAudioPlayback;
             if (!IsPlaying)
             {
-                Media.pausePlayback();
+                Media.PausePlayback();
                 //MessageBox.Show("An error occured while pausing playback.");
             }
             else
@@ -771,188 +876,656 @@ namespace VisualMusic
                 double startTime = songPosS - Props.AudioOffset - Props.PlaybackOffsetS;
                 if (startTime >= 0)
                 {
-                    Media.startPlaybackAtTime(startTime);
+                    Media.StartPlaybackAtTime(startTime);
                     //MessageBox.Show("An error occured while starting playback.");
-                    if (!Media.playbackIsRunning()) //Assuming this is because we tried to start playback after end of audio
+                    if (!Media.PlaybackIsRunning()) //Assuming this is because we tried to start playback after end of audio
                         IsPlaying = false;
                     else
                         AudioHasStarted = true;
                 }
                 else
                 {
-                    pbStartSysTime = SongPanel.TotalTimeElapsed;
-                    pbStartSongTimeS = songPosS;
+                    _pbStartSysTime = DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero;
+                    _pbStartSongTimeS = songPosS;
                     AudioHasStarted = false;
                 }
             }
         }
 
-        public void pausePlayback()
+        public void PausePlayback()
         {
-            if (isPlaying)
-                togglePlayback();
+            if (_isPlaying)
+                TogglePlayback();
         }
 
-        public void stopPlayback()
+        public void StopPlayback()
         {
             IsPlaying = false;
             //			bAudioPlayback = false;
-            Media.stopPlayback();
+            Media.StopPlayback();
             // MessageBox.Show("An error occured while stopping playback.");
             NormSongPos = 0;
         }
 
-        public Vector2 getScreenPos(int timeT, int pitch)
+        public Vector2 GetScreenPos(int timeT, int pitch)
         {
             Vector2 p = new Vector2();
-            p.X = getScreenPosX(timeT);
-            p.Y = getScreenPosY((float)pitch);
+            p.X = GetScreenPosX(timeT);
+            p.Y = GetScreenPosY((float)pitch);
             return p;
         }
-        public float getScreenPosX(double timeT)
+        public float GetScreenPosX(double timeT)
         {
             return (float)((timeT / ViewWidthT) * (Props.Camera.ViewportSize.X));
         }
 
-        public float getScreenPosY(float pitch)
+        public float GetScreenPosY(float pitch)
         {
             return (pitch - Props.MinPitch) * Props.NoteHeight + Props.NoteHeight / 2.0f + Props.PitchMargin - Props.Camera.ViewportSize.Y / 2;
         }
-        public double pixelsToTicks(double screenX)
+        public double PixelsToTicks(double screenX)
         { //Returns time in ticks
             return screenX / Props.Camera.ViewportSize.X * ViewWidthT; //Far right -> screenX = viewPortSize / 2
         }
 
         public float SongLengthP => (float)(SongLengthT * Props.Camera.ViewportSize.X) / ViewWidthT;
 
-        public int SmallScrollStepT => (int)(ViewWidthT * SongPanel.SmallScrollStep);
-        public int LargeScrollStepT => (int)(ViewWidthT * SongPanel.LargeScrollStep);
+        public int SmallScrollStepT => (int)(ViewWidthT / 16f);   // 1/16 of visible width
+        public int LargeScrollStepT => (int)ViewWidthT;            // one full visible width
 
         public string DefaultFileName { get; set; }
         public string AudioFilePath { get; private set; }
 
         public const string DefaultFileExt = "vmp";
 
-        public float getCurveScreenY(float x, Curve curve)
+        public float GetCurveScreenY(float x, Curve curve)
         {
             //float pitch = curve.EvaluateCurvature((float)getTimeT(x));
             //return pitch / 100;
-            float pitch = curve.Evaluate((float)pixelsToTicks(x));
-            return getScreenPosY(pitch);
+            float pitch = curve.Evaluate((float)PixelsToTicks(x));
+            return GetScreenPosY(pitch);
         }
 
-        public void tempPausePlayback()
+        public void TempPausePlayback()
         {
             if (IsPlaying)
             {
-                tempPausing = true;
-                togglePlayback();
+                _tempPausing = true;
+                TogglePlayback();
             }
         }
 
-        public void resumeTempPausedPlayback()
+        public void ResumeTempPausedPlayback()
         {
-            if (!IsPlaying && tempPausing)
+            if (!IsPlaying && _tempPausing)
             {
-                tempPausing = false;
-                togglePlayback();
+                _tempPausing = false;
+                TogglePlayback();
             }
         }
 
-        public Vector3 getSpatialNormPosOffset(TrackProps trackProps)
+        public Vector3 GetSpatialNormPosOffset(TrackProps trackProps)
         {
-            return normalizeVpVector(GlobalTrackProps.SpatialProps.PosOffset + trackProps.SpatialProps.PosOffset);
+            return NormalizeVpVector(GlobalTrackProps.SpatialProps.PosOffset + trackProps.SpatialProps.PosOffset);
         }
 
-        public float normalizeVpScalar(float value)
+        public float NormalizeVpScalar(float value)
         {
             return value * Props.Camera.ViewportSize.X / Props.UserViewWidth;
         }
-        public Vector3 normalizeVpVector(Vector3 value)
+        public Vector3 NormalizeVpVector(Vector3 value)
         {
             return value * Props.Camera.ViewportSize.X / Props.UserViewWidth;
         }
 
-        public int insertLyrics()
+        public double CurrentLyricsBeat
         {
+            get
+            {
+                if (Notes == null || Notes.TicksPerBeat <= 0)
+                    return 0;
+                return Math.Max(0, (SongPosT - PlaybackOffsetT) / Notes.TicksPerBeat);
+            }
+        }
+
+        public int LyricsBeatToTimelineTick(double beat)
+        {
+            double tpb = Notes?.TicksPerBeat ?? 480;
+            return (int)Math.Round(Math.Max(0, beat) * tpb + PlaybackOffsetT);
+        }
+
+        public double TimelineTickToLyricsBeat(double tick)
+        {
+            double tpb = Notes?.TicksPerBeat ?? 480;
+            if (tpb <= 0) return 0;
+            return Math.Max(0, (tick - PlaybackOffsetT) / tpb);
+        }
+
+        public void SortLyrics()
+        {
+            if (Props.LyricsSegments.Count <= 1)
+                return;
+
+            var sorted = Props.LyricsSegments
+                .OrderBy(s => s.Beat)
+                .ToList();
+
+            Props.LyricsSegments.RaiseListChangedEvents = false;
+            try
+            {
+                Props.LyricsSegments.Clear();
+                foreach (var segment in sorted)
+                    Props.LyricsSegments.Add(segment);
+            }
+            finally
+            {
+                Props.LyricsSegments.RaiseListChangedEvents = true;
+                Props.LyricsSegments.ResetBindings();
+            }
+        }
+
+        public int InsertLyrics()
+        {
+            float beat = (float)CurrentLyricsBeat;
             for (int i = 0; i < Props.LyricsSegments.Count; i++)
             {
-                if (Props.LyricsSegments[i].Time >= SongPosS)
+                if (Props.LyricsSegments[i].Beat >= beat)
                 {
-                    Props.LyricsSegments.Insert(i, new LyricsSegment((float)SongPosS));
+                    Props.LyricsSegments.Insert(i, new LyricsSegment(beat));
+                    DrawHost?.Invalidate();
                     return i;
                 }
             }
-            Props.LyricsSegments.Add(new LyricsSegment((float)SongPosS));
+            Props.LyricsSegments.Add(new LyricsSegment(beat));
+            DrawHost?.Invalidate();
             return Props.LyricsSegments.Count - 1;
         }
 
-        public int insertKeyFrameAtSongPos()
+        /// <summary>
+        /// Seeks to <paramref name="tick"/> (absolute song position in ticks).
+        /// Used by the new per-property keyframe GUI.  Callers are responsible for
+        /// calling ResyncPlaybackPosition when audio is already playing.
+        /// </summary>
+        public void GoToTick(int tick)
         {
-            return KeyFrames.insert((int)SongPosT);
+            if (SongLengthT > 0)
+                NormSongPos = Math.Max(0, Math.Min(1, (tick + 0.5) / SongLengthT));
         }
 
-        public void goToKeyFrame(int index)
+        // ---- Property accessor registry for per-property keyframe interpolation ----
+
+        /// <summary>
+        /// Builds the map from property IDs to live getter/setter pairs so that
+        /// <see cref="InterpolatePropertyKeyframes"/> can apply interpolated values every frame.
+        /// Must be called after <c>_trackViews</c> is populated (end of ImportSong /
+        /// InitAfterDeserialization).
+        /// </summary>
+        public void InitPropertyAccessors()
         {
-            int newPosT = KeyFrames.keyAtIndex(index);
-            if (SongLengthT > 0 && newPosT >= 0)
-                NormSongPos = (newPosT + 0.5) / SongLengthT;
+            _propAccessors.Clear();
+
+            // Project-scope
+            _propAccessors["proj/ViewWidthQn"] = PropAccessor.Scalar(
+                () => Props.ViewWidthQn,
+                v => Props.ViewWidthQn = (float)v,
+                logScale: true);
+            _propAccessors["proj/Camera"] = PropAccessor.Camera(() => Props.Camera);
+            _propAccessors["proj/MaxPitch"] = PropAccessor.Scalar(
+                () => Props.MaxPitch,
+                v => Props.MaxPitch = (int)Math.Round(v),
+                needsRebuild: true);
+            _propAccessors["proj/MinPitch"] = PropAccessor.Scalar(
+                () => Props.MinPitch,
+                v => Props.MinPitch = (int)Math.Round(v),
+                needsRebuild: true);
+            _propAccessors["proj/BackgroundImageOpacity"] = PropAccessor.Scalar(
+                () => Props.BackgroundImageOpacity,
+                v => Props.BackgroundImageOpacity = (float)v);
+            _propAccessors["proj/BackgroundImageSaturation"] = PropAccessor.Scalar(
+                () => Props.BackgroundImageSaturation,
+                v => Props.BackgroundImageSaturation = (float)v);
+            _propAccessors["proj/BackgroundImagePath"] = PropAccessor.StringHold(
+                () => Props.BackgroundImagePath,
+                v => Props.BackgroundImagePath = v);
+
+            // Track-scope — one entry per track view.
+            // Key by TrackNumber (the MIDI track index, stable across list reorder) and capture the
+            // TrackView reference directly so lambdas remain bound after a reorder.
+            if (_trackViews == null) return;
+            for (int i = 0; i < _trackViews.Count; i++)
+            {
+                var tv = _trackViews[i];     // capture reference, not index
+                int tn = tv.TrackNumber;     // stable id, never changes
+                string prefix = $"track/{tn}";
+
+                // Style
+                _propAccessors[$"track/{tn}/StyleTypeIndex"] = PropAccessor.Scalar(
+                    () => { var t = tv.TrackProps.StyleProps.Type; return t == null ? 0 : (double)(int)t; },
+                    v => { tv.TrackProps.StyleProps.Type = (NoteStyleType)(int)Math.Round(v); },
+                    needsRebuild: true, alwaysHold: true);
+                _propAccessors[$"track/{tn}/LineWidth"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().LineWidth ?? 0,
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().LineWidth = (float)v; },
+                    needsRebuild: true);
+                _propAccessors[$"track/{tn}/QnGapThreshold"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold ?? 0,
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold = (float)v; },
+                    needsRebuild: true);
+                _propAccessors[$"track/{tn}/HlSize"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().HlSize ?? 0,
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().HlSize = (float)v; });
+                _propAccessors[$"track/{tn}/HlMovementPow"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().HlMovementPow ?? 0,
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().HlMovementPow = (float)v; });
+                _propAccessors[$"track/{tn}/LineTypeIndex"] = PropAccessor.Scalar(
+                    () => { var t = tv.TrackProps.StyleProps.GetLineStyle().LineType; return t == null ? 0 : (double)(int)t; },
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().LineType = (LineType)(int)Math.Round(v); },
+                    needsRebuild: true, alwaysHold: true);
+                _propAccessors[$"track/{tn}/LineHlTypeIndex"] = PropAccessor.Scalar(
+                    () => { var t = tv.TrackProps.StyleProps.GetLineStyle().HlType; return t == null ? 0 : (double)(int)t; },
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().HlType = (LineHlType)(int)Math.Round(v); },
+                    alwaysHold: true);
+                _propAccessors[$"track/{tn}/Continuous"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().Continuous == true ? 1.0 : 0.0,
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().Continuous = v >= 0.5; },
+                    needsRebuild: true, alwaysHold: true);
+                _propAccessors[$"track/{tn}/MovingHl"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().MovingHl == true ? 1.0 : 0.0,
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().MovingHl = v >= 0.5; },
+                    alwaysHold: true);
+                _propAccessors[$"track/{tn}/ShrinkingHl"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().ShrinkingHl == true ? 1.0 : 0.0,
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().ShrinkingHl = v >= 0.5; },
+                    alwaysHold: true);
+                _propAccessors[$"track/{tn}/HlBorder"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.StyleProps.GetLineStyle().HlBorder == true ? 1.0 : 0.0,
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().HlBorder = v >= 0.5; },
+                    alwaysHold: true);
+
+                // Material
+                _propAccessors[$"{prefix}/Transp"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Transp ?? 0,
+                    v => tv.TrackProps.MaterialProps.Transp = (float)v);
+                _propAccessors[$"{prefix}/MaterialHue"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Hue ?? 0,
+                    v => tv.TrackProps.MaterialProps.Hue = (float)v);
+                _propAccessors[$"{prefix}/NormalSat"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Normal.Sat ?? 0,
+                    v => tv.TrackProps.MaterialProps.Normal.Sat = (float)v);
+                _propAccessors[$"{prefix}/NormalLum"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Normal.Lum ?? 0,
+                    v => tv.TrackProps.MaterialProps.Normal.Lum = (float)v);
+                _propAccessors[$"{prefix}/HiliteSat"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Hilited.Sat ?? 0,
+                    v => tv.TrackProps.MaterialProps.Hilited.Sat = (float)v);
+                _propAccessors[$"{prefix}/HiliteLum"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.Hilited.Lum ?? 0,
+                    v => tv.TrackProps.MaterialProps.Hilited.Lum = (float)v);
+                _propAccessors[$"{prefix}/TexturePath"] = PropAccessor.StringHold(
+                    () => tv.TrackProps.MaterialProps.TexProps.Path ?? "",
+                    v => ApplyTrackTexturePath(tv, v));
+                _propAccessors[$"{prefix}/DisableTexture"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.DisableTexture,
+                    v => tv.TrackProps.MaterialProps.TexProps.DisableTexture = v);
+                _propAccessors[$"{prefix}/PointSmp"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.PointSmp,
+                    v => tv.TrackProps.MaterialProps.TexProps.PointSmp = v);
+                _propAccessors[$"{prefix}/TexColBlend"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.TexColBlend,
+                    v => tv.TrackProps.MaterialProps.TexProps.TexColBlend = v);
+                _propAccessors[$"{prefix}/UTile"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.UTile,
+                    v => tv.TrackProps.MaterialProps.TexProps.UTile = v,
+                    needsRebuild: true);
+                _propAccessors[$"{prefix}/VTile"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.VTile,
+                    v => tv.TrackProps.MaterialProps.TexProps.VTile = v,
+                    needsRebuild: true);
+                _propAccessors[$"{prefix}/KeepAspect"] = PropAccessor.Bool(
+                    () => tv.TrackProps.MaterialProps.TexProps.KeepAspect,
+                    v => tv.TrackProps.MaterialProps.TexProps.KeepAspect = v,
+                    needsRebuild: true);
+                _propAccessors[$"{prefix}/UAnchorIndex"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.TexProps.UAnchor == null
+                        ? 0 : (double)(int)tv.TrackProps.MaterialProps.TexProps.UAnchor.Value,
+                    v => tv.TrackProps.MaterialProps.TexProps.UAnchor =
+                        (TexAnchorEnum)Math.Clamp((int)Math.Round(v), 0, 2),
+                    needsRebuild: true, alwaysHold: true);
+                _propAccessors[$"{prefix}/VAnchorIndex"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.TexProps.VAnchor == null
+                        ? 0 : (double)(int)tv.TrackProps.MaterialProps.TexProps.VAnchor.Value,
+                    v => tv.TrackProps.MaterialProps.TexProps.VAnchor =
+                        (TexAnchorEnum)Math.Clamp((int)Math.Round(v), 0, 1),
+                    needsRebuild: true, alwaysHold: true);
+                _propAccessors[$"{prefix}/UScroll"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.TexProps.UScroll ?? 0,
+                    v => tv.TrackProps.MaterialProps.TexProps.UScroll = (float)v);
+                _propAccessors[$"{prefix}/VScroll"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.MaterialProps.TexProps.VScroll ?? 0,
+                    v => tv.TrackProps.MaterialProps.TexProps.VScroll = (float)v);
+
+                // Light
+                _propAccessors[$"{prefix}/UseGlobalLight"] = PropAccessor.Bool(
+                    () => tv.TrackProps.LightProps.UseGlobalLight,
+                    v => tv.TrackProps.LightProps.UseGlobalLight = v);
+                _propAccessors[$"{prefix}/LightDirX"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.DirX ?? 0,
+                    v => tv.TrackProps.LightProps.DirX = (float)v);
+                _propAccessors[$"{prefix}/LightDirY"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.DirY ?? 0,
+                    v => tv.TrackProps.LightProps.DirY = (float)v);
+                _propAccessors[$"{prefix}/LightDirZ"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.DirZ ?? 0,
+                    v => tv.TrackProps.LightProps.DirZ = (float)v);
+                _propAccessors[$"{prefix}/AmbientAmount"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.AmbientAmount ?? 0,
+                    v => tv.TrackProps.LightProps.AmbientAmount = (float)v);
+                _propAccessors[$"{prefix}/AmbientColor"] = PropAccessor.Color(
+                    () => tv.TrackProps.LightProps.AmbientColor ?? Color.White,
+                    v => tv.TrackProps.LightProps.AmbientColor = v);
+                _propAccessors[$"{prefix}/DiffuseAmount"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.DiffuseAmount ?? 0,
+                    v => tv.TrackProps.LightProps.DiffuseAmount = (float)v);
+                _propAccessors[$"{prefix}/DiffuseColor"] = PropAccessor.Color(
+                    () => tv.TrackProps.LightProps.DiffuseColor ?? Color.White,
+                    v => tv.TrackProps.LightProps.DiffuseColor = v);
+                _propAccessors[$"{prefix}/SpecAmount"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.SpecAmount ?? 0,
+                    v => tv.TrackProps.LightProps.SpecAmount = (float)v);
+                _propAccessors[$"{prefix}/SpecColor"] = PropAccessor.Color(
+                    () => tv.TrackProps.LightProps.SpecColor ?? Color.White,
+                    v => tv.TrackProps.LightProps.SpecColor = v);
+                _propAccessors[$"{prefix}/SpecPower"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.SpecPower ?? 1,
+                    v => tv.TrackProps.LightProps.SpecPower = (float)v);
+                _propAccessors[$"{prefix}/MasterAmount"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.LightProps.MasterAmount ?? 0,
+                    v => tv.TrackProps.LightProps.MasterAmount = (float)v);
+                _propAccessors[$"{prefix}/MasterColor"] = PropAccessor.Color(
+                    () => tv.TrackProps.LightProps.MasterColor ?? Color.White,
+                    v => tv.TrackProps.LightProps.MasterColor = v);
+
+                // Spatial
+                _propAccessors[$"{prefix}/XOffset"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.SpatialProps.XOffset ?? 0,
+                    v => tv.TrackProps.SpatialProps.XOffset = (float)v);
+                _propAccessors[$"{prefix}/YOffset"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.SpatialProps.YOffset ?? 0,
+                    v => tv.TrackProps.SpatialProps.YOffset = (float)v);
+                _propAccessors[$"{prefix}/ZOffset"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.SpatialProps.ZOffset ?? 0,
+                    v => tv.TrackProps.SpatialProps.ZOffset = (float)v);
+            }
         }
 
-        public KeyFrame getKeyFrameAtSongPos()
+        bool ApplyTrackTexturePath(TrackView tv, string path, bool rebuild = true)
         {
-            return KeyFrames[(int)SongPosT];
+            if (tv == null) return false;
+            var texProps = tv.TrackProps.MaterialProps.TexProps;
+            path ??= "";
+            if (string.Equals(texProps.Path ?? "", path, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            try
+            {
+                if (string.IsNullOrEmpty(path))
+                    texProps.UnloadTexture();
+                else if (DrawHost != null)
+                    texProps.LoadTexture(path, DrawHost);
+                else
+                    texProps.Path = path;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to apply texture keyframe '{path}': {ex.Message}");
+                texProps.UnloadTexture();
+                texProps.Path = path;
+            }
+
+            if (rebuild)
+                CreateGeos(resetVertScale: false);
+            return true;
         }
 
-        void onPlaybackOffsetSChanged()
+        TrackView FindTrackViewByTrackNumber(int trackNumber)
         {
-            if (notes == null)
+            if (_trackViews == null) return null;
+            foreach (var t in _trackViews)
+                if (t.TrackNumber == trackNumber) return t;
+            return null;
+        }
+
+        bool ApplyMaterialTexturePathKeyframes(string id, Keyframes.PropertyKeyframeTrack track)
+        {
+            var parts = id.Split('/');
+            if (parts.Length != 3 || parts[0] != "track" || parts[2] != "TexturePath")
+                return false;
+            if (!int.TryParse(parts[1], out int tn)) return false;
+
+            var tv = FindTrackViewByTrackNumber(tn);
+            if (tv == null) return false;
+
+            var (before, after, t) = track.FindBrackets((int)SongPosT);
+            if (before?.Value == null && after?.Value == null) return false;
+
+            string pathA = (before?.Value as Keyframes.StringKfValue)?.S ?? "";
+            string pathB = (after?.Value as Keyframes.StringKfValue)?.S ?? "";
+            var texProps = tv.TrackProps.MaterialProps.TexProps;
+
+            bool changed = false;
+            if (before == null || before.Value == null)
+            {
+                changed |= ApplyTrackTexturePath(tv, pathB, rebuild: false);
+                changed |= texProps.SetTextureTransition("", 0f, DrawHost);
+            }
+            else if (after == null || after.Value == null
+                     || before.Interpolation == Keyframes.KfInterpolation.Hold)
+            {
+                changed |= ApplyTrackTexturePath(tv, pathA, rebuild: false);
+                changed |= texProps.SetTextureTransition("", 0f, DrawHost);
+            }
+            else
+            {
+                float blend = before.Interpolation == Keyframes.KfInterpolation.Smooth
+                    ? (float)(t * t * (3.0 - 2.0 * t))
+                    : (float)t;
+                changed |= ApplyTrackTexturePath(tv, pathA, rebuild: false);
+                changed |= texProps.SetTextureTransition(pathB, blend, DrawHost);
+            }
+
+            return changed;
+        }
+
+        /// <summary>
+        /// Resolves a full property id to a live accessor.  Pre-registered ids (proj/*, non-mod track/*)
+        /// are returned directly.  Modulation ids of the form <c>track/{tn}/mod/{eid}/{name}</c> are
+        /// resolved dynamically by finding the TrackView and entry on demand (robust to add/delete/reorder).
+        /// Returns null if the id is unresolvable (orphan, wrong track type, etc.).
+        /// </summary>
+        PropAccessor ResolveAccessor(string id)
+        {
+            if (_propAccessors.TryGetValue(id, out var a)) return a;
+
+            // Modulation: track/{tn}/mod/{eid}/{name}
+            var parts = id.Split('/');
+            if (parts.Length != 5 || parts[0] != "track" || parts[2] != "mod") return null;
+            if (!int.TryParse(parts[1], out int tn)) return null;
+            string eid = parts[3];
+            string name = parts[4];
+
+            if (!_modPropTable.TryGetValue(name, out var factory)) return null;
+
+            // Find the TrackView by stable TrackNumber
+            TrackView tv = FindTrackViewByTrackNumber(tn);
+            if (tv == null) return null;
+
+            // Find the mod entry by stable Id
+            NoteStyleMod entry = null;
+            var modEntries = tv.TrackProps.ActiveNoteStyle?.ModEntries;
+            if (modEntries != null)
+                foreach (var m in modEntries)
+                    if (m.Id == eid) { entry = m; break; }
+            if (entry == null) return null;
+
+            return factory(entry);
+        }
+
+        /// <summary>Returns the live value for a full property id, or null if unresolvable.</summary>
+        public Keyframes.KfValue GetCurrentValue(string fullId)
+            => ResolveAccessor(fullId)?.Capture();
+
+        /// <summary>True when the new keyframe set has any track-scoped keyframes.</summary>
+        public bool HasTrackKeyframes
+            => PropertyKeyframes?.AllTicks().Any() == true
+            && PropertyKeyframes.Tracks.Keys.Any(k => k.StartsWith("track/"));
+
+        /// <summary>
+        /// Applies the new per-property keyframe set by interpolating each tracked property to its
+        /// value at the current song position.  Called inside <see cref="Update"/> (during playback)
+        /// and from the video-export loop so exports animate too.
+        /// </summary>
+        public void InterpolatePropertyKeyframes()
+        {
+            if (PropertyKeyframes == null) return;
+            bool anyRebuildNeeded = false;
+
+            // ---- Background-image crossfade — special-cased because the crossfade needs both
+            // bracket values and the interpolant simultaneously, which the generic Apply can't express.
+            if (PropertyKeyframes.Tracks.TryGetValue("proj/BackgroundImagePath", out var bkgTrack))
+            {
+                var (bkgBefore, bkgAfter, bkgT) = bkgTrack.FindBrackets((int)SongPosT);
+                string pathA = (bkgBefore?.Value as Keyframes.StringKfValue)?.S ?? "";
+                string pathB = (bkgAfter?.Value as Keyframes.StringKfValue)?.S ?? "";
+                bool hold = bkgBefore == null || bkgAfter == null
+                               || bkgBefore.Interpolation == Keyframes.KfInterpolation.Hold;
+                float blend = hold ? 0f
+                               : bkgBefore.Interpolation == Keyframes.KfInterpolation.Smooth
+                                   ? (float)(bkgT * bkgT * (3.0 - 2.0 * bkgT))
+                                   : (float)bkgT;
+                string effectiveA = bkgBefore?.Value != null ? pathA : pathB;
+                string effectiveB = hold ? null : pathB;
+                DrawHost?.SetBackgroundCrossfade(effectiveA, effectiveB, blend);
+            }
+
+            foreach (var kv in PropertyKeyframes.Tracks)
+            {
+                string id = kv.Key;
+                var track = kv.Value;
+
+                // Background path is handled by the special-case block above (crossfade needs the brackets);
+                // skip it here to avoid overwriting Props.BackgroundImagePath with just the "after" value.
+                if (id == "proj/BackgroundImagePath") continue;
+
+                if (id.StartsWith("track/", StringComparison.Ordinal)
+                    && id.EndsWith("/TexturePath", StringComparison.Ordinal))
+                {
+                    if (ApplyMaterialTexturePathKeyframes(id, track))
+                        anyRebuildNeeded = true;
+                    continue;
+                }
+
+                var acc = ResolveAccessor(id);
+                if (acc == null) continue;
+
+                var (before, after, t) = track.FindBrackets((int)SongPosT);
+
+                // Skip if neither surrounding keyframe carries a captured value
+                if (before?.Value == null && after?.Value == null) continue;
+
+                Keyframes.KfValue value;
+                if (before == null || before.Value == null)
+                    value = after.Value;
+                else if (after == null || after.Value == null)
+                    value = before.Value;
+                else
+                {
+                    // Enum/bool props must step at the keyframe, never blend to a fractional value.
+                    var mode = acc.AlwaysHold ? Keyframes.KfInterpolation.Hold : before.Interpolation;
+                    value = acc.Interp(before.Value, after.Value, t, mode);
+                }
+
+                if (acc.NeedsRebuild && value is Keyframes.ScalarKfValue sv)
+                {
+                    var prevKv = acc.Capture() as Keyframes.ScalarKfValue;
+                    acc.Apply(value);
+                    if (prevKv == null || Math.Abs(sv.V - prevKv.V) > 1e-6)
+                        anyRebuildNeeded = true;
+                }
+                else
+                {
+                    acc.Apply(value);
+                }
+            }
+
+            if (anyRebuildNeeded) CreateGeos(resetVertScale: false);
+        }
+
+        // ---- End property-keyframe interpolation ----
+
+        /// <summary>
+        /// Writes the live <see cref="Props.Camera"/> into the per-property camera keyframe at the
+        /// current tick after user-driven movement (WASD, mouse-look).
+        /// </summary>
+        public void SyncLiveCameraEdit()
+        {
+            var cam = Props.Camera;
+            if (PropertyKeyframes?.HasAny("proj/Camera") == true
+                && Keyframes.KeyframeService.HasKeyHereForAll("Camera", Keyframes.KeyframeService.KfScope.Project))
+            {
+                Keyframes.KeyframeService.SyncEditedValue("Camera", Keyframes.KeyframeService.KfScope.Project,
+                    new Keyframes.CameraKfValue(cam.Pos, cam.Orientation, cam.Fov));
+            }
+        }
+
+        void OnPlaybackOffsetSChanged()
+        {
+            if (_notes == null)
                 return;
-            firstTempoEvent = pbTempoEvent = 0;
-            pbTimeS = pbTimeT = playbackOffsetT = 0;
+            _firstTempoEvent = _pbTempoEvent = 0;
+            _pbTimeS = _pbTimeT = _playbackOffsetT = 0;
 
             //Set playbackOffsetT
             if (Props.PlaybackOffsetS >= 0)
-                playbackOffsetT = (float)(Props.PlaybackOffsetS * notes.TempoEvents[0].Tempo / 60 * notes.TicksPerBeat);
+                _playbackOffsetT = (float)(Props.PlaybackOffsetS * _notes.TempoEvents[0].Tempo / 60 * _notes.TicksPerBeat);
             else
-                playbackOffsetT = (float)-secondsToTicks((double)-Props.PlaybackOffsetS);
+                _playbackOffsetT = (float)-SecondsToTicks((double)-Props.PlaybackOffsetS);
 
             //Set firstTempoEvent (if playback offset is negative, playback may start after second event in which firstTempoEvent shouldn't be zero)
             if (Props.PlaybackOffsetS < 0)
             {
-                double offsetT = -playbackOffsetT;
-                for (int i = 0; i < notes.TempoEvents.Count; i++)
+                double offsetT = -_playbackOffsetT;
+                for (int i = 0; i < _notes.TempoEvents.Count; i++)
                 {
-                    if (notes.TempoEvents[i].Time <= offsetT)
-                        firstTempoEvent = i;
+                    if (_notes.TempoEvents[i].Time <= offsetT)
+                        _firstTempoEvent = i;
                     else
                         break;
                 }
             }
 
-            pbTimeS = pbTimeT = 0;
-            pbTempoEvent = firstTempoEvent;
-            SongLengthS = normSongPosToSeconds(1);
+            _pbTimeS = _pbTimeT = 0;
+            _pbTempoEvent = _firstTempoEvent;
+            SongLengthS = NormSongPosToSeconds(1);
         }
 
-        public Project clone()
+        public Project Clone()
         {
-            Project dest = Cloning.clone(this);
+            Project dest = Cloning.Clone(this);
 
-            for (int i = 0; i < trackViews.Count; i++)
+            for (int i = 0; i < _trackViews.Count; i++)
             {
                 //dest.trackViews[i] = trackViews[i].clone();
                 //dest.TrackViews[i].TrackProps.GlobalProps = dest.TrackViews[0].TrackProps;
-                dest.trackViews[i].MidiTrack = trackViews[i].MidiTrack;
-                dest.trackViews[i].OcTree = trackViews[i].OcTree;
-                dest.trackViews[i].Curve = trackViews[i].Curve;
-                dest.trackViews[i].TrackProps.AudioProps = trackViews[i].TrackProps.AudioProps;
+                dest._trackViews[i].MidiTrack = _trackViews[i].MidiTrack;
+                dest._trackViews[i].Geo = _trackViews[i].Geo;
+                dest._trackViews[i].Curve = _trackViews[i].Curve;
+                dest._trackViews[i].TrackProps.AudioProps = _trackViews[i].TrackProps.AudioProps;
             }
 
-            dest.notes = notes;
+            dest._notes = _notes;
             //dest.Props = Props.clone();
             //dest.vertViewWidthQn = vertViewWidthQn;
-            dest.Props.OnPlaybackOffsetSChanged = dest.onPlaybackOffsetSChanged;
+            dest.Props.OnPlaybackOffsetSChanged = dest.OnPlaybackOffsetSChanged;
             dest.Props.OnPlaybackOffsetSChanged();
             return dest;
         }
@@ -962,49 +1535,57 @@ namespace VisualMusic
             // Only called on undo snapshots, which share AudioProps with the live project via clone().
             // Disposing AudioProps here would dispose the live SampleBuffer/AudioFileReader and cause
             // NREs the next time a chunk is loaded (e.g. after seeking).
-            foreach (var tv in trackViews)
+            foreach (var tv in _trackViews)
             {
-                tv.OcTree?.Dispose();
+                tv.Geo?.Dispose();
             }
         }
 
-        public void copyPropsFrom(Project project)
+        public void CopyPropsFrom(Project project)
         {
-            var source = project.clone();
+            var source = project.Clone();
             Props = source.Props;
-            vertViewWidthQn = Props.ViewWidthQn;
+            _vertViewWidthQn = Props.ViewWidthQn;
             //TrackViews = source.TrackViews;
             for (int i = 0; i < TrackViews.Count; i++)
             {
                 var destProps = TrackViews[i].TrackProps;
-                var sourceProps = TrackViews[i].TrackProps;
+                var sourceProps = source.TrackViews[i].TrackProps;
                 destProps.StyleProps = sourceProps.StyleProps;
                 destProps.MaterialProps = sourceProps.MaterialProps;
                 destProps.LightProps = sourceProps.LightProps;
                 destProps.SpatialProps = sourceProps.SpatialProps;
                 //Skip AudioProps for more lightweight redos
             }
-            KeyFrames = source.KeyFrames;
+            PropertyKeyframes = source.PropertyKeyframes;
             //source.Dispose();
         }
 
-        internal void InitAfterDeserialization()
+        internal void InitAfterDeserialization(WaveformPanel waveformPanel = null)
         {
-            if (KeyFrames == null) //Old project file format
-                KeyFrames = new KeyFrames();
-            ImportOptions.updateImportForm();
-            SongPanel.WaveformPanel.ClearChannels();
+            if (PropertyKeyframes == null)
+                PropertyKeyframes = new Keyframes.KeyframeSet();
+            ImportOptions.UpdateImportForm();
+            var wp = waveformPanel ?? DrawHost?.WaveformPanel;
+            wp.ClearChannels();
 
             for (int i = 0; i < TrackViews.Count; i++)
             {
                 var tv = TrackViews[i];
-                //tv.TrackProps.StyleProps.LoadFx();
+                tv.TrackProps.LoadContent();
                 if (i > 0)
                 {
                     _ = tv.TrackProps.AudioProps.LoadAudioAsync();
-                    SongPanel.WaveformPanel.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
+                    wp.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
                 }
             }
+
+            // Force recalculation of derived state (SongLengthS, playbackOffsetT, etc).
+            // During deserialization, Props was set BEFORE notes were loaded, so the
+            // playback-offset callback fired with notes==null and returned early.
+            // Do this explicitly so loaded projects get the correct SongLengthS.
+            OnPlaybackOffsetSChanged();
+            InitPropertyAccessors();
         }
     }
 
@@ -1017,28 +1598,29 @@ namespace VisualMusic
     [Serializable]
     public class LyricsSegment : ISerializable
     {
-        public float Time { get; set; }
-        public string Lyrics { get; set; }
-        public LyricsSegment(float time)
+        public float Beat { get; set; }
+        public string Lyrics { get; set; } = "";
+
+        public LyricsSegment(float beat)
         {
-            Time = time;
+            Beat = beat;
         }
 
         public LyricsSegment(SerializationInfo info, StreamingContext ctxt)
         {
             foreach (SerializationEntry entry in info)
             {
-                if (entry.Name == "time")
-                    Time = (float)entry.Value;
+                if (entry.Name == "beat")
+                    Beat = (float)entry.Value;
                 else if (entry.Name == "lyrics")
-                    Lyrics = (string)entry.Value;
+                    Lyrics = (string)entry.Value ?? "";
             }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
-            info.AddValue("time", Time);
-            info.AddValue("lyrics", Lyrics);
+            info.AddValue("beat", Beat);
+            info.AddValue("lyrics", Lyrics ?? "");
         }
     }
 }

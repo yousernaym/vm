@@ -5,6 +5,7 @@ struct VSInput
     float2 normPos : POSITION0;
 	float4 rect : POSITION1;
 	float4 texCoords : TEXCOORD0;
+	float4 texCoords2 : TEXCOORD1;
 };
 
 struct VSOutput
@@ -14,6 +15,7 @@ struct VSOutput
 	float4 worldPos : POSITION2;
 	float2 worldSize : POSITION3;
 	float2 texCoords : TEXCOORD0;
+	float2 texCoords2 : TEXCOORD1;
 	float4 color : COLOR0;
 };
 
@@ -27,6 +29,9 @@ VSOutput VS(VSInput IN)
 	TexScrollOffset.x /= VertWidthScale;
 	OUT.texCoords = IN.texCoords.xy + IN.normPos * IN.texCoords.zw - TexScrollOffset;
 	OUT.texCoords.x *= VertWidthScale;
+	TexScrollOffset2.x /= VertWidthScale;
+	OUT.texCoords2 = IN.texCoords2.xy + IN.normPos * IN.texCoords2.zw - TexScrollOffset2;
+	OUT.texCoords2.x *= VertWidthScale;
 	float4 scaledRect = IN.rect * VertWidthScale;
     if (scaledRect.x < SongPos && scaledRect.x + scaledRect.z > SongPos)
 		OUT.color = HlColor;
@@ -39,7 +44,7 @@ VSOutput VS(VSInput IN)
 
 float4 PS(VSOutput IN) : COLOR0
 {
-	float4 color = getPixelColor(IN.color, IN.texCoords);
+	float4 color = getPixelColor(IN.color, IN.texCoords, IN.texCoords2);
     color = modulate(IN.normPos, IN.worldSize, color, float3(0, 0, 1), IN.worldPos.xyz);
 	
 	return color;

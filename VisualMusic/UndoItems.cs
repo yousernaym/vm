@@ -15,60 +15,70 @@ namespace VisualMusic
             }
         }
 
-        LinkedList<Item> items = new LinkedList<Item>();
-        LinkedListNode<Item> currentItem;
+        LinkedList<Item> _items = new LinkedList<Item>();
+        LinkedListNode<Item> _currentItem;
+        LinkedListNode<Item> _savedItem;
 
-        public Item Current => currentItem == null ? null : currentItem.Value;
-        public Item Previous => currentItem.Previous == null ? null : currentItem.Previous.Value;
-        public Item Next => currentItem.Next == null ? null : currentItem.Next.Value;
+        public Item Current => _currentItem == null ? null : _currentItem.Value;
+        public Item Previous => _currentItem?.Previous == null ? null : _currentItem.Previous.Value;
+        public Item Next => _currentItem?.Next == null ? null : _currentItem.Next.Value;
         public string UndoDesc => Current == null ? "" : Current.Desc;
         public string RedoDesc => Next == null ? "" : Next.Desc;
+        public bool IsCurrentSaved => _currentItem != null && _currentItem == _savedItem;
 
-        public void clear()
+        public void Clear()
         {
-            foreach (var item in items)
+            foreach (var item in _items)
                 item.Project.Dispose();
-            items.Clear();
-            currentItem = null;
+            _items.Clear();
+            _currentItem = null;
+            _savedItem = null;
+        }
+
+        public void MarkSaved()
+        {
+            _savedItem = _currentItem;
         }
 
         public void Add(string desc, Project project)
         {
-            var snapshot = new Item(desc, project.clone());
+            var snapshot = new Item(desc, project.Clone());
 
-            if (currentItem == null)
+            if (_currentItem == null)
             {
-                currentItem = items.AddLast(snapshot);
+                _currentItem = _items.AddLast(snapshot);
                 return;
             }
 
-            var node = currentItem.Next;
+            var node = _currentItem.Next;
             while (node != null)
             {
                 var next = node.Next;
                 node.Value.Project.Dispose();
-                items.Remove(node);
+                if (node == _savedItem)
+                    _savedItem = null;
+                _items.Remove(node);
                 node = next;
             }
 
-            currentItem = items.AddAfter(currentItem, snapshot);
+            _currentItem = _items.AddAfter(_currentItem, snapshot);
         }
 
-        void replaceLast(string desc, Project project)
+        void ReplaceLast(string desc, Project project)
         {
 
         }
 
         public static UndoItems operator ++(UndoItems obj)
         {
-            if (obj.currentItem != null)
-                obj.currentItem = obj.currentItem.Next;
+            if (obj._currentItem != null)
+                obj._currentItem = obj._currentItem.Next;
             return obj;
         }
         public static UndoItems operator --(UndoItems obj)
         {
-            if (obj.currentItem != null)
-                obj.currentItem = obj.currentItem.Previous;
+            if (obj._currentItem != null)
+                obj._currentItem = obj._currentItem.Previous;
             return obj;
         }
     }

@@ -1,0 +1,29 @@
+<UserControl x:Class="VisualMusic.Controls.TrackPropsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:tabs="clr-namespace:VisualMusic.Controls.Tabs">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolVis"/>
+    </UserControl.Resources>
+    <TabControl SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+        <TabControl.Resources>
+            <sys:Double x:Key="MahApps.Font.Size.TabItem">12</sys:Double>
+        </TabControl.Resources>
+        <TabItem Header="Style">
+            <tabs:StyleTab DataContext="{Binding}"/>
+        </TabItem>
+        <TabItem Header="Material">
+            <tabs:MaterialTab DataContext="{Binding}"/>
+        </TabItem>
+        <TabItem Header="Light">
+            <tabs:LightTab DataContext="{Binding}"/>
+        </TabItem>
+        <TabItem Header="Spatial">
+            <tabs:SpatialTab DataContext="{Binding}"/>
+        </TabItem>
+        <TabItem Header="Audio">
+            <tabs:AudioTab DataContext="{Binding}"/>
+        </TabItem>
+    </TabControl>
+</UserControl>

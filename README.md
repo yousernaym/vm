@@ -51,7 +51,7 @@ Changes to supported properties will be stored in the currently highlighted key 
 
 ## Sub projects
 
-* [Remuxer](https://github.com/yousernaym/remuxer) (command-line tool) - Converts tracker and sid files to midi/wav. Based on libRemuxer which is based on the third-party libraries libsidplayfp, libmikmod and libopenmpt. libRemuxer should ideally have been linked directly to Visual Music but was not, because of a conflict between the Monogame and libsidplayfp licenses.
+* [Remuxer](https://github.com/yousernaym/remuxer) (command-line tool) - Converts tracker and sid files to midi/wav. Based on libRemuxer which is based on the third-party libraries libsidplayfp and libopenmpt. libRemuxer should ideally have been linked directly to Visual Music but was not, because of a conflict between the Monogame and libsidplayfp licenses.
 * [Midilib](https://github.com/yousernaym/midilib) (C# library) - Midi parser
 * [MidMix](https://github.com/yousernaym/midmix) (C++ library) - Audio mixdown for midi files, based on [Fluidsynth](http://www.fluidsynth.org/)
 * [Media](https://github.com/yousernaym/media) (C++ library)

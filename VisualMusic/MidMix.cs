@@ -4,14 +4,12 @@ namespace VisualMusic
 {
     static class MidMix
     {
-        [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void init();
-        [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool sfLoaded();
-        [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void mixdown(string midiPath, string mixdownPath);
-        [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void close();
+        [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "init")]
+        public static extern void Init();
+        [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "mixdown")]
+        public static extern void Mixdown(string midiPath, string mixdownPath);
+        [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "close")]
+        public static extern void Close();
 
     }
 }

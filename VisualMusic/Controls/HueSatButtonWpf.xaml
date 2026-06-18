@@ -1,0 +1,7 @@
+<UserControl x:Class="VisualMusic.Controls.HueSatButtonWpf"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Button Click="Button_Click" Padding="2" MinWidth="28" MinHeight="20">
+        <Rectangle x:Name="colorRect" Width="20" Height="12"/>
+    </Button>
+</UserControl>

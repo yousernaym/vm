@@ -1,0 +1,362 @@
+<UserControl x:Class="VisualMusic.Controls.Tabs.StyleTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrl="clr-namespace:VisualMusic.Controls"
+             xmlns:kf="clr-namespace:VisualMusic.Keyframes"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolVis"/>
+    </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="4">
+
+            <!-- Default Style button -->
+            <Button Content="Default Style" HorizontalAlignment="Left"
+                    Margin="0,0,0,6" Click="DefaultStyleBtn_Click"/>
+
+            <!-- Note style type selector -->
+            <TextBlock Text="Note style:" Margin="0,0,0,2"/>
+            <ComboBox SelectedIndex="{Binding StyleTypeIndex, Mode=TwoWay}"
+                      kf:Keyframing.PropertyId="StyleTypeIndex"
+                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                      kf:Keyframing.Interpolatable="False">
+                <ComboBoxItem Content="Default"/>
+                <ComboBoxItem Content="Bar"/>
+                <ComboBoxItem Content="Line"/>
+            </ComboBox>
+
+            <!-- Line style sub-panel -->
+            <StackPanel Visibility="{Binding LineStyleVisible,
+                        Converter={StaticResource BoolVis}}"
+                        Margin="0,6,0,0">
+                <Separator/>
+                <TextBlock Text="Line style" FontWeight="SemiBold" Margin="0,4,0,4"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Line type:" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="2"
+                              SelectedIndex="{Binding LineTypeIndex, Mode=TwoWay}"
+                              kf:Keyframing.PropertyId="LineTypeIndex"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                              kf:Keyframing.Interpolatable="False">
+                        <ComboBoxItem Content="Standard"/>
+                        <ComboBoxItem Content="Ribbon"/>
+                    </ComboBox>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Width:" VerticalAlignment="Center"/>
+                    <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
+                                      Value="{Binding LineWidth, Mode=TwoWay}"
+                                      Min="0" Max="50" Decimals="1"
+                                      kf:Keyframing.PropertyId="LineWidth"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                      kf:Keyframing.Interpolatable="True"/>
+                </Grid>
+
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Gap fill:" VerticalAlignment="Center"/>
+                    <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
+                                      Value="{Binding QnGapThreshold, Mode=TwoWay}"
+                                      Min="0" Max="32" Decimals="0"
+                                      kf:Keyframing.PropertyId="QnGapThreshold"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                      kf:Keyframing.Interpolatable="True"/>
+                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                              Content="Continuous"
+                              IsChecked="{Binding Continuous, Mode=TwoWay}"
+                              IsThreeState="True" Margin="0,4,0,0"
+                              kf:Keyframing.PropertyId="Continuous"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                              kf:Keyframing.Interpolatable="False"/>
+                </Grid>
+
+                <Separator Margin="0,6,0,0"/>
+                <TextBlock Text="Highlight" FontWeight="SemiBold" Margin="0,4,0,4"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="HL type:" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="2"
+                              SelectedIndex="{Binding LineHlTypeIndex, Mode=TwoWay}"
+                              kf:Keyframing.PropertyId="LineHlTypeIndex"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                              kf:Keyframing.Interpolatable="False">
+                        <ComboBoxItem Content="Arrow"/>
+                        <ComboBoxItem Content="Circle"/>
+                    </ComboBox>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="HL size:" VerticalAlignment="Center"/>
+                    <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
+                                      Value="{Binding HlSize, Mode=TwoWay}"
+                                      Min="0" Max="100" Decimals="1"
+                                      kf:Keyframing.PropertyId="HlSize"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                      kf:Keyframing.Interpolatable="True"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Movement pow:" VerticalAlignment="Center"/>
+                    <ctrl:TbSliderWpf Grid.Row="2" Grid.Column="1" Margin="2"
+                                      Value="{Binding HlMovementPow, Mode=TwoWay}"
+                                      Min="0.1" Max="5" Decimals="2"
+                                      kf:Keyframing.PropertyId="HlMovementPow"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                      kf:Keyframing.Interpolatable="True"/>
+                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                                Margin="0,4,0,0">
+                        <CheckBox Content="Moving"    IsChecked="{Binding MovingHl,    Mode=TwoWay}" IsThreeState="True" Margin="0,0,0,2"
+                                  kf:Keyframing.PropertyId="MovingHl"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Interpolatable="False"/>
+                        <CheckBox Content="Shrinking" IsChecked="{Binding ShrinkingHl, Mode=TwoWay}" IsThreeState="True" Margin="0,0,0,2"
+                                  kf:Keyframing.PropertyId="ShrinkingHl"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Interpolatable="False"/>
+                        <CheckBox Content="Border"    IsChecked="{Binding HlBorder,    Mode=TwoWay}" IsThreeState="True"
+                                  kf:Keyframing.PropertyId="HlBorder"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                                  kf:Keyframing.Interpolatable="False"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- Modulation editor (Bar and Line) -->
+            <StackPanel Visibility="{Binding ModulationVisible, Converter={StaticResource BoolVis}}"
+                        Margin="0,6,0,0">
+                <Separator/>
+                <TextBlock Text="Modulation" FontWeight="SemiBold" Margin="0,4,0,4"/>
+
+                <!-- Entry selector — EXCLUDED from keyframing (structural selector, not a value) -->
+                <ComboBox x:Name="modEntryCombo"
+                          ItemsSource="{Binding ModEntries}"
+                          DisplayMemberPath="Name"
+                          IsEnabled="{Binding ModEntryComboEnabled}"
+                          SelectedIndex="{Binding ModEntryIndex, Mode=TwoWay}">
+                    <ComboBox.ContextMenu>
+                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext,
+                                               RelativeSource={RelativeSource Self}}">
+                            <MenuItem Header="New entry"    Click="NewModEntry_Click"/>
+                            <MenuItem Header="Clone entry"  Click="CloneModEntry_Click"
+                                      IsEnabled="{Binding ModEntryDetailsVisible}"/>
+                            <MenuItem Header="Delete entry" Click="DeleteModEntry_Click"
+                                      IsEnabled="{Binding ModEntryDetailsVisible}"/>
+                        </ContextMenu>
+                    </ComboBox.ContextMenu>
+                </ComboBox>
+
+                <!-- Entry-details panel (only when an entry is selected) -->
+                <StackPanel Visibility="{Binding ModEntryDetailsVisible, Converter={StaticResource BoolVis}}"
+                            Margin="0,6,0,0">
+
+                    <!-- Pixel position -->
+                    <TextBlock Text="Pixel position" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Origin X -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Origin X:" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding ModXOriginEnable, Mode=TwoWay}"
+                                      IsThreeState="True" VerticalAlignment="Center" Margin="0,0,4,0"
+                                      kf:Keyframing.PropertyId="ModXOriginEnable"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                      kf:Keyframing.Interpolatable="False"/>
+                            <ctrl:TbSliderWpf Value="{Binding ModXOrigin, Mode=TwoWay}"
+                                              IsEnabled="{Binding ModXOriginEnabled}"
+                                              Min="0" Max="1" Decimals="2" Width="120"
+                                              kf:Keyframing.PropertyId="ModXOrigin"
+                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                              kf:Keyframing.Interpolatable="True"/>
+                        </StackPanel>
+
+                        <!-- Origin Y -->
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Origin Y:" VerticalAlignment="Center" Margin="0,2,0,0"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,2,0,0">
+                            <CheckBox IsChecked="{Binding ModYOriginEnable, Mode=TwoWay}"
+                                      IsThreeState="True" VerticalAlignment="Center" Margin="0,0,4,0"
+                                      kf:Keyframing.PropertyId="ModYOriginEnable"
+                                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                      kf:Keyframing.Interpolatable="False"/>
+                            <ctrl:TbSliderWpf Value="{Binding ModYOrigin, Mode=TwoWay}"
+                                              IsEnabled="{Binding ModYOriginEnabled}"
+                                              Min="0" Max="1" Decimals="2" Width="120"
+                                              kf:Keyframing.PropertyId="ModYOrigin"
+                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                              kf:Keyframing.Interpolatable="True"/>
+                        </StackPanel>
+
+                        <!-- Combine -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Combine:" VerticalAlignment="Center" Margin="0,4,0,0"/>
+                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,4,2,0"
+                                  IsEnabled="{Binding ModCombineEnabled}"
+                                  SelectedIndex="{Binding ModCombineIndex, Mode=TwoWay}"
+                                  kf:Keyframing.PropertyId="ModCombineIndex"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                  kf:Keyframing.Interpolatable="False">
+                            <ComboBoxItem Content="x + y"/>
+                            <ComboBoxItem Content="x² + y²"/>
+                            <ComboBoxItem Content="Max (x, y)"/>
+                        </ComboBox>
+
+                        <!-- Square aspect -->
+                        <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                                  Content="Square aspect"
+                                  IsChecked="{Binding ModSquareAspect, Mode=TwoWay}"
+                                  IsThreeState="True" Margin="0,4,0,0"
+                                  kf:Keyframing.PropertyId="ModSquareAspect"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                  kf:Keyframing.Interpolatable="False"/>
+                    </Grid>
+
+                    <!-- Destinations -->
+                    <Separator Margin="0,6,0,0"/>
+                    <TextBlock Text="Destinations" FontWeight="SemiBold" Margin="0,4,0,4"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Color destination -->
+                        <CheckBox Grid.Row="0" Grid.Column="0" Content="Color"
+                                  IsChecked="{Binding ModColorDestEnable, Mode=TwoWay}"
+                                  IsThreeState="True" VerticalAlignment="Center"
+                                  kf:Keyframing.PropertyId="ModColorDestEnable"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                  kf:Keyframing.Interpolatable="False"/>
+                        <ctrl:HueSatButtonWpf Grid.Row="0" Grid.Column="1" Margin="2"
+                                              SelectedXnaColor="{Binding ModColorDest, Mode=TwoWay}"
+                                              kf:Keyframing.PropertyId="ModColorDest"
+                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                              kf:Keyframing.Interpolatable="True"/>
+
+                        <!-- Angle destination -->
+                        <CheckBox Grid.Row="1" Grid.Column="0" Content="Angle"
+                                  IsChecked="{Binding ModAngleDestEnable, Mode=TwoWay}"
+                                  IsThreeState="True" VerticalAlignment="Center" Margin="0,4,0,0"
+                                  kf:Keyframing.PropertyId="ModAngleDestEnable"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                  kf:Keyframing.Interpolatable="False"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="2,4,0,0">
+                            <ctrl:TbSliderWpf Value="{Binding ModAngleDest, Mode=TwoWay}"
+                                              Min="0" Max="90" Decimals="0" Width="100"
+                                              kf:Keyframing.PropertyId="ModAngleDest"
+                                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                              kf:Keyframing.Interpolatable="True"/>
+                            <TextBlock Text="°" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Interpolation -->
+                    <Separator Margin="0,6,0,0"/>
+                    <TextBlock Text="Interpolation" FontWeight="SemiBold" Margin="0,4,0,4"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Start:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModStart, Mode=TwoWay}"
+                                          Min="0" Max="1" Decimals="2"
+                                          kf:Keyframing.PropertyId="ModStart"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                          kf:Keyframing.Interpolatable="True"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Stop:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModStop, Mode=TwoWay}"
+                                          Min="0" Max="1" Decimals="2"
+                                          kf:Keyframing.PropertyId="ModStop"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                          kf:Keyframing.Interpolatable="True"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Fade in:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="2" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModFadeIn, Mode=TwoWay}"
+                                          Min="0" Max="1" Decimals="2"
+                                          kf:Keyframing.PropertyId="ModFadeIn"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                          kf:Keyframing.Interpolatable="True"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Fade out:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="3" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModFadeOut, Mode=TwoWay}"
+                                          Min="0" Max="1" Decimals="2"
+                                          kf:Keyframing.PropertyId="ModFadeOut"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                          kf:Keyframing.Interpolatable="True"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Fade pow:" VerticalAlignment="Center"/>
+                        <ctrl:TbSliderWpf Grid.Row="4" Grid.Column="1" Margin="2"
+                                          Value="{Binding ModPower, Mode=TwoWay}"
+                                          Min="0" Max="10" Decimals="2"
+                                          kf:Keyframing.PropertyId="ModPower"
+                                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                          kf:Keyframing.Interpolatable="True"/>
+
+                        <CheckBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                                  Content="Discard after stop"
+                                  IsChecked="{Binding ModDiscardAfterStop, Mode=TwoWay}"
+                                  IsThreeState="True" Margin="0,4,0,0"
+                                  kf:Keyframing.PropertyId="ModDiscardAfterStop"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                  kf:Keyframing.Interpolatable="False"/>
+
+                        <CheckBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                                  Content="Invert"
+                                  IsChecked="{Binding ModInvert, Mode=TwoWay}"
+                                  IsThreeState="True" Margin="0,2,0,0"
+                                  kf:Keyframing.PropertyId="ModInvert"
+                                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
+                                  kf:Keyframing.Interpolatable="False"/>
+                    </Grid>
+
+                </StackPanel>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,91 @@
+<UserControl x:Class="VisualMusic.Controls.SongPropsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrl="clr-namespace:VisualMusic.Controls"
+             xmlns:kf="clr-namespace:VisualMusic.Keyframes">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="4">
+            <TextBlock Text="Viewport width" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding ViewWidthQn, Mode=TwoWay}"
+                              Min="0" Max="10" ExpBase="2" Decimals="3" Decimals2="2"
+                              Margin="0,0,0,8"
+                              CommitChanges="VpWidth_CommitChanges"
+                              kf:Keyframing.PropertyId="ViewWidthQn"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                              kf:Keyframing.Interpolatable="True"/>
+
+            <TextBlock Text="Audio offset (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding AudioOffset, Mode=TwoWay}"
+                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"
+                              CommitChanges="AudioOffset_CommitChanges"/>
+
+            <TextBlock Text="Playback offset (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding PlaybackOffsetS, Mode=TwoWay}"
+                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"
+                              CommitChanges="PlaybackOffset_CommitChanges"/>
+
+            <TextBlock Text="Fade in (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding FadeIn, Mode=TwoWay}"
+                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"
+                              CommitChanges="FadeIn_CommitChanges"/>
+
+            <TextBlock Text="Fade out (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding FadeOut, Mode=TwoWay}"
+                              Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"
+                              CommitChanges="FadeOut_CommitChanges"/>
+
+            <TextBlock Text="Max pitch" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding MaxPitch, Mode=TwoWay}"
+                              Min="0" Max="128" Decimals="0" Margin="0,0,0,8"
+                              kf:Keyframing.PropertyId="MaxPitch"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                              kf:Keyframing.Interpolatable="False"/>
+
+            <TextBlock Text="Min pitch" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding MinPitch, Mode=TwoWay}"
+                              Min="0" Max="128" Decimals="0" Margin="0,0,0,4"
+                              kf:Keyframing.PropertyId="MinPitch"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                              kf:Keyframing.Interpolatable="False"/>
+            <Button Content="Reset pitches" HorizontalAlignment="Left"
+                    Margin="0,0,0,8" Click="ResetPitches_Click"/>
+
+            <TextBlock Text="Camera" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <TextBox Text="{Binding CameraText, Mode=OneWay}"
+                     IsReadOnly="True" AcceptsReturn="True"
+                     TextWrapping="NoWrap" Height="120"
+                     FontFamily="Consolas" FontSize="11"
+                     VerticalScrollBarVisibility="Auto"
+                     HorizontalScrollBarVisibility="Auto"
+                     Margin="0,0,0,8"
+                     kf:Keyframing.PropertyId="Camera"
+                     kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                     kf:Keyframing.Interpolatable="True"/>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <Button Content="Load background" Click="LoadBkg_Click"
+                        kf:Keyframing.PropertyId="BackgroundImagePath"
+                        kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                        kf:Keyframing.Interpolatable="True"/>
+                <Button Content="Unload" Margin="4,0,0,0" Click="UnloadBkg_Click"
+                        kf:Keyframing.PropertyId="BackgroundImagePath"
+                        kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                        kf:Keyframing.Interpolatable="True"/>
+            </StackPanel>
+
+            <TextBlock Text="Background opacity" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding BackgroundImageOpacity, Mode=TwoWay}"
+                              Min="0" Max="1" Decimals="2" Margin="0,0,0,8"
+                              kf:Keyframing.PropertyId="BackgroundImageOpacity"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                              kf:Keyframing.Interpolatable="True"/>
+
+            <TextBlock Text="Background saturation" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding BackgroundImageSaturation, Mode=TwoWay}"
+                              Min="0" Max="1" Decimals="2" Margin="0,0,0,4"
+                              kf:Keyframing.PropertyId="BackgroundImageSaturation"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                              kf:Keyframing.Interpolatable="True"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

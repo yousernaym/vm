@@ -5,9 +5,9 @@
     <AssemblyName>VM</AssemblyName>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows7.0</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <StartupObject>VisualMusic.Program</StartupObject>
+    <StartupObject>VisualMusic.App</StartupObject>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <PropertyGroup>
@@ -52,9 +52,10 @@
     <PackageReference Include="cef.redist.x64" Version="120.2.7" />
     <PackageReference Include="cef.redist.x86" Version="120.2.7" />
     <PackageReference Include="CefSharp.Common.NETCore" Version="121.3.70" />
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="121.3.70" />
-    <PackageReference Include="Microsoft-WindowsAPICodePack-Core-6.0" Version="1.1.6" />
-    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell-6.0" Version="1.1.6" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="121.3.70" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="5.0.0" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NAudio.Core" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -63,24 +64,17 @@
     <ProjectReference Include="..\Dependencies\midilib\midilib.csproj" />
     <ProjectReference Include="..\Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="xmplay.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(SolutionDir)Dependencies\Remuxer\Remuxer\bin\$(ConfigurationName)\&quot; &quot;$(TargetDir)Remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /Y /D&#xD;&#xA;&#xD;&#xA;" />
+  </Target>
+  <Target Name="BuildMonoGameContent" BeforeTargets="BeforeBuild" Condition="'$(MSBuildProjectFile)' == 'VisualMusic.csproj' and '$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Content\Content.mgcb')">
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\Content" Command="dotnet tool run mgcb -- /@:Content.mgcb /platform:Windows" />
+  </Target>
+  <Target Name="CopyMonoGameContent" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(MSBuildProjectFile)' == 'VisualMusic.csproj' and '$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Content\bin\Windows')">
+    <ItemGroup>
+      <BuiltMonoGameContent Include="$(MSBuildProjectDirectory)\Content\bin\Windows\*.xnb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BuiltMonoGameContent)" DestinationFolder="$(TargetDir)Content\" SkipUnchangedFiles="true" />
   </Target>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High" />

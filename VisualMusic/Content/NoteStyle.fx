@@ -3,10 +3,14 @@ float4x4 WorldMat;
 float4x4 VpMat;
 float2 ViewportSize;
 texture Texture;
+texture Texture2;
 bool UseTexture;
+bool UseTexture2;
 bool TexColBlend;
+float TextureBlend;
 float SongPos;
 float2 TexScrollOffset;
+float2 TexScrollOffset2;
 float VertWidthScale;
 float TexWidthScale;
 float4 HlColor;
@@ -14,6 +18,10 @@ float4 HlColor;
 sampler  TextureSampler = sampler_state
 {
 	texture = <Texture>;
+};
+sampler  TextureSampler2 = sampler_state
+{
+	texture = <Texture2>;
 };
 float4 Color;
 float BlurredEdgePixels = 2;
@@ -417,28 +425,39 @@ float4 RgbaToHsla(float4 rgba)
     return float4(h, s, l, rgba.a);
 }
 
-float4 getPixelColor(float4 color, float2 texCoords)
+float4 applyTextureColor(float4 hslaColor, float4 texColor)
 {
-	if (UseTexture)
+	if (TexColBlend)
 	{
-		float4 texColor = tex2D(TextureSampler, texCoords);
-		if (TexColBlend)
-		{
-			color = HslaToRgba(color) * texColor;
-		}
-		else
-		{
-			texColor = RgbaToHsla(texColor);
-			color.x += texColor.x;
-			if (color.x >= 1)
-				color.x -= (int)color.x;
-			color.y *= texColor.y;
-			color.z *= texColor.z;
-			color = saturate(color);
-			color = HslaToRgba(color);
-		}
+		return HslaToRgba(hslaColor) * texColor;
 	}
 	else
-		color = HslaToRgba(color);
-    return color;
+	{
+		texColor = RgbaToHsla(texColor);
+		hslaColor.x += texColor.x;
+		if (hslaColor.x >= 1)
+			hslaColor.x -= (int)hslaColor.x;
+		hslaColor.y *= texColor.y;
+		hslaColor.z *= texColor.z;
+		hslaColor = saturate(hslaColor);
+		return HslaToRgba(hslaColor);
+	}
+}
+
+float4 getPixelColor(float4 color, float2 texCoords, float2 texCoords2)
+{
+	float4 baseColor = HslaToRgba(color);
+	float4 color1 = UseTexture
+		? applyTextureColor(color, tex2D(TextureSampler, texCoords))
+		: baseColor;
+
+	float blend = saturate(TextureBlend);
+	if (blend <= 0)
+		return color1;
+
+	float4 color2 = UseTexture2
+		? applyTextureColor(color, tex2D(TextureSampler2, texCoords2))
+		: baseColor;
+
+    return lerp(color1, color2, blend);
 }

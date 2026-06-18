@@ -21,43 +21,43 @@ namespace VisualMusic
     static class Media
     {
         //General stuff
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool initMF();
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool closeMF();
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool openAudioFile(string file);
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "initMF")]
+        public static extern bool InitMF();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "closeMF")]
+        public static extern bool CloseMF();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "openAudioFile")]
+        public static extern bool OpenAudioFile(string file);
         [DllImport("media.dll", EntryPoint = "getAudioFilePath", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr getAudioFilePath_intptr();
-        public static string getAudioFilePath()
+        public static extern IntPtr GetAudioFilePath_intptr();
+        public static string GetAudioFilePath()
         {
-            return Marshal.PtrToStringAnsi(getAudioFilePath_intptr());
+            return Marshal.PtrToStringAnsi(GetAudioFilePath_intptr());
         }
 
         //Encoding
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool beginVideoEnc(string outputFile, string audioFile, VideoFormat vidFmt, double audioOffsetSeconds, bool spherical, bool sphericalStereo, AVCodecID videoCodec, string crf);
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool writeFrame(UInt32[] videoFrameBuffer);
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void endVideoEnc();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "beginVideoEnc")]
+        public static extern bool BeginVideoEnc(string outputFile, string audioFile, VideoFormat vidFmt, double audioOffsetSeconds, bool spherical, bool sphericalStereo, AVCodecID videoCodec, string crf);
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "writeFrame")]
+        public static extern bool WriteFrame(UInt32[] videoFrameBuffer);
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "endVideoEnc")]
+        public static extern void EndVideoEnc();
 
         //Playback
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool playbackIsRunning();
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool closeAudioFile();
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern double getPlaybackPos();
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool startPlaybackAtTime(double timeS);
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool startPlayback();
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool stopPlayback();
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool pausePlayback();
-        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern double getAudioLength();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "playbackIsRunning")]
+        public static extern bool PlaybackIsRunning();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "closeAudioFile")]
+        public static extern bool CloseAudioFile();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "getPlaybackPos")]
+        public static extern double GetPlaybackPos();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "startPlaybackAtTime")]
+        public static extern bool StartPlaybackAtTime(double timeS);
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "startPlayback")]
+        public static extern bool StartPlayback();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "stopPlayback")]
+        public static extern bool StopPlayback();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "pausePlayback")]
+        public static extern bool PausePlayback();
+        [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "getAudioLength")]
+        public static extern double GetAudioLength();
     }
 }
