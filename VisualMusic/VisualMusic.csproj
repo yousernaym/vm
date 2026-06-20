@@ -52,14 +52,14 @@
   <ItemGroup>
     <PackageReference Include="cef.redist.x64" Version="120.2.7" />
     <PackageReference Include="cef.redist.x86" Version="120.2.7" />
-    <PackageReference Include="CefSharp.Common.NETCore" Version="121.3.70" />
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="121.3.70" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
-    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="5.0.0" />
-    <PackageReference Include="NAudio" Version="2.2.1" />
-    <PackageReference Include="NAudio.Core" Version="2.2.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="148.0.90" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="148.0.90" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.11" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="6.2.1" />
+    <PackageReference Include="NAudio" Version="2.3.0" />
+    <PackageReference Include="NAudio.Core" Version="2.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependencies\midilib\midilib.csproj" />
@@ -82,13 +82,13 @@
         <Exec Command="dotnet tool restore" />
     </Target>
     <ItemGroup>
-      <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="121.3.7" />
+      <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="148.0.9" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="121.3.7" />
+      <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="148.0.9" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="121.3.7" />
+      <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="148.0.9" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="tparty\LibSidWiz\" />

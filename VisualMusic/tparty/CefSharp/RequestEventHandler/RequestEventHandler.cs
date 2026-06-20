@@ -88,9 +88,9 @@ namespace CefSharp.Example.RequestEventHandler
         //    return args.ContinueAsync;
         //}
 
-        void IRequestHandler.OnRenderProcessTerminated(IWebBrowser browserControl, IBrowser browser, CefTerminationStatus status)
+        void IRequestHandler.OnRenderProcessTerminated(IWebBrowser browserControl, IBrowser browser, CefTerminationStatus status, int errorCode, string errorMessage)
         {
-            var args = new OnRenderProcessTerminatedEventArgs(browserControl, browser, status);
+            var args = new OnRenderProcessTerminatedEventArgs(browserControl, browser, status, errorCode, errorMessage);
 
             OnRenderProcessTerminatedEvent?.Invoke(this, args);
         }
