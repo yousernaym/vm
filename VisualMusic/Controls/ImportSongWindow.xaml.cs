@@ -187,7 +187,7 @@ namespace VisualMusic.Controls
         {
             if (string.IsNullOrWhiteSpace(NoteFilePath))
             {
-                MessageBox.Show("Please specify a song file.", Program.AppName,
+                MetroMessageBox.Show("Please specify a song file.", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 noteFileBox.Focus();
                 return;

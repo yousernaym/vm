@@ -389,7 +389,7 @@ namespace VisualMusic
             }
             catch (Exception)
             {
-                System.Windows.MessageBox.Show("Failed to load texture " + Path);
+                MetroMessageBox.Show("Failed to load texture " + Path);
             }
         }
     }

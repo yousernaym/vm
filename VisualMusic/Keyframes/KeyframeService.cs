@@ -469,7 +469,7 @@ namespace VisualMusic.Keyframes
                         + string.Join("\n", labels.Select(l => "• " + l))
                         + "\n\nContinue?";
 
-            var result = System.Windows.MessageBox.Show(
+            var result = MetroMessageBox.Show(
                 body,
                 "Delete mod entry",
                 System.Windows.MessageBoxButton.OKCancel,
@@ -543,7 +543,7 @@ namespace VisualMusic.Keyframes
                                + string.Join("\n", modLabels.Select(l => "• " + l)));
                 string body = string.Join("\n\n", sections) + "\n\nContinue?";
 
-                var result = System.Windows.MessageBox.Show(
+                var result = MetroMessageBox.Show(
                     body,
                     "Default style",
                     System.Windows.MessageBoxButton.OKCancel,
@@ -583,7 +583,7 @@ namespace VisualMusic.Keyframes
                             + "\n\nReset to default will create keyframes at the current playback "
                             + "position for these properties.\n\nContinue?";
 
-                var result = System.Windows.MessageBox.Show(
+                var result = MetroMessageBox.Show(
                     body,
                     caption,
                     System.Windows.MessageBoxButton.OKCancel,
@@ -665,7 +665,7 @@ namespace VisualMusic.Keyframes
                             + "\n\nReset pitches will create keyframes at the current playback position "
                             + "for these properties.\n\nContinue?";
 
-                var result = System.Windows.MessageBox.Show(
+                var result = MetroMessageBox.Show(
                     body,
                     "Reset pitches",
                     System.Windows.MessageBoxButton.OKCancel,
@@ -723,7 +723,7 @@ namespace VisualMusic.Keyframes
 
             // blue → prompt
             var label = GetDisplayNameForId(ResolveIds(propertyId, scope).FirstOrDefault() ?? propertyId);
-            var result = System.Windows.MessageBox.Show(
+            var result = MetroMessageBox.Show(
                 $"There is no keyframe for \"{label}\" at the current playback position.\nCreate one?",
                 "Keyframe",
                 System.Windows.MessageBoxButton.OKCancel,
@@ -835,7 +835,7 @@ namespace VisualMusic.Keyframes
             string label = GetDisplayNameForId(ids[0]);
             if (ids.Count > 1) label += $" (+{ids.Count - 1} more)";
 
-            var result = System.Windows.MessageBox.Show(
+            var result = MetroMessageBox.Show(
                 $"Remove all keyframes for \"{label}\"?",
                 "Remove property keyframes",
                 System.Windows.MessageBoxButton.OKCancel,

@@ -172,10 +172,10 @@ namespace VisualMusic.Controls
         void Ok_Click(object sender, RoutedEventArgs e)
         {
             if (!ParseReso())
-                MessageBox.Show("Invalid resolution format", Program.AppName,
+                MetroMessageBox.Show("Invalid resolution format", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
             else if (Options.Width % 2 != 0 || Options.Height % 2 != 0)
-                MessageBox.Show("Resolution width and height must be even numbers", Program.AppName,
+                MetroMessageBox.Show("Resolution width and height must be even numbers", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
             else
                 DialogResult = true;

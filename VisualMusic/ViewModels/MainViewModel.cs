@@ -128,7 +128,7 @@ namespace VisualMusic.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, Program.AppName,
+                    MetroMessageBox.Show(ex.Message, Program.AppName,
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
@@ -180,7 +180,7 @@ namespace VisualMusic.ViewModels
                     .Select(item => item.TrackView.TrackProps.AudioProps.SidWizChannel)
                     .FirstOrDefault(ch => !string.IsNullOrEmpty(ch.ErrorMessage));
                 if (failedChannel != null)
-                    MessageBox.Show($"Couldn't load audio file:\n{failedChannel.Filename}", Program.AppName,
+                    MetroMessageBox.Show($"Couldn't load audio file:\n{failedChannel.Filename}", Program.AppName,
                         MessageBoxButton.OK, MessageBoxImage.Warning);
             };
 
@@ -515,12 +515,12 @@ namespace VisualMusic.ViewModels
             }
             catch (SerializationException e)
             {
-                MessageBox.Show("Invalid project file.\n" + e.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MetroMessageBox.Show("Invalid project file.\n" + e.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (IOException e)
             {
-                MessageBox.Show("Could not open file.\n" + e.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MetroMessageBox.Show("Could not open file.\n" + e.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -541,14 +541,14 @@ namespace VisualMusic.ViewModels
                 // rendering reads the static NoteStyle.Project — so restore it to _project rather than
                 // null, otherwise the next Draw() dereferences a null Project (NoteStyle.DrawTrack).
                 NoteStyle.SetProject(_project);
-                MessageBox.Show($"Could not load project file: {ex.Message}\n\nMissing file: {ex.FileName}",
+                MetroMessageBox.Show($"Could not load project file: {ex.Message}\n\nMissing file: {ex.FileName}",
                     Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (Exception ex)
             {
                 NoteStyle.SetProject(_project);
-                MessageBox.Show("Error loading project: " + ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MetroMessageBox.Show("Error loading project: " + ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -677,7 +677,7 @@ namespace VisualMusic.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Could not save {title.ToLower()}:\n{ex.Message}", Program.AppName,
+                MetroMessageBox.Show($"Could not save {title.ToLower()}:\n{ex.Message}", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
@@ -699,7 +699,7 @@ namespace VisualMusic.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MetroMessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
@@ -708,7 +708,7 @@ namespace VisualMusic.ViewModels
         {
             if (!HasUnsavedChanges) return true;
 
-            var result = MessageBox.Show(
+            var result = MetroMessageBox.Show(
                 $"Save changes to the current project before {action}?",
                 Program.AppName,
                 MessageBoxButton.YesNoCancel,
@@ -820,7 +820,7 @@ namespace VisualMusic.ViewModels
             try { options.CheckSourceFile(); }
             catch (FileImportException ex)
             {
-                MessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
+                MetroMessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
@@ -862,13 +862,13 @@ namespace VisualMusic.ViewModels
             }
             catch (FileImportException ex)
             {
-                MessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
+                MetroMessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Import failed: " + ex.Message, Program.AppName,
+                MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
@@ -912,7 +912,7 @@ namespace VisualMusic.ViewModels
                 ? $"{Program.SoundFontFileName} could not be loaded from the app folder"
                 : $"{Program.SoundFontFileName} is missing from the app folder";
 
-            MessageBox.Show(
+            MetroMessageBox.Show(
                 $"Audio will be disabled for this MIDI import because no WAV path was specified and {soundFontStatus}.\n\n" +
                 $"App folder:\n{Program.Dir}\n\n" +
                 $"Place a valid {Program.SoundFontFileName} in that folder, then restart {Program.AppName}, to enable generated MIDI audio.",
@@ -1118,7 +1118,7 @@ namespace VisualMusic.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MetroMessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1136,7 +1136,7 @@ namespace VisualMusic.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MetroMessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1178,7 +1178,7 @@ namespace VisualMusic.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MetroMessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -1211,7 +1211,7 @@ namespace VisualMusic.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MetroMessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1245,7 +1245,7 @@ namespace VisualMusic.ViewModels
 
             if (fileType == null)
             {
-                MessageBox.Show(
+                MetroMessageBox.Show(
                     $"Unrecognised file type: .{ext}\n\nFile: {suggestedFileName}",
                     Program.AppName, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -1267,7 +1267,7 @@ namespace VisualMusic.ViewModels
             try { options.SetNotePath(); }    // downloads the URL to a temp file (WebClient)
             catch (FileImportException)
             {
-                MessageBox.Show("Download failed: " + url, Program.AppName,
+                MetroMessageBox.Show("Download failed: " + url, Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }

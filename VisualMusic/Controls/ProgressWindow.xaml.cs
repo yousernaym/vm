@@ -38,7 +38,7 @@ namespace VisualMusic.Controls
         {
             // Block the job thread until the user dismisses the dialog.
             Dispatcher.Invoke(() =>
-                MessageBox.Show(this, message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Warning));
+                MetroMessageBox.Show(this, message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Warning));
         }
 
         void IRenderProgressCallback.UpdateProgress(float normProgress)
@@ -129,7 +129,7 @@ namespace VisualMusic.Controls
         {
             if (_job == null)
             {
-                MessageBox.Show("No job provided.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MetroMessageBox.Show("No job provided.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 _finished = true;
                 Close();
                 return;
@@ -196,7 +196,7 @@ namespace VisualMusic.Controls
         {
             taskbarInfo.ProgressState = TaskbarItemProgressState.None;
             if (_doneMessage != null && !Cancel)
-                MessageBox.Show(this, _doneMessage, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+                MetroMessageBox.Show(this, _doneMessage, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
             _cts.Dispose();
             Close();
         }
@@ -210,7 +210,7 @@ namespace VisualMusic.Controls
 
             if (_confirmCancel)
             {
-                var result = MessageBox.Show(this, "Stop?", Program.AppName,
+                var result = MetroMessageBox.Show(this, "Stop?", Program.AppName,
                     MessageBoxButton.OKCancel, MessageBoxImage.Question);
                 if (result != MessageBoxResult.OK)
                 {

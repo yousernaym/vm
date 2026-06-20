@@ -565,7 +565,7 @@ namespace VisualMusic
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(
+                MetroMessageBox.Show(
                     $"Could not load image \"{Path.GetFileName(path)}\". {ex.Message}",
                     "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                 return null;
@@ -720,7 +720,7 @@ namespace VisualMusic
                     }
                     catch (Exception e)
                     {
-                        System.Windows.MessageBox.Show(e.Message);
+                        MetroMessageBox.Show(e.Message);
                         lock (progress.CancelLock) { }
                         return;
                     }

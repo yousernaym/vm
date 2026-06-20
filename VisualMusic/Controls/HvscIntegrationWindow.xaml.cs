@@ -107,7 +107,7 @@ namespace VisualMusic.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                MetroMessageBox.Show(
                     "Couldn't download the file from the specified URL.\n" + ex.Message,
                     Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -119,7 +119,7 @@ namespace VisualMusic.Controls
             }
 
             if (cancelled)
-                MessageBox.Show("Download cancelled.", Program.AppName,
+                MetroMessageBox.Show("Download cancelled.", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
