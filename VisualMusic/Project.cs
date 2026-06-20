@@ -395,9 +395,13 @@ namespace VisualMusic
             }
             else if (!options.HasSuppliedAudio)
             {
-                string audioPath = Path.Combine(Program.TempDir, Path.GetFileName(options.NotePath)) + ".wav";
-                MidMix.Mixdown(options.NotePath, audioPath);
-                options.GeneratedAudioPath = audioPath;
+                options.GeneratedAudioPath = null;
+                if (MidMix.SfLoaded())
+                {
+                    string audioPath = Path.Combine(Program.TempDir, Path.GetFileName(options.NotePath)) + ".wav";
+                    MidMix.Mixdown(options.NotePath, audioPath);
+                    options.GeneratedAudioPath = audioPath;
+                }
             }
 
             bool resetProject = options.EraseCurrent || (_notes == null && (_trackViews == null || _trackViews.Count == 0));
@@ -486,6 +490,7 @@ namespace VisualMusic
         public void OpenAudioFile(ImportOptions options)
         {
             Media.CloseAudioFile();
+            AudioFilePath = "";
             string file = options.HasSuppliedAudio ? options.AudioPath : options.GeneratedAudioPath;
 
             if (string.IsNullOrWhiteSpace(file))

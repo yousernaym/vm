@@ -9,6 +9,8 @@ namespace VisualMusic
     {
         public static readonly string AppName = "Visual Music";
         public static readonly string Dir = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        public const string SoundFontFileName = "soundfont.sf2";
+        public static readonly string SoundFontPath = Path.Combine(Dir, SoundFontFileName);
         public static readonly string AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppName);
         public static readonly string DefaultUserFilesDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), AppName);
         public static readonly string TempDirRoot = Path.Combine(Path.GetTempPath(), AppName).ToLowerInvariant();

@@ -824,6 +824,7 @@ namespace VisualMusic.ViewModels
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            WarnIfMidiAudioWillBeDisabled(options);
 
             try
             {
@@ -900,6 +901,24 @@ namespace VisualMusic.ViewModels
 
             WindowTitle = $"{Program.AppName} — {options.DisplayName}";
             CurrentScreen = AppScreen.Song;
+        }
+
+        static void WarnIfMidiAudioWillBeDisabled(ImportOptions options)
+        {
+            if (options.NoteFileType != FileType.Midi || options.HasSuppliedAudio || MidMix.SfLoaded())
+                return;
+
+            string soundFontStatus = File.Exists(Program.SoundFontPath)
+                ? $"{Program.SoundFontFileName} could not be loaded from the app folder"
+                : $"{Program.SoundFontFileName} is missing from the app folder";
+
+            MessageBox.Show(
+                $"Audio will be disabled for this MIDI import because no WAV path was specified and {soundFontStatus}.\n\n" +
+                $"App folder:\n{Program.Dir}\n\n" +
+                $"Place a valid {Program.SoundFontFileName} in that folder, then restart {Program.AppName}, to enable generated MIDI audio.",
+                Program.AppName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
