@@ -17,4 +17,4 @@
 [submodule "Dependencies/MonoGame"]
 	path = Dependencies/MonoGame
 	url = https://github.com/yousernaym/MonoGame.git
-	branch = My_branch
+	branch = my_branch
