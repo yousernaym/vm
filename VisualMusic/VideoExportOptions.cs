@@ -65,6 +65,26 @@ namespace VisualMusic
 
         int _sphereResoIndex = 1;
         int _nonSphereResoIndex = 1;
+
+        /// <summary>
+        /// The exact resolution text last shown in the combo (e.g. a custom "2000 x 1000"),
+        /// routed by <see cref="Sphere"/> like <see cref="ResoIndex"/>. Lets a typed custom
+        /// resolution survive a dialog reopen, where <see cref="ResoIndex"/> alone cannot.
+        /// </summary>
+        public string ResoText
+        {
+            get => Sphere ? _sphereResoText : _nonSphereResoText;
+            set
+            {
+                if (Sphere)
+                    _sphereResoText = value;
+                else
+                    _nonSphereResoText = value;
+            }
+        }
+
+        string _sphereResoText;
+        string _nonSphereResoText;
         public int SsaaIndex => (int)Math.Log(_ssaaFactor, 2);
 
         public VideoExportOptions()

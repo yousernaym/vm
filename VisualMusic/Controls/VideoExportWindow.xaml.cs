@@ -62,6 +62,9 @@ namespace VisualMusic.Controls
 
         void UpdateResoItems()
         {
+            // Capture before rebuilding: setting SelectedIndex below resets the editable text.
+            string savedResoText = Options.ResoText;
+
             resoCombo.Items.Clear();
             if (Options.Sphere)
             {
@@ -87,6 +90,11 @@ namespace VisualMusic.Controls
             if (idx < 0 || idx >= resoCombo.Items.Count) idx = 0;
             resoCombo.SelectedIndex = idx;
             Options.ResoIndex = idx;           // keep in sync regardless of whether SelectionChanged fires
+
+            // Restore a custom (non-preset) resolution typed previously for this mode.
+            if (!string.IsNullOrWhiteSpace(savedResoText))
+                resoCombo.Text = savedResoText;
+
             UpdateResoColor();
         }
 
@@ -101,6 +109,7 @@ namespace VisualMusic.Controls
                 if (w <= 0 || h <= 0) return false;
                 Options.Width = w;
                 Options.Height = h;
+                Options.ResoText = resoCombo.Text;
                 return true;
             }
             catch (FormatException) { return false; }
@@ -120,8 +129,11 @@ namespace VisualMusic.Controls
         {
             Options.Sphere = sphereCb.IsChecked == true;
             // WPF CheckBox.IsChecked is bool? — set them separately to avoid implicit bool?→bool error.
+            // Setting IsChecked programmatically does not raise Click, so mirror the auto-toggled
+            // state into Options here; otherwise only the checkbox the user clicked gets persisted.
             sphericalMetadataCb.IsChecked = Options.Sphere;
             sphericalMetadataCb.IsEnabled = Options.Sphere;
+            Options.SphericalMetadata = Options.Sphere;
             UpdateResoItems();
         }
 

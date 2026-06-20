@@ -929,6 +929,10 @@ namespace VisualMusic.ViewModels
             var dlg = new Controls.VideoExportWindow(options) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
 
+            // Persist the chosen settings as soon as OK is clicked, so they survive even if the
+            // user then cancels the save-file dialog below.
+            AppSettings.Instance.SaveVideoExportOptions(dlg.Options);
+
             var save = new SaveFileDialog
             {
                 Filter = "Mkv files (*.mkv)|*.mkv",
@@ -938,7 +942,6 @@ namespace VisualMusic.ViewModels
             if (save.ShowDialog() != true) return;
 
             AppSettings.Instance.RememberFolder(save.FileName, dir => AppSettings.Instance.VideoFolder = dir);
-            AppSettings.Instance.SaveVideoExportOptions(dlg.Options);
 
             Controls.ProgressWindow.RunRender(save.FileName, dlg.Options, RenderVideo);
         }

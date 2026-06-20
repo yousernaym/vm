@@ -83,6 +83,8 @@ namespace VisualMusic
         [DataMember] public bool VideoSphericalStereo { get; set; }
         [DataMember] public int VideoSphereResoIndex { get; set; }
         [DataMember] public int VideoNonSphereResoIndex { get; set; }
+        [DataMember] public string VideoSphereResoText { get; set; }
+        [DataMember] public string VideoNonSphereResoText { get; set; }
         [DataMember] public int VideoSsaaFactor { get; set; }
         [DataMember] public int? VideoQualityLoss { get; set; }
         [DataMember] public float VideoFps { get; set; }
@@ -96,9 +98,9 @@ namespace VisualMusic
         public VideoExportOptions LoadVideoExportOptions()
         {
             var o = new VideoExportOptions();
-            // ResoIndex setter routes by Sphere, so set the non-sphere index first.
-            o.Sphere = false; o.ResoIndex = VideoNonSphereResoIndex;
-            o.Sphere = true; o.ResoIndex = VideoSphereResoIndex;
+            // ResoIndex/ResoText setters route by Sphere, so set the non-sphere values first.
+            o.Sphere = false; o.ResoIndex = VideoNonSphereResoIndex; o.ResoText = VideoNonSphereResoText;
+            o.Sphere = true; o.ResoIndex = VideoSphereResoIndex; o.ResoText = VideoSphereResoText;
             o.Sphere = VideoSphere;
             o.SphericalMetadata = VideoSphericalMetadata;
             o.SphericalStereo = VideoSphericalStereo;
@@ -115,8 +117,8 @@ namespace VisualMusic
             VideoSphericalMetadata = o.SphericalMetadata;
             VideoSphericalStereo = o.SphericalStereo;
             bool origSphere = o.Sphere;
-            o.Sphere = true; VideoSphereResoIndex = o.ResoIndex;
-            o.Sphere = false; VideoNonSphereResoIndex = o.ResoIndex;
+            o.Sphere = true; VideoSphereResoIndex = o.ResoIndex; VideoSphereResoText = o.ResoText;
+            o.Sphere = false; VideoNonSphereResoIndex = o.ResoIndex; VideoNonSphereResoText = o.ResoText;
             o.Sphere = origSphere;
             VideoSsaaFactor = o.SSAAFactor;
             VideoQualityLoss = o.VideoQualityLoss;
