@@ -614,17 +614,21 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// For a non-MIDI project, offers to export the converted MIDI / generated WAV alongside the
-        /// project (both default off). A saved WAV becomes the project's supplied audio; a saved MIDI
-        /// turns this into a MIDI project. This never blocks the save: cancelling the checkbox dialog
-        /// (or an individual file picker) just skips the export and the project is still saved.
+        /// Offers to export the converted/synthesized MIDI and WAV alongside the project (both default
+        /// off). MOD/SID/HVL projects can save both; a MIDI project already has the MIDI as its source,
+        /// so only the generated WAV can be saved (its MIDI checkbox stays disabled). A saved WAV
+        /// becomes the project's supplied audio; a saved MIDI turns a non-MIDI project into a MIDI
+        /// project. This never blocks the save: cancelling the checkbox dialog (or an individual file
+        /// picker) just skips the export and the project is still saved.
         /// </summary>
         void SaveSourceFiles(string projectPath)
         {
             var io = _project?.ImportOptions;
-            if (io == null || io.NoteFileType == FileType.Midi) return;   // only non-MIDI projects
+            if (io == null) return;
 
-            bool midiAvail = !string.IsNullOrEmpty(io.MidiOutputPath) && File.Exists(io.MidiOutputPath);
+            // A MIDI project's MIDI is already its source file, so only the generated WAV is offered.
+            bool midiAvail = io.NoteFileType != FileType.Midi
+                && !string.IsNullOrEmpty(io.MidiOutputPath) && File.Exists(io.MidiOutputPath);
             // Only offer to save the WAV when there's a freshly generated one and the project doesn't
             // already reference a WAV (supplied audio or one saved earlier).
             bool wavAvail = !io.HasSuppliedAudio
