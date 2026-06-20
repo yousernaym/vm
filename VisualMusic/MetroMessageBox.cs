@@ -70,7 +70,7 @@ namespace VisualMusic
 
                 Title = caption;
                 MinWidth = 260;
-                MaxWidth = owner != null ? System.Math.Max(360, owner.ActualWidth - 80) : 560;
+                MaxWidth = 560;
                 SizeToContent = SizeToContent.WidthAndHeight;
                 ResizeMode = ResizeMode.NoResize;
                 ShowInTaskbar = owner == null;
