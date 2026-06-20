@@ -29,7 +29,10 @@ namespace VisualMusic
         // (CheckBox, RadioButton, ListView items) can swallow the Space activation key.
         void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space && Keyboard.Modifiers == ModifierKeys.Control)
+            // Ctrl+Space or the keyboard's media play/pause key toggles playback.
+            bool ctrlSpace = e.Key == Key.Space && Keyboard.Modifiers == ModifierKeys.Control;
+            bool mediaPlayPause = e.Key == Key.MediaPlayPause;
+            if (ctrlSpace || mediaPlayPause)
             {
                 if (_vm.TogglePlaybackCommand.CanExecute(null))
                     _vm.TogglePlaybackCommand.Execute(null);
