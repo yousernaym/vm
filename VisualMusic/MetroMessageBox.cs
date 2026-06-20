@@ -57,6 +57,7 @@ namespace VisualMusic
         sealed class MetroMessageBoxWindow : MetroWindow
         {
             readonly MessageBoxButton _buttons;
+            Button _defaultButton;
             bool _hasExplicitResult;
 
             public MessageBoxResult Result { get; private set; }
@@ -68,10 +69,9 @@ namespace VisualMusic
                 Result = DefaultResult(buttons);
 
                 Title = caption;
-                Width = 520;
-                MinWidth = 360;
-                MaxWidth = owner != null ? System.Math.Max(360, owner.ActualWidth - 80) : 720;
-                SizeToContent = SizeToContent.Height;
+                MinWidth = 260;
+                MaxWidth = owner != null ? System.Math.Max(360, owner.ActualWidth - 80) : 560;
+                SizeToContent = SizeToContent.WidthAndHeight;
                 ResizeMode = ResizeMode.NoResize;
                 ShowInTaskbar = owner == null;
                 WindowStartupLocation = owner != null
@@ -91,17 +91,16 @@ namespace VisualMusic
                 body.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 body.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-                var iconText = GetIconText(icon);
-                if (!string.IsNullOrEmpty(iconText))
+                var (iconGlyph, iconBrush) = GetIcon(icon);
+                if (!string.IsNullOrEmpty(iconGlyph))
                 {
                     var iconBlock = new TextBlock
                     {
-                        Text = iconText,
-                        Width = 32,
-                        Height = 32,
-                        Margin = new Thickness(0, 1, 14, 0),
-                        FontSize = 22,
-                        FontWeight = FontWeights.SemiBold,
+                        Text = iconGlyph,
+                        Margin = new Thickness(0, 1, 16, 0),
+                        FontFamily = SymbolFont,
+                        FontSize = 28,
+                        Foreground = iconBrush,
                         TextAlignment = TextAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Top
                     };
@@ -148,11 +147,19 @@ namespace VisualMusic
                     };
                     button.Click += (_, _) => CloseWith(result);
                     buttonPanel.Children.Add(button);
+                    if (isDefault)
+                        _defaultButton = button;
                 }
 
                 Grid.SetRow(buttonPanel, 1);
                 root.Children.Add(buttonPanel);
                 return root;
+            }
+
+            protected override void OnSourceInitialized(System.EventArgs e)
+            {
+                base.OnSourceInitialized(e);
+                _defaultButton?.Focus();
             }
 
             void CloseWith(MessageBoxResult result)
@@ -209,16 +216,26 @@ namespace VisualMusic
                 };
             }
 
-            static string GetIconText(MessageBoxImage icon)
+            static readonly FontFamily SymbolFont = new FontFamily("Segoe MDL2 Assets");
+
+            static (string Glyph, Brush Brush) GetIcon(MessageBoxImage icon)
             {
                 return icon switch
                 {
-                    MessageBoxImage.Error => "X",
-                    MessageBoxImage.Warning => "!",
-                    MessageBoxImage.Question => "?",
-                    MessageBoxImage.Information => "i",
-                    _ => ""
+                    // Glyphs from Segoe MDL2 Assets (present on Win10/11).
+                    MessageBoxImage.Error => ("", Brush(0xE8, 0x11, 0x23)),      // red Error
+                    MessageBoxImage.Warning => ("", Brush(0xF7, 0x9A, 0x1C)),    // amber Warning
+                    MessageBoxImage.Question => ("", Brush(0x00, 0x78, 0xD4)),   // blue Help
+                    MessageBoxImage.Information => ("", Brush(0x00, 0x78, 0xD4)),// blue Info
+                    _ => (string.Empty, System.Windows.Media.Brushes.Transparent)
                 };
+            }
+
+            static SolidColorBrush Brush(byte r, byte g, byte b)
+            {
+                var brush = new SolidColorBrush(Color.FromRgb(r, g, b));
+                brush.Freeze();
+                return brush;
             }
         }
     }
