@@ -11,7 +11,7 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
 
 ## Building the source
 
-* Install [Visual Studio 2022](https://visualstudio.microsoft.com/) with the following components:
+* Install [Visual Studio 2026](https://visualstudio.microsoft.com/) with the following components:
   * Workloads
     * .NET desktop development
     * Desktop development with C++
@@ -42,12 +42,13 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
 3. When returned to the visualization screen, press CTRL-Space or your keyboard's play button to start playback
 
 ### Camera control
-Move: wasdrf  
-Rotate: Shift + wasdqe
+Click in the song area to give it focus.
+Move with WASD + RF.
+Click scroll wheel to lock mouse movement for camera rotation. Click again to release lock.
 
-### Key frames (WIP)
-Press CTRL-K to insert a key frame at the current playback position.  
-Changes to supported properties will be stored in the currently highlighted key frame. Currently only Viewport widht and Camera is supported.
+
+### Key frames
+Right-click on a control to add a key frame for that control at the current playback position.
 
 ## Sub projects
 

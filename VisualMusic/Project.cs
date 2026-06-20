@@ -8,6 +8,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace VisualMusic
@@ -310,7 +313,10 @@ namespace VisualMusic
             info.AddValue("vertWidthQn", _vertViewWidthQn);
         }
 
-        async public Task<bool> ImportSong(ImportOptions options)
+        // Matches the "Progress: N%" lines emitted by remuxer.exe (see Remuxer/Program.cs).
+        static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
+
+        async public Task<bool> ImportSong(ImportOptions options, IProgress<float> progress = null, CancellationToken ct = default)
         { //`Open project` and `import files` meet here
             options.CheckSourceFile();
             //Convert mod/sid files to mid/wav
@@ -349,12 +355,37 @@ namespace VisualMusic
                     var startInfo = new ProcessStartInfo(Path.Combine(workingDir, "remuxer.exe"), cmdLine)
                     {
                         WorkingDirectory = workingDir,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true,
                     };
                     using var process = Process.Start(startInfo)
                         ?? throw new IOException("Couldn't start remuxer.");
-                    await process.WaitForExitAsync();
+
+                    // Parse the "Progress: N%" lines remuxer writes to stdout and forward them to the UI.
+                    process.OutputDataReceived += (_, e) =>
+                    {
+                        if (e.Data == null)
+                            return;
+                        var m = RemuxerProgressRegex.Match(e.Data);
+                        if (m.Success && int.TryParse(m.Groups[1].Value, out int percent))
+                            progress?.Report(percent / 100f);
+                    };
+                    var errorOutput = new StringBuilder();
+                    process.ErrorDataReceived += (_, e) => { if (e.Data != null) errorOutput.AppendLine(e.Data); };
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+
+                    // Kill the converter if the user cancels the progress dialog.
+                    using (ct.Register(() => { try { if (!process.HasExited) process.Kill(true); } catch { /* already gone */ } }))
+                        await process.WaitForExitAsync();
+                    ct.ThrowIfCancellationRequested();
+
                     if (process.ExitCode != 0)
-                        throw new FileImportException(null, ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
+                        throw new FileImportException(
+                            errorOutput.Length > 0 ? errorOutput.ToString().Trim() : null,
+                            ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
 
                     if (!File.Exists(midiPath) && !File.Exists(generatedAudioPath))
                         return false;

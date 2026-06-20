@@ -756,7 +756,37 @@ namespace VisualMusic.ViewModels
 
             try
             {
-                if (!await _project.ImportSong(options)) return;
+                if (options.NoteFileType != FileType.Midi)
+                {
+                    // MOD/SID are converted by the external remuxer.exe, which reports percentage
+                    // progress on stdout. Run it behind the shared progress window so the user sees
+                    // the conversion advance and can cancel it.
+                    bool imported = false;
+                    bool cancelled = false;
+                    Exception failure = null;
+
+                    var w = new Controls.ProgressWindow(
+                        $"Converting {Path.GetFileName(options.RawNotePath ?? options.NotePath ?? "")}",
+                        async cb =>
+                        {
+                            try
+                            {
+                                imported = await _project.ImportSong(
+                                    options, new Progress<float>(cb.UpdateProgress), cb.CancelToken);
+                            }
+                            catch (OperationCanceledException) { cancelled = true; }
+                            catch (Exception ex) { failure = ex; }
+                            return null;
+                        })
+                    { Owner = Application.Current?.MainWindow };
+                    w.ShowDialog();
+
+                    if (cancelled) return;
+                    if (failure != null) throw failure;
+                    if (!imported) return;
+                }
+                else if (!await _project.ImportSong(options))
+                    return;
             }
             catch (FileImportException ex)
             {
