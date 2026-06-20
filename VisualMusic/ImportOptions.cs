@@ -43,6 +43,27 @@ namespace VisualMusic
         public string MidiOutputPath { get; set; }
         public bool SavedMidi { get; set; }
 
+        /// <summary>
+        /// Human-readable source file name for window titles and progress dialogs.
+        /// Prefers the resolved local file so URL imports show the downloaded name
+        /// (e.g. "song.mod"), not the full download URL.
+        /// </summary>
+        public string DisplayName
+        {
+            get
+            {
+                string p = !string.IsNullOrWhiteSpace(NotePath) ? NotePath
+                         : SavedMidi ? MidiOutputPath
+                         : RawNotePath;
+                if (string.IsNullOrWhiteSpace(p)) return "";
+                if (p.IsUrl())
+                {
+                    try { return Path.GetFileName(new Uri(p).LocalPath); } catch { return p; }
+                }
+                return Path.GetFileName(p);
+            }
+        }
+
         public ImportOptions(FileType noteFileType)
         {
             NoteFileType = noteFileType;

@@ -606,10 +606,77 @@ namespace VisualMusic.ViewModels
             };
             if (dlg.ShowDialog() != true) return false;
             AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.ProjectFolder = dir);
+            SaveSourceFiles(dlg.FileName);   // optional MIDI/WAV export; cancelling it still saves the project
             if (!SaveToPath(dlg.FileName)) return false;
             _currentProjectPath = dlg.FileName;
             _project.DefaultFileName = Path.GetFileName(dlg.FileName);
             return true;
+        }
+
+        /// <summary>
+        /// For a non-MIDI project, offers to export the converted MIDI / generated WAV alongside the
+        /// project (both default off). A saved WAV becomes the project's supplied audio; a saved MIDI
+        /// turns this into a MIDI project. This never blocks the save: cancelling the checkbox dialog
+        /// (or an individual file picker) just skips the export and the project is still saved.
+        /// </summary>
+        void SaveSourceFiles(string projectPath)
+        {
+            var io = _project?.ImportOptions;
+            if (io == null || io.NoteFileType == FileType.Midi) return;   // only non-MIDI projects
+
+            bool midiAvail = !string.IsNullOrEmpty(io.MidiOutputPath) && File.Exists(io.MidiOutputPath);
+            // Only offer to save the WAV when there's a freshly generated one and the project doesn't
+            // already reference a WAV (supplied audio or one saved earlier).
+            bool wavAvail = !io.HasSuppliedAudio
+                && !string.IsNullOrEmpty(io.GeneratedAudioPath) && File.Exists(io.GeneratedAudioPath);
+            if (!midiAvail && !wavAvail) return;
+
+            var dlg = new Controls.SaveSourceFilesWindow(midiAvail, wavAvail) { Owner = Application.Current.MainWindow };
+            if (dlg.ShowDialog() != true) return;   // cancelled — skip export, project is still saved
+
+            string dir = Path.GetDirectoryName(projectPath);
+            string name = Path.GetFileNameWithoutExtension(projectPath);
+
+            string savedMidiPath = dlg.SaveMidi
+                ? PickAndCopy(io.MidiOutputPath, "MIDI files (*.mid)|*.mid|All files (*.*)|*.*",
+                    Path.Combine(dir, name + ".mid"), "Save MIDI file")
+                : null;
+            string savedWavPath = dlg.SaveWav
+                ? PickAndCopy(io.GeneratedAudioPath, "Wave files (*.wav)|*.wav|All files (*.*)|*.*",
+                    Path.Combine(dir, name + ".wav"), "Save WAV file")
+                : null;
+
+            // Wire the saved WAV as supplied audio (recorded in the project, reused on load).
+            if (savedWavPath != null) io.AudioPath = savedWavPath;
+            // Saving MIDI turns this into a MIDI project.
+            if (savedMidiPath != null) _project.ConvertToMidiProject(savedMidiPath, io.AudioPath);
+        }
+
+        /// <summary>
+        /// Prompts for a destination with a SaveFileDialog and copies <paramref name="source"/> there.
+        /// Returns the chosen path, or null if the user cancelled the picker.
+        /// </summary>
+        static string PickAndCopy(string source, string filter, string defaultPath, string title)
+        {
+            var dlg = new SaveFileDialog
+            {
+                Filter = filter,
+                Title = title,
+                InitialDirectory = Path.GetDirectoryName(defaultPath),
+                FileName = Path.GetFileName(defaultPath),
+            };
+            if (dlg.ShowDialog() != true) return null;
+            try
+            {
+                File.Copy(source, dlg.FileName, true);
+                return dlg.FileName;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not save {title.ToLower()}:\n{ex.Message}", Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
         }
 
         bool SaveToPath(string path)
@@ -766,7 +833,7 @@ namespace VisualMusic.ViewModels
                     Exception failure = null;
 
                     var w = new Controls.ProgressWindow(
-                        $"Converting {Path.GetFileName(options.RawNotePath ?? options.NotePath ?? "")}",
+                        $"Converting {options.DisplayName}",
                         async cb =>
                         {
                             try
@@ -827,8 +894,7 @@ namespace VisualMusic.ViewModels
                 _undoItems.MarkSaved();
             UpdateUndoRedo();
 
-            string name = Path.GetFileName(options.RawNotePath ?? options.NotePath ?? "");
-            WindowTitle = $"{Program.AppName} — {name}";
+            WindowTitle = $"{Program.AppName} — {options.DisplayName}";
             CurrentScreen = AppScreen.Song;
         }
 

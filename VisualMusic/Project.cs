@@ -416,6 +416,25 @@ namespace VisualMusic
             return true;
         }
 
+        /// <summary>
+        /// Turn this (MOD/SID/HVL) project into a plain MIDI project that loads from a saved .mid,
+        /// so future loads no longer run the remuxer. <paramref name="audioPath"/> (the saved WAV or a
+        /// pre-existing supplied audio file, or null) becomes the project's supplied audio.
+        /// </summary>
+        public void ConvertToMidiProject(string midiPath, string audioPath)
+        {
+            var midiOpts = new MidiImportOptions
+            {
+                RawNotePath = midiPath,
+                AudioPath = audioPath,   // saved WAV (or pre-existing supplied audio), else null
+                InsTrack = true,         // saved .mid already carries the remuxer's track layout
+                EraseCurrent = false,
+            };
+            midiOpts.SetNotePath();      // NotePath = midiPath (local file)
+            ImportOptions = midiOpts;
+            midiOpts.UpdateImportForm(); // pre-fill the MIDI import dialog session (UpdateSession)
+        }
+
         public bool OpenNoteFile(ImportOptions options, bool? resetProjectOverride = null)
         {
             bool resetProject = resetProjectOverride ?? options.EraseCurrent;
