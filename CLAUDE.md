@@ -20,7 +20,7 @@ project dependencies so a single build produces a runnable app.
 
 | Project | Language | How VisualMusic uses it | Guide |
 |---|---|---|---|
-| VisualMusic | C# (net8.0-windows, WPF + WinForms) | the app itself; assembly `VM.exe` | [VisualMusic/CLAUDE.md](VisualMusic/CLAUDE.md) |
+| VisualMusic | C# (net10.0-windows, WPF + WinForms) | the app itself; assembly `VM.exe` | [VisualMusic/CLAUDE.md](VisualMusic/CLAUDE.md) |
 | midiLib | C# (net48) | `ProjectReference` — MIDI parsing (`Midi.Song`) | [Dependencies/midiLib/CLAUDE.md](Dependencies/midiLib/CLAUDE.md) |
 | MonoGame (WindowsDX) | C# (fork) | `ProjectReference` — 3D graphics framework | [Dependencies/MonoGame/CLAUDE.md](Dependencies/MonoGame/CLAUDE.md) |
 | Media | C++ → `media.dll` | P/Invoke ([VisualMusic/Media.cs](VisualMusic/Media.cs)) — FFmpeg video export + Media Foundation audio playback | [Dependencies/Media/CLAUDE.md](Dependencies/Media/CLAUDE.md) |

@@ -25,7 +25,7 @@ Key characteristics:
   vcpkg install fluidsynth:x64-windows
   vcpkg install ffmpeg[x264]:x64-windows
   ```
-- **.NET 8.0** (project targets `net8.0-windows7.0`)
+- **.NET 10.0** (project targets `net10.0-windows10.0.26100.0`)
 
 ### Building
 
@@ -36,7 +36,7 @@ msbuild VisualMusic.sln /p:Configuration=Release
 ```
 
 **Output locations:**
-- Main executable: `VisualMusic/bin/Debug/net8.0-windows7.0/` or `VisualMusic/bin/Release/...`
+- Main executable: `VisualMusic/bin/x64/Debug/net10.0-windows10.0.26100.0/` or `VisualMusic/bin/x64/Release/...`
 - Assembly name: `VM.exe`
 - Post-build copies native DLLs and Remuxer binaries to output folder
 
