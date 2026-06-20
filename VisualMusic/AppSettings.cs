@@ -47,6 +47,15 @@ namespace VisualMusic
         public void SetAudioFolder(FileType type, string dir)
             => _audioFolders[type] = dir;
 
+        // ---- Window state ----
+
+        /// <summary>Whether the main window was maximized when last closed.
+        /// Null when never persisted; defaults to maximized via <see cref="WindowMaximizedOrDefault"/>.</summary>
+        [DataMember] public bool? WindowMaximized { get; set; }
+
+        /// <summary>Persisted maximized state, defaulting to maximized when unset.</summary>
+        public bool WindowMaximizedOrDefault => WindowMaximized ?? true;
+
         // ---- Theme ----
 
         [DataMember] public string ThemeBaseColor { get; set; }  // e.g. "Dark" or "Light"

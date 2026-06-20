@@ -15,6 +15,8 @@ namespace VisualMusic
             _vm = new MainViewModel();
             DataContext = _vm;
             InitializeComponent();
+            if (AppSettings.Instance.WindowMaximizedOrDefault)
+                WindowState = WindowState.Maximized;
             Loaded += OnLoaded;
             Closing += OnClosing;
         }
@@ -22,7 +24,13 @@ namespace VisualMusic
         void OnClosing(object sender, CancelEventArgs e)
         {
             if (!_vm.ConfirmSaveChangesBefore("exiting"))
+            {
                 e.Cancel = true;
+                return;
+            }
+
+            AppSettings.Instance.WindowMaximized = WindowState == WindowState.Maximized;
+            AppSettings.Instance.Save();
         }
 
         // Tunneling PreviewKeyDown ensures Ctrl+Space reaches us before focusable panel controls
