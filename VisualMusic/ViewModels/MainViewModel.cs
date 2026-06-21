@@ -68,8 +68,8 @@ namespace VisualMusic.ViewModels
         [NotifyCanExecuteChangedFor(nameof(GoToPrevKeyFrameCommand))]
         private Project _project;
 
-        public bool HasProject => _project != null;
-        public bool HasAudio => _project != null && Media.GetAudioLength() > 0;
+        public bool HasProject => Project != null;
+        public bool HasAudio => Project != null && Media.GetAudioLength() > 0;
         public bool HasUnsavedChanges => HasProject && _undoItems.Current != null && !_undoItems.IsCurrentSaved;
 
         [ObservableProperty]
@@ -107,14 +107,14 @@ namespace VisualMusic.ViewModels
             {
                 foreach (var item in TrackList.SelectedItems)
                     fn(item.TrackView.TrackProps);
-                _project?.CreateGeos();
+                Project?.CreateGeos();
             };
 
             SelectedTrackProps.RefreshTrackColors = TrackList.RefreshColors;
 
             SelectedTrackProps.LoadTexture = path =>
             {
-                if (_project == null) return;
+                if (Project == null) return;
                 var drawHost = GetDrawHost?.Invoke();
                 if (drawHost == null) return;
                 if (!Keyframes.KeyframeService.EnsureKeyframeForEdit("TexturePath",
@@ -132,7 +132,7 @@ namespace VisualMusic.ViewModels
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                _project.CreateGeos();
+                Project.CreateGeos();
                 Keyframes.KeyframeService.SyncEditedValue("TexturePath",
                     Keyframes.KeyframeService.KfScope.Track,
                     new Keyframes.StringKfValue(path));
@@ -142,14 +142,14 @@ namespace VisualMusic.ViewModels
 
             SelectedTrackProps.UnloadTexture = () =>
             {
-                if (_project == null) return;
+                if (Project == null) return;
                 if (!Keyframes.KeyframeService.EnsureKeyframeForEdit("TexturePath",
                     Keyframes.KeyframeService.KfScope.Track))
                     return;
 
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.MaterialProps.TexProps.UnloadTexture();
-                _project.CreateGeos();
+                Project.CreateGeos();
                 Keyframes.KeyframeService.SyncEditedValue("TexturePath",
                     Keyframes.KeyframeService.KfScope.Track,
                     new Keyframes.StringKfValue(""));
@@ -192,7 +192,7 @@ namespace VisualMusic.ViewModels
                     item.TrackView.TrackProps.ResetStyle();
                 Keyframes.KeyframeService.PurgeModKeyframesForSelectedTracks();
                 Keyframes.KeyframeService.CaptureDefaultStyleAtCurrentTick(affected);
-                _project?.CreateGeos();
+                Project?.CreateGeos();
                 OnTrackListSelectionChanged();
                 AddUndoItem("Reset style");
             };
@@ -204,7 +204,7 @@ namespace VisualMusic.ViewModels
                 foreach (var item in TrackList.SelectedItems)
                     item.TrackView.TrackProps.ResetMaterial();
                 Keyframes.KeyframeService.CaptureDefaultMaterialAtCurrentTick(affected);
-                _project?.CreateGeos();
+                Project?.CreateGeos();
                 OnTrackListSelectionChanged();
                 AddUndoItem("Reset material");
             };
@@ -287,7 +287,7 @@ namespace VisualMusic.ViewModels
             // to all dragged items (destinations). Visual tabs only (Style/Material/Light/Spatial).
             TrackList.CopyTabPropsToDropped = (sourceItem, destItems) =>
             {
-                if (_project == null || sourceItem == null) return;
+                if (Project == null || sourceItem == null) return;
                 int tabIndex = SelectedTrackProps.SelectedTabIndex;   // 0=Style…3=Spatial, 4=Audio
                 if (tabIndex < 0 || tabIndex > 3) return;             // Audio tab = no-op
                 int flag = 1 << tabIndex;
@@ -304,7 +304,7 @@ namespace VisualMusic.ViewModels
                 if (!changed) return;
 
                 if ((flag & ((int)TrackPropsType.TPT_Style | (int)TrackPropsType.TPT_Material)) != 0)
-                    _project.CreateGeos();   // geometry/texture coords are baked per track
+                    Project.CreateGeos();   // geometry/texture coords are baked per track
                 if (flag == (int)TrackPropsType.TPT_Material)
                     TrackList.RefreshColors(); // update the two color swatches in the list
                 OnTrackListSelectionChanged(); // refresh the tabs for the (still-selected) dragged tracks
@@ -314,14 +314,14 @@ namespace VisualMusic.ViewModels
 
         void OnTrackListSelectionChanged()
         {
-            if (_project == null) return;
+            if (Project == null) return;
             // List positions for MergeTrackProps (which indexes TrackViews[] by position).
             var indices = TrackList.SelectedItems
                 .Select(item => TrackList.Items.IndexOf(item))
                 .Where(i => i >= 0)
                 .ToList();
             _lastSelectedIndices = indices;
-            SelectedTrackProps.MergedProps = _project.MergeTrackProps(indices);
+            SelectedTrackProps.MergedProps = Project.MergeTrackProps(indices);
             // TrackNumbers (stable MIDI track indices) for the keyframe service.
             var trackNumbers = TrackList.SelectedItems
                 .Select(item => item.TrackView.TrackNumber)
@@ -332,35 +332,35 @@ namespace VisualMusic.ViewModels
 
         void WireSongPropsCallbacks()
         {
-            SongProps.CreateGeos = () => _project?.CreateGeos();
+            SongProps.CreateGeos = () => Project?.CreateGeos();
 
             SongProps.CommitViewWidth = () =>
             {
-                _project?.CreateGeos();
+                Project?.CreateGeos();
             };
 
             SongProps.ResetPitches = () =>
             {
                 if (!Keyframes.KeyframeService.ConfirmPitchReset(out var affected))
                     return;
-                _project?.ResetPitchLimits();
+                Project?.ResetPitchLimits();
                 Keyframes.KeyframeService.CapturePitchResetAtCurrentTick(affected);
-                _project?.CreateGeos();
+                Project?.CreateGeos();
                 SongProps.RefreshAll();
                 AddUndoItem("Reset pitches");
             };
 
-            SongProps.NotesMinPitch = () => _project?.Notes?.MinPitch;
-            SongProps.NotesMaxPitch = () => _project?.Notes?.MaxPitch;
+            SongProps.NotesMinPitch = () => Project?.Notes?.MinPitch;
+            SongProps.NotesMaxPitch = () => Project?.Notes?.MaxPitch;
 
             SongProps.SongLengthSWithoutPbOffset = () =>
-                _project?.Notes != null
-                    ? (double?)_project.TicksToSeconds(_project.Notes.SongLengthT)
+                Project?.Notes != null
+                    ? (double?)Project.TicksToSeconds(Project.Notes.SongLengthT)
                     : null;
 
             SongProps.BrowseBackground = () =>
             {
-                if (_project == null) return;
+                if (Project == null) return;
                 var dlg = new Microsoft.Win32.OpenFileDialog
                 {
                     Filter = "Image files|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.tiff|All files|*.*"
@@ -375,7 +375,7 @@ namespace VisualMusic.ViewModels
                 if (!Keyframes.KeyframeService.EnsureKeyframeForEdit("BackgroundImagePath", Keyframes.KeyframeService.KfScope.Project))
                     return;
 
-                _project.Props.BackgroundImagePath = dlg.FileName;
+                Project.Props.BackgroundImagePath = dlg.FileName;
                 OnLoadBackgroundImage?.Invoke(dlg.FileName);
 
                 // Record the chosen path into a keyframe at the current tick (no-op when no keyframes exist).
@@ -387,13 +387,13 @@ namespace VisualMusic.ViewModels
 
             SongProps.UnloadBackground = () =>
             {
-                if (_project == null) return;
+                if (Project == null) return;
 
                 // Gate: if background-path keyframes exist but not at this tick, prompt to create one.
                 if (!Keyframes.KeyframeService.EnsureKeyframeForEdit("BackgroundImagePath", Keyframes.KeyframeService.KfScope.Project))
                     return;
 
-                _project.Props.BackgroundImagePath = "";
+                Project.Props.BackgroundImagePath = "";
                 OnUnloadBackgroundImage?.Invoke();
 
                 // Record the empty path into a keyframe at the current tick (no-op when no keyframes exist).
@@ -408,8 +408,8 @@ namespace VisualMusic.ViewModels
 
         public double ScrollPosition
         {
-            get => _project?.NormSongPos ?? 0;
-            set { if (_project != null) _project.NormSongPos = value; }
+            get => Project?.NormSongPos ?? 0;
+            set { if (Project != null) Project.NormSongPos = value; }
         }
 
         public void NotifyScrollPositionChanged()
@@ -418,13 +418,13 @@ namespace VisualMusic.ViewModels
             // Apply per-property keyframe interpolation for the new position. During playback Project.Update
             // already did this; here it covers paused seeks/scrubs (this method fires on every position
             // change, but NOT during a static control edit — so it never fights an in-progress edit).
-            if (_project != null && !_project.IsPlaying)
-                _project.InterpolatePropertyKeyframes();
+            if (Project != null && !Project.IsPlaying)
+                Project.InterpolatePropertyKeyframes();
             if (ShowSongProps)
                 SongProps.RefreshLiveValues();
-            if (ShowTrackProps && _project?.HasTrackKeyframes == true)
+            if (ShowTrackProps && Project?.HasTrackKeyframes == true)
             {
-                SelectedTrackProps.MergedProps = _project.MergeTrackProps(_lastSelectedIndices);
+                SelectedTrackProps.MergedProps = Project.MergeTrackProps(_lastSelectedIndices);
                 SelectedTrackProps.RefreshLiveValues();
             }
             // Drive per-frame refresh for control coloring and the diamond panel
@@ -458,9 +458,9 @@ namespace VisualMusic.ViewModels
         /// </summary>
         void OnKeyframesChangedRestoreBackground()
         {
-            if (_project == null) return;
-            if (!_project.PropertyKeyframes.HasAny("proj/BackgroundImagePath"))
-                OnLoadBackgroundImage?.Invoke(_project.Props.BackgroundImagePath);
+            if (Project == null) return;
+            if (!Project.PropertyKeyframes.HasAny("proj/BackgroundImagePath"))
+                OnLoadBackgroundImage?.Invoke(Project.Props.BackgroundImagePath);
         }
 
         // The track list and property tabs live in a collapsed panel until ShowTrackProps turns on;
@@ -537,17 +537,17 @@ namespace VisualMusic.ViewModels
             catch (FileImportException ex)
             {
                 // Loading failed (e.g. the referenced song file couldn't be downloaded). The renderer's
-                // animation loop is still drawing the previous live project (_project), and its note
-                // rendering reads the static NoteStyle.Project — so restore it to _project rather than
+                // animation loop is still drawing the previous live project (Project), and its note
+                // rendering reads the static NoteStyle.Project — so restore it to Project rather than
                 // null, otherwise the next Draw() dereferences a null Project (NoteStyle.DrawTrack).
-                NoteStyle.SetProject(_project);
+                NoteStyle.SetProject(Project);
                 MetroMessageBox.Show($"Could not load project file: {ex.Message}\n\nMissing file: {ex.FileName}",
                     Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (Exception ex)
             {
-                NoteStyle.SetProject(_project);
+                NoteStyle.SetProject(Project);
                 MetroMessageBox.Show("Error loading project: " + ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
@@ -591,7 +591,7 @@ namespace VisualMusic.ViewModels
 
         bool SaveProjectCore()
         {
-            if (_project == null) return false;
+            if (Project == null) return false;
             if (string.IsNullOrEmpty(_currentProjectPath)) return SaveProjectAsCore();
             return SaveToPath(_currentProjectPath);
         }
@@ -602,14 +602,14 @@ namespace VisualMusic.ViewModels
             {
                 Filter = $"Visual Music projects|*.{Project.DefaultFileExt}|All files|*.*",
                 InitialDirectory = AppSettings.Instance.ProjectFolderOrDefault,
-                FileName = _project.DefaultFileName
+                FileName = Project.DefaultFileName
             };
             if (dlg.ShowDialog() != true) return false;
             AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.ProjectFolder = dir);
             SaveSourceFiles(dlg.FileName);   // optional MIDI/WAV export; cancelling it still saves the project
             if (!SaveToPath(dlg.FileName)) return false;
             _currentProjectPath = dlg.FileName;
-            _project.DefaultFileName = Path.GetFileName(dlg.FileName);
+            Project.DefaultFileName = Path.GetFileName(dlg.FileName);
             return true;
         }
 
@@ -623,7 +623,7 @@ namespace VisualMusic.ViewModels
         /// </summary>
         void SaveSourceFiles(string projectPath)
         {
-            var io = _project?.ImportOptions;
+            var io = Project?.ImportOptions;
             if (io == null) return;
 
             // A MIDI project's MIDI is already its source file, so only the generated WAV is offered.
@@ -653,7 +653,7 @@ namespace VisualMusic.ViewModels
             // Wire the saved WAV as supplied audio (recorded in the project, reused on load).
             if (savedWavPath != null) io.AudioPath = savedWavPath;
             // Saving MIDI turns this into a MIDI project.
-            if (savedMidiPath != null) _project.ConvertToMidiProject(savedMidiPath, io.AudioPath);
+            if (savedMidiPath != null) Project.ConvertToMidiProject(savedMidiPath, io.AudioPath);
         }
 
         /// <summary>
@@ -690,7 +690,7 @@ namespace VisualMusic.ViewModels
                 var dcs = new DataContractSerializer(typeof(Project), ProjectSerializer.KnownTypes);
                 string tmp = Path.Combine(Program.TempDir, "tempprojectfile");
                 using (var stream = File.Open(tmp, FileMode.Create))
-                    dcs.WriteObject(stream, _project);
+                    dcs.WriteObject(stream, Project);
                 File.Copy(tmp, path, true);
                 _undoItems.MarkSaved();
                 OnPropertyChanged(nameof(HasUnsavedChanges));
@@ -806,7 +806,7 @@ namespace VisualMusic.ViewModels
                 return;
 
             // Ensure a project object exists to import into.
-            if (_project == null)
+            if (Project == null)
             {
                 var fresh = new Project();
                 NoteStyle.SetProject(fresh);
@@ -815,7 +815,7 @@ namespace VisualMusic.ViewModels
 
             var drawHost = GetDrawHost?.Invoke();
             if (drawHost != null) Project.SetDrawHost(drawHost);
-            NoteStyle.SetProject(_project);
+            NoteStyle.SetProject(Project);
 
             try { options.CheckSourceFile(); }
             catch (FileImportException ex)
@@ -843,7 +843,7 @@ namespace VisualMusic.ViewModels
                         {
                             try
                             {
-                                imported = await _project.ImportSong(
+                                imported = await Project.ImportSong(
                                     options, new Progress<float>(cb.UpdateProgress), cb.CancelToken);
                             }
                             catch (OperationCanceledException) { cancelled = true; }
@@ -857,7 +857,7 @@ namespace VisualMusic.ViewModels
                     if (failure != null) throw failure;
                     if (!imported) return;
                 }
-                else if (!await _project.ImportSong(options))
+                else if (!await Project.ImportSong(options))
                     return;
             }
             catch (FileImportException ex)
@@ -877,11 +877,11 @@ namespace VisualMusic.ViewModels
                 _currentProjectPath = "";
 
             var wfp = GetRendererWaveformPanel?.Invoke();
-            _project.InitAfterDeserialization(wfp);
+            Project.InitAfterDeserialization(wfp);
 
-            TrackList.Rebuild(_project);
-            OnProjectLoaded?.Invoke(_project);
-            OnLoadBackgroundImage?.Invoke(_project.Props.BackgroundImagePath);
+            TrackList.Rebuild(Project);
+            OnProjectLoaded?.Invoke(Project);
+            OnLoadBackgroundImage?.Invoke(Project.Props.BackgroundImagePath);
 
             // Refresh audio-dependent CanExecute (HasAudio depends on Media.getAudioLength()).
             OnPropertyChanged(nameof(HasAudio));
@@ -894,7 +894,7 @@ namespace VisualMusic.ViewModels
             JumpForwardCommand.NotifyCanExecuteChanged();
 
             _undoItems.Clear();
-            _undoItems.Add("", _project);
+            _undoItems.Add("", Project);
             if (options.EraseCurrent)
                 _undoItems.MarkSaved();
             UpdateUndoRedo();
@@ -956,65 +956,65 @@ namespace VisualMusic.ViewModels
         // ---- Playback commands ----
 
         [RelayCommand(CanExecute = nameof(HasProject))]
-        void TogglePlayback() => _project?.TogglePlayback();
+        void TogglePlayback() => Project?.TogglePlayback();
 
         [RelayCommand(CanExecute = nameof(HasProject))]
-        void GoToBeginning() => _project?.StopPlayback();
+        void GoToBeginning() => Project?.StopPlayback();
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void GoToEnd()
         {
-            if (_project == null) return;
-            if (_project.IsPlaying) _project.TogglePlayback();
-            _project.NormSongPos = 1;
+            if (Project == null) return;
+            if (Project.IsPlaying) Project.TogglePlayback();
+            Project.NormSongPos = 1;
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void NudgeBack()
         {
-            if (_project == null) return;
-            _project.NudgeSongPos(SongRenderer.SmallScrollStep);
+            if (Project == null) return;
+            Project.NudgeSongPos(SongRenderer.SmallScrollStep);
             ResyncPlaybackPosition();
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void NudgeForward()
         {
-            if (_project == null) return;
-            _project.NudgeSongPos(-SongRenderer.SmallScrollStep);
+            if (Project == null) return;
+            Project.NudgeSongPos(-SongRenderer.SmallScrollStep);
             ResyncPlaybackPosition();
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void JumpBack()
         {
-            if (_project == null) return;
-            _project.NudgeSongPos(SongRenderer.LargeScrollStep);
+            if (Project == null) return;
+            Project.NudgeSongPos(SongRenderer.LargeScrollStep);
             ResyncPlaybackPosition();
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void JumpForward()
         {
-            if (_project == null) return;
-            _project.NudgeSongPos(-SongRenderer.LargeScrollStep);
+            if (Project == null) return;
+            Project.NudgeSongPos(-SongRenderer.LargeScrollStep);
             ResyncPlaybackPosition();
         }
 
         void ResyncPlaybackPosition()
         {
             // When playing, restart audio at the new position.
-            if (_project?.IsPlaying == true)
+            if (Project?.IsPlaying == true)
             {
-                _project.TogglePlayback();
-                _project.TogglePlayback();
+                Project.TogglePlayback();
+                Project.TogglePlayback();
             }
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void GoToNextKeyFrame()
         {
-            if (_project == null) return;
+            if (Project == null) return;
             Keyframes.KeyframeService.GoToNextAny();
             ResyncPlaybackPosition();
         }
@@ -1022,7 +1022,7 @@ namespace VisualMusic.ViewModels
         [RelayCommand(CanExecute = nameof(HasProject))]
         void GoToPrevKeyFrame()
         {
-            if (_project == null) return;
+            if (Project == null) return;
             Keyframes.KeyframeService.GoToPrevAny();
             ResyncPlaybackPosition();
         }
@@ -1051,9 +1051,9 @@ namespace VisualMusic.ViewModels
         void ApplyUndoItem()
         {
             if (_undoItems.Current == null) return;
-            _project?.CopyPropsFrom(_undoItems.Current.Project);
+            Project?.CopyPropsFrom(_undoItems.Current.Project);
             // Rebuild geometry for any style/material/spatial changes in the restored snapshot.
-            _project?.CreateGeos();
+            Project?.CreateGeos();
             // Refresh the Song and Track property panels so they reflect restored values.
             SongProps.RefreshAll();
             OnTrackListSelectionChanged();
@@ -1073,18 +1073,18 @@ namespace VisualMusic.ViewModels
 
         public void AddUndoItem(string desc)
         {
-            if (_project == null) return;
-            _undoItems.Add(desc, _project);
+            if (Project == null) return;
+            _undoItems.Add(desc, Project);
             UpdateUndoRedo();
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void ResetCamera()
         {
-            if (_project == null) return;
+            if (Project == null) return;
             if (!EnsureCameraEditKeyframe()) return;
             ApplyCamera(new Camera());
-            _project.SyncLiveCameraEdit();
+            Project.SyncLiveCameraEdit();
             SongProps.RefreshLiveValues();
             Keyframes.KeyframeService.RaiseRefresh();
             AddUndoItem("Reset Camera");
@@ -1107,7 +1107,7 @@ namespace VisualMusic.ViewModels
                 var cam = (Camera)dcs.ReadObject(stream);
                 if (!EnsureCameraEditKeyframe()) return;
                 ApplyCamera(cam);
-                _project.SyncLiveCameraEdit();
+                Project.SyncLiveCameraEdit();
                 SongProps.RefreshLiveValues();
                 Keyframes.KeyframeService.RaiseRefresh();
                 AddUndoItem("Load Camera");
@@ -1128,7 +1128,7 @@ namespace VisualMusic.ViewModels
             {
                 var dcs = new DataContractSerializer(typeof(Camera), ProjectSerializer.KnownTypes);
                 using var stream = File.Open(dlg.FileName, FileMode.Create);
-                dcs.WriteObject(stream, _project?.Props.Camera);
+                dcs.WriteObject(stream, Project?.Props.Camera);
             }
             catch (Exception ex)
             {
@@ -1138,7 +1138,7 @@ namespace VisualMusic.ViewModels
 
         bool EnsureCameraEditKeyframe()
         {
-            if (_project == null) return false;
+            if (Project == null) return false;
 
             var scope = Keyframes.KeyframeService.KfScope.Project;
             if (Keyframes.KeyframeService.HasAnyKeyForAny("Camera", scope))
@@ -1148,7 +1148,7 @@ namespace VisualMusic.ViewModels
 
         void ApplyCamera(Camera source)
         {
-            var dest = _project.Props.Camera;
+            var dest = Project.Props.Camera;
             dest.Pos = source.Pos;
             dest.Orientation = source.Orientation;
             dest.Fov = source.Fov;
@@ -1179,9 +1179,9 @@ namespace VisualMusic.ViewModels
             }
 
             // Apply to the global (index 0) track — full track-list editing comes in a later phase.
-            _project.TrackViews[0].TrackProps.CloneFrom(props, (int)TrackPropsType.TPT_All);
+            Project.TrackViews[0].TrackProps.CloneFrom(props, (int)TrackPropsType.TPT_All);
             if ((props.TypeFlags & (int)TrackPropsType.TPT_Style) != 0)
-                _project.CreateGeos();
+                Project.CreateGeos();
             AddUndoItem("Load Track Properties");
         }
 
@@ -1197,7 +1197,7 @@ namespace VisualMusic.ViewModels
             if (dlg.ShowDialog() != true) return;
             AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TrackPropsFolder = dir);
 
-            TrackProps props = _project.TrackViews[0].TrackProps;
+            TrackProps props = Project.TrackViews[0].TrackProps;
             props.TypeFlags = (int)TrackPropsType.TPT_All;
             var dcs = new DataContractSerializer(typeof(TrackProps), ProjectSerializer.KnownTypes);
             try
@@ -1214,16 +1214,16 @@ namespace VisualMusic.ViewModels
         [RelayCommand(CanExecute = nameof(HasProject))]
         void DefaultTrackProps()
         {
-            foreach (var tv in _project.TrackViews)
+            foreach (var tv in Project.TrackViews)
                 tv.TrackProps.ResetProps();
-            _project.CreateGeos();
+            Project.CreateGeos();
             AddUndoItem("Default Track Properties");
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]
         void InsertLyrics()
         {
-            _project.InsertLyrics();
+            Project.InsertLyrics();
             AddUndoItem("Insert Lyrics");
         }
 

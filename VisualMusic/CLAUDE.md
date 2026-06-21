@@ -19,12 +19,11 @@ Key characteristics:
   - .NET desktop development workload
   - Desktop development with C++ workload
   - MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs
-- **vcpkg** (checked out to specific commit: `cb1301e9977b5f10b49f7988f68b808f7a558970`)
-- **Fluidsynth** and **FFmpeg** installed via vcpkg
-  ```
-  vcpkg install fluidsynth:x64-windows
-  vcpkg install ffmpeg[x264]:x64-windows
-  ```
+- **vcpkg** with `vcpkg integrate install` (no specific checkout needed — versions are pinned per-project)
+- **Fluidsynth** and **FFmpeg** are restored automatically via vcpkg **manifest mode**: the Media and
+  MidMix submodules each ship a `vcpkg.json` (with `builtin-baseline`
+  `f3e10653cc27d62a37a3763cd84b38bca07c6075`, vcpkg release `2026.06.01`), so the first x64 build installs them into a local
+  `vcpkg_installed/` — no manual `vcpkg install` step.
 - **.NET 10.0** (project targets `net10.0-windows10.0.26100.0`)
 
 ### Building

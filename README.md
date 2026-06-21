@@ -15,18 +15,26 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
   * Workloads
     * .NET desktop development
     * Desktop development with C++
-  * Individual components
-    * MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest)
-* Install Vcpkg, Fluidsynth and Ffmpeg:
+* Install Vcpkg and wire it into MSBuild:
     ```
     git clone https://github.com/microsoft/vcpkg.git
     cd vcpkg
-    git checkout cb1301e9977b5f10b49f7988f68b808f7a558970
     bootstrap-vcpkg.bat
     vcpkg integrate install
-    vcpkg install fluidsynth:x64-windows
-    vcpkg install ffmpeg[x264]:x64-windows
     ```
+    Fluidsynth and Ffmpeg/x264 are **not** installed by hand. The Media and MidMix
+    C++ projects use vcpkg [manifest mode](https://learn.microsoft.com/vcpkg/concepts/manifest-mode):
+    each declares its dependencies in a `vcpkg.json` and pins the package versions via
+    `builtin-baseline` (currently vcpkg release `2026.06.01` = `f3e10653cc27d62a37a3763cd84b38bca07c6075`), so the
+    first x64 build of `VisualMusic.sln` restores them automatically into a local
+    `vcpkg_installed/` folder. (`vcpkg integrate install` is still required — it's what
+    locates the vcpkg root and runs the manifest restore during the build.)
+
+    > **Heads-up:** the **first** x64 build compiles Ffmpeg/x264 and Fluidsynth from
+    > source — expect **~30–40 minutes** and an internet connection. The result is
+    > cached (in the per-project `vcpkg_installed/` and vcpkg's binary cache), so every
+    > later build reuses it and is fast; the dependencies are not rebuilt unless you
+    > change a `vcpkg.json`, wipe `vcpkg_installed/`, or upgrade your MSVC toolset.
 * Clone repo with submodules:
 ```
     git clone --recurse-submodules https://github.com/yousernaym/vm.git

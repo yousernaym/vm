@@ -52,13 +52,9 @@ namespace VisualMusic
 
         Vector3 _rotVel = new Vector3();
         Vector3 _moveVel = new Vector3();
-        Vector3 _rotVelAcc = new Vector3();
-        Vector3 _moveVelAcc = new Vector3();
 
         const float rotSpeed = 0.15f;
         const float moveSpeed = 0.5f;
-        const float rotSpeedAcc = 0.05f;
-        const float moveSpeedAcc = 0.05f;
 
         public Matrix RotMat
         {

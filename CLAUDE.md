@@ -37,7 +37,9 @@ Full prerequisites and the exact vcpkg steps are in [README.md](README.md). In s
 
 - Visual Studio 2026 with the **.NET desktop** and **Desktop development with C++** workloads (plus the
   Spectre-mitigated MSVC v143 x64/x86 libs).
-- vcpkg (pinned commit) with `fluidsynth:x64-windows` and `ffmpeg[x264]:x64-windows`.
+- vcpkg with `vcpkg integrate install`. Fluidsynth and `ffmpeg[x264]` are restored automatically via
+  vcpkg **manifest mode**: Media and MidMix each ship a `vcpkg.json` (pinning versions with a
+  `builtin-baseline`), and the first x64 build installs them into a local `vcpkg_installed/` per submodule.
 - Clone with `--recurse-submodules` — the `Dependencies/*` repos must be present or the solution won't load.
 - Build `VisualMusic.sln` (Debug/Release). Use the **x64** solution platform: the native DLLs
   are 64-bit, so the app must run 64-bit. The first build auto-runs `dotnet tool restore` (the MonoGame
