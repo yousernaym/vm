@@ -43,7 +43,7 @@ Full prerequisites and the exact vcpkg steps are in [README.md](README.md). In s
   are 64-bit, so the app must run 64-bit. The first build auto-runs `dotnet tool restore` (the MonoGame
   content-builder tool, pinned in [VisualMusic/.config/dotnet-tools.json](VisualMusic/.config/dotnet-tools.json)).
 
-### Building from the command line (agents: read this)
+### Building from the command line.
 
 This is a **mixed C#/C++ solution**, so you must build it with **MSBuild**, not `dotnet build`
 (`dotnet build` cannot build the C++ `.vcxproj` projects). `msbuild` is usually **not on `PATH`** in a
@@ -53,10 +53,13 @@ VS, at a fixed path) and call it by full path. From the repo root (`d:\dev\vm`),
 ```powershell
 $msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
     -latest -prerelease -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe"
-& $msbuild VisualMusic.sln /p:Configuration=Debug /p:Platform=x64 /m /nologo
+& $msbuild d:\dev\vm\VisualMusic.sln /p:Configuration=Debug /p:Platform=x64 /m /nologo
 ```
 
 Notes:
+- **Pass the full path to the `.sln`.** The agent PowerShell shell does **not** reliably start in the repo
+  root, so a bare `VisualMusic.sln` fails with `MSB1009: Project file does not exist`. Use the absolute
+  path `d:\dev\vm\VisualMusic.sln` (the Bash tool, by contrast, does persist its cwd at the repo root).
 - The platform **must** be `x64` (not `Any CPU` / `Win32`); the native DLLs are 64-bit.
 - Use `/p:Configuration=Release` for a release build. `/m` enables parallel builds; `/t:Rebuild` forces a
   clean rebuild.
@@ -64,6 +67,12 @@ Notes:
   `msbuild VisualMusic.sln /p:Platform=x64` may work too — but the `vswhere` form above is the reliable one
   for agents and fresh shells.
 - First build only: if you hit a missing-tool error, run `dotnet tool restore` in [VisualMusic/](VisualMusic/) first.
+- **Reading the output:** a successful build is ~126 KB and noisy with *pre-existing, benign* warnings
+  (MVVMTK0034 "should not be directly referenced", SYSLIB0003, CS0618, CS0168) plus a transient
+  `VisualMusic_<hash>_wpftmp.csproj` (WPF's markup-compile pass — not an error). To find real failures
+  grep for `": error "` and exclude `aka.ms` / `/errors/` (those substrings appear in warning help-links
+  and cause false positives). Success indicators: `VM.dll ->` is emitted and the post-build `File(s) copied`
+  lines run.
 
 How the pieces reach the app output (this part trips people up — it's spread across several project files):
 
