@@ -46,7 +46,7 @@ namespace VisualMusic.Controls
             _browser = new ChromiumWebBrowser(_initialUrl ?? "")
             {
                 KeyboardHandler = new WpfBrowserKeyboardHandler(() => GetProject?.Invoke()),
-                RequestHandler = new DownloadNavigationHandler(TryImportKnownDownloadUrl)
+                RequestHandler = new DownloadNavigationHandler()
             };
 
             var downloadHandler = new DownloadHandler { ShowDialog = false };
@@ -70,35 +70,6 @@ namespace VisualMusic.Controls
             string url = e.Url;
             string fileName = e.SuggestedFileName;
             Dispatcher.InvokeAsync(() => ImportService?.ImportFromUrl(url, fileName));
-        }
-
-        bool TryImportKnownDownloadUrl(string url)
-        {
-            if (!TryGetKnownDownloadFileName(url, out string fileName))
-                return false;
-
-            Dispatcher.InvokeAsync(() => ImportService?.ImportFromUrl(url, fileName));
-            return true;
-        }
-
-        static bool TryGetKnownDownloadFileName(string url, out string fileName)
-        {
-            fileName = null;
-
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-                return false;
-
-            bool isFreeMidi = uri.Host.Equals("freemidi.org", StringComparison.OrdinalIgnoreCase) ||
-                uri.Host.Equals("www.freemidi.org", StringComparison.OrdinalIgnoreCase);
-            if (!isFreeMidi)
-                return false;
-
-            var match = Regex.Match(uri.AbsolutePath.Trim('/'), @"^getter-(\d+)$", RegexOptions.IgnoreCase);
-            if (!match.Success)
-                return false;
-
-            fileName = "freemidi-" + match.Groups[1].Value + ".mid";
-            return true;
         }
 
         void OnBrowserStatusMessage(object sender, StatusMessageEventArgs args) =>
@@ -130,19 +101,9 @@ namespace VisualMusic.Controls
 
         sealed class DownloadNavigationHandler : CefSharp.Handler.RequestHandler
         {
-            readonly Func<string, bool> _tryImport;
-
-            public DownloadNavigationHandler(Func<string, bool> tryImport) => _tryImport = tryImport;
-
             protected override bool OnBeforeBrowse(IWebBrowser chromiumWebBrowser, IBrowser browser,
                 IFrame frame, IRequest request, bool userGesture, bool isRedirect)
             {
-                if (!isRedirect && frame.IsMain && string.Equals(request.Method, "GET", StringComparison.OrdinalIgnoreCase) &&
-                    _tryImport(request.Url))
-                {
-                    return true;
-                }
-
                 return false;
             }
         }
