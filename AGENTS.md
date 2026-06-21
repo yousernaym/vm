@@ -35,13 +35,35 @@ and exports video.
 
 Full prerequisites and the exact vcpkg steps are in [README.md](README.md). In short:
 
-- Visual Studio 2022 with the **.NET desktop** and **Desktop development with C++** workloads (plus the
+- Visual Studio 2026 with the **.NET desktop** and **Desktop development with C++** workloads (plus the
   Spectre-mitigated MSVC v143 x64/x86 libs).
 - vcpkg (pinned commit) with `fluidsynth:x64-windows` and `ffmpeg[x264]:x64-windows`.
 - Clone with `--recurse-submodules` — the `Dependencies/*` repos must be present or the solution won't load.
-- Build `VisualMusic.sln` (Debug/Release). Use the **x64** (or Any CPU) solution platform: the native DLLs
+- Build `VisualMusic.sln` (Debug/Release). Use the **x64** solution platform: the native DLLs
   are 64-bit, so the app must run 64-bit. The first build auto-runs `dotnet tool restore` (the MonoGame
   content-builder tool, pinned in [VisualMusic/.config/dotnet-tools.json](VisualMusic/.config/dotnet-tools.json)).
+
+### Building from the command line (agents: read this)
+
+This is a **mixed C#/C++ solution**, so you must build it with **MSBuild**, not `dotnet build`
+(`dotnet build` cannot build the C++ `.vcxproj` projects). `msbuild` is usually **not on `PATH`** in a
+plain shell — do not give up if `msbuild` "isn't found". Locate it with `vswhere` (always installed with
+VS, at a fixed path) and call it by full path. From the repo root (`d:\dev\vm`), in PowerShell:
+
+```powershell
+$msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+    -latest -prerelease -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe"
+& $msbuild VisualMusic.sln /p:Configuration=Debug /p:Platform=x64 /m /nologo
+```
+
+Notes:
+- The platform **must** be `x64` (not `Any CPU` / `Win32`); the native DLLs are 64-bit.
+- Use `/p:Configuration=Release` for a release build. `/m` enables parallel builds; `/t:Rebuild` forces a
+  clean rebuild.
+- On this dev machine MSBuild also happens to be on `PATH` (a VS Developer shell), so a bare
+  `msbuild VisualMusic.sln /p:Platform=x64` may work too — but the `vswhere` form above is the reliable one
+  for agents and fresh shells.
+- First build only: if you hit a missing-tool error, run `dotnet tool restore` in [VisualMusic/](VisualMusic/) first.
 
 How the pieces reach the app output (this part trips people up — it's spread across several project files):
 
