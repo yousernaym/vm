@@ -838,7 +838,7 @@ namespace VisualMusic.ViewModels
                     Exception failure = null;
 
                     var w = new Controls.ProgressWindow(
-                        $"Converting {options.DisplayName}",
+                        $"Converting song",
                         async cb =>
                         {
                             try
