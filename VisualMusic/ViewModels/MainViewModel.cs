@@ -947,16 +947,9 @@ namespace VisualMusic.ViewModels
         }
 
         [RelayCommand]
-        void HvscIntegration()
+        void Settings()
         {
-            var dlg = new Controls.HvscIntegrationWindow { Owner = Application.Current.MainWindow };
-            dlg.ShowDialog();
-        }
-
-        [RelayCommand]
-        void Preferences()
-        {
-            var dlg = new Controls.PreferencesWindow { Owner = Application.Current.MainWindow };
+            var dlg = new Controls.SettingsWindow { Owner = Application.Current.MainWindow };
             dlg.ShowDialog();
         }
 

@@ -25,7 +25,6 @@
         <KeyBinding Command="{Binding SaveProjectCommand}"    Key="S"    Modifiers="Control"/>
         <KeyBinding Command="{Binding SaveProjectAsCommand}"  Key="S"    Modifiers="Alt+Shift"/>
         <KeyBinding Command="{Binding ExportVideoCommand}"    Key="E"    Modifiers="Control"/>
-        <KeyBinding Command="{Binding HvscIntegrationCommand}" Key="H" Modifiers="Control+Shift"/>
         <!-- Edit -->
         <KeyBinding Command="{Binding UndoCommand}"           Key="Z"    Modifiers="Control"/>
         <KeyBinding Command="{Binding RedoCommand}"           Key="Z"    Modifiers="Control+Shift"/>
@@ -34,7 +33,7 @@
         <KeyBinding Command="{Binding LoadTrackPropsCommand}" Key="T"    Modifiers="Control"/>
         <KeyBinding Command="{Binding SaveTrackPropsCommand}" Key="T"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding InsertLyricsCommand}"   Key="L"    Modifiers="Control"/>
-        <KeyBinding Command="{Binding PreferencesCommand}"    Key="P"    Modifiers="Control"/>
+        <KeyBinding Command="{Binding SettingsCommand}"       Key="F12"/>
         <!-- Playback — Ctrl+Space handled via PreviewKeyDown in code-behind (tunneling) so it
              fires even when a focused panel control (CheckBox, ListBox, etc.) would otherwise
              swallow the Space activation key. -->
@@ -89,7 +88,6 @@
                 <MenuItem Header="Save project _as..."    Command="{Binding SaveProjectAsCommand}" InputGestureText="Alt+Shift+S"/>
                 <Separator/>
                 <MenuItem Header="_Export video..."       Command="{Binding ExportVideoCommand}"   InputGestureText="Ctrl+E"/>
-                <MenuItem Header="_HVSC integration..." Command="{Binding HvscIntegrationCommand}" InputGestureText="Ctrl+Shift+H"/>
             </MenuItem>
 
             <!-- EDIT -->
@@ -110,7 +108,7 @@
                 <Separator/>
                 <MenuItem Header="Insert _Lyrics"    Command="{Binding InsertLyricsCommand}"   InputGestureText="Ctrl+L"/>
                 <Separator/>
-                <MenuItem Header="_Preferences..."   Command="{Binding PreferencesCommand}" InputGestureText="Ctrl+P"/>
+                <MenuItem Header="_Settings..."   Command="{Binding SettingsCommand}" InputGestureText="F12"/>
             </MenuItem>
 
             <!-- PLAYBACK -->

@@ -18,6 +18,11 @@ namespace VisualMusic
         const string DefaultThemeBaseColor = "Dark";
         const string DefaultThemeColorScheme = "Teal";
 
+        // ---- Default web-browser start URLs ----
+        public const string DefaultModBrowserUrl  = "https://modarchive.org/index.php?request=view_searchbox";
+        public const string DefaultSidBrowserUrl  = "https://www.exotica.org.uk/wiki/Special:HVSC";
+        public const string DefaultMidiBrowserUrl = "https://freemidi.org/";
+
         // ---- Singleton ----
         static AppSettings s_instance;
         public static AppSettings Instance => s_instance ??= Load();
@@ -74,6 +79,19 @@ namespace VisualMusic
         /// <summary>Returns the persisted URL, falling back to the built-in default.</summary>
         public string SongLengthsUrlOrDefault
             => string.IsNullOrEmpty(SongLengthsUrl) ? Hvsc.DefaultSongLengthsUrl : SongLengthsUrl;
+
+        // ---- Web-browser start URLs ----
+
+        [DataMember] public string ModBrowserUrl  { get; set; }
+        [DataMember] public string SidBrowserUrl  { get; set; }
+        [DataMember] public string MidiBrowserUrl { get; set; }
+
+        public string ModBrowserUrlOrDefault
+            => string.IsNullOrEmpty(ModBrowserUrl) ? DefaultModBrowserUrl : ModBrowserUrl;
+        public string SidBrowserUrlOrDefault
+            => string.IsNullOrEmpty(SidBrowserUrl) ? DefaultSidBrowserUrl : SidBrowserUrl;
+        public string MidiBrowserUrlOrDefault
+            => string.IsNullOrEmpty(MidiBrowserUrl) ? DefaultMidiBrowserUrl : MidiBrowserUrl;
 
         // ---- Video export ----
 

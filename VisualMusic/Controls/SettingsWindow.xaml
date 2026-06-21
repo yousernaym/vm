@@ -1,0 +1,160 @@
+<mah:MetroWindow x:Class="VisualMusic.Controls.SettingsWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 Title="Settings"
+                 Width="600" Height="460"
+                 ResizeMode="NoResize"
+                 WindowStartupLocation="CenterOwner"
+                 ShowMinButton="False"
+                 ShowMaxRestoreButton="False">
+
+    <mah:MetroWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolVis"/>
+    </mah:MetroWindow.Resources>
+
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Section side menu -->
+        <ListBox Grid.Column="0"
+                 SelectedIndex="{Binding SelectedSectionIndex, Mode=TwoWay}">
+            <ListBoxItem Content="Themes"/>
+            <ListBoxItem Content="Integrations"/>
+        </ListBox>
+
+        <!-- Content + buttons -->
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="16"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- ===== Themes section ===== -->
+            <StackPanel Grid.Row="0"
+                        Visibility="{Binding IsThemesSelected, Converter={StaticResource BoolVis}}">
+                <TextBlock Text="Theme" FontWeight="Bold"/>
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Base color:" VerticalAlignment="Center"/>
+                    <ComboBox  Grid.Row="0" Grid.Column="1"
+                               ItemsSource="{Binding BaseColors}"
+                               SelectedItem="{Binding SelectedBaseColor, Mode=TwoWay}"
+                               VerticalAlignment="Center"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Accent color:" VerticalAlignment="Center"/>
+                    <ComboBox  Grid.Row="2" Grid.Column="1"
+                               ItemsSource="{Binding ColorSchemes}"
+                               SelectedItem="{Binding SelectedColorScheme, Mode=TwoWay}"
+                               VerticalAlignment="Center"/>
+                </Grid>
+                <TextBlock Text="Changes are previewed live. Cancel reverts."
+                           Foreground="Gray" FontStyle="Italic" Margin="0,12,0,0"/>
+            </StackPanel>
+
+            <!-- ===== Integrations section ===== -->
+            <StackPanel Grid.Row="0"
+                        Visibility="{Binding IsIntegrationsSelected, Converter={StaticResource BoolVis}}">
+
+                <!-- HVSC -->
+                <TextBlock Text="HVSC" FontWeight="Bold"/>
+                <TextBlock Text="Song lengths URL:" Margin="0,8,0,0"/>
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0"
+                             Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalAlignment="Center"/>
+                    <Button Grid.Column="2" Content="Default" Width="80"
+                            IsEnabled="{Binding IsIdle}" Click="DefaultUrl_Click"/>
+                </Grid>
+
+                <!-- Update / progress / cancel row -->
+                <Grid Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="Update" Width="80"
+                            IsEnabled="{Binding IsIdle}" Click="Update_Click"/>
+                    <ProgressBar Grid.Column="2"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding DownloadProgress}"
+                                 Height="20"
+                                 Visibility="{Binding IsDownloading, Converter={StaticResource BoolVis}}"/>
+                    <Button Grid.Column="4" Content="Cancel" Width="80"
+                            Visibility="{Binding IsDownloading, Converter={StaticResource BoolVis}}"
+                            Click="CancelDownload_Click"/>
+                </Grid>
+                <TextBlock Text="{Binding LastUpdated}" Foreground="Gray" Margin="0,6,0,0"/>
+
+                <!-- Browser start URLs -->
+                <TextBlock Text="Browser start URLs" FontWeight="Bold" Margin="0,20,0,0"/>
+                <Grid Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="6"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="6"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Modules:" VerticalAlignment="Center"/>
+                    <TextBox   Grid.Row="0" Grid.Column="1"
+                               Text="{Binding ModBrowserUrl, UpdateSourceTrigger=PropertyChanged}"
+                               VerticalAlignment="Center"/>
+                    <Button    Grid.Row="0" Grid.Column="3" Content="Default" Width="80"
+                               Click="DefaultModUrl_Click"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="SID:" VerticalAlignment="Center"/>
+                    <TextBox   Grid.Row="2" Grid.Column="1"
+                               Text="{Binding SidBrowserUrl, UpdateSourceTrigger=PropertyChanged}"
+                               VerticalAlignment="Center"/>
+                    <Button    Grid.Row="2" Grid.Column="3" Content="Default" Width="80"
+                               Click="DefaultSidUrl_Click"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="MIDI:" VerticalAlignment="Center"/>
+                    <TextBox   Grid.Row="4" Grid.Column="1"
+                               Text="{Binding MidiBrowserUrl, UpdateSourceTrigger=PropertyChanged}"
+                               VerticalAlignment="Center"/>
+                    <Button    Grid.Row="4" Grid.Column="3" Content="Default" Width="80"
+                               Click="DefaultMidiUrl_Click"/>
+                </Grid>
+                <TextBlock Text="Browser URL changes take effect after restarting."
+                           Foreground="Gray" FontStyle="Italic" Margin="0,12,0,0"/>
+            </StackPanel>
+
+            <!-- OK / Cancel -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="OK"     Width="80" IsDefault="True" Click="Ok_Click"     Margin="0,0,8,0"/>
+                <Button Content="Cancel" Width="80" IsCancel="True"  Click="Cancel_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</mah:MetroWindow>
