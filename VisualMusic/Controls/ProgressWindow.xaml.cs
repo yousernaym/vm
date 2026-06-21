@@ -2,8 +2,6 @@ using MahApps.Metro.Controls;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -274,48 +272,36 @@ namespace VisualMusic.Controls
         /// <summary>Background download job wired to the progress/cancel callback.</summary>
         static async Task<object> DownloadJobAsync(string url, IRenderProgressCallback cb)
         {
-            using var webClient = new WebClient();
-
-            // Relay cancellation to WebClient the instant the user clicks Cancel. Registering on
-            // the token (rather than polling cb.Cancel inside DownloadProgressChanged) means cancel
-            // still works when the server is unresponsive and no progress events ever fire.
-            using var cancelReg = cb.CancelToken.Register(webClient.CancelAsync);
-
-            webClient.DownloadProgressChanged += (_, e) =>
-            {
-                bool indeterminate = e.TotalBytesToReceive < 0;
-                if (indeterminate)
-                {
-                    // Signal the window to show indeterminate mode (no time estimates).
-                    cb.UpdateProgress(0f);
-                    if (cb is ProgressWindow pw)
-                        pw.Dispatcher.InvokeAsync(() =>
-                        {
-                            pw.IsIndeterminate = true;
-                            pw.ElapsedText = "";
-                            pw.RemainingText = "";
-                        });
-                }
-                else
-                {
-                    cb.UpdateProgress((float)e.ProgressPercentage / 100f);
-                }
-            };
-
             try
             {
-                byte[] data = await webClient.DownloadDataTaskAsync(new Uri(url));
-                if (cb.Cancel) return null;
+                return await Download.DownloadToTempFileAsync(
+                    url,
+                    (totalBytes, downloadedBytes) =>
+                    {
+                        if (totalBytes == null || totalBytes <= 0)
+                        {
+                            // Signal the window to show indeterminate mode (no time estimates).
+                            cb.UpdateProgress(0f);
+                            if (cb is ProgressWindow pw)
+                                pw.Dispatcher.InvokeAsync(() =>
+                                {
+                                    pw.IsIndeterminate = true;
+                                    pw.ElapsedText = "";
+                                    pw.RemainingText = "";
+                                });
+                            return;
+                        }
 
-                // Grab response headers while the WebClient still holds them.
-                string fileName = Download.GetDownloadFileName(webClient.ResponseHeaders, url);
-                string path = Path.Combine(Program.TempDir, fileName);
-                File.WriteAllBytes(path, data);
-                return path;
+                        if (cb is ProgressWindow progressWindow)
+                            progressWindow.Dispatcher.InvokeAsync(() => progressWindow.IsIndeterminate = false);
+
+                        cb.UpdateProgress((float)downloadedBytes / totalBytes.Value);
+                    },
+                    cb.CancelToken);
             }
             catch
             {
-                return null;   // cancelled or network error — caller converts null to FileImportException
+                return null;   // cancelled or network error - caller converts null to FileImportException
             }
         }
     }
