@@ -67,7 +67,7 @@ namespace VisualMusic
 
             modBrowser.Url = "https://modarchive.org/index.php?request=view_searchbox";
             sidBrowser.Url = "https://www.exotica.org.uk/wiki/Special:HVSC";
-            midiBrowser.Url = "https://bitmidi.com/";
+            midiBrowser.Url = "https://freemidi.org/";
 
             _vm.GetDrawHost = () => monoGameHost.Renderer;
             monoGameHost.Renderer?.SetTrackSelectionService(trackListControl);

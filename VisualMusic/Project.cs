@@ -316,6 +316,23 @@ namespace VisualMusic
         // Matches the "Progress: N%" lines emitted by remuxer.exe (see Remuxer/Program.cs).
         static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
 
+        // Remuxer writes a 58-byte IEEE-float WAV header before the data chunk.
+        const long EmptyGeneratedWavBytes = 58;
+
+        static bool HasGeneratedAudio(string path)
+        {
+            try
+            {
+                return !string.IsNullOrEmpty(path)
+                    && File.Exists(path)
+                    && new FileInfo(path).Length > EmptyGeneratedWavBytes;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         async public Task<bool> ImportSong(ImportOptions options, IProgress<float> progress = null, CancellationToken ct = default)
         { //`Open project` and `import files` meet here
             options.CheckSourceFile();
@@ -350,7 +367,10 @@ namespace VisualMusic
                     string songLengthsFlag = $"-l{options.SongLengthS.ToString()}";
                     string subSongFlag = $"-s{options.SubSong.ToString()}";
                     string supressErrorFlag = "-e";
-                    string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag} {supressErrorFlag}";
+                    string cancelSignalPath = Path.Combine(Program.TempDir, Path.GetRandomFileName() + ".cancel");
+                    File.Delete(cancelSignalPath);
+                    string cancelFlag = $"-c\"{cancelSignalPath}\"";
+                    string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag} {supressErrorFlag} {cancelFlag}";
                     var workingDir = Path.Combine(Program.Dir, "remuxer");
                     var startInfo = new ProcessStartInfo(Path.Combine(workingDir, "remuxer.exe"), cmdLine)
                     {
@@ -377,17 +397,37 @@ namespace VisualMusic
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
-                    // Kill the converter if the user cancels the progress dialog.
-                    using (ct.Register(() => { try { if (!process.HasExited) process.Kill(true); } catch { /* already gone */ } }))
+                    // Signal the converter to stop gracefully if the user cancels. Remuxer will
+                    // exit its processing loop and run EndProcessing(), which writes partial outputs.
+                    using (ct.Register(() =>
+                    {
+                        try { File.WriteAllText(cancelSignalPath, ""); }
+                        catch { /* best-effort cancel signal */ }
+                    }))
+                    {
                         await process.WaitForExitAsync();
-                    ct.ThrowIfCancellationRequested();
+                    }
+                    try { File.Delete(cancelSignalPath); } catch { /* best-effort cleanup */ }
 
-                    if (process.ExitCode != 0)
+                    bool cancelled = ct.IsCancellationRequested;
+                    bool midiExists = !string.IsNullOrEmpty(midiPath) && File.Exists(midiPath);
+                    bool audioExists = HasGeneratedAudio(generatedAudioPath);
+                    if (!audioExists)
+                        generatedAudioPath = null;
+
+                    if (cancelled)
+                    {
+                        if (!midiExists)
+                            return false;
+                    }
+                    else if (process.ExitCode != 0)
+                    {
                         throw new FileImportException(
                             errorOutput.Length > 0 ? errorOutput.ToString().Trim() : null,
                             ImportError.Corrupt, ImportFileType.Note, options.RawNotePath);
+                    }
 
-                    if (!File.Exists(midiPath) && !File.Exists(generatedAudioPath))
+                    if (!midiExists && !audioExists)
                         return false;
                 }
                 options.MidiOutputPath = midiPath;
