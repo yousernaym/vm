@@ -1,0 +1,12 @@
+#1.0.0 (2026-06-27)
+- Background image
+- SidWiz integration
+- Metro UI
+- Configurable song-browser urls
+- Per-property keyframes, supporting most properties, selectable interpolation types
+- Update .net and all dependencies to latest stable versions
+- Migrate to Vcpkg manifest mode
+- Add HVL/AHX support through Hvl-Replayer
+- Mouse camera rotation (activate with middle mouse button)
+- Remove dependency on libmikmod
+- Remove XMPlay mixdown and custom third-party mixdown
