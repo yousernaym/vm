@@ -338,6 +338,17 @@ namespace VisualMusic.ViewModels
         public Action ResetLight { get; set; }
         public Action ResetSpatial { get; set; }
 
+        // ---- Per-tab save/load (track-properties context menu) ----
+
+        /// <summary>Save the currently-open tab's properties to a .tp file (wired by MainViewModel).</summary>
+        public Action SaveCurrentTab { get; set; }
+        /// <summary>Load the currently-open tab's properties from a .tp file (wired by MainViewModel).</summary>
+        public Action LoadCurrentTab { get; set; }
+
+        /// <summary>Number of tracks selected in the track list; drives context-menu enable state.
+        /// Set by MainViewModel on every selection change.</summary>
+        public int SelectedTrackCount { get; set; }
+
         // ---- Modulation ----
 
         public bool ModulationVisible => SP?.Type == NoteStyleType.Bar || SP?.Type == NoteStyleType.Line;

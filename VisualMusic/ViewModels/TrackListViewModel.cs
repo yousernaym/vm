@@ -22,6 +22,11 @@ namespace VisualMusic.ViewModels
         // (source) to the dragged items (destinations). Ctrl+drag gesture.
         public Action<TrackItemViewModel, IReadOnlyList<TrackItemViewModel>> CopyTabPropsToDropped { get; set; }
 
+        // Track-list context menu actions (wired by MainViewModel to its selection-based commands).
+        public Action SaveSelectedProps { get; set; }
+        public Action LoadSelectedProps { get; set; }
+        public Action DefaultProps { get; set; }
+
         Project _project;
 
         public void Rebuild(Project p)

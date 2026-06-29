@@ -48,6 +48,63 @@ namespace VisualMusic.Controls
             }
         }
 
+        void OnContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (DataContext is not TrackListViewModel vm)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            int count = vm.SelectedItems.Count;
+            bool hasItems = trackListView.Items.Count > 0;
+            var menu = new ContextMenu();
+
+            var save = new MenuItem { Header = "_Save properties...", InputGestureText = "Ctrl+Shift+T", IsEnabled = count == 1 };
+            save.Click += (_, _) => vm.SaveSelectedProps?.Invoke();
+            menu.Items.Add(save);
+
+            var load = new MenuItem { Header = "_Load properties...", InputGestureText = "Ctrl+T", IsEnabled = count >= 1 };
+            load.Click += (_, _) => vm.LoadSelectedProps?.Invoke();
+            menu.Items.Add(load);
+
+            var def = new MenuItem { Header = "_Default properties", InputGestureText = "Ctrl+D", IsEnabled = count >= 1 };
+            def.Click += (_, _) => vm.DefaultProps?.Invoke();
+            menu.Items.Add(def);
+
+            menu.Items.Add(new Separator());
+
+            var selectAll = new MenuItem { Header = "Select _all", InputGestureText = "Ctrl+A", IsEnabled = hasItems };
+            selectAll.Click += (_, _) => trackListView.SelectAll();
+            menu.Items.Add(selectAll);
+
+            var invert = new MenuItem { Header = "_Invert selection", IsEnabled = hasItems };
+            invert.Click += (_, _) => InvertSelection();
+            menu.Items.Add(invert);
+
+            trackListView.ContextMenu = menu;
+        }
+
+        void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // Ctrl+A → select all. Handled here so the gesture works regardless of which child has focus.
+            if (e.Key == Key.A && (Keyboard.Modifiers & ModifierKeys.Control) != 0)
+            {
+                trackListView.SelectAll();
+                e.Handled = true;
+            }
+        }
+
+        void InvertSelection()
+        {
+            var selected = new HashSet<object>(trackListView.SelectedItems.Cast<object>());
+            var all = trackListView.Items.Cast<object>().ToList();
+            trackListView.SelectedItems.Clear();
+            foreach (var item in all)
+                if (!selected.Contains(item))
+                    trackListView.SelectedItems.Add(item);
+        }
+
         void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _dragStart = e.GetPosition(null);

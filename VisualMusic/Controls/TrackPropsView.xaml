@@ -6,7 +6,8 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolVis"/>
     </UserControl.Resources>
-    <TabControl SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+    <TabControl SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
+                ContextMenuOpening="OnContextMenuOpening">
         <TabControl.Resources>
             <sys:Double x:Key="MahApps.Font.Size.TabItem">12</sys:Double>
         </TabControl.Resources>

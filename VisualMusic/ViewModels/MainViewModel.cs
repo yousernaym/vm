@@ -64,6 +64,7 @@ namespace VisualMusic.ViewModels
         [NotifyCanExecuteChangedFor(nameof(InsertLyricsCommand))]
         [NotifyCanExecuteChangedFor(nameof(LoadTrackPropsCommand))]
         [NotifyCanExecuteChangedFor(nameof(SaveTrackPropsCommand))]
+        [NotifyCanExecuteChangedFor(nameof(DefaultTrackPropsCommand))]
         [NotifyCanExecuteChangedFor(nameof(GoToNextKeyFrameCommand))]
         [NotifyCanExecuteChangedFor(nameof(GoToPrevKeyFrameCommand))]
         private Project _project;
@@ -310,6 +311,34 @@ namespace VisualMusic.ViewModels
                 OnTrackListSelectionChanged(); // refresh the tabs for the (still-selected) dragged tracks
                 AddUndoItem("Copy Track Properties");
             };
+
+            // Track-list context menu → the same selection-based commands the main menu uses.
+            TrackList.SaveSelectedProps = SaveTrackProps;
+            TrackList.LoadSelectedProps = LoadTrackProps;
+            TrackList.DefaultProps = DefaultTrackProps;
+
+            // Track-properties context menu → save/load just the currently-open tab.
+            SelectedTrackProps.SaveCurrentTab = () =>
+            {
+                if (Project == null || TrackList.SelectedItems.Count != 1) return;
+                int flag = 1 << SelectedTrackProps.SelectedTabIndex;
+                SaveTrackPropsFile(TrackList.SelectedItems[0].TrackView.TrackProps, flag);
+            };
+
+            SelectedTrackProps.LoadCurrentTab = () =>
+            {
+                if (Project == null || TrackList.SelectedItems.Count < 1) return;
+                int tabIndex = SelectedTrackProps.SelectedTabIndex;
+                int flag = 1 << tabIndex;
+                if (!TryLoadTrackPropsFile(out TrackProps props)) return;
+                if ((props.TypeFlags & flag) == 0)
+                {
+                    MetroMessageBox.Show($"The selected file does not contain {TabNames[tabIndex]} properties.",
+                        Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                ApplyLoadedProps(props, flag);
+            };
         }
 
         void OnTrackListSelectionChanged()
@@ -328,6 +357,12 @@ namespace VisualMusic.ViewModels
                 .ToList();
             Keyframes.KeyframeService.SelectedTrackIds = trackNumbers;
             Keyframes.KeyframeService.RaiseKeyframesChanged();
+
+            // Selection count drives the save/load/default enable state (main menu + context menus).
+            SelectedTrackProps.SelectedTrackCount = TrackList.SelectedItems.Count;
+            SaveTrackPropsCommand.NotifyCanExecuteChanged();
+            LoadTrackPropsCommand.NotifyCanExecuteChanged();
+            DefaultTrackPropsCommand.NotifyCanExecuteChanged();
         }
 
         void WireSongPropsCallbacks()
@@ -1154,18 +1189,67 @@ namespace VisualMusic.ViewModels
             dest.Fov = source.Fov;
         }
 
-        [RelayCommand(CanExecute = nameof(HasProject))]
+        // ---- Track property save/load (selection-aware, per-tab) ----
+
+        // Tab index (0..4) → display name, for messages. Mirrors TrackPropsType bit order.
+        static readonly string[] TabNames = { "Style", "Material", "Light", "Spatial", "Audio" };
+
+        public bool CanSaveTrackProps => HasProject && TrackList.SelectedItems.Count == 1;
+        public bool CanLoadTrackProps => HasProject && TrackList.SelectedItems.Count >= 1;
+        public bool CanDefaultTrackProps => HasProject && TrackList.SelectedItems.Count >= 1;
+
+        [RelayCommand(CanExecute = nameof(CanSaveTrackProps))]
+        void SaveTrackProps()
+        {
+            if (TrackList.SelectedItems.Count != 1) return;
+
+            var tabDlg = new TrackPropsTabSelectWindow("Save properties",
+                (int)TrackPropsType.TPT_All, (int)TrackPropsType.TPT_All)
+            { Owner = Application.Current.MainWindow };
+            if (tabDlg.ShowDialog() != true || tabDlg.SelectedFlags == 0) return;
+
+            SaveTrackPropsFile(TrackList.SelectedItems[0].TrackView.TrackProps, tabDlg.SelectedFlags);
+        }
+
+        [RelayCommand(CanExecute = nameof(CanLoadTrackProps))]
         void LoadTrackProps()
         {
+            if (TrackList.SelectedItems.Count < 1) return;
+            if (!TryLoadTrackPropsFile(out TrackProps props)) return;
+
+            var tabDlg = new TrackPropsTabSelectWindow("Load properties",
+                props.TypeFlags, props.TypeFlags)
+            { Owner = Application.Current.MainWindow };
+            if (tabDlg.ShowDialog() != true || tabDlg.SelectedFlags == 0) return;
+
+            ApplyLoadedProps(props, tabDlg.SelectedFlags);
+        }
+
+        [RelayCommand(CanExecute = nameof(CanDefaultTrackProps))]
+        void DefaultTrackProps()
+        {
+            if (TrackList.SelectedItems.Count < 1) return;
+            foreach (var item in TrackList.SelectedItems)
+                item.TrackView.TrackProps.ResetProps();
+            Project.CreateGeos();
+            TrackList.RefreshColors();
+            OnTrackListSelectionChanged();
+            AddUndoItem("Default Track Properties");
+        }
+
+        // ---- Shared file/serialization helpers (used by both the track-list and per-tab paths) ----
+
+        bool TryLoadTrackPropsFile(out TrackProps props)
+        {
+            props = null;
             var dlg = new OpenFileDialog
             {
                 Filter = "Track property files|*.tp|All files|*.*",
                 InitialDirectory = AppSettings.Instance.TrackPropsFolderOrDefault
             };
-            if (dlg.ShowDialog() != true) return;
+            if (dlg.ShowDialog() != true) return false;
             AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TrackPropsFolder = dir);
 
-            TrackProps props;
             var dcs = new DataContractSerializer(typeof(TrackProps), ProjectSerializer.KnownTypes);
             try
             {
@@ -1175,18 +1259,12 @@ namespace VisualMusic.ViewModels
             catch (Exception ex)
             {
                 MetroMessageBox.Show(ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                return false;
             }
-
-            // Apply to the global (index 0) track — full track-list editing comes in a later phase.
-            Project.TrackViews[0].TrackProps.CloneFrom(props, (int)TrackPropsType.TPT_All);
-            if ((props.TypeFlags & (int)TrackPropsType.TPT_Style) != 0)
-                Project.CreateGeos();
-            AddUndoItem("Load Track Properties");
+            return true;
         }
 
-        [RelayCommand(CanExecute = nameof(HasProject))]
-        void SaveTrackProps()
+        void SaveTrackPropsFile(TrackProps source, int flags)
         {
             var dlg = new SaveFileDialog
             {
@@ -1197,13 +1275,12 @@ namespace VisualMusic.ViewModels
             if (dlg.ShowDialog() != true) return;
             AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TrackPropsFolder = dir);
 
-            TrackProps props = Project.TrackViews[0].TrackProps;
-            props.TypeFlags = (int)TrackPropsType.TPT_All;
+            source.TypeFlags = flags;   // marks which tabs the file is meant to carry (see TrackProps.TypeFlags)
             var dcs = new DataContractSerializer(typeof(TrackProps), ProjectSerializer.KnownTypes);
             try
             {
                 using var stream = File.Open(dlg.FileName, FileMode.Create);
-                dcs.WriteObject(stream, props);
+                dcs.WriteObject(stream, source);
             }
             catch (Exception ex)
             {
@@ -1211,13 +1288,19 @@ namespace VisualMusic.ViewModels
             }
         }
 
-        [RelayCommand(CanExecute = nameof(HasProject))]
-        void DefaultTrackProps()
+        // Applies the chosen tabs of <paramref name="props"/> to every selected track, then refreshes.
+        void ApplyLoadedProps(TrackProps props, int flags)
         {
-            foreach (var tv in Project.TrackViews)
-                tv.TrackProps.ResetProps();
-            Project.CreateGeos();
-            AddUndoItem("Default Track Properties");
+            var drawHost = GetDrawHost?.Invoke();
+            foreach (var item in TrackList.SelectedItems)
+                item.TrackView.TrackProps.CloneFrom(props, flags, drawHost);
+
+            if ((flags & ((int)TrackPropsType.TPT_Style | (int)TrackPropsType.TPT_Material)) != 0)
+                Project.CreateGeos();
+            if ((flags & (int)TrackPropsType.TPT_Material) != 0)
+                TrackList.RefreshColors();
+            OnTrackListSelectionChanged();
+            AddUndoItem("Load Track Properties");
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]

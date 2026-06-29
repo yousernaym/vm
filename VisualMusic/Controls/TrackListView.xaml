@@ -8,6 +8,8 @@
               ItemsSource="{Binding Items}"
               SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
               SelectionChanged="OnSelectionChanged"
+              ContextMenuOpening="OnContextMenuOpening"
+              PreviewKeyDown="OnPreviewKeyDown"
               PreviewMouseLeftButtonDown="OnPreviewMouseLeftButtonDown"
               PreviewMouseLeftButtonUp="OnPreviewMouseLeftButtonUp"
               MouseMove="OnMouseMove"
