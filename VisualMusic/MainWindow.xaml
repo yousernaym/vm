@@ -101,9 +101,9 @@
                     <MenuItem Header="_Save..."  Command="{Binding SaveCameraCommand}"/>
                 </MenuItem>
                 <MenuItem Header="_Tracks">
-                    <MenuItem Header="_Default Properties" Command="{Binding DefaultTrackPropsCommand}" InputGestureText="Ctrl+D"/>
                     <MenuItem Header="_Load properties..."  Command="{Binding LoadTrackPropsCommand}"   InputGestureText="Ctrl+T"/>
                     <MenuItem Header="_Save properties..."  Command="{Binding SaveTrackPropsCommand}"   InputGestureText="Ctrl+Shift+T"/>
+                    <MenuItem Header="_Default Properties" Command="{Binding DefaultTrackPropsCommand}" InputGestureText="Ctrl+D"/>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Insert _Lyrics"    Command="{Binding InsertLyricsCommand}"   InputGestureText="Ctrl+L"/>

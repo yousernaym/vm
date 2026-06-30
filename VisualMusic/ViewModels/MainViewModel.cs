@@ -316,6 +316,7 @@ namespace VisualMusic.ViewModels
             TrackList.SaveSelectedProps = SaveTrackProps;
             TrackList.LoadSelectedProps = LoadTrackProps;
             TrackList.DefaultProps = DefaultTrackProps;
+            SelectedTrackProps.DefaultProps = DefaultTrackProps;
 
             // Track-properties context menu → save/load just the currently-open tab.
             SelectedTrackProps.SaveCurrentTab = () =>

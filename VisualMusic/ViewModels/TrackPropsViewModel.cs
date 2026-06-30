@@ -344,6 +344,8 @@ namespace VisualMusic.ViewModels
         public Action SaveCurrentTab { get; set; }
         /// <summary>Load the currently-open tab's properties from a .tp file (wired by MainViewModel).</summary>
         public Action LoadCurrentTab { get; set; }
+        /// <summary>Reset the selected track(s) to default properties (wired by MainViewModel).</summary>
+        public Action DefaultProps { get; set; }
 
         /// <summary>Number of tracks selected in the track list; drives context-menu enable state.
         /// Set by MainViewModel on every selection change.</summary>

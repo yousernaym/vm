@@ -60,13 +60,13 @@ namespace VisualMusic.Controls
             bool hasItems = trackListView.Items.Count > 0;
             var menu = new ContextMenu();
 
-            var save = new MenuItem { Header = "_Save properties...", InputGestureText = "Ctrl+Shift+T", IsEnabled = count == 1 };
-            save.Click += (_, _) => vm.SaveSelectedProps?.Invoke();
-            menu.Items.Add(save);
-
             var load = new MenuItem { Header = "_Load properties...", InputGestureText = "Ctrl+T", IsEnabled = count >= 1 };
             load.Click += (_, _) => vm.LoadSelectedProps?.Invoke();
             menu.Items.Add(load);
+
+            var save = new MenuItem { Header = "_Save properties...", InputGestureText = "Ctrl+Shift+T", IsEnabled = count == 1 };
+            save.Click += (_, _) => vm.SaveSelectedProps?.Invoke();
+            menu.Items.Add(save);
 
             var def = new MenuItem { Header = "_Default properties", InputGestureText = "Ctrl+D", IsEnabled = count >= 1 };
             def.Click += (_, _) => vm.DefaultProps?.Invoke();

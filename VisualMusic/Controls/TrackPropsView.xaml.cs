@@ -23,13 +23,17 @@ namespace VisualMusic.Controls
 
             var menu = new ContextMenu();
 
+            var load = new MenuItem { Header = "_Load properties for current tab...", IsEnabled = vm.SelectedTrackCount >= 1 };
+            load.Click += (_, _) => vm.LoadCurrentTab?.Invoke();
+            menu.Items.Add(load);
+
             var save = new MenuItem { Header = "_Save properties for current tab...", IsEnabled = vm.SelectedTrackCount == 1 };
             save.Click += (_, _) => vm.SaveCurrentTab?.Invoke();
             menu.Items.Add(save);
 
-            var load = new MenuItem { Header = "_Load properties for current tab...", IsEnabled = vm.SelectedTrackCount >= 1 };
-            load.Click += (_, _) => vm.LoadCurrentTab?.Invoke();
-            menu.Items.Add(load);
+            var def = new MenuItem { Header = "_Default properties", IsEnabled = vm.SelectedTrackCount >= 1 };
+            def.Click += (_, _) => vm.DefaultProps?.Invoke();
+            menu.Items.Add(def);
 
             ((Control)sender).ContextMenu = menu;
         }
