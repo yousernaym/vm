@@ -9,6 +9,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <StartupObject>VisualMusic.App</StartupObject>
     <Platforms>AnyCPU;x64</Platforms>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <NoWarn>$(NoWarn);CA1416</NoWarn>
