@@ -110,14 +110,14 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="HL size:" VerticalAlignment="Center"/>
                     <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
                                       Value="{Binding HlSize, Mode=TwoWay}"
-                                      Min="0" Max="100" Decimals="1"
+                                      Min="0" Max="100" Decimals="1" SmallChange="1"
                                       kf:Keyframing.PropertyId="HlSize"
                                       kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                                       kf:Keyframing.Interpolatable="True"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Movement pow:" VerticalAlignment="Center"/>
                     <ctrl:TbSliderWpf Grid.Row="2" Grid.Column="1" Margin="2"
                                       Value="{Binding HlMovementPow, Mode=TwoWay}"
-                                      Min="0.1" Max="5" Decimals="2"
+                                      Min="0.1" Max="5" Decimals="2" SmallChange="0.1"
                                       kf:Keyframing.PropertyId="HlMovementPow"
                                       kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                                       kf:Keyframing.Interpolatable="True"/>
@@ -271,7 +271,7 @@
                                   kf:Keyframing.Interpolatable="False"/>
                         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="2,4,0,0">
                             <ctrl:TbSliderWpf Value="{Binding ModAngleDest, Mode=TwoWay}"
-                                              Min="0" Max="90" Decimals="0" Width="100"
+                                              Min="0" Max="90" Decimals="0" Width="100" SmallChange="1"
                                               kf:Keyframing.PropertyId="ModAngleDest"
                                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                               kf:Keyframing.Interpolatable="True"/>
@@ -300,7 +300,7 @@
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Start:" VerticalAlignment="Center"/>
                         <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
                                           Value="{Binding ModStart, Mode=TwoWay}"
-                                          Min="0" Max="1" Decimals="2"
+                                          Min="0" Max="1" Decimals="2" SmallChange="0.1"
                                           kf:Keyframing.PropertyId="ModStart"
                                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>
@@ -308,7 +308,7 @@
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Stop:" VerticalAlignment="Center"/>
                         <ctrl:TbSliderWpf Grid.Row="1" Grid.Column="1" Margin="2"
                                           Value="{Binding ModStop, Mode=TwoWay}"
-                                          Min="0" Max="1" Decimals="2"
+                                          Min="0" Max="1" Decimals="2" SmallChange="0.1"
                                           kf:Keyframing.PropertyId="ModStop"
                                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>
@@ -316,7 +316,7 @@
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Fade in:" VerticalAlignment="Center"/>
                         <ctrl:TbSliderWpf Grid.Row="2" Grid.Column="1" Margin="2"
                                           Value="{Binding ModFadeIn, Mode=TwoWay}"
-                                          Min="0" Max="1" Decimals="2"
+                                          Min="0" Max="1" Decimals="2" SmallChange="0.1"
                                           kf:Keyframing.PropertyId="ModFadeIn"
                                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>
@@ -324,7 +324,7 @@
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Fade out:" VerticalAlignment="Center"/>
                         <ctrl:TbSliderWpf Grid.Row="3" Grid.Column="1" Margin="2"
                                           Value="{Binding ModFadeOut, Mode=TwoWay}"
-                                          Min="0" Max="1" Decimals="2"
+                                          Min="0" Max="1" Decimals="2" SmallChange="0.1"
                                           kf:Keyframing.PropertyId="ModFadeOut"
                                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>
@@ -332,7 +332,7 @@
                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Fade pow:" VerticalAlignment="Center"/>
                         <ctrl:TbSliderWpf Grid.Row="4" Grid.Column="1" Margin="2"
                                           Value="{Binding ModPower, Mode=TwoWay}"
-                                          Min="0" Max="10" Decimals="2"
+                                          Min="0" Max="10" Decimals="2" SmallChange="0.1"
                                           kf:Keyframing.PropertyId="ModPower"
                                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.TrackMod}"
                                           kf:Keyframing.Interpolatable="True"/>

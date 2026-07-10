@@ -36,14 +36,14 @@
 
             <TextBlock Text="Max pitch" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding MaxPitch, Mode=TwoWay}"
-                              Min="0" Max="128" Decimals="0" Margin="0,0,0,8"
+                              Min="0" Max="128" Decimals="0" Margin="0,0,0,8" SmallChange="1"
                               kf:Keyframing.PropertyId="MaxPitch"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="False"/>
 
             <TextBlock Text="Min pitch" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding MinPitch, Mode=TwoWay}"
-                              Min="0" Max="128" Decimals="0" Margin="0,0,0,4"
+                              Min="0" Max="128" Decimals="0" Margin="0,0,0,4" SmallChange="1"
                               kf:Keyframing.PropertyId="MinPitch"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="False"/>

@@ -94,7 +94,7 @@ namespace VisualMusic.Keyframes
             ("MovingHl",                  KfScope.Track,    "Moving highlight"),
             ("ShrinkingHl",               KfScope.Track,    "Shrinking highlight"),
             ("HlBorder",                  KfScope.Track,    "Highlight border"),
-            ("Transp",                    KfScope.Track,    "Transparency"),
+            ("Transp",                    KfScope.Track,    "Opacity"),
             ("MaterialHue",               KfScope.Track,    "Material hue"),
             ("NormalSat",                 KfScope.Track,    "Normal saturation"),
             ("NormalLum",                 KfScope.Track,    "Normal luminance"),

@@ -489,14 +489,18 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// When background-image keyframes are removed entirely, restore the renderer to the static
-        /// background path so it doesn't stay stuck on the last crossfade state.
+        /// Reacts to any change in the keyframe set (add/remove/move). Restores the static background
+        /// when its keyframes are gone, then re-applies keyframe interpolation and refreshes the live
+        /// property values. This makes a removed keyframe take effect immediately — e.g. deleting one of
+        /// two keyframes updates the property to its remaining interpolated value right away, instead of
+        /// only when playback next runs.
         /// </summary>
         void OnKeyframesChangedRestoreBackground()
         {
             if (Project == null) return;
             if (!Project.PropertyKeyframes.HasAny("proj/BackgroundImagePath"))
                 OnLoadBackgroundImage?.Invoke(Project.Props.BackgroundImagePath);
+            NotifyScrollPositionChanged();
         }
 
         // The track list and property tabs live in a collapsed panel until ShowTrackProps turns on;

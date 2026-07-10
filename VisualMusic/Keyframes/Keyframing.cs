@@ -80,7 +80,12 @@ namespace VisualMusic.Keyframes
         class ElementState
         {
             public KeyframeAdorner Adorner;
-            /// <summary>Value cached when the control is green or default (not blue).</summary>
+            /// <summary>
+            /// The control's currently-displayed value, captured on every refresh. Used as the revert
+            /// target when the user declines the "create keyframe?" prompt on a blue control — so the
+            /// revert restores the value shown at the current position (interpolated from the keyframes),
+            /// not a stale value from some other position.
+            /// </summary>
             public object SafeValue;
             /// <summary>Blocks re-entrant interception during revert.</summary>
             public bool Reverting;
@@ -151,7 +156,11 @@ namespace VisualMusic.Keyframes
 
             var state = _states.GetOrCreateValue(fe);
 
-            if (!blue && !state.Reverting)
+            // Cache the currently-displayed value (green, blue, or default) so a declined edit reverts to
+            // the value shown at the current position. Blue controls show the interpolated keyframe value,
+            // which is the correct revert target; skipping them here would leave SafeValue stale (e.g. from
+            // the last keyframe visited), causing a cancel to snap the property to a wrong value.
+            if (!state.Reverting)
                 CacheValue(fe, state);
 
             // Update adorner

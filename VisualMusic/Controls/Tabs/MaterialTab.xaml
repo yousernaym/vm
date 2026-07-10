@@ -24,7 +24,7 @@
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Transparency:" VerticalAlignment="Center" Margin="0,1"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Opacity:" VerticalAlignment="Center" Margin="0,1"/>
                 <ctrl:TbSliderWpf Grid.Row="0" Grid.Column="1" Margin="2"
                                   Value="{Binding Transp, Mode=TwoWay}" Min="0" Max="1" Decimals="2"
                                   kf:Keyframing.PropertyId="Transp"
