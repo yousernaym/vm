@@ -711,7 +711,40 @@ namespace VisualMusic
             host.GraphicsDevice.DepthStencilState = oldDss;
 
             DrawLyrics(host);
-            host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS);
+            RefreshSidWizLineColors();
+            host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS, GetSongFade());
+        }
+
+        /// <summary>
+        /// Pushes each track's current highlighted material color into its SidWiz channel so the
+        /// waveform overlay follows hue changes from keyframes (and live edits), including changes
+        /// to the global track's hue.
+        /// </summary>
+        void RefreshSidWizLineColors()
+        {
+            for (int t = 1; t < _trackViews.Count; t++)
+            {
+                var tp = _trackViews[t].TrackProps;
+                var color = tp.MaterialProps.GetSysColor(true, GlobalTrackProps.MaterialProps);
+                if (tp.AudioProps.LineColor.ToArgb() != color.ToArgb())
+                    tp.AudioProps.LineColor = color;
+            }
+        }
+
+        /// <summary>
+        /// Song-wide fade factor [0,1] from the project's fade in/out props, matching the
+        /// SongFade computation used by the note shader (see NoteStyle.DrawTrack).
+        /// </summary>
+        float GetSongFade()
+        {
+            float songFade = 1;
+            float songPosS = (float)SongPosS;
+            float songLength = (float)SongLengthS;
+            if (Props.FadeIn > 0 && songPosS < Props.FadeIn)
+                songFade = songPosS / Props.FadeIn;
+            else if (Props.FadeOut > 0 && songLength - songPosS < Props.FadeOut)
+                songFade = (songLength - songPosS) / Props.FadeOut;
+            return Math.Clamp(songFade, 0, 1);
         }
 
         void DrawLyrics(ISongDrawHost host)

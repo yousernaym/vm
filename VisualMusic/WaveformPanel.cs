@@ -66,9 +66,9 @@ namespace VisualMusic
             }
         }
 
-        internal void Draw(double songPosS)
+        internal void Draw(double songPosS, float fade = 1)
         {
-            if (songPosS < 0 || _renderer.ChannelCount == 0)
+            if (songPosS < 0 || _renderer.ChannelCount == 0 || fade <= 0)
                 return;
             if (!_channels.Exists(c => !string.IsNullOrEmpty(c.Filename)))
                 return;
@@ -80,7 +80,9 @@ namespace VisualMusic
             _waveTex.SetData(pixels);
 
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-            _spriteBatch.Draw(_waveTex, _overlayRect, Microsoft.Xna.Framework.Color.White);
+            // The texture is premultiplied BGRA, so scaling the whole color by the fade factor
+            // fades both the waveforms and the semi-transparent background correctly.
+            _spriteBatch.Draw(_waveTex, _overlayRect, Microsoft.Xna.Framework.Color.White * fade);
             _spriteBatch.End();
         }
 
