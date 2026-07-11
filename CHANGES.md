@@ -1,4 +1,5 @@
 #1.0.0 (2026-06-27)
+- Pitch offset in Spatial tab
 - Background image
 - SidWiz integration
 - Metro UI
