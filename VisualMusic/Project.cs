@@ -1108,7 +1108,12 @@ namespace VisualMusic
 
         public Vector3 GetSpatialNormPosOffset(TrackProps trackProps)
         {
-            return NormalizeVpVector(GlobalTrackProps.SpatialProps.PosOffset + trackProps.SpatialProps.PosOffset);
+            Vector3 offset = NormalizeVpVector(GlobalTrackProps.SpatialProps.PosOffset + trackProps.SpatialProps.PosOffset);
+            // Pitch offset is in note rows, so it scales with NoteHeight (already in viewport units)
+            // rather than with NormalizeVpVector.
+            float pitchOffset = (GlobalTrackProps.SpatialProps.PitchOffset ?? 0) + (trackProps.SpatialProps.PitchOffset ?? 0);
+            offset.Y += pitchOffset * Props.NoteHeight;
+            return offset;
         }
 
         public float NormalizeVpScalar(float value)
@@ -1397,6 +1402,9 @@ namespace VisualMusic
                 _propAccessors[$"{prefix}/ZOffset"] = PropAccessor.Scalar(
                     () => tv.TrackProps.SpatialProps.ZOffset ?? 0,
                     v => tv.TrackProps.SpatialProps.ZOffset = (float)v);
+                _propAccessors[$"{prefix}/PitchOffset"] = PropAccessor.Scalar(
+                    () => tv.TrackProps.SpatialProps.PitchOffset ?? 0,
+                    v => tv.TrackProps.SpatialProps.PitchOffset = (float)v);
             }
         }
 

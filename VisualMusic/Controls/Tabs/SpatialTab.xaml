@@ -36,5 +36,11 @@
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                               kf:Keyframing.Interpolatable="True"/>
         </Grid>
+        <TextBlock Text="Pitch offset" FontWeight="SemiBold" Margin="0,6,0,4"/>
+        <ctrl:TbSliderWpf Margin="2"
+                          Value="{Binding PitchOffset, Mode=TwoWay}" Min="-127" Max="127" Decimals="2"
+                          kf:Keyframing.PropertyId="PitchOffset"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="True"/>
     </StackPanel>
 </UserControl>

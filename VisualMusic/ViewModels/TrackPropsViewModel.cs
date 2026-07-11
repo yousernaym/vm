@@ -131,6 +131,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(XOffset));
             OnPropertyChanged(nameof(YOffset));
             OnPropertyChanged(nameof(ZOffset));
+            OnPropertyChanged(nameof(PitchOffset));
 
             // Audio
             OnPropertyChanged(nameof(AudioFilename));
@@ -220,6 +221,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(XOffset));
             OnPropertyChanged(nameof(YOffset));
             OnPropertyChanged(nameof(ZOffset));
+            OnPropertyChanged(nameof(PitchOffset));
         }
 
         // =====================================================================
@@ -831,6 +833,12 @@ namespace VisualMusic.ViewModels
         {
             get => (double?)SpatP?.ZOffset;
             set { if (value != null) Apply(tp => tp.SpatialProps.ZOffset = (float)value); OnPropertyChanged(); }
+        }
+
+        public double? PitchOffset
+        {
+            get => (double?)SpatP?.PitchOffset;
+            set { if (value != null) Apply(tp => tp.SpatialProps.PitchOffset = (float)value); OnPropertyChanged(); }
         }
 
         // =====================================================================

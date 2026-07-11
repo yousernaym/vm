@@ -827,6 +827,9 @@ namespace VisualMusic
         public float? YOffset { get; set; }
         public float? ZOffset { get; set; }
 
+        /// <summary>Shifts notes vertically by this many pitches (semitones). Global and track offsets add.</summary>
+        public float? PitchOffset { get; set; } = 0;
+
         public SpatialProps()
         {
             PosOffset = new Vector3();
@@ -838,12 +841,16 @@ namespace VisualMusic
             {
                 if (entry.Name == "posOffset")
                     PosOffset = (Vector3)entry.Value;
+                else if (entry.Name == "pitchOffset" && entry.Value != null)
+                    PitchOffset = Convert.ToSingle(entry.Value);
             }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
             info.AddValue("posOffset", PosOffset);
+            if (PitchOffset != null)
+                info.AddValue("pitchOffset", PitchOffset.Value);
         }
     }
 

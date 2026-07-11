@@ -127,6 +127,7 @@ namespace VisualMusic.Keyframes
             ("XOffset",                   KfScope.Track,    "X offset"),
             ("YOffset",                   KfScope.Track,    "Y offset"),
             ("ZOffset",                   KfScope.Track,    "Z offset"),
+            ("PitchOffset",               KfScope.Track,    "Pitch offset"),
             ("ModXOriginEnable",          KfScope.TrackMod, "Mod origin X enable"),
             ("ModXOrigin",                KfScope.TrackMod, "Mod origin X"),
             ("ModYOriginEnable",          KfScope.TrackMod, "Mod origin Y enable"),
@@ -204,9 +205,10 @@ namespace VisualMusic.Keyframes
 
         static readonly (string Id, KfScope Scope)[] SpatialKeyframeProperties =
         {
-            ("XOffset", KfScope.Track),
-            ("YOffset", KfScope.Track),
-            ("ZOffset", KfScope.Track),
+            ("XOffset",     KfScope.Track),
+            ("YOffset",     KfScope.Track),
+            ("ZOffset",     KfScope.Track),
+            ("PitchOffset", KfScope.Track),
         };
 
         /// <summary>Returns a friendly label for a full property id (e.g. "track/2/LineWidth").</summary>
