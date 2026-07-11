@@ -139,6 +139,7 @@ namespace VisualMusic
 
             NoteStyle noteStyle = TrackProps.ActiveNoteStyle;
             noteStyle.CreateGeoChunk(out Geo newGeo, new BoundingBox(minPos, maxPos), _midiTrack, TrackProps, texMaterial);
+            newGeo.RefWidthQn = project.GlobalViewWidthQn;   // width this geometry was baked at
             Geo = newGeo;
         }
 

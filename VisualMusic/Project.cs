@@ -144,9 +144,33 @@ namespace VisualMusic
 
         TimeSpan _pbStartSysTime = new TimeSpan(0);
         double _pbStartSongTimeS;
-        public float ViewWidthT => _notes == null ? 0 : Props.ViewWidthQn * _notes.TicksPerBeat; //Number of ticks that fits on screen
-        float _vertViewWidthQn;
-        public float ViewWidthQnScale => _vertViewWidthQn / Props.ViewWidthQn;
+        // Set while CreateGeos bakes a track so screen-position mapping uses that track's ref width.
+        float? _geoWidthOverrideQn;
+
+        public float GlobalViewWidthQn => _geoWidthOverrideQn
+            ?? EffectiveViewWidthQn(_trackViews != null && _trackViews.Count > 0 ? GlobalTrackProps : null);
+
+        /// <summary>Effective width (QN) for a track: own value, else global track's, else default.</summary>
+        public float EffectiveViewWidthQn(TrackProps tp)
+        {
+            float? w = tp?.SpatialProps?.ViewWidthQn;
+            if (w == null && _trackViews != null && _trackViews.Count > 0)
+                w = GlobalTrackProps.SpatialProps?.ViewWidthQn;
+            float v = w ?? ProjProps.DefaultViewWidthQn;
+            return v > 0 ? v : ProjProps.DefaultViewWidthQn;   // guard div-by-zero
+        }
+
+        public float ViewWidthT => _notes == null ? 0 : GlobalViewWidthQn * _notes.TicksPerBeat; //Number of ticks that fits on screen
+        public float TrackViewWidthT(TrackProps tp)
+            => _notes == null ? 0 : EffectiveViewWidthQn(tp) * _notes.TicksPerBeat;
+
+        /// <summary>Shader x-scale: width the track's geometry was baked at / current effective width.</summary>
+        public float TrackViewWidthQnScale(TrackProps tp)
+        {
+            float eff = EffectiveViewWidthQn(tp);
+            float refW = tp?.TrackView?.Geo?.RefWidthQn ?? 0;
+            return refW > 0 ? refW / eff : 1f;
+        }
 
         public ImportOptions ImportOptions { get; set; }
 
@@ -227,7 +251,6 @@ namespace VisualMusic
 
         public Project()
         {
-            Props.ViewWidthQn = ProjProps.DefaultViewWidthQn;
             Props.OnPlaybackOffsetSChanged = OnPlaybackOffsetSChanged;
         }
 
@@ -251,6 +274,7 @@ namespace VisualMusic
         public Project(SerializationInfo info, StreamingContext ctxt) : this()
         {
             //	Props = new ProjProps();
+            float? legacyWidth = null;
             foreach (SerializationEntry entry in info)
             {
                 if (entry.Name == "version")
@@ -279,15 +303,10 @@ namespace VisualMusic
                     PropertyKeyframes = (Keyframes.KeyframeSet)entry.Value ?? PropertyKeyframes;
                 else if (entry.Name == "props")
                     Props = (ProjProps)entry.Value;
-                else if (entry.Name == "vertWidthQn")
-                    _vertViewWidthQn = (float)entry.Value;
 
                 //Compatibility
                 else if (entry.Name == "qn_viewWidth")
-                {
-                    Props.ViewWidthQn = (float)entry.Value;
-                    _vertViewWidthQn = Props.ViewWidthQn;
-                }
+                    legacyWidth = (float)entry.Value;
                 else if (entry.Name == "audioOffset")
                     Props.AudioOffset = (double)entry.Value;
                 else if (entry.Name == "fadeIn")
@@ -303,6 +322,16 @@ namespace VisualMusic
                 else if (entry.Name == "userViewWidth")
                     Props.UserViewWidth = (float)entry.Value;
             }
+
+            // Migrate legacy project-level width to the global track (idempotent, clone-safe:
+            // new-format clones already carry the per-track value).
+            if (_trackViews != null && _trackViews.Count > 0)
+            {
+                var gs = _trackViews[0].TrackProps.SpatialProps;
+                if (gs.ViewWidthQn == null)
+                    gs.ViewWidthQn = legacyWidth ?? Props.LegacyViewWidthQn ?? ProjProps.DefaultViewWidthQn;
+            }
+            PropertyKeyframes?.RenameProperty("proj/ViewWidthQn", "track/0/ViewWidthQn");
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -312,7 +341,6 @@ namespace VisualMusic
             info.AddValue("trackViews", _trackViews);
             info.AddValue("propertyKeyframes", PropertyKeyframes);
             info.AddValue("props", Props);
-            info.AddValue("vertWidthQn", _vertViewWidthQn);
         }
 
         // Matches the "Progress: N%" lines emitted by remuxer.exe (see Remuxer/Program.cs).
@@ -455,7 +483,6 @@ namespace VisualMusic
             if (resetProject)
             {
                 DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + "." + DefaultFileExt;
-                Props.ViewWidthQn = _vertViewWidthQn = ProjProps.DefaultViewWidthQn;
             }
             CreateTrackViews(_notes.Tracks.Count, resetProject);
             InitPropertyAccessors();
@@ -677,16 +704,21 @@ namespace VisualMusic
 
         public void CreateGeos(bool resetVertScale = true)
         {
-            if (_trackViews == null || Props.ViewWidthQn == 0 || Notes == null)
+            if (_trackViews == null || Notes == null)
                 return;
-            float viewWidthQnBackup = Props.ViewWidthQn;
-            if (resetVertScale)
-                _vertViewWidthQn = Props.ViewWidthQn;
-            else
-                Props.ViewWidthQn = _vertViewWidthQn;
             for (int i = 1; i < _trackViews.Count; i++)
-                TrackViews[i].CreateGeo(this, GlobalTrackProps);
-            Props.ViewWidthQn = viewWidthQnBackup;
+            {
+                var tv = _trackViews[i];
+                // resetVertScale: bake fresh at the current effective width (scale 1). Otherwise re-bake at
+                // the track's existing ref width so the shader scale (ref/effective) is preserved.
+                _geoWidthOverrideQn = (resetVertScale ? null : (tv.Geo?.RefWidthQn > 0 ? tv.Geo.RefWidthQn : (float?)null))
+                    ?? EffectiveViewWidthQn(tv.TrackProps);
+                try
+                {
+                    tv.CreateGeo(this, GlobalTrackProps);
+                }
+                finally { _geoWidthOverrideQn = null; }
+            }
         }
 
         public void DrawSong()
@@ -1061,6 +1093,20 @@ namespace VisualMusic
             return (float)((timeT / ViewWidthT) * (Props.Camera.ViewportSize.X));
         }
 
+        // Per-track overloads: map using the track's own effective width.
+        public float GetScreenPosX(double timeT, TrackProps tp)
+        {
+            return (float)((timeT / TrackViewWidthT(tp)) * (Props.Camera.ViewportSize.X));
+        }
+        public Vector2 GetScreenPos(int timeT, int pitch, TrackProps tp)
+        {
+            Vector2 p = new Vector2();
+            p.X = GetScreenPosX(timeT, tp);
+            p.Y = GetScreenPosY((float)pitch);
+            return p;
+        }
+        public float GetSongPosP(TrackProps tp) => GetScreenPosX(SongPosT - PlaybackOffsetT, tp);
+
         public float GetScreenPosY(float pitch)
         {
             return (pitch - Props.MinPitch) * Props.NoteHeight + Props.NoteHeight / 2.0f + Props.PitchMargin - Props.Camera.ViewportSize.Y / 2;
@@ -1068,6 +1114,10 @@ namespace VisualMusic
         public double PixelsToTicks(double screenX)
         { //Returns time in ticks
             return screenX / Props.Camera.ViewportSize.X * ViewWidthT; //Far right -> screenX = viewPortSize / 2
+        }
+        public double PixelsToTicks(double screenX, TrackProps tp)
+        { //Returns time in ticks using the track's own effective width
+            return screenX / Props.Camera.ViewportSize.X * TrackViewWidthT(tp);
         }
 
         public float SongLengthP => (float)(SongLengthT * Props.Camera.ViewportSize.X) / ViewWidthT;
@@ -1212,10 +1262,6 @@ namespace VisualMusic
             _propAccessors.Clear();
 
             // Project-scope
-            _propAccessors["proj/ViewWidthQn"] = PropAccessor.Scalar(
-                () => Props.ViewWidthQn,
-                v => Props.ViewWidthQn = (float)v,
-                logScale: true);
             _propAccessors["proj/Camera"] = PropAccessor.Camera(() => Props.Camera);
             _propAccessors["proj/MaxPitch"] = PropAccessor.Scalar(
                 () => Props.MaxPitch,
@@ -1405,6 +1451,10 @@ namespace VisualMusic
                 _propAccessors[$"{prefix}/PitchOffset"] = PropAccessor.Scalar(
                     () => tv.TrackProps.SpatialProps.PitchOffset ?? 0,
                     v => tv.TrackProps.SpatialProps.PitchOffset = (float)v);
+                _propAccessors[$"{prefix}/ViewWidthQn"] = PropAccessor.Scalar(
+                    () => EffectiveViewWidthQn(tv.TrackProps),
+                    v => tv.TrackProps.SpatialProps.ViewWidthQn = (float)v,
+                    logScale: true);    // no needsRebuild — width renders via shader scale, as before
             }
         }
 
@@ -1695,7 +1745,6 @@ namespace VisualMusic
         {
             var source = project.Clone();
             Props = source.Props;
-            _vertViewWidthQn = Props.ViewWidthQn;
             //TrackViews = source.TrackViews;
             for (int i = 0; i < TrackViews.Count; i++)
             {

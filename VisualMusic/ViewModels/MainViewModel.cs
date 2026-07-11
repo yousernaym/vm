@@ -232,6 +232,10 @@ namespace VisualMusic.ViewModels
                 AddUndoItem("Reset spatial");
             };
 
+            // Re-bake geometry at the new effective width on commit (undo snapshot comes from
+            // Keyframing.OnCommit on the same CommitChanges event).
+            SelectedTrackProps.CommitViewWidth = () => Project?.CreateGeos();
+
             SelectedTrackProps.AddModEntry = () =>
             {
                 foreach (var item in TrackList.SelectedItems)
@@ -369,11 +373,6 @@ namespace VisualMusic.ViewModels
         void WireSongPropsCallbacks()
         {
             SongProps.CreateGeos = () => Project?.CreateGeos();
-
-            SongProps.CommitViewWidth = () =>
-            {
-                Project?.CreateGeos();
-            };
 
             SongProps.ResetPitches = () =>
             {

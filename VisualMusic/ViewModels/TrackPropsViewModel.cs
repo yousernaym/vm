@@ -132,6 +132,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(YOffset));
             OnPropertyChanged(nameof(ZOffset));
             OnPropertyChanged(nameof(PitchOffset));
+            OnPropertyChanged(nameof(ViewWidthQn));
 
             // Audio
             OnPropertyChanged(nameof(AudioFilename));
@@ -222,6 +223,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(YOffset));
             OnPropertyChanged(nameof(ZOffset));
             OnPropertyChanged(nameof(PitchOffset));
+            OnPropertyChanged(nameof(ViewWidthQn));
         }
 
         // =====================================================================
@@ -340,6 +342,8 @@ namespace VisualMusic.ViewModels
         public Action ResetMaterial { get; set; }
         public Action ResetLight { get; set; }
         public Action ResetSpatial { get; set; }
+        /// <summary>Re-bake geometry at the new effective viewport width after a commit (wired by MainViewModel).</summary>
+        public Action CommitViewWidth { get; set; }
 
         // ---- Per-tab save/load (track-properties context menu) ----
 
@@ -839,6 +843,17 @@ namespace VisualMusic.ViewModels
         {
             get => (double?)SpatP?.PitchOffset;
             set { if (value != null) Apply(tp => tp.SpatialProps.PitchOffset = (float)value); OnPropertyChanged(); }
+        }
+
+        public double? ViewWidthQn
+        {
+            get => (double?)SpatP?.ViewWidthQn;
+            set
+            {
+                if (value != null && value <= 0) return;   // reject 0/negative typed values
+                Apply(tp => tp.SpatialProps.ViewWidthQn = (float?)value);   // null clears the override (inherit)
+                OnPropertyChanged();
+            }
         }
 
         // =====================================================================

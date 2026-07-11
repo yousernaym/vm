@@ -18,9 +18,6 @@ namespace VisualMusic.ViewModels
 
         public Action CreateGeos { get; set; }
 
-        /// <summary>Called on slider release to rebuild track geometry. Undo is handled by keyframing.</summary>
-        public Action CommitViewWidth { get; set; }
-
         public Action ResetPitches { get; set; }
         public Action BrowseBackground { get; set; }
         public Action UnloadBackground { get; set; }
@@ -30,7 +27,6 @@ namespace VisualMusic.ViewModels
 
         public void RefreshAll()
         {
-            OnPropertyChanged(nameof(ViewWidthQn));
             OnPropertyChanged(nameof(AudioOffset));
             OnPropertyChanged(nameof(PlaybackOffsetS));
             OnPropertyChanged(nameof(FadeIn));
@@ -48,7 +44,6 @@ namespace VisualMusic.ViewModels
         /// </summary>
         public void RefreshLiveValues()
         {
-            OnPropertyChanged(nameof(ViewWidthQn));
             OnPropertyChanged(nameof(AudioOffset));
             OnPropertyChanged(nameof(PlaybackOffsetS));
             OnPropertyChanged(nameof(FadeIn));
@@ -58,21 +53,6 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(CameraText));
             OnPropertyChanged(nameof(BackgroundImageOpacity));
             OnPropertyChanged(nameof(BackgroundImageSaturation));
-        }
-
-        // =====================================================================
-        // VIEWPORT WIDTH
-        // =====================================================================
-
-        public double? ViewWidthQn
-        {
-            get => (double?)Props?.ViewWidthQn;
-            set
-            {
-                if (value == null || _project == null) return;
-                Props.ViewWidthQn = (float)value;
-                OnPropertyChanged();
-            }
         }
 
         // =====================================================================

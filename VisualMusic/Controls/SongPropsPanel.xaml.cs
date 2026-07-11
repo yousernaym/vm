@@ -13,9 +13,6 @@ namespace VisualMusic.Controls
             InitializeComponent();
         }
 
-        void VpWidth_CommitChanges(object sender, EventArgs e)
-            => (DataContext as SongPropsViewModel)?.CommitViewWidth?.Invoke();
-
         void AudioOffset_CommitChanges(object sender, EventArgs e)
             => KeyframeService.RaiseUndoSnapshot("Edit Audio offset");
 

@@ -5,15 +5,6 @@
              xmlns:kf="clr-namespace:VisualMusic.Keyframes">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="4">
-            <TextBlock Text="Viewport width" FontWeight="SemiBold" Margin="0,0,0,4"/>
-            <ctrl:TbSliderWpf Value="{Binding ViewWidthQn, Mode=TwoWay}"
-                              Min="0" Max="10" ExpBase="2" Decimals="3" Decimals2="2"
-                              Margin="0,0,0,8"
-                              CommitChanges="VpWidth_CommitChanges"
-                              kf:Keyframing.PropertyId="ViewWidthQn"
-                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
-                              kf:Keyframing.Interpolatable="True"/>
-
             <TextBlock Text="Audio offset (s)" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding AudioOffset, Mode=TwoWay}"
                               Min="-10" Max="10" Decimals="2" Margin="0,0,0,8"

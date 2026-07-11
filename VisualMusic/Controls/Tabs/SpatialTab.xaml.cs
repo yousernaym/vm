@@ -15,5 +15,8 @@ namespace VisualMusic.Controls.Tabs
 
         void DefaultSpatialBtn_Click(object sender, RoutedEventArgs e)
             => VM?.ResetSpatial?.Invoke();
+
+        void ViewWidth_CommitChanges(object sender, System.EventArgs e)
+            => VM?.CommitViewWidth?.Invoke();
     }
 }

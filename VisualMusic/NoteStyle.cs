@@ -266,11 +266,6 @@ namespace VisualMusic
             //		texture = defaultTextures[(int)styleType].normal;
             //}
         }
-        protected List<Midi.Note> GetNotes(int leftMargin, Midi.Track track)
-        {   //Get currently visible notes in specified track
-            return track.GetNotes((int)(Project.SongPosT - Project.ViewWidthT / 2 - leftMargin), (int)(Project.SongPosT + Project.ViewWidthT / 2 + leftMargin));
-        }
-
         abstract public void DrawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
 
         protected void DrawTrack(Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial, out float songPosP)
@@ -285,11 +280,11 @@ namespace VisualMusic
 
             _fx.Parameters["SongFade"].SetValue(songFade);
             _fx.Parameters["BlurredEdge"].SetValue(0.002f * Project.Props.Camera.ViewportSize.X);
-            songPosP = Project.SongPosP - Project.PlaybackOffsetP;
+            songPosP = Project.GetSongPosP(trackProps);
             _fx.Parameters["SongPos"].SetValue(songPosP);
             _fx.Parameters["ViewportSize"].SetValue(new Vector2(Project.Props.Camera.ViewportSize.X, Project.Props.Camera.ViewportSize.Y));
             _fx.Parameters["VpMat"].SetValue(Project.Props.Camera.VpMat);
-            _fx.Parameters["VertWidthScale"].SetValue(Project.ViewWidthQnScale);
+            _fx.Parameters["VertWidthScale"].SetValue(Project.TrackViewWidthQnScale(trackProps));
             //fx.Parameters["TexWidthScale"].SetValue(texMaterial.TexProps.UAnchor == TexAnchorEnum.Screen ? VertWidthScale : 1);
 
             //Common notestyle props
@@ -517,6 +512,7 @@ namespace VisualMusic
     public abstract class Geo : IDisposable
     {
         public List<BoundingBoxEx> bboxes = new List<BoundingBoxEx>();
+        public float RefWidthQn;   // effective viewport width (QN) this geometry was baked at
         int _refCount = 0;
 
         public Geo AddRef()
@@ -541,7 +537,7 @@ namespace VisualMusic
             foreach (var bbox in bboxes)
             {
                 BoundingBoxEx bb = bbox.Clone();
-                bb.Scale(new Vector3(project.ViewWidthQnScale, 1, 1));
+                bb.Scale(new Vector3(project.TrackViewWidthQnScale(trackProps), 1, 1));
 
                 Vector3 posOffset = project.GetSpatialNormPosOffset(trackProps);
                 posOffset.X -= songPos;

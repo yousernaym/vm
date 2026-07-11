@@ -515,7 +515,7 @@ namespace VisualMusic
                 for (int i = 1; i < Project.TrackViews.Count; i++)
                 {
                     if (Project.TrackViews[i].MidiTrack.Notes.Count > 0 &&
-                        Project.TrackViews[i].Geo.AreObjectsInFrustum(selectionFrustum, Project.SongPosP - Project.PlaybackOffsetP, Project, Project.TrackViews[i].TrackProps))
+                        Project.TrackViews[i].Geo.AreObjectsInFrustum(selectionFrustum, Project.GetSongPosP(Project.TrackViews[i].TrackProps), Project, Project.TrackViews[i].TrackProps))
                     {
                         _trackSelection.SetTrackSelected(i, true);
                         selectedCount++;

@@ -42,5 +42,15 @@
                           kf:Keyframing.PropertyId="PitchOffset"
                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                           kf:Keyframing.Interpolatable="True"/>
+        <TextBlock Text="Viewport width" FontWeight="SemiBold" Margin="0,6,0,4"/>
+        <ctrl:TbSliderWpf Margin="2"
+                          Value="{Binding ViewWidthQn, Mode=TwoWay}"
+                          Min="0" Max="10" ExpBase="2" Decimals="3" Decimals2="2"
+                          AllowEmpty="True"
+                          ToolTip="Quarter notes visible per screen. Empty = use the global track's value."
+                          CommitChanges="ViewWidth_CommitChanges"
+                          kf:Keyframing.PropertyId="ViewWidthQn"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="True"/>
     </StackPanel>
 </UserControl>

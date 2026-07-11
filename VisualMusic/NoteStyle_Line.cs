@@ -617,10 +617,10 @@ namespace VisualMusic
             else
                 nextNote = note;
 
-            Vector3 noteStart = new Vector3(Project.GetScreenPos(note.start, note.pitch), 0);
-            float noteEnd = Project.GetScreenPos(note.stop, note.pitch).X;
+            Vector3 noteStart = new Vector3(Project.GetScreenPos(note.start, note.pitch, trackProps), 0);
+            float noteEnd = Project.GetScreenPos(note.stop, note.pitch, trackProps).X;
 
-            Vector3 nextNoteStart = new Vector3(Project.GetScreenPos(nextNote.start, nextNote.pitch), 0);
+            Vector3 nextNoteStart = new Vector3(Project.GetScreenPos(nextNote.start, nextNote.pitch, trackProps), 0);
             if (noteEnd > nextNoteStart.X && hlNoteIndex < noteList.Count - 1)
                 noteEnd = nextNoteStart.X;
 
@@ -638,7 +638,7 @@ namespace VisualMusic
             {
                 float poweredNormPos = (float)Math.Pow(normPos, (double)HlMovementPow);
                 hlPos.X = noteStart.X + poweredNormPos * noteLength;
-                hlPos.Y = Project.GetScreenPosY(trackProps.TrackView.Curve.Evaluate((float)Project.PixelsToTicks(hlPos.X)));
+                hlPos.Y = Project.GetScreenPosY(trackProps.TrackView.Curve.Evaluate((float)Project.PixelsToTicks(hlPos.X, trackProps)));
             }
 
             //Set common fx params---------------------
@@ -677,7 +677,7 @@ namespace VisualMusic
                     float x1 = hlPos.X;
                     float y1 = hlPos.Y;
                     float x2 = x1 + 0.001f;
-                    float pitch2 = trackProps.TrackView.Curve.Evaluate((float)Project.PixelsToTicks(x2));
+                    float pitch2 = trackProps.TrackView.Curve.Evaluate((float)Project.PixelsToTicks(x2, trackProps));
                     float y2 = Project.GetScreenPosY(pitch2);
                     arrowDir = new Vector3(x2 - x1, y2 - y1, 0);
                     arrowLength = VpHlSize * 1.25f;  //Make arrow 25% longer than wide

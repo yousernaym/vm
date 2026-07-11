@@ -76,7 +76,6 @@ namespace VisualMusic.Keyframes
 
         public static readonly (string Id, KfScope Scope, string DisplayName)[] AllKeyframeProperties =
         {
-            ("ViewWidthQn",               KfScope.Project,  "Viewport width"),
             ("MaxPitch",                  KfScope.Project,  "Max pitch"),
             ("MinPitch",                  KfScope.Project,  "Min pitch"),
             ("Camera",                    KfScope.Project,  "Camera"),
@@ -128,6 +127,7 @@ namespace VisualMusic.Keyframes
             ("YOffset",                   KfScope.Track,    "Y offset"),
             ("ZOffset",                   KfScope.Track,    "Z offset"),
             ("PitchOffset",               KfScope.Track,    "Pitch offset"),
+            ("ViewWidthQn",               KfScope.Track,    "Viewport width"),
             ("ModXOriginEnable",          KfScope.TrackMod, "Mod origin X enable"),
             ("ModXOrigin",                KfScope.TrackMod, "Mod origin X"),
             ("ModYOriginEnable",          KfScope.TrackMod, "Mod origin Y enable"),
@@ -209,6 +209,7 @@ namespace VisualMusic.Keyframes
             ("YOffset",     KfScope.Track),
             ("ZOffset",     KfScope.Track),
             ("PitchOffset", KfScope.Track),
+            ("ViewWidthQn", KfScope.Track),
         };
 
         /// <summary>Returns a friendly label for a full property id (e.g. "track/2/LineWidth").</summary>

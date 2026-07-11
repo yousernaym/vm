@@ -9,7 +9,9 @@ namespace VisualMusic
     {
         public const float DefaultViewWidthQn = 16; //Number of quarter notes that fits on screen with default camera
         public BindingList<LyricsSegment> LyricsSegments { get; private set; } = new BindingList<LyricsSegment>();
-        public float ViewWidthQn { get; set; }
+
+        /// <summary>Legacy project-level viewport width read from old files; migrated to the global track. Not serialized.</summary>
+        internal float? LegacyViewWidthQn;
 
         public double AudioOffset { get; set; }
         public delegate void Delegate_PropertyChanged<T>(T value);
@@ -49,7 +51,7 @@ namespace VisualMusic
             foreach (SerializationEntry entry in info)
             {
                 if (entry.Name == "qn_viewWidth")
-                    ViewWidthQn = (float)entry.Value;
+                    LegacyViewWidthQn = (float)entry.Value;
                 else if (entry.Name == "audioOffset")
                     AudioOffset = (double)entry.Value;
                 else if (entry.Name == "playbackOffsetS")
@@ -78,7 +80,6 @@ namespace VisualMusic
         }
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
-            info.AddValue("qn_viewWidth", ViewWidthQn);
             info.AddValue("audioOffset", AudioOffset);
             info.AddValue("playbackOffsetS", _playbackOffsetS);
             info.AddValue("fadeIn", FadeIn);

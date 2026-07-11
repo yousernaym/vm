@@ -94,6 +94,8 @@ namespace VisualMusic
         public void ResetSpatial()
         {
             SpatialProps = new SpatialProps();
+            if (TrackView != null && TrackView.TrackNumber == 0)
+                SpatialProps.ViewWidthQn = ProjProps.DefaultViewWidthQn;
         }
 
         public void ResetProps()
@@ -830,6 +832,9 @@ namespace VisualMusic
         /// <summary>Shifts notes vertically by this many pitches (semitones). Global and track offsets add.</summary>
         public float? PitchOffset { get; set; } = 0;
 
+        /// <summary>Quarter notes visible per screen for this track. Null = inherit the global track's value.</summary>
+        public float? ViewWidthQn { get; set; }
+
         public SpatialProps()
         {
             PosOffset = new Vector3();
@@ -843,6 +848,8 @@ namespace VisualMusic
                     PosOffset = (Vector3)entry.Value;
                 else if (entry.Name == "pitchOffset" && entry.Value != null)
                     PitchOffset = Convert.ToSingle(entry.Value);
+                else if (entry.Name == "viewWidthQn" && entry.Value != null)
+                    ViewWidthQn = Convert.ToSingle(entry.Value);
             }
         }
 
@@ -851,6 +858,8 @@ namespace VisualMusic
             info.AddValue("posOffset", PosOffset);
             if (PitchOffset != null)
                 info.AddValue("pitchOffset", PitchOffset.Value);
+            if (ViewWidthQn != null)
+                info.AddValue("viewWidthQn", ViewWidthQn.Value);
         }
     }
 

@@ -88,6 +88,17 @@ namespace VisualMusic.Controls
             set => SetValue(ExpBaseProperty, value);
         }
 
+        public static readonly DependencyProperty AllowEmptyProperty = DependencyProperty.Register(
+            nameof(AllowEmpty), typeof(bool), typeof(TbSliderWpf),
+            new PropertyMetadata(false));
+
+        /// <summary>When true, clearing the textbox sets Value to null (inherit) instead of being ignored.</summary>
+        public bool AllowEmpty
+        {
+            get => (bool)GetValue(AllowEmptyProperty);
+            set => SetValue(AllowEmptyProperty, value);
+        }
+
         public static readonly DependencyProperty SmallChangeProperty = DependencyProperty.Register(
             nameof(SmallChange), typeof(double), typeof(TbSliderWpf),
             new PropertyMetadata(0.01));
@@ -173,7 +184,21 @@ namespace VisualMusic.Controls
         void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (_updating) return;
-            if (!double.TryParse(textBox.Text, out double parsed)) return;
+            if (!double.TryParse(textBox.Text, out double parsed))
+            {
+                if (AllowEmpty && string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    _updating = true;
+                    try
+                    {
+                        Value = null;
+                        slider.Value = Min;
+                    }
+                    finally { _updating = false; }
+                    ValueChanged?.Invoke(this, EventArgs.Empty);
+                }
+                return;
+            }
             _updating = true;
             try
             {

@@ -352,6 +352,15 @@ namespace VisualMusic.Keyframes
             }
         }
 
+        /// <summary>Migrates a keyframe track to a new property id (used for legacy id renames on load).</summary>
+        public void RenameProperty(string oldId, string newId)
+        {
+            if (!_tracks.TryGetValue(oldId, out var track)) return;
+            _tracks.Remove(oldId);
+            if (!_tracks.ContainsKey(newId))
+                _tracks[newId] = track;
+        }
+
         public void Toggle(string propertyId, int tick)
         {
             if (HasKeyAt(propertyId, tick)) Remove(propertyId, tick);
