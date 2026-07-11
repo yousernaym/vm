@@ -116,12 +116,14 @@ namespace VisualMusic
         const int WM_MBUTTONDOWN = 0x0207;
         const int WM_MBUTTONUP = 0x0208;
         const int WM_MOUSEMOVE = 0x0200;
+        const int WM_MOUSEWHEEL = 0x020A;
         const int WM_CAPTURECHANGED = 0x0215;
         const int WM_KEYDOWN = 0x0100;
         const int WM_KEYUP = 0x0101;
         const int WM_SIZE = 0x0005;
 
         const int MK_SHIFT = 0x0004;
+        const int MK_CONTROL = 0x0008;
 
         // ---- Fields ----
         IntPtr _hwnd;
@@ -293,6 +295,17 @@ namespace VisualMusic
                 case WM_MOUSEMOVE:
                     int workH = (int)SystemParameters.WorkArea.Height;
                     Renderer.HandleMouseMove(lo, hi, workH);
+                    break;
+
+                case WM_MOUSEWHEEL:
+                    // WM_MOUSEWHEEL reaches this window only while it has keyboard focus (set on click).
+                    // WPARAM is 64-bit on x64 (upper bits may be set), so read as Int64 before masking —
+                    // ToInt32() would throw OverflowException.
+                    long wheelWParam = wParam.ToInt64();
+                    int wheelDelta = unchecked((short)((wheelWParam >> 16) & 0xFFFF));
+                    bool isCtrl = (wheelWParam & MK_CONTROL) != 0;
+                    if (Renderer.HandleMouseWheel(wheelDelta, isCtrl))
+                        handled = true;
                     break;
 
                 case WM_KEYDOWN:

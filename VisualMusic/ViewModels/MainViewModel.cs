@@ -88,6 +88,13 @@ namespace VisualMusic.ViewModels
         UndoItems _undoItems = new UndoItems();
         List<int> _lastSelectedIndices = new List<int>();
 
+        // Ctrl+wheel viewport-width edit: multiply width by this factor per notch, clamp to the
+        // slider's range (ExpBase 2, log 0..10 → 1..1024 QN), and coalesce undo via a debounce timer.
+        const double ViewWidthWheelFactor = 1.1;
+        const float MinViewWidthQn = 1f;
+        const float MaxViewWidthQn = 1024f;
+        System.Windows.Threading.DispatcherTimer _viewWidthUndoTimer;
+
         public MainViewModel()
         {
             TrackList.SelectionChanged += OnTrackListSelectionChanged;
@@ -1128,6 +1135,53 @@ namespace VisualMusic.ViewModels
             if (Project == null) return;
             _undoItems.Add(desc, Project);
             UpdateUndoRedo();
+        }
+
+        /// <summary>
+        /// Ctrl+mouse-wheel over the focused song panel: scales the viewport width of the selected
+        /// track(s). Positive <paramref name="notches"/> (wheel away) zooms in (narrower width).
+        /// </summary>
+        public void AdjustSelectedViewWidth(int notches)
+        {
+            if (Project == null || notches == 0) return;
+            var selected = TrackList.SelectedItems.ToList();
+            if (selected.Count == 0) return;
+            if (!Keyframes.KeyframeService.EnsureKeyframeForEdit("ViewWidthQn",
+                    Keyframes.KeyframeService.KfScope.Track))
+                return;
+
+            double factor = Math.Pow(ViewWidthWheelFactor, -notches);   // wheel away → narrower
+            foreach (var item in selected)
+            {
+                var tp = item.TrackView.TrackProps;
+                float current = Project.EffectiveViewWidthQn(tp);
+                tp.SpatialProps.ViewWidthQn =
+                    (float)Math.Clamp(current * factor, MinViewWidthQn, MaxViewWidthQn);
+            }
+            Project.CreateGeos();
+            Keyframes.KeyframeService.SyncCurrentValues("ViewWidthQn",
+                Keyframes.KeyframeService.KfScope.Track);
+            OnTrackListSelectionChanged();   // refresh the Spatial tab slider display
+            ScheduleViewWidthUndo();
+        }
+
+        // Debounce: fold a burst of wheel notches into a single undo item once scrolling settles.
+        void ScheduleViewWidthUndo()
+        {
+            if (_viewWidthUndoTimer == null)
+            {
+                _viewWidthUndoTimer = new System.Windows.Threading.DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(600)
+                };
+                _viewWidthUndoTimer.Tick += (s, e) =>
+                {
+                    _viewWidthUndoTimer.Stop();
+                    AddUndoItem("Edit viewport width");
+                };
+            }
+            _viewWidthUndoTimer.Stop();
+            _viewWidthUndoTimer.Start();
         }
 
         [RelayCommand(CanExecute = nameof(HasProject))]

@@ -77,6 +77,10 @@ namespace VisualMusic
             {
                 monoGameHost.Renderer.OnCameraControlModeChanged =
                     on => Dispatcher.InvokeAsync(() => _vm.IsMouseLookMode = on);
+
+                // Ctrl+wheel over the focused song panel adjusts the selected tracks' viewport width.
+                monoGameHost.Renderer.OnCtrlWheelViewWidth =
+                    notches => _vm.AdjustSelectedViewWidth(notches);
             }
 
             _vm.OnProjectLoaded = project =>

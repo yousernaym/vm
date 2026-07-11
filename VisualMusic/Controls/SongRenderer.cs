@@ -81,6 +81,13 @@ namespace VisualMusic
         /// </summary>
         public Action OnResetCamera { get; set; }
 
+        /// <summary>
+        /// Ctrl+mouse-wheel over the focused song panel: adjusts the viewport width of the selected
+        /// track(s). Argument is the number of wheel notches (positive = wheel away / zoom in). Wire on
+        /// the UI thread.
+        /// </summary>
+        public Action<int> OnCtrlWheelViewWidth { get; set; }
+
         // --- Public properties ---
         public SpriteFont LyricsFont { get; private set; }
         Project _project;
@@ -303,6 +310,22 @@ namespace VisualMusic
                     _isPausingWhileScrolling = false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Handles a mouse-wheel notch. Ctrl+wheel adjusts the selected track(s) viewport width.
+        /// Returns true if the message was consumed.
+        /// </summary>
+        public bool HandleMouseWheel(int wheelDelta, bool isCtrl)
+        {
+            if (!isCtrl || Project?.Notes == null || OnCtrlWheelViewWidth == null)
+                return false;
+            int notches = wheelDelta / 120;
+            if (notches == 0)
+                notches = Math.Sign(wheelDelta);
+            if (notches != 0)
+                OnCtrlWheelViewWidth.Invoke(notches);
+            return true;
         }
 
         public void HandleMouseMove(int x, int y, int workAreaHeight)
