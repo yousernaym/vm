@@ -66,8 +66,15 @@ namespace LibSidWiz
         public float ActivityThreshold = 0.004f;   // ~ -48 dBFS; tweak
         public int ActivityWindowSamplesOverride = 0; // 0 => use ViewWidthInSamples
         public int ActivitySubsampleStride = 4;  // >=1; higher = faster
-        public float ActivityHoldBelowThresholdSeconds = 4.5f; // hang time after dropping below threshold
-        private int[] _lastAboveThresholdSample;    // Per-channel activity state
+        public float ActivityLookaheadSeconds = 4.5f; // hide as soon as this much upcoming silence is detected
+        // Per-channel lookahead cache: earliest known upcoming active sample (int.MinValue = unknown)
+        // and the exclusive end of the contiguously verified-silent region (int.MinValue = none).
+        // Valid only while playback advances forward; backward seeks reset via ResetActivityState.
+        private int[] _nextActiveSample;
+        private int[] _silentScannedUntil;
+        // Whether the channel was shown last frame: the lookahead only bridges gaps for a visible
+        // channel; a hidden one must wait for audio to actually reach the window.
+        private bool[] _wasActive;
         private int _lastFrameStartSample = int.MinValue;
 
         /// <summary>Allocate and pin buffers; (re)build template.</summary>
@@ -118,8 +125,12 @@ namespace LibSidWiz
         /// <summary>Reset activity/trigger history, e.g. after seeking backwards.</summary>
         public void ResetActivityState(int frameStartSample, int frameSamples)
         {
-            if (_lastAboveThresholdSample != null)
-                Array.Fill(_lastAboveThresholdSample, int.MinValue);
+            if (_nextActiveSample != null)
+                Array.Fill(_nextActiveSample, int.MinValue);
+            if (_silentScannedUntil != null)
+                Array.Fill(_silentScannedUntil, int.MinValue);
+            if (_wasActive != null)
+                Array.Fill(_wasActive, false);
 
             if (_prevTrigger != null)
             {
@@ -222,10 +233,13 @@ namespace LibSidWiz
                     _prevTrigger[i] = (int)((long)startFrame * SamplingRate / Math.Max(1, FramesPerSecond)) - frameSamples;
             }
 
-            if (_lastAboveThresholdSample == null || _lastAboveThresholdSample.Length != _channels.Count)
+            if (_nextActiveSample == null || _nextActiveSample.Length != _channels.Count)
             {
-                _lastAboveThresholdSample = new int[_channels.Count];
-                for (int i = 0; i < _channels.Count; ++i) _lastAboveThresholdSample[i] = int.MinValue;
+                _nextActiveSample = new int[_channels.Count];
+                _silentScannedUntil = new int[_channels.Count];
+                _wasActive = new bool[_channels.Count];
+                Array.Fill(_nextActiveSample, int.MinValue);
+                Array.Fill(_silentScannedUntil, int.MinValue);
             }
 
             if (_pointsPerChannel == null || _pointsPerChannel.Length != _channels.Count)
@@ -249,35 +263,52 @@ namespace LibSidWiz
             int left = triggerPoint - width / 2;
             int right = left + width;
 
-            float peak = 0f;
             int step = Math.Max(1, ActivitySubsampleStride);
 
-            // Scan the window; if any sample crosses the threshold, update timestamp and return active
+            // Scan the current window; any sample crossing the threshold means active now
             for (int s = left; s < right; s += step)
             {
                 float v = ch.GetSample(s, forTrigger: false);
-                float a = v >= 0 ? v : -v;
-                if (a > peak) peak = a;
-
-                if (a >= ActivityThreshold)
+                if ((v >= 0 ? v : -v) >= ActivityThreshold)
                 {
-                    // mark the latest moment we observed activity; use the end of this frame as the timestamp
-                    _lastAboveThresholdSample[chIndex] = frameStartSample + frameSamples - 1;
+                    // Lookahead cache is only valid for a contiguous silent stretch — reset it
+                    _nextActiveSample[chIndex] = int.MinValue;
+                    _silentScannedUntil[chIndex] = int.MinValue;
+                    _wasActive[chIndex] = true;
                     return true;
                 }
             }
 
-            // No sample crossed the threshold in this window — apply hold
-            if (ActivityHoldBelowThresholdSeconds > 0f)
+            // Silent now — a hidden channel stays hidden until audio actually reaches the window;
+            // the lookahead below only decides whether a visible channel keeps showing across a gap.
+            if (!_wasActive[chIndex] || ActivityLookaheadSeconds <= 0f)
             {
-                int holdSamples = Math.Max(0, (int)Math.Round(ActivityHoldBelowThresholdSeconds * SamplingRate));
-                int samplesSinceHit = frameStartSample + frameSamples - 1 - _lastAboveThresholdSample[chIndex];
-                if (_lastAboveThresholdSample[chIndex] != int.MinValue && samplesSinceHit <= holdSamples)
-                    return true; // still within hang time
+                _wasActive[chIndex] = false;
+                return false;
             }
 
-            // Finally, without hold, fall back to pure threshold decision
-            return peak >= ActivityThreshold;
+            int lookaheadSamples = (int)Math.Round(ActivityLookaheadSeconds * SamplingRate);
+            int scanTo = frameStartSample + frameSamples + lookaheadSamples;
+
+            // Upcoming activity found on an earlier frame and not yet reached
+            if (_nextActiveSample[chIndex] != int.MinValue && _nextActiveSample[chIndex] >= right)
+                return _wasActive[chIndex] = _nextActiveSample[chIndex] < scanTo;
+            _nextActiveSample[chIndex] = int.MinValue;
+
+            // Scan only the stretch not already verified silent on earlier frames
+            for (int s = Math.Max(right, _silentScannedUntil[chIndex]); s < scanTo; s += step)
+            {
+                float v = ch.GetSample(s, forTrigger: false);
+                if ((v >= 0 ? v : -v) >= ActivityThreshold)
+                {
+                    _nextActiveSample[chIndex] = s;
+                    _silentScannedUntil[chIndex] = s;
+                    return true;
+                }
+            }
+            _silentScannedUntil[chIndex] = scanTo;
+            _wasActive[chIndex] = false;
+            return false;
         }
 
         /// <summary>Rebuild channel.Bounds layout for the given visible set and repaint the template into _templateData.</summary>
