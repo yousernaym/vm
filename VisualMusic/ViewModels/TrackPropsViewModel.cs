@@ -134,6 +134,7 @@ namespace VisualMusic.ViewModels
 
             // Audio
             OnPropertyChanged(nameof(AudioFilename));
+            OnPropertyChanged(nameof(SilenceThreshold));
         }
 
         /// <summary>
@@ -844,6 +845,25 @@ namespace VisualMusic.ViewModels
                 Apply(tp => tp.AudioProps.Filename = value);
                 OnPropertyChanged();
                 _ = LoadSelectedTracksAudio?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Silence threshold in seconds as text; empty = inherit the global track's value.
+        /// String-typed so the box can be cleared (and shows blank when selected tracks differ).
+        /// Committed per keystroke (UpdateSourceTrigger=PropertyChanged) so a refresh — e.g. at
+        /// playback start — can't revert a pending edit; hence no OnPropertyChanged here, which
+        /// would disturb the caret while typing. Invalid text simply leaves the last valid value.
+        /// </summary>
+        public string SilenceThreshold
+        {
+            get => _mergedProps?.AudioProps?.SilenceThresholdS?.ToString() ?? "";
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    Apply(tp => tp.AudioProps.SilenceThresholdS = null);
+                else if (float.TryParse(value, out float s) && s >= 0)
+                    Apply(tp => tp.AudioProps.SilenceThresholdS = s);
             }
         }
 

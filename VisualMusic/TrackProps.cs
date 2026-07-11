@@ -864,6 +864,15 @@ namespace VisualMusic
 
         public System.Drawing.Color LineColor { get => SidWizChannel.LineColor; set => SidWizChannel.LineColor = value; }
 
+        public const float DefaultSilenceThresholdS = 5;
+
+        /// <summary>
+        /// Seconds of upcoming silence after which the track's waveform is hidden.
+        /// Null = inherit the global track's value (which defaults to
+        /// <see cref="DefaultSilenceThresholdS"/>).
+        /// </summary>
+        public float? SilenceThresholdS { get; set; }
+
         public AudioProps()
         {
 
@@ -883,12 +892,16 @@ namespace VisualMusic
                     SidWizChannel.Filename = (string)entry.Value;
                     //SidWizChannel.LoadDataAsync();
                 }
+                else if (entry.Name == "silenceThreshold" && entry.Value != null)
+                    SilenceThresholdS = Convert.ToSingle(entry.Value);
             }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
             info.AddValue("audioFile", SidWizChannel.Filename);
+            if (SilenceThresholdS != null)
+                info.AddValue("silenceThreshold", SilenceThresholdS.Value);
         }
 
         public async Task LoadAudioAsync()

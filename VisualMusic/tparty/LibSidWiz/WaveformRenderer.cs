@@ -66,7 +66,7 @@ namespace LibSidWiz
         public float ActivityThreshold = 0.004f;   // ~ -48 dBFS; tweak
         public int ActivityWindowSamplesOverride = 0; // 0 => use ViewWidthInSamples
         public int ActivitySubsampleStride = 4;  // >=1; higher = faster
-        public float ActivityLookaheadSeconds = 4.5f; // hide as soon as this much upcoming silence is detected
+        // Lookahead duration comes from each channel's ActivityLookaheadSeconds.
         // Per-channel lookahead cache: earliest known upcoming active sample (int.MinValue = unknown)
         // and the exclusive end of the contiguously verified-silent region (int.MinValue = none).
         // Valid only while playback advances forward; backward seeks reset via ResetActivityState.
@@ -281,13 +281,13 @@ namespace LibSidWiz
 
             // Silent now — a hidden channel stays hidden until audio actually reaches the window;
             // the lookahead below only decides whether a visible channel keeps showing across a gap.
-            if (!_wasActive[chIndex] || ActivityLookaheadSeconds <= 0f)
+            if (!_wasActive[chIndex] || ch.ActivityLookaheadSeconds <= 0f)
             {
                 _wasActive[chIndex] = false;
                 return false;
             }
 
-            int lookaheadSamples = (int)Math.Round(ActivityLookaheadSeconds * SamplingRate);
+            int lookaheadSamples = (int)Math.Round(ch.ActivityLookaheadSeconds * SamplingRate);
             int scanTo = frameStartSample + frameSamples + lookaheadSamples;
 
             // Upcoming activity found on an earlier frame and not yet reached

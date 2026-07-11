@@ -270,6 +270,8 @@ namespace VisualMusic
                         {
                             tv.TrackProps.AudioProps.LineColor = tv.TrackProps.MaterialProps.GetSysColor(true, tv.TrackProps.GlobalProps.MaterialProps);
                         }
+                        else if (tv.TrackProps.AudioProps.SilenceThresholdS == null)
+                            tv.TrackProps.AudioProps.SilenceThresholdS = AudioProps.DefaultSilenceThresholdS;
                     }
                 }
 
@@ -664,6 +666,8 @@ namespace VisualMusic
         {
             _trackViews.Add(view);
             view.TrackProps.GlobalProps = TrackViews[0].TrackProps;
+            if (view.TrackNumber == 0 && view.TrackProps.AudioProps.SilenceThresholdS == null)
+                view.TrackProps.AudioProps.SilenceThresholdS = AudioProps.DefaultSilenceThresholdS;
             view.TrackProps.AudioProps.LineColor = view.TrackProps.MaterialProps.GetSysColor(true, view.TrackProps.GlobalProps.MaterialProps);
             view.TrackProps.AudioProps.SidWizChannel.Filename = "";
             DrawHost?.WaveformPanel?.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
@@ -711,23 +715,28 @@ namespace VisualMusic
             host.GraphicsDevice.DepthStencilState = oldDss;
 
             DrawLyrics(host);
-            RefreshSidWizLineColors();
+            RefreshSidWizChannels();
             host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS, GetSongFade());
         }
 
         /// <summary>
         /// Pushes each track's current highlighted material color into its SidWiz channel so the
         /// waveform overlay follows hue changes from keyframes (and live edits), including changes
-        /// to the global track's hue.
+        /// to the global track's hue. Also pushes the effective silence threshold (per-track
+        /// override, else the global track's value).
         /// </summary>
-        void RefreshSidWizLineColors()
+        void RefreshSidWizChannels()
         {
+            float globalThreshold = GlobalTrackProps.AudioProps.SilenceThresholdS
+                ?? AudioProps.DefaultSilenceThresholdS;
             for (int t = 1; t < _trackViews.Count; t++)
             {
                 var tp = _trackViews[t].TrackProps;
                 var color = tp.MaterialProps.GetSysColor(true, GlobalTrackProps.MaterialProps);
                 if (tp.AudioProps.LineColor.ToArgb() != color.ToArgb())
                     tp.AudioProps.LineColor = color;
+                tp.AudioProps.SidWizChannel.ActivityLookaheadSeconds =
+                    tp.AudioProps.SilenceThresholdS ?? globalThreshold;
             }
         }
 
@@ -804,7 +813,12 @@ namespace VisualMusic
             TrackProps outProps = TrackViews[list[0]].TrackProps;
             if (list.Count == 1) return outProps;
             outProps = outProps.Clone(DrawHost);
-            outProps.AudioProps = new AudioProps { Filename = outProps.AudioProps.Filename, LineColor = outProps.AudioProps.LineColor };
+            outProps.AudioProps = new AudioProps
+            {
+                Filename = outProps.AudioProps.Filename,
+                LineColor = outProps.AudioProps.LineColor,
+                SilenceThresholdS = outProps.AudioProps.SilenceThresholdS
+            };
             for (int i = 1; i < list.Count; i++)
                 outProps = (TrackProps)MergeObjects(outProps, TrackViews[list[i]].TrackProps);
             return outProps;

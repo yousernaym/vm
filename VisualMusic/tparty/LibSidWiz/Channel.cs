@@ -295,6 +295,10 @@ namespace LibSidWiz
         }
 
         [Category("Appearance")]
+        [Description("Seconds of upcoming silence after which the channel is hidden. Re-read every frame, so no change notification is needed.")]
+        public float ActivityLookaheadSeconds { get; set; } = 5f;
+
+        [Category("Appearance")]
         [Description("The line colour")]
         public Color LineColor
         {
