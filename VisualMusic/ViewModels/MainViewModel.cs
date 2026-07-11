@@ -498,9 +498,22 @@ namespace VisualMusic.ViewModels
         void OnKeyframesChangedRestoreBackground()
         {
             if (Project == null) return;
-            if (!Project.PropertyKeyframes.HasAny("proj/BackgroundImagePath"))
-                OnLoadBackgroundImage?.Invoke(Project.Props.BackgroundImagePath);
+            LoadStaticBackgroundIfUnkeyframed(Project);
             NotifyScrollPositionChanged();
+        }
+
+        /// <summary>
+        /// Loads the static background image unless background-path keyframes exist. With keyframes,
+        /// the serialized live path is stale (whatever was interpolated when the project was saved —
+        /// often the last keyframe's image), so keyframe interpolation at the current position must
+        /// decide the image/crossfade instead.
+        /// </summary>
+        void LoadStaticBackgroundIfUnkeyframed(Project project)
+        {
+            if (!project.PropertyKeyframes.HasAny("proj/BackgroundImagePath"))
+                OnLoadBackgroundImage?.Invoke(project.Props.BackgroundImagePath);
+            else if (!project.IsPlaying)
+                project.InterpolatePropertyKeyframes();
         }
 
         // The track list and property tabs live in a collapsed panel until ShowTrackProps turns on;
@@ -608,7 +621,7 @@ namespace VisualMusic.ViewModels
             Project = tempProject;
             tempProject.DefaultFileName = Path.GetFileName(path);
             OnProjectLoaded?.Invoke(tempProject);
-            OnLoadBackgroundImage?.Invoke(tempProject.Props.BackgroundImagePath);
+            LoadStaticBackgroundIfUnkeyframed(tempProject);
 
             _undoItems.Clear();
             _undoItems.Add("", tempProject);
@@ -921,7 +934,7 @@ namespace VisualMusic.ViewModels
 
             TrackList.Rebuild(Project);
             OnProjectLoaded?.Invoke(Project);
-            OnLoadBackgroundImage?.Invoke(Project.Props.BackgroundImagePath);
+            LoadStaticBackgroundIfUnkeyframed(Project);
 
             // Refresh audio-dependent CanExecute (HasAudio depends on Media.getAudioLength()).
             OnPropertyChanged(nameof(HasAudio));
