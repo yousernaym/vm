@@ -51,6 +51,8 @@
             <CheckBox Content="Erase current project" IsChecked="{Binding EraseCurrent}" Margin="0,0,0,10"/>
             <RadioButton GroupName="TrackSplit" Content="{Binding PerInstrumentLabel}" IsChecked="{Binding InsTrack}"  Margin="0,0,0,2"/>
             <RadioButton GroupName="TrackSplit" Content="{Binding PerChannelLabel}"    IsChecked="{Binding PerChannel}"/>
+            <CheckBox Content="Generate audio file for each track" IsChecked="{Binding TrackAudio}"
+                      IsEnabled="{Binding TrackAudioEnabled}" Margin="0,10,0,0"/>
         </StackPanel>
 
         <!-- Buttons -->

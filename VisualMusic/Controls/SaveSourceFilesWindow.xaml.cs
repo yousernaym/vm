@@ -19,12 +19,25 @@ namespace VisualMusic.Controls
 
         public bool MidiAvailable { get; }
         public bool WavAvailable { get; }
+        public bool TrackWavsAvailable { get; }
 
         bool _saveMidi;
         public bool SaveMidi
         {
             get => _saveMidi;
-            set { _saveMidi = value; Notify(); }
+            set
+            {
+                _saveMidi = value;
+                Notify();
+                // Saving the MIDI converts the project so the remuxer never re-runs; the WAVs must
+                // then be saved alongside or their temp copies eventually go stale. Auto-check both
+                // (the user can still uncheck manually).
+                if (value)
+                {
+                    SaveWav = WavAvailable;
+                    SaveTrackWavs = TrackWavsAvailable;
+                }
+            }
         }
 
         bool _saveWav;
@@ -34,10 +47,18 @@ namespace VisualMusic.Controls
             set { _saveWav = value; Notify(); }
         }
 
-        public SaveSourceFilesWindow(bool midiAvailable, bool wavAvailable)
+        bool _saveTrackWavs;
+        public bool SaveTrackWavs
+        {
+            get => _saveTrackWavs;
+            set { _saveTrackWavs = value; Notify(); }
+        }
+
+        public SaveSourceFilesWindow(bool midiAvailable, bool wavAvailable, bool trackWavsAvailable)
         {
             MidiAvailable = midiAvailable;
             WavAvailable = wavAvailable;
+            TrackWavsAvailable = trackWavsAvailable;
 
             DataContext = this;
             InitializeComponent();

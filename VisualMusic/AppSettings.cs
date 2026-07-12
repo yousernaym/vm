@@ -153,6 +153,12 @@ namespace VisualMusic
         public bool GetInsTrack(FileType type) => _insTrack.TryGetValue(type, out var v) ? v : true;
         public void SetInsTrack(FileType type, bool v) => _insTrack[type] = v;
 
+        // ---- Per-file-type "generate audio file per track" preference (default off) ----
+        [DataMember] Dictionary<FileType, bool> _trackAudio = new();
+
+        public bool GetTrackAudio(FileType type) => _trackAudio.TryGetValue(type, out var v) && v;
+        public void SetTrackAudio(FileType type, bool v) => _trackAudio[type] = v;
+
         // ---- Defaults (applied when a stored value is null/empty) ----
 
         public string ProjectFolderOrDefault
@@ -179,6 +185,7 @@ namespace VisualMusic
             _noteFolders ??= new();
             _audioFolders ??= new();
             _insTrack ??= new();
+            _trackAudio ??= new();
         }
 
         // ---- Persistence ----

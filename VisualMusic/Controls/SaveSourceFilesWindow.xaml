@@ -25,7 +25,9 @@
             <CheckBox Content="Save MIDI file" IsChecked="{Binding SaveMidi}"
                       IsEnabled="{Binding MidiAvailable}" Margin="0,0,0,8"/>
             <CheckBox Content="Save WAV file" IsChecked="{Binding SaveWav}"
-                      IsEnabled="{Binding WavAvailable}"/>
+                      IsEnabled="{Binding WavAvailable}" Margin="0,0,0,8"/>
+            <CheckBox Content="Track audio files" IsChecked="{Binding SaveTrackWavs}"
+                      IsEnabled="{Binding TrackWavsAvailable}"/>
         </StackPanel>
 
         <!-- Buttons -->

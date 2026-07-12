@@ -24,15 +24,15 @@ namespace VisualMusic.Controls
         FileType _fileType;
 
         // ---- In-memory session cache (resets to defaults after app restart) ----
-        static readonly Dictionary<FileType, (bool Erase, string NotePath, string AudioPath, bool InsTrack)> s_session = new();
+        static readonly Dictionary<FileType, (bool Erase, string NotePath, string AudioPath, bool InsTrack, bool TrackAudio)> s_session = new();
 
         /// <summary>
         /// Update the session cache for <paramref name="type"/> without opening the dialog.
         /// Call this after a silent import or project load so the dialog is pre-filled correctly
         /// if the user opens it manually afterward.
         /// </summary>
-        internal static void UpdateSession(FileType type, bool erase, string notePath, string audioPath, bool insTrack)
-            => s_session[type] = (erase, notePath, audioPath, insTrack);
+        internal static void UpdateSession(FileType type, bool erase, string notePath, string audioPath, bool insTrack, bool trackAudio = false)
+            => s_session[type] = (erase, notePath, audioPath, insTrack, trackAudio);
 
         // ---- Bound properties ----
 
@@ -79,6 +79,17 @@ namespace VisualMusic.Controls
             set { if (value) InsTrack = false; }
         }
 
+        bool _trackAudio;
+        /// <summary>true = render one WAV per track (in addition to the mixdown). Not offered for MIDI.</summary>
+        public bool TrackAudio
+        {
+            get => _trackAudio;
+            set { _trackAudio = value; Notify(); }
+        }
+
+        /// <summary>The per-track audio option is disabled for MIDI imports.</summary>
+        public bool TrackAudioEnabled => _fileType != FileType.Midi;
+
         string _perInstrumentLabel = "One track per instrument";
         public string PerInstrumentLabel
         {
@@ -111,8 +122,9 @@ namespace VisualMusic.Controls
             DataContext = this;
             InitializeComponent();
 
-            // Restore persisted track-split preference, then let the session override if present
+            // Restore persisted preferences, then let the session override if present
             InsTrack = AppSettings.Instance.GetInsTrack(fileType);
+            TrackAudio = AppSettings.Instance.GetTrackAudio(fileType);
 
             // Restore in-memory session values (resets to defaults after app restart)
             if (s_session.TryGetValue(fileType, out var s))
@@ -121,6 +133,7 @@ namespace VisualMusic.Controls
                 NoteFilePath = s.NotePath;
                 AudioFilePath = s.AudioPath;
                 InsTrack = s.InsTrack;
+                TrackAudio = s.TrackAudio;
             }
 
             switch (fileType)
@@ -193,12 +206,13 @@ namespace VisualMusic.Controls
                 return;
             }
 
-            // Persist the track-split choice across app restarts
+            // Persist the track-split and per-track-audio choices across app restarts
             AppSettings.Instance.SetInsTrack(_fileType, InsTrack);
+            AppSettings.Instance.SetTrackAudio(_fileType, TrackAudio);
             AppSettings.Instance.Save();
 
             // Remember all fields for the rest of this session
-            s_session[_fileType] = (EraseCurrent, NoteFilePath, AudioFilePath, InsTrack);
+            s_session[_fileType] = (EraseCurrent, NoteFilePath, AudioFilePath, InsTrack, TrackAudio);
 
             DialogResult = true;
         }

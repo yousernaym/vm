@@ -270,6 +270,7 @@ namespace VisualMusic
 
             ImportOptions.SetNotePath();
             ImportOptions.EraseCurrent = false;
+            ImportOptions.IsProjectLoad = true;
             await ImportSong(ImportOptions);
         }
 
@@ -355,6 +356,9 @@ namespace VisualMusic
         // Matches the "Progress: N%" lines emitted by remuxer.exe (see Remuxer/Program.cs).
         static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
 
+        // Matches the "TrackAudio: <miditrack>|<path>" lines emitted by remuxer.exe after processing.
+        static readonly Regex RemuxerTrackAudioRegex = new Regex(@"^TrackAudio:\s*(\d+)\|(.+)$", RegexOptions.Compiled);
+
         // Remuxer writes a 58-byte IEEE-float WAV header before the data chunk.
         const long EmptyGeneratedWavBytes = 58;
 
@@ -370,6 +374,26 @@ namespace VisualMusic
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// True when every real track that carries a serialized per-track audio filename already has
+        /// that file present on disk (and at least one such track exists). Used on project load to
+        /// skip the extra remuxer track-audio render passes when the WAVs are already available
+        /// (either the temp copies or ones saved next to the project).
+        /// </summary>
+        bool AllSerializedTrackAudioPresent()
+        {
+            if (_trackViews == null) return false;
+            bool any = false;
+            for (int i = 1; i < _trackViews.Count; i++)   // index 0 = global/MIDI track 0
+            {
+                string fn = _trackViews[i].TrackProps.AudioProps.Filename;
+                if (string.IsNullOrEmpty(fn)) continue;
+                any = true;
+                if (!File.Exists(fn)) return false;
+            }
+            return any;
         }
 
         async public Task<bool> ImportSong(ImportOptions options, IProgress<float> progress = null, CancellationToken ct = default)
@@ -399,8 +423,22 @@ namespace VisualMusic
                     File.Delete(generatedAudioPath);
                 }
 
-                //Does either midi or audio need to be created?
-                if (midiArg != null || audioArg != null)
+                // Per-track WAVs, if requested. They live under the stable TempDirRoot (not the random
+                // per-session TempDir) so a reload regenerates identical paths — keeping serialized
+                // AudioProps.Filename values valid. On project load we skip the extra passes when the
+                // WAVs are already present on disk.
+                string trackAudioArg = null, trackAudioBase = null;
+                if (options.TrackAudio && !(options.IsProjectLoad && AllSerializedTrackAudioPresent()))
+                {
+                    string trackAudioDir = Path.Combine(Program.TempDirRoot, "trackaudio",
+                        $"{noteFile}-s{options.SubSong}-{(options.InsTrack ? "ins" : "chn")}");
+                    Directory.CreateDirectory(trackAudioDir);
+                    trackAudioBase = Path.Combine(trackAudioDir, noteFile);
+                    trackAudioArg = $"-t\"{trackAudioBase}\"";
+                }
+
+                //Does either midi or audio (or per-track audio) need to be created?
+                if (midiArg != null || audioArg != null || trackAudioArg != null)
                 {
                     string insTrackFlag = options.InsTrack ? "-i" : "";
                     string songLengthsFlag = $"-l{options.SongLengthS.ToString()}";
@@ -409,7 +447,7 @@ namespace VisualMusic
                     string cancelSignalPath = Path.Combine(Program.TempDir, Path.GetRandomFileName() + ".cancel");
                     File.Delete(cancelSignalPath);
                     string cancelFlag = $"-c\"{cancelSignalPath}\"";
-                    string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag} {supressErrorFlag} {cancelFlag}";
+                    string cmdLine = $"\"{options.NotePath}\" {midiArg} {audioArg} {trackAudioArg} {insTrackFlag} {songLengthsFlag} {subSongFlag} {supressErrorFlag} {cancelFlag}";
                     var workingDir = Path.Combine(Program.Dir, "remuxer");
                     var startInfo = new ProcessStartInfo(Path.Combine(workingDir, "remuxer.exe"), cmdLine)
                     {
@@ -422,14 +460,27 @@ namespace VisualMusic
                     using var process = Process.Start(startInfo)
                         ?? throw new IOException("Couldn't start remuxer.");
 
-                    // Parse the "Progress: N%" lines remuxer writes to stdout and forward them to the UI.
+                    // Collected per-track WAV lines ("TrackAudio: <miditrack>|<path>"). The stdout
+                    // handler runs on a pool thread, so guard the list with a lock.
+                    var trackAudioFiles = new List<(int Track, string Path)>();
+
+                    // Parse the "Progress: N%" and "TrackAudio:" lines remuxer writes to stdout.
                     process.OutputDataReceived += (_, e) =>
                     {
                         if (e.Data == null)
                             return;
                         var m = RemuxerProgressRegex.Match(e.Data);
                         if (m.Success && int.TryParse(m.Groups[1].Value, out int percent))
+                        {
                             progress?.Report(percent / 100f);
+                            return;
+                        }
+                        var t = RemuxerTrackAudioRegex.Match(e.Data);
+                        if (t.Success && int.TryParse(t.Groups[1].Value, out int midiTrack))
+                        {
+                            lock (trackAudioFiles)
+                                trackAudioFiles.Add((midiTrack, t.Groups[2].Value.Trim()));
+                        }
                     };
                     var errorOutput = new StringBuilder();
                     process.ErrorDataReceived += (_, e) => { if (e.Data != null) errorOutput.AppendLine(e.Data); };
@@ -447,6 +498,13 @@ namespace VisualMusic
                         await process.WaitForExitAsync();
                     }
                     try { File.Delete(cancelSignalPath); } catch { /* best-effort cleanup */ }
+
+                    // Record the per-track WAVs that were actually produced (non-empty on disk).
+                    List<(int Track, string Path)> collectedTrackAudio;
+                    lock (trackAudioFiles)
+                        collectedTrackAudio = trackAudioFiles.ToList();
+                    options.GeneratedTrackAudioPaths = collectedTrackAudio
+                        .Where(x => HasGeneratedAudio(x.Path)).ToList();
 
                     bool cancelled = ct.IsCancellationRequested;
                     bool midiExists = !string.IsNullOrEmpty(midiPath) && File.Exists(midiPath);

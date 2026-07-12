@@ -728,8 +728,9 @@ namespace VisualMusic.ViewModels
         /// off). MOD/SID/HVL projects can save both; a MIDI project already has the MIDI as its source,
         /// so only the generated WAV can be saved (its MIDI checkbox stays disabled). A saved WAV
         /// becomes the project's supplied audio; a saved MIDI turns a non-MIDI project into a MIDI
-        /// project. This never blocks the save: cancelling the checkbox dialog (or an individual file
-        /// picker) just skips the export and the project is still saved.
+        /// project. Exported files are written with auto-generated names into a "&lt;project&gt;-sources"
+        /// subfolder (no per-file save dialogs). This never blocks the save: cancelling the checkbox
+        /// dialog just skips the export and the project is still saved.
         /// </summary>
         void SaveSourceFiles(string projectPath)
         {
@@ -743,22 +744,46 @@ namespace VisualMusic.ViewModels
             // already reference a WAV (supplied audio or one saved earlier).
             bool wavAvail = !io.HasSuppliedAudio
                 && !string.IsNullOrEmpty(io.GeneratedAudioPath) && File.Exists(io.GeneratedAudioPath);
-            if (!midiAvail && !wavAvail) return;
 
-            var dlg = new Controls.SaveSourceFilesWindow(midiAvail, wavAvail) { Owner = Application.Current.MainWindow };
+            // Per-track WAVs are savable when any real track references a WAV under the trackaudio
+            // temp dir that still exists (i.e. not already copied next to the project).
+            var trackWavTracks = GetTempTrackAudioTracks();
+            bool trackWavsAvail = trackWavTracks.Count > 0;
+
+            if (!midiAvail && !wavAvail && !trackWavsAvail) return;
+
+            var dlg = new Controls.SaveSourceFilesWindow(midiAvail, wavAvail, trackWavsAvail) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;   // cancelled — skip export, project is still saved
 
             string dir = Path.GetDirectoryName(projectPath);
             string name = Path.GetFileNameWithoutExtension(projectPath);
 
-            string savedMidiPath = dlg.SaveMidi
-                ? PickAndCopy(io.MidiOutputPath, "MIDI files (*.mid)|*.mid|All files (*.*)|*.*",
-                    Path.Combine(dir, name + ".mid"), "Save MIDI file")
+            // All exported source files go into a "<project>-sources" subfolder with auto-generated
+            // names based on the project name — no per-file save dialogs.
+            string sourcesDir = Path.Combine(dir, name + "-sources");
+            bool anySave = (dlg.SaveMidi && midiAvail) || (dlg.SaveWav && wavAvail) || (dlg.SaveTrackWavs && trackWavsAvail);
+            if (anySave)
+            {
+                try { Directory.CreateDirectory(sourcesDir); }
+                catch (Exception ex)
+                {
+                    MetroMessageBox.Show($"Could not create sources folder:\n{ex.Message}", Program.AppName,
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+
+            string savedMidiPath = (dlg.SaveMidi && midiAvail)
+                ? CopyToSources(io.MidiOutputPath, Path.Combine(sourcesDir, name + ".mid"), "MIDI file")
                 : null;
-            string savedWavPath = dlg.SaveWav
-                ? PickAndCopy(io.GeneratedAudioPath, "Wave files (*.wav)|*.wav|All files (*.*)|*.*",
-                    Path.Combine(dir, name + ".wav"), "Save WAV file")
+            string savedWavPath = (dlg.SaveWav && wavAvail)
+                ? CopyToSources(io.GeneratedAudioPath, Path.Combine(sourcesDir, name + ".wav"), "WAV file")
                 : null;
+
+            // Copy per-track WAVs into the same "<project>-sources" folder and re-point each track's
+            // filename there (so the serialized paths survive temp cleanup).
+            if (dlg.SaveTrackWavs && trackWavsAvail)
+                SaveTrackAudioFiles(trackWavTracks, sourcesDir);
 
             // Wire the saved WAV as supplied audio (recorded in the project, reused on load).
             if (savedWavPath != null) io.AudioPath = savedWavPath;
@@ -767,27 +792,60 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// Prompts for a destination with a SaveFileDialog and copies <paramref name="source"/> there.
-        /// Returns the chosen path, or null if the user cancelled the picker.
+        /// Real tracks whose per-track audio filename points under the trackaudio temp dir and exists.
         /// </summary>
-        static string PickAndCopy(string source, string filter, string defaultPath, string title)
+        List<AudioProps> GetTempTrackAudioTracks()
         {
-            var dlg = new SaveFileDialog
+            var result = new List<AudioProps>();
+            var tvs = Project?.TrackViews;
+            if (tvs == null) return result;
+            string tempRoot = Path.Combine(Program.TempDirRoot, "trackaudio");
+            for (int i = 1; i < tvs.Count; i++)   // index 0 = global
             {
-                Filter = filter,
-                Title = title,
-                InitialDirectory = Path.GetDirectoryName(defaultPath),
-                FileName = Path.GetFileName(defaultPath),
-            };
-            if (dlg.ShowDialog() != true) return null;
+                var ap = tvs[i].TrackProps.AudioProps;
+                string fn = ap.Filename;
+                if (string.IsNullOrEmpty(fn)) continue;
+                if (fn.StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase) && File.Exists(fn))
+                    result.Add(ap);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Copies each track's temp WAV into <paramref name="destDir"/> (keeping file names) and
+        /// re-points its filename to the copy. Best-effort; failures leave the original path intact.
+        /// </summary>
+        static void SaveTrackAudioFiles(List<AudioProps> tracks, string destDir)
+        {
+            try { Directory.CreateDirectory(destDir); }
+            catch { return; }
+
+            foreach (var ap in tracks)
+            {
+                try
+                {
+                    string dest = Path.Combine(destDir, Path.GetFileName(ap.Filename));
+                    File.Copy(ap.Filename, dest, true);
+                    ap.Filename = dest;
+                }
+                catch { /* best-effort per file */ }
+            }
+        }
+
+        /// <summary>
+        /// Copies <paramref name="source"/> to <paramref name="destPath"/> (auto-generated, no picker).
+        /// Returns the destination path, or null on failure.
+        /// </summary>
+        static string CopyToSources(string source, string destPath, string label)
+        {
             try
             {
-                File.Copy(source, dlg.FileName, true);
-                return dlg.FileName;
+                File.Copy(source, destPath, true);
+                return destPath;
             }
             catch (Exception ex)
             {
-                MetroMessageBox.Show($"Could not save {title.ToLower()}:\n{ex.Message}", Program.AppName,
+                MetroMessageBox.Show($"Could not save {label}:\n{ex.Message}", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
@@ -906,6 +964,7 @@ namespace VisualMusic.ViewModels
 
             options.EraseCurrent = dlg.EraseCurrent;
             options.InsTrack = dlg.InsTrack;
+            options.TrackAudio = dlg.TrackAudio && fileType != FileType.Midi;
             return options;
         }
 
@@ -990,6 +1049,35 @@ namespace VisualMusic.ViewModels
             Project.InitAfterDeserialization(wfp);
 
             TrackList.Rebuild(Project);
+
+            // Assign freshly generated per-track WAVs to their tracks. Fresh imports only — the
+            // project-load path never re-assigns (InitAfterDeserialization already loads the
+            // serialized filenames). Done before the undo baseline so it isn't a dirtying edit.
+            if (!options.IsProjectLoad && options.GeneratedTrackAudioPaths is { Count: > 0 } trackAudio)
+            {
+                var targets = new List<AudioProps>();
+                foreach (var (track, path) in trackAudio)
+                {
+                    // Items[0] = Global = MIDI track 0; real tracks align 1:1 with remuxer track numbers.
+                    if (track >= 0 && track < TrackList.Items.Count)
+                    {
+                        var ap = TrackList.Items[track].TrackView.TrackProps.AudioProps;
+                        ap.Filename = path;
+                        targets.Add(ap);
+                    }
+                }
+                if (targets.Count > 0)
+                {
+                    await Task.WhenAll(targets.Select(ap => ap.LoadAudioAsync()));
+                    var failed = targets
+                        .Select(ap => ap.SidWizChannel)
+                        .FirstOrDefault(ch => !string.IsNullOrEmpty(ch.ErrorMessage));
+                    if (failed != null)
+                        MetroMessageBox.Show($"Couldn't load audio file:\n{failed.Filename}", Program.AppName,
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+
             OnProjectLoaded?.Invoke(Project);
             LoadStaticBackgroundIfUnkeyframed(Project);
 
@@ -1474,8 +1562,10 @@ namespace VisualMusic.ViewModels
             }
             options.EraseCurrent = true;
             options.InsTrack = AppSettings.Instance.GetInsTrack(fileType.Value);
+            options.TrackAudio = fileType.Value != FileType.Midi && AppSettings.Instance.GetTrackAudio(fileType.Value);
             ImportSongWindow.UpdateSession(fileType.Value, erase: true, notePath: url, audioPath: "",
-                insTrack: AppSettings.Instance.GetInsTrack(fileType.Value));
+                insTrack: AppSettings.Instance.GetInsTrack(fileType.Value),
+                trackAudio: AppSettings.Instance.GetTrackAudio(fileType.Value));
 
             // SID downloads may contain multiple sub-songs — let the user pick.
             if (!SelectSidSubSong(options)) return;

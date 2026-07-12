@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using VisualMusic.Controls;
@@ -35,6 +36,17 @@ namespace VisualMusic
         internal string GeneratedAudioPath { get; set; }
         public bool HasSuppliedAudio => !string.IsNullOrWhiteSpace(AudioPath);
         public bool InsTrack;
+
+        /// <summary>Render one WAV per track (in addition to the mixdown) and auto-assign them.</summary>
+        public bool TrackAudio;
+
+        /// <summary>True when this import is re-running the remuxer on project load (not a fresh import).
+        /// Track-audio assignment only happens on fresh import; loads never re-assign.</summary>
+        internal bool IsProjectLoad;
+
+        /// <summary>Per-track WAVs produced by the last remuxer run: (MIDI track number, WAV path).</summary>
+        internal List<(int Track, string Path)> GeneratedTrackAudioPaths { get; set; }
+
         public int SubSong;
         public int NumSubSongs;
         public float SongLengthS;
@@ -79,6 +91,8 @@ namespace VisualMusic
                     AudioPath = (string)entry.Value;
                 else if (entry.Name == "insTrack")
                     InsTrack = (bool)entry.Value;
+                else if (entry.Name == "trackAudio")
+                    TrackAudio = (bool)entry.Value;
                 else if (entry.Name == "noteFileType")
                     NoteFileType = (FileType)entry.Value;
                 else if (entry.Name == "subSong")
@@ -100,6 +114,7 @@ namespace VisualMusic
             if (HasSuppliedAudio)
                 info.AddValue("audioPath", AudioPath);
             info.AddValue("insTrack", InsTrack);
+            info.AddValue("trackAudio", TrackAudio);
             info.AddValue("noteFileType", NoteFileType);
             info.AddValue("subSong", SubSong);
             info.AddValue("numSubSong", NumSubSongs);
@@ -115,7 +130,8 @@ namespace VisualMusic
                 erase: EraseCurrent,
                 notePath: RawNotePath,
                 audioPath: AudioPath ?? "",
-                insTrack: InsTrack);
+                insTrack: InsTrack,
+                trackAudio: TrackAudio);
         }
 
         public void CheckSourceFile()
