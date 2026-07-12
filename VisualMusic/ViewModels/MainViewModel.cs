@@ -780,10 +780,11 @@ namespace VisualMusic.ViewModels
                 ? CopyToSources(io.GeneratedAudioPath, Path.Combine(sourcesDir, name + ".wav"), "WAV file")
                 : null;
 
-            // Copy per-track WAVs into the same "<project>-sources" folder and re-point each track's
-            // filename there (so the serialized paths survive temp cleanup).
+            // Copy per-track WAVs into the same "<project>-sources" folder (renamed to the project
+            // name prefix) and re-point each track's filename there (so the serialized paths survive
+            // temp cleanup).
             if (dlg.SaveTrackWavs && trackWavsAvail)
-                SaveTrackAudioFiles(trackWavTracks, sourcesDir);
+                SaveTrackAudioFiles(trackWavTracks, sourcesDir, name);
 
             // Wire the saved WAV as supplied audio (recorded in the project, reused on load).
             if (savedWavPath != null) io.AudioPath = savedWavPath;
@@ -812,10 +813,12 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// Copies each track's temp WAV into <paramref name="destDir"/> (keeping file names) and
-        /// re-points its filename to the copy. Best-effort; failures leave the original path intact.
+        /// Copies each track's temp WAV into <paramref name="destDir"/>, renaming it to use
+        /// <paramref name="projectName"/> as the prefix (keeping the "-trackNN-&lt;name&gt;.wav"
+        /// suffix), and re-points its filename to the copy. Best-effort; failures leave the original
+        /// path intact.
         /// </summary>
-        static void SaveTrackAudioFiles(List<AudioProps> tracks, string destDir)
+        static void SaveTrackAudioFiles(List<AudioProps> tracks, string destDir, string projectName)
         {
             try { Directory.CreateDirectory(destDir); }
             catch { return; }
@@ -824,7 +827,12 @@ namespace VisualMusic.ViewModels
             {
                 try
                 {
-                    string dest = Path.Combine(destDir, Path.GetFileName(ap.Filename));
+                    // Temp track WAVs are named "<noteFile>-trackNN-<name>.wav"; swap the imported-file
+                    // prefix for the project name so exported files match the MIDI/master WAV naming.
+                    string original = Path.GetFileName(ap.Filename);
+                    int idx = original.IndexOf("-track", StringComparison.OrdinalIgnoreCase);
+                    string destName = idx >= 0 ? projectName + original.Substring(idx) : original;
+                    string dest = Path.Combine(destDir, destName);
                     File.Copy(ap.Filename, dest, true);
                     ap.Filename = dest;
                 }
