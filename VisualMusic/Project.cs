@@ -263,15 +263,15 @@ namespace VisualMusic
             Props.OnPlaybackOffsetSChanged = OnPlaybackOffsetSChanged;
         }
 
-        async public Task LoadContent()
+        async public Task<bool> LoadContent(IProgress<float> progress = null, CancellationToken ct = default)
         {
             if (ImportOptions == null)
-                return;
+                return true;
 
             ImportOptions.SetNotePath();
             ImportOptions.EraseCurrent = false;
             ImportOptions.IsProjectLoad = true;
-            await ImportSong(ImportOptions);
+            return await ImportSong(ImportOptions, progress, ct);
         }
 
         public void NudgeSongPos(float stepFraction)

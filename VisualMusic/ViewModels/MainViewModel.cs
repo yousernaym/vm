@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using VisualMusic.Controls;
@@ -642,7 +643,20 @@ namespace VisualMusic.ViewModels
 
             try
             {
-                await tempProject.LoadContent();
+                // A MOD/SID/HVL project re-runs the external remuxer on load (unless its converted
+                // outputs are already cached), so show the same progress window a fresh import does.
+                if (tempProject.ImportOptions != null &&
+                    tempProject.ImportOptions.NoteFileType != FileType.Midi)
+                {
+                    if (!RunConversionBehindProgress((p, ct) => tempProject.LoadContent(p, ct)))
+                    {
+                        // Conversion was cancelled or produced nothing — keep the current project.
+                        NoteStyle.SetProject(Project);
+                        return;
+                    }
+                }
+                else
+                    await tempProject.LoadContent();
             }
             catch (FileImportException ex)
             {
@@ -984,6 +998,35 @@ namespace VisualMusic.ViewModels
             return options;
         }
 
+        /// <summary>
+        /// Runs a MOD/SID remuxer conversion <paramref name="convert"/> behind the shared progress
+        /// window so the user sees the conversion advance and can cancel it. Rethrows any job failure
+        /// (so callers can surface it). Returns true only when the conversion completed and produced a
+        /// song; false if it was cancelled or nothing was imported.
+        /// </summary>
+        static bool RunConversionBehindProgress(
+            Func<IProgress<float>, CancellationToken, Task<bool>> convert)
+        {
+            bool imported = false;
+            bool cancelled = false;
+            Exception failure = null;
+
+            var w = new Controls.ProgressWindow(
+                "Converting song",
+                async cb =>
+                {
+                    try { imported = await convert(new Progress<float>(cb.UpdateProgress), cb.CancelToken); }
+                    catch (OperationCanceledException) { cancelled = true; }
+                    catch (Exception ex) { failure = ex; }
+                    return null;
+                })
+            { Owner = Application.Current?.MainWindow };
+            w.ShowDialog();
+
+            if (failure != null) throw failure;
+            return imported && !cancelled;
+        }
+
         /// <summary>Shared post-dialog import logic.</summary>
         async Task DoImport(ImportOptions options)
         {
@@ -1018,29 +1061,8 @@ namespace VisualMusic.ViewModels
                     // MOD/SID are converted by the external remuxer.exe, which reports percentage
                     // progress on stdout. Run it behind the shared progress window so the user sees
                     // the conversion advance and can cancel it.
-                    bool imported = false;
-                    bool cancelled = false;
-                    Exception failure = null;
-
-                    var w = new Controls.ProgressWindow(
-                        $"Converting song",
-                        async cb =>
-                        {
-                            try
-                            {
-                                imported = await Project.ImportSong(
-                                    options, new Progress<float>(cb.UpdateProgress), cb.CancelToken);
-                            }
-                            catch (OperationCanceledException) { cancelled = true; }
-                            catch (Exception ex) { failure = ex; }
-                            return null;
-                        })
-                    { Owner = Application.Current?.MainWindow };
-                    w.ShowDialog();
-
-                    if (cancelled) return;
-                    if (failure != null) throw failure;
-                    if (!imported) return;
+                    if (!RunConversionBehindProgress((p, ct) => Project.ImportSong(options, p, ct)))
+                        return;
                 }
                 else if (!await Project.ImportSong(options))
                     return;
