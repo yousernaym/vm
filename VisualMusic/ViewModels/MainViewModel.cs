@@ -671,7 +671,8 @@ namespace VisualMusic.ViewModels
             if (io != null)
             {
                 ImportSongWindow.UpdateSession(io.NoteFileType, erase: true,
-                    notePath: io.RawNotePath ?? "", audioPath: io.AudioPath ?? "", insTrack: io.InsTrack);
+                    notePath: io.RawNotePath ?? "", audioPath: io.AudioPath ?? "", insTrack: io.InsTrack,
+                    trackAudio: io.TrackAudio);
             }
 
             _currentProjectPath = path;
@@ -784,7 +785,14 @@ namespace VisualMusic.ViewModels
             // name prefix) and re-point each track's filename there (so the serialized paths survive
             // temp cleanup).
             if (dlg.SaveTrackWavs && trackWavsAvail)
+            {
                 SaveTrackAudioFiles(trackWavTracks, sourcesDir, name);
+                // The tracks now reference the saved WAVs directly, so the project no longer needs
+                // to regenerate them on load: save "generate audio file for each track" as off and
+                // uncheck it in the import dialog.
+                io.TrackAudio = false;
+                ImportSongWindow.ClearSessionTrackAudio(io.NoteFileType);
+            }
 
             // Wire the saved WAV as supplied audio (recorded in the project, reused on load).
             if (savedWavPath != null) io.AudioPath = savedWavPath;
