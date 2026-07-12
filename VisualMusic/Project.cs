@@ -1727,6 +1727,7 @@ namespace VisualMusic
             //dest.vertViewWidthQn = vertViewWidthQn;
             dest.Props.OnPlaybackOffsetSChanged = dest.OnPlaybackOffsetSChanged;
             dest.Props.OnPlaybackOffsetSChanged();
+            dest.InitPropertyAccessors();
             return dest;
         }
 
