@@ -224,6 +224,9 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(ZOffset));
             OnPropertyChanged(nameof(PitchOffset));
             OnPropertyChanged(nameof(ViewWidthQn));
+
+            // Audio
+            OnPropertyChanged(nameof(SilenceThreshold));
         }
 
         // =====================================================================
@@ -872,9 +875,11 @@ namespace VisualMusic.ViewModels
             get => _mergedProps?.AudioProps?.Filename ?? "";
             set
             {
+                if (value == AudioFilename) return;   // unchanged → no reload, no undo item
                 Apply(tp => tp.AudioProps.Filename = value);
                 OnPropertyChanged();
                 _ = LoadSelectedTracksAudio?.Invoke();
+                Keyframes.KeyframeService.RaiseUndoSnapshot("Set track audio");
             }
         }
 

@@ -42,7 +42,10 @@ namespace VisualMusic
 
         public void Add(string desc, Project project)
         {
-            var snapshot = new Item(desc, project.Clone());
+            // Snapshots must own their AudioProps (Filename, SilenceThresholdS): sharing the live
+            // reference would let later edits retroactively mutate every snapshot, making undo a
+            // no-op for audio properties. The snapshot's channels stay empty (no audio buffers).
+            var snapshot = new Item(desc, project.Clone(shareAudioProps: false));
 
             if (_currentItem == null)
             {

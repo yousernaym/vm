@@ -175,8 +175,9 @@ namespace VisualMusic.ViewModels
                 if (!string.IsNullOrEmpty(audioDir)) dlg.InitialDirectory = audioDir;
                 if (dlg.ShowDialog() != true) return;
                 AppSettings.Instance.RememberFolder(dlg.FileName, dir => AppSettings.Instance.TrackAudioFolder = dir);
+                // The AudioFilename setter loads the audio and adds the "Set track audio" undo
+                // item (only when the value actually changed).
                 SelectedTrackProps.AudioFilename = dlg.FileName;
-                AddUndoItem("Set track audio");
             };
 
             SelectedTrackProps.BrowseMultipleAudioFiles = async () =>

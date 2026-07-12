@@ -128,6 +128,7 @@ namespace VisualMusic.Keyframes
             ("ZOffset",                   KfScope.Track,    "Z offset"),
             ("PitchOffset",               KfScope.Track,    "Pitch offset"),
             ("ViewWidthQn",               KfScope.Track,    "Viewport width"),
+            ("SilenceThreshold",          KfScope.Track,    "Silence threshold"),
             ("ModXOriginEnable",          KfScope.TrackMod, "Mod origin X enable"),
             ("ModXOrigin",                KfScope.TrackMod, "Mod origin X"),
             ("ModYOriginEnable",          KfScope.TrackMod, "Mod origin Y enable"),

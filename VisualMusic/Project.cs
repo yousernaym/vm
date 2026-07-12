@@ -160,6 +160,15 @@ namespace VisualMusic
             return v > 0 ? v : ProjProps.DefaultViewWidthQn;   // guard div-by-zero
         }
 
+        /// <summary>Effective silence threshold (s) for a track: own value, else global track's, else default.</summary>
+        public float EffectiveSilenceThresholdS(TrackProps tp)
+        {
+            float? s = tp?.AudioProps?.SilenceThresholdS;
+            if (s == null && _trackViews != null && _trackViews.Count > 0)
+                s = GlobalTrackProps.AudioProps?.SilenceThresholdS;
+            return s ?? AudioProps.DefaultSilenceThresholdS;
+        }
+
         public float ViewWidthT => _notes == null ? 0 : GlobalViewWidthQn * _notes.TicksPerBeat; //Number of ticks that fits on screen
         public float TrackViewWidthT(TrackProps tp)
             => _notes == null ? 0 : EffectiveViewWidthQn(tp) * _notes.TicksPerBeat;
@@ -1455,6 +1464,12 @@ namespace VisualMusic
                     () => EffectiveViewWidthQn(tv.TrackProps),
                     v => tv.TrackProps.SpatialProps.ViewWidthQn = (float)v,
                     logScale: true);    // no needsRebuild — width renders via shader scale, as before
+
+                // Audio
+                _propAccessors[$"{prefix}/SilenceThreshold"] = PropAccessor.Scalar(
+                    () => EffectiveSilenceThresholdS(tv.TrackProps),
+                    v => tv.TrackProps.AudioProps.SilenceThresholdS = (float)v);
+                    // no needsRebuild — the effective threshold feeds the waveform via RefreshSidWizChannels
             }
         }
 
@@ -1708,7 +1723,15 @@ namespace VisualMusic
             SongLengthS = NormSongPosToSeconds(1);
         }
 
-        public Project Clone()
+        /// <summary>
+        /// Deep-clones the project. By default the clone shares each track's live AudioProps
+        /// (and thus the loaded SidWizChannel sample buffers) so e.g. the video-export clone can
+        /// render waveforms without reloading audio. Pass <paramref name="shareAudioProps"/> =
+        /// false for undo snapshots: the clone then keeps its own deserialized AudioProps
+        /// (correct Filename + SilenceThresholdS, fresh empty channel) so later edits to the live
+        /// project don't retroactively mutate the snapshot.
+        /// </summary>
+        public Project Clone(bool shareAudioProps = true)
         {
             Project dest = Cloning.Clone(this);
 
@@ -1719,7 +1742,8 @@ namespace VisualMusic
                 dest._trackViews[i].MidiTrack = _trackViews[i].MidiTrack;
                 dest._trackViews[i].Geo = _trackViews[i].Geo;
                 dest._trackViews[i].Curve = _trackViews[i].Curve;
-                dest._trackViews[i].TrackProps.AudioProps = _trackViews[i].TrackProps.AudioProps;
+                if (shareAudioProps)
+                    dest._trackViews[i].TrackProps.AudioProps = _trackViews[i].TrackProps.AudioProps;
             }
 
             dest._notes = _notes;
@@ -1755,7 +1779,19 @@ namespace VisualMusic
                 destProps.MaterialProps = sourceProps.MaterialProps;
                 destProps.LightProps = sourceProps.LightProps;
                 destProps.SpatialProps = sourceProps.SpatialProps;
-                //Skip AudioProps for more lightweight redos
+                // The live AudioProps object is kept (WaveformPanel holds its SidWizChannel), but
+                // its undoable values are restored from the snapshot. The effective silence
+                // threshold is re-pushed by RefreshSidWizChannels.
+                destProps.AudioProps.SilenceThresholdS = sourceProps.AudioProps.SilenceThresholdS;
+                // Reload audio only for tracks whose filename actually changed, so ordinary
+                // undo/redo steps stay cheap.
+                string oldFn = destProps.AudioProps.Filename ?? "";
+                string newFn = sourceProps.AudioProps.Filename ?? "";
+                if (!string.Equals(oldFn, newFn, StringComparison.OrdinalIgnoreCase))
+                {
+                    destProps.AudioProps.Filename = newFn;
+                    _ = destProps.AudioProps.LoadAudioAsync();
+                }
             }
             PropertyKeyframes = source.PropertyKeyframes;
             //source.Dispose();
