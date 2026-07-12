@@ -319,7 +319,10 @@ namespace LibSidWiz
             set
             {
                 _lineWidth = value;
-                Pen.Width = value * (Renderer?.Width ?? 480) / 480;
+                // Scale with the renderer height (not width) so the thickness tracks the output
+                // resolution but stays constant when the overlay-width setting changes the strip
+                // width. Equals the old width-based scaling for a 16:9 viewport at 25% width.
+                Pen.Width = value * (Renderer?.Height ?? 1080) / 1080;
                 Changed?.Invoke(this, false);
             }
         }
