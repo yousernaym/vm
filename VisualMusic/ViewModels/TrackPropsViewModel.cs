@@ -875,12 +875,35 @@ namespace VisualMusic.ViewModels
             get => _mergedProps?.AudioProps?.Filename ?? "";
             set
             {
+                value = value?.Trim() ?? "";   // don't try to load a whitespace-only path
                 if (value == AudioFilename) return;   // unchanged → no reload, no undo item
                 Apply(tp => tp.AudioProps.Filename = value);
                 OnPropertyChanged();
                 _ = LoadSelectedTracksAudio?.Invoke();
                 Keyframes.KeyframeService.RaiseUndoSnapshot("Set track audio");
             }
+        }
+
+        /// <summary>
+        /// Clears the audio path of every selected track. Unlike setting
+        /// <see cref="AudioFilename"/> to "", this also works when the merged value is already
+        /// "" because the selected tracks have different paths.
+        /// </summary>
+        public void RemoveAudioFile()
+        {
+            bool hadAudio = false;
+            Apply(tp =>
+            {
+                if (!string.IsNullOrEmpty(tp.AudioProps.Filename))
+                {
+                    hadAudio = true;
+                    tp.AudioProps.Filename = "";
+                }
+            });
+            if (!hadAudio) return;   // nothing to clear → no reload, no undo item
+            OnPropertyChanged(nameof(AudioFilename));
+            _ = LoadSelectedTracksAudio?.Invoke();   // empty path unloads the audio
+            Keyframes.KeyframeService.RaiseUndoSnapshot("Remove track audio");
         }
 
         /// <summary>

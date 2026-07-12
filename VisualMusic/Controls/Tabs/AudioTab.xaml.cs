@@ -14,6 +14,9 @@ namespace VisualMusic.Controls.Tabs
         void BrowseBtn_Click(object sender, RoutedEventArgs e)
             => (DataContext as TrackPropsViewModel)?.BrowseAudioFile?.Invoke();
 
+        void RemoveBtn_Click(object sender, RoutedEventArgs e)
+            => (DataContext as TrackPropsViewModel)?.RemoveAudioFile();
+
         void AssignBtn_Click(object sender, RoutedEventArgs e)
             => _ = (DataContext as TrackPropsViewModel)?.BrowseMultipleAudioFiles?.Invoke();
     }

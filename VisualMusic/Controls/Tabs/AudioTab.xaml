@@ -9,11 +9,14 @@
     <StackPanel Margin="4">
         <!-- Normal selection: single audio file for the selected track(s) -->
         <StackPanel Visibility="{Binding IsNotOnlyGlobalSelected, Converter={StaticResource BoolVis}}">
-            <TextBlock Text="Audio file" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <TextBlock Text="Audio file path" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <TextBox Text="{Binding AudioFilename, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Margin="0,0,0,4"/>
-            <Button Content="Browse..." HorizontalAlignment="Left"
-                    Width="72" Click="BrowseBtn_Click"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Browse..." Width="72" Click="BrowseBtn_Click"/>
+                <Button Content="Remove" Width="72" Margin="4,0,0,0" Click="RemoveBtn_Click"
+                        ToolTip="Clear the audio file path of the selected track(s)."/>
+            </StackPanel>
         </StackPanel>
         <!-- Global-only selection: batch assignment across all tracks -->
         <StackPanel Visibility="{Binding IsOnlyGlobalSelected, Converter={StaticResource BoolVis}}">
