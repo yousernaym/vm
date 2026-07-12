@@ -885,15 +885,15 @@ namespace VisualMusic.ViewModels
         /// playback start — can't revert a pending edit; hence no OnPropertyChanged here, which
         /// would disturb the caret while typing. Invalid text simply leaves the last valid value.
         /// </summary>
-        public string SilenceThreshold
+        public double? SilenceThreshold
         {
-            get => _mergedProps?.AudioProps?.SilenceThresholdS?.ToString() ?? "";
+            get => _mergedProps?.AudioProps?.SilenceThresholdS;
             set
             {
-                if (string.IsNullOrWhiteSpace(value))
+                if (value == null)
                     Apply(tp => tp.AudioProps.SilenceThresholdS = null);
-                else if (float.TryParse(value, out float s) && s >= 0)
-                    Apply(tp => tp.AudioProps.SilenceThresholdS = s);
+                else if (value >= 0)
+                    Apply(tp => tp.AudioProps.SilenceThresholdS = (float)value.Value);
             }
         }
 
