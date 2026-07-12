@@ -179,6 +179,53 @@ namespace VisualMusic.ViewModels
                 AddUndoItem("Set track audio");
             };
 
+            SelectedTrackProps.BrowseMultipleAudioFiles = async () =>
+            {
+                if (Project == null) return;
+                var tracks = TrackList.Items.Skip(1).ToList();   // real tracks; Global is Items[0]
+                if (tracks.Count == 0)
+                {
+                    MetroMessageBox.Show("There are no tracks to assign audio files to.", Program.AppName,
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                var dlg = new Microsoft.Win32.OpenFileDialog
+                {
+                    Filter = "Audio files|*.wav;*.flac;*.mp3;*.ogg|All files|*.*",
+                    Multiselect = true
+                };
+                var audioDir = AppSettings.Instance.TrackAudioFolder;
+                if (!string.IsNullOrEmpty(audioDir)) dlg.InitialDirectory = audioDir;
+                if (dlg.ShowDialog() != true || dlg.FileNames.Length == 0) return;
+                AppSettings.Instance.RememberFolder(dlg.FileNames[0], dir => AppSettings.Instance.TrackAudioFolder = dir);
+
+                var win = new Controls.AssignAudioFilesWindow(
+                    tracks.Select(t => t.Name).ToList(), dlg.FileNames)
+                {
+                    Owner = Application.Current.MainWindow
+                };
+                if (win.ShowDialog() != true || win.Assignments.Count == 0) return;
+
+                foreach (var kv in win.Assignments)
+                    tracks[kv.Key].TrackView.TrackProps.AudioProps.Filename = kv.Value;
+
+                OnTrackListSelectionChanged();                 // refresh merged props
+                AddUndoItem("Assign track audio files");       // one undo step for the whole batch
+
+                // Load audio for exactly the assigned tracks (Global is selected, so
+                // LoadSelectedTracksAudio can't be reused).
+                var targets = win.Assignments.Keys
+                    .Select(i => tracks[i].TrackView.TrackProps.AudioProps).ToList();
+                await Task.WhenAll(targets.Select(ap => ap.LoadAudioAsync()));
+                var failed = targets
+                    .Select(ap => ap.SidWizChannel)
+                    .FirstOrDefault(ch => !string.IsNullOrEmpty(ch.ErrorMessage));
+                if (failed != null)
+                    MetroMessageBox.Show($"Couldn't load audio file:\n{failed.Filename}", Program.AppName,
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+            };
+
             SelectedTrackProps.LoadSelectedTracksAudio = async () =>
             {
                 var selectedItems = TrackList.SelectedItems.ToList();
@@ -372,6 +419,9 @@ namespace VisualMusic.ViewModels
 
             // Selection count drives the save/load/default enable state (main menu + context menus).
             SelectedTrackProps.SelectedTrackCount = TrackList.SelectedItems.Count;
+            SelectedTrackProps.IsOnlyGlobalSelected =
+                TrackList.SelectedItems.Count == 1 &&
+                TrackList.SelectedItems[0].TrackView.TrackNumber == 0;
             SaveTrackPropsCommand.NotifyCanExecuteChanged();
             LoadTrackPropsCommand.NotifyCanExecuteChanged();
             DefaultTrackPropsCommand.NotifyCanExecuteChanged();

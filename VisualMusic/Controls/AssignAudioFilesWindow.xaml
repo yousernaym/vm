@@ -1,0 +1,111 @@
+<mah:MetroWindow x:Class="VisualMusic.Controls.AssignAudioFilesWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 Title="Assign Audio Files"
+                 Width="1020" Height="480" MinWidth="780" MinHeight="360"
+                 WindowStartupLocation="CenterOwner"
+                 ShowMinButton="False"
+                 ShowMaxRestoreButton="False">
+    <mah:MetroWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolVis"/>
+
+        <!-- Draggable file chip -->
+        <DataTemplate x:Key="FileChip">
+            <Border Background="{DynamicResource MahApps.Brushes.Accent4}"
+                    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+                    BorderThickness="1" CornerRadius="3" Padding="6,2" Margin="2"
+                    Cursor="Hand" ToolTip="{Binding FullPath}"
+                    MouseLeftButtonDown="Chip_MouseLeftButtonDown"
+                    MouseLeftButtonUp="Chip_MouseLeftButtonUp"
+                    MouseMove="Chip_MouseMove">
+                <TextBlock Text="{Binding DisplayName}"/>
+            </Border>
+        </DataTemplate>
+    </mah:MetroWindow.Resources>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" TextWrapping="Wrap" Margin="0,0,0,8"
+                   Text="Drag files onto tracks. Click an assigned file to return it to the pool. Tracks without a file keep their current audio."/>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Track rows -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="trackItems" AllowDrop="True">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderThickness="1" CornerRadius="3" Padding="4" Margin="0,2"
+                                    BorderBrush="{DynamicResource MahApps.Brushes.Gray7}"
+                                    Background="Transparent"
+                                    AllowDrop="True"
+                                    DragEnter="TrackRow_DragEnter" DragOver="TrackRow_DragEnter"
+                                    DragLeave="TrackRow_DragLeave" Drop="TrackRow_Drop">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDropTarget}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent4}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding TrackName}"
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    <ContentControl Grid.Column="1" Content="{Binding AssignedFile}"
+                                                    ContentTemplate="{StaticResource FileChip}"
+                                                    Visibility="{Binding HasFile, Converter={StaticResource BoolVis}}"/>
+                                    <TextBlock Grid.Column="1" Text="(drop a file here)" Opacity="0.5"
+                                               VerticalAlignment="Center" Margin="6,0"
+                                               Visibility="{Binding HasNoFile, Converter={StaticResource BoolVis}}"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Unassigned file pool -->
+            <Border Grid.Column="2" BorderThickness="1" CornerRadius="3" Padding="4"
+                    BorderBrush="{DynamicResource MahApps.Brushes.Gray7}"
+                    AllowDrop="True" DragEnter="Pool_DragEnter" DragOver="Pool_DragEnter"
+                    Drop="Pool_Drop">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Unassigned files" FontWeight="SemiBold" Margin="2,0,0,4"/>
+                        <ItemsControl x:Name="poolItems" ItemTemplate="{StaticResource FileChip}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="OK"     Width="80" IsDefault="True" Click="Ok_Click" Margin="0,0,8,0"/>
+            <Button Content="Cancel" Width="80" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

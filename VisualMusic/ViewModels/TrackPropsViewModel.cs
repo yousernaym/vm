@@ -358,6 +358,13 @@ namespace VisualMusic.ViewModels
         /// Set by MainViewModel on every selection change.</summary>
         public int SelectedTrackCount { get; set; }
 
+        /// <summary>True when the track-list selection is exactly the Global track. Set by MainViewModel.</summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsNotOnlyGlobalSelected))]
+        bool _isOnlyGlobalSelected;
+
+        public bool IsNotOnlyGlobalSelected => !IsOnlyGlobalSelected;
+
         // ---- Modulation ----
 
         public bool ModulationVisible => SP?.Type == NoteStyleType.Bar || SP?.Type == NoteStyleType.Line;
@@ -891,6 +898,8 @@ namespace VisualMusic.ViewModels
         }
 
         public Action BrowseAudioFile { get; set; }
+        /// <summary>Batch audio-file assignment (Global-only selection); wired by MainViewModel.</summary>
+        public Func<Task> BrowseMultipleAudioFiles { get; set; }
         public Func<Task> LoadSelectedTracksAudio { get; set; }
     }
 }
