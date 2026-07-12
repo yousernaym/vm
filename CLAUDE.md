@@ -76,6 +76,26 @@ Notes:
   and cause false positives). Success indicators: `VM.dll ->` is emitted and the post-build `File(s) copied`
   lines run.
 
+### Where the app output lands (sln vs csproj — easy to get wrong)
+
+The `.sln` maps the VisualMusic *project* to different project platforms per configuration, so the app's
+output folder depends on how you build:
+
+- `VisualMusic.sln` with `/p:Configuration=Debug /p:Platform=x64` (the normal build): the sln maps the
+  app project to **Any CPU**, so the runnable output is
+  `VisualMusic\bin\Debug\net10.0-windows10.0.26100.0\` — **no `x64\` segment**. (The C# assembly is
+  platform-agnostic; the native DLLs xcopied in are still x64.)
+- `VisualMusic.sln` with `/p:Configuration=Release /p:Platform=x64`: the sln maps Release|x64 to **x64**,
+  so the output is `VisualMusic\bin\x64\Release\net10.0-windows10.0.26100.0\` (asymmetric with Debug).
+- Building `VisualMusic.csproj` directly: **don't.** `$(SolutionDir)` is undefined outside the solution,
+  so after compiling, the post-build xcopy of native DLLs + remuxer fails with `MSB3073`, and the output
+  goes to yet another folder (`bin\x64\Debug\...`) that lacks the native DLLs. Always build the `.sln`.
+
+Stale copies of `VM.exe`/`VM.dll` can linger in the folders you are *not* building to (e.g.
+`bin\x64\Debug\` from an old direct-csproj build). To confirm where a build landed, read the
+`VM.dll -> <path>` line in the build log, or find the newest binary:
+`Get-ChildItem d:\dev\vm\VisualMusic\bin -Recurse -Filter VM.exe | Sort-Object LastWriteTime -Descending`
+
 How the pieces reach the app output (this part trips people up — it's spread across several project files):
 
 1. The C++ projects (Media, MidMix, libRemuxer + its vendored libs) build into the repo-root `x64\<Config>\`

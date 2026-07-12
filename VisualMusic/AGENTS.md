@@ -31,13 +31,17 @@ Key characteristics:
 Build `VisualMusic.sln` (in the repo root) via Visual Studio 2022 or:
 
 ```bash
-msbuild VisualMusic.sln /p:Configuration=Release
+msbuild VisualMusic.sln /p:Configuration=Release /p:Platform=x64
 ```
 
-**Output locations:**
-- Main executable: `VisualMusic/bin/x64/Debug/net10.0-windows10.0.26100.0/` or `VisualMusic/bin/x64/Release/...`
+**Output locations** (they differ by configuration — the sln maps the app project to `Any CPU` for
+Debug|x64 but to `x64` for Release|x64; details in the root [AGENTS.md](../AGENTS.md) build section):
+- Debug (sln x64 build): `VisualMusic/bin/Debug/net10.0-windows10.0.26100.0/` — no `x64/` segment
+- Release (sln x64 build): `VisualMusic/bin/x64/Release/net10.0-windows10.0.26100.0/`
 - Assembly name: `VM.exe`
-- Post-build copies native DLLs and Remuxer binaries to output folder
+- Post-build copies native DLLs and Remuxer binaries to the output folder — **solution builds only**:
+  building `VisualMusic.csproj` directly leaves `$(SolutionDir)` undefined, so the copy fails (MSB3073)
+  and its output (`bin/x64/Debug/...`) lacks the native DLLs. Always build the `.sln`.
 
 ### Running
 
