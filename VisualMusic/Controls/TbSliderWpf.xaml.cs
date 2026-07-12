@@ -216,6 +216,18 @@ namespace VisualMusic.Controls
             if (e.Key == Key.Enter) CommitChanges?.Invoke(this, EventArgs.Empty);
         }
 
+        void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // TextBox swallows arrow keys in KeyDown (caret movement), so intercept them here.
+            if (e.Key == Key.Up || e.Key == Key.Down)
+            {
+                // Nudge by the same step the slider uses for Left/Right (SmallChange, in slider space).
+                double delta = e.Key == Key.Up ? SmallChange : -SmallChange;
+                slider.Value = Math.Clamp(slider.Value + delta, Min, Max);
+                e.Handled = true;
+            }
+        }
+
         void TextBox_LostFocus(object sender, RoutedEventArgs e)
             => CommitChanges?.Invoke(this, EventArgs.Empty);
     }

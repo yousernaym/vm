@@ -20,6 +20,7 @@
                  VerticalContentAlignment="Center"
                  TextChanged="TextBox_TextChanged"
                  KeyDown="TextBox_KeyDown"
+                 PreviewKeyDown="TextBox_PreviewKeyDown"
                  LostFocus="TextBox_LostFocus"
                  Margin="2,0,0,0"/>
     </Grid>
