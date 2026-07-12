@@ -36,6 +36,10 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(CameraText));
             OnPropertyChanged(nameof(BackgroundImageOpacity));
             OnPropertyChanged(nameof(BackgroundImageSaturation));
+            OnPropertyChanged(nameof(AudioVisLeft));
+            OnPropertyChanged(nameof(AudioVisRight));
+            OnPropertyChanged(nameof(AudioVisWidth));
+            OnPropertyChanged(nameof(AudioVisLineWidth));
         }
 
         /// <summary>
@@ -189,6 +193,54 @@ namespace VisualMusic.ViewModels
             {
                 if (value == null || Props == null) return;
                 Props.BackgroundImageSaturation = (float)value;
+                OnPropertyChanged();
+            }
+        }
+
+        // =====================================================================
+        // AUDIO VISUALIZATION
+        // =====================================================================
+
+        public bool? AudioVisLeft
+        {
+            get => Props?.AudioVisLeft;
+            set
+            {
+                if (value == null || Props == null) return;
+                Props.AudioVisLeft = value.Value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool? AudioVisRight
+        {
+            get => Props?.AudioVisRight;
+            set
+            {
+                if (value == null || Props == null) return;
+                Props.AudioVisRight = value.Value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double? AudioVisWidth
+        {
+            get => (double?)Props?.AudioVisWidth;
+            set
+            {
+                if (value == null || Props == null) return;
+                Props.AudioVisWidth = (float)value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double? AudioVisLineWidth
+        {
+            get => (double?)Props?.AudioVisLineWidth;
+            set
+            {
+                if (value == null || Props == null) return;
+                Props.AudioVisLineWidth = (float)value;
                 OnPropertyChanged();
             }
         }

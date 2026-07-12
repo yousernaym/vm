@@ -815,7 +815,8 @@ namespace VisualMusic
 
             DrawLyrics(host);
             RefreshSidWizChannels();
-            host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS, GetSongFade());
+            host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS, GetSongFade(),
+                Props.AudioVisLeft, Props.AudioVisRight, Props.AudioVisWidth);
         }
 
         /// <summary>
@@ -834,6 +835,8 @@ namespace VisualMusic
                 var color = tp.MaterialProps.GetSysColor(true, GlobalTrackProps.MaterialProps);
                 if (tp.AudioProps.LineColor.ToArgb() != color.ToArgb())
                     tp.AudioProps.LineColor = color;
+                if (tp.AudioProps.SidWizChannel.LineWidth != Props.AudioVisLineWidth)
+                    tp.AudioProps.SidWizChannel.LineWidth = Props.AudioVisLineWidth;
                 tp.AudioProps.SidWizChannel.ActivityLookaheadSeconds =
                     tp.AudioProps.SilenceThresholdS ?? globalThreshold;
             }

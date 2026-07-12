@@ -77,6 +77,18 @@
                               kf:Keyframing.PropertyId="BackgroundImageSaturation"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="True"/>
+
+            <TextBlock Text="Audio visualization" FontWeight="SemiBold" Margin="0,8,0,4"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <CheckBox Content="Left side"  IsChecked="{Binding AudioVisLeft,  Mode=TwoWay}" Click="AudioVisSide_Click" Margin="0,0,12,0"/>
+                <CheckBox Content="Right side" IsChecked="{Binding AudioVisRight, Mode=TwoWay}" Click="AudioVisSide_Click"/>
+            </StackPanel>
+            <TextBlock Text="Width" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding AudioVisWidth, Mode=TwoWay}" Min="0" Max="1" Decimals="2" SmallChange="0.1"
+                              Margin="0,0,0,8" CommitChanges="AudioVisWidth_CommitChanges"/>
+            <TextBlock Text="Line width" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding AudioVisLineWidth, Mode=TwoWay}" Min="0" Max="10" Decimals="1" SmallChange="1"
+                              Margin="0,0,0,4" CommitChanges="AudioVisLineWidth_CommitChanges"/>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

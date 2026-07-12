@@ -42,6 +42,11 @@ namespace VisualMusic
         public float BackgroundImageOpacity { get; set; } = 1.0f;
         public float BackgroundImageSaturation { get; set; } = 1.0f;
 
+        public bool AudioVisLeft { get; set; } = true;
+        public bool AudioVisRight { get; set; } = false;
+        public float AudioVisWidth { get; set; } = 0.25f;
+        public float AudioVisLineWidth { get; set; } = 3;   // matches Channel.cs default
+
         public ProjProps()
         {
 
@@ -76,6 +81,14 @@ namespace VisualMusic
                     BackgroundImageOpacity = (float)entry.Value;
                 else if (entry.Name == "backgroundImageSaturation")
                     BackgroundImageSaturation = (float)entry.Value;
+                else if (entry.Name == "audioVisLeft")
+                    AudioVisLeft = (bool)entry.Value;
+                else if (entry.Name == "audioVisRight")
+                    AudioVisRight = (bool)entry.Value;
+                else if (entry.Name == "audioVisWidth")
+                    AudioVisWidth = (float)entry.Value;
+                else if (entry.Name == "audioVisLineWidth")
+                    AudioVisLineWidth = (float)entry.Value;
             }
         }
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -92,6 +105,10 @@ namespace VisualMusic
             info.AddValue("backgroundImagePath", BackgroundImagePath);
             info.AddValue("backgroundImageOpacity", BackgroundImageOpacity);
             info.AddValue("backgroundImageSaturation", BackgroundImageSaturation);
+            info.AddValue("audioVisLeft", AudioVisLeft);
+            info.AddValue("audioVisRight", AudioVisRight);
+            info.AddValue("audioVisWidth", AudioVisWidth);
+            info.AddValue("audioVisLineWidth", AudioVisLineWidth);
         }
     }
 }

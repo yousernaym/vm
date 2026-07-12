@@ -319,7 +319,7 @@ namespace LibSidWiz
             set
             {
                 _lineWidth = value;
-                Pen.Width = value * Renderer.Width / 480;
+                Pen.Width = value * (Renderer?.Width ?? 480) / 480;
                 Changed?.Invoke(this, false);
             }
         }

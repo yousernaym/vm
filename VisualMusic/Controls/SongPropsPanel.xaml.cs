@@ -25,6 +25,15 @@ namespace VisualMusic.Controls
         void FadeOut_CommitChanges(object sender, EventArgs e)
             => KeyframeService.RaiseUndoSnapshot("Edit Fade out");
 
+        void AudioVisSide_Click(object sender, RoutedEventArgs e)
+            => KeyframeService.RaiseUndoSnapshot("Edit Audio visualization sides");
+
+        void AudioVisWidth_CommitChanges(object sender, EventArgs e)
+            => KeyframeService.RaiseUndoSnapshot("Edit Audio visualization width");
+
+        void AudioVisLineWidth_CommitChanges(object sender, EventArgs e)
+            => KeyframeService.RaiseUndoSnapshot("Edit Audio visualization line width");
+
         void ResetPitches_Click(object sender, RoutedEventArgs e)
             => (DataContext as SongPropsViewModel)?.ResetPitches?.Invoke();
 
