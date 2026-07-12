@@ -1350,6 +1350,18 @@ namespace VisualMusic
             _propAccessors["proj/BackgroundImagePath"] = PropAccessor.StringHold(
                 () => Props.BackgroundImagePath,
                 v => Props.BackgroundImagePath = v);
+            _propAccessors["proj/AudioVisLeft"] = PropAccessor.Bool(
+                () => Props.AudioVisLeft,
+                v => Props.AudioVisLeft = v);
+            _propAccessors["proj/AudioVisRight"] = PropAccessor.Bool(
+                () => Props.AudioVisRight,
+                v => Props.AudioVisRight = v);
+            _propAccessors["proj/AudioVisWidth"] = PropAccessor.Scalar(
+                () => Props.AudioVisWidth,
+                v => Props.AudioVisWidth = (float)v);
+            _propAccessors["proj/AudioVisLineWidth"] = PropAccessor.Scalar(
+                () => Props.AudioVisLineWidth,
+                v => Props.AudioVisLineWidth = (float)v);
 
             // Track-scope — one entry per track view.
             // Key by TrackNumber (the MIDI track index, stable across list reorder) and capture the

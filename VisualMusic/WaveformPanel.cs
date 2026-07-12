@@ -15,7 +15,6 @@ namespace VisualMusic
         {
             public WaveformRenderer Renderer;
             public Texture2D Tex;
-            public byte[] FramePixels;
             public Rectangle Rect;
             public readonly List<Channel> Channels = new List<Channel>();
 
@@ -25,7 +24,6 @@ namespace VisualMusic
                 Tex?.Dispose();
                 Renderer = null;
                 Tex = null;
-                FramePixels = null;
             }
         }
 
@@ -73,17 +71,30 @@ namespace VisualMusic
                 || vp.Width != _cfgVpW || vp.Height != _cfgVpH)
                 Reconfigure(left, right, widthFrac, vp.Width, vp.Height);
 
+            // Phase 1: compute each side's active channel set, then give both renderers the same
+            // slot count so track heights always match (the side with fewer active tracks leaves
+            // its bottom slots empty).
+            int slots = 0;
+            if (_leftStrip != null)
+                slots = _leftStrip.Renderer.PrepareFrame(songPosS);
+            if (_rightStrip != null)
+                slots = System.Math.Max(slots, _rightStrip.Renderer.PrepareFrame(songPosS));
+            if (_leftStrip != null)
+                _leftStrip.Renderer.LayoutSlots = slots;
+            if (_rightStrip != null)
+                _rightStrip.Renderer.LayoutSlots = slots;
+
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-            DrawStrip(_leftStrip, songPosS, fade);
-            DrawStrip(_rightStrip, songPosS, fade);
+            DrawStrip(_leftStrip, fade);
+            DrawStrip(_rightStrip, fade);
             _spriteBatch.End();
         }
 
-        void DrawStrip(Strip strip, double songPosS, float fade)
+        void DrawStrip(Strip strip, float fade)
         {
             if (strip == null || strip.Tex == null)
                 return;
-            var pixels = strip.Renderer.RenderFrame(songPosS);
+            var pixels = strip.Renderer.RenderPreparedFrame();
             strip.Tex.SetData(pixels);
             // The texture is premultiplied BGRA, so scaling the whole color by the fade factor
             // fades both the waveforms and the semi-transparent background correctly.
@@ -123,15 +134,18 @@ namespace VisualMusic
                     rightChannels.Add(_channels[i]);
             }
 
+            // Both strips span the full viewport height; per-frame row layout (uniform track
+            // heights across the two sides, empty slots at the bottom of the sparser side) is
+            // handled inside WaveformRenderer via LayoutSlots — see Draw().
             if (left)
                 _leftStrip = BuildStrip(leftChannels, new Rectangle(0, 0, stripW, vpH), stripW, vpH);
             if (right)
                 _rightStrip = BuildStrip(rightChannels, new Rectangle(vpW - stripW, 0, stripW, vpH), stripW, vpH);
         }
 
-        Strip BuildStrip(List<Channel> channels, Rectangle rect, int stripW, int vpH)
+        Strip BuildStrip(List<Channel> channels, Rectangle rect, int stripW, int stripH)
         {
-            if (channels.Count == 0)
+            if (channels.Count == 0 || stripW <= 0 || stripH <= 0)
                 return null;
 
             var strip = new Strip { Rect = rect };
@@ -140,9 +154,9 @@ namespace VisualMusic
             strip.Renderer = new WaveformRenderer
             {
                 Width = stripW,
-                Height = vpH,
+                Height = stripH,
                 Columns = 1,
-                RenderingBounds = new System.Drawing.Rectangle(0, 0, stripW, vpH),
+                RenderingBounds = new System.Drawing.Rectangle(0, 0, stripW, stripH),
                 BackgroundColor = System.Drawing.Color.FromArgb(192, 0, 0, 0),
                 FramesPerSecond = UiFps,
             };
@@ -150,8 +164,7 @@ namespace VisualMusic
                 strip.Renderer.AddChannel(ch);
             strip.Renderer.Init();
 
-            strip.Tex = new Texture2D(_gfxDevice, stripW, vpH, false, SurfaceFormat.Color);
-            strip.FramePixels = new byte[stripW * vpH * 4];
+            strip.Tex = new Texture2D(_gfxDevice, stripW, stripH, false, SurfaceFormat.Color);
             return strip;
         }
 

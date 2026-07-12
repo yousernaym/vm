@@ -57,6 +57,10 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(CameraText));
             OnPropertyChanged(nameof(BackgroundImageOpacity));
             OnPropertyChanged(nameof(BackgroundImageSaturation));
+            OnPropertyChanged(nameof(AudioVisLeft));
+            OnPropertyChanged(nameof(AudioVisRight));
+            OnPropertyChanged(nameof(AudioVisWidth));
+            OnPropertyChanged(nameof(AudioVisLineWidth));
         }
 
         // =====================================================================

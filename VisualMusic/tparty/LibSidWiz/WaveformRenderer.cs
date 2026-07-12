@@ -34,6 +34,15 @@ namespace LibSidWiz
         public Image BackgroundImage { get => _backgroundImage; set { _backgroundImage = value; _templateDirty = true; } }
         public Rectangle RenderingBounds { get => _renderingBounds; set { _renderingBounds = value; _templateDirty = true; } }
 
+        private int _layoutSlots;
+        /// <summary>
+        /// Number of layout rows the rendering bounds are divided into. When greater than the
+        /// visible channel count, channels stack from the top and the remaining rows stay empty
+        /// (transparent). 0 = one row per visible channel (fill the whole bounds). Lets two
+        /// side-by-side renderers keep their track heights in sync.
+        /// </summary>
+        public int LayoutSlots { get => _layoutSlots; set { if (_layoutSlots != value) { _layoutSlots = value; _templateDirty = true; } } }
+
         public int ChannelCount => _channels.Count;
 
         public void AddChannel(Channel channel)
@@ -61,6 +70,11 @@ namespace LibSidWiz
         // Dynamic active set
         private List<Channel> _visible = new List<Channel>();
         private string _visibleSignature = "";
+
+        // Per-frame state computed by PrepareFrame and consumed by RenderPreparedFrame
+        private readonly List<Channel> _activeThisFrame = new List<Channel>();
+        private int[] _frameTriggers;
+        private bool _framePrepared;
 
         // Activity detection knobs
         public float ActivityThreshold = 0.004f;   // ~ -48 dBFS; tweak
@@ -149,10 +163,23 @@ namespace LibSidWiz
         /// </summary>
         public byte[] RenderFrame(double posSeconds)
         {
+            PrepareFrame(posSeconds);
+            return RenderPreparedFrame();
+        }
+
+        /// <summary>
+        /// Phase 1: computes triggers and the set of channels active at the given time.
+        /// Returns the active channel count so the caller can set <see cref="LayoutSlots"/>
+        /// (e.g. to the max of two renderers) before calling <see cref="RenderPreparedFrame"/>.
+        /// </summary>
+        public int PrepareFrame(double posSeconds)
+        {
             if (_frameData == null)
                 Init();
+            _activeThisFrame.Clear();
+            _framePrepared = false;
             if (_channels.Count == 0 || SamplingRate <= 0 || FramesPerSecond <= 0)
-                return _frameData;
+                return 0;
 
             // === Time → frame/sample math
             var maxSamples = (int)_channels.Max(c => c.SampleCount);
@@ -168,10 +195,10 @@ namespace LibSidWiz
             _lastFrameStartSample = frameIndexSamples;
 
             EnsurePerFrameCachesInitialized(frameIndex, frameSamples);
+            if (_frameTriggers == null || _frameTriggers.Length != _channels.Count)
+                _frameTriggers = new int[_channels.Count];
 
             // === Compute triggers; decide which channels are "active now" ===
-            Span<int> triggers = stackalloc int[_channels.Count];
-            var active = new List<Channel>(_channels.Count);
             for (int i = 0; i < _channels.Count; ++i)
             {
                 var ch = _channels[i];
@@ -179,18 +206,32 @@ namespace LibSidWiz
 
                 int trig = ch.GetTriggerPoint(frameIndexSamples, frameSamples, _prevTrigger[i]);
                 _prevTrigger[i] = trig;
-                triggers[i] = trig;
+                _frameTriggers[i] = trig;
 
                 if (IsChannelActive(i, ch, trig, frameIndexSamples, frameSamples))
-                    active.Add(ch);
+                    _activeThisFrame.Add(ch);
             }
 
+            _framePrepared = true;
+            return _activeThisFrame.Count;
+        }
+
+        /// <summary>
+        /// Phase 2: renders the frame prepared by <see cref="PrepareFrame"/>, rebuilding the
+        /// layout/template first if the active set or <see cref="LayoutSlots"/> changed.
+        /// Returns the reused pinned pixel buffer (BGRA, premultiplied).
+        /// </summary>
+        public byte[] RenderPreparedFrame()
+        {
+            if (!_framePrepared)
+                return _frameData;
+
             // === If active set changed (or template invalid), rebuild layout + template ===
-            string sig = string.Join("-", active.Select(c => _channels.IndexOf(c)));
+            string sig = string.Join("-", _activeThisFrame.Select(c => _channels.IndexOf(c)));
             if (_templateDirty || sig != _visibleSignature)
             {
                 _visibleSignature = sig;
-                _visible = active;
+                _visible = _activeThisFrame.ToList();
                 RebuildLayoutAndTemplateForVisible(_visible);
                 _templateDirty = false;
             }
@@ -203,7 +244,7 @@ namespace LibSidWiz
                 foreach (var ch in _visible)
                 {
                     int idx = _channels.IndexOf(ch);
-                    RenderWave(g, ch, triggers[idx], _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
+                    RenderWave(g, ch, _frameTriggers[idx], _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
                 }
             }
 
@@ -321,15 +362,23 @@ namespace LibSidWiz
             if (rb.Width == 0 || rb.Height == 0)
                 rb = new Rectangle(0, 0, Width, Height);
 
-            // Compute per-channel rectangles (stack vertically regardless of Columns when dynamic)
+            // Compute per-channel rectangles (stack vertically regardless of Columns when dynamic).
+            // With LayoutSlots > count, channels fill the top rows and the rest stays transparent
+            // so two side-by-side renderers keep identical track heights.
             int count = visible.Count;
+            int slots = Math.Max(count, LayoutSlots);
+            // Region actually occupied by channels (background is only drawn here)
+            var occupied = slots == 0
+                ? Rectangle.Empty
+                : new Rectangle(rb.Left, rb.Top, rb.Width, count * rb.Height / slots);
+
             if (count == 0)
             {
-                // Just background
+                // No visible channels → fully transparent template
                 using (var templateBmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, _templateHandle.AddrOfPinnedObject()))
                 using (var g = Graphics.FromImage(templateBmp))
                 {
-                    DrawBackground(g, rb);
+                    DrawBackground(g, occupied);
                 }
                 return;
             }
@@ -337,8 +386,8 @@ namespace LibSidWiz
             for (int i = 0; i < count; ++i)
             {
                 int x0 = rb.Left, x1 = rb.Right;
-                int y0 = rb.Top + i * rb.Height / count;
-                int y1 = rb.Top + (i + 1) * rb.Height / count;
+                int y0 = rb.Top + i * rb.Height / slots;
+                int y1 = rb.Top + (i + 1) * rb.Height / slots;
                 visible[i].Bounds = new Rectangle(x0, y0, x1 - x0, y1 - y0);
             }
 
@@ -346,15 +395,15 @@ namespace LibSidWiz
             using (var g = Graphics.FromImage(templateBmp))
             {
                 // Background
-                DrawBackground(g, rb);
+                DrawBackground(g, occupied);
 
                 // Per-channel static items (bg box, zero line, border, label)
                 foreach (var ch in visible)
-                    DrawChannelTemplate(g, ch, rb);
+                    DrawChannelTemplate(g, ch, occupied);
             }
         }
 
-        private void DrawBackground(Graphics g, Rectangle rb)
+        private void DrawBackground(Graphics g, Rectangle bgRect)
         {
             //Clear
             var oldMode = g.CompositingMode;
@@ -365,6 +414,9 @@ namespace LibSidWiz
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
+            if (bgRect.Width <= 0 || bgRect.Height <= 0)
+                return;
+
             if (BackgroundImage != null)
             {
                 using (var attribute = new ImageAttributes())
@@ -372,7 +424,7 @@ namespace LibSidWiz
                     attribute.SetWrapMode(WrapMode.TileFlipXY);
                     g.DrawImage(
                         BackgroundImage,
-                        new Rectangle(0, 0, Width, Height),
+                        bgRect,
                         0, 0, BackgroundImage.Width, BackgroundImage.Height,
                         GraphicsUnit.Pixel,
                         attribute);
@@ -381,7 +433,7 @@ namespace LibSidWiz
             else
             {
                 using (var brush = new SolidBrush(BackgroundColor))
-                    g.FillRectangle(brush, -1, -1, Width + 1, Height + 1);
+                    g.FillRectangle(brush, bgRect.Left - 1, bgRect.Top - 1, bgRect.Width + 1, bgRect.Height + 1);
             }
         }
 
