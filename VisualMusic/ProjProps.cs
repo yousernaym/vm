@@ -46,6 +46,7 @@ namespace VisualMusic
         public bool AudioVisRight { get; set; } = false;
         public float AudioVisWidth { get; set; } = 0.25f;
         public float AudioVisLineWidth { get; set; } = 3;   // matches Channel.cs default
+        public float AudioVisOpacity { get; set; } = 0.75f;
 
         public ProjProps()
         {
@@ -89,6 +90,8 @@ namespace VisualMusic
                     AudioVisWidth = (float)entry.Value;
                 else if (entry.Name == "audioVisLineWidth")
                     AudioVisLineWidth = (float)entry.Value;
+                else if (entry.Name == "audioVisOpacity")
+                    AudioVisOpacity = (float)entry.Value;
             }
         }
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -109,6 +112,7 @@ namespace VisualMusic
             info.AddValue("audioVisRight", AudioVisRight);
             info.AddValue("audioVisWidth", AudioVisWidth);
             info.AddValue("audioVisLineWidth", AudioVisLineWidth);
+            info.AddValue("audioVisOpacity", AudioVisOpacity);
         }
     }
 }

@@ -86,6 +86,7 @@ namespace VisualMusic.Keyframes
             ("AudioVisRight",             KfScope.Project,  "Audio vis right side"),
             ("AudioVisWidth",             KfScope.Project,  "Audio vis overlay width"),
             ("AudioVisLineWidth",         KfScope.Project,  "Audio vis line width"),
+            ("AudioVisOpacity",           KfScope.Project,  "Audio vis overlay opacity"),
             ("StyleTypeIndex",            KfScope.Track,    "Note style"),
             ("LineTypeIndex",             KfScope.Track,    "Line type"),
             ("LineWidth",                 KfScope.Track,    "Line width"),

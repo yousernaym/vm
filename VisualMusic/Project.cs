@@ -664,6 +664,7 @@ namespace VisualMusic
             Props.AudioVisRight = defaults.AudioVisRight;
             Props.AudioVisWidth = defaults.AudioVisWidth;
             Props.AudioVisLineWidth = defaults.AudioVisLineWidth;
+            Props.AudioVisOpacity = defaults.AudioVisOpacity;
         }
 
         /// <summary>
@@ -976,7 +977,7 @@ namespace VisualMusic
             DrawLyrics(host);
             RefreshSidWizChannels();
             host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS, GetSongFade(),
-                Props.AudioVisLeft, Props.AudioVisRight, Props.AudioVisWidth);
+                Props.AudioVisLeft, Props.AudioVisRight, Props.AudioVisWidth, Props.AudioVisOpacity);
         }
 
         /// <summary>
@@ -1522,6 +1523,9 @@ namespace VisualMusic
             _propAccessors["proj/AudioVisLineWidth"] = PropAccessor.Scalar(
                 () => Props.AudioVisLineWidth,
                 v => Props.AudioVisLineWidth = (float)v);
+            _propAccessors["proj/AudioVisOpacity"] = PropAccessor.Scalar(
+                () => Props.AudioVisOpacity,
+                v => Props.AudioVisOpacity = (float)v);
 
             // Track-scope — one entry per track view.
             // Key by TrackNumber (the MIDI track index, stable across list reorder) and capture the

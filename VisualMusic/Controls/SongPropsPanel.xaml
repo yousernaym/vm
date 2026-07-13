@@ -97,8 +97,14 @@
                               kf:Keyframing.Interpolatable="True"/>
             <TextBlock Text="Line width" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding AudioVisLineWidth, Mode=TwoWay}" Min="1" Max="10" Decimals="1" SmallChange="1"
-                              Margin="0,0,0,4"
+                              Margin="0,0,0,8"
                               kf:Keyframing.PropertyId="AudioVisLineWidth"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                              kf:Keyframing.Interpolatable="True"/>
+            <TextBlock Text="Overlay opacity" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding AudioVisOpacity, Mode=TwoWay}" Min="0" Max="1" Decimals="2" SmallChange="0.1"
+                              Margin="0,0,0,4"
+                              kf:Keyframing.PropertyId="AudioVisOpacity"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="True"/>
         </StackPanel>

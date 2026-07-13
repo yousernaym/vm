@@ -56,9 +56,9 @@ namespace VisualMusic
             _dirty = true;
         }
 
-        internal void Draw(double songPosS, float fade, bool left, bool right, float widthFrac)
+        internal void Draw(double songPosS, float fade, bool left, bool right, float widthFrac, float opacity)
         {
-            if (songPosS < 0 || fade <= 0 || (!left && !right) || widthFrac <= 0)
+            if (songPosS < 0 || fade <= 0 || (!left && !right) || widthFrac <= 0 || opacity <= 0)
                 return;
             if (!_channels.Exists(c => !string.IsNullOrEmpty(c.Filename)))
                 return;
@@ -88,9 +88,12 @@ namespace VisualMusic
             if (_rightStrip != null)
                 _rightStrip.Renderer.LayoutSlots = slots;
 
+            // Opacity scales the whole overlay on top of the song fade; because the strip texture is
+            // premultiplied BGRA, multiplying the draw color fades waveforms and background together.
+            float alpha = fade * opacity;
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-            DrawStrip(_leftStrip, fade);
-            DrawStrip(_rightStrip, fade);
+            DrawStrip(_leftStrip, alpha);
+            DrawStrip(_rightStrip, alpha);
             _spriteBatch.End();
         }
 
@@ -161,7 +164,9 @@ namespace VisualMusic
                 Height = stripH,
                 Columns = 1,
                 RenderingBounds = new System.Drawing.Rectangle(0, 0, stripW, stripH),
-                BackgroundColor = System.Drawing.Color.FromArgb(192, 0, 0, 0),
+                // Fully opaque backdrop so the overlay is solid at opacity 1; the AudioVisOpacity
+                // slider (applied per-frame in DrawStrip) fades the whole strip down from there.
+                BackgroundColor = System.Drawing.Color.FromArgb(255, 0, 0, 0),
                 FramesPerSecond = UiFps,
             };
             foreach (var ch in channels)

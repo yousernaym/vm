@@ -40,6 +40,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(AudioVisRight));
             OnPropertyChanged(nameof(AudioVisWidth));
             OnPropertyChanged(nameof(AudioVisLineWidth));
+            OnPropertyChanged(nameof(AudioVisOpacity));
         }
 
         /// <summary>
@@ -67,6 +68,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(AudioVisRight));
             OnPropertyChanged(nameof(AudioVisWidth));
             OnPropertyChanged(nameof(AudioVisLineWidth));
+            OnPropertyChanged(nameof(AudioVisOpacity));
         }
 
         // =====================================================================
@@ -251,6 +253,17 @@ namespace VisualMusic.ViewModels
             {
                 if (value == null || Props == null) return;
                 Props.AudioVisLineWidth = (float)value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double? AudioVisOpacity
+        {
+            get => (double?)Props?.AudioVisOpacity;
+            set
+            {
+                if (value == null || Props == null) return;
+                Props.AudioVisOpacity = (float)value;
                 OnPropertyChanged();
             }
         }
