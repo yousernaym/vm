@@ -27,6 +27,9 @@ namespace VisualMusic.ViewModels
         public Action LoadSelectedProps { get; set; }
         public Action DefaultProps { get; set; }
 
+        // Wired by MainViewModel: adds an undo item after a drag-drop reorder actually moved a track.
+        public Action AfterReorder { get; set; }
+
         Project _project;
 
         public void Rebuild(Project p)
@@ -86,6 +89,7 @@ namespace VisualMusic.ViewModels
 
             // Move each item (in original order) to just before the anchor. Indices are
             // recomputed each step because earlier moves shift them.
+            bool moved = false;
             foreach (var it in block)
             {
                 int from = Items.IndexOf(it);
@@ -97,7 +101,9 @@ namespace VisualMusic.ViewModels
                 var tv = _project.TrackViews[from];
                 _project.TrackViews.RemoveAt(from);
                 _project.TrackViews.Insert(to, tv);
+                moved = true;
             }
+            if (moved) AfterReorder?.Invoke();
         }
 
         // Refreshes the color swatches for all non-Global tracks (call after a Material copy).

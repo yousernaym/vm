@@ -228,12 +228,10 @@ namespace VisualMusic.ViewModels
 
                 OnTrackListSelectionChanged();                 // refresh merged props
 
-                if (createdTracks)
-                    // Track count changed → reset the undo baseline (after all Filenames are set, so
-                    // the baseline captures them). CopyPropsFrom can't restore across track counts.
-                    ResetUndoStack();
-                else
-                    AddUndoItem("Assign track audio files");   // one undo step for the whole batch
+                // One undo step for the whole batch. Snapshots don't capture audio buffers, so
+                // taking it before the audio load below is correct; CopyPropsFrom reconciles the
+                // track set/order on restore, so track creation is undoable like any other edit.
+                AddUndoItem(createdTracks ? "Add audio tracks" : "Assign track audio files");
 
                 await Task.WhenAll(targets.Select(ap => ap.LoadAudioAsync()));
                 var failed = targets
@@ -392,6 +390,7 @@ namespace VisualMusic.ViewModels
             TrackList.SaveSelectedProps = SaveTrackProps;
             TrackList.LoadSelectedProps = LoadTrackProps;
             TrackList.DefaultProps = DefaultTrackProps;
+            TrackList.AfterReorder = () => AddUndoItem("Reorder tracks");
             SelectedTrackProps.DefaultProps = DefaultTrackProps;
 
             // Track-properties context menu → save/load just the currently-open tab.
@@ -1322,11 +1321,17 @@ namespace VisualMusic.ViewModels
         void ApplyUndoItem()
         {
             if (_undoItems.Current == null) return;
+            // Did the restore change the track set or order? If so the track-list rows must be
+            // rebuilt (and rebuilt BEFORE OnTrackListSelectionChanged, which reseeds the positional
+            // indices the per-frame merged-props path relies on).
+            bool tracksChanged = Project != null && !Project.TrackViews.Select(v => v.TrackNumber)
+                .SequenceEqual(_undoItems.Current.Project.TrackViews.Select(v => v.TrackNumber));
             Project?.CopyPropsFrom(_undoItems.Current.Project);
             // Rebuild geometry for any style/material/spatial changes in the restored snapshot.
             Project?.CreateGeos();
             // Refresh the Song and Track property panels so they reflect restored values.
             SongProps.RefreshAll();
+            if (tracksChanged) TrackList.Rebuild(Project);
             OnTrackListSelectionChanged();
             TrackList.RefreshColors();
             // Refresh keyframe panel and list.
@@ -1346,20 +1351,6 @@ namespace VisualMusic.ViewModels
         {
             if (Project == null) return;
             _undoItems.Add(desc, Project);
-            UpdateUndoRedo();
-        }
-
-        /// <summary>
-        /// Discards the undo history and captures the current project as a fresh baseline. Required
-        /// after any edit that changes the track count: undo snapshots share note data and restore
-        /// props by track position (CopyPropsFrom indexes source.TrackViews[i]), so replaying across
-        /// a different track count throws. Leaves the project dirty (no MarkSaved).
-        /// </summary>
-        void ResetUndoStack()
-        {
-            if (Project == null) return;
-            _undoItems.Clear();
-            _undoItems.Add("", Project);
             UpdateUndoRedo();
         }
 

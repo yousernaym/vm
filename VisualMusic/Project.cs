@@ -851,8 +851,9 @@ namespace VisualMusic
         /// <summary>
         /// Appends one new project track per audio file, naming each track after its filename and
         /// assigning it as the track's audio. Returns the created track views (caller loads their
-        /// audio and refreshes the UI). Creating tracks changes the track count, so the caller must
-        /// reset the undo stack afterward (undo snapshots can't restore across track counts).
+        /// audio and refreshes the UI). Callers add a normal undo item afterward; undo restore
+        /// (<see cref="CopyPropsFrom"/> → <see cref="ReconcileTrackViews"/>) reconciles the track
+        /// set and order, so track creation is a fully undoable/redoable operation.
         /// </summary>
         public List<TrackView> AddAudioTracks(IReadOnlyList<string> files)
         {
@@ -1916,7 +1917,9 @@ namespace VisualMusic
         /// render waveforms without reloading audio. Pass <paramref name="shareAudioProps"/> =
         /// false for undo snapshots: the clone then keeps its own deserialized AudioProps
         /// (correct Filename + SilenceThresholdS, fresh empty channel) so later edits to the live
-        /// project don't retroactively mutate the snapshot.
+        /// project don't retroactively mutate the snapshot. Undo restore (<see cref="CopyPropsFrom"/>)
+        /// also clones with <paramref name="shareAudioProps"/> = false, so views adopted from the
+        /// snapshot (redo of a track add) own their AudioProps rather than aliasing the snapshot's.
         /// </summary>
         public Project Clone(bool shareAudioProps = true)
         {
@@ -1953,15 +1956,75 @@ namespace VisualMusic
             }
         }
 
+        /// <summary>
+        /// Restores the live track <b>set and order</b> to the snapshot's, matching by TrackNumber.
+        /// Handles undo of a track add (removes live tracks the snapshot doesn't have), redo of a
+        /// track add (re-appends and re-wires views adopted from the snapshot clone), and reorder
+        /// undo/redo (rebuilds <see cref="_trackViews"/> in snapshot order). Returns whether the set
+        /// or order changed. Removed tracks' AudioProps/SidWizChannel are intentionally not disposed
+        /// (matches the CreateTrackViews shrink precedent — avoids racing an in-flight LoadDataAsync).
+        /// </summary>
+        bool ReconcileTrackViews(Project source)
+        {
+            // Fast path: same TrackNumber sequence → nothing to do.
+            if (_trackViews.Select(v => v.TrackNumber).SequenceEqual(source.TrackViews.Select(v => v.TrackNumber)))
+                return false;
+
+            var liveByTn = _trackViews.ToDictionary(v => v.TrackNumber);
+            int srcCount = source.TrackViews.Count;
+
+            // Remove live tracks not present in the snapshot (undo of a track add):
+            foreach (var tv in _trackViews.Where(v => v.TrackNumber >= srcCount))
+            {
+                DrawHost?.WaveformPanel?.RemoveChannel(tv.TrackProps.AudioProps.SidWizChannel);
+                tv.Geo = null;              // release live refcount; snapshots keep their own
+            }
+            if (_notes.Tracks.Count > srcCount)
+                _notes.Tracks.RemoveRange(srcCount, _notes.Tracks.Count - srcCount);
+
+            // Rebuild the list in snapshot order, adopting the clone's views for missing TrackNumbers
+            // (redo of a track add). Adopt from the CLONE, never the snapshot itself.
+            var newList = new List<TrackView>(srcCount);
+            var adopted = new List<TrackView>();
+            foreach (var stv in source.TrackViews)
+                if (liveByTn.TryGetValue(stv.TrackNumber, out var tv) && stv.TrackNumber < srcCount)
+                    newList.Add(tv);
+                else { newList.Add(stv); adopted.Add(stv); }
+            _trackViews = newList;
+
+            // Wire adopted views (mirrors AddTrackView, but keeps Filename — AddTrackView clears it):
+            foreach (var stv in adopted.OrderBy(v => v.TrackNumber))
+            {
+                Debug.Assert(_notes.Tracks.Count == stv.TrackNumber);
+                _notes.Tracks.Add(stv.MidiTrack);                       // snapshot's ref keeps it alive
+                stv.TrackProps.GlobalProps = TrackViews[0].TrackProps;  // not serialized → null in clone
+                stv.TrackProps.LoadContent();                           // textures round-trip Path only
+                stv.TrackProps.AudioProps.LineColor = stv.TrackProps.MaterialProps
+                    .GetSysColor(true, stv.TrackProps.GlobalProps.MaterialProps);   // not serialized
+                DrawHost?.WaveformPanel?.AddChannel(stv.TrackProps.AudioProps.SidWizChannel);
+                if (!string.IsNullOrEmpty(stv.TrackProps.AudioProps.Filename))
+                    _ = stv.TrackProps.AudioProps.LoadAudioAsync();
+            }
+
+            TrackView.NumTracks = _trackViews.Count;
+            InitPropertyAccessors();
+            return true;
+        }
+
         public void CopyPropsFrom(Project project)
         {
-            var source = project.Clone();
+            var source = project.Clone(shareAudioProps: false);
             Props = source.Props;
+            ReconcileTrackViews(source);
             //TrackViews = source.TrackViews;
-            for (int i = 0; i < TrackViews.Count; i++)
+            var srcByTn = source.TrackViews.ToDictionary(v => v.TrackNumber);
+            foreach (var tv in _trackViews)
             {
-                var destProps = TrackViews[i].TrackProps;
-                var sourceProps = source.TrackViews[i].TrackProps;
+                var destProps = tv.TrackProps;
+                var sourceProps = srcByTn[tv.TrackNumber].TrackProps;
+                // Adopted-this-restore views already hold snapshot state (dest and source are the
+                // same object) — skip to avoid self-assign and a duplicate audio load.
+                if (ReferenceEquals(destProps, sourceProps)) continue;
                 destProps.StyleProps = sourceProps.StyleProps;
                 destProps.MaterialProps = sourceProps.MaterialProps;
                 destProps.LightProps = sourceProps.LightProps;
