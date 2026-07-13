@@ -367,18 +367,24 @@ namespace LibSidWiz
             // so two side-by-side renderers keep identical track heights.
             int count = visible.Count;
             int slots = Math.Max(count, LayoutSlots);
-            // Region actually occupied by channels (background is only drawn here)
-            var occupied = slots == 0
+            // Region actually occupied by channels (used for per-channel border edge detection).
+            var channelsRect = count == 0
                 ? Rectangle.Empty
                 : new Rectangle(rb.Left, rb.Top, rb.Width, count * rb.Height / slots);
+            // The dark overlay always spans the full slot grid, so with two side-by-side strips the
+            // sparser side still shows the backdrop where its extra (empty) slots are — no gap even
+            // when the other side has more active tracks.
+            var bgRect = slots == 0
+                ? Rectangle.Empty
+                : new Rectangle(rb.Left, rb.Top, rb.Width, rb.Height);
 
             if (count == 0)
             {
-                // No visible channels → fully transparent template
+                // No visible channels → background overlay only (transparent where no waveform is drawn)
                 using (var templateBmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, _templateHandle.AddrOfPinnedObject()))
                 using (var g = Graphics.FromImage(templateBmp))
                 {
-                    DrawBackground(g, occupied);
+                    DrawBackground(g, bgRect);
                 }
                 return;
             }
@@ -395,11 +401,11 @@ namespace LibSidWiz
             using (var g = Graphics.FromImage(templateBmp))
             {
                 // Background
-                DrawBackground(g, occupied);
+                DrawBackground(g, bgRect);
 
                 // Per-channel static items (bg box, zero line, border, label)
                 foreach (var ch in visible)
-                    DrawChannelTemplate(g, ch, occupied);
+                    DrawChannelTemplate(g, ch, channelsRect);
             }
         }
 

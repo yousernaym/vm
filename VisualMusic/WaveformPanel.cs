@@ -79,6 +79,10 @@ namespace VisualMusic
                 slots = _leftStrip.Renderer.PrepareFrame(songPosS);
             if (_rightStrip != null)
                 slots = System.Math.Max(slots, _rightStrip.Renderer.PrepareFrame(songPosS));
+            // When every channel is silent this frame (slots == 0), still lay out one slot so each
+            // strip draws its full-height dark overlay instead of vanishing.
+            if (slots == 0 && (_leftStrip != null || _rightStrip != null))
+                slots = 1;
             if (_leftStrip != null)
                 _leftStrip.Renderer.LayoutSlots = slots;
             if (_rightStrip != null)
