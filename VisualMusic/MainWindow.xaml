@@ -21,6 +21,7 @@
         <KeyBinding Command="{Binding ImportModCommand}"      Key="M"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding ImportHvlCommand}"      Key="H"    Modifiers="Control"/>
         <KeyBinding Command="{Binding ImportSidCommand}"      Key="S"    Modifiers="Control+Shift"/>
+        <KeyBinding Command="{Binding ImportAudioCommand}"    Key="A"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding OpenProjectCommand}"    Key="O"    Modifiers="Control"/>
         <KeyBinding Command="{Binding SaveProjectCommand}"    Key="S"    Modifiers="Control"/>
         <KeyBinding Command="{Binding SaveProjectAsCommand}"  Key="S"    Modifiers="Alt+Shift"/>
@@ -82,7 +83,7 @@
                 <MenuItem Header="Import M_odule..."      Command="{Binding ImportModCommand}"     InputGestureText="Ctrl+Shift+M"/>
                 <MenuItem Header="Import _HVL song..."    Command="{Binding ImportHvlCommand}"     InputGestureText="Ctrl+H"/>
                 <MenuItem Header="Import _SID song..."    Command="{Binding ImportSidCommand}"     InputGestureText="Ctrl+Shift+S"/>
-                <MenuItem Header="Import _audio..."        Command="{Binding ImportAudioCommand}"/>
+                <MenuItem Header="Import _audio..."        Command="{Binding ImportAudioCommand}"   InputGestureText="Ctrl+Shift+A"/>
                 <Separator/>
                 <MenuItem Header="_Open project..."       Command="{Binding OpenProjectCommand}"   InputGestureText="Ctrl+O"/>
                 <MenuItem Header="_Save project"          Command="{Binding SaveProjectCommand}"   InputGestureText="Ctrl+S"/>
@@ -100,11 +101,6 @@
                     <MenuItem Header="_Reset"  Command="{Binding ResetCameraCommand}" InputGestureText="Ctrl+R"/>
                     <MenuItem Header="_Load..."  Command="{Binding LoadCameraCommand}"/>
                     <MenuItem Header="_Save..."  Command="{Binding SaveCameraCommand}"/>
-                </MenuItem>
-                <MenuItem Header="_Tracks">
-                    <MenuItem Header="_Load properties..."  Command="{Binding LoadTrackPropsCommand}"   InputGestureText="Ctrl+T"/>
-                    <MenuItem Header="_Save properties..."  Command="{Binding SaveTrackPropsCommand}"   InputGestureText="Ctrl+Shift+T"/>
-                    <MenuItem Header="_Default Properties" Command="{Binding DefaultTrackPropsCommand}" InputGestureText="Ctrl+D"/>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Insert _Lyrics"    Command="{Binding InsertLyricsCommand}"   InputGestureText="Ctrl+L"/>

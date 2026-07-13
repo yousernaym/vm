@@ -89,7 +89,13 @@
                     Drop="Pool_Drop">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="Unassigned files" FontWeight="SemiBold" Margin="2,0,0,4"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <CheckBox x:Name="selectAllCheck" Click="SelectAll_Click"
+                                      VerticalAlignment="Center" Margin="2,0,4,0"
+                                      ToolTip="Check or uncheck all unassigned files"/>
+                            <TextBlock Text="Unassigned files" FontWeight="SemiBold"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <ItemsControl x:Name="poolItems">
                             <!-- Checkbox sits OUTSIDE the chip Border so its clicks don't hit the
                                  chip's drag handlers. Checked files create new tracks on OK. -->

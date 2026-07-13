@@ -814,7 +814,9 @@ namespace VisualMusic
             }
             else
             {
-                startTrack = _trackViews.Count; //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props at current song's track count and up.
+                //Keep current props but add new props if the new imported note file has more tracks than the current song. Start assigning default track props above the highest existing TrackNumber.
+                //Max (not Count): the model is sparse after a track removal, so Count would resurrect a removed middle track on project reload (reload re-parses the note file).
+                startTrack = _trackViews.Count == 0 ? 0 : _trackViews.Max(v => v.TrackNumber) + 1;
             }
 
             for (int i = 0; i < _trackViews.Count; i++)
@@ -900,6 +902,31 @@ namespace VisualMusic
 
             InitPropertyAccessors();
             return created;
+        }
+
+        /// <summary>
+        /// Removes the given track views from the live project. The model is <b>sparse</b>: a removed
+        /// track's <see cref="Midi.Track"/> slot stays in <see cref="Notes"/>.Tracks (TrackNumber is an
+        /// index into it everywhere), and remaining tracks keep their TrackNumbers — no renumbering — so
+        /// keyframe ids (<c>track/{tn}/...</c>) and undo snapshots (matched by TrackNumber) stay valid.
+        /// Only the TrackView and this track's per-track keyframes are removed; undo restores keyframes
+        /// wholesale from the snapshot. The Global track (TrackNumber 0) is never removable. Removed
+        /// tracks' AudioProps/SidWizChannel are intentionally not disposed (matches
+        /// <see cref="ReconcileTrackViews"/> — avoids racing an in-flight LoadDataAsync).
+        /// </summary>
+        public void RemoveTracks(IReadOnlyList<TrackView> views)
+        {
+            foreach (var tv in views)
+            {
+                if (tv.TrackNumber == 0 || !_trackViews.Remove(tv)) continue;
+                DrawHost?.WaveformPanel?.RemoveChannel(tv.TrackProps.AudioProps.SidWizChannel);
+                tv.Geo = null;   // release live refcount; snapshots keep their own
+                // Trailing '/' so track 1 doesn't also match track 10, 11, ...
+                PropertyKeyframes.RemovePropertiesWithPrefix($"track/{tv.TrackNumber}/");
+            }
+            TrackView.NumTracks = _trackViews.Count;
+            InitPropertyAccessors();
+            DrawHost?.Invalidate();
         }
 
         public void CreateGeos(bool resetVertScale = true)
@@ -1990,22 +2017,28 @@ namespace VisualMusic
 
             var liveByTn = _trackViews.ToDictionary(v => v.TrackNumber);
             int srcCount = source.TrackViews.Count;
+            // Set-based (not tail-based): the model is sparse, so a snapshot may omit a middle
+            // TrackNumber (redo of a Remove) as well as tail ones (undo of an Add).
+            var srcTns = new HashSet<int>(source.TrackViews.Select(v => v.TrackNumber));
 
-            // Remove live tracks not present in the snapshot (undo of a track add):
-            foreach (var tv in _trackViews.Where(v => v.TrackNumber >= srcCount))
+            // Remove live tracks not present in the snapshot (undo of an add / redo of a remove):
+            foreach (var tv in _trackViews.Where(v => !srcTns.Contains(v.TrackNumber)))
             {
                 DrawHost?.WaveformPanel?.RemoveChannel(tv.TrackProps.AudioProps.SidWizChannel);
                 tv.Geo = null;              // release live refcount; snapshots keep their own
             }
-            if (_notes.Tracks.Count > srcCount)
-                _notes.Tracks.RemoveRange(srcCount, _notes.Tracks.Count - srcCount);
+            // Trim only the tail of _notes.Tracks (undo of an Add). Middle orphan slots from a Remove
+            // stay — TrackNumber indexes into Tracks, so shifting would corrupt higher tracks.
+            int keepSlots = srcTns.Count == 0 ? 0 : srcTns.Max() + 1;
+            if (_notes.Tracks.Count > keepSlots)
+                _notes.Tracks.RemoveRange(keepSlots, _notes.Tracks.Count - keepSlots);
 
             // Rebuild the list in snapshot order, adopting the clone's views for missing TrackNumbers
             // (redo of a track add). Adopt from the CLONE, never the snapshot itself.
             var newList = new List<TrackView>(srcCount);
             var adopted = new List<TrackView>();
             foreach (var stv in source.TrackViews)
-                if (liveByTn.TryGetValue(stv.TrackNumber, out var tv) && stv.TrackNumber < srcCount)
+                if (liveByTn.TryGetValue(stv.TrackNumber, out var tv))
                     newList.Add(tv);
                 else { newList.Add(stv); adopted.Add(stv); }
             _trackViews = newList;
@@ -2013,8 +2046,10 @@ namespace VisualMusic
             // Wire adopted views (mirrors AddTrackView, but keeps Filename — AddTrackView clears it):
             foreach (var stv in adopted.OrderBy(v => v.TrackNumber))
             {
-                Debug.Assert(_notes.Tracks.Count == stv.TrackNumber);
-                _notes.Tracks.Add(stv.MidiTrack);                       // snapshot's ref keeps it alive
+                // Append only when this TrackNumber has no slot yet (redo of an Add). Undo of a middle
+                // Remove finds its slot still present (the snapshot's MidiTrack is the same object).
+                if (stv.TrackNumber >= _notes.Tracks.Count)
+                    _notes.Tracks.Add(stv.MidiTrack);                   // snapshot's ref keeps it alive
                 stv.TrackProps.GlobalProps = TrackViews[0].TrackProps;  // not serialized → null in clone
                 stv.TrackProps.LoadContent();                           // textures round-trip Path only
                 stv.TrackProps.AudioProps.LineColor = stv.TrackProps.MaterialProps

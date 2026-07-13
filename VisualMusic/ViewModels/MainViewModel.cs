@@ -390,6 +390,7 @@ namespace VisualMusic.ViewModels
             TrackList.SaveSelectedProps = SaveTrackProps;
             TrackList.LoadSelectedProps = LoadTrackProps;
             TrackList.DefaultProps = DefaultTrackProps;
+            TrackList.RemoveSelectedTracks = RemoveSelectedTracks;
             TrackList.AfterReorder = () => AddUndoItem("Reorder tracks");
             SelectedTrackProps.DefaultProps = DefaultTrackProps;
 
@@ -415,6 +416,20 @@ namespace VisualMusic.ViewModels
                 }
                 ApplyLoadedProps(props, flag);
             };
+        }
+
+        void RemoveSelectedTracks()
+        {
+            if (Project == null) return;
+            var views = TrackList.SelectedItems
+                .Where(it => it.TrackView.TrackNumber != 0)
+                .Select(it => it.TrackView).ToList();
+            if (views.Count == 0) return;
+            Project.RemoveTracks(views);
+            TrackList.Rebuild(Project);              // reselects Global
+            OnTrackListSelectionChanged();
+            Keyframes.KeyframeService.RaiseKeyframesChanged();
+            AddUndoItem(views.Count == 1 ? "Remove track" : "Remove tracks");
         }
 
         void OnTrackListSelectionChanged()
@@ -556,7 +571,11 @@ namespace VisualMusic.ViewModels
             Keyframes.KeyframeService.RequestUndoSnapshot = AddUndoItem;
             Keyframes.KeyframeService.KeyframesChanged += OnKeyframesChangedRestoreBackground;
             Keyframes.KeyframeService.RaiseKeyframesChanged();
-            Camera.OnUserUpdating = () => value?.SyncLiveCameraEdit();
+            Camera.OnUserUpdating = () =>
+            {
+                value?.SyncLiveCameraEdit();
+                if (ShowSongProps) SongProps.RefreshCamera();
+            };
             Camera.OnUserUpdated = () => AddUndoItem("Edit Camera");
             NotifyScrollPositionChanged();
         }

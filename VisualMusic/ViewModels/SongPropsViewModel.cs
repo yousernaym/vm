@@ -43,6 +43,12 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
+        /// Refreshes only the camera readout. Called while the user moves the camera interactively
+        /// (WASD / mouse-look) so the textbox tracks the live camera position.
+        /// </summary>
+        public void RefreshCamera() => OnPropertyChanged(nameof(CameraText));
+
+        /// <summary>
         /// Called each frame via <see cref="MainViewModel.NotifyScrollPositionChanged"/> to keep
         /// interpolated / live values (camera, viewport width, background) in sync with playback.
         /// </summary>

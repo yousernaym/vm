@@ -108,6 +108,28 @@ namespace VisualMusic.Controls
             poolItems.ItemsSource = _pool;
 
             AutoPair();
+
+            _pool.CollectionChanged += (_, _) => UpdateSelectAllState();
+            foreach (var f in _allFiles)
+                f.PropertyChanged += (_, a) =>
+                { if (a.PropertyName == nameof(FileBoxVm.CreateTrack)) UpdateSelectAllState(); };
+            UpdateSelectAllState();
+        }
+
+        // ---- Select-all header checkbox (tri-state: display-only indeterminate) ----
+
+        void SelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            bool check = selectAllCheck.IsChecked == true;
+            foreach (var f in _pool) f.CreateTrack = check;
+        }
+
+        void UpdateSelectAllState()
+        {
+            selectAllCheck.IsEnabled = _pool.Count > 0;
+            int n = _pool.Count(f => f.CreateTrack);
+            selectAllCheck.IsChecked = _pool.Count == 0 ? false
+                : n == 0 ? false : n == _pool.Count ? true : (bool?)null;
         }
 
         // ---- Auto-pairing: longest-common-substring on normalized names ----

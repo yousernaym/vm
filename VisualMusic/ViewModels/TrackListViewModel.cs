@@ -26,6 +26,7 @@ namespace VisualMusic.ViewModels
         public Action SaveSelectedProps { get; set; }
         public Action LoadSelectedProps { get; set; }
         public Action DefaultProps { get; set; }
+        public Action RemoveSelectedTracks { get; set; }
 
         // Wired by MainViewModel: adds an undo item after a drag-drop reorder actually moved a track.
         public Action AfterReorder { get; set; }
@@ -42,7 +43,9 @@ namespace VisualMusic.ViewModels
                 Colors.Transparent, Colors.Transparent));
 
             var globalMat = p.GlobalTrackProps.MaterialProps;
-            for (int i = 1; i < p.Notes.Tracks.Count; i++)
+            // Loop over views, not note-slot indices: after a track removal the model is sparse
+            // (fewer views than Notes.Tracks slots, and TrackNumbers may have gaps).
+            for (int i = 1; i < p.TrackViews.Count; i++)
             {
                 int trackNumber = p.TrackViews[i].TrackNumber;
                 string name = trackNumber + " - " + p.Notes.Tracks[trackNumber].Name;

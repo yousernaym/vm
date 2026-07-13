@@ -72,6 +72,11 @@ namespace VisualMusic.Controls
             def.Click += (_, _) => vm.DefaultProps?.Invoke();
             menu.Items.Add(def);
 
+            bool hasGlobal = vm.SelectedItems.Any(it => it.TrackView.TrackNumber == 0);
+            var remove = new MenuItem { Header = "_Remove track(s)", IsEnabled = count >= 1 && !hasGlobal };
+            remove.Click += (_, _) => vm.RemoveSelectedTracks?.Invoke();
+            menu.Items.Add(remove);
+
             menu.Items.Add(new Separator());
 
             var selectAll = new MenuItem { Header = "Select _all", InputGestureText = "Ctrl+A", IsEnabled = hasItems };
@@ -88,7 +93,8 @@ namespace VisualMusic.Controls
         void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
             // Ctrl+A → select all. Handled here so the gesture works regardless of which child has focus.
-            if (e.Key == Key.A && (Keyboard.Modifiers & ModifierKeys.Control) != 0)
+            // Exact-match modifiers so Ctrl+Shift+A (Import audio) isn't swallowed while the list has focus.
+            if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control)
             {
                 trackListView.SelectAll();
                 e.Handled = true;
