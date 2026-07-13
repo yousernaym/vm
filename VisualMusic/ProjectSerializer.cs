@@ -17,7 +17,7 @@ namespace VisualMusic
             typeof(NoteStyle_Bar), typeof(NoteStyle_Line), typeof(LineType), typeof(LineHlType),
             typeof(NoteStyle[]), typeof(NoteStyleType), typeof(List<TrackView>), typeof(FileType),
             typeof(Camera), typeof(List<NoteStyleMod>), typeof(SourceSongType),
-            typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions),typeof(HvlImportOptions),
+            typeof(ImportOptions), typeof(MidiImportOptions), typeof(ModImportOptions), typeof(SidImportOptions),typeof(HvlImportOptions),typeof(AudioImportOptions),
             typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment),
             typeof(ProjProps),
             typeof(List<TrackProps>), typeof(AudioProps),

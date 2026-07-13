@@ -11,7 +11,8 @@ namespace VisualMusic
         [EnumMember] Midi,
         [EnumMember] Mod,
         [EnumMember] Sid,
-        [EnumMember] Hvl
+        [EnumMember] Hvl,
+        [EnumMember] Audio
     }
 
     [Serializable]
@@ -64,6 +65,10 @@ namespace VisualMusic
         {
             get
             {
+                // Audio-only projects have no note file; the title comes from the master audio.
+                if (NoteFileType == FileType.Audio)
+                    return string.IsNullOrWhiteSpace(AudioPath) ? "" : Path.GetFileName(AudioPath);
+
                 string p = !string.IsNullOrWhiteSpace(NotePath) ? NotePath
                          : SavedMidi ? MidiOutputPath
                          : RawNotePath;
@@ -125,6 +130,13 @@ namespace VisualMusic
 
         public void UpdateImportForm()
         {
+            // Audio-only projects use the separate Import Audio dialog, not ImportSongWindow.
+            if (NoteFileType == FileType.Audio)
+            {
+                ImportAudioWindow.UpdateSession(AudioPath ?? "", EraseCurrent);
+                return;
+            }
+
             ImportSongWindow.UpdateSession(
                 NoteFileType,
                 erase: EraseCurrent,
@@ -136,6 +148,16 @@ namespace VisualMusic
 
         public void CheckSourceFile()
         {
+            // Audio-only projects have no note file — validate only the master audio.
+            if (NoteFileType == FileType.Audio)
+            {
+                if (string.IsNullOrWhiteSpace(AudioPath) || !File.Exists(AudioPath))
+                    throw new FileImportException("Audio file not found", ImportError.Missing, ImportFileType.Audio, AudioPath);
+                if (!Media.OpenAudioFile(AudioPath))
+                    throw new FileImportException("Couldn't read audio file", ImportError.Corrupt, ImportFileType.Audio, AudioPath);
+                return;
+            }
+
             if (!SavedMidi)
             {
                 if (string.IsNullOrWhiteSpace(NotePath) || !File.Exists(NotePath))
@@ -223,6 +245,24 @@ namespace VisualMusic
         }
 
         public HvlImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Options for a pure-audio project (no note file). The master <see cref="ImportOptions.AudioPath"/>
+    /// drives playback and song length; tracks are created from audio files via the batch-assign flow.
+    /// No new fields: the base already round-trips <c>audioPath</c> (written because
+    /// <see cref="ImportOptions.HasSuppliedAudio"/>) and <c>noteFileType</c>.
+    /// </summary>
+    [Serializable]
+    public class AudioImportOptions : ImportOptions
+    {
+        public AudioImportOptions() : base(FileType.Audio)
+        {
+        }
+
+        public AudioImportOptions(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

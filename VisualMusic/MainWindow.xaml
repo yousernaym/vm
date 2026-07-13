@@ -82,6 +82,7 @@
                 <MenuItem Header="Import M_odule..."      Command="{Binding ImportModCommand}"     InputGestureText="Ctrl+Shift+M"/>
                 <MenuItem Header="Import _HVL song..."    Command="{Binding ImportHvlCommand}"     InputGestureText="Ctrl+H"/>
                 <MenuItem Header="Import _SID song..."    Command="{Binding ImportSidCommand}"     InputGestureText="Ctrl+Shift+S"/>
+                <MenuItem Header="Import _audio..."        Command="{Binding ImportAudioCommand}"/>
                 <Separator/>
                 <MenuItem Header="_Open project..."       Command="{Binding OpenProjectCommand}"   InputGestureText="Ctrl+O"/>
                 <MenuItem Header="_Save project"          Command="{Binding SaveProjectCommand}"   InputGestureText="Ctrl+S"/>

@@ -21,10 +21,22 @@ namespace VisualMusic.Controls
     {
         const string DragFormat = "VisualMusic.AudioFileBox";
 
-        public class FileBoxVm
+        public class FileBoxVm : INotifyPropertyChanged
         {
+            public event PropertyChangedEventHandler PropertyChanged;
+            void Notify([CallerMemberName] string name = null) =>
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
             public string FullPath { get; init; }
             public string DisplayName { get; init; }
+
+            bool _createTrack;
+            /// <summary>When checked (and still in the pool), OK creates a new project track for this file.</summary>
+            public bool CreateTrack
+            {
+                get => _createTrack;
+                set { _createTrack = value; Notify(); }
+            }
         }
 
         public class TrackRowVm : INotifyPropertyChanged
@@ -61,27 +73,36 @@ namespace VisualMusic.Controls
 
         readonly List<TrackRowVm> _trackRows;
         readonly ObservableCollection<FileBoxVm> _pool;
+        // All pool files in original selection order, so NewTrackFiles output order is stable.
+        readonly List<FileBoxVm> _allFiles;
 
         /// <summary>Track row index → full file path; valid after DialogResult == true.</summary>
         public IReadOnlyDictionary<int, string> Assignments { get; private set; }
+
+        /// <summary>Files whose "create a new track" box is checked (and that are still unassigned);
+        /// valid after DialogResult == true.</summary>
+        public IReadOnlyList<string> NewTrackFiles { get; private set; } = new List<string>();
 
         // Drag state: chip pressed but not yet dragged, and the row it sits in (null = pool).
         Point _dragStart;
         FileBoxVm _pressedBox;
         TrackRowVm _pressedSourceRow;
 
-        public AssignAudioFilesWindow(IReadOnlyList<string> trackNames, IReadOnlyList<string> filePaths)
+        public AssignAudioFilesWindow(IReadOnlyList<string> trackNames, IReadOnlyList<string> filePaths,
+            bool defaultCreateNewTracks = false)
         {
             InitializeComponent();
 
             _trackRows = trackNames
                 .Select((name, i) => new TrackRowVm { TrackName = name, TrackIndex = i })
                 .ToList();
-            _pool = new ObservableCollection<FileBoxVm>(filePaths.Select(p => new FileBoxVm
+            _allFiles = filePaths.Select(p => new FileBoxVm
             {
                 FullPath = p,
-                DisplayName = Path.GetFileName(p)
-            }));
+                DisplayName = Path.GetFileName(p),
+                CreateTrack = defaultCreateNewTracks,
+            }).ToList();
+            _pool = new ObservableCollection<FileBoxVm>(_allFiles);
 
             trackItems.ItemsSource = _trackRows;
             poolItems.ItemsSource = _pool;
@@ -255,6 +276,14 @@ namespace VisualMusic.Controls
             Assignments = _trackRows
                 .Where(r => r.AssignedFile != null)
                 .ToDictionary(r => r.TrackIndex, r => r.AssignedFile.FullPath);
+
+            // Deriving from still-in-pool files keeps drag interactions correct: a checked file
+            // dropped onto an existing track is excluded (it left the pool); dragged back, included.
+            NewTrackFiles = _allFiles
+                .Where(f => f.CreateTrack && _pool.Contains(f))
+                .Select(f => f.FullPath)
+                .ToList();
+
             DialogResult = true;
         }
     }

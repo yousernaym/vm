@@ -400,7 +400,12 @@ namespace VisualMusic
         { //`Open project` and `import files` meet here
             options.CheckSourceFile();
             //Convert mod/sid files to mid/wav
-            if (options.NoteFileType != FileType.Midi)
+            if (options.NoteFileType == FileType.Audio)
+            {
+                // Audio-only project: there is no note file to convert. The master audio drives
+                // everything and is opened below by OpenAudioFile.
+            }
+            else if (options.NoteFileType != FileType.Midi)
             {
                 string noteFile = Path.GetFileName(options.NotePath);
                 string midiPath = null, midiArg = null, generatedAudioPath = null, audioArg = null;
@@ -543,13 +548,25 @@ namespace VisualMusic
 
             bool resetProject = options.EraseCurrent || (_notes == null && (_trackViews == null || _trackViews.Count == 0));
 
-            OpenNoteFile(options, resetProject);
+            if (options.NoteFileType == FileType.Audio)
+                OpenSyntheticSong(resetProject);
+            else
+                OpenNoteFile(options, resetProject);
             OpenAudioFile(options);
+
+            // Audio-only: OpenAudioFile set SongLengthT from the master audio length; propagate it to
+            // every (note-less) track so their reported length matches the song.
+            if (options.NoteFileType == FileType.Audio)
+                foreach (var track in _notes.Tracks)
+                    track.Length = _notes.SongLengthT;
 
             ImportOptions = options;
             if (resetProject)
             {
-                DefaultFileName = Path.GetFileName(ImportOptions.NotePath) + "." + DefaultFileExt;
+                // Audio-only projects have no note path; name the project from the master audio.
+                string sourceName = options.NoteFileType == FileType.Audio
+                    ? ImportOptions.AudioPath : ImportOptions.NotePath;
+                DefaultFileName = Path.GetFileName(sourceName) + "." + DefaultFileExt;
             }
             CreateTrackViews(_notes.Tracks.Count, resetProject);
             InitPropertyAccessors();
@@ -611,16 +628,78 @@ namespace VisualMusic
             _notes.CreateNoteBsp();
 
             if (resetProject)
-            {
-                PropertyKeyframes = new Keyframes.KeyframeSet();
-                Props.LyricsSegments.Clear();
-                Keyframes.KeyframeService.RaiseKeyframesChanged();
-                Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
-                NormSongPos = 0;
-                ResetPitchLimits();
-            }
+                ResetProjectStateForNewSong();
             //viewWidthT = (int)(ViewWidthQn * notes.TicksPerBeat);
             return true;
+        }
+
+        /// <summary>
+        /// Clears per-project state (keyframes, lyrics, offsets, position, pitch limits) when a new
+        /// song replaces the current one. Assumes <see cref="_notes"/> is already assigned, because
+        /// setting Props.PlaybackOffsetS fires a callback that reads <c>_notes.TempoEvents[0]</c>.
+        /// </summary>
+        void ResetProjectStateForNewSong()
+        {
+            PropertyKeyframes = new Keyframes.KeyframeSet();
+            Props.LyricsSegments.Clear();
+            Keyframes.KeyframeService.RaiseKeyframesChanged();
+            Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
+            NormSongPos = 0;
+            ResetPitchLimits();
+        }
+
+        /// <summary>
+        /// Builds a synthetic, note-less <see cref="Midi.Song"/> for a pure-audio project. The song
+        /// carries only a tempo map (so timing works) and one empty <see cref="Midi.Track"/> per
+        /// project track; track names follow their audio filenames. On a fresh import (or erase) only
+        /// the global track exists; on reload the deserialized <see cref="_trackViews"/> drive the
+        /// track count and names.
+        /// </summary>
+        void OpenSyntheticSong(bool resetProject)
+        {
+            DrawHost?.Invalidate();
+            StopPlayback();
+            _pbTempoEvent = 0;
+            _pbTimeT = 0;
+            _pbTimeS = 0;
+
+            // Fresh Midi.Song leaves Tracks/TempoEvents null, so assign new lists explicitly (the
+            // collection-initializer form would NRE). Use the (int, double) tempo ctor: the (int, int)
+            // overload never assigns Tempo, which would make SecondsToTicks loop forever (bps == 0).
+            var song = new Midi.Song
+            {
+                TicksPerBeat = 480,
+                TempoEvents = new List<Midi.TempoEvent> { new Midi.TempoEvent(0, 120.0) },
+                Tracks = new List<Midi.Track>(),
+            };
+
+            // Track 0 is the empty global/master track (not rendered).
+            song.Tracks.Add(new Midi.Track { Name = "" });
+
+            // On reload, rebuild one track per deserialized track view. Name each by its TrackNumber
+            // (the track list is reorderable, so list position isn't the track index), using the
+            // saved audio filename; fall back to a generic name so names are never null.
+            if (!resetProject && _trackViews != null && _trackViews.Count > 0)
+            {
+                int trackCount = _trackViews.Max(tv => tv.TrackNumber) + 1;
+                while (song.Tracks.Count < trackCount)
+                    song.Tracks.Add(new Midi.Track());
+
+                foreach (var tv in _trackViews)
+                {
+                    if (tv.TrackNumber <= 0) continue;
+                    string fn = tv.TrackProps.AudioProps.Filename;
+                    song.Tracks[tv.TrackNumber].Name = !string.IsNullOrWhiteSpace(fn)
+                        ? Path.GetFileNameWithoutExtension(fn)
+                        : $"Track {tv.TrackNumber}";
+                }
+            }
+
+            _notes = song;
+            _notes.CreateNoteBsp();
+
+            if (resetProject)
+                ResetProjectStateForNewSong();
         }
 
         public void OpenAudioFile(ImportOptions options)
@@ -767,6 +846,41 @@ namespace VisualMusic
             DrawHost?.WaveformPanel?.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
             if (view.TrackNumber == 1)
                 view.TrackProps.AudioProps.SidWizChannel.LoadDataAsync();
+        }
+
+        /// <summary>
+        /// Appends one new project track per audio file, naming each track after its filename and
+        /// assigning it as the track's audio. Returns the created track views (caller loads their
+        /// audio and refreshes the UI). Creating tracks changes the track count, so the caller must
+        /// reset the undo stack afterward (undo snapshots can't restore across track counts).
+        /// </summary>
+        public List<TrackView> AddAudioTracks(IReadOnlyList<string> files)
+        {
+            var created = new List<TrackView>();
+            if (_notes == null || files == null || files.Count == 0)
+                return created;
+
+            int start = _notes.Tracks.Count;
+            foreach (var file in files)
+                _notes.Tracks.Add(new Midi.Track
+                {
+                    Name = Path.GetFileNameWithoutExtension(file),
+                    Length = _notes.SongLengthT,
+                });
+
+            // Preferred over manual AddTrackView: updates TrackView.NumTracks (default hue spread),
+            // wires GlobalProps, and adds SidWiz channels to the live WaveformPanel.
+            CreateTrackViews(_notes.Tracks.Count, false);
+
+            for (int i = start; i < _notes.Tracks.Count; i++)
+            {
+                var tv = _trackViews.First(v => v.TrackNumber == i);
+                tv.TrackProps.AudioProps.Filename = files[i - start];
+                created.Add(tv);
+            }
+
+            InitPropertyAccessors();
+            return created;
         }
 
         public void CreateGeos(bool resetVertScale = true)

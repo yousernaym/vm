@@ -185,12 +185,6 @@ namespace VisualMusic.ViewModels
             {
                 if (Project == null) return;
                 var tracks = TrackList.Items.Skip(1).ToList();   // real tracks; Global is Items[0]
-                if (tracks.Count == 0)
-                {
-                    MetroMessageBox.Show("There are no tracks to assign audio files to.", Program.AppName,
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
 
                 var dlg = new Microsoft.Win32.OpenFileDialog
                 {
@@ -202,23 +196,45 @@ namespace VisualMusic.ViewModels
                 if (dlg.ShowDialog() != true || dlg.FileNames.Length == 0) return;
                 AppSettings.Instance.RememberFolder(dlg.FileNames[0], dir => AppSettings.Instance.TrackAudioFolder = dir);
 
+                // In an audio-only project this dialog is the track-creation UI, so default the
+                // per-file "create new track" checkboxes on. Note projects keep them off.
+                bool isAudioOnly = Project.ImportOptions?.NoteFileType == FileType.Audio;
+
                 var win = new Controls.AssignAudioFilesWindow(
-                    tracks.Select(t => t.Name).ToList(), dlg.FileNames)
+                    tracks.Select(t => t.Name).ToList(), dlg.FileNames, isAudioOnly)
                 {
                     Owner = Application.Current.MainWindow
                 };
-                if (win.ShowDialog() != true || win.Assignments.Count == 0) return;
+                if (win.ShowDialog() != true ||
+                    (win.Assignments.Count == 0 && win.NewTrackFiles.Count == 0)) return;
 
+                // Assign audio to existing tracks.
                 foreach (var kv in win.Assignments)
                     tracks[kv.Key].TrackView.TrackProps.AudioProps.Filename = kv.Value;
 
-                OnTrackListSelectionChanged();                 // refresh merged props
-                AddUndoItem("Assign track audio files");       // one undo step for the whole batch
-
-                // Load audio for exactly the assigned tracks (Global is selected, so
+                // Load audio for exactly the assigned + newly created tracks (Global is selected, so
                 // LoadSelectedTracksAudio can't be reused).
                 var targets = win.Assignments.Keys
                     .Select(i => tracks[i].TrackView.TrackProps.AudioProps).ToList();
+
+                // Create new tracks for the checked files.
+                bool createdTracks = win.NewTrackFiles.Count > 0;
+                if (createdTracks)
+                {
+                    var newViews = Project.AddAudioTracks(win.NewTrackFiles);
+                    targets.AddRange(newViews.Select(v => v.TrackProps.AudioProps));
+                    TrackList.Rebuild(Project);
+                }
+
+                OnTrackListSelectionChanged();                 // refresh merged props
+
+                if (createdTracks)
+                    // Track count changed → reset the undo baseline (after all Filenames are set, so
+                    // the baseline captures them). CopyPropsFrom can't restore across track counts.
+                    ResetUndoStack();
+                else
+                    AddUndoItem("Assign track audio files");   // one undo step for the whole batch
+
                 await Task.WhenAll(targets.Select(ap => ap.LoadAudioAsync()));
                 var failed = targets
                     .Select(ap => ap.SidWizChannel)
@@ -645,8 +661,9 @@ namespace VisualMusic.ViewModels
             {
                 // A MOD/SID/HVL project re-runs the external remuxer on load (unless its converted
                 // outputs are already cached), so show the same progress window a fresh import does.
+                // MIDI and audio-only projects rebuild in-process, so no progress window is needed.
                 if (tempProject.ImportOptions != null &&
-                    tempProject.ImportOptions.NoteFileType != FileType.Midi)
+                    tempProject.ImportOptions.NoteFileType is not (FileType.Midi or FileType.Audio))
                 {
                     if (!RunConversionBehindProgress((p, ct) => tempProject.LoadContent(p, ct)))
                     {
@@ -684,9 +701,12 @@ namespace VisualMusic.ViewModels
             var io = tempProject.ImportOptions;
             if (io != null)
             {
-                ImportSongWindow.UpdateSession(io.NoteFileType, erase: true,
-                    notePath: io.RawNotePath ?? "", audioPath: io.AudioPath ?? "", insTrack: io.InsTrack,
-                    trackAudio: io.TrackAudio);
+                if (io.NoteFileType == FileType.Audio)
+                    ImportAudioWindow.UpdateSession(io.AudioPath ?? "", erase: true);
+                else
+                    ImportSongWindow.UpdateSession(io.NoteFileType, erase: true,
+                        notePath: io.RawNotePath ?? "", audioPath: io.AudioPath ?? "", insTrack: io.InsTrack,
+                        trackAudio: io.TrackAudio);
             }
 
             _currentProjectPath = path;
@@ -955,6 +975,20 @@ namespace VisualMusic.ViewModels
             await DoImport(options);
         }
 
+        [RelayCommand]
+        async Task ImportAudio()
+        {
+            var dlg = new ImportAudioWindow { Owner = Application.Current.MainWindow };
+            if (dlg.ShowDialog() != true) return;
+
+            var options = new AudioImportOptions
+            {
+                AudioPath = dlg.AudioFilePath,
+                EraseCurrent = dlg.EraseCurrent,
+            };
+            await DoImport(options);
+        }
+
         /// <summary>
         /// For a SID import, shows the sub-song picker when the file has more than one
         /// sub-song and writes the chosen sub-song + its length into <paramref name="options"/>.
@@ -1056,11 +1090,12 @@ namespace VisualMusic.ViewModels
 
             try
             {
-                if (options.NoteFileType != FileType.Midi)
+                if (options.NoteFileType is not (FileType.Midi or FileType.Audio))
                 {
                     // MOD/SID are converted by the external remuxer.exe, which reports percentage
                     // progress on stdout. Run it behind the shared progress window so the user sees
-                    // the conversion advance and can cancel it.
+                    // the conversion advance and can cancel it. MIDI and audio-only imports take the
+                    // direct in-process path (no remuxer, no progress window).
                     if (!RunConversionBehindProgress((p, ct) => Project.ImportSong(options, p, ct)))
                         return;
                 }
@@ -1311,6 +1346,20 @@ namespace VisualMusic.ViewModels
         {
             if (Project == null) return;
             _undoItems.Add(desc, Project);
+            UpdateUndoRedo();
+        }
+
+        /// <summary>
+        /// Discards the undo history and captures the current project as a fresh baseline. Required
+        /// after any edit that changes the track count: undo snapshots share note data and restore
+        /// props by track position (CopyPropsFrom indexes source.TrackViews[i]), so replaying across
+        /// a different track count throws. Leaves the project dirty (no MarkSaved).
+        /// </summary>
+        void ResetUndoStack()
+        {
+            if (Project == null) return;
+            _undoItems.Clear();
+            _undoItems.Add("", Project);
             UpdateUndoRedo();
         }
 
