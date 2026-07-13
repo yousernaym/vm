@@ -27,13 +27,24 @@ namespace VisualMusic.Controls
             // Read the SID header (song count + default song). Use a shared-read open and
             // release it before the HVSC lookup, which reopens the same file.
             int defSong;
+            bool validSid;
             using (var f = File.Open(sidPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
+                // Magic must be "PSID" or "RSID"; otherwise this isn't a SID file (e.g. a stray HTML
+                // page) and the header fields below are meaningless — don't trust the sub-song count.
+                byte[] magic = new byte[4];
+                validSid = f.Read(magic, 0, 4) == 4 &&
+                           (magic[0] == 'P' || magic[0] == 'R') &&
+                           magic[1] == 'S' && magic[2] == 'I' && magic[3] == 'D';
+
                 f.Seek(0x0e, SeekOrigin.Begin);
                 NumSongs = (f.ReadByte() << 8) | f.ReadByte();
                 defSong = (f.ReadByte() << 8) | f.ReadByte();
             }
-            if (NumSongs < 1) NumSongs = 1;
+            // Per the SID spec the sub-song count is 1..256; clamp so a malformed file can't produce a
+            // bogus list. A non-SID file is treated as a single sub-song (import then fails cleanly).
+            if (!validSid || NumSongs < 1) NumSongs = 1;
+            else if (NumSongs > 256) NumSongs = 256;
             if (defSong < 1 || defSong > NumSongs) defSong = 1;
 
             string[] lengths = Hvsc.GetSongLengths(sidPath);

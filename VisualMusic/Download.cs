@@ -12,6 +12,12 @@ namespace VisualMusic
     public static class Download
     {
         const int MaxRedirects = 10;
+
+        // Some hosts (e.g. the exotica.org.uk SID browser) gate the first request behind a
+        // cookie-setting "Verifying..." HTML interstitial that returns 200 OK. The shared HttpClient
+        // stores the cookie it sets, so re-requesting a bounded number of times fetches the real file.
+        const int MaxVerifyRetries = 2;
+
         static readonly HttpClient Http = CreateHttpClient();
 
         /// <summary>
@@ -43,6 +49,7 @@ namespace VisualMusic
             Uri uri = new Uri(url);
             Uri referrer = new Uri(uri.GetLeftPart(UriPartial.Authority) + "/");
 
+            int verifyRetries = 0;
             for (int redirects = 0; redirects <= MaxRedirects; redirects++)
             {
                 using var request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -55,6 +62,16 @@ namespace VisualMusic
 
                 if (response.IsSuccessStatusCode || HasAttachmentDisposition(response))
                 {
+                    // A cookie-gate interstitial (see MaxVerifyRetries) returns an HTML body instead of
+                    // the file. Music downloads are always binary, so an HTML response means the file
+                    // wasn't served yet; the interstitial has now set its cookie (stored in the shared
+                    // HttpClient), so re-request the same URL rather than saving the HTML as the file.
+                    if (IsHtmlResponse(response) && verifyRetries++ < MaxVerifyRetries)
+                    {
+                        redirects--;   // a verification hop isn't a redirect; don't spend the budget
+                        continue;
+                    }
+
                     string fileName = GetDownloadFileName(response, uri.ToString());
                     string path = Path.Combine(Program.TempDir, fileName);
                     await WriteContentAsync(response, path, progress, cancelToken);
@@ -139,6 +156,13 @@ namespace VisualMusic
             }
 
             return contentDisposition?.IndexOf("attachment", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        static bool IsHtmlResponse(HttpResponseMessage response)
+        {
+            string mediaType = response.Content.Headers.ContentType?.MediaType;
+            return mediaType != null &&
+                   mediaType.Equals("text/html", StringComparison.OrdinalIgnoreCase);
         }
 
         static bool IsRedirect(HttpResponseMessage response)
