@@ -76,6 +76,43 @@ namespace LibSidWiz
         private int[] _frameTriggers;
         private bool _framePrepared;
 
+        /// <summary>Channels found active by the last PrepareFrame, in track order. Read-only; do not mutate.</summary>
+        public IReadOnlyList<Channel> ActiveThisFrame => _activeThisFrame;
+
+        // When set, RenderPreparedFrame draws only the active channels also in this set (used to split
+        // the active channels across two side-by-side strips). null => draw every active channel.
+        private HashSet<Channel> _renderFilter;
+        private readonly List<Channel> _renderVisibleScratch = new List<Channel>();
+
+        /// <summary>Restrict which active channels this renderer draws (null = all). The set is copied.</summary>
+        public void SetRenderFilter(IReadOnlyList<Channel> channels)
+        {
+            if (channels == null) { _renderFilter = null; return; }
+            if (_renderFilter == null) _renderFilter = new HashSet<Channel>();
+            else _renderFilter.Clear();
+            for (int i = 0; i < channels.Count; ++i)
+                _renderFilter.Add(channels[i]);
+        }
+
+        /// <summary>
+        /// Adopt the active set and triggers computed by another renderer over the SAME channel list
+        /// (identical references, identical order), so a second strip can render without recomputing
+        /// activity/triggers. Pair with <see cref="SetRenderFilter"/> to pick this strip's channels.
+        /// </summary>
+        public void CopyPreparedFrom(WaveformRenderer src)
+        {
+            if (_frameData == null)
+                Init();
+            EnsurePerFrameCachesInitialized(0, Math.Max(1, SamplingRate / Math.Max(1, FramesPerSecond)));
+            if (_frameTriggers == null || _frameTriggers.Length != _channels.Count)
+                _frameTriggers = new int[_channels.Count];
+            if (src._frameTriggers != null)
+                Array.Copy(src._frameTriggers, _frameTriggers, Math.Min(_frameTriggers.Length, src._frameTriggers.Length));
+            _activeThisFrame.Clear();
+            _activeThisFrame.AddRange(src._activeThisFrame);
+            _framePrepared = true;
+        }
+
         // Activity detection knobs
         public float ActivityThreshold = 0.004f;   // ~ -48 dBFS; tweak
         public int ActivityWindowSamplesOverride = 0; // 0 => use ViewWidthInSamples
@@ -226,12 +263,25 @@ namespace LibSidWiz
             if (!_framePrepared)
                 return _frameData;
 
-            // === If active set changed (or template invalid), rebuild layout + template ===
-            string sig = string.Join("-", _activeThisFrame.Select(c => _channels.IndexOf(c)));
+            // The active set may be split across two strips; draw only our assigned channels.
+            List<Channel> visibleNow;
+            if (_renderFilter == null)
+                visibleNow = _activeThisFrame;
+            else
+            {
+                _renderVisibleScratch.Clear();
+                foreach (var ch in _activeThisFrame)
+                    if (_renderFilter.Contains(ch))
+                        _renderVisibleScratch.Add(ch);
+                visibleNow = _renderVisibleScratch;
+            }
+
+            // === If visible set changed (or template invalid), rebuild layout + template ===
+            string sig = string.Join("-", visibleNow.Select(c => _channels.IndexOf(c)));
             if (_templateDirty || sig != _visibleSignature)
             {
                 _visibleSignature = sig;
-                _visible = _activeThisFrame.ToList();
+                _visible = visibleNow.ToList();
                 RebuildLayoutAndTemplateForVisible(_visible);
                 _templateDirty = false;
             }

@@ -34,6 +34,15 @@ namespace VisualMusic
         private Strip _rightStrip;
         private bool _dirty = true;
 
+        private enum Side { Left, Right }
+        // Persistent per-channel side assignment: a channel keeps its side while it sounds, so greedy
+        // balancing only ever places a NEWLY-active channel on the currently-emptier side.
+        private readonly Dictionary<Channel, Side> _side = new Dictionary<Channel, Side>();
+        private readonly List<Channel> _leftAssigned = new List<Channel>();
+        private readonly List<Channel> _rightAssigned = new List<Channel>();
+        private readonly List<Channel> _sideRemoveScratch = new List<Channel>();
+        private readonly HashSet<Channel> _activeSetScratch = new HashSet<Channel>();
+
         // Cached config used to detect changes that require a Reconfigure().
         private bool _cfgLeft;
         private bool _cfgRight;
@@ -77,16 +86,45 @@ namespace VisualMusic
                 || vp.Width != _cfgVpW || vp.Height != _cfgVpH)
                 Reconfigure(left, right, widthFrac, vp.Width, vp.Height);
 
-            // Phase 1: compute each side's active channel set, then give both renderers the same
-            // slot count so track heights always match (the side with fewer active tracks leaves
-            // its bottom slots empty).
-            int slots = 0;
-            if (_leftStrip != null)
-                slots = _leftStrip.Renderer.PrepareFrame(songPosS);
-            if (_rightStrip != null)
-                slots = System.Math.Max(slots, _rightStrip.Renderer.PrepareFrame(songPosS));
-            // When every channel is silent this frame (slots == 0), still lay out one slot so each
-            // strip draws its full-height dark overlay instead of vanishing.
+            // Phase 1: compute the active channel set ONCE. Both strips hold every channel, so the
+            // authority strip runs activity/trigger detection and the other reuses its result — the
+            // two sides can't disagree about which channels are active or where they trigger.
+            var authority = _leftStrip?.Renderer ?? _rightStrip?.Renderer;
+            if (authority == null)
+                return;
+            authority.PrepareFrame(songPosS);
+            var active = authority.ActiveThisFrame;
+            if (_leftStrip != null && _rightStrip != null)
+                _rightStrip.Renderer.CopyPreparedFrom(_leftStrip.Renderer);
+
+            // Phase 2: split the active channels across the two sides. A newly-appearing channel goes
+            // to whichever side currently has fewer waveforms and stays there while it sounds, so the
+            // sides stay balanced without existing waveforms hopping from one side to the other.
+            int leftCount, rightCount;
+            if (_leftStrip != null && _rightStrip != null)
+            {
+                AssignSides(active);
+                _leftAssigned.Clear();
+                _rightAssigned.Clear();
+                foreach (var ch in active)
+                    (_side[ch] == Side.Left ? _leftAssigned : _rightAssigned).Add(ch);
+                _leftStrip.Renderer.SetRenderFilter(_leftAssigned);
+                _rightStrip.Renderer.SetRenderFilter(_rightAssigned);
+                leftCount = _leftAssigned.Count;
+                rightCount = _rightAssigned.Count;
+            }
+            else
+            {
+                // Only one side visible: it shows every active channel, no balancing needed.
+                _leftStrip?.Renderer.SetRenderFilter(null);
+                _rightStrip?.Renderer.SetRenderFilter(null);
+                leftCount = rightCount = active.Count;
+            }
+
+            // Give both renderers the same slot count so track heights match across the two sides
+            // (the sparser side leaves its bottom slots empty). When every channel is silent this
+            // frame, still lay out one slot so each strip draws its full-height dark overlay.
+            int slots = System.Math.Max(leftCount, rightCount);
             if (slots == 0 && (_leftStrip != null || _rightStrip != null))
                 slots = 1;
             if (_leftStrip != null)
@@ -102,6 +140,41 @@ namespace VisualMusic
             DrawStrip(_leftStrip, fade, bgAlpha);
             DrawStrip(_rightStrip, fade, bgAlpha);
             _spriteBatch.End();
+        }
+
+        // Update _side for this frame: drop channels that went silent (freeing their slot), then give
+        // each newly-active channel (in track order) to the side that currently holds fewer waveforms.
+        void AssignSides(IReadOnlyList<Channel> active)
+        {
+            _activeSetScratch.Clear();
+            for (int i = 0; i < active.Count; ++i)
+                _activeSetScratch.Add(active[i]);
+
+            int lc = 0, rc = 0;
+            if (_side.Count > 0)
+            {
+                _sideRemoveScratch.Clear();
+                foreach (var kv in _side)
+                {
+                    if (!_activeSetScratch.Contains(kv.Key))
+                        _sideRemoveScratch.Add(kv.Key);
+                    else if (kv.Value == Side.Left)
+                        lc++;
+                    else
+                        rc++;
+                }
+                foreach (var ch in _sideRemoveScratch)
+                    _side.Remove(ch);
+            }
+
+            for (int i = 0; i < active.Count; ++i)
+            {
+                var ch = active[i];
+                if (_side.ContainsKey(ch))
+                    continue;
+                if (lc <= rc) { _side[ch] = Side.Left; lc++; }
+                else { _side[ch] = Side.Right; rc++; }
+            }
         }
 
         void DrawStrip(Strip strip, float fade, float bgAlpha)
@@ -139,26 +212,18 @@ namespace VisualMusic
             if (stripW <= 0)
                 return;
 
-            // Distribute channels: one side visible -> all on it; both -> alternate (i even = left).
-            var leftChannels = new List<Channel>();
-            var rightChannels = new List<Channel>();
-            for (int i = 0; i < _channels.Count; i++)
-            {
-                if (left && right)
-                    (i % 2 == 0 ? leftChannels : rightChannels).Add(_channels[i]);
-                else if (left)
-                    leftChannels.Add(_channels[i]);
-                else
-                    rightChannels.Add(_channels[i]);
-            }
+            // Both strips hold EVERY channel; which side actually draws a given active channel is
+            // decided per-frame in Draw (greedy balancing). Stale side assignments from the previous
+            // strip pair no longer apply.
+            _side.Clear();
 
             // Both strips span the full viewport height; per-frame row layout (uniform track
             // heights across the two sides, empty slots at the bottom of the sparser side) is
             // handled inside WaveformRenderer via LayoutSlots — see Draw().
             if (left)
-                _leftStrip = BuildStrip(leftChannels, new Rectangle(0, 0, stripW, vpH), stripW, vpH);
+                _leftStrip = BuildStrip(_channels, new Rectangle(0, 0, stripW, vpH), stripW, vpH);
             if (right)
-                _rightStrip = BuildStrip(rightChannels, new Rectangle(vpW - stripW, 0, stripW, vpH), stripW, vpH);
+                _rightStrip = BuildStrip(_channels, new Rectangle(vpW - stripW, 0, stripW, vpH), stripW, vpH);
         }
 
         Strip BuildStrip(List<Channel> channels, Rectangle rect, int stripW, int stripH)
