@@ -169,6 +169,15 @@ namespace VisualMusic
             return s ?? AudioProps.DefaultSilenceThresholdS;
         }
 
+        /// <summary>Effective waveform time window (ms) for a track: own value, else global track's, else default.</summary>
+        public float EffectiveWaveformViewWidthMs(TrackProps tp)
+        {
+            float? ms = tp?.AudioProps?.WaveformViewWidthMs;
+            if (ms == null && _trackViews != null && _trackViews.Count > 0)
+                ms = GlobalTrackProps.AudioProps?.WaveformViewWidthMs;
+            return ms ?? AudioProps.DefaultViewWidthMs;
+        }
+
         public float ViewWidthT => _notes == null ? 0 : GlobalViewWidthQn * _notes.TicksPerBeat; //Number of ticks that fits on screen
         public float TrackViewWidthT(TrackProps tp)
             => _notes == null ? 0 : EffectiveViewWidthQn(tp) * _notes.TicksPerBeat;
@@ -304,8 +313,13 @@ namespace VisualMusic
                         {
                             tv.TrackProps.AudioProps.LineColor = tv.TrackProps.MaterialProps.GetSysColor(true, tv.TrackProps.GlobalProps.MaterialProps);
                         }
-                        else if (tv.TrackProps.AudioProps.SilenceThresholdS == null)
-                            tv.TrackProps.AudioProps.SilenceThresholdS = AudioProps.DefaultSilenceThresholdS;
+                        else
+                        {
+                            if (tv.TrackProps.AudioProps.SilenceThresholdS == null)
+                                tv.TrackProps.AudioProps.SilenceThresholdS = AudioProps.DefaultSilenceThresholdS;
+                            if (tv.TrackProps.AudioProps.WaveformViewWidthMs == null)
+                                tv.TrackProps.AudioProps.WaveformViewWidthMs = AudioProps.DefaultViewWidthMs;
+                        }
                     }
                 }
 
@@ -862,6 +876,8 @@ namespace VisualMusic
             view.TrackProps.GlobalProps = TrackViews[0].TrackProps;
             if (view.TrackNumber == 0 && view.TrackProps.AudioProps.SilenceThresholdS == null)
                 view.TrackProps.AudioProps.SilenceThresholdS = AudioProps.DefaultSilenceThresholdS;
+            if (view.TrackNumber == 0 && view.TrackProps.AudioProps.WaveformViewWidthMs == null)
+                view.TrackProps.AudioProps.WaveformViewWidthMs = AudioProps.DefaultViewWidthMs;
             view.TrackProps.AudioProps.LineColor = view.TrackProps.MaterialProps.GetSysColor(true, view.TrackProps.GlobalProps.MaterialProps);
             view.TrackProps.AudioProps.SidWizChannel.Filename = "";
             DrawHost?.WaveformPanel?.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
@@ -983,23 +999,35 @@ namespace VisualMusic
         /// <summary>
         /// Pushes each track's current highlighted material color into its SidWiz channel so the
         /// waveform overlay follows hue changes from keyframes (and live edits), including changes
-        /// to the global track's hue. Also pushes the effective silence threshold (per-track
-        /// override, else the global track's value).
+        /// to the global track's hue. Also pushes the effective silence threshold and waveform view
+        /// width (per-track override, else the global track's value, else the hardcoded default).
         /// </summary>
         void RefreshSidWizChannels()
         {
             float globalThreshold = GlobalTrackProps.AudioProps.SilenceThresholdS
                 ?? AudioProps.DefaultSilenceThresholdS;
+            float? globalViewMs = GlobalTrackProps.AudioProps.WaveformViewWidthMs;
             for (int t = 1; t < _trackViews.Count; t++)
             {
                 var tp = _trackViews[t].TrackProps;
+                var ch = tp.AudioProps.SidWizChannel;
                 var color = tp.MaterialProps.GetSysColor(true, GlobalTrackProps.MaterialProps);
                 if (tp.AudioProps.LineColor.ToArgb() != color.ToArgb())
                     tp.AudioProps.LineColor = color;
-                if (tp.AudioProps.SidWizChannel.LineWidth != Props.AudioVisLineWidth)
-                    tp.AudioProps.SidWizChannel.LineWidth = Props.AudioVisLineWidth;
-                tp.AudioProps.SidWizChannel.ActivityLookaheadSeconds =
+                if (ch.LineWidth != Props.AudioVisLineWidth)
+                    ch.LineWidth = Props.AudioVisLineWidth;
+                ch.ActivityLookaheadSeconds =
                     tp.AudioProps.SilenceThresholdS ?? globalThreshold;
+
+                // Waveform time window (horizontal zoom): own value → global → default.
+                // Only applied once the sample rate is known (audio loaded); nothing renders before that.
+                float viewMs = tp.AudioProps.WaveformViewWidthMs ?? globalViewMs ?? AudioProps.DefaultViewWidthMs;
+                if (ch.SampleRate > 0)
+                {
+                    int targetSamples = System.Math.Max(1, (int)(viewMs / 1000 * ch.SampleRate));
+                    if (ch.ViewWidthInSamples != targetSamples)
+                        ch.ViewWidthInSamples = targetSamples;
+                }
             }
         }
 
@@ -1080,7 +1108,8 @@ namespace VisualMusic
             {
                 Filename = outProps.AudioProps.Filename,
                 LineColor = outProps.AudioProps.LineColor,
-                SilenceThresholdS = outProps.AudioProps.SilenceThresholdS
+                SilenceThresholdS = outProps.AudioProps.SilenceThresholdS,
+                WaveformViewWidthMs = outProps.AudioProps.WaveformViewWidthMs
             };
             for (int i = 1; i < list.Count; i++)
                 outProps = (TrackProps)MergeObjects(outProps, TrackViews[list[i]].TrackProps);
@@ -1707,6 +1736,10 @@ namespace VisualMusic
                     () => EffectiveSilenceThresholdS(tv.TrackProps),
                     v => tv.TrackProps.AudioProps.SilenceThresholdS = (float)v);
                     // no needsRebuild — the effective threshold feeds the waveform via RefreshSidWizChannels
+                _propAccessors[$"{prefix}/WaveformViewWidthMs"] = PropAccessor.Scalar(
+                    () => EffectiveWaveformViewWidthMs(tv.TrackProps),
+                    v => tv.TrackProps.AudioProps.WaveformViewWidthMs = (float)v,
+                    logScale: true);   // zoom feels natural on a log scale; fed to the channel via RefreshSidWizChannels
             }
         }
 
@@ -2090,6 +2123,7 @@ namespace VisualMusic
                 // its undoable values are restored from the snapshot. The effective silence
                 // threshold is re-pushed by RefreshSidWizChannels.
                 destProps.AudioProps.SilenceThresholdS = sourceProps.AudioProps.SilenceThresholdS;
+                destProps.AudioProps.WaveformViewWidthMs = sourceProps.AudioProps.WaveformViewWidthMs;
                 // Reload audio only for tracks whose filename actually changed, so ordinary
                 // undo/redo steps stay cheap.
                 string oldFn = destProps.AudioProps.Filename ?? "";

@@ -889,6 +889,16 @@ namespace VisualMusic
         /// </summary>
         public float? SilenceThresholdS { get; set; }
 
+        /// <summary>Default/fallback waveform time window, in ms (used to seed the global track).</summary>
+        public const float DefaultViewWidthMs = 15.0f;
+
+        /// <summary>
+        /// Waveform time window in milliseconds (horizontal zoom): smaller = zoom in, larger = zoom out.
+        /// Null = inherit the global track's value; when that is also null
+        /// <see cref="DefaultViewWidthMs"/> is used.
+        /// </summary>
+        public float? WaveformViewWidthMs { get; set; }
+
         public AudioProps()
         {
 
@@ -910,6 +920,8 @@ namespace VisualMusic
                 }
                 else if (entry.Name == "silenceThreshold" && entry.Value != null)
                     SilenceThresholdS = Convert.ToSingle(entry.Value);
+                else if (entry.Name == "waveformViewWidthMs" && entry.Value != null)
+                    WaveformViewWidthMs = Convert.ToSingle(entry.Value);
             }
         }
 
@@ -918,6 +930,8 @@ namespace VisualMusic
             info.AddValue("audioFile", SidWizChannel.Filename);
             if (SilenceThresholdS != null)
                 info.AddValue("silenceThreshold", SilenceThresholdS.Value);
+            if (WaveformViewWidthMs != null)
+                info.AddValue("waveformViewWidthMs", WaveformViewWidthMs.Value);
         }
 
         public async Task LoadAudioAsync()

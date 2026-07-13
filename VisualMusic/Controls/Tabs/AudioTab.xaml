@@ -34,5 +34,15 @@
                           kf:Keyframing.PropertyId="SilenceThreshold"
                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                           kf:Keyframing.Interpolatable="True"/>
+
+        <TextBlock Text="Waveform view width (ms)" FontWeight="SemiBold" Margin="0,12,0,4"/>
+        <ctrl:TbSliderWpf Margin="2"
+                          Value="{Binding WaveformViewWidthMs, Mode=TwoWay}"
+                          Min="1" Max="100" Decimals="1" SmallChange="1"
+                          AllowEmpty="True"
+                          ToolTip="Waveform time window in milliseconds (horizontal zoom): smaller = zoom in, larger = zoom out. Empty = use the global track's value."
+                          kf:Keyframing.PropertyId="WaveformViewWidthMs"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="True"/>
     </StackPanel>
 </UserControl>

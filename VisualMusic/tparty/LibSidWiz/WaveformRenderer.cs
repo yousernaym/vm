@@ -244,6 +244,11 @@ namespace LibSidWiz
                 foreach (var ch in _visible)
                 {
                     int idx = _channels.IndexOf(ch);
+                    // ViewWidthInSamples can change at runtime (waveform zoom), so keep the reused
+                    // point buffer sized to it — RenderWave writes one point per sample.
+                    int need = Math.Max(1, ch.ViewWidthInSamples);
+                    if (_pointsPerChannel[idx].Length != need)
+                        _pointsPerChannel[idx] = new PointF[need];
                     RenderWave(g, ch, _frameTriggers[idx], _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
                 }
             }

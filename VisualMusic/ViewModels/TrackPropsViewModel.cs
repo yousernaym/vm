@@ -137,6 +137,7 @@ namespace VisualMusic.ViewModels
             // Audio
             OnPropertyChanged(nameof(AudioFilename));
             OnPropertyChanged(nameof(SilenceThreshold));
+            OnPropertyChanged(nameof(WaveformViewWidthMs));
         }
 
         /// <summary>
@@ -227,6 +228,7 @@ namespace VisualMusic.ViewModels
 
             // Audio
             OnPropertyChanged(nameof(SilenceThreshold));
+            OnPropertyChanged(nameof(WaveformViewWidthMs));
         }
 
         // =====================================================================
@@ -922,6 +924,23 @@ namespace VisualMusic.ViewModels
                     Apply(tp => tp.AudioProps.SilenceThresholdS = null);
                 else if (value >= 0)
                     Apply(tp => tp.AudioProps.SilenceThresholdS = (float)value.Value);
+            }
+        }
+
+        /// <summary>
+        /// Waveform time window in milliseconds (horizontal zoom); empty = inherit the global track's
+        /// value (which, when also empty, falls back to the hardcoded default window). Same string/blank
+        /// semantics as <see cref="SilenceThreshold"/>.
+        /// </summary>
+        public double? WaveformViewWidthMs
+        {
+            get => _mergedProps?.AudioProps?.WaveformViewWidthMs;
+            set
+            {
+                if (value == null)
+                    Apply(tp => tp.AudioProps.WaveformViewWidthMs = null);
+                else if (value > 0)
+                    Apply(tp => tp.AudioProps.WaveformViewWidthMs = (float)value.Value);
             }
         }
 
