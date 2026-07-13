@@ -634,8 +634,9 @@ namespace VisualMusic
         }
 
         /// <summary>
-        /// Clears per-project state (keyframes, lyrics, offsets, position, pitch limits) when a new
-        /// song replaces the current one. Assumes <see cref="_notes"/> is already assigned, because
+        /// Clears per-project state (keyframes, lyrics, offsets, position, pitch limits, and the
+        /// project-visual settings: camera, background image, audio visualization) when a new song
+        /// replaces the current one. Assumes <see cref="_notes"/> is already assigned, because
         /// setting Props.PlaybackOffsetS fires a callback that reads <c>_notes.TempoEvents[0]</c>.
         /// </summary>
         void ResetProjectStateForNewSong()
@@ -646,6 +647,23 @@ namespace VisualMusic
             Props.AudioOffset = Props.PlaybackOffsetS = Props.FadeIn = Props.FadeOut = 0;
             NormSongPos = 0;
             ResetPitchLimits();
+
+            // Reset the project-visual settings so they don't carry over from the previous song. A
+            // throwaway ProjProps supplies the defaults so the literals aren't duplicated here. The
+            // camera keeps its live ViewportSize/XYRatio (renderer-owned) — only Pos/Orientation/Fov
+            // reset, mirroring the Reset Camera command. The background texture is unloaded by the
+            // import path's LoadStaticBackgroundIfUnkeyframed once BackgroundImagePath is cleared.
+            var defaults = new ProjProps();
+            Props.Camera.Pos = defaults.Camera.Pos;
+            Props.Camera.Orientation = defaults.Camera.Orientation;
+            Props.Camera.Fov = defaults.Camera.Fov;
+            Props.BackgroundImagePath = defaults.BackgroundImagePath;
+            Props.BackgroundImageOpacity = defaults.BackgroundImageOpacity;
+            Props.BackgroundImageSaturation = defaults.BackgroundImageSaturation;
+            Props.AudioVisLeft = defaults.AudioVisLeft;
+            Props.AudioVisRight = defaults.AudioVisRight;
+            Props.AudioVisWidth = defaults.AudioVisWidth;
+            Props.AudioVisLineWidth = defaults.AudioVisLineWidth;
         }
 
         /// <summary>

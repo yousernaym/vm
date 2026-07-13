@@ -1152,6 +1152,9 @@ namespace VisualMusic.ViewModels
 
             OnProjectLoaded?.Invoke(Project);
             LoadStaticBackgroundIfUnkeyframed(Project);
+            // The project object is reused across an erase-import, so the Song-props panel bindings
+            // are stale (OnProjectChanged didn't fire). Push the reset values to the panel.
+            SongProps.RefreshAll();
 
             // Refresh audio-dependent CanExecute (HasAudio depends on Media.getAudioLength()).
             OnPropertyChanged(nameof(HasAudio));
