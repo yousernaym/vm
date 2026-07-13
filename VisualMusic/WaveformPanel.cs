@@ -43,11 +43,15 @@ namespace VisualMusic
 
         GraphicsDevice _gfxDevice;
         SpriteBatch _spriteBatch;
+        Texture2D _pixel;   // 1x1 white texture used to draw the dark backdrop as its own layer
 
         internal void Init(GraphicsDevice gfxDevice, SpriteBatch spriteBatch)
         {
             _gfxDevice = gfxDevice;
             _spriteBatch = spriteBatch;
+            _pixel?.Dispose();
+            _pixel = new Texture2D(gfxDevice, 1, 1);
+            _pixel.SetData(new[] { Microsoft.Xna.Framework.Color.White });
             _dirty = true;
         }
 
@@ -58,7 +62,9 @@ namespace VisualMusic
 
         internal void Draw(double songPosS, float fade, bool left, bool right, float widthFrac, float opacity)
         {
-            if (songPosS < 0 || fade <= 0 || (!left && !right) || widthFrac <= 0 || opacity <= 0)
+            // Note: opacity is NOT part of this guard — it only dims the backdrop, so the waveforms
+            // still draw (fully opaque) even at opacity 0.
+            if (songPosS < 0 || fade <= 0 || (!left && !right) || widthFrac <= 0)
                 return;
             if (!_channels.Exists(c => !string.IsNullOrEmpty(c.Filename)))
                 return;
@@ -88,23 +94,28 @@ namespace VisualMusic
             if (_rightStrip != null)
                 _rightStrip.Renderer.LayoutSlots = slots;
 
-            // Opacity scales the whole overlay on top of the song fade; because the strip texture is
-            // premultiplied BGRA, multiplying the draw color fades waveforms and background together.
-            float alpha = fade * opacity;
+            // The backdrop is a separate layer faded by both the song fade and the AudioVisOpacity
+            // slider; the waveform texture is drawn on top at full opacity (song fade only) so the
+            // waveforms stay 100% opaque regardless of the opacity setting.
+            float bgAlpha = fade * opacity;
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-            DrawStrip(_leftStrip, alpha);
-            DrawStrip(_rightStrip, alpha);
+            DrawStrip(_leftStrip, fade, bgAlpha);
+            DrawStrip(_rightStrip, fade, bgAlpha);
             _spriteBatch.End();
         }
 
-        void DrawStrip(Strip strip, float fade)
+        void DrawStrip(Strip strip, float fade, float bgAlpha)
         {
             if (strip == null || strip.Tex == null)
                 return;
+            // Dark backdrop behind the waveforms (the texture itself has a transparent background),
+            // drawn first and dimmed by the opacity slider. Color.Black * a is premultiplied black.
+            if (bgAlpha > 0)
+                _spriteBatch.Draw(_pixel, strip.Rect, Microsoft.Xna.Framework.Color.Black * bgAlpha);
             var pixels = strip.Renderer.RenderPreparedFrame();
             strip.Tex.SetData(pixels);
-            // The texture is premultiplied BGRA, so scaling the whole color by the fade factor
-            // fades both the waveforms and the semi-transparent background correctly.
+            // Waveforms (premultiplied BGRA, transparent background) at full opacity — only the song
+            // fade applies, never the opacity slider.
             _spriteBatch.Draw(strip.Tex, strip.Rect, Microsoft.Xna.Framework.Color.White * fade);
         }
 
@@ -164,9 +175,9 @@ namespace VisualMusic
                 Height = stripH,
                 Columns = 1,
                 RenderingBounds = new System.Drawing.Rectangle(0, 0, stripW, stripH),
-                // Fully opaque backdrop so the overlay is solid at opacity 1; the AudioVisOpacity
-                // slider (applied per-frame in DrawStrip) fades the whole strip down from there.
-                BackgroundColor = System.Drawing.Color.FromArgb(255, 0, 0, 0),
+                // Transparent baked background: the dark backdrop is drawn as its own layer in
+                // DrawStrip (dimmed by AudioVisOpacity), so the texture holds only the waveforms.
+                BackgroundColor = System.Drawing.Color.Transparent,
                 FramesPerSecond = UiFps,
             };
             foreach (var ch in channels)
@@ -193,6 +204,8 @@ namespace VisualMusic
         {
             _leftStrip?.Dispose();
             _rightStrip?.Dispose();
+            _pixel?.Dispose();
+            _pixel = null;
         }
 
         internal void RemoveChannel(Channel sidWizChannel)
