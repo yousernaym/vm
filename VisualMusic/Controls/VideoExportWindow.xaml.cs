@@ -57,7 +57,7 @@ namespace VisualMusic.Controls
             int qualIdx = Math.Max(0, Math.Min(options.VideoQualityLoss, qualityLossCombo.Items.Count - 1));
             qualityLossCombo.SelectedIndex = qualIdx;
 
-            fpsUd.Value = options.Fps;
+            fpsSlider.Value = options.Fps;
         }
 
         void UpdateResoItems()
@@ -175,11 +175,14 @@ namespace VisualMusic.Controls
             Options.VideoQualityLoss = qualityLossCombo.SelectedIndex;
         }
 
-        void FpsUd_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double?> e)
+        void FpsSlider_ValueChanged(object sender, EventArgs e)
         {
-            if (Options == null || !e.NewValue.HasValue) return;
-            Options.Fps = (float)e.NewValue.Value;
+            if (Options == null || !fpsSlider.Value.HasValue) return;
+            Options.Fps = (float)fpsSlider.Value.Value;
         }
+
+        void RevertDefaults_Click(object sender, RoutedEventArgs e)
+            => SetOptions(new VideoExportOptions());
 
         void Ok_Click(object sender, RoutedEventArgs e)
         {
