@@ -193,16 +193,12 @@ namespace VisualMusic
 
         public void Update(double deltaTime)
         {
-            Vector3 mouseRotVel = new Vector3();
-            if (MouseRot)
-            {
-                if (Project.StaticDrawHost?.LeftMbPressed == true)
-                    mouseRotVel.Z = rotSpeed;
-                if (Project.StaticDrawHost?.RightMbPressed == true)
-                    mouseRotVel.Z = -rotSpeed;
-            }
+            // Mouse-look roll comes from actual mouse movement while the left button is held
+            // (see SongRenderer.HandleMouseMove -> ApplyMouseRot); it must NOT be applied here as a
+            // constant per-frame velocity, or the camera would keep rotating while the button is held
+            // still. Only keyboard-driven velocities (_rotVel/_moveVel) are integrated per frame.
             Pos += Vector3.Transform(_moveVel, RotMat) * (float)deltaTime;
-            Vector3 scaledRotVel = (_rotVel + mouseRotVel) * (float)deltaTime;
+            Vector3 scaledRotVel = _rotVel * (float)deltaTime;
             Orientation = Orientation * Quaternion.CreateFromYawPitchRoll(scaledRotVel.Y, scaledRotVel.X, scaledRotVel.Z);
             if (Vector3.Zero != _moveVel || Vector3.Zero != scaledRotVel)
                 OnUserUpdating?.Invoke();
