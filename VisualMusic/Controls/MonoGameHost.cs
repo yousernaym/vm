@@ -132,6 +132,29 @@ namespace VisualMusic
         Stopwatch _clock = new Stopwatch();
         TimeSpan _oldTime;
 
+        // ---- Live-loop suspension ----
+        // While a modal blocking dialog (conversion/download progress) is open, the app runs a
+        // nested message loop. If this 120fps timer keeps ticking it does a vsync-locked Present
+        // on the UI thread every frame, which pins the message pump and breaks Alt+Tab away from
+        // the app while the dialog is up. Suspending the loop for the dialog's lifetime (the same
+        // way video export short-circuits it via IsRenderingVideo) keeps Alt+Tab responsive.
+        static int s_suspendCount;
+
+        /// <summary>Pauses the live render loop until the returned token is disposed.</summary>
+        public static IDisposable SuspendLiveLoop() => new LoopSuspension();
+
+        sealed class LoopSuspension : IDisposable
+        {
+            bool _released;
+            public LoopSuspension() => System.Threading.Interlocked.Increment(ref s_suspendCount);
+            public void Dispose()
+            {
+                if (_released) return;
+                _released = true;
+                System.Threading.Interlocked.Decrement(ref s_suspendCount);
+            }
+        }
+
         // ---- Public ----
         public SongRenderer Renderer { get; private set; }
 
@@ -202,7 +225,9 @@ namespace VisualMusic
             // While a background video export owns the GraphicsDevice, skip the live game loop —
             // the modal export dialog keeps this timer ticking, and a concurrent Draw on the same
             // device from this (UI) thread corrupts its state mid-render.
-            if (Renderer.IsRenderingVideo) return;
+            // Also skip while a modal progress dialog has suspended the loop (see SuspendLiveLoop):
+            // a vsync-locked Present each tick would otherwise starve the pump and break Alt+Tab.
+            if (Renderer.IsRenderingVideo || s_suspendCount > 0) return;
 
             Renderer.Update(dt);
             RenderNow();

@@ -101,6 +101,10 @@ namespace VisualMusic.Controls
         bool _finished;
         bool _cancelRequested;   // guard against re-entrancy in RequestCancel()
 
+        // Pause the live 120fps render loop while this modal dialog is up. The nested message loop
+        // plus a vsync-locked Present each tick would otherwise pin the pump and break Alt+Tab.
+        IDisposable _liveLoopSuspension;
+
         // ---- Constructor ----
 
         /// <param name="titlePrefix">Window title before the percentage suffix is appended.</param>
@@ -120,7 +124,9 @@ namespace VisualMusic.Controls
 
             DataContext = this;
             InitializeComponent();
+            _liveLoopSuspension = MonoGameHost.SuspendLiveLoop();
             Loaded += OnLoaded;
+            Closed += (_, _) => _liveLoopSuspension?.Dispose();
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
