@@ -38,7 +38,7 @@
                               kf:Keyframing.PropertyId="MinPitch"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="False"/>
-            <Button Content="Reset pitches" HorizontalAlignment="Left"
+            <Button Content="_Reset pitches" HorizontalAlignment="Left"
                     Margin="0,0,0,8" Click="ResetPitches_Click"/>
 
             <TextBlock Text="Camera" FontWeight="SemiBold" Margin="0,0,0,4"/>
@@ -54,11 +54,11 @@
                      kf:Keyframing.Interpolatable="True"/>
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                <Button Content="Load background" Click="LoadBkg_Click"
+                <Button Content="Load _background" Click="LoadBkg_Click"
                         kf:Keyframing.PropertyId="BackgroundImagePath"
                         kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                         kf:Keyframing.Interpolatable="True"/>
-                <Button Content="Unload" Margin="4,0,0,0" Click="UnloadBkg_Click"
+                <Button Content="_Unload" Margin="4,0,0,0" Click="UnloadBkg_Click"
                         kf:Keyframing.PropertyId="BackgroundImagePath"
                         kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                         kf:Keyframing.Interpolatable="True"/>
