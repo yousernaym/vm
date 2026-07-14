@@ -711,6 +711,9 @@ namespace VisualMusic
                 }
 
                 _isRenderingVideo = true;
+                // Export frames must be frame-exact: render waveforms inline on this thread instead
+                // of the live loop's async worker (which draws the latest *finished* frame).
+                WaveformPanel.Synchronous = true;
                 RenderTarget2D[] rt32 = new RenderTarget2D[2];
                 RenderTargetCube rtCube = null;
                 RenderTarget2D rt8 = null;
@@ -786,6 +789,7 @@ namespace VisualMusic
                 finally
                 {
                     Project = backup;
+                    WaveformPanel.Synchronous = false;
                     EndVideoRender();
                     rtCube?.Dispose();
                     for (int i = 0; i < 2; i++) rt32[i]?.Dispose();
