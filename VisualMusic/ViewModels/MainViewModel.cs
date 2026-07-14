@@ -285,6 +285,7 @@ namespace VisualMusic.ViewModels
                         nonGlobal?.IndexOf(item.TrackView) ?? 0, hueCount);
                 Keyframes.KeyframeService.CaptureDefaultMaterialAtCurrentTick(affected);
                 Project?.CreateGeos();
+                TrackList.RefreshColors(); // update the normal/hilited swatches in the track list
                 OnTrackListSelectionChanged();
                 AddUndoItem("Reset material");
             };

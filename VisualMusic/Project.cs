@@ -582,7 +582,7 @@ namespace VisualMusic
                     ? ImportOptions.AudioPath : ImportOptions.NotePath;
                 DefaultFileName = Path.GetFileName(sourceName) + "." + DefaultFileExt;
             }
-            CreateTrackViews(_notes.Tracks.Count, resetProject);
+            CreateTrackViews(_notes.Tracks.Count, resetProject, options.IsProjectLoad);
             InitPropertyAccessors();
             return true;
         }
@@ -817,7 +817,15 @@ namespace VisualMusic
             //}
         }
 
-        public void CreateTrackViews(int numTracks, bool eraseCurrent)
+        /// <param name="preserveTrackSet">
+        /// When true (project load), the deserialized <see cref="_trackViews"/> are authoritative: note
+        /// data is re-wired for the existing views but no extra views are created for note-file tracks
+        /// absent from the saved set. Without this, re-parsing the note file (which still contains every
+        /// original track) would resurrect tracks the user had removed before saving — the model is
+        /// sparse for middle removals, but trailing removals leave <c>Max(TrackNumber)+1 &lt; numTracks</c>,
+        /// so the "add new tracks" loop below would recreate them.
+        /// </param>
+        public void CreateTrackViews(int numTracks, bool eraseCurrent, bool preserveTrackSet = false)
         {
             TrackView.NumTracks = numTracks;
             int startTrack; //At which index to start creating new (default) track props
@@ -852,12 +860,13 @@ namespace VisualMusic
                 // If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
                 _trackViews[i].TrackProps.StyleProps.LoadFx();
             }
-            for (int i = startTrack; i < numTracks; i++)
-            {
-                //New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
-                TrackView view = new TrackView(i, numTracks, _notes);
-                AddTrackView(view);
-            }
+            if (!preserveTrackSet)
+                for (int i = startTrack; i < numTracks; i++)
+                {
+                    //New note file has more tracks than current project or we're creating a new project. Create new track props for the new tracks.
+                    TrackView view = new TrackView(i, numTracks, _notes);
+                    AddTrackView(view);
+                }
             //if (startTrack >= numTracks && numTracks > 0)  //New note file has fewer tracks than current song. Remove the extra trackViews.
             //trackViews.RemoveRange(numTracks, startTrack - numTracks);
             List<TrackView> tvCopy = new List<TrackView>();
@@ -867,6 +876,9 @@ namespace VisualMusic
                     tvCopy.Add(_trackViews[i]);
             }
             _trackViews = tvCopy;
+            // Keep the static count in sync with the actual view set (it can be < numTracks when
+            // preserveTrackSet drops trailing note-file tracks that were removed before saving).
+            TrackView.NumTracks = _trackViews.Count;
             CreateGeos(false);
         }
 
