@@ -136,6 +136,7 @@ namespace VisualMusic.ViewModels
 
             // Audio
             OnPropertyChanged(nameof(AudioFilename));
+            OnPropertyChanged(nameof(Label));
             OnPropertyChanged(nameof(SilenceThreshold));
             OnPropertyChanged(nameof(WaveformViewWidthMs));
         }
@@ -884,6 +885,23 @@ namespace VisualMusic.ViewModels
                 OnPropertyChanged();
                 _ = LoadSelectedTracksAudio?.Invoke();
                 Keyframes.KeyframeService.RaiseUndoSnapshot("Set track audio");
+            }
+        }
+
+        /// <summary>
+        /// Caption drawn above the selected track(s)' waveform. Blank shows no text. Committed on
+        /// LostFocus (see AudioTab.xaml), so one undo item per edit. Blank when selected tracks differ.
+        /// </summary>
+        public string Label
+        {
+            get => _mergedProps?.AudioProps?.Label ?? "";
+            set
+            {
+                value = value ?? "";
+                if (value == Label) return;
+                Apply(tp => tp.AudioProps.Label = value);
+                OnPropertyChanged();
+                Keyframes.KeyframeService.RaiseUndoSnapshot("Set track audio label");
             }
         }
 

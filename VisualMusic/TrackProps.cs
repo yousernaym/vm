@@ -901,11 +901,24 @@ namespace VisualMusic
         public LibSidWiz.Channel SidWizChannel { get; } = new LibSidWiz.Channel(false)
         {
             Algorithm = new PeakSpeedTrigger(),
+            // Label rendered above the waveform (top-centered). The font is (re)created per output
+            // resolution in Project.RefreshSidWizChannels; colour/alignment are fixed here. A blank
+            // label draws nothing, so the default (empty) shows no text.
+            LabelColor = System.Drawing.Color.White,
+            LabelAlignment = System.Drawing.ContentAlignment.TopCenter,
+            LabelMargins = new LibSidWiz.Padding(4, 4, 4, 4),
         };
         public string Filename
         {
             get => SidWizChannel.Filename;
             set => SidWizChannel.Filename = value;
+        }
+
+        /// <summary>User-supplied caption rendered above this track's waveform. Blank by default.</summary>
+        public string Label
+        {
+            get => SidWizChannel.Label;
+            set => SidWizChannel.Label = value ?? "";
         }
 
         public System.Drawing.Color LineColor { get => SidWizChannel.LineColor; set => SidWizChannel.LineColor = value; }
@@ -948,6 +961,8 @@ namespace VisualMusic
                     SidWizChannel.Filename = (string)entry.Value;
                     //SidWizChannel.LoadDataAsync();
                 }
+                else if (entry.Name == "audioLabel" && entry.Value != null)
+                    SidWizChannel.Label = (string)entry.Value;
                 else if (entry.Name == "silenceThreshold" && entry.Value != null)
                     SilenceThresholdS = Convert.ToSingle(entry.Value);
                 else if (entry.Name == "waveformViewWidthMs" && entry.Value != null)
@@ -958,6 +973,8 @@ namespace VisualMusic
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
             info.AddValue("audioFile", SidWizChannel.Filename);
+            if (!string.IsNullOrEmpty(SidWizChannel.Label))
+                info.AddValue("audioLabel", SidWizChannel.Label);
             if (SilenceThresholdS != null)
                 info.AddValue("silenceThreshold", SilenceThresholdS.Value);
             if (WaveformViewWidthMs != null)

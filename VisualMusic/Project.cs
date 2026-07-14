@@ -1028,6 +1028,15 @@ namespace VisualMusic
                     tp.AudioProps.LineColor = color;
                 if (ch.LineWidth != Props.AudioVisLineWidth)
                     ch.LineWidth = Props.AudioVisLineWidth;
+
+                // Label font scales with the output height so the caption stays proportional across
+                // resolutions (preview vs export). Recreated only when the height actually changes.
+                float labelPx = System.Math.Max(8f, (ch.Renderer?.Height ?? 1080) / 30f);
+                if (ch.LabelFont == null || System.Math.Abs(ch.LabelFont.Size - labelPx) > 0.5f)
+                {
+                    ch.LabelFont?.Dispose();
+                    ch.LabelFont = new System.Drawing.Font("Arial", labelPx, System.Drawing.GraphicsUnit.Pixel);
+                }
                 ch.ActivityLookaheadSeconds =
                     tp.AudioProps.SilenceThresholdS ?? globalThreshold;
 
@@ -1119,6 +1128,7 @@ namespace VisualMusic
             outProps.AudioProps = new AudioProps
             {
                 Filename = outProps.AudioProps.Filename,
+                Label = outProps.AudioProps.Label,
                 LineColor = outProps.AudioProps.LineColor,
                 SilenceThresholdS = outProps.AudioProps.SilenceThresholdS,
                 WaveformViewWidthMs = outProps.AudioProps.WaveformViewWidthMs
@@ -2136,6 +2146,7 @@ namespace VisualMusic
                 // threshold is re-pushed by RefreshSidWizChannels.
                 destProps.AudioProps.SilenceThresholdS = sourceProps.AudioProps.SilenceThresholdS;
                 destProps.AudioProps.WaveformViewWidthMs = sourceProps.AudioProps.WaveformViewWidthMs;
+                destProps.AudioProps.Label = sourceProps.AudioProps.Label;
                 // Reload audio only for tracks whose filename actually changed, so ordinary
                 // undo/redo steps stay cheap.
                 string oldFn = destProps.AudioProps.Filename ?? "";

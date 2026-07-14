@@ -277,7 +277,9 @@ namespace LibSidWiz
             }
 
             // === If visible set changed (or template invalid), rebuild layout + template ===
-            string sig = string.Join("-", visibleNow.Select(c => _channels.IndexOf(c)));
+            // Include each channel's label so editing a caption (baked into the template) rebuilds it
+            // even while the same set of channels stays visible.
+            string sig = string.Join("-", visibleNow.Select(c => _channels.IndexOf(c) + ":" + c.Label));
             if (_templateDirty || sig != _visibleSignature)
             {
                 _visibleSignature = sig;

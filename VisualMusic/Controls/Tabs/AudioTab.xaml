@@ -18,6 +18,10 @@
                 <Button Content="_Clear" Width="72" Margin="4,0,0,0" Click="RemoveBtn_Click"
                         ToolTip="Clear the audio file path of the selected track(s)."/>
             </StackPanel>
+            <TextBlock Text="Label" FontWeight="SemiBold" Margin="0,12,0,4"/>
+            <TextBox Text="{Binding Label, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     Margin="0,0,0,4"
+                     ToolTip="Text drawn above this track's waveform. Leave blank for no label."/>
         </StackPanel>
         <!-- Global-only selection: batch assignment across all tracks -->
         <StackPanel Visibility="{Binding IsOnlyGlobalSelected, Converter={StaticResource BoolVis}}">
