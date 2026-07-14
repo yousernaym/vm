@@ -132,7 +132,8 @@ namespace VisualMusic
             AudioProps.SilenceThresholdS = isGlobal ? AudioProps.DefaultSilenceThresholdS : null;
             AudioProps.WaveformViewWidthMs = isGlobal ? AudioProps.DefaultViewWidthMs : null;
             AudioProps.TriggerAlgorithmName = isGlobal ? AudioProps.TriggerAlgorithms[0].Type.Name : null;
-            AudioProps.TriggerLookaheadFrames = isGlobal ? 0 : (int?)null;
+            AudioProps.TriggerLookaheadFrames = isGlobal ? AudioProps.DefaultTriggerLookahead : (int?)null;
+            AudioProps.TriggerLookaheadOnFailureFrames = isGlobal ? AudioProps.DefaultTriggerLookaheadOnFailure : (int?)null;
         }
 
         public TrackProps Clone(ISongDrawHost host = null)
@@ -938,11 +939,28 @@ namespace VisualMusic
         /// </summary>
         public string TriggerAlgorithmName { get; set; }
 
+        /// <summary>Default/fallback normal trigger lookahead (used to seed the global track).</summary>
+        public const int DefaultTriggerLookahead = 0;
+
         /// <summary>
         /// Frames the trigger may look ahead (helps low-frequency channels find a stable sync point).
-        /// Null = inherit the global track's value; when that is also null, 0 is used.
+        /// Null = inherit the global track's value; when that is also null,
+        /// <see cref="DefaultTriggerLookahead"/> is used.
         /// </summary>
         public int? TriggerLookaheadFrames { get; set; }
+
+        /// <summary>Default/fallback on-failure trigger lookahead (matches the LibSidWiz Channel default).</summary>
+        public const int DefaultTriggerLookaheadOnFailure = 2;
+
+        /// <summary>
+        /// Frames the trigger may look ahead when the normal lookahead finds no trigger at all
+        /// (e.g. a bass wave whose period is longer than the frame). Unlike
+        /// <see cref="TriggerLookaheadFrames"/>, this wider search only runs on failure frames, so
+        /// it steadies low-frequency channels without the choppiness a large always-on lookahead
+        /// causes. Null = inherit the global track's value; when that is also null,
+        /// <see cref="DefaultTriggerLookaheadOnFailure"/> is used.
+        /// </summary>
+        public int? TriggerLookaheadOnFailureFrames { get; set; }
         public string Filename
         {
             get => SidWizChannel.Filename;
@@ -1006,6 +1024,8 @@ namespace VisualMusic
                     TriggerAlgorithmName = (string)entry.Value;
                 else if (entry.Name == "triggerLookahead" && entry.Value != null)
                     TriggerLookaheadFrames = Convert.ToInt32(entry.Value);
+                else if (entry.Name == "triggerLookaheadOnFailure" && entry.Value != null)
+                    TriggerLookaheadOnFailureFrames = Convert.ToInt32(entry.Value);
             }
         }
 
@@ -1022,6 +1042,8 @@ namespace VisualMusic
                 info.AddValue("triggerAlgorithm", TriggerAlgorithmName);
             if (TriggerLookaheadFrames != null)
                 info.AddValue("triggerLookahead", TriggerLookaheadFrames.Value);
+            if (TriggerLookaheadOnFailureFrames != null)
+                info.AddValue("triggerLookaheadOnFailure", TriggerLookaheadOnFailureFrames.Value);
         }
 
         public async Task LoadAudioAsync()

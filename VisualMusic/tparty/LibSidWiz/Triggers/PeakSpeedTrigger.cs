@@ -1,49 +1,91 @@
-﻿namespace LibSidWiz.Triggers
+using System;
+using System.Collections.Generic;
+
+namespace LibSidWiz.Triggers
 {
     /// <summary>
-    /// Finds the positive edge which most quickly reaches the peak value in the sample range.
-    /// This is implemented in a slightly complicated way to make it do it with a single pass over the samples,
-    /// you could implement it as:
-    /// 1. Find first zero crossing
-    /// 2. Find max sample value after that
-    /// 4. Select the zero crossing closest to a following max value
-    /// This algorithm is based code from オップナー2608.
-    /// This algorithm can show good stability for waves which cross the zero point more than once.
+    /// Finds positive edges followed by a near-maximal peak, and among those picks the one closest
+    /// to where the previous trigger would land after advancing one frame (previousIndex +
+    /// frameSamples). Preferring the expected position keeps the view advancing at playback speed
+    /// even when the search window spans several frames (trigger lookahead): selecting purely by
+    /// peak height would pin the trigger to the same loud transient for several consecutive frames
+    /// and then leap past it, making the animation choppy.
+    /// Like the original single-pass peak-speed algorithm (based on code from オップナー2608), this
+    /// stays stable for waves which cross the zero point more than once per cycle.
     /// </summary>
     public class PeakSpeedTrigger : ITriggerAlgorithm
     {
-        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int previousIndex)
+        // Crossings whose following peak is at least this fraction of the window's best peak count
+        // as equally valid sync points; the tie is broken by proximity to the expected position.
+        private const float PeakTolerance = 0.7f;
+
+        // Reused across frames to avoid per-frame allocations; safe because triggers run
+        // sequentially on the render thread (WaveformRenderer.PrepareFrame).
+        private readonly List<KeyValuePair<int, float>> _candidates = new List<KeyValuePair<int, float>>();
+
+        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int frameSamples, int previousIndex)
         {
-            float peakValue = float.MinValue;
-            int shortestDistance = int.MaxValue;
-            int result = -1;
+            _candidates.Clear();
+            float maxPeak = float.MinValue;
+
             int i = startIndex;
             while (i < endIndex)
             {
                 // First find a positive edge crossing zero
-                while (channel.GetSample(i) > 0 && i < endIndex) ++i;
-                while (channel.GetSample(i) <= 0 && i < endIndex) ++i;
-                // Remember this point
-                int lastCrossing = i;
-                // Now move forward looking for a peak
-                for (var sample = channel.GetSample(i); sample > 0 && i < endIndex; ++i)
+                while (i < endIndex && channel.GetSample(i) > 0) ++i;
+                while (i < endIndex && channel.GetSample(i) <= 0) ++i;
+                if (i >= endIndex)
                 {
-                    if (sample > peakValue)
+                    break;
+                }
+
+                int crossing = i;
+                // Measure the peak of the positive run following the crossing
+                float peak = 0;
+                for (; i < endIndex; ++i)
+                {
+                    var sample = channel.GetSample(i);
+                    if (sample <= 0)
                     {
-                        // It's a new high
-                        peakValue = sample;
-                        result = lastCrossing;
-                        shortestDistance = i - lastCrossing;
-                    }
-                    // ReSharper disable once CompareOfFloatsByEqualityOperator
-                    else if (sample == peakValue && (i - lastCrossing) < shortestDistance)
-                    {
-                        // It's equal to the best peak but closer to the crossing point
-                        result = lastCrossing;
-                        shortestDistance = i - lastCrossing;
+                        break;
                     }
 
-                    sample = channel.GetSample(i);
+                    if (sample > peak)
+                    {
+                        peak = sample;
+                    }
+                }
+
+                _candidates.Add(new KeyValuePair<int, float>(crossing, peak));
+                if (peak > maxPeak)
+                {
+                    maxPeak = peak;
+                }
+            }
+
+            if (_candidates.Count == 0)
+            {
+                return -1;
+            }
+
+            // Among the crossings with a near-maximal peak, pick the one nearest the expected
+            // position so consecutive frames advance the view by ~frameSamples.
+            int expected = previousIndex + frameSamples;
+            float threshold = maxPeak * PeakTolerance;
+            int result = -1;
+            long bestDistance = long.MaxValue;
+            foreach (var candidate in _candidates)
+            {
+                if (candidate.Value < threshold)
+                {
+                    continue;
+                }
+
+                long distance = Math.Abs((long)candidate.Key - expected);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    result = candidate.Key;
                 }
             }
 

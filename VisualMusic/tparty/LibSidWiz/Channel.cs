@@ -626,12 +626,12 @@ namespace LibSidWiz
         internal int GetTriggerPoint(int frameIndexSamples, int frameSamples, int previousTriggerPoint)
         {
             // Try at default settings
-            var result = Algorithm.GetTriggerPoint(this, frameIndexSamples, frameIndexSamples + frameSamples * (TriggerLookaheadFrames + 1), previousTriggerPoint);
+            var result = Algorithm.GetTriggerPoint(this, frameIndexSamples, frameIndexSamples + frameSamples * (TriggerLookaheadFrames + 1), frameSamples, previousTriggerPoint);
 
             if (result < frameIndexSamples)
             {
                 // Try again
-                result = Algorithm.GetTriggerPoint(this, frameIndexSamples, frameIndexSamples + frameSamples * (TriggerLookaheadOnFailureFrames + 1), previousTriggerPoint);
+                result = Algorithm.GetTriggerPoint(this, frameIndexSamples, frameIndexSamples + frameSamples * (TriggerLookaheadOnFailureFrames + 1), frameSamples, previousTriggerPoint);
             }
 
             if (result < frameIndexSamples)

@@ -8,7 +8,7 @@ namespace LibSidWiz.Triggers
     // ReSharper disable once UnusedType.Global
     internal class BiggestPositiveWaveAreaTrigger : ITriggerAlgorithm
     {
-        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int previousIndex)
+        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int frameSamples, int previousIndex)
         {
             int bestOffset = -1;
             int lastCrossingPoint = endIndex;

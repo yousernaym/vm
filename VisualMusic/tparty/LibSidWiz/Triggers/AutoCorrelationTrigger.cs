@@ -11,7 +11,7 @@ namespace LibSidWiz.Triggers
     {
         private float[] _normalDistribution;
 
-        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int previousIndex)
+        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int frameSamples, int previousIndex)
         {
             var width = endIndex - startIndex;
             if (_normalDistribution == null || _normalDistribution.Length != width)

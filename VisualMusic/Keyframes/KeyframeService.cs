@@ -135,6 +135,9 @@ namespace VisualMusic.Keyframes
             ("ViewWidthQn",               KfScope.Track,    "Viewport width"),
             ("SilenceThreshold",          KfScope.Track,    "Silence threshold"),
             ("WaveformViewWidthMs",       KfScope.Track,    "Waveform view width"),
+            ("TriggerAlgorithmIndex",     KfScope.Track,    "Trigger sync"),
+            ("TriggerLookahead",          KfScope.Track,    "Trigger lookahead"),
+            ("TriggerLookaheadOnFailure", KfScope.Track,    "Trigger lookahead on failure"),
             ("ModXOriginEnable",          KfScope.TrackMod, "Mod origin X enable"),
             ("ModXOrigin",                KfScope.TrackMod, "Mod origin X"),
             ("ModYOriginEnable",          KfScope.TrackMod, "Mod origin Y enable"),
@@ -225,6 +228,7 @@ namespace VisualMusic.Keyframes
             ("WaveformViewWidthMs",   KfScope.Track),
             ("TriggerAlgorithmIndex", KfScope.Track),
             ("TriggerLookahead",      KfScope.Track),
+            ("TriggerLookaheadOnFailure", KfScope.Track),
         };
 
         /// <summary>Returns a friendly label for a full property id (e.g. "track/2/LineWidth").</summary>

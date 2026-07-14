@@ -6,7 +6,7 @@
     // ReSharper disable once UnusedType.Global
     internal class NullTrigger : ITriggerAlgorithm
     {
-        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int previousIndex)
+        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int frameSamples, int previousIndex)
         {
             return startIndex;
         }

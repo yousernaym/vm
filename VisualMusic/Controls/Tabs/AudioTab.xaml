@@ -59,7 +59,7 @@
             <ComboBoxItem Content="Default"
                           ToolTip="Use the global track's setting. On the global track itself this selects Peak speed."/>
             <ComboBoxItem Content="Peak speed"
-                          ToolTip="Locks to the rising zero crossing that reaches the wave's peak fastest. Stays stable even when the wave crosses zero several times per cycle — a good general-purpose default."/>
+                          ToolTip="Locks to a rising zero crossing followed by a near-maximal peak, preferring the one that keeps the view advancing smoothly. Stays stable even when the wave crosses zero several times per cycle — a good general-purpose default."/>
             <ComboBoxItem Content="Rising edge"
                           ToolTip="Classic oscilloscope trigger: the first negative-to-positive zero crossing. Good for clean, simple waveforms (square/pulse, triangle); can jitter on waves with multiple zero crossings per cycle."/>
             <ComboBoxItem Content="Auto-correlation"
@@ -83,6 +83,16 @@
                           AllowEmpty="True"
                           ToolTip="Frames the trigger may look ahead to find a stable sync point; helps low-frequency (bass) channels. Empty = use the global track's value."
                           kf:Keyframing.PropertyId="TriggerLookahead"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="False"/>
+
+        <TextBlock Text="Trigger lookahead on failure (frames)" FontWeight="SemiBold" Margin="0,12,0,4"/>
+        <ctrl:TbSliderWpf Margin="2"
+                          Value="{Binding TriggerLookaheadOnFailureFrames, Mode=TwoWay}"
+                          Min="0" Max="8" Decimals="0" SmallChange="1"
+                          AllowEmpty="True"
+                          ToolTip="Wider lookahead used only on frames where the normal lookahead finds no trigger (e.g. bass waves longer than a frame). Steadies low-frequency channels without the choppiness of a large always-on lookahead. Empty = use the global track's value (default 2)."
+                          kf:Keyframing.PropertyId="TriggerLookaheadOnFailure"
                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                           kf:Keyframing.Interpolatable="False"/>
     </StackPanel>

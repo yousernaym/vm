@@ -9,7 +9,7 @@
     /// </summary>
     internal class RisingEdgeTrigger : ITriggerAlgorithm
     {
-        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int previousIndex)
+        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int frameSamples, int previousIndex)
         {
             // We step through the sample and select the first negative -> positive transition
             int result = startIndex;

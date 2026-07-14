@@ -196,6 +196,15 @@ namespace VisualMusic
             return f ?? 0;
         }
 
+        /// <summary>Effective on-failure trigger lookahead frames for a track: own value, else global track's, else the hardcoded default.</summary>
+        public int EffectiveTriggerLookaheadOnFailure(TrackProps tp)
+        {
+            int? f = tp?.AudioProps?.TriggerLookaheadOnFailureFrames;
+            if (f == null && _trackViews != null && _trackViews.Count > 0)
+                f = GlobalTrackProps.AudioProps?.TriggerLookaheadOnFailureFrames;
+            return f ?? AudioProps.DefaultTriggerLookaheadOnFailure;
+        }
+
         public float ViewWidthT => _notes == null ? 0 : GlobalViewWidthQn * _notes.TicksPerBeat; //Number of ticks that fits on screen
         public float TrackViewWidthT(TrackProps tp)
             => _notes == null ? 0 : EffectiveViewWidthQn(tp) * _notes.TicksPerBeat;
@@ -337,6 +346,10 @@ namespace VisualMusic
                                 tv.TrackProps.AudioProps.SilenceThresholdS = AudioProps.DefaultSilenceThresholdS;
                             if (tv.TrackProps.AudioProps.WaveformViewWidthMs == null)
                                 tv.TrackProps.AudioProps.WaveformViewWidthMs = AudioProps.DefaultViewWidthMs;
+                            if (tv.TrackProps.AudioProps.TriggerLookaheadFrames == null)
+                                tv.TrackProps.AudioProps.TriggerLookaheadFrames = AudioProps.DefaultTriggerLookahead;
+                            if (tv.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames == null)
+                                tv.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames = AudioProps.DefaultTriggerLookaheadOnFailure;
                         }
                     }
                 }
@@ -912,6 +925,10 @@ namespace VisualMusic
                 view.TrackProps.AudioProps.SilenceThresholdS = AudioProps.DefaultSilenceThresholdS;
             if (view.TrackNumber == 0 && view.TrackProps.AudioProps.WaveformViewWidthMs == null)
                 view.TrackProps.AudioProps.WaveformViewWidthMs = AudioProps.DefaultViewWidthMs;
+            if (view.TrackNumber == 0 && view.TrackProps.AudioProps.TriggerLookaheadFrames == null)
+                view.TrackProps.AudioProps.TriggerLookaheadFrames = AudioProps.DefaultTriggerLookahead;
+            if (view.TrackNumber == 0 && view.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames == null)
+                view.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames = AudioProps.DefaultTriggerLookaheadOnFailure;
             view.TrackProps.AudioProps.LineColor = view.TrackProps.MaterialProps.GetSysColor(true, view.TrackProps.GlobalProps.MaterialProps);
             view.TrackProps.AudioProps.SidWizChannel.Filename = "";
             DrawHost?.WaveformPanel?.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
@@ -1068,6 +1085,9 @@ namespace VisualMusic
                 int lookahead = EffectiveTriggerLookahead(tp);
                 if (ch.TriggerLookaheadFrames != lookahead)
                     ch.TriggerLookaheadFrames = lookahead;
+                int lookaheadOnFailure = EffectiveTriggerLookaheadOnFailure(tp);
+                if (ch.TriggerLookaheadOnFailureFrames != lookaheadOnFailure)
+                    ch.TriggerLookaheadOnFailureFrames = lookaheadOnFailure;
 
                 // Fill under the waveform in the track colour, at the global opacity (0 = no fill).
                 int fillAlpha = (int)(Props.AudioVisFillOpacity * 255);
@@ -1189,7 +1209,8 @@ namespace VisualMusic
                 SilenceThresholdS = outProps.AudioProps.SilenceThresholdS,
                 WaveformViewWidthMs = outProps.AudioProps.WaveformViewWidthMs,
                 TriggerAlgorithmName = outProps.AudioProps.TriggerAlgorithmName,
-                TriggerLookaheadFrames = outProps.AudioProps.TriggerLookaheadFrames
+                TriggerLookaheadFrames = outProps.AudioProps.TriggerLookaheadFrames,
+                TriggerLookaheadOnFailureFrames = outProps.AudioProps.TriggerLookaheadOnFailureFrames
             };
             for (int i = 1; i < list.Count; i++)
                 outProps = (TrackProps)MergeObjects(outProps, TrackViews[list[i]].TrackProps);
@@ -1857,6 +1878,10 @@ namespace VisualMusic
                     () => EffectiveTriggerLookahead(tv.TrackProps),
                     v => tv.TrackProps.AudioProps.TriggerLookaheadFrames = (int)Math.Round(v),
                     alwaysHold: true);   // integer frame count; fed to the channel via RefreshSidWizChannels
+                _propAccessors[$"{prefix}/TriggerLookaheadOnFailure"] = PropAccessor.Scalar(
+                    () => EffectiveTriggerLookaheadOnFailure(tv.TrackProps),
+                    v => tv.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames = (int)Math.Round(v),
+                    alwaysHold: true);   // integer frame count; fed to the channel via RefreshSidWizChannels
             }
         }
 
@@ -2243,6 +2268,7 @@ namespace VisualMusic
                 destProps.AudioProps.WaveformViewWidthMs = sourceProps.AudioProps.WaveformViewWidthMs;
                 destProps.AudioProps.TriggerAlgorithmName = sourceProps.AudioProps.TriggerAlgorithmName;
                 destProps.AudioProps.TriggerLookaheadFrames = sourceProps.AudioProps.TriggerLookaheadFrames;
+                destProps.AudioProps.TriggerLookaheadOnFailureFrames = sourceProps.AudioProps.TriggerLookaheadOnFailureFrames;
                 destProps.AudioProps.Label = sourceProps.AudioProps.Label;
                 // Reload audio only for tracks whose filename actually changed, so ordinary
                 // undo/redo steps stay cheap.

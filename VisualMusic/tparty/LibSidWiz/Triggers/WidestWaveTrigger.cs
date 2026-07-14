@@ -7,7 +7,7 @@
     // ReSharper disable once UnusedType.Global
     internal class WidestWaveTrigger : ITriggerAlgorithm
     {
-        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int previousIndex)
+        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int frameSamples, int previousIndex)
         {
             int bestOffset = -1;
             int lastCrossingPoint = endIndex;

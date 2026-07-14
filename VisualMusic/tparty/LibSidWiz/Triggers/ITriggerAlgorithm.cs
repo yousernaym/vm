@@ -8,8 +8,11 @@
         /// <param name="channel">Channel object holding samples</param>
         /// <param name="startIndex">Index of start of frame for analysis</param>
         /// <param name="endIndex">Index of end of frame for analysis</param>
+        /// <param name="frameSamples">Samples per rendered frame; previousIndex + frameSamples is where
+        /// the trigger would land if the view advanced perfectly smoothly (endIndex - startIndex may
+        /// span several frames when lookahead is enabled)</param>
         /// <param name="previousIndex">Index of previously found trigger</param>
         /// <returns>Index of the trigger point, should be between startIndex and endIndex. Return -1 for failure.</returns>
-        int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int previousIndex);
+        int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int frameSamples, int previousIndex);
     }
 }

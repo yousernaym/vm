@@ -141,6 +141,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(WaveformViewWidthMs));
             OnPropertyChanged(nameof(TriggerAlgorithmIndex));
             OnPropertyChanged(nameof(TriggerLookaheadFrames));
+            OnPropertyChanged(nameof(TriggerLookaheadOnFailureFrames));
         }
 
         /// <summary>
@@ -234,6 +235,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(WaveformViewWidthMs));
             OnPropertyChanged(nameof(TriggerAlgorithmIndex));
             OnPropertyChanged(nameof(TriggerLookaheadFrames));
+            OnPropertyChanged(nameof(TriggerLookaheadOnFailureFrames));
         }
 
         // =====================================================================
@@ -1018,6 +1020,24 @@ namespace VisualMusic.ViewModels
                     Apply(tp => tp.AudioProps.TriggerLookaheadFrames = null);
                 else if (value >= 0)
                     Apply(tp => tp.AudioProps.TriggerLookaheadFrames = (int)value.Value);
+            }
+        }
+
+        /// <summary>
+        /// Trigger lookahead used only on frames where the normal lookahead finds no trigger;
+        /// empty = inherit the global track's value (which, when also empty, falls back to
+        /// <see cref="AudioProps.DefaultTriggerLookaheadOnFailure"/>). Same string/blank semantics
+        /// as <see cref="SilenceThreshold"/>.
+        /// </summary>
+        public double? TriggerLookaheadOnFailureFrames
+        {
+            get => _mergedProps?.AudioProps?.TriggerLookaheadOnFailureFrames;
+            set
+            {
+                if (value == null)
+                    Apply(tp => tp.AudioProps.TriggerLookaheadOnFailureFrames = null);
+                else if (value >= 0)
+                    Apply(tp => tp.AudioProps.TriggerLookaheadOnFailureFrames = (int)value.Value);
             }
         }
 
