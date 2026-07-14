@@ -92,12 +92,29 @@ namespace VisualMusic.Controls
 
         void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            // Ctrl+A → select all. Handled here so the gesture works regardless of which child has focus.
-            // Exact-match modifiers so Ctrl+Shift+A (Import audio) isn't swallowed while the list has focus.
+            // These fire whenever keyboard focus is anywhere inside the list (the ListView itself
+            // or a row) — clicking empty space focuses the ListView (see OnPreviewMouseLeftButtonDown),
+            // so a selection can be acted on without a specific row holding focus.
+
+            // Ctrl+A → select all. Exact-match modifiers so Ctrl+Shift+A (Import audio) isn't swallowed.
             if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control)
             {
                 trackListView.SelectAll();
                 e.Handled = true;
+                return;
+            }
+
+            // Del → remove selected tracks. Same guard as the context menu's Remove item:
+            // needs a selection and must not include Global (track 0, which is pinned).
+            if (e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.None &&
+                DataContext is TrackListViewModel vm)
+            {
+                bool hasGlobal = vm.SelectedItems.Any(it => it.TrackView.TrackNumber == 0);
+                if (vm.SelectedItems.Count >= 1 && !hasGlobal)
+                {
+                    vm.RemoveSelectedTracks?.Invoke();
+                    e.Handled = true;
+                }
             }
         }
 
@@ -116,6 +133,13 @@ namespace VisualMusic.Controls
             _dragStart = e.GetPosition(null);
             _dragItem = HitTestItem(e.GetPosition(trackListView));
             _deferSelectionToMouseUp = false;
+
+            // Clicking empty space (below the rows) doesn't focus the ListView on its own, so key
+            // gestures handled here (Ctrl+A, Del) wouldn't fire. Give the list keyboard focus so an
+            // existing selection can be acted on after clicking anywhere in the panel. A click on a
+            // row focuses that row normally, so only do this for empty space.
+            if (_dragItem == null)
+                trackListView.Focus();
 
             // Explorer-style: clicking an already-selected row must not change the selection on
             // mouse-down — defer it to mouse-up so the user can drag the whole selection and see
