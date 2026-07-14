@@ -1024,7 +1024,8 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// Trigger lookahead used only on frames where the normal lookahead finds no trigger;
+        /// Extra trigger lookahead frames searched beyond the normal window, used only on frames
+        /// where the normal lookahead finds no trigger;
         /// empty = inherit the global track's value (which, when also empty, falls back to
         /// <see cref="AudioProps.DefaultTriggerLookaheadOnFailure"/>). Same string/blank semantics
         /// as <see cref="SilenceThreshold"/>.

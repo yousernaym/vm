@@ -283,7 +283,7 @@ namespace LibSidWiz
         }
 
         [Category("Triggering")]
-        [Description("How many frames to allow the triggering algorithm to look ahead, when nothing is found with the default lookahead.")]
+        [Description("How many additional frames (beyond the normal lookahead window) to search when nothing is found with the default lookahead. Zero disables the retry.")]
         public int TriggerLookaheadOnFailureFrames
         {
             get => _triggerLookaheadOnFailureFrames;
@@ -626,12 +626,15 @@ namespace LibSidWiz
         internal int GetTriggerPoint(int frameIndexSamples, int frameSamples, int previousTriggerPoint)
         {
             // Try at default settings
-            var result = Algorithm.GetTriggerPoint(this, frameIndexSamples, frameIndexSamples + frameSamples * (TriggerLookaheadFrames + 1), frameSamples, previousTriggerPoint);
+            var normalWindowEnd = frameIndexSamples + frameSamples * (TriggerLookaheadFrames + 1);
+            var result = Algorithm.GetTriggerPoint(this, frameIndexSamples, normalWindowEnd, frameSamples, previousTriggerPoint);
 
-            if (result < frameIndexSamples)
+            if (result < frameIndexSamples && TriggerLookaheadOnFailureFrames > 0)
             {
-                // Try again
-                result = Algorithm.GetTriggerPoint(this, frameIndexSamples, frameIndexSamples + frameSamples * (TriggerLookaheadOnFailureFrames + 1), frameSamples, previousTriggerPoint);
+                // The normal window had no trigger at all, so search only the frames after it.
+                // Start one sample early so a zero crossing landing exactly on the window
+                // boundary is still seen (crossing detectors compare against the previous sample).
+                result = Algorithm.GetTriggerPoint(this, normalWindowEnd - 1, normalWindowEnd + frameSamples * TriggerLookaheadOnFailureFrames, frameSamples, previousTriggerPoint);
             }
 
             if (result < frameIndexSamples)

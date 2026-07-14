@@ -91,7 +91,7 @@
                           Value="{Binding TriggerLookaheadOnFailureFrames, Mode=TwoWay}"
                           Min="0" Max="8" Decimals="0" SmallChange="1"
                           AllowEmpty="True"
-                          ToolTip="Wider lookahead used only on frames where the normal lookahead finds no trigger (e.g. bass waves longer than a frame). Steadies low-frequency channels without the choppiness of a large always-on lookahead. Empty = use the global track's value (default 2)."
+                          ToolTip="Extra frames searched beyond the normal lookahead, only on frames where it finds no trigger (e.g. bass waves longer than a frame). Steadies low-frequency channels without the choppiness of a large always-on lookahead. 0 disables the retry. Empty = use the global track's value (default 2)."
                           kf:Keyframing.PropertyId="TriggerLookaheadOnFailure"
                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                           kf:Keyframing.Interpolatable="False"/>

@@ -953,12 +953,12 @@ namespace VisualMusic
         public const int DefaultTriggerLookaheadOnFailure = 2;
 
         /// <summary>
-        /// Frames the trigger may look ahead when the normal lookahead finds no trigger at all
-        /// (e.g. a bass wave whose period is longer than the frame). Unlike
-        /// <see cref="TriggerLookaheadFrames"/>, this wider search only runs on failure frames, so
-        /// it steadies low-frequency channels without the choppiness a large always-on lookahead
-        /// causes. Null = inherit the global track's value; when that is also null,
-        /// <see cref="DefaultTriggerLookaheadOnFailure"/> is used.
+        /// Additional frames (beyond the normal lookahead window) the trigger searches when the
+        /// normal lookahead finds no trigger at all (e.g. a bass wave whose period is longer than
+        /// the frame). Unlike <see cref="TriggerLookaheadFrames"/>, this extended search only runs
+        /// on failure frames, so it steadies low-frequency channels without the choppiness a large
+        /// always-on lookahead causes. Zero disables the retry. Null = inherit the global track's
+        /// value; when that is also null, <see cref="DefaultTriggerLookaheadOnFailure"/> is used.
         /// </summary>
         public int? TriggerLookaheadOnFailureFrames { get; set; }
         public string Filename
