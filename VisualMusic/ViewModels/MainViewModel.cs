@@ -463,6 +463,15 @@ namespace VisualMusic.ViewModels
                 .Where(i => i >= 0)
                 .ToList();
             _lastSelectedIndices = indices;
+            // Selection count/global flag drive the save/load/default enable state (main menu +
+            // context menus) and selection-dependent property getters (e.g. the trigger-algorithm
+            // dropdown shows the global track's unset value as the concrete default). Set them
+            // BEFORE MergedProps: its setter refreshes all bound properties, which must not read
+            // the previous selection's stale flags.
+            SelectedTrackProps.SelectedTrackCount = TrackList.SelectedItems.Count;
+            SelectedTrackProps.IsOnlyGlobalSelected =
+                TrackList.SelectedItems.Count == 1 &&
+                TrackList.SelectedItems[0].TrackView.TrackNumber == 0;
             SelectedTrackProps.MergedProps = Project.MergeTrackProps(indices);
             // TrackNumbers (stable MIDI track indices) for the keyframe service.
             var trackNumbers = TrackList.SelectedItems
@@ -470,12 +479,6 @@ namespace VisualMusic.ViewModels
                 .ToList();
             Keyframes.KeyframeService.SelectedTrackIds = trackNumbers;
             Keyframes.KeyframeService.RaiseKeyframesChanged();
-
-            // Selection count drives the save/load/default enable state (main menu + context menus).
-            SelectedTrackProps.SelectedTrackCount = TrackList.SelectedItems.Count;
-            SelectedTrackProps.IsOnlyGlobalSelected =
-                TrackList.SelectedItems.Count == 1 &&
-                TrackList.SelectedItems[0].TrackView.TrackNumber == 0;
             SaveTrackPropsCommand.NotifyCanExecuteChanged();
             LoadTrackPropsCommand.NotifyCanExecuteChanged();
             DefaultTrackPropsCommand.NotifyCanExecuteChanged();

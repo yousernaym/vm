@@ -178,6 +178,24 @@ namespace VisualMusic
             return ms ?? AudioProps.DefaultViewWidthMs;
         }
 
+        /// <summary>Effective trigger algorithm type name for a track: own value, else global track's, else the first registry entry.</summary>
+        public string EffectiveTriggerAlgorithmName(TrackProps tp)
+        {
+            string name = tp?.AudioProps?.TriggerAlgorithmName;
+            if (string.IsNullOrEmpty(name) && _trackViews != null && _trackViews.Count > 0)
+                name = GlobalTrackProps.AudioProps?.TriggerAlgorithmName;
+            return string.IsNullOrEmpty(name) ? AudioProps.TriggerAlgorithms[0].Type.Name : name;
+        }
+
+        /// <summary>Effective trigger lookahead frames for a track: own value, else global track's, else 0.</summary>
+        public int EffectiveTriggerLookahead(TrackProps tp)
+        {
+            int? f = tp?.AudioProps?.TriggerLookaheadFrames;
+            if (f == null && _trackViews != null && _trackViews.Count > 0)
+                f = GlobalTrackProps.AudioProps?.TriggerLookaheadFrames;
+            return f ?? 0;
+        }
+
         public float ViewWidthT => _notes == null ? 0 : GlobalViewWidthQn * _notes.TicksPerBeat; //Number of ticks that fits on screen
         public float TrackViewWidthT(TrackProps tp)
             => _notes == null ? 0 : EffectiveViewWidthQn(tp) * _notes.TicksPerBeat;
@@ -679,6 +697,10 @@ namespace VisualMusic
             Props.AudioVisWidth = defaults.AudioVisWidth;
             Props.AudioVisLineWidth = defaults.AudioVisLineWidth;
             Props.AudioVisOpacity = defaults.AudioVisOpacity;
+            Props.AudioVisFillOpacity = defaults.AudioVisFillOpacity;
+            Props.AudioVisSmoothLines = defaults.AudioVisSmoothLines;
+            Props.AudioVisLabelScale = defaults.AudioVisLabelScale;
+            Props.AudioVisActivityThresholdDb = defaults.AudioVisActivityThresholdDb;
         }
 
         /// <summary>
@@ -1004,15 +1026,20 @@ namespace VisualMusic
 
             DrawLyrics(host);
             RefreshSidWizChannels();
+            // Activity threshold is a dB level relative to each channel's normalized peak; convert to
+            // the linear sample amplitude the renderer compares against.
+            float activityThreshold = (float)System.Math.Pow(10, Props.AudioVisActivityThresholdDb / 20.0);
             host.WaveformPanel?.Draw(SongPosS - Props.PlaybackOffsetS, GetSongFade(),
-                Props.AudioVisLeft, Props.AudioVisRight, Props.AudioVisWidth, Props.AudioVisOpacity);
+                Props.AudioVisLeft, Props.AudioVisRight, Props.AudioVisWidth, Props.AudioVisOpacity,
+                activityThreshold);
         }
 
         /// <summary>
         /// Pushes each track's current highlighted material color into its SidWiz channel so the
         /// waveform overlay follows hue changes from keyframes (and live edits), including changes
-        /// to the global track's hue. Also pushes the effective silence threshold and waveform view
-        /// width (per-track override, else the global track's value, else the hardcoded default).
+        /// to the global track's hue. Also pushes the effective silence threshold, waveform view
+        /// width, trigger algorithm and lookahead (per-track override, else the global track's value,
+        /// else the hardcoded default) plus the global fill / smoothing / label-size settings.
         /// </summary>
         void RefreshSidWizChannels()
         {
@@ -1029,14 +1056,43 @@ namespace VisualMusic
                 if (ch.LineWidth != Props.AudioVisLineWidth)
                     ch.LineWidth = Props.AudioVisLineWidth;
 
-                // Label font scales with the output height so the caption stays proportional across
-                // resolutions (preview vs export). Recreated only when the height actually changes.
-                float labelPx = System.Math.Max(8f, (ch.Renderer?.Height ?? 1080) / 30f);
+                // Trigger algorithm (cascade: own → global track → first registry entry). Recreated
+                // only when the effective type changes, so the compare avoids per-frame allocations.
+                string algoName = EffectiveTriggerAlgorithmName(tp);
+                if (ch.Algorithm == null || ch.Algorithm.GetType().Name != algoName)
+                {
+                    var entry = System.Array.Find(AudioProps.TriggerAlgorithms, a => a.Type.Name == algoName);
+                    var type = entry.Type ?? AudioProps.TriggerAlgorithms[0].Type;
+                    ch.Algorithm = (LibSidWiz.Triggers.ITriggerAlgorithm)System.Activator.CreateInstance(type);
+                }
+                int lookahead = EffectiveTriggerLookahead(tp);
+                if (ch.TriggerLookaheadFrames != lookahead)
+                    ch.TriggerLookaheadFrames = lookahead;
+
+                // Fill under the waveform in the track colour, at the global opacity (0 = no fill).
+                int fillAlpha = (int)(Props.AudioVisFillOpacity * 255);
+                var fill = fillAlpha <= 0
+                    ? System.Drawing.Color.Transparent
+                    : System.Drawing.Color.FromArgb(System.Math.Min(255, fillAlpha), color);
+                if (ch.FillColor.ToArgb() != fill.ToArgb())
+                    ch.FillColor = fill;
+
+                if (ch.SmoothLines != Props.AudioVisSmoothLines)
+                    ch.SmoothLines = Props.AudioVisSmoothLines;
+
+                // Label font scales with the output height (so the caption stays proportional across
+                // preview vs export) and the global label-size slider. Recreated only when the size
+                // actually changes. Colour follows the track colour; scale 0 hides the label.
+                float labelPx = System.Math.Max(1f, (ch.Renderer?.Height ?? 1080) / 30f * Props.AudioVisLabelScale);
                 if (ch.LabelFont == null || System.Math.Abs(ch.LabelFont.Size - labelPx) > 0.5f)
                 {
                     ch.LabelFont?.Dispose();
                     ch.LabelFont = new System.Drawing.Font("Arial", labelPx, System.Drawing.GraphicsUnit.Pixel);
                 }
+                var labelColor = Props.AudioVisLabelScale <= 0 ? System.Drawing.Color.Transparent : color;
+                if (ch.LabelColor.ToArgb() != labelColor.ToArgb())
+                    ch.LabelColor = labelColor;
+
                 ch.ActivityLookaheadSeconds =
                     tp.AudioProps.SilenceThresholdS ?? globalThreshold;
 
@@ -1131,7 +1187,9 @@ namespace VisualMusic
                 Label = outProps.AudioProps.Label,
                 LineColor = outProps.AudioProps.LineColor,
                 SilenceThresholdS = outProps.AudioProps.SilenceThresholdS,
-                WaveformViewWidthMs = outProps.AudioProps.WaveformViewWidthMs
+                WaveformViewWidthMs = outProps.AudioProps.WaveformViewWidthMs,
+                TriggerAlgorithmName = outProps.AudioProps.TriggerAlgorithmName,
+                TriggerLookaheadFrames = outProps.AudioProps.TriggerLookaheadFrames
             };
             for (int i = 1; i < list.Count; i++)
                 outProps = (TrackProps)MergeObjects(outProps, TrackViews[list[i]].TrackProps);
@@ -1577,6 +1635,18 @@ namespace VisualMusic
             _propAccessors["proj/AudioVisOpacity"] = PropAccessor.Scalar(
                 () => Props.AudioVisOpacity,
                 v => Props.AudioVisOpacity = (float)v);
+            _propAccessors["proj/AudioVisFillOpacity"] = PropAccessor.Scalar(
+                () => Props.AudioVisFillOpacity,
+                v => Props.AudioVisFillOpacity = (float)v);
+            _propAccessors["proj/AudioVisSmoothLines"] = PropAccessor.Bool(
+                () => Props.AudioVisSmoothLines,
+                v => Props.AudioVisSmoothLines = v);
+            _propAccessors["proj/AudioVisLabelScale"] = PropAccessor.Scalar(
+                () => Props.AudioVisLabelScale,
+                v => Props.AudioVisLabelScale = (float)v);
+            _propAccessors["proj/AudioVisActivityThreshold"] = PropAccessor.Scalar(
+                () => Props.AudioVisActivityThresholdDb,
+                v => Props.AudioVisActivityThresholdDb = (float)v);
 
             // Track-scope — one entry per track view.
             // Key by TrackNumber (the MIDI track index, stable across list reorder) and capture the
@@ -1762,6 +1832,31 @@ namespace VisualMusic
                     () => EffectiveWaveformViewWidthMs(tv.TrackProps),
                     v => tv.TrackProps.AudioProps.WaveformViewWidthMs = (float)v,
                     logScale: true);   // zoom feels natural on a log scale; fed to the channel via RefreshSidWizChannels
+                // Trigger algorithm keyframed in ComboBox-index space (0 = Default/inherit, i = registry
+                // index + 1), matching how the keyframe behaviour captures ComboBox.SelectedIndex.
+                _propAccessors[$"{prefix}/TriggerAlgorithmIndex"] = PropAccessor.Scalar(
+                    () =>
+                    {
+                        string name = tv.TrackProps.AudioProps.TriggerAlgorithmName;
+                        if (string.IsNullOrEmpty(name)) return 0;
+                        int idx = System.Array.FindIndex(AudioProps.TriggerAlgorithms, a => a.Type.Name == name);
+                        return idx < 0 ? 0 : idx + 1;
+                    },
+                    v =>
+                    {
+                        int idx = (int)Math.Round(v);
+                        // The global track has nothing to inherit from: "Default" becomes the
+                        // concrete first registry entry there (mirrors TrackPropsViewModel).
+                        tv.TrackProps.AudioProps.TriggerAlgorithmName =
+                            idx <= 0 || idx > AudioProps.TriggerAlgorithms.Length
+                                ? (tn == 0 ? AudioProps.TriggerAlgorithms[0].Type.Name : null)
+                                : AudioProps.TriggerAlgorithms[idx - 1].Type.Name;
+                    },
+                    alwaysHold: true);   // discrete selection; fed to the channel via RefreshSidWizChannels
+                _propAccessors[$"{prefix}/TriggerLookahead"] = PropAccessor.Scalar(
+                    () => EffectiveTriggerLookahead(tv.TrackProps),
+                    v => tv.TrackProps.AudioProps.TriggerLookaheadFrames = (int)Math.Round(v),
+                    alwaysHold: true);   // integer frame count; fed to the channel via RefreshSidWizChannels
             }
         }
 
@@ -2146,6 +2241,8 @@ namespace VisualMusic
                 // threshold is re-pushed by RefreshSidWizChannels.
                 destProps.AudioProps.SilenceThresholdS = sourceProps.AudioProps.SilenceThresholdS;
                 destProps.AudioProps.WaveformViewWidthMs = sourceProps.AudioProps.WaveformViewWidthMs;
+                destProps.AudioProps.TriggerAlgorithmName = sourceProps.AudioProps.TriggerAlgorithmName;
+                destProps.AudioProps.TriggerLookaheadFrames = sourceProps.AudioProps.TriggerLookaheadFrames;
                 destProps.AudioProps.Label = sourceProps.AudioProps.Label;
                 // Reload audio only for tracks whose filename actually changed, so ordinary
                 // undo/redo steps stay cheap.

@@ -139,6 +139,8 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(Label));
             OnPropertyChanged(nameof(SilenceThreshold));
             OnPropertyChanged(nameof(WaveformViewWidthMs));
+            OnPropertyChanged(nameof(TriggerAlgorithmIndex));
+            OnPropertyChanged(nameof(TriggerLookaheadFrames));
         }
 
         /// <summary>
@@ -230,6 +232,8 @@ namespace VisualMusic.ViewModels
             // Audio
             OnPropertyChanged(nameof(SilenceThreshold));
             OnPropertyChanged(nameof(WaveformViewWidthMs));
+            OnPropertyChanged(nameof(TriggerAlgorithmIndex));
+            OnPropertyChanged(nameof(TriggerLookaheadFrames));
         }
 
         // =====================================================================
@@ -960,6 +964,60 @@ namespace VisualMusic.ViewModels
                     Apply(tp => tp.AudioProps.WaveformViewWidthMs = null);
                 else if (value > 0)
                     Apply(tp => tp.AudioProps.WaveformViewWidthMs = (float)value.Value);
+            }
+        }
+
+        /// <summary>
+        /// Trigger algorithm as a ComboBox index: 0 = Default (inherit the global track's value, which
+        /// itself falls back to the first registry entry), i = <see cref="AudioProps.TriggerAlgorithms"/>
+        /// index + 1. The global track has nothing to inherit from, so for it "Default" is coerced to
+        /// the concrete first registry entry (both when displaying an unset value and when selected).
+        /// Returns -1 when selected tracks differ so the dropdown shows blank.
+        /// </summary>
+        public int TriggerAlgorithmIndex
+        {
+            get
+            {
+                var ap = _mergedProps?.AudioProps;
+                if (ap == null) return -1;
+                string name = ap.TriggerAlgorithmName;
+                if (string.IsNullOrEmpty(name)) return IsOnlyGlobalSelected ? 1 : 0;
+                int idx = System.Array.FindIndex(AudioProps.TriggerAlgorithms, a => a.Type.Name == name);
+                return idx < 0 ? 0 : idx + 1;
+            }
+            set
+            {
+                if (value < 0) return;
+                string name = value == 0 || value > AudioProps.TriggerAlgorithms.Length
+                    ? null
+                    : AudioProps.TriggerAlgorithms[value - 1].Type.Name;
+                Apply(tp => tp.AudioProps.TriggerAlgorithmName =
+                    name == null && tp.TrackView?.TrackNumber == 0
+                        ? AudioProps.TriggerAlgorithms[0].Type.Name
+                        : name);
+                // With several tracks selected _mergedProps is a detached clone that Apply doesn't
+                // touch; sync it so the OnPropertyChanged re-read doesn't revert the ComboBox to the
+                // pre-edit value. (With one track selected _mergedProps IS the live, already-updated
+                // TrackProps — leave it alone so the global track's coerced value shows.)
+                if (SelectedTrackCount > 1 && _mergedProps != null)
+                    _mergedProps.AudioProps.TriggerAlgorithmName = name;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Trigger lookahead in frames; empty = inherit the global track's value (which, when also
+        /// empty, falls back to 0). Same string/blank semantics as <see cref="SilenceThreshold"/>.
+        /// </summary>
+        public double? TriggerLookaheadFrames
+        {
+            get => _mergedProps?.AudioProps?.TriggerLookaheadFrames;
+            set
+            {
+                if (value == null)
+                    Apply(tp => tp.AudioProps.TriggerLookaheadFrames = null);
+                else if (value >= 0)
+                    Apply(tp => tp.AudioProps.TriggerLookaheadFrames = (int)value.Value);
             }
         }
 

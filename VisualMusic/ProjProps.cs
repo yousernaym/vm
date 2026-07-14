@@ -47,6 +47,10 @@ namespace VisualMusic
         public float AudioVisWidth { get; set; } = 0.25f;
         public float AudioVisLineWidth { get; set; } = 3;   // matches Channel.cs default
         public float AudioVisOpacity { get; set; } = 0.75f;
+        public float AudioVisFillOpacity { get; set; } = 0f;   // 0 = no fill under the waveform
+        public bool AudioVisSmoothLines { get; set; } = true;  // anti-aliased vs pixelated lines
+        public float AudioVisLabelScale { get; set; } = 1f;    // 0 hides the track labels
+        public float AudioVisActivityThresholdDb { get; set; } = -48f; // matches the old 0.004 linear
 
         public ProjProps()
         {
@@ -92,6 +96,14 @@ namespace VisualMusic
                     AudioVisLineWidth = (float)entry.Value;
                 else if (entry.Name == "audioVisOpacity")
                     AudioVisOpacity = (float)entry.Value;
+                else if (entry.Name == "audioVisFillOpacity")
+                    AudioVisFillOpacity = (float)entry.Value;
+                else if (entry.Name == "audioVisSmoothLines")
+                    AudioVisSmoothLines = (bool)entry.Value;
+                else if (entry.Name == "audioVisLabelScale")
+                    AudioVisLabelScale = (float)entry.Value;
+                else if (entry.Name == "audioVisActivityThresholdDb")
+                    AudioVisActivityThresholdDb = (float)entry.Value;
             }
         }
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
@@ -113,6 +125,10 @@ namespace VisualMusic
             info.AddValue("audioVisWidth", AudioVisWidth);
             info.AddValue("audioVisLineWidth", AudioVisLineWidth);
             info.AddValue("audioVisOpacity", AudioVisOpacity);
+            info.AddValue("audioVisFillOpacity", AudioVisFillOpacity);
+            info.AddValue("audioVisSmoothLines", AudioVisSmoothLines);
+            info.AddValue("audioVisLabelScale", AudioVisLabelScale);
+            info.AddValue("audioVisActivityThresholdDb", AudioVisActivityThresholdDb);
         }
     }
 }

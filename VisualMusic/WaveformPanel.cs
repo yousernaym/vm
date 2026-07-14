@@ -69,7 +69,8 @@ namespace VisualMusic
             _dirty = true;
         }
 
-        internal void Draw(double songPosS, float fade, bool left, bool right, float widthFrac, float opacity)
+        internal void Draw(double songPosS, float fade, bool left, bool right, float widthFrac, float opacity,
+            float activityThreshold)
         {
             // Note: opacity is NOT part of this guard — it only dims the backdrop, so the waveforms
             // still draw (fully opaque) even at opacity 0.
@@ -85,6 +86,13 @@ namespace VisualMusic
             if (_dirty || left != _cfgLeft || right != _cfgRight || widthFrac != _cfgWidthFrac
                 || vp.Width != _cfgVpW || vp.Height != _cfgVpH)
                 Reconfigure(left, right, widthFrac, vp.Width, vp.Height);
+
+            // Silence-detection level (linear amplitude, relative to each channel's normalized peak).
+            // Both strips run their own activity scan, so push it to whichever renderers exist.
+            if (_leftStrip?.Renderer != null)
+                _leftStrip.Renderer.ActivityThreshold = activityThreshold;
+            if (_rightStrip?.Renderer != null)
+                _rightStrip.Renderer.ActivityThreshold = activityThreshold;
 
             // Phase 1: compute the active channel set ONCE. Both strips hold every channel, so the
             // authority strip runs activity/trigger detection and the other reuses its result — the

@@ -41,6 +41,10 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(AudioVisWidth));
             OnPropertyChanged(nameof(AudioVisLineWidth));
             OnPropertyChanged(nameof(AudioVisOpacity));
+            OnPropertyChanged(nameof(AudioVisFillOpacity));
+            OnPropertyChanged(nameof(AudioVisSmoothLines));
+            OnPropertyChanged(nameof(AudioVisLabelScale));
+            OnPropertyChanged(nameof(AudioVisActivityThresholdDb));
         }
 
         /// <summary>
@@ -69,6 +73,10 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(AudioVisWidth));
             OnPropertyChanged(nameof(AudioVisLineWidth));
             OnPropertyChanged(nameof(AudioVisOpacity));
+            OnPropertyChanged(nameof(AudioVisFillOpacity));
+            OnPropertyChanged(nameof(AudioVisSmoothLines));
+            OnPropertyChanged(nameof(AudioVisLabelScale));
+            OnPropertyChanged(nameof(AudioVisActivityThresholdDb));
         }
 
         // =====================================================================
@@ -264,6 +272,50 @@ namespace VisualMusic.ViewModels
             {
                 if (value == null || Props == null) return;
                 Props.AudioVisOpacity = (float)value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double? AudioVisFillOpacity
+        {
+            get => (double?)Props?.AudioVisFillOpacity;
+            set
+            {
+                if (value == null || Props == null) return;
+                Props.AudioVisFillOpacity = (float)value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool? AudioVisSmoothLines
+        {
+            get => Props?.AudioVisSmoothLines;
+            set
+            {
+                if (value == null || Props == null) return;
+                Props.AudioVisSmoothLines = value.Value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double? AudioVisLabelScale
+        {
+            get => (double?)Props?.AudioVisLabelScale;
+            set
+            {
+                if (value == null || Props == null) return;
+                Props.AudioVisLabelScale = (float)value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double? AudioVisActivityThresholdDb
+        {
+            get => (double?)Props?.AudioVisActivityThresholdDb;
+            set
+            {
+                if (value == null || Props == null) return;
+                Props.AudioVisActivityThresholdDb = (float)value;
                 OnPropertyChanged();
             }
         }

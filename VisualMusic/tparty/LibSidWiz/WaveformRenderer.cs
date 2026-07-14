@@ -65,7 +65,9 @@ namespace LibSidWiz
         private Pen[] _pens;
         private Brush[] _brushes;
         private int[] _prevTrigger;                // previous trigger per channel
-        private readonly GraphicsPath _fillPath = new GraphicsPath();
+        // Recreated in Init(): Init() starts with Dispose(), which releases the path, so a
+        // once-only (readonly) instance would be dead by the time the first frame renders.
+        private GraphicsPath _fillPath;
 
         // Dynamic active set
         private List<Channel> _visible = new List<Channel>();
@@ -138,6 +140,7 @@ namespace LibSidWiz
 
             _lastFrameStartSample = int.MinValue;
 
+            _fillPath = new GraphicsPath();
             _frameData = new byte[Width * Height * 4];
             _frameHandle = GCHandle.Alloc(_frameData, GCHandleType.Pinned);
             _frameBitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, _frameHandle.AddrOfPinnedObject());
@@ -158,6 +161,7 @@ namespace LibSidWiz
         public void Dispose()
         {
             _fillPath?.Dispose();
+            _fillPath = null;
 
             _frameBitmap?.Dispose(); _frameBitmap = null;
             if (_frameHandle.IsAllocated) _frameHandle.Free();
@@ -277,9 +281,11 @@ namespace LibSidWiz
             }
 
             // === If visible set changed (or template invalid), rebuild layout + template ===
-            // Include each channel's label so editing a caption (baked into the template) rebuilds it
-            // even while the same set of channels stays visible.
-            string sig = string.Join("-", visibleNow.Select(c => _channels.IndexOf(c) + ":" + c.Label));
+            // Include each channel's label text, font size and colour so runtime label edits (caption,
+            // size slider, track-hue changes — all baked into the template) rebuild it even while the
+            // same set of channels stays visible.
+            string sig = string.Join("-", visibleNow.Select(c =>
+                _channels.IndexOf(c) + ":" + c.Label + ":" + (c.LabelFont?.Size ?? 0) + ":" + c.LabelColor.ToArgb()));
             if (_templateDirty || sig != _visibleSignature)
             {
                 _visibleSignature = sig;
@@ -301,6 +307,23 @@ namespace LibSidWiz
                     int need = Math.Max(1, ch.ViewWidthInSamples);
                     if (_pointsPerChannel[idx].Length != need)
                         _pointsPerChannel[idx] = new PointF[need];
+                    // FillColor can change at runtime (fill-opacity slider / hue keyframes), but the
+                    // brush cache is only rebuilt on channel-count changes — refresh it in place here.
+                    if (ch.FillColor == Color.Transparent)
+                    {
+                        _brushes[idx]?.Dispose();
+                        _brushes[idx] = null;
+                    }
+                    else if (_brushes[idx] is SolidBrush sb)
+                    {
+                        if (sb.Color != ch.FillColor)
+                            sb.Color = ch.FillColor;
+                    }
+                    else
+                    {
+                        _brushes[idx]?.Dispose();
+                        _brushes[idx] = new SolidBrush(ch.FillColor);
+                    }
                     RenderWave(g, ch, _frameTriggers[idx], _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
                 }
             }

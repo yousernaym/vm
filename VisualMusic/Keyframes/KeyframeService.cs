@@ -221,8 +221,10 @@ namespace VisualMusic.Keyframes
 
         static readonly (string Id, KfScope Scope)[] AudioKeyframeProperties =
         {
-            ("SilenceThreshold",    KfScope.Track),
-            ("WaveformViewWidthMs", KfScope.Track),
+            ("SilenceThreshold",      KfScope.Track),
+            ("WaveformViewWidthMs",   KfScope.Track),
+            ("TriggerAlgorithmIndex", KfScope.Track),
+            ("TriggerLookahead",      KfScope.Track),
         };
 
         /// <summary>Returns a friendly label for a full property id (e.g. "track/2/LineWidth").</summary>

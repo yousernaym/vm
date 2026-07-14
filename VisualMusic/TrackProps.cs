@@ -121,16 +121,18 @@ namespace VisualMusic
             AudioProps = new AudioProps();
         }
 
-        /// <summary>Resets only the audio settings (silence threshold + waveform view width),
-        /// keeping the assigned audio file. Unlike <see cref="ResetAudio"/>, does not dispose
-        /// AudioProps or clear the filename. Regular tracks reset to null (inherit global); the
-        /// Global track has nothing to inherit, so it resets to the hardcoded defaults (mirrors
-        /// <see cref="ResetSpatial"/>).</summary>
+        /// <summary>Resets only the audio settings (silence threshold, waveform view width and the
+        /// trigger settings), keeping the assigned audio file. Unlike <see cref="ResetAudio"/>, does
+        /// not dispose AudioProps or clear the filename. Regular tracks reset to null (inherit
+        /// global); the Global track has nothing to inherit, so it resets to the hardcoded defaults
+        /// (mirrors <see cref="ResetSpatial"/>).</summary>
         public void ResetAudioSettings()
         {
             bool isGlobal = TrackView != null && TrackView.TrackNumber == 0;
             AudioProps.SilenceThresholdS = isGlobal ? AudioProps.DefaultSilenceThresholdS : null;
             AudioProps.WaveformViewWidthMs = isGlobal ? AudioProps.DefaultViewWidthMs : null;
+            AudioProps.TriggerAlgorithmName = isGlobal ? AudioProps.TriggerAlgorithms[0].Type.Name : null;
+            AudioProps.TriggerLookaheadFrames = isGlobal ? 0 : (int?)null;
         }
 
         public TrackProps Clone(ISongDrawHost host = null)
@@ -902,12 +904,45 @@ namespace VisualMusic
         {
             Algorithm = new PeakSpeedTrigger(),
             // Label rendered above the waveform (top-centered). The font is (re)created per output
-            // resolution in Project.RefreshSidWizChannels; colour/alignment are fixed here. A blank
-            // label draws nothing, so the default (empty) shows no text.
+            // resolution in Project.RefreshSidWizChannels, which also drives the colour from the
+            // track colour; the white here is only the pre-first-frame value. A blank label draws
+            // nothing, so the default (empty) shows no text.
             LabelColor = System.Drawing.Color.White,
             LabelAlignment = System.Drawing.ContentAlignment.TopCenter,
             LabelMargins = new LibSidWiz.Padding(4, 4, 4, 4),
+            // DC-offset removal is always on: SID digi / FM stems often carry a DC bias that would
+            // otherwise push the waveform off-centre. autoReloadOnSettingChanged is false, so this
+            // just sets the flag before the first LoadDataAsync().
+            HighPassFilter = true,
         };
+
+        /// <summary>
+        /// Trigger algorithms offered in the Audio-tab dropdown, in fixed display order. Index 0 is
+        /// the hard-coded fallback used by the cascade (per-track "Default" → global track → this).
+        /// </summary>
+        public static readonly (string Display, Type Type)[] TriggerAlgorithms =
+        {
+            ("Peak speed", typeof(PeakSpeedTrigger)),
+            ("Rising edge", typeof(RisingEdgeTrigger)),
+            ("Auto-correlation", typeof(AutoCorrelationTrigger)),
+            ("Widest wave", typeof(WidestWaveTrigger)),
+            ("Middle widest", typeof(MiddleWidest)),
+            ("Biggest wave area", typeof(BiggestWaveAreaTrigger)),
+            ("Biggest positive area", typeof(BiggestPositiveWaveAreaTrigger)),
+            ("None", typeof(NullTrigger)),
+        };
+
+        /// <summary>
+        /// Trigger algorithm type name (e.g. "RisingEdgeTrigger"). Null = inherit the global track's
+        /// value; when that is also null the first entry of <see cref="TriggerAlgorithms"/> is used.
+        /// </summary>
+        public string TriggerAlgorithmName { get; set; }
+
+        /// <summary>
+        /// Frames the trigger may look ahead (helps low-frequency channels find a stable sync point).
+        /// Null = inherit the global track's value; when that is also null, 0 is used.
+        /// </summary>
+        public int? TriggerLookaheadFrames { get; set; }
         public string Filename
         {
             get => SidWizChannel.Filename;
@@ -967,6 +1002,10 @@ namespace VisualMusic
                     SilenceThresholdS = Convert.ToSingle(entry.Value);
                 else if (entry.Name == "waveformViewWidthMs" && entry.Value != null)
                     WaveformViewWidthMs = Convert.ToSingle(entry.Value);
+                else if (entry.Name == "triggerAlgorithm" && entry.Value != null)
+                    TriggerAlgorithmName = (string)entry.Value;
+                else if (entry.Name == "triggerLookahead" && entry.Value != null)
+                    TriggerLookaheadFrames = Convert.ToInt32(entry.Value);
             }
         }
 
@@ -979,6 +1018,10 @@ namespace VisualMusic
                 info.AddValue("silenceThreshold", SilenceThresholdS.Value);
             if (WaveformViewWidthMs != null)
                 info.AddValue("waveformViewWidthMs", WaveformViewWidthMs.Value);
+            if (!string.IsNullOrEmpty(TriggerAlgorithmName))
+                info.AddValue("triggerAlgorithm", TriggerAlgorithmName);
+            if (TriggerLookaheadFrames != null)
+                info.AddValue("triggerLookahead", TriggerLookaheadFrames.Value);
         }
 
         public async Task LoadAudioAsync()

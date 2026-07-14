@@ -103,8 +103,34 @@
                               kf:Keyframing.Interpolatable="True"/>
             <TextBlock Text="Overlay opacity" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <ctrl:TbSliderWpf Value="{Binding AudioVisOpacity, Mode=TwoWay}" Min="0" Max="1" Decimals="2" SmallChange="0.1"
-                              Margin="0,0,0,4"
+                              Margin="0,0,0,8"
                               kf:Keyframing.PropertyId="AudioVisOpacity"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                              kf:Keyframing.Interpolatable="True"/>
+            <TextBlock Text="Fill opacity" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding AudioVisFillOpacity, Mode=TwoWay}" Min="0" Max="1" Decimals="2" SmallChange="0.1"
+                              Margin="0,0,0,8"
+                              ToolTip="Fills the area under each waveform with the track colour. 0 = no fill."
+                              kf:Keyframing.PropertyId="AudioVisFillOpacity"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                              kf:Keyframing.Interpolatable="True"/>
+            <CheckBox Content="Smooth lines" IsChecked="{Binding AudioVisSmoothLines, Mode=TwoWay}" Margin="0,0,0,8"
+                      ToolTip="Anti-aliased waveform lines (off = pixelated / retro)."
+                      kf:Keyframing.PropertyId="AudioVisSmoothLines"
+                      kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                      kf:Keyframing.Interpolatable="False"/>
+            <TextBlock Text="Label size" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding AudioVisLabelScale, Mode=TwoWay}" Min="0" Max="3" Decimals="2" SmallChange="0.1"
+                              Margin="0,0,0,8"
+                              ToolTip="Scales the track labels above each waveform. 0 hides them."
+                              kf:Keyframing.PropertyId="AudioVisLabelScale"
+                              kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
+                              kf:Keyframing.Interpolatable="True"/>
+            <TextBlock Text="Silence level (dB)" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ctrl:TbSliderWpf Value="{Binding AudioVisActivityThresholdDb, Mode=TwoWay}" Min="-96" Max="0" Decimals="0" SmallChange="1"
+                              Margin="0,0,0,4"
+                              ToolTip="Level below which a channel counts as silent (and is hidden), relative to its normalized peak. Lower = keep faint channels visible."
+                              kf:Keyframing.PropertyId="AudioVisActivityThreshold"
                               kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Project}"
                               kf:Keyframing.Interpolatable="True"/>
         </StackPanel>
