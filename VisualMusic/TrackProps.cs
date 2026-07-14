@@ -81,9 +81,17 @@ namespace VisualMusic
             StyleProps = new StyleProps(TrackNumber);
         }
 
+        // Parameterless reset assumes a contiguous track set (ordinal == TrackNumber-1), which holds at
+        // track-creation time. After a sparse removal, callers that re-apply defaults (the "Default
+        // material" button) pass the track's true ordinal position via the overload below.
         public void ResetMaterial()
         {
-            MaterialProps = new MaterialProps(TrackNumber, NumTracks);
+            ResetMaterial(TrackNumber - 1, NumTracks - 1);
+        }
+
+        public void ResetMaterial(int hueOrdinal, int hueCount)
+        {
+            MaterialProps = new MaterialProps(TrackNumber, MaterialProps.DefaultHue(hueOrdinal, hueCount));
         }
 
         public void ResetLight()
@@ -582,7 +590,17 @@ namespace VisualMusic
         public TrackPropsTex TexProps { get; set; } = new TrackPropsTex();
         public TrackPropsTex HmapProps { get; set; } = new TrackPropsTex();
 
-        public MaterialProps(int trackNumber, int numTracks)
+        /// <summary>
+        /// Even hue spread for a non-global track's default material: the track's ordinal position
+        /// among the non-global tracks (0-based) over the number of non-global tracks. Basing it on
+        /// ordinal position (not the raw, possibly-sparse <see cref="TrackView.TrackNumber"/>) keeps
+        /// the spread even after a middle track is removed, and dividing by the count (not count-1)
+        /// keeps the last track short of hue 1.0 (which wraps back to the first track's hue 0).
+        /// </summary>
+        public static float DefaultHue(int hueOrdinal, int hueCount)
+            => hueCount > 0 ? (float)hueOrdinal / hueCount : 0f;
+
+        public MaterialProps(int trackNumber, float hue)
         {
             TexProps.UnloadTexture();
             TexProps = new TrackPropsTex();
@@ -596,7 +614,7 @@ namespace VisualMusic
             else
             {
                 Transp = 1;
-                Hue = (float)(trackNumber - 1) / (numTracks - 1);
+                Hue = hue;
                 Normal = new NoteTypeMaterial();
                 Hilited = new NoteTypeMaterial(); ;
             }

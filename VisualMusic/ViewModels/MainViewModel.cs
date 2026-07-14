@@ -272,8 +272,17 @@ namespace VisualMusic.ViewModels
             {
                 if (!Keyframes.KeyframeService.ConfirmDefaultMaterialReset(out var affected))
                     return;
+                // Spread the default hue by each track's ordinal position among the current non-global
+                // tracks (not the raw, possibly-sparse TrackNumber), so the rainbow stays even after
+                // the track count changed via add/remove.
+                var nonGlobal = Project?.TrackViews
+                    .Where(v => v.TrackNumber != 0)
+                    .OrderBy(v => v.TrackNumber)
+                    .ToList();
+                int hueCount = nonGlobal?.Count ?? 0;
                 foreach (var item in TrackList.SelectedItems)
-                    item.TrackView.TrackProps.ResetMaterial();
+                    item.TrackView.TrackProps.ResetMaterial(
+                        nonGlobal?.IndexOf(item.TrackView) ?? 0, hueCount);
                 Keyframes.KeyframeService.CaptureDefaultMaterialAtCurrentTick(affected);
                 Project?.CreateGeos();
                 OnTrackListSelectionChanged();
