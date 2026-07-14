@@ -41,8 +41,8 @@ namespace LibSidWiz
         private string _filename;
         private string _externalTriggerFilename;
         private ITriggerAlgorithm _algorithm;
-        private int _triggerLookaheadFrames; // Default to current frame only
-        private int _triggerLookaheadOnFailureFrames = 2; // Default to 2 frames ahead
+        private int _triggerLookaheadFrames = 1; // Current frame plus one ahead
+        private int _triggerLookaheadOnFailureFrames = 3; // Extra frames searched beyond the normal window on failure
         private Color _lineColor = Color.White;
         private string _label = "";
         private float _lineWidth = 3;

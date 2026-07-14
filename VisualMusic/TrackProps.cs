@@ -939,8 +939,9 @@ namespace VisualMusic
         /// </summary>
         public string TriggerAlgorithmName { get; set; }
 
-        /// <summary>Default/fallback normal trigger lookahead (used to seed the global track).</summary>
-        public const int DefaultTriggerLookahead = 0;
+        /// <summary>Default/fallback normal trigger lookahead (used to seed the global track).
+        /// 1 = a 2-frame window (~33 ms at the 60 fps SidWiz frame grid), syncing down to ~30 Hz.</summary>
+        public const int DefaultTriggerLookahead = 1;
 
         /// <summary>
         /// Frames the trigger may look ahead (helps low-frequency channels find a stable sync point).
@@ -949,8 +950,9 @@ namespace VisualMusic
         /// </summary>
         public int? TriggerLookaheadFrames { get; set; }
 
-        /// <summary>Default/fallback on-failure trigger lookahead (matches the LibSidWiz Channel default).</summary>
-        public const int DefaultTriggerLookaheadOnFailure = 2;
+        /// <summary>Default/fallback on-failure trigger lookahead (matches the LibSidWiz Channel
+        /// default). 3 extra frames beyond the normal window gives ~83 ms total (~12 Hz floor).</summary>
+        public const int DefaultTriggerLookaheadOnFailure = 3;
 
         /// <summary>
         /// Additional frames (beyond the normal lookahead window) the trigger searches when the
