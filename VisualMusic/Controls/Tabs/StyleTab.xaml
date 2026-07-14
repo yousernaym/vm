@@ -11,7 +11,7 @@
         <StackPanel Margin="4">
 
             <!-- Default Style button -->
-            <Button Content="Default Style" HorizontalAlignment="Left"
+            <Button Content="_Default Style" HorizontalAlignment="Left"
                     Margin="0,0,0,6" Click="DefaultStyleBtn_Click"/>
 
             <!-- Note style type selector -->

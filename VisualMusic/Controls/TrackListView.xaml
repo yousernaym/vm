@@ -17,6 +17,9 @@
               DragEnter="OnDragEnter"
               DragOver="OnDragOver"
               DragLeave="OnDragLeave">
+        <ListView.ContextMenu>
+            <ContextMenu/>
+        </ListView.ContextMenu>
         <ListView.View>
             <GridView>
                 <GridViewColumn Header="Track" Width="130">

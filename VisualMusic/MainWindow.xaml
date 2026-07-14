@@ -31,6 +31,7 @@
         <KeyBinding Command="{Binding RedoCommand}"           Key="Z"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding ResetCameraCommand}"    Key="R"    Modifiers="Control"/>
         <KeyBinding Command="{Binding DefaultTrackPropsCommand}" Key="D" Modifiers="Control"/>
+        <KeyBinding Command="{Binding InvertTrackSelectionCommand}" Key="I" Modifiers="Control"/>
         <KeyBinding Command="{Binding LoadTrackPropsCommand}" Key="T"    Modifiers="Control"/>
         <KeyBinding Command="{Binding SaveTrackPropsCommand}" Key="T"    Modifiers="Control+Shift"/>
         <KeyBinding Command="{Binding InsertLyricsCommand}"   Key="L"    Modifiers="Control"/>

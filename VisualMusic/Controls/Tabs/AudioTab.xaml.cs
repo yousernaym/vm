@@ -11,6 +11,9 @@ namespace VisualMusic.Controls.Tabs
             InitializeComponent();
         }
 
+        void DefaultAudioBtn_Click(object sender, RoutedEventArgs e)
+            => (DataContext as TrackPropsViewModel)?.ResetAudio?.Invoke();
+
         void BrowseBtn_Click(object sender, RoutedEventArgs e)
             => (DataContext as TrackPropsViewModel)?.BrowseAudioFile?.Invoke();
 

@@ -36,6 +36,13 @@ namespace VisualMusic.Controls
         public TrackListView()
         {
             InitializeComponent();
+            // Invert selection manipulates the ListView (owned by the view), so expose it to the
+            // VM here rather than having MainViewModel wire it like the other context-menu actions.
+            DataContextChanged += (_, _) =>
+            {
+                if (DataContext is TrackListViewModel vm)
+                    vm.InvertSelection = InvertSelection;
+            };
         }
 
         void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -73,7 +80,7 @@ namespace VisualMusic.Controls
             menu.Items.Add(def);
 
             bool hasGlobal = vm.SelectedItems.Any(it => it.TrackView.TrackNumber == 0);
-            var remove = new MenuItem { Header = "_Remove track(s)", IsEnabled = count >= 1 && !hasGlobal };
+            var remove = new MenuItem { Header = "_Remove track(s)", InputGestureText = "Del", IsEnabled = count >= 1 && !hasGlobal };
             remove.Click += (_, _) => vm.RemoveSelectedTracks?.Invoke();
             menu.Items.Add(remove);
 
@@ -83,7 +90,7 @@ namespace VisualMusic.Controls
             selectAll.Click += (_, _) => trackListView.SelectAll();
             menu.Items.Add(selectAll);
 
-            var invert = new MenuItem { Header = "_Invert selection", IsEnabled = hasItems };
+            var invert = new MenuItem { Header = "_Invert selection", InputGestureText = "Ctrl+I", IsEnabled = hasItems };
             invert.Click += (_, _) => InvertSelection();
             menu.Items.Add(invert);
 
@@ -103,6 +110,9 @@ namespace VisualMusic.Controls
                 e.Handled = true;
                 return;
             }
+
+            // Note: Ctrl+I (invert selection) is a global command bound in MainWindow, so it works
+            // regardless of list focus and isn't handled here.
 
             // Del → remove selected tracks. Same guard as the context menu's Remove item:
             // needs a selection and must not include Global (track 0, which is pinned).

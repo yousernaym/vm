@@ -7,21 +7,22 @@
         <BooleanToVisibilityConverter x:Key="BoolVis"/>
     </UserControl.Resources>
     <StackPanel Margin="4">
+        <Button Content="_Default Audio" HorizontalAlignment="Left" Margin="0,0,0,6" Click="DefaultAudioBtn_Click"/>
         <!-- Normal selection: single audio file for the selected track(s) -->
         <StackPanel Visibility="{Binding IsNotOnlyGlobalSelected, Converter={StaticResource BoolVis}}">
             <TextBlock Text="Audio file path" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <TextBox Text="{Binding AudioFilename, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Margin="0,0,0,4"/>
             <StackPanel Orientation="Horizontal">
-                <Button Content="Browse..." Width="72" Click="BrowseBtn_Click"/>
-                <Button Content="Remove" Width="72" Margin="4,0,0,0" Click="RemoveBtn_Click"
+                <Button Content="Bro_wse..." Width="72" Click="BrowseBtn_Click"/>
+                <Button Content="_Clear" Width="72" Margin="4,0,0,0" Click="RemoveBtn_Click"
                         ToolTip="Clear the audio file path of the selected track(s)."/>
             </StackPanel>
         </StackPanel>
         <!-- Global-only selection: batch assignment across all tracks -->
         <StackPanel Visibility="{Binding IsOnlyGlobalSelected, Converter={StaticResource BoolVis}}">
             <TextBlock Text="Audio files" FontWeight="SemiBold" Margin="0,0,0,4"/>
-            <Button Content="Assign audio files..." HorizontalAlignment="Left"
+            <Button Content="Assi_gn audio files..." HorizontalAlignment="Left"
                     Click="AssignBtn_Click"
                     ToolTip="Pick multiple audio files and assign them to tracks."/>
         </StackPanel>

@@ -66,6 +66,7 @@ namespace VisualMusic.ViewModels
         [NotifyCanExecuteChangedFor(nameof(LoadTrackPropsCommand))]
         [NotifyCanExecuteChangedFor(nameof(SaveTrackPropsCommand))]
         [NotifyCanExecuteChangedFor(nameof(DefaultTrackPropsCommand))]
+        [NotifyCanExecuteChangedFor(nameof(InvertTrackSelectionCommand))]
         [NotifyCanExecuteChangedFor(nameof(GoToNextKeyFrameCommand))]
         [NotifyCanExecuteChangedFor(nameof(GoToPrevKeyFrameCommand))]
         private Project _project;
@@ -310,6 +311,17 @@ namespace VisualMusic.ViewModels
                 Keyframes.KeyframeService.CaptureDefaultSpatialAtCurrentTick(affected);
                 OnTrackListSelectionChanged();
                 AddUndoItem("Reset spatial");
+            };
+
+            SelectedTrackProps.ResetAudio = () =>
+            {
+                if (!Keyframes.KeyframeService.ConfirmDefaultAudioReset(out var affected))
+                    return;
+                foreach (var item in TrackList.SelectedItems)
+                    item.TrackView.TrackProps.ResetAudioSettings();
+                Keyframes.KeyframeService.CaptureDefaultAudioAtCurrentTick(affected);
+                OnTrackListSelectionChanged();
+                AddUndoItem("Reset audio");
             };
 
             // Re-bake geometry at the new effective width on commit (undo snapshot comes from
@@ -1556,6 +1568,11 @@ namespace VisualMusic.ViewModels
             OnTrackListSelectionChanged();
             AddUndoItem("Default Track Properties");
         }
+
+        // Global shortcut (Ctrl+I); works regardless of track-list focus. The actual selection
+        // toggle lives in the view (it owns the ListView), reached via TrackList.InvertSelection.
+        [RelayCommand(CanExecute = nameof(HasProject))]
+        void InvertTrackSelection() => TrackList.InvertSelection?.Invoke();
 
         // ---- Shared file/serialization helpers (used by both the track-list and per-tab paths) ----
 

@@ -219,6 +219,12 @@ namespace VisualMusic.Keyframes
             ("ViewWidthQn", KfScope.Track),
         };
 
+        static readonly (string Id, KfScope Scope)[] AudioKeyframeProperties =
+        {
+            ("SilenceThreshold",    KfScope.Track),
+            ("WaveformViewWidthMs", KfScope.Track),
+        };
+
         /// <summary>Returns a friendly label for a full property id (e.g. "track/2/LineWidth").</summary>
         public static string GetDisplayNameForId(string fullId)
         {
@@ -631,6 +637,14 @@ namespace VisualMusic.Keyframes
                 SpatialKeyframeProperties, out affected);
 
         public static void CaptureDefaultSpatialAtCurrentTick(
+            IEnumerable<(string Id, KfScope Scope)> affected)
+            => CapturePropertiesAtCurrentTick(affected);
+
+        public static bool ConfirmDefaultAudioReset(out List<(string Id, KfScope Scope)> affected)
+            => ConfirmDefaultTrackTabReset("audio", "Default audio",
+                AudioKeyframeProperties, out affected);
+
+        public static void CaptureDefaultAudioAtCurrentTick(
             IEnumerable<(string Id, KfScope Scope)> affected)
             => CapturePropertiesAtCurrentTick(affected);
 

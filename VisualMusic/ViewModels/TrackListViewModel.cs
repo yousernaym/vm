@@ -28,6 +28,10 @@ namespace VisualMusic.ViewModels
         public Action DefaultProps { get; set; }
         public Action RemoveSelectedTracks { get; set; }
 
+        // Wired by the view code-behind (not MainViewModel): inverts the ListView's selection,
+        // which lives in the view. Invoked by the context menu and the global Ctrl+I command.
+        public Action InvertSelection { get; set; }
+
         // Wired by MainViewModel: adds an undo item after a drag-drop reorder actually moved a track.
         public Action AfterReorder { get; set; }
 

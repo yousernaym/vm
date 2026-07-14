@@ -5,7 +5,7 @@
              xmlns:kf="clr-namespace:VisualMusic.Keyframes">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="4">
-            <Button Content="Default Light" HorizontalAlignment="Left"
+            <Button Content="_Default Light" HorizontalAlignment="Left"
                     Margin="0,0,0,6" Click="DefaultLightBtn_Click"/>
             <CheckBox Content="Use global light"
                       IsChecked="{Binding UseGlobalLight, Mode=TwoWay}"

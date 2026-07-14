@@ -347,6 +347,7 @@ namespace VisualMusic.ViewModels
         public Action ResetMaterial { get; set; }
         public Action ResetLight { get; set; }
         public Action ResetSpatial { get; set; }
+        public Action ResetAudio { get; set; }
         /// <summary>Re-bake geometry at the new effective viewport width after a commit (wired by MainViewModel).</summary>
         public Action CommitViewWidth { get; set; }
 

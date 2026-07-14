@@ -4,7 +4,7 @@
              xmlns:ctrl="clr-namespace:VisualMusic.Controls"
              xmlns:kf="clr-namespace:VisualMusic.Keyframes">
     <StackPanel Margin="4">
-        <Button Content="Default Spatial" HorizontalAlignment="Left"
+        <Button Content="_Default Spatial" HorizontalAlignment="Left"
                 Margin="0,0,0,6" Click="DefaultSpatialBtn_Click"/>
         <TextBlock Text="Position offset" FontWeight="SemiBold" Margin="0,0,0,4"/>
         <Grid>

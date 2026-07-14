@@ -11,19 +11,19 @@
         <TabControl.Resources>
             <sys:Double x:Key="MahApps.Font.Size.TabItem">12</sys:Double>
         </TabControl.Resources>
-        <TabItem Header="Style">
+        <TabItem Header="_Style">
             <tabs:StyleTab DataContext="{Binding}"/>
         </TabItem>
-        <TabItem Header="Material">
+        <TabItem Header="_Material">
             <tabs:MaterialTab DataContext="{Binding}"/>
         </TabItem>
-        <TabItem Header="Light">
+        <TabItem Header="_Light">
             <tabs:LightTab DataContext="{Binding}"/>
         </TabItem>
-        <TabItem Header="Spatial">
+        <TabItem Header="Spat_ial">
             <tabs:SpatialTab DataContext="{Binding}"/>
         </TabItem>
-        <TabItem Header="Audio">
+        <TabItem Header="_Audio">
             <tabs:AudioTab DataContext="{Binding}"/>
         </TabItem>
     </TabControl>

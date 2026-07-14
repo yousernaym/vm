@@ -121,6 +121,15 @@ namespace VisualMusic
             AudioProps = new AudioProps();
         }
 
+        /// <summary>Resets only the audio settings (silence threshold + waveform view width) to
+        /// inherit-global, keeping the assigned audio file. Unlike <see cref="ResetAudio"/>, does not
+        /// dispose AudioProps or clear the filename.</summary>
+        public void ResetAudioSettings()
+        {
+            AudioProps.SilenceThresholdS = null;
+            AudioProps.WaveformViewWidthMs = null;
+        }
+
         public TrackProps Clone(ISongDrawHost host = null)
         {
             TrackProps newProps = new TrackProps(TrackView);
