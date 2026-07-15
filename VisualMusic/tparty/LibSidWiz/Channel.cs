@@ -705,6 +705,24 @@ namespace LibSidWiz
 
         private const int PitchTolerance = 1; // semitones; glides (±1) stay in one slot, arps split
 
+        // Pitch classification looks at least this far ahead regardless of the trigger lookahead,
+        // so alternation (arp) detection still sees a full cycle or two even when the trigger
+        // window is a single frame.
+        private const double PitchClassifySeconds = 0.15;
+
+        /// <summary>Per-frame statistics for one pitch group in the classification window.</summary>
+        private struct PidStat
+        {
+            public int FirstStart;   // sample of the group's first segment start
+            public int LastEnd;      // sample of the group's last segment end (may exceed the trigger window)
+            public int FirstIndex;   // positions of the group's segments in the window's segment sequence
+            public int LastIndex;
+            public int SegmentCount;
+            // True when another pitch sounds between two occurrences of this one (arp-style
+            // alternation) — such a pitch keeps its own slot instead of being voice-continued.
+            public bool Alternating => LastIndex - FirstIndex + 1 != SegmentCount;
+        }
+
         /// <summary>Per-pitch rendering slots (null when SplitCount &lt;= 1). Read by the renderer.</summary>
         internal WaveSlot[] Slots { get; private set; }
 
@@ -720,8 +738,10 @@ namespace LibSidWiz
         private readonly System.Collections.Generic.List<PitchSegment> _segmentScratch = new System.Collections.Generic.List<PitchSegment>();
         private readonly System.Collections.Generic.List<int> _framePitchIds = new System.Collections.Generic.List<int>();
         private readonly System.Collections.Generic.List<int> _framePitchSlots = new System.Collections.Generic.List<int>();
+        private readonly System.Collections.Generic.List<PidStat> _pidStats = new System.Collections.Generic.List<PidStat>();
         private readonly System.Collections.Generic.List<int> _gapScratch = new System.Collections.Generic.List<int>();
         private bool[] _slotClaimed;
+        private int[] _slotTail; // per slot: index (into _framePitchIds) of its latest-assigned pitch group, -1 = none this frame
         private Pen[] _slotPens;
         private int _slotPenColorArgb = -1;
         private float _slotPenWidth = -1;
@@ -773,39 +793,70 @@ namespace LibSidWiz
 
             int normalEnd = frameStart + frameSamples * (TriggerLookaheadFrames + 1);
             int failEnd = normalEnd + frameSamples * TriggerLookaheadOnFailureFrames;
+            int statsEnd = Math.Max(failEnd, frameStart + (int)(PitchClassifySeconds * SampleRate));
 
-            // 1. Pitch segments over the whole window (or a detected fallback).
+            // 1. Pitch segments over the classification window (or a detected fallback). Segments
+            //    beyond failEnd only feed the alternation statistics, never a trigger search.
             _segmentScratch.Clear();
             var source = PitchSegments;
             if (source != null && SampleRate > 0)
-                source(frameStart / (double)SampleRate, failEnd / (double)SampleRate, _segmentScratch);
+                source(frameStart / (double)SampleRate, statsEnd / (double)SampleRate, _segmentScratch);
             if (_segmentScratch.Count == 0 && SampleRate > 0)
             {
                 int pid = DetectPitchId(frameStart, normalEnd);
                 _segmentScratch.Add(new PitchSegment(frameStart / (double)SampleRate, failEnd / (double)SampleRate, pid));
             }
 
-            // 2. Distinct pitch ids in first-occurrence order (only those audible in the window).
+            // 2. Group the segments by pitch (±PitchTolerance coalesces vibrato wobble into one
+            //    group) in first-occurrence order, recording each group's time span and whether it
+            //    interleaves with other pitches. Groups are only created for pitches audible inside
+            //    the trigger window; future-only segments just update the statistics.
             _framePitchIds.Clear();
             _framePitchSlots.Clear();
+            _pidStats.Clear();
+            int seq = 0;
             foreach (var seg in _segmentScratch)
             {
-                int segEnd = SegEndSample(seg, failEnd);
                 int segStart = SegStartSample(seg);
-                if (segEnd <= frameStart || segStart >= failEnd)
+                int segEnd = SegEndSampleRaw(seg);
+                if (segEnd <= frameStart || segStart >= statsEnd)
                     continue;
-                if (!_framePitchIds.Contains(seg.PitchId))
-                    _framePitchIds.Add(seg.PitchId);
+                int k = FindPidGroup(seg.PitchId);
+                if (k < 0)
+                {
+                    if (segStart < failEnd)
+                    {
+                        _framePitchIds.Add(seg.PitchId);
+                        _framePitchSlots.Add(-1);
+                        _pidStats.Add(new PidStat
+                        {
+                            FirstStart = segStart,
+                            LastEnd = segEnd,
+                            FirstIndex = seq,
+                            LastIndex = seq,
+                            SegmentCount = 1
+                        });
+                    }
+                }
+                else
+                {
+                    var st = _pidStats[k];
+                    if (segEnd > st.LastEnd)
+                        st.LastEnd = segEnd;
+                    st.LastIndex = seq;
+                    st.SegmentCount++;
+                    _pidStats[k] = st;
+                }
+                ++seq;
             }
 
-            // 3. Resolve each distinct pitch to a slot (re-key / allocate / evict).
-            foreach (int pid in _framePitchIds)
-                _framePitchSlots.Add(ResolveSlot(pid));
+            // 3. Resolve each pitch group to a slot (match / re-key / voice-continue / allocate / evict).
+            ResolveSlots();
 
             // 4. Update most-recent-active markers from every segment.
             foreach (var seg in _segmentScratch)
             {
-                int k = _framePitchIds.IndexOf(seg.PitchId);
+                int k = FindPidGroup(seg.PitchId);
                 if (k < 0)
                     continue;
                 int slotIdx = _framePitchSlots[k];
@@ -816,13 +867,13 @@ namespace LibSidWiz
                     slots[slotIdx].LastActiveEndSample = segEnd;
             }
 
-            // 5. Trigger update for each resolved slot.
-            for (int k = 0; k < _framePitchIds.Count; ++k)
+            // 5. Trigger update per assigned slot, over all of the slot's pitch groups: a joined
+            //    voice's old and new pitch are searched together, so the trigger keeps advancing
+            //    smoothly through the transition just like an unsplit channel would.
+            for (int i = 0; i < n; ++i)
             {
-                int slotIdx = _framePitchSlots[k];
-                if (slotIdx < 0)
-                    continue;
-                UpdateSlotTrigger(slots[slotIdx], _framePitchIds[k], frameStart, frameSamples, normalEnd, failEnd);
+                if (_slotTail[i] >= 0)
+                    UpdateSlotTrigger(slots[i], i, frameStart, frameSamples, normalEnd, failEnd);
             }
 
             // 6. Visibility (song-position keyed) and layout row count.
@@ -840,27 +891,73 @@ namespace LibSidWiz
         private int SegStartSample(PitchSegment seg) => (int)(seg.StartSeconds * SampleRate);
         private int SegEndSample(PitchSegment seg, int cap)
         {
-            int e = (int)(seg.EndSeconds * SampleRate);
+            int e = SegEndSampleRaw(seg);
             return e > cap ? cap : e;
         }
+        private int SegEndSampleRaw(PitchSegment seg)
+        {
+            double e = seg.EndSeconds * SampleRate;
+            return e >= int.MaxValue ? int.MaxValue : (int)e;
+        }
 
-        /// <summary>Maps a pitch id to a slot index for this frame, or -1 if all slots are taken.</summary>
-        private int ResolveSlot(int pid)
+        /// <summary>
+        /// Index of the pitch group this pid belongs to this frame (within ±PitchTolerance for
+        /// pitched ids, so vibrato crossing a semitone boundary stays one group), or -1.
+        /// </summary>
+        private int FindPidGroup(int pid)
+        {
+            for (int k = 0; k < _framePitchIds.Count; ++k)
+            {
+                int g = _framePitchIds[k];
+                if (g == pid || (pid != PitchSegment.Unpitched && g != PitchSegment.Unpitched
+                                 && Math.Abs(g - pid) <= PitchTolerance))
+                    return k;
+            }
+            return -1;
+        }
+
+        private void Claim(int groupIdx, int slotIdx)
+        {
+            _slotClaimed[slotIdx] = true;
+            _slotTail[slotIdx] = groupIdx;
+            _framePitchSlots[groupIdx] = slotIdx;
+        }
+
+        /// <summary>
+        /// Maps this frame's pitch groups to slots. A pitch that keeps recurring gets a persistent
+        /// slot of its own (the arp case), while a pitch that appears after another voice has ended
+        /// continues in that voice's slot — so a melody walking D→F→A lives in one updating slot
+        /// instead of leaving a frozen curve behind at every pitch change.
+        /// </summary>
+        private void ResolveSlots()
         {
             var slots = Slots;
             int n = slots.Length;
-
-            // Exact match (also matches unused slots when pid is Unpitched, giving it a home).
+            if (_slotTail == null || _slotTail.Length != n)
+                _slotTail = new int[n];
             for (int i = 0; i < n; ++i)
-                if (!_slotClaimed[i] && slots[i].PitchId == pid)
-                {
-                    _slotClaimed[i] = true;
-                    return i;
-                }
+                _slotTail[i] = -1;
 
-            // Hysteresis: re-key a near slot (keeps glides/vibrato in one slot, its curve intact).
-            if (pid != PitchSegment.Unpitched)
+            // a) Exact pitch match (also matches unused slots when the group is Unpitched, giving it a home).
+            for (int k = 0; k < _framePitchIds.Count; ++k)
             {
+                int pid = _framePitchIds[k];
+                for (int i = 0; i < n; ++i)
+                    if (!_slotClaimed[i] && slots[i].PitchId == pid)
+                    {
+                        Claim(k, i);
+                        break;
+                    }
+            }
+
+            // b) Hysteresis: re-key a near slot (keeps glides/vibrato in one slot, its curve intact).
+            for (int k = 0; k < _framePitchIds.Count; ++k)
+            {
+                if (_framePitchSlots[k] >= 0)
+                    continue;
+                int pid = _framePitchIds[k];
+                if (pid == PitchSegment.Unpitched)
+                    continue;
                 int nearest = -1, nearestDist = int.MaxValue;
                 for (int i = 0; i < n; ++i)
                 {
@@ -876,46 +973,117 @@ namespace LibSidWiz
                 if (nearest >= 0)
                 {
                     slots[nearest].PitchId = pid;
-                    _slotClaimed[nearest] = true;
-                    return nearest;
+                    Claim(k, nearest);
                 }
             }
 
-            // Free (never captured) slot.
-            for (int i = 0; i < n; ++i)
-                if (!_slotClaimed[i] && !slots[i].HasCurve)
-                {
-                    slots[i].PitchId = pid;
-                    _slotClaimed[i] = true;
-                    return i;
-                }
-
-            // Evict least-recently-active.
-            int evict = -1;
-            int oldest = int.MaxValue;
-            for (int i = 0; i < n; ++i)
+            // c) Voice continuation: this group starts after some voice's last occurrence ended and
+            //    that voice never interleaves with other pitches, so the group is that voice moving
+            //    to a new pitch, not a new alternating layer. If the old pitch is still winding down
+            //    inside the window, the group joins its slot (the trigger then searches both pitches'
+            //    ranges); if the old pitch has already left the window, the slot is re-keyed in place.
+            for (int k = 0; k < _framePitchIds.Count; ++k)
             {
-                if (_slotClaimed[i])
+                if (_framePitchSlots[k] >= 0)
                     continue;
-                if (slots[i].LastActiveEndSample < oldest)
+                int pid = _framePitchIds[k];
+                if (pid == PitchSegment.Unpitched)
+                    continue;
+                var stat = _pidStats[k];
+                int best = -1, bestDiff = int.MaxValue;
+                long bestEnd = long.MinValue;
+                for (int i = 0; i < n; ++i)
                 {
-                    oldest = slots[i].LastActiveEndSample;
-                    evict = i;
+                    int diff;
+                    long end;
+                    if (_slotClaimed[i])
+                    {
+                        int t = _slotTail[i];
+                        if (t < 0)
+                            continue;
+                        int tailPid = _framePitchIds[t];
+                        if (tailPid == PitchSegment.Unpitched)
+                            continue;
+                        var ts = _pidStats[t];
+                        if (ts.Alternating || ts.LastEnd > stat.FirstStart)
+                            continue;
+                        diff = Math.Abs(tailPid - pid);
+                        end = ts.LastEnd;
+                    }
+                    else
+                    {
+                        if (!slots[i].HasCurve || slots[i].PitchId == PitchSegment.Unpitched)
+                            continue;
+                        if (FindPidGroup(slots[i].PitchId) >= 0) // its pitch is still sounding somewhere
+                            continue;
+                        diff = Math.Abs(slots[i].PitchId - pid);
+                        end = slots[i].LastActiveEndSample;
+                    }
+                    // Nearest pitch first (the melodic step is usually small); latest end breaks ties.
+                    if (diff < bestDiff || (diff == bestDiff && end > bestEnd))
+                    {
+                        bestDiff = diff;
+                        bestEnd = end;
+                        best = i;
+                    }
+                }
+                if (best < 0)
+                    continue;
+                if (_slotClaimed[best])
+                {
+                    _slotTail[best] = k; // join; the slot keeps its pid until the old pitch leaves the window
+                    _framePitchSlots[k] = best;
+                }
+                else
+                {
+                    slots[best].PitchId = pid; // re-key; curve kept, so the voice keeps updating in place
+                    Claim(k, best);
                 }
             }
-            if (evict >= 0)
+
+            // d) Free (never captured) slot.
+            for (int k = 0; k < _framePitchIds.Count; ++k)
             {
+                if (_framePitchSlots[k] >= 0)
+                    continue;
+                for (int i = 0; i < n; ++i)
+                    if (!_slotClaimed[i] && !slots[i].HasCurve)
+                    {
+                        slots[i].PitchId = _framePitchIds[k];
+                        Claim(k, i);
+                        break;
+                    }
+            }
+
+            // e) Evict least-recently-active.
+            for (int k = 0; k < _framePitchIds.Count; ++k)
+            {
+                if (_framePitchSlots[k] >= 0)
+                    continue;
+                int evict = -1;
+                int oldest = int.MaxValue;
+                for (int i = 0; i < n; ++i)
+                {
+                    if (_slotClaimed[i])
+                        continue;
+                    if (slots[i].LastActiveEndSample < oldest)
+                    {
+                        oldest = slots[i].LastActiveEndSample;
+                        evict = i;
+                    }
+                }
+                if (evict < 0)
+                    continue;
                 var slot = slots[evict];
-                slot.PitchId = pid;
+                slot.PitchId = _framePitchIds[k];
                 slot.HasCurve = false;
                 slot.LastTrigger = -1;
                 slot.LastUpdateFrameStart = int.MinValue;
-                _slotClaimed[evict] = true;
+                Claim(k, evict);
             }
-            return evict;
         }
 
-        private void UpdateSlotTrigger(WaveSlot slot, int pid, int frameStart, int frameSamples, int normalEnd, int failEnd)
+        private void UpdateSlotTrigger(WaveSlot slot, int slotIdx, int frameStart, int frameSamples, int normalEnd, int failEnd)
         {
             long expected = slot.HasCurve
                 ? (long)slot.LastTrigger + (frameStart - slot.LastUpdateFrameStart)
@@ -928,13 +1096,13 @@ namespace LibSidWiz
             {
                 var scratch = ca.CandidateScratch;
                 scratch.Clear();
-                CollectPitchCandidates(ca, scratch, pid, frameStart, normalEnd);
+                CollectPitchCandidates(ca, scratch, slotIdx, frameStart, normalEnd);
                 result = TriggerCandidateSelector.Select(this, scratch, ca.SelectionTolerance,
                     expected, ShapeStabilityWeight, referenceCenter, windowSpan);
                 if (result < 0 && TriggerLookaheadOnFailureFrames > 0)
                 {
                     scratch.Clear();
-                    CollectPitchCandidates(ca, scratch, pid, normalEnd - 1, failEnd);
+                    CollectPitchCandidates(ca, scratch, slotIdx, normalEnd - 1, failEnd);
                     result = TriggerCandidateSelector.Select(this, scratch, ca.SelectionTolerance,
                         expected, ShapeStabilityWeight, referenceCenter, windowSpan);
                 }
@@ -942,9 +1110,9 @@ namespace LibSidWiz
             else
             {
                 int slotPrev = slot.HasCurve ? slot.LastTrigger : frameStart;
-                result = FindSlotTriggerNonCandidate(pid, frameStart, normalEnd, frameSamples, slotPrev);
+                result = FindSlotTriggerNonCandidate(slotIdx, frameStart, normalEnd, frameSamples, slotPrev);
                 if (result < 0 && TriggerLookaheadOnFailureFrames > 0)
-                    result = FindSlotTriggerNonCandidate(pid, normalEnd - 1, failEnd, frameSamples, slotPrev);
+                    result = FindSlotTriggerNonCandidate(slotIdx, normalEnd - 1, failEnd, frameSamples, slotPrev);
             }
 
             if (result >= 0)
@@ -955,11 +1123,18 @@ namespace LibSidWiz
             }
         }
 
-        private void CollectPitchCandidates(CandidateTriggerAlgorithm ca, System.Collections.Generic.List<TriggerCandidate> results, int pid, int winStart, int winEnd)
+        /// <summary>True when a segment's pitch resolved to the given slot this frame.</summary>
+        private bool SegBelongsToSlot(PitchSegment seg, int slotIdx)
+        {
+            int k = FindPidGroup(seg.PitchId);
+            return k >= 0 && _framePitchSlots[k] == slotIdx;
+        }
+
+        private void CollectPitchCandidates(CandidateTriggerAlgorithm ca, System.Collections.Generic.List<TriggerCandidate> results, int slotIdx, int winStart, int winEnd)
         {
             foreach (var seg in _segmentScratch)
             {
-                if (seg.PitchId != pid)
+                if (!SegBelongsToSlot(seg, slotIdx))
                     continue;
                 int s = SegStartSample(seg);
                 if (s < winStart) s = winStart;
@@ -969,11 +1144,11 @@ namespace LibSidWiz
             }
         }
 
-        private int FindSlotTriggerNonCandidate(int pid, int winStart, int winEnd, int frameSamples, int slotPrev)
+        private int FindSlotTriggerNonCandidate(int slotIdx, int winStart, int winEnd, int frameSamples, int slotPrev)
         {
             foreach (var seg in _segmentScratch)
             {
-                if (seg.PitchId != pid)
+                if (!SegBelongsToSlot(seg, slotIdx))
                     continue;
                 int s = SegStartSample(seg);
                 if (s < winStart) s = winStart;
