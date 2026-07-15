@@ -263,15 +263,15 @@ namespace VisualMusic
                     (_side[ch] == Side.Left ? _leftAssigned : _rightAssigned).Add(ch);
                 leftR.SetRenderFilter(_leftAssigned);
                 rightR.SetRenderFilter(_rightAssigned);
-                leftCount = _leftAssigned.Count;
-                rightCount = _rightAssigned.Count;
+                leftCount = RowSum(_leftAssigned);
+                rightCount = RowSum(_rightAssigned);
             }
             else
             {
                 // Only one side visible: it shows every active channel, no balancing needed.
                 leftR?.SetRenderFilter(null);
                 rightR?.SetRenderFilter(null);
-                leftCount = rightCount = active.Count;
+                leftCount = rightCount = RowSum(active);
             }
 
             // Give both renderers the same slot count so track heights match across the two sides
@@ -314,6 +314,8 @@ namespace VisualMusic
             for (int i = 0; i < active.Count; ++i)
                 _activeSetScratch.Add(active[i]);
 
+            // Weight by the rows each channel occupies (a Separate-mode split channel is several
+            // rows) so the two sides stay balanced by height, not just by channel count.
             int lc = 0, rc = 0;
             if (_side.Count > 0)
             {
@@ -323,9 +325,9 @@ namespace VisualMusic
                     if (!_activeSetScratch.Contains(kv.Key))
                         _sideRemoveScratch.Add(kv.Key);
                     else if (kv.Value == Side.Left)
-                        lc++;
+                        lc += kv.Key.LayoutRows;
                     else
-                        rc++;
+                        rc += kv.Key.LayoutRows;
                 }
                 foreach (var ch in _sideRemoveScratch)
                     _side.Remove(ch);
@@ -336,9 +338,17 @@ namespace VisualMusic
                 var ch = active[i];
                 if (_side.ContainsKey(ch))
                     continue;
-                if (lc <= rc) { _side[ch] = Side.Left; lc++; }
-                else { _side[ch] = Side.Right; rc++; }
+                if (lc <= rc) { _side[ch] = Side.Left; lc += ch.LayoutRows; }
+                else { _side[ch] = Side.Right; rc += ch.LayoutRows; }
             }
+        }
+
+        static int RowSum(IReadOnlyList<Channel> channels)
+        {
+            int sum = 0;
+            for (int i = 0; i < channels.Count; ++i)
+                sum += channels[i].LayoutRows;
+            return sum;
         }
 
         void DrawStrip(Strip strip, float fade, float bgAlpha)

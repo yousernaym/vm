@@ -205,6 +205,33 @@ namespace VisualMusic
             return f ?? AudioProps.DefaultTriggerLookaheadOnFailure;
         }
 
+        /// <summary>Effective shape-stability weight for a track: own value, else global track's, else the hardcoded default.</summary>
+        public float EffectiveShapeStability(TrackProps tp)
+        {
+            float? s = tp?.AudioProps?.ShapeStability;
+            if (s == null && _trackViews != null && _trackViews.Count > 0)
+                s = GlobalTrackProps.AudioProps?.ShapeStability;
+            return s ?? AudioProps.DefaultShapeStability;
+        }
+
+        /// <summary>Effective pitch-split count for a track: own value, else global track's, else the hardcoded default.</summary>
+        public int EffectivePitchSplitCount(TrackProps tp)
+        {
+            int? c = tp?.AudioProps?.PitchSplitCount;
+            if (c == null && _trackViews != null && _trackViews.Count > 0)
+                c = GlobalTrackProps.AudioProps?.PitchSplitCount;
+            return c ?? AudioProps.DefaultPitchSplitCount;
+        }
+
+        /// <summary>Effective pitch-split layout for a track: own value, else global track's, else the hardcoded default.</summary>
+        public int EffectivePitchSplitLayout(TrackProps tp)
+        {
+            int? l = tp?.AudioProps?.PitchSplitLayout;
+            if (l == null && _trackViews != null && _trackViews.Count > 0)
+                l = GlobalTrackProps.AudioProps?.PitchSplitLayout;
+            return l ?? AudioProps.DefaultPitchSplitLayout;
+        }
+
         public float ViewWidthT => _notes == null ? 0 : GlobalViewWidthQn * _notes.TicksPerBeat; //Number of ticks that fits on screen
         public float TrackViewWidthT(TrackProps tp)
             => _notes == null ? 0 : EffectiveViewWidthQn(tp) * _notes.TicksPerBeat;
@@ -350,6 +377,12 @@ namespace VisualMusic
                                 tv.TrackProps.AudioProps.TriggerLookaheadFrames = AudioProps.DefaultTriggerLookahead;
                             if (tv.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames == null)
                                 tv.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames = AudioProps.DefaultTriggerLookaheadOnFailure;
+                            if (tv.TrackProps.AudioProps.ShapeStability == null)
+                                tv.TrackProps.AudioProps.ShapeStability = AudioProps.DefaultShapeStability;
+                            if (tv.TrackProps.AudioProps.PitchSplitCount == null)
+                                tv.TrackProps.AudioProps.PitchSplitCount = AudioProps.DefaultPitchSplitCount;
+                            if (tv.TrackProps.AudioProps.PitchSplitLayout == null)
+                                tv.TrackProps.AudioProps.PitchSplitLayout = AudioProps.DefaultPitchSplitLayout;
                         }
                     }
                 }
@@ -929,6 +962,12 @@ namespace VisualMusic
                 view.TrackProps.AudioProps.TriggerLookaheadFrames = AudioProps.DefaultTriggerLookahead;
             if (view.TrackNumber == 0 && view.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames == null)
                 view.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames = AudioProps.DefaultTriggerLookaheadOnFailure;
+            if (view.TrackNumber == 0 && view.TrackProps.AudioProps.ShapeStability == null)
+                view.TrackProps.AudioProps.ShapeStability = AudioProps.DefaultShapeStability;
+            if (view.TrackNumber == 0 && view.TrackProps.AudioProps.PitchSplitCount == null)
+                view.TrackProps.AudioProps.PitchSplitCount = AudioProps.DefaultPitchSplitCount;
+            if (view.TrackNumber == 0 && view.TrackProps.AudioProps.PitchSplitLayout == null)
+                view.TrackProps.AudioProps.PitchSplitLayout = AudioProps.DefaultPitchSplitLayout;
             view.TrackProps.AudioProps.LineColor = view.TrackProps.MaterialProps.GetSysColor(true, view.TrackProps.GlobalProps.MaterialProps);
             view.TrackProps.AudioProps.SidWizChannel.Filename = "";
             DrawHost?.WaveformPanel?.AddChannel(view.TrackProps.AudioProps.SidWizChannel);
@@ -1089,6 +1128,20 @@ namespace VisualMusic
                 if (ch.TriggerLookaheadOnFailureFrames != lookaheadOnFailure)
                     ch.TriggerLookaheadOnFailureFrames = lookaheadOnFailure;
 
+                float shape = EffectiveShapeStability(tp);
+                if (ch.ShapeStabilityWeight != shape)
+                    ch.ShapeStabilityWeight = shape;
+
+                // Pitch split: count, layout, and the note-derived pitch-segment source (or null →
+                // the channel detects pitch from the audio itself).
+                int splitCount = EffectivePitchSplitCount(tp);
+                if (ch.SplitCount != splitCount)
+                    ch.SplitCount = splitCount;
+                var splitLayout = (LibSidWiz.SplitLayout)EffectivePitchSplitLayout(tp);
+                if (ch.SplitLayout != splitLayout)
+                    ch.SplitLayout = splitLayout;
+                PushPitchSegmentSource(_trackViews[t], tp, ch, splitCount);
+
                 // Fill under the waveform in the track colour, at the global opacity (0 = no fill).
                 int fillAlpha = (int)(Props.AudioVisFillOpacity * 255);
                 var fill = fillAlpha <= 0
@@ -1126,6 +1179,46 @@ namespace VisualMusic
                         ch.ViewWidthInSamples = targetSamples;
                 }
             }
+        }
+
+        // Per-track note-derived pitch-segment sources, cached until the song or playback offset
+        // changes. Built lazily on the UI thread; the render thread reads the pushed delegate.
+        Dictionary<int, LibSidWiz.PitchSegmentSource> _pitchSegmentSources;
+        Midi.Song _pitchSegSong;
+        float _pitchSegOffsetT;
+        float _pitchSegOffsetS;
+
+        /// <summary>
+        /// Pushes the effective pitch-segment source onto a split channel: notes if the track has
+        /// them, else null so the channel detects pitch from the audio. No-op (and null) when the
+        /// track isn't split.
+        /// </summary>
+        void PushPitchSegmentSource(TrackView tv, TrackProps tp, LibSidWiz.Channel ch, int splitCount)
+        {
+            if (splitCount <= 1 || tv.MidiTrack?.Notes == null || tv.MidiTrack.Notes.Count == 0)
+            {
+                if (ch.PitchSegments != null)
+                    ch.PitchSegments = null;
+                return;
+            }
+
+            if (_pitchSegmentSources == null || !ReferenceEquals(_pitchSegSong, _notes)
+                || _pitchSegOffsetT != _playbackOffsetT || _pitchSegOffsetS != Props.PlaybackOffsetS)
+            {
+                _pitchSegmentSources = new Dictionary<int, LibSidWiz.PitchSegmentSource>();
+                _pitchSegSong = _notes;
+                _pitchSegOffsetT = _playbackOffsetT;
+                _pitchSegOffsetS = Props.PlaybackOffsetS;
+            }
+
+            if (!_pitchSegmentSources.TryGetValue(tv.TrackNumber, out var src))
+            {
+                var snapshot = SidWizPitchSegments.Build(this, tv.MidiTrack);
+                src = snapshot != null ? (LibSidWiz.PitchSegmentSource)snapshot.Query : null;
+                _pitchSegmentSources[tv.TrackNumber] = src; // cache the negative result too
+            }
+            if (!ReferenceEquals(ch.PitchSegments, src))
+                ch.PitchSegments = src;
         }
 
         /// <summary>
@@ -1210,7 +1303,10 @@ namespace VisualMusic
                 WaveformViewWidthMs = outProps.AudioProps.WaveformViewWidthMs,
                 TriggerAlgorithmName = outProps.AudioProps.TriggerAlgorithmName,
                 TriggerLookaheadFrames = outProps.AudioProps.TriggerLookaheadFrames,
-                TriggerLookaheadOnFailureFrames = outProps.AudioProps.TriggerLookaheadOnFailureFrames
+                TriggerLookaheadOnFailureFrames = outProps.AudioProps.TriggerLookaheadOnFailureFrames,
+                ShapeStability = outProps.AudioProps.ShapeStability,
+                PitchSplitCount = outProps.AudioProps.PitchSplitCount,
+                PitchSplitLayout = outProps.AudioProps.PitchSplitLayout
             };
             for (int i = 1; i < list.Count; i++)
                 outProps = (TrackProps)MergeObjects(outProps, TrackViews[list[i]].TrackProps);
@@ -1882,6 +1978,32 @@ namespace VisualMusic
                     () => EffectiveTriggerLookaheadOnFailure(tv.TrackProps),
                     v => tv.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames = (int)Math.Round(v),
                     alwaysHold: true);   // integer frame count; fed to the channel via RefreshSidWizChannels
+                _propAccessors[$"{prefix}/ShapeStability"] = PropAccessor.Scalar(
+                    () => EffectiveShapeStability(tv.TrackProps),
+                    v => tv.TrackProps.AudioProps.ShapeStability = (float)v);
+                    // interpolatable weight; fed to the channel via RefreshSidWizChannels
+                _propAccessors[$"{prefix}/PitchSplitCount"] = PropAccessor.Scalar(
+                    () => EffectivePitchSplitCount(tv.TrackProps),
+                    v => tv.TrackProps.AudioProps.PitchSplitCount = (int)Math.Round(v),
+                    alwaysHold: true);   // integer count; fed to the channel via RefreshSidWizChannels
+                // Split layout keyframed in ComboBox-index space (0 = Default/inherit, i = SplitLayout + 1),
+                // mirroring TriggerAlgorithmIndex.
+                _propAccessors[$"{prefix}/PitchSplitLayoutIndex"] = PropAccessor.Scalar(
+                    () =>
+                    {
+                        int? l = tv.TrackProps.AudioProps.PitchSplitLayout;
+                        return l == null ? 0 : l.Value + 1;
+                    },
+                    v =>
+                    {
+                        int idx = (int)Math.Round(v);
+                        // Global track has nothing to inherit: "Default" becomes Stacked there.
+                        tv.TrackProps.AudioProps.PitchSplitLayout =
+                            idx <= 0 || idx > 3
+                                ? (tn == 0 ? AudioProps.DefaultPitchSplitLayout : (int?)null)
+                                : idx - 1;
+                    },
+                    alwaysHold: true);   // discrete selection; fed to the channel via RefreshSidWizChannels
             }
         }
 
@@ -2269,6 +2391,9 @@ namespace VisualMusic
                 destProps.AudioProps.TriggerAlgorithmName = sourceProps.AudioProps.TriggerAlgorithmName;
                 destProps.AudioProps.TriggerLookaheadFrames = sourceProps.AudioProps.TriggerLookaheadFrames;
                 destProps.AudioProps.TriggerLookaheadOnFailureFrames = sourceProps.AudioProps.TriggerLookaheadOnFailureFrames;
+                destProps.AudioProps.ShapeStability = sourceProps.AudioProps.ShapeStability;
+                destProps.AudioProps.PitchSplitCount = sourceProps.AudioProps.PitchSplitCount;
+                destProps.AudioProps.PitchSplitLayout = sourceProps.AudioProps.PitchSplitLayout;
                 destProps.AudioProps.Label = sourceProps.AudioProps.Label;
                 // Reload audio only for tracks whose filename actually changed, so ordinary
                 // undo/redo steps stay cheap.

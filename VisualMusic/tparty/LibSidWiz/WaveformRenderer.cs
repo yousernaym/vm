@@ -194,6 +194,10 @@ namespace LibSidWiz
                     _prevTrigger[i] = frameStartSample - frameSamples;
             }
 
+            // Split slots hold history across frames too; clear them so seeks/export starts are clean.
+            foreach (var ch in _channels)
+                ch.ResetSlots(frameStartSample);
+
             // Also reset the "last frame" marker to the new position
             _lastFrameStartSample = frameStartSample;
         }
@@ -250,7 +254,15 @@ namespace LibSidWiz
                 _frameTriggers[i] = trig;
 
                 if (IsChannelActive(i, ch, trig, frameIndexSamples, frameSamples))
+                {
                     _activeThisFrame.Add(ch);
+                    // Split channels compute their per-pitch slots here (single-writer: only the
+                    // authority renderer runs PrepareFrame; the other strip shares these Channels).
+                    if (ch.SplitCount > 1)
+                        ch.UpdateSlots(frameIndexSamples, frameSamples);
+                    else
+                        ch.LayoutRowsThisFrame = 1;
+                }
             }
 
             _framePrepared = true;
@@ -285,7 +297,8 @@ namespace LibSidWiz
             // size slider, track-hue changes — all baked into the template) rebuild it even while the
             // same set of channels stays visible.
             string sig = string.Join("-", visibleNow.Select(c =>
-                _channels.IndexOf(c) + ":" + c.Label + ":" + (c.LabelFont?.Size ?? 0) + ":" + c.LabelColor.ToArgb()));
+                _channels.IndexOf(c) + ":" + c.Label + ":" + (c.LabelFont?.Size ?? 0) + ":" + c.LabelColor.ToArgb()
+                + ":" + (int)c.SplitLayout + ":" + c.SplitCount + ":" + VisibleSlotMask(c)));
             if (_templateDirty || sig != _visibleSignature)
             {
                 _visibleSignature = sig;
@@ -324,7 +337,23 @@ namespace LibSidWiz
                         _brushes[idx]?.Dispose();
                         _brushes[idx] = new SolidBrush(ch.FillColor);
                     }
-                    RenderWave(g, ch, _frameTriggers[idx], _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
+
+                    if (ch.SplitCount > 1 && ch.Slots != null)
+                    {
+                        var slots = ch.Slots;
+                        for (int k = 0; k < slots.Length; ++k)
+                        {
+                            var slot = slots[k];
+                            if (!slot.HasCurve || !slot.VisibleThisFrame || slot.Bounds.Width <= 0 || slot.Bounds.Height <= 0)
+                                continue;
+                            var pen = ch.SplitLayout == SplitLayout.Overlaid ? ch.GetSlotPen(k) : ch.Pen;
+                            RenderWave(g, ch, slot.Bounds, slot.LastTrigger, pen, _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
+                        }
+                    }
+                    else
+                    {
+                        RenderWave(g, ch, ch.Bounds, _frameTriggers[idx], ch.Pen, _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
+                    }
                 }
             }
 
@@ -443,14 +472,18 @@ namespace LibSidWiz
                 rb = new Rectangle(0, 0, Width, Height);
 
             // Compute per-channel rectangles (stack vertically regardless of Columns when dynamic).
-            // With LayoutSlots > count, channels fill the top rows and the rest stays transparent
-            // so two side-by-side renderers keep identical track heights.
+            // The layout unit is a "row": most channels take one row, but a Separate-mode split
+            // channel takes one row per visible slot. With LayoutSlots > rows, channels fill the top
+            // rows and the rest stays transparent so two side-by-side renderers keep identical heights.
             int count = visible.Count;
-            int slots = Math.Max(count, LayoutSlots);
+            int rows = 0;
+            foreach (var ch in visible)
+                rows += LayoutRowsOf(ch);
+            int slots = Math.Max(rows, LayoutSlots);
             // Region actually occupied by channels (used for per-channel border edge detection).
             var channelsRect = count == 0
                 ? Rectangle.Empty
-                : new Rectangle(rb.Left, rb.Top, rb.Width, count * rb.Height / slots);
+                : new Rectangle(rb.Left, rb.Top, rb.Width, rows * rb.Height / slots);
             // The dark overlay always spans the full slot grid, so with two side-by-side strips the
             // sparser side still shows the backdrop where its extra (empty) slots are — no gap even
             // when the other side has more active tracks.
@@ -469,12 +502,16 @@ namespace LibSidWiz
                 return;
             }
 
+            int row = 0;
             for (int i = 0; i < count; ++i)
             {
-                int x0 = rb.Left, x1 = rb.Right;
-                int y0 = rb.Top + i * rb.Height / slots;
-                int y1 = rb.Top + (i + 1) * rb.Height / slots;
-                visible[i].Bounds = new Rectangle(x0, y0, x1 - x0, y1 - y0);
+                var ch = visible[i];
+                int chRows = LayoutRowsOf(ch);
+                int y0 = rb.Top + row * rb.Height / slots;
+                int y1 = rb.Top + (row + chRows) * rb.Height / slots;
+                ch.Bounds = new Rectangle(rb.Left, y0, rb.Width, y1 - y0);
+                AssignSlotBounds(ch, slots, rb, row);
+                row += chRows;
             }
 
             using (var templateBmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, _templateHandle.AddrOfPinnedObject()))
@@ -486,6 +523,62 @@ namespace LibSidWiz
                 // Per-channel static items (bg box, zero line, border, label)
                 foreach (var ch in visible)
                     DrawChannelTemplate(g, ch, channelsRect);
+            }
+        }
+
+        /// <summary>Rows a channel occupies in the strip layout (Separate split = one per visible slot).</summary>
+        private static int LayoutRowsOf(Channel ch)
+            => ch.SplitCount > 1 ? Math.Max(1, ch.LayoutRowsThisFrame) : 1;
+
+        /// <summary>Bitmask of a split channel's currently-visible slots (0 for non-split), for the template signature.</summary>
+        private static int VisibleSlotMask(Channel ch)
+        {
+            if (ch.SplitCount <= 1 || ch.Slots == null)
+                return 0;
+            int m = 0;
+            for (int k = 0; k < ch.Slots.Length; ++k)
+                if (ch.Slots[k].VisibleThisFrame)
+                    m |= 1 << k;
+            return m;
+        }
+
+        /// <summary>Assign each split slot its drawing rectangle within the channel's row(s).</summary>
+        private void AssignSlotBounds(Channel ch, int slots, Rectangle rb, int startRow)
+        {
+            if (ch.SplitCount <= 1 || ch.Slots == null)
+                return;
+            var s = ch.Slots;
+            switch (ch.SplitLayout)
+            {
+                case SplitLayout.Overlaid:
+                    foreach (var slot in s)
+                        slot.Bounds = ch.Bounds;
+                    break;
+                case SplitLayout.Separate:
+                    // Each visible slot (slot-index order) gets its own full row.
+                    int r = startRow;
+                    foreach (var slot in s)
+                    {
+                        if (!slot.VisibleThisFrame)
+                        {
+                            slot.Bounds = Rectangle.Empty;
+                            continue;
+                        }
+                        int y0 = rb.Top + r * rb.Height / slots;
+                        int y1 = rb.Top + (r + 1) * rb.Height / slots;
+                        slot.Bounds = new Rectangle(rb.Left, y0, rb.Width, y1 - y0);
+                        ++r;
+                    }
+                    break;
+                default: // Stacked: fixed vertical slices of the channel's single row
+                    int n = ch.SplitCount;
+                    for (int k = 0; k < s.Length; ++k)
+                    {
+                        int y0 = ch.Bounds.Top + k * ch.Bounds.Height / n;
+                        int y1 = ch.Bounds.Top + (k + 1) * ch.Bounds.Height / n;
+                        s[k].Bounds = new Rectangle(ch.Bounds.Left, y0, ch.Bounds.Width, y1 - y0);
+                    }
+                    break;
             }
         }
 
@@ -523,6 +616,53 @@ namespace LibSidWiz
             }
         }
 
+        private static void DrawZeroLine(Graphics g, Channel channel, Rectangle bounds)
+        {
+            if (channel.ZeroLineColor == Color.Transparent || channel.ZeroLineWidth <= 0)
+                return;
+            using (var pen = new Pen(channel.ZeroLineColor, channel.ZeroLineWidth))
+            {
+                g.DrawLine(pen,
+                    bounds.Left,
+                    bounds.Top + bounds.Height / 2,
+                    bounds.Right,
+                    bounds.Top + bounds.Height / 2);
+            }
+        }
+
+        private static void DrawBorder(Graphics g, Channel channel, Rectangle bounds, Rectangle rb)
+        {
+            if (channel.BorderWidth <= 0 || channel.BorderColor == Color.Transparent)
+                return;
+            using (var pen = new Pen(channel.BorderColor, channel.BorderWidth))
+            {
+                if (channel.BorderEdges)
+                {
+                    // Pull in 1px on right/bottom.
+                    g.DrawRectangle(
+                        pen,
+                        bounds.Left,
+                        bounds.Top,
+                        bounds.Width - (bounds.Right == rb.Right ? 1 : 0),
+                        bounds.Height - (bounds.Bottom == rb.Bottom ? 1 : 0));
+                }
+                else
+                {
+                    if (bounds.Left != rb.Left)
+                        g.DrawLine(pen, bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
+
+                    if (bounds.Top != rb.Top)
+                        g.DrawLine(pen, bounds.Left, bounds.Top, bounds.Right, bounds.Top);
+
+                    if (bounds.Right != rb.Right)
+                        g.DrawLine(pen, bounds.Right, bounds.Top, bounds.Right, bounds.Bottom);
+
+                    if (bounds.Bottom != rb.Bottom)
+                        g.DrawLine(pen, bounds.Left, bounds.Bottom, bounds.Right, bounds.Bottom);
+                }
+            }
+        }
+
         private void DrawChannelTemplate(Graphics g, Channel channel, Rectangle rb)
         {
             if (channel.BackgroundColor != Color.Transparent)
@@ -531,47 +671,35 @@ namespace LibSidWiz
                     g.FillRectangle(b, channel.Bounds);
             }
 
-            if (channel.ZeroLineColor != Color.Transparent && channel.ZeroLineWidth > 0)
+            // Zero lines and borders: per sub-rect for a split channel, else the whole channel row.
+            if (channel.SplitCount > 1 && channel.Slots != null)
             {
-                using (var pen = new Pen(channel.ZeroLineColor, channel.ZeroLineWidth))
+                switch (channel.SplitLayout)
                 {
-                    g.DrawLine(pen,
-                        channel.Bounds.Left,
-                        channel.Bounds.Top + channel.Bounds.Height / 2,
-                        channel.Bounds.Right,
-                        channel.Bounds.Top + channel.Bounds.Height / 2);
+                    case SplitLayout.Overlaid:
+                        DrawZeroLine(g, channel, channel.Bounds);
+                        DrawBorder(g, channel, channel.Bounds, rb);
+                        break;
+                    case SplitLayout.Separate:
+                        foreach (var slot in channel.Slots)
+                        {
+                            if (!slot.VisibleThisFrame || slot.Bounds.Width <= 0 || slot.Bounds.Height <= 0)
+                                continue;
+                            DrawZeroLine(g, channel, slot.Bounds);
+                            DrawBorder(g, channel, slot.Bounds, rb);
+                        }
+                        break;
+                    default: // Stacked: fixed slices
+                        foreach (var slot in channel.Slots)
+                            DrawZeroLine(g, channel, slot.Bounds);
+                        DrawBorder(g, channel, channel.Bounds, rb);
+                        break;
                 }
             }
-
-            if (channel.BorderWidth > 0 && channel.BorderColor != Color.Transparent)
+            else
             {
-                using (var pen = new Pen(channel.BorderColor, channel.BorderWidth))
-                {
-                    if (channel.BorderEdges)
-                    {
-                        // Pull in 1px on right/bottom.
-                        g.DrawRectangle(
-                            pen,
-                            channel.Bounds.Left,
-                            channel.Bounds.Top,
-                            channel.Bounds.Width - (channel.Bounds.Right == rb.Right ? 1 : 0),
-                            channel.Bounds.Height - (channel.Bounds.Bottom == rb.Bottom ? 1 : 0));
-                    }
-                    else
-                    {
-                        if (channel.Bounds.Left != rb.Left)
-                            g.DrawLine(pen, channel.Bounds.Left, channel.Bounds.Top, channel.Bounds.Left, channel.Bounds.Bottom);
-
-                        if (channel.Bounds.Top != rb.Top)
-                            g.DrawLine(pen, channel.Bounds.Left, channel.Bounds.Top, channel.Bounds.Right, channel.Bounds.Top);
-
-                        if (channel.Bounds.Right != rb.Right)
-                            g.DrawLine(pen, channel.Bounds.Right, channel.Bounds.Top, channel.Bounds.Right, channel.Bounds.Bottom);
-
-                        if (channel.Bounds.Bottom != rb.Bottom)
-                            g.DrawLine(pen, channel.Bounds.Left, channel.Bounds.Bottom, channel.Bounds.Right, channel.Bounds.Bottom);
-                    }
-                }
+                DrawZeroLine(g, channel, channel.Bounds);
+                DrawBorder(g, channel, channel.Bounds, rb);
             }
 
             if (channel.LabelFont != null && channel.LabelColor != Color.Transparent)
@@ -605,14 +733,14 @@ namespace LibSidWiz
             }
         }
 
-        private void RenderWave(Graphics g, Channel channel, int triggerPoint, Brush brush, PointF[] points, GraphicsPath path, double fillBase)
+        private void RenderWave(Graphics g, Channel channel, Rectangle bounds, int triggerPoint, Pen pen, Brush brush, PointF[] points, GraphicsPath path, double fillBase)
         {
             var leftmostSampleIndex = triggerPoint - channel.ViewWidthInSamples / 2;
 
-            float xOffset = channel.Bounds.Left;
-            float xScale = (float)channel.Bounds.Width / channel.ViewWidthInSamples;
-            float yOffset = channel.Bounds.Top + channel.Bounds.Height * 0.5f;
-            float yScale = -channel.Bounds.Height * 0.5f;
+            float xOffset = bounds.Left;
+            float xScale = (float)bounds.Width / channel.ViewWidthInSamples;
+            float yOffset = bounds.Top + bounds.Height * 0.5f;
+            float yScale = -bounds.Height * 0.5f;
 
             for (int i = 0; i < channel.ViewWidthInSamples; ++i)
             {
@@ -624,16 +752,16 @@ namespace LibSidWiz
             if (channel.Clip)
             {
                 for (int i = 0; i < channel.ViewWidthInSamples; ++i)
-                    points[i].Y = Math.Min(Math.Max(points[i].Y, channel.Bounds.Top), channel.Bounds.Bottom);
+                    points[i].Y = Math.Min(Math.Max(points[i].Y, bounds.Top), bounds.Bottom);
             }
 
             g.SmoothingMode = channel.SmoothLines ? SmoothingMode.HighQuality : SmoothingMode.None;
 
-            g.DrawLines(channel.Pen, points);
+            g.DrawLines(pen, points);
 
             if (brush != null)
             {
-                var baseY = (float)(yOffset + channel.Bounds.Height * -0.5 * fillBase);
+                var baseY = (float)(yOffset + bounds.Height * -0.5 * fillBase);
                 path.Reset();
                 path.AddLine(points[0].X, baseY, points[0].X, points[0].Y);
                 path.AddLines(points);

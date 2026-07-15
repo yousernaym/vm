@@ -43,6 +43,10 @@ namespace LibSidWiz
         private ITriggerAlgorithm _algorithm;
         private int _triggerLookaheadFrames = 1; // Current frame plus one ahead
         private int _triggerLookaheadOnFailureFrames = 3; // Extra frames searched beyond the normal window on failure
+        private float _shapeStabilityWeight;
+        private int _splitCount = 1;
+        private SplitLayout _splitLayout = SplitLayout.Stacked;
+        internal const int MaxSplitCount = 4;
         private Color _lineColor = Color.White;
         private string _label = "";
         private float _lineWidth = 3;
@@ -293,6 +297,57 @@ namespace LibSidWiz
                 Changed?.Invoke(this, false);
             }
         }
+
+        [Category("Triggering")]
+        [Description("0 = pick the sync point nearest the expected position; higher values instead prefer the candidate whose surrounding waveform best matches the previous frame's, steadying complex timbres that hop between similar cycles. Only affects candidate-based algorithms (Peak speed, Biggest wave area, Biggest positive area).")]
+        public float ShapeStabilityWeight
+        {
+            get => _shapeStabilityWeight;
+            set
+            {
+                _shapeStabilityWeight = value;
+                Changed?.Invoke(this, false);
+            }
+        }
+
+        [Category("Triggering")]
+        [Description("Number of waveforms to split the channel into by pitch (1 = off). Chip arpeggios then show one stable waveform per pitch instead of one flickering one.")]
+        public int SplitCount
+        {
+            get => _splitCount;
+            set
+            {
+                int clamped = value < 1 ? 1 : (value > MaxSplitCount ? MaxSplitCount : value);
+                if (clamped == _splitCount)
+                    return;
+                _splitCount = clamped;
+                // Publish a fresh slot array (or null) as the last step so a worker reading the old
+                // reference mid-frame stays consistent.
+                Slots = clamped > 1 ? BuildSlots(clamped) : null;
+                Changed?.Invoke(this, false);
+            }
+        }
+
+        [Category("Triggering")]
+        [Description("How the split waveforms are arranged within the channel's area.")]
+        public SplitLayout SplitLayout
+        {
+            get => _splitLayout;
+            set
+            {
+                _splitLayout = value;
+                Changed?.Invoke(this, false);
+            }
+        }
+
+        /// <summary>
+        /// Injected by the app: given an audio-time range, appends the pitch segments overlapping it.
+        /// Null falls back to detecting pitch from the audio itself. Read once per frame on the render
+        /// thread, so replacing it is safe.
+        /// </summary>
+        [JsonIgnore]
+        [Browsable(false)]
+        public PitchSegmentSource PitchSegments { get; set; }
 
         [Category("Appearance")]
         [Description("Seconds of upcoming silence after which the channel is hidden. Re-read every frame, so no change notification is needed.")]
@@ -646,6 +701,365 @@ namespace LibSidWiz
             return result;
         }
 
+        // ===================== Pitch split =====================
+
+        private const int PitchTolerance = 1; // semitones; glides (±1) stay in one slot, arps split
+
+        /// <summary>Per-pitch rendering slots (null when SplitCount &lt;= 1). Read by the renderer.</summary>
+        internal WaveSlot[] Slots { get; private set; }
+
+        /// <summary>Rows this channel occupies in the strip layout this frame (Separate mode only differs from 1).</summary>
+        internal int LayoutRowsThisFrame { get; set; } = 1;
+
+        /// <summary>Public row count for side-balancing in WaveformPanel (a separate assembly).</summary>
+        [JsonIgnore]
+        [Browsable(false)]
+        public int LayoutRows => SplitCount > 1 ? Math.Max(1, LayoutRowsThisFrame) : 1;
+
+        // Scratch reused across frames; render thread only, same rationale as the trigger candidate lists.
+        private readonly System.Collections.Generic.List<PitchSegment> _segmentScratch = new System.Collections.Generic.List<PitchSegment>();
+        private readonly System.Collections.Generic.List<int> _framePitchIds = new System.Collections.Generic.List<int>();
+        private readonly System.Collections.Generic.List<int> _framePitchSlots = new System.Collections.Generic.List<int>();
+        private readonly System.Collections.Generic.List<int> _gapScratch = new System.Collections.Generic.List<int>();
+        private bool[] _slotClaimed;
+        private Pen[] _slotPens;
+        private int _slotPenColorArgb = -1;
+        private float _slotPenWidth = -1;
+
+        private static WaveSlot[] BuildSlots(int n)
+        {
+            var slots = new WaveSlot[n];
+            for (int i = 0; i < n; ++i)
+                slots[i] = new WaveSlot();
+            return slots;
+        }
+
+        /// <summary>Clears all slot history, e.g. after seeking backwards or at export start.</summary>
+        internal void ResetSlots(int frameStartSample)
+        {
+            LayoutRowsThisFrame = 1;
+            var slots = Slots;
+            if (slots == null)
+                return;
+            foreach (var slot in slots)
+            {
+                slot.PitchId = PitchSegment.Unpitched;
+                slot.LastTrigger = -1;
+                slot.LastUpdateFrameStart = int.MinValue;
+                slot.LastActiveEndSample = int.MinValue;
+                slot.HasCurve = false;
+                slot.VisibleThisFrame = false;
+            }
+        }
+
+        /// <summary>
+        /// Per-frame split engine: classifies the window's pitch segments into persistent slots and
+        /// updates each active slot's trigger, holding the others' last curve. Only called for
+        /// channels with SplitCount &gt; 1, on the render thread (single writer).
+        /// </summary>
+        internal void UpdateSlots(int frameStart, int frameSamples)
+        {
+            var slots = Slots;
+            if (slots == null)
+            {
+                LayoutRowsThisFrame = 1;
+                return;
+            }
+            int n = slots.Length;
+            if (_slotClaimed == null || _slotClaimed.Length != n)
+                _slotClaimed = new bool[n];
+            else
+                Array.Clear(_slotClaimed, 0, n);
+
+            int normalEnd = frameStart + frameSamples * (TriggerLookaheadFrames + 1);
+            int failEnd = normalEnd + frameSamples * TriggerLookaheadOnFailureFrames;
+
+            // 1. Pitch segments over the whole window (or a detected fallback).
+            _segmentScratch.Clear();
+            var source = PitchSegments;
+            if (source != null && SampleRate > 0)
+                source(frameStart / (double)SampleRate, failEnd / (double)SampleRate, _segmentScratch);
+            if (_segmentScratch.Count == 0 && SampleRate > 0)
+            {
+                int pid = DetectPitchId(frameStart, normalEnd);
+                _segmentScratch.Add(new PitchSegment(frameStart / (double)SampleRate, failEnd / (double)SampleRate, pid));
+            }
+
+            // 2. Distinct pitch ids in first-occurrence order (only those audible in the window).
+            _framePitchIds.Clear();
+            _framePitchSlots.Clear();
+            foreach (var seg in _segmentScratch)
+            {
+                int segEnd = SegEndSample(seg, failEnd);
+                int segStart = SegStartSample(seg);
+                if (segEnd <= frameStart || segStart >= failEnd)
+                    continue;
+                if (!_framePitchIds.Contains(seg.PitchId))
+                    _framePitchIds.Add(seg.PitchId);
+            }
+
+            // 3. Resolve each distinct pitch to a slot (re-key / allocate / evict).
+            foreach (int pid in _framePitchIds)
+                _framePitchSlots.Add(ResolveSlot(pid));
+
+            // 4. Update most-recent-active markers from every segment.
+            foreach (var seg in _segmentScratch)
+            {
+                int k = _framePitchIds.IndexOf(seg.PitchId);
+                if (k < 0)
+                    continue;
+                int slotIdx = _framePitchSlots[k];
+                if (slotIdx < 0)
+                    continue;
+                int segEnd = SegEndSample(seg, failEnd);
+                if (segEnd > slots[slotIdx].LastActiveEndSample)
+                    slots[slotIdx].LastActiveEndSample = segEnd;
+            }
+
+            // 5. Trigger update for each resolved slot.
+            for (int k = 0; k < _framePitchIds.Count; ++k)
+            {
+                int slotIdx = _framePitchSlots[k];
+                if (slotIdx < 0)
+                    continue;
+                UpdateSlotTrigger(slots[slotIdx], _framePitchIds[k], frameStart, frameSamples, normalEnd, failEnd);
+            }
+
+            // 6. Visibility (song-position keyed) and layout row count.
+            long hideAfter = (long)(ActivityLookaheadSeconds * SampleRate);
+            int visible = 0;
+            foreach (var slot in slots)
+            {
+                slot.VisibleThisFrame = slot.HasCurve && (frameStart - (long)slot.LastActiveEndSample) <= hideAfter;
+                if (slot.VisibleThisFrame)
+                    ++visible;
+            }
+            LayoutRowsThisFrame = SplitLayout == SplitLayout.Separate ? Math.Max(1, visible) : 1;
+        }
+
+        private int SegStartSample(PitchSegment seg) => (int)(seg.StartSeconds * SampleRate);
+        private int SegEndSample(PitchSegment seg, int cap)
+        {
+            int e = (int)(seg.EndSeconds * SampleRate);
+            return e > cap ? cap : e;
+        }
+
+        /// <summary>Maps a pitch id to a slot index for this frame, or -1 if all slots are taken.</summary>
+        private int ResolveSlot(int pid)
+        {
+            var slots = Slots;
+            int n = slots.Length;
+
+            // Exact match (also matches unused slots when pid is Unpitched, giving it a home).
+            for (int i = 0; i < n; ++i)
+                if (!_slotClaimed[i] && slots[i].PitchId == pid)
+                {
+                    _slotClaimed[i] = true;
+                    return i;
+                }
+
+            // Hysteresis: re-key a near slot (keeps glides/vibrato in one slot, its curve intact).
+            if (pid != PitchSegment.Unpitched)
+            {
+                int nearest = -1, nearestDist = int.MaxValue;
+                for (int i = 0; i < n; ++i)
+                {
+                    if (_slotClaimed[i] || !slots[i].HasCurve || slots[i].PitchId == PitchSegment.Unpitched)
+                        continue;
+                    int d = Math.Abs(slots[i].PitchId - pid);
+                    if (d <= PitchTolerance && d < nearestDist)
+                    {
+                        nearestDist = d;
+                        nearest = i;
+                    }
+                }
+                if (nearest >= 0)
+                {
+                    slots[nearest].PitchId = pid;
+                    _slotClaimed[nearest] = true;
+                    return nearest;
+                }
+            }
+
+            // Free (never captured) slot.
+            for (int i = 0; i < n; ++i)
+                if (!_slotClaimed[i] && !slots[i].HasCurve)
+                {
+                    slots[i].PitchId = pid;
+                    _slotClaimed[i] = true;
+                    return i;
+                }
+
+            // Evict least-recently-active.
+            int evict = -1;
+            int oldest = int.MaxValue;
+            for (int i = 0; i < n; ++i)
+            {
+                if (_slotClaimed[i])
+                    continue;
+                if (slots[i].LastActiveEndSample < oldest)
+                {
+                    oldest = slots[i].LastActiveEndSample;
+                    evict = i;
+                }
+            }
+            if (evict >= 0)
+            {
+                var slot = slots[evict];
+                slot.PitchId = pid;
+                slot.HasCurve = false;
+                slot.LastTrigger = -1;
+                slot.LastUpdateFrameStart = int.MinValue;
+                _slotClaimed[evict] = true;
+            }
+            return evict;
+        }
+
+        private void UpdateSlotTrigger(WaveSlot slot, int pid, int frameStart, int frameSamples, int normalEnd, int failEnd)
+        {
+            long expected = slot.HasCurve
+                ? (long)slot.LastTrigger + (frameStart - slot.LastUpdateFrameStart)
+                : frameStart + frameSamples / 2;
+            int referenceCenter = slot.HasCurve ? slot.LastTrigger : -1;
+            int windowSpan = normalEnd - frameStart;
+
+            int result;
+            if (Algorithm is CandidateTriggerAlgorithm ca)
+            {
+                var scratch = ca.CandidateScratch;
+                scratch.Clear();
+                CollectPitchCandidates(ca, scratch, pid, frameStart, normalEnd);
+                result = TriggerCandidateSelector.Select(this, scratch, ca.SelectionTolerance,
+                    expected, ShapeStabilityWeight, referenceCenter, windowSpan);
+                if (result < 0 && TriggerLookaheadOnFailureFrames > 0)
+                {
+                    scratch.Clear();
+                    CollectPitchCandidates(ca, scratch, pid, normalEnd - 1, failEnd);
+                    result = TriggerCandidateSelector.Select(this, scratch, ca.SelectionTolerance,
+                        expected, ShapeStabilityWeight, referenceCenter, windowSpan);
+                }
+            }
+            else
+            {
+                int slotPrev = slot.HasCurve ? slot.LastTrigger : frameStart;
+                result = FindSlotTriggerNonCandidate(pid, frameStart, normalEnd, frameSamples, slotPrev);
+                if (result < 0 && TriggerLookaheadOnFailureFrames > 0)
+                    result = FindSlotTriggerNonCandidate(pid, normalEnd - 1, failEnd, frameSamples, slotPrev);
+            }
+
+            if (result >= 0)
+            {
+                slot.LastTrigger = result;
+                slot.LastUpdateFrameStart = frameStart;
+                slot.HasCurve = true;
+            }
+        }
+
+        private void CollectPitchCandidates(CandidateTriggerAlgorithm ca, System.Collections.Generic.List<TriggerCandidate> results, int pid, int winStart, int winEnd)
+        {
+            foreach (var seg in _segmentScratch)
+            {
+                if (seg.PitchId != pid)
+                    continue;
+                int s = SegStartSample(seg);
+                if (s < winStart) s = winStart;
+                int e = SegEndSample(seg, winEnd);
+                if (e - s >= 2)
+                    ca.CollectCandidates(this, s, e, results);
+            }
+        }
+
+        private int FindSlotTriggerNonCandidate(int pid, int winStart, int winEnd, int frameSamples, int slotPrev)
+        {
+            foreach (var seg in _segmentScratch)
+            {
+                if (seg.PitchId != pid)
+                    continue;
+                int s = SegStartSample(seg);
+                if (s < winStart) s = winStart;
+                int e = SegEndSample(seg, winEnd);
+                if (e - s < 2)
+                    continue;
+                int r = Algorithm.GetTriggerPoint(this, s, e, frameSamples, slotPrev);
+                if (r >= s)
+                    return r;
+            }
+            return -1;
+        }
+
+        /// <summary>Estimates a MIDI-semitone pitch id from the audio (fallback when no note data).</summary>
+        private int DetectPitchId(int start, int end)
+        {
+            _gapScratch.Clear();
+            int prevCrossing = -1;
+            float prev = GetSample(start);
+            for (int i = start + 1; i < end; ++i)
+            {
+                float s = GetSample(i);
+                if (s > 0 && prev <= 0)
+                {
+                    if (prevCrossing >= 0)
+                        _gapScratch.Add(i - prevCrossing);
+                    prevCrossing = i;
+                }
+                prev = s;
+            }
+            if (_gapScratch.Count < 2) // need >= 3 crossings
+                return PitchSegment.Unpitched;
+
+            _gapScratch.Sort();
+            int mid = _gapScratch.Count / 2;
+            double median = _gapScratch.Count % 2 == 1
+                ? _gapScratch[mid]
+                : (_gapScratch[mid - 1] + _gapScratch[mid]) / 2.0;
+            if (median <= 0)
+                return PitchSegment.Unpitched;
+
+            double devSum = 0;
+            foreach (int g in _gapScratch)
+                devSum += Math.Abs(g - median);
+            double dev = devSum / _gapScratch.Count;
+            if (dev > 0.25 * median) // too irregular => noise/drums
+                return PitchSegment.Unpitched;
+
+            double freq = SampleRate / median;
+            return (int)Math.Round(69 + 12 * Math.Log(freq / 440.0, 2));
+        }
+
+        /// <summary>Pen for a split slot in Overlaid mode; slot 0 is the base colour, others vary in brightness.</summary>
+        internal Pen GetSlotPen(int slotIndex)
+        {
+            int argb = _lineColor.ToArgb();
+            if (_slotPens == null || _slotPenColorArgb != argb || _slotPenWidth != Pen.Width)
+            {
+                if (_slotPens != null)
+                    foreach (var p in _slotPens) p?.Dispose();
+                _slotPens = new Pen[MaxSplitCount];
+                for (int i = 0; i < MaxSplitCount; ++i)
+                    _slotPens[i] = new Pen(SlotColor(i), Pen.Width);
+                _slotPenColorArgb = argb;
+                _slotPenWidth = Pen.Width;
+            }
+            return _slotPens[((slotIndex % MaxSplitCount) + MaxSplitCount) % MaxSplitCount];
+        }
+
+        private Color SlotColor(int i)
+        {
+            switch (i)
+            {
+                case 0: return _lineColor;
+                case 1: return Lerp(_lineColor, Color.White, 0.3f);
+                case 2: return Lerp(_lineColor, Color.Black, 0.3f);
+                default: return Lerp(_lineColor, Color.White, 0.55f);
+            }
+        }
+
+        private static Color Lerp(Color a, Color b, float t) => Color.FromArgb(
+            a.A,
+            (int)(a.R + (b.R - a.R) * t),
+            (int)(a.G + (b.G - a.G) * t),
+            (int)(a.B + (b.B - a.B) * t));
+
         public static string GuessNameFromMultidumperFilename(string filename)
         {
             var namePart = Path.GetFileNameWithoutExtension(filename);
@@ -805,6 +1219,8 @@ namespace LibSidWiz
                 _samplesForTrigger.Dispose();
             }
             _labelFont?.Dispose();
+            if (_slotPens != null)
+                foreach (var p in _slotPens) p?.Dispose();
         }
 
         public string ToJson()

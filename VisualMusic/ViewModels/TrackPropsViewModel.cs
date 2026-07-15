@@ -1042,6 +1042,70 @@ namespace VisualMusic.ViewModels
             }
         }
 
+        /// <summary>
+        /// Shape-stability weight (0..1); empty = inherit the global track's value (which, when also
+        /// empty, falls back to <see cref="AudioProps.DefaultShapeStability"/>). Same string/blank
+        /// semantics as <see cref="SilenceThreshold"/>.
+        /// </summary>
+        public double? ShapeStability
+        {
+            get => _mergedProps?.AudioProps?.ShapeStability;
+            set
+            {
+                if (value == null)
+                    Apply(tp => tp.AudioProps.ShapeStability = null);
+                else if (value >= 0)
+                    Apply(tp => tp.AudioProps.ShapeStability = (float)value.Value);
+            }
+        }
+
+        /// <summary>
+        /// Pitch-split count (1 = off); empty = inherit the global track's value (which, when also
+        /// empty, falls back to <see cref="AudioProps.DefaultPitchSplitCount"/>). Same string/blank
+        /// semantics as <see cref="SilenceThreshold"/>.
+        /// </summary>
+        public double? PitchSplitCount
+        {
+            get => _mergedProps?.AudioProps?.PitchSplitCount;
+            set
+            {
+                if (value == null)
+                    Apply(tp => tp.AudioProps.PitchSplitCount = null);
+                else if (value >= 1)
+                    Apply(tp => tp.AudioProps.PitchSplitCount = (int)value.Value);
+            }
+        }
+
+        /// <summary>
+        /// Pitch-split layout as a ComboBox index: 0 = Default (inherit the global track's value,
+        /// which itself falls back to Stacked), i = <see cref="LibSidWiz.SplitLayout"/> + 1. Mirrors
+        /// <see cref="TriggerAlgorithmIndex"/>: the global track coerces "Default" to Stacked, and
+        /// selecting across differing tracks shows blank (-1).
+        /// </summary>
+        public int PitchSplitLayoutIndex
+        {
+            get
+            {
+                var ap = _mergedProps?.AudioProps;
+                if (ap == null) return -1;
+                int? l = ap.PitchSplitLayout;
+                if (l == null) return IsOnlyGlobalSelected ? 1 : 0;
+                return l.Value + 1;
+            }
+            set
+            {
+                if (value < 0) return;
+                int? layout = value == 0 || value > 3 ? (int?)null : value - 1;
+                Apply(tp => tp.AudioProps.PitchSplitLayout =
+                    layout == null && tp.TrackView?.TrackNumber == 0
+                        ? AudioProps.DefaultPitchSplitLayout
+                        : layout);
+                if (SelectedTrackCount > 1 && _mergedProps != null)
+                    _mergedProps.AudioProps.PitchSplitLayout = layout;
+                OnPropertyChanged();
+            }
+        }
+
         public Action BrowseAudioFile { get; set; }
         /// <summary>Batch audio-file assignment (Global-only selection); wired by MainViewModel.</summary>
         public Func<Task> BrowseMultipleAudioFiles { get; set; }
