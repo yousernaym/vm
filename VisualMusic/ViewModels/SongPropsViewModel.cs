@@ -147,7 +147,9 @@ namespace VisualMusic.ViewModels
             set
             {
                 if (value == null || Props == null) return;
-                int v = (int)value;
+                // Round, don't truncate: slider drags deliver fractional values, which (int) would
+                // floor back to the previous step (matches the MaxPitch keyframe accessor in Project.cs).
+                int v = (int)Math.Round(value.Value);
                 int? minNote = NotesMinPitch?.Invoke();
                 if (minNote.HasValue && v < minNote.Value) v = minNote.Value;
                 Props.MaxPitch = v;
@@ -162,7 +164,9 @@ namespace VisualMusic.ViewModels
             set
             {
                 if (value == null || Props == null) return;
-                int v = (int)value;
+                // Round, don't truncate: slider drags deliver fractional values, which (int) would
+                // floor back to the previous step (matches the MinPitch keyframe accessor in Project.cs).
+                int v = (int)Math.Round(value.Value);
                 int? maxNote = NotesMaxPitch?.Invoke();
                 if (maxNote.HasValue && v > maxNote.Value) v = maxNote.Value;
                 Props.MinPitch = v;

@@ -142,6 +142,9 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(TriggerAlgorithmIndex));
             OnPropertyChanged(nameof(TriggerLookaheadFrames));
             OnPropertyChanged(nameof(TriggerLookaheadOnFailureFrames));
+            OnPropertyChanged(nameof(ShapeStability));
+            OnPropertyChanged(nameof(PitchSplitCount));
+            OnPropertyChanged(nameof(PitchSplitLayoutIndex));
         }
 
         /// <summary>
@@ -236,6 +239,9 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(TriggerAlgorithmIndex));
             OnPropertyChanged(nameof(TriggerLookaheadFrames));
             OnPropertyChanged(nameof(TriggerLookaheadOnFailureFrames));
+            OnPropertyChanged(nameof(ShapeStability));
+            OnPropertyChanged(nameof(PitchSplitCount));
+            OnPropertyChanged(nameof(PitchSplitLayoutIndex));
         }
 
         // =====================================================================
@@ -489,7 +495,9 @@ namespace VisualMusic.ViewModels
         public double? ModAngleDest
         {
             get => (double?)ME?.AngleDest;
-            set { if (value != null) ApplyMod(m => m.AngleDest = (int)value); OnPropertyChanged(); }
+            // Round, don't truncate: slider drags deliver fractional values, which (int) would floor
+            // back to the previous step (matches the ModAngleDest keyframe accessor in Project.cs).
+            set { if (value != null) ApplyMod(m => m.AngleDest = (int)Math.Round(value.Value)); OnPropertyChanged(); }
         }
 
         // -- Interpolation --
@@ -1019,7 +1027,9 @@ namespace VisualMusic.ViewModels
                 if (value == null)
                     Apply(tp => tp.AudioProps.TriggerLookaheadFrames = null);
                 else if (value >= 0)
-                    Apply(tp => tp.AudioProps.TriggerLookaheadFrames = (int)value.Value);
+                    // Round, don't truncate: slider drags deliver fractional values, which (int)
+                    // would floor back to the previous step.
+                    Apply(tp => tp.AudioProps.TriggerLookaheadFrames = (int)Math.Round(value.Value));
             }
         }
 
@@ -1038,7 +1048,9 @@ namespace VisualMusic.ViewModels
                 if (value == null)
                     Apply(tp => tp.AudioProps.TriggerLookaheadOnFailureFrames = null);
                 else if (value >= 0)
-                    Apply(tp => tp.AudioProps.TriggerLookaheadOnFailureFrames = (int)value.Value);
+                    // Round, don't truncate: slider drags deliver fractional values, which (int)
+                    // would floor back to the previous step.
+                    Apply(tp => tp.AudioProps.TriggerLookaheadOnFailureFrames = (int)Math.Round(value.Value));
             }
         }
 
@@ -1072,7 +1084,9 @@ namespace VisualMusic.ViewModels
                 if (value == null)
                     Apply(tp => tp.AudioProps.PitchSplitCount = null);
                 else if (value >= 1)
-                    Apply(tp => tp.AudioProps.PitchSplitCount = (int)value.Value);
+                    // Round, don't truncate: slider drags deliver fractional values (e.g. 1.98 for a
+                    // displayed "2"), which (int) would floor back to the previous step.
+                    Apply(tp => tp.AudioProps.PitchSplitCount = (int)Math.Round(value.Value));
             }
         }
 
