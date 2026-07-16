@@ -60,6 +60,10 @@ namespace LibSidWiz
             }
         }
 
+        // The whole normalised sample array, or null before Analyze() ran / on failure. The array is
+        // never mutated after Analyze(), so a reference held by another thread is safe to read.
+        internal float[] Decoded => _decoded;
+
         public void Analyze()
         {
             // Read all samples on the current thread (same thread that created _reader and its

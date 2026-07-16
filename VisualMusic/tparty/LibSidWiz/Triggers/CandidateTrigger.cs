@@ -36,19 +36,11 @@ namespace LibSidWiz.Triggers
         protected virtual float ScoreTolerance => 0.7f;
 
         // Reused across frames to avoid per-frame allocations; safe because triggers run
-        // sequentially on the render thread (WaveformRenderer.PrepareFrame). The pitch-split path
-        // (Channel.UpdateSlots) borrows this via CandidateScratch to pool candidates across
-        // several disjoint sub-ranges before a single Select call.
+        // sequentially on the render thread (WaveformRenderer.PrepareFrame).
         private readonly List<TriggerCandidate> _candidates = new List<TriggerCandidate>();
 
         /// <summary>Appends this algorithm's candidate sync points in [startIndex, endIndex) to results.</summary>
         public abstract void CollectCandidates(Channel channel, int startIndex, int endIndex, List<TriggerCandidate> results);
-
-        /// <summary>Scratch candidate list, reused for pooled multi-range selection (pitch split).</summary>
-        internal List<TriggerCandidate> CandidateScratch => _candidates;
-
-        /// <summary>Score tolerance exposed for the pitch-split path, which selects candidates directly.</summary>
-        internal float SelectionTolerance => ScoreTolerance;
 
         public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int frameSamples, int previousIndex)
         {

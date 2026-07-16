@@ -297,7 +297,7 @@ namespace LibSidWiz
             // size slider, track-hue changes — all baked into the template) rebuild it even while the
             // same set of channels stays visible.
             string sig = string.Join("-", visibleNow.Select(c =>
-                _channels.IndexOf(c) + ":" + c.Label + ":" + (c.LabelFont?.Size ?? 0) + ":" + c.LabelColor.ToArgb()
+                _channels.IndexOf(c) + ":" + c.EffectiveLabel + ":" + (c.LabelFont?.Size ?? 0) + ":" + c.LabelColor.ToArgb()
                 + ":" + (int)c.SplitLayout + ":" + c.SplitCount + ":" + VisibleSlotMask(c)));
             if (_templateDirty || sig != _visibleSignature)
             {
@@ -338,7 +338,7 @@ namespace LibSidWiz
                         _brushes[idx] = new SolidBrush(ch.FillColor);
                     }
 
-                    if (ch.SplitCount > 1 && ch.Slots != null)
+                    if (ch.SplitPreparedThisFrame && ch.Slots != null)
                     {
                         var slots = ch.Slots;
                         for (int k = 0; k < slots.Length; ++k)
@@ -347,7 +347,10 @@ namespace LibSidWiz
                             if (!slot.HasCurve || !slot.VisibleThisFrame || slot.Bounds.Width <= 0 || slot.Bounds.Height <= 0)
                                 continue;
                             var pen = ch.SplitLayout == SplitLayout.Overlaid ? ch.GetSlotPen(k) : ch.Pen;
-                            RenderWave(g, ch, slot.Bounds, slot.LastTrigger, pen, _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase);
+                            // Draw the slot from its own voice buffer (routed via GetSample).
+                            ch.SetActiveVoice(ch.FrameVoiceSamples(k));
+                            try { RenderWave(g, ch, slot.Bounds, slot.LastTrigger, pen, _brushes[idx], _pointsPerChannel[idx], _fillPath, ch.FillBase); }
+                            finally { ch.SetActiveVoice(null); }
                         }
                     }
                     else
@@ -533,7 +536,7 @@ namespace LibSidWiz
         /// <summary>Bitmask of a split channel's currently-visible slots (0 for non-split), for the template signature.</summary>
         private static int VisibleSlotMask(Channel ch)
         {
-            if (ch.SplitCount <= 1 || ch.Slots == null)
+            if (!ch.SplitPreparedThisFrame || ch.Slots == null)
                 return 0;
             int m = 0;
             for (int k = 0; k < ch.Slots.Length; ++k)
@@ -672,7 +675,7 @@ namespace LibSidWiz
             }
 
             // Zero lines and borders: per sub-rect for a split channel, else the whole channel row.
-            if (channel.SplitCount > 1 && channel.Slots != null)
+            if (channel.SplitPreparedThisFrame && channel.Slots != null)
             {
                 switch (channel.SplitLayout)
                 {
@@ -728,7 +731,7 @@ namespace LibSidWiz
                         default: throw new ArgumentOutOfRangeException();
                     }
 
-                    g.DrawString(channel.Label, channel.LabelFont, brush, layoutRectangle, stringFormat);
+                    g.DrawString(channel.EffectiveLabel, channel.LabelFont, brush, layoutRectangle, stringFormat);
                 }
             }
         }

@@ -1132,15 +1132,15 @@ namespace VisualMusic
                 if (ch.ShapeStabilityWeight != shape)
                     ch.ShapeStabilityWeight = shape;
 
-                // Pitch split: count, layout, and the note-derived pitch-segment source (or null →
-                // the channel detects pitch from the audio itself).
+                // Pitch split: count, layout, and the MIDI-guided per-voice separated audio (or none →
+                // the channel renders unsplit; audio-only separation is not supported).
                 int splitCount = EffectivePitchSplitCount(tp);
                 if (ch.SplitCount != splitCount)
                     ch.SplitCount = splitCount;
                 var splitLayout = (LibSidWiz.SplitLayout)EffectivePitchSplitLayout(tp);
                 if (ch.SplitLayout != splitLayout)
                     ch.SplitLayout = splitLayout;
-                PushPitchSegmentSource(_trackViews[t], tp, ch, splitCount);
+                PushVoiceSet(_trackViews[t], tp, ch, splitCount);
 
                 // Fill under the waveform in the track colour, at the global opacity (0 = no fill).
                 int fillAlpha = (int)(Props.AudioVisFillOpacity * 255);
@@ -1181,44 +1181,154 @@ namespace VisualMusic
             }
         }
 
-        // Per-track note-derived pitch-segment sources, cached until the song or playback offset
-        // changes. Built lazily on the UI thread; the render thread reads the pushed delegate.
-        Dictionary<int, LibSidWiz.PitchSegmentSource> _pitchSegmentSources;
-        Midi.Song _pitchSegSong;
-        float _pitchSegOffsetT;
-        float _pitchSegOffsetS;
+        // Identity of the inputs a ChannelVoiceSet was separated from. Equal keys ⇒ the cached
+        // separation is still valid; any change (song, offsets, split count, or reloaded audio →
+        // a fresh decoded array) yields a new key and triggers a recompute.
+        sealed class SidWizVoiceKey
+        {
+            public Midi.Song Song;
+            public int TrackNumber;
+            public float OffsetT, OffsetS;
+            public int VoiceCount;
+            public float[] Samples; // decoded-buffer identity (by reference)
+
+            public bool Matches(SidWizVoiceKey o) =>
+                o != null && ReferenceEquals(Song, o.Song) && ReferenceEquals(Samples, o.Samples)
+                && TrackNumber == o.TrackNumber && OffsetT == o.OffsetT && OffsetS == o.OffsetS
+                && VoiceCount == o.VoiceCount;
+        }
+
+        sealed class SeparationJob
+        {
+            public SidWizVoiceKey Key;
+            public System.Threading.CancellationTokenSource Cts;
+            public System.Threading.Tasks.Task<LibSidWiz.ChannelVoiceSet> Task;
+        }
+
+        // In-flight/finished separation jobs, keyed by track number. Accessed only from the single
+        // thread that drives RefreshSidWizChannels for this Project instance (UI thread in preview,
+        // export thread during export), so no locking is needed.
+        //
+        // Memory: each ready set holds VoiceCount full-track float buffers (a 3-minute 44.1 kHz track
+        // at 4 voices ≈ 127 MB). Acceptable at this scale; short[] storage is a phase-2 follow-up.
+        Dictionary<int, SeparationJob> _separationJobs;
+        SidWizVoiceKey _lastFailedKey; // don't re-launch a key that just faulted, every frame
 
         /// <summary>
-        /// Pushes the effective pitch-segment source onto a split channel: notes if the track has
-        /// them, else null so the channel detects pitch from the audio. No-op (and null) when the
-        /// track isn't split.
+        /// Ensures a split channel has (or is computing) its per-voice separated audio, publishing it
+        /// to the channel when ready and showing a "(separating…)" label suffix meanwhile. Clears the
+        /// voice set and any job when the track isn't eligible (unsplit, no notes, or audio not loaded)
+        /// — such a track renders unsplit. During export (Synchronous) it blocks until separation is
+        /// ready so no exported frame shows the unsplit fallback.
         /// </summary>
-        void PushPitchSegmentSource(TrackView tv, TrackProps tp, LibSidWiz.Channel ch, int splitCount)
+        void PushVoiceSet(TrackView tv, TrackProps tp, LibSidWiz.Channel ch, int splitCount)
         {
-            if (splitCount <= 1 || tv.MidiTrack?.Notes == null || tv.MidiTrack.Notes.Count == 0)
+            float[] samples = ch.DecodedSamples;
+            bool desired = splitCount > 1 && tv.MidiTrack?.Notes != null && tv.MidiTrack.Notes.Count > 0
+                && samples != null && ch.SampleRate > 0 && !ch.Loading;
+
+            if (!desired)
             {
-                if (ch.PitchSegments != null)
-                    ch.PitchSegments = null;
+                CancelJob(tv.TrackNumber);
+                if (ch.VoiceSet != null)
+                    ch.VoiceSet = null;
+                ch.LabelSuffix = "";
                 return;
             }
 
-            if (_pitchSegmentSources == null || !ReferenceEquals(_pitchSegSong, _notes)
-                || _pitchSegOffsetT != _playbackOffsetT || _pitchSegOffsetS != Props.PlaybackOffsetS)
+            var key = new SidWizVoiceKey
             {
-                _pitchSegmentSources = new Dictionary<int, LibSidWiz.PitchSegmentSource>();
-                _pitchSegSong = _notes;
-                _pitchSegOffsetT = _playbackOffsetT;
-                _pitchSegOffsetS = Props.PlaybackOffsetS;
+                Song = _notes,
+                TrackNumber = tv.TrackNumber,
+                OffsetT = _playbackOffsetT,
+                OffsetS = Props.PlaybackOffsetS,
+                VoiceCount = splitCount,
+                Samples = samples
+            };
+
+            // Already published and current: nothing to do (drop a stale finished job if any).
+            if (ch.VoiceSet?.Key is SidWizVoiceKey pubKey && pubKey.Matches(key))
+            {
+                CancelJob(tv.TrackNumber);
+                ch.LabelSuffix = "";
+                return;
             }
 
-            if (!_pitchSegmentSources.TryGetValue(tv.TrackNumber, out var src))
+            _separationJobs ??= new Dictionary<int, SeparationJob>();
+            if (_separationJobs.TryGetValue(tv.TrackNumber, out var job) && job.Key.Matches(key))
             {
-                var snapshot = SidWizPitchSegments.Build(this, tv.MidiTrack);
-                src = snapshot != null ? (LibSidWiz.PitchSegmentSource)snapshot.Query : null;
-                _pitchSegmentSources[tv.TrackNumber] = src; // cache the negative result too
+                bool export = DrawHost?.WaveformPanel?.Synchronous == true;
+                if (export && !job.Task.IsCompleted)
+                {
+                    try { job.Task.Wait(); } catch { }
+                }
+                if (!job.Task.IsCompleted)
+                {
+                    ch.LabelSuffix = " (separating…)"; // still running (preview)
+                    return;
+                }
+                if (job.Task.Status == System.Threading.Tasks.TaskStatus.RanToCompletion && job.Task.Result != null)
+                {
+                    ch.VoiceSet = job.Task.Result;
+                    ch.LabelSuffix = "";
+                }
+                else
+                {
+                    _lastFailedKey = key; // faulted/cancelled: stay unsplit until the key changes
+                    if (ch.VoiceSet != null)
+                        ch.VoiceSet = null;
+                    ch.LabelSuffix = "";
+                }
+                _separationJobs.Remove(tv.TrackNumber);
+                return;
             }
-            if (!ReferenceEquals(ch.PitchSegments, src))
-                ch.PitchSegments = src;
+
+            // Need a fresh job. Cancel any stale one and don't retry a just-failed key.
+            CancelJob(tv.TrackNumber);
+            if (key.Matches(_lastFailedKey))
+                return;
+
+            var voices = SidWizNoteSeparation.BuildVoices(this, tv.MidiTrack, splitCount);
+            if (voices == null)
+            {
+                if (ch.VoiceSet != null)
+                    ch.VoiceSet = null;
+                ch.LabelSuffix = "";
+                return;
+            }
+
+            var cts = new System.Threading.CancellationTokenSource();
+            var token = cts.Token;
+            int sampleRate = ch.SampleRate;
+            var task = System.Threading.Tasks.Task.Run(
+                () => SidWizNoteSeparation.Separate(samples, sampleRate, voices, key, token), token);
+            _separationJobs[tv.TrackNumber] = new SeparationJob { Key = key, Cts = cts, Task = task };
+            ch.LabelSuffix = " (separating…)";
+
+            // Export: block now so this frame already renders the finished split.
+            if (DrawHost?.WaveformPanel?.Synchronous == true)
+            {
+                try { task.Wait(); } catch { }
+                if (task.Status == System.Threading.Tasks.TaskStatus.RanToCompletion && task.Result != null)
+                {
+                    ch.VoiceSet = task.Result;
+                    ch.LabelSuffix = "";
+                }
+                else
+                {
+                    _lastFailedKey = key;
+                }
+                _separationJobs.Remove(tv.TrackNumber);
+            }
+        }
+
+        void CancelJob(int trackNumber)
+        {
+            if (_separationJobs != null && _separationJobs.TryGetValue(trackNumber, out var job))
+            {
+                try { job.Cts.Cancel(); } catch { }
+                _separationJobs.Remove(trackNumber);
+            }
         }
 
         /// <summary>

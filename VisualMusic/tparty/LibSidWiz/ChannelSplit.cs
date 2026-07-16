@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Drawing;
 
 namespace LibSidWiz
@@ -15,42 +15,102 @@ namespace LibSidWiz
     }
 
     /// <summary>
-    /// A span of audio time during which a single pitch class sounds on a track. Times are in the
-    /// same "audio seconds" domain the renderer is driven with (song seconds minus playback offset).
-    /// <see cref="PitchId"/> is a MIDI semitone number; int.MinValue means "unpitched".
+    /// Immutable per-voice separated audio for one channel, produced by MIDI-guided STFT masking and
+    /// published whole by the app. The render thread latches one reference per frame and reads each
+    /// voice's <see cref="VoiceAudio.Samples"/> for its slot's trigger and waveform.
     /// </summary>
-    public struct PitchSegment
+    public sealed class ChannelVoiceSet
     {
-        public double StartSeconds;
-        public double EndSeconds;
-        public int PitchId;
+        /// <summary>Opaque identity of the inputs this set was built from, compared by the app side.</summary>
+        public readonly object Key;
+        /// <summary>One entry per voice; length equals the split count it was built for.</summary>
+        public readonly VoiceAudio[] Voices;
 
-        public const int Unpitched = int.MinValue;
-
-        public PitchSegment(double startSeconds, double endSeconds, int pitchId)
+        public ChannelVoiceSet(object key, VoiceAudio[] voices)
         {
-            StartSeconds = startSeconds;
-            EndSeconds = endSeconds;
-            PitchId = pitchId;
+            Key = key;
+            Voices = voices;
         }
     }
 
     /// <summary>
-    /// Appends the pitch segments overlapping [startSeconds, endSeconds), ordered by start, to
-    /// results. Implementations must be thread-safe and allocation-light (called on the render thread).
+    /// One voice's separated waveform plus the sample-index spans (note intervals extended by a short
+    /// release) during which it sounds. Spans are sorted and non-overlapping, so ends ascend too.
     /// </summary>
-    public delegate void PitchSegmentSource(double startSeconds, double endSeconds, List<PitchSegment> results);
+    public sealed class VoiceAudio
+    {
+        public readonly float[] Samples;   // full track length, same normalised domain as the channel
+        public readonly int[] SpanStarts;  // sorted ascending
+        public readonly int[] SpanEnds;    // non-overlapping ⇒ ascending
+
+        public VoiceAudio(float[] samples, int[] spanStarts, int[] spanEnds)
+        {
+            Samples = samples;
+            SpanStarts = spanStarts;
+            SpanEnds = spanEnds;
+        }
+
+        /// <summary>End (capped at <paramref name="cap"/>) of the latest span starting before cap, or int.MinValue.</summary>
+        public int LastActiveEndBefore(int cap)
+        {
+            var starts = SpanStarts;
+            if (starts.Length == 0)
+                return int.MinValue;
+            // Largest index with SpanStarts[i] < cap.
+            int lo = 0, hi = starts.Length;
+            while (lo < hi)
+            {
+                int mid = (lo + hi) / 2;
+                if (starts[mid] < cap)
+                    lo = mid + 1;
+                else
+                    hi = mid;
+            }
+            if (lo == 0)
+                return int.MinValue;
+            int end = SpanEnds[lo - 1];
+            return end > cap ? cap : end;
+        }
+
+        /// <summary>Does any span overlap [start, end)?</summary>
+        public bool SoundsIn(int start, int end)
+        {
+            var starts = SpanStarts;
+            if (starts.Length == 0 || start >= end)
+                return false;
+            // First span that could overlap: largest index with start >= its start, then walk forward.
+            int lo = 0, hi = starts.Length;
+            while (lo < hi)
+            {
+                int mid = (lo + hi) / 2;
+                if (starts[mid] < end)
+                    lo = mid + 1;
+                else
+                    hi = mid;
+            }
+            // Spans [0, lo) all start before end; the latest one is the only candidate that can reach
+            // into [start, end) (non-overlapping ⇒ earlier spans end even earlier), but a span can be
+            // long, so check backward until a span ends at/before start.
+            for (int i = lo - 1; i >= 0; --i)
+            {
+                if (SpanEnds[i] <= start)
+                    break;
+                if (SpanStarts[i] < end && SpanEnds[i] > start)
+                    return true;
+            }
+            return false;
+        }
+    }
 
     /// <summary>
-    /// Per-pitch rendering slot for a split channel. A slot keeps drawing its last found waveform
-    /// while its pitch is silent, so alternating pitches each show a steady curve.
+    /// Per-voice rendering slot for a split channel. A slot keeps drawing its last found waveform
+    /// while its voice is silent, so held/alternating voices each show a steady curve.
     /// </summary>
     internal class WaveSlot
     {
-        public int PitchId = PitchSegment.Unpitched;   // pitch class currently owning this slot
         public int LastTrigger = -1;                   // absolute sample index the held curve is centred on
         public int LastUpdateFrameStart = int.MinValue; // frame-start sample of the last successful update
-        public int LastActiveEndSample = int.MinValue;  // song-sample end of this pitch's most recent audible segment
+        public int LastActiveEndSample = int.MinValue;  // song-sample end of this voice's most recent audible span
         public bool HasCurve;                          // a waveform has been captured at least once
         public bool VisibleThisFrame;                  // drawn this frame (recently active)
         public Rectangle Bounds;                       // set by the renderer during layout
