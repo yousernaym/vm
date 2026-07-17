@@ -30,7 +30,6 @@ namespace VisualMusic
             typeof(PropertyKeyframe),
             typeof(KfInterpolation),
             typeof(Dictionary<int, string>),
-            typeof(HashSet<int>),
             typeof(KfValue),
             typeof(ScalarKfValue),
             typeof(ColorKfValue),
