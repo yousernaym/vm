@@ -1,0 +1,40 @@
+---
+description: Keep the working tree clean - don't leave build logs, scratch files, or other temp artifacts in the repo
+alwaysApply: true
+---
+
+# Don't leave temp files in the repo
+
+Never leave build logs, scratch output, or throwaway files sitting in the
+working tree — even if `.gitignore` would hide them (e.g. `*.log`). They clutter
+the repo and confuse the next agent.
+
+## Build output
+
+The Shell tool already captures full command output to a terminal file, so you
+almost never need to redirect a build to a file. Do NOT do this:
+
+```powershell
+# BAD - dumps a 700 KB log into the repo root that lingers forever
+& $msbuild d:\dev\vm\VisualMusic.sln /p:Platform=x64 > build_fix.log 2>&1
+```
+
+Just run the build and read the captured output. If output is huge, it's already
+written to the terminal file for you to read in full.
+
+## When you genuinely need a scratch file
+
+- Write it under the system temp dir, not the repo: `$env:TEMP` (PowerShell) or
+  `/tmp` — e.g. `"$env:TEMP\vm_build.log"`.
+- If a temp file must live in the repo (e.g. a plan you're iterating on), delete
+  it before you finish the task.
+
+## Before ending a task
+
+Check for stray files you created and remove them:
+
+```powershell
+git -C d:\dev\vm status --ignored --porcelain | Select-String "build.*\.log|scratch|\.tmp"
+```
+
+Leave the working tree exactly as clean as you found it.
