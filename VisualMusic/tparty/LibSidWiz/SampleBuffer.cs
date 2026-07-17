@@ -43,6 +43,25 @@ namespace LibSidWiz
                 _sampleProvider = new HighPassSampleProvider(_sampleProvider);
         }
 
+        // In-memory buffer from an already-decoded mono float array (e.g. the summed voice buffer of a
+        // pitch-split track). Analyze() is a no-op — the samples are ready to read immediately.
+        public SampleBuffer(float[] decoded, int sampleRate)
+        {
+            _decoded = decoded;
+            Count = decoded?.LongLength ?? 0;
+            SampleRate = sampleRate;
+            Length = TimeSpan.FromSeconds(sampleRate > 0 ? (double)Count / sampleRate : 0.0);
+            float min = 0, max = 0;
+            if (decoded != null)
+                for (long i = 0; i < decoded.LongLength; i++)
+                {
+                    if (decoded[i] < min) min = decoded[i];
+                    if (decoded[i] > max) max = decoded[i];
+                }
+            Min = min;
+            Max = max;
+        }
+
         public void Dispose()
         {
             // Guard against cross-thread COM release errors (e.g. MP3/MediaFoundation).
@@ -64,8 +83,15 @@ namespace LibSidWiz
         // never mutated after Analyze(), so a reference held by another thread is safe to read.
         internal float[] Decoded => _decoded;
 
-        public void Analyze()
+        public void Analyze() => Analyze(true);
+
+        // normalize = false leaves the decoded samples at their raw amplitude (used when several voice
+        // buffers are summed and then normalised together, so their relative levels are preserved).
+        public void Analyze(bool normalize)
         {
+            if (_reader == null)   // in-memory buffer: already decoded in the ctor
+                return;
+
             // Read all samples on the current thread (same thread that created _reader and its
             // underlying COM objects). This avoids cross-apartment InvalidCastExceptions that
             // the old lazy-chunk approach triggered for MP3/MediaFoundation readers.
@@ -98,13 +124,14 @@ namespace LibSidWiz
                 if (raw[i] > max) max = raw[i];
             }
             float peak = Math.Max(Math.Abs(min), Math.Abs(max));
-            float gain = peak > 0 ? TargetPeak / peak : 1.0f;
+            float gain = (normalize && peak > 0) ? TargetPeak / peak : 1.0f;
             Min = min * gain;
             Max = max * gain;
 
             // Apply gain in place.
-            for (long i = 0; i < pos; i++)
-                raw[i] *= gain;
+            if (gain != 1.0f)
+                for (long i = 0; i < pos; i++)
+                    raw[i] *= gain;
 
             _decoded = raw;
 

@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
@@ -135,7 +137,6 @@ namespace VisualMusic
             AudioProps.TriggerLookaheadFrames = isGlobal ? AudioProps.DefaultTriggerLookahead : (int?)null;
             AudioProps.TriggerLookaheadOnFailureFrames = isGlobal ? AudioProps.DefaultTriggerLookaheadOnFailure : (int?)null;
             AudioProps.ShapeStability = isGlobal ? AudioProps.DefaultShapeStability : (float?)null;
-            AudioProps.PitchSplitCount = isGlobal ? AudioProps.DefaultPitchSplitCount : (int?)null;
             AudioProps.PitchSplitLayout = isGlobal ? AudioProps.DefaultPitchSplitLayout : (int?)null;
         }
 
@@ -978,23 +979,16 @@ namespace VisualMusic
         /// </summary>
         public float? ShapeStability { get; set; }
 
-        /// <summary>Default/fallback pitch-split count (used to seed the global track). 1 = off.</summary>
-        public const int DefaultPitchSplitCount = 1;
+        // Pitch-split count is no longer a setting: the number of split waveforms is automatic (one
+        // per source channel an instrument is played on; see Project.RefreshSidWizChannels).
 
-        /// <summary>
-        /// Number of per-pitch waveforms to split the track into (1 = off, up to
-        /// <see cref="LibSidWiz.Channel.MaxSplitCount"/>). Null = inherit the global track's value;
-        /// when that is also null, <see cref="DefaultPitchSplitCount"/> is used.
-        /// </summary>
-        public int? PitchSplitCount { get; set; }
-
-        /// <summary>Default/fallback pitch-split layout (used to seed the global track). 0 = Stacked.</summary>
-        public const int DefaultPitchSplitLayout = 0;
+        /// <summary>Default/fallback pitch-split layout (used to seed the global track). 1 = Overlaid.</summary>
+        public const int DefaultPitchSplitLayout = 1;
 
         /// <summary>
         /// How split waveforms are arranged, as a <see cref="LibSidWiz.SplitLayout"/> value. Null =
         /// inherit the global track's value; when that is also null,
-        /// <see cref="DefaultPitchSplitLayout"/> (Stacked) is used.
+        /// <see cref="DefaultPitchSplitLayout"/> (Overlaid) is used.
         /// </summary>
         public int? PitchSplitLayout { get; set; }
 
@@ -1003,6 +997,14 @@ namespace VisualMusic
             get => SidWizChannel.Filename;
             set => SidWizChannel.Filename = value;
         }
+
+        /// <summary>
+        /// Per-voice source WAVs for an exact pitch split: (source channel, path). Empty/null = a
+        /// plain single-file track (see <see cref="Filename"/>). Produced by a per-instrument import
+        /// with per-track audio; serialised as parallel arrays. Forwarded to the channel by
+        /// <see cref="LoadAudioAsync"/>, which then sums the voices and builds the split.
+        /// </summary>
+        public List<(int Channel, string Path)> VoiceAudioFiles { get; set; }
 
         /// <summary>User-supplied caption rendered above this track's waveform. Blank by default.</summary>
         public string Label
@@ -1044,6 +1046,8 @@ namespace VisualMusic
 
         public AudioProps(SerializationInfo info, StreamingContext ctxt)
         {
+            int[] voiceChannels = null;
+            string[] voicePaths = null;
             foreach (SerializationEntry entry in info)
             {
                 if (entry.Name == "audioFile")
@@ -1051,6 +1055,10 @@ namespace VisualMusic
                     SidWizChannel.Filename = (string)entry.Value;
                     //SidWizChannel.LoadDataAsync();
                 }
+                else if (entry.Name == "voiceAudioChannels" && entry.Value != null)
+                    voiceChannels = (int[])entry.Value;
+                else if (entry.Name == "voiceAudioFiles" && entry.Value != null)
+                    voicePaths = (string[])entry.Value;
                 else if (entry.Name == "audioLabel" && entry.Value != null)
                     SidWizChannel.Label = (string)entry.Value;
                 else if (entry.Name == "silenceThreshold" && entry.Value != null)
@@ -1065,10 +1073,14 @@ namespace VisualMusic
                     TriggerLookaheadOnFailureFrames = Convert.ToInt32(entry.Value);
                 else if (entry.Name == "shapeStability" && entry.Value != null)
                     ShapeStability = Convert.ToSingle(entry.Value);
-                else if (entry.Name == "pitchSplitCount" && entry.Value != null)
-                    PitchSplitCount = Convert.ToInt32(entry.Value);
                 else if (entry.Name == "pitchSplitLayout" && entry.Value != null)
                     PitchSplitLayout = Convert.ToInt32(entry.Value);
+            }
+            if (voiceChannels != null && voicePaths != null && voiceChannels.Length == voicePaths.Length)
+            {
+                VoiceAudioFiles = new List<(int, string)>(voicePaths.Length);
+                for (int i = 0; i < voicePaths.Length; i++)
+                    VoiceAudioFiles.Add((voiceChannels[i], voicePaths[i]));
             }
         }
 
@@ -1089,16 +1101,22 @@ namespace VisualMusic
                 info.AddValue("triggerLookaheadOnFailure", TriggerLookaheadOnFailureFrames.Value);
             if (ShapeStability != null)
                 info.AddValue("shapeStability", ShapeStability.Value);
-            if (PitchSplitCount != null)
-                info.AddValue("pitchSplitCount", PitchSplitCount.Value);
             if (PitchSplitLayout != null)
                 info.AddValue("pitchSplitLayout", PitchSplitLayout.Value);
+            if (VoiceAudioFiles != null && VoiceAudioFiles.Count > 0)
+            {
+                info.AddValue("voiceAudioChannels", VoiceAudioFiles.Select(v => v.Channel).ToArray());
+                info.AddValue("voiceAudioFiles", VoiceAudioFiles.Select(v => v.Path).ToArray());
+            }
         }
 
         public async Task LoadAudioAsync()
         {
+            // Sync the channel's voice-file list from our serialised state so a voice-backed track
+            // sums its voices; a plain track (null/empty) loads from Filename as before.
+            SidWizChannel.VoiceFiles = VoiceAudioFiles?
+                .Select(v => new LibSidWiz.VoiceFile(v.Channel, v.Path)).ToList();
             await SidWizChannel.LoadDataAsync();
-
         }
 
         public void Dispose()

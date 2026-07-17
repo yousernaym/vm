@@ -3,6 +3,7 @@ using NAudio.Wave;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
@@ -14,6 +15,25 @@ using System.Threading.Tasks;
 
 namespace LibSidWiz
 {
+    /// <summary>One source (chip/mod) channel's WAV feeding an exact pitch split.</summary>
+    public struct VoiceFile
+    {
+        public int SourceChannel;
+        public string Path;
+        public VoiceFile(int sourceChannel, string path)
+        {
+            SourceChannel = sourceChannel;
+            Path = path;
+        }
+    }
+
+    /// <summary>A decoded voice buffer (Q15) plus the source channel it came from.</summary>
+    public sealed class LoadedVoice
+    {
+        public int SourceChannel;
+        public short[] Samples;
+    }
+
     public struct Padding
     {
         public int Left { get; set; }
@@ -104,6 +124,13 @@ namespace LibSidWiz
 
                     _samples?.Dispose();
 
+                    if (VoiceFiles != null && VoiceFiles.Count > 0)
+                    {
+                        LoadVoiceData(token);
+                        return true;
+                    }
+                    LoadedVoices = null; // plain single-file track from here on
+
                     if (string.IsNullOrEmpty(Filename))
                     {
                         _samples = null;
@@ -163,6 +190,7 @@ namespace LibSidWiz
                     _samplesForTrigger = null;
                     try { _samples?.Dispose(); } catch { }
                     _samples = null;
+                    LoadedVoices = null;
                     Loading = false;
                     return false;
                 }
@@ -183,6 +211,7 @@ namespace LibSidWiz
                     _samplesForTrigger = null;
                     try { _samples?.Dispose(); } catch { }
                     _samples = null;
+                    LoadedVoices = null;
                     Loading = false;
                     return false;
                 }
@@ -195,6 +224,68 @@ namespace LibSidWiz
                     Changed?.Invoke(this, false);
                 }
             }, token);
+        }
+
+        // Voice-backed load: decode each voice WAV un-normalised (mono + high-pass), sum them into the
+        // track's mixed buffer, normalise the sum once, and quantise every voice to Q15 with that same
+        // gain — so lane levels stay comparable and the voices sum back to the mixed channel signal.
+        private void LoadVoiceData(CancellationToken token)
+        {
+            IsEmpty = false;
+            Loading = true;
+
+            int rate = 0;
+            long maxLen = 0;
+            var decodedVoices = new List<(int SourceChannel, float[] Samples)>(VoiceFiles.Count);
+            foreach (var vf in VoiceFiles.OrderBy(v => v.SourceChannel))
+            {
+                var sb = new SampleBuffer(vf.Path, Side, HighPassFilter);
+                sb.Analyze(false); // raw amplitude; the sum is normalised below
+                token.ThrowIfCancellationRequested();
+                var dec = sb.Decoded ?? Array.Empty<float>();
+                if (rate == 0) rate = sb.SampleRate;
+                decodedVoices.Add((vf.SourceChannel, dec));
+                if (dec.LongLength > maxLen) maxLen = dec.LongLength;
+            }
+
+            var mixed = new float[maxLen];
+            foreach (var (_, dec) in decodedVoices)
+                for (long i = 0; i < dec.LongLength; i++)
+                    mixed[i] += dec[i];
+
+            float targetPeak = (float)Math.Pow(10.0, -1.0 / 20.0); // -1 dBFS, matches SampleBuffer
+            float peak = 0;
+            for (long i = 0; i < mixed.LongLength; i++)
+            {
+                float a = Math.Abs(mixed[i]);
+                if (a > peak) peak = a;
+            }
+            float gain = peak > 0 ? targetPeak / peak : 1.0f;
+            if (gain != 1.0f)
+                for (long i = 0; i < mixed.LongLength; i++)
+                    mixed[i] *= gain;
+
+            var loaded = new LoadedVoice[decodedVoices.Count];
+            for (int v = 0; v < decodedVoices.Count; v++)
+            {
+                var dec = decodedVoices[v].Samples;
+                var q15 = new short[dec.LongLength];
+                for (long i = 0; i < dec.LongLength; i++)
+                {
+                    int s = (int)Math.Round(dec[i] * gain * 32767f);
+                    q15[i] = s > 32767 ? (short)32767 : s < -32767 ? (short)-32767 : (short)s;
+                }
+                loaded[v] = new LoadedVoice { SourceChannel = decodedVoices[v].SourceChannel, Samples = q15 };
+            }
+
+            _samples = new SampleBuffer(mixed, rate);
+            SampleRate = rate;
+            Length = _samples.Length;
+            SampleCount = _samples.Count;
+            Max = Math.Max(Math.Abs(_samples.Max), Math.Abs(_samples.Min));
+            _samplesForTrigger = _samples;
+            LoadedVoices = loaded;
+            Loading = false;
         }
 
         [Category("Data")]
@@ -319,13 +410,13 @@ namespace LibSidWiz
         }
 
         [Category("Triggering")]
-        [Description("Number of waveforms to split the channel into by pitch (1 = off). Chip arpeggios then show one stable waveform per pitch instead of one flickering one.")]
+        [Description("Number of waveforms the channel is split into (1 = off). Driven by the number of source channels an instrument is played on (exact per-voice splitting).")]
         public int SplitCount
         {
             get => _splitCount;
             set
             {
-                int clamped = value < 1 ? 1 : (value > MaxSplitCount ? MaxSplitCount : value);
+                int clamped = value < 1 ? 1 : value; // no upper bound: as many voices as source channels
                 if (clamped == _splitCount)
                     return;
                 _splitCount = clamped;
@@ -537,6 +628,18 @@ namespace LibSidWiz
         [Browsable(false)]
         [JsonIgnore]
         public float[] DecodedSamples => _samples?.Decoded;
+
+        // Per-voice source WAVs for an exact pitch split, set before LoadDataAsync. Empty/null = a
+        // plain single-file track. The app serialises this list on AudioProps, not here.
+        [Browsable(false)]
+        [JsonIgnore]
+        public IReadOnlyList<VoiceFile> VoiceFiles { get; set; }
+
+        // Per-voice decoded Q15 buffers produced by the voice-backed load, sorted by SourceChannel.
+        // null = not a split track. The app builds a ChannelVoiceSet from these plus the MIDI spans.
+        [Browsable(false)]
+        [JsonIgnore]
+        public LoadedVoice[] LoadedVoices { get; private set; }
 
         [Category("Appearance")]
         [Description("The font for the channel label")]
@@ -758,10 +861,10 @@ namespace LibSidWiz
 
         // ===================== Pitch split =====================
         //
-        // Each slot renders one voice's precomputed separated audio (MIDI-guided STFT masking done
-        // by the app; see SidWizNoteSeparation). The slot→voice mapping is fixed 1:1, so this class
-        // only has to search each voice buffer's trigger per frame and hold the curve while silent —
-        // no per-frame pitch classification or slot allocation any more.
+        // Each slot renders one voice's exact per-channel audio (the source channel's rendered WAV,
+        // gated to the notes that channel plays; built by the app in Project.BuildExactVoiceSet). The
+        // slot→voice mapping is fixed 1:1, so this class only has to search each voice buffer's trigger
+        // per frame and hold the curve while silent — no per-frame pitch classification or allocation.
 
         /// <summary>Per-voice rendering slots (null when SplitCount &lt;= 1). Read by the renderer.</summary>
         internal WaveSlot[] Slots { get; private set; }

@@ -139,7 +139,6 @@ namespace VisualMusic.Keyframes
             ("TriggerLookahead",          KfScope.Track,    "Trigger lookahead"),
             ("TriggerLookaheadOnFailure", KfScope.Track,    "Trigger lookahead on failure"),
             ("ShapeStability",            KfScope.Track,    "Shape stability"),
-            ("PitchSplitCount",           KfScope.Track,    "Pitch split count"),
             ("PitchSplitLayoutIndex",     KfScope.Track,    "Pitch split layout"),
             ("ModXOriginEnable",          KfScope.TrackMod, "Mod origin X enable"),
             ("ModXOrigin",                KfScope.TrackMod, "Mod origin X"),
@@ -233,7 +232,6 @@ namespace VisualMusic.Keyframes
             ("TriggerLookahead",      KfScope.Track),
             ("TriggerLookaheadOnFailure", KfScope.Track),
             ("ShapeStability",        KfScope.Track),
-            ("PitchSplitCount",       KfScope.Track),
             ("PitchSplitLayoutIndex", KfScope.Track),
         };
 

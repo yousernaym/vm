@@ -214,15 +214,6 @@ namespace VisualMusic
             return s ?? AudioProps.DefaultShapeStability;
         }
 
-        /// <summary>Effective pitch-split count for a track: own value, else global track's, else the hardcoded default.</summary>
-        public int EffectivePitchSplitCount(TrackProps tp)
-        {
-            int? c = tp?.AudioProps?.PitchSplitCount;
-            if (c == null && _trackViews != null && _trackViews.Count > 0)
-                c = GlobalTrackProps.AudioProps?.PitchSplitCount;
-            return c ?? AudioProps.DefaultPitchSplitCount;
-        }
-
         /// <summary>Effective pitch-split layout for a track: own value, else global track's, else the hardcoded default.</summary>
         public int EffectivePitchSplitLayout(TrackProps tp)
         {
@@ -379,8 +370,6 @@ namespace VisualMusic
                                 tv.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames = AudioProps.DefaultTriggerLookaheadOnFailure;
                             if (tv.TrackProps.AudioProps.ShapeStability == null)
                                 tv.TrackProps.AudioProps.ShapeStability = AudioProps.DefaultShapeStability;
-                            if (tv.TrackProps.AudioProps.PitchSplitCount == null)
-                                tv.TrackProps.AudioProps.PitchSplitCount = AudioProps.DefaultPitchSplitCount;
                             if (tv.TrackProps.AudioProps.PitchSplitLayout == null)
                                 tv.TrackProps.AudioProps.PitchSplitLayout = AudioProps.DefaultPitchSplitLayout;
                         }
@@ -434,8 +423,14 @@ namespace VisualMusic
         // Matches the "Progress: N%" lines emitted by remuxer.exe (see Remuxer/Program.cs).
         static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
 
-        // Matches the "TrackAudio: <miditrack>|<path>" lines emitted by remuxer.exe after processing.
+        // Matches the "TrackAudio: <miditrack>|<path>" lines emitted by remuxer.exe after processing
+        // (whole-track WAVs, per-channel import mode).
         static readonly Regex RemuxerTrackAudioRegex = new Regex(@"^TrackAudio:\s*(\d+)\|(.+)$", RegexOptions.Compiled);
+
+        // Matches the "TrackVoiceAudio: <miditrack>|<channel>|<path>" lines (per-voice WAVs, per-
+        // instrument import mode's exact split). A distinct prefix keeps the anchored regex above
+        // from mis-parsing the extra field into the path.
+        static readonly Regex RemuxerTrackVoiceAudioRegex = new Regex(@"^TrackVoiceAudio:\s*(\d+)\|(\d+)\|(.+)$", RegexOptions.Compiled);
 
         // Remuxer writes a 58-byte IEEE-float WAV header before the data chunk.
         const long EmptyGeneratedWavBytes = 58;
@@ -466,7 +461,16 @@ namespace VisualMusic
             bool any = false;
             for (int i = 1; i < _trackViews.Count; i++)   // index 0 = global/MIDI track 0
             {
-                string fn = _trackViews[i].TrackProps.AudioProps.Filename;
+                var ap = _trackViews[i].TrackProps.AudioProps;
+                var voices = ap.VoiceAudioFiles;
+                if (voices != null && voices.Count > 0)   // per-instrument exact split: one WAV per voice
+                {
+                    any = true;
+                    foreach (var vf in voices)
+                        if (!File.Exists(vf.Path)) return false;
+                    continue;
+                }
+                string fn = ap.Filename;
                 if (string.IsNullOrEmpty(fn)) continue;
                 any = true;
                 if (!File.Exists(fn)) return false;
@@ -543,11 +547,12 @@ namespace VisualMusic
                     using var process = Process.Start(startInfo)
                         ?? throw new IOException("Couldn't start remuxer.");
 
-                    // Collected per-track WAV lines ("TrackAudio: <miditrack>|<path>"). The stdout
-                    // handler runs on a pool thread, so guard the list with a lock.
-                    var trackAudioFiles = new List<(int Track, string Path)>();
+                    // Collected per-track WAV lines. The stdout handler runs on a pool thread, so
+                    // guard the list with a lock. Channel -1 = whole-track WAV; >= 0 = per-voice WAV.
+                    var trackAudioFiles = new List<(int Track, int Channel, string Path)>();
 
-                    // Parse the "Progress: N%" and "TrackAudio:" lines remuxer writes to stdout.
+                    // Parse the "Progress: N%", "TrackAudio:" and "TrackVoiceAudio:" lines remuxer
+                    // writes to stdout.
                     process.OutputDataReceived += (_, e) =>
                     {
                         if (e.Data == null)
@@ -558,11 +563,19 @@ namespace VisualMusic
                             progress?.Report(percent / 100f);
                             return;
                         }
+                        var v = RemuxerTrackVoiceAudioRegex.Match(e.Data);
+                        if (v.Success && int.TryParse(v.Groups[1].Value, out int vTrack)
+                            && int.TryParse(v.Groups[2].Value, out int vChannel))
+                        {
+                            lock (trackAudioFiles)
+                                trackAudioFiles.Add((vTrack, vChannel, v.Groups[3].Value.Trim()));
+                            return;
+                        }
                         var t = RemuxerTrackAudioRegex.Match(e.Data);
                         if (t.Success && int.TryParse(t.Groups[1].Value, out int midiTrack))
                         {
                             lock (trackAudioFiles)
-                                trackAudioFiles.Add((midiTrack, t.Groups[2].Value.Trim()));
+                                trackAudioFiles.Add((midiTrack, -1, t.Groups[2].Value.Trim()));
                         }
                     };
                     var errorOutput = new StringBuilder();
@@ -583,7 +596,7 @@ namespace VisualMusic
                     try { File.Delete(cancelSignalPath); } catch { /* best-effort cleanup */ }
 
                     // Record the per-track WAVs that were actually produced (non-empty on disk).
-                    List<(int Track, string Path)> collectedTrackAudio;
+                    List<(int Track, int Channel, string Path)> collectedTrackAudio;
                     lock (trackAudioFiles)
                         collectedTrackAudio = trackAudioFiles.ToList();
                     options.GeneratedTrackAudioPaths = collectedTrackAudio
@@ -964,8 +977,6 @@ namespace VisualMusic
                 view.TrackProps.AudioProps.TriggerLookaheadOnFailureFrames = AudioProps.DefaultTriggerLookaheadOnFailure;
             if (view.TrackNumber == 0 && view.TrackProps.AudioProps.ShapeStability == null)
                 view.TrackProps.AudioProps.ShapeStability = AudioProps.DefaultShapeStability;
-            if (view.TrackNumber == 0 && view.TrackProps.AudioProps.PitchSplitCount == null)
-                view.TrackProps.AudioProps.PitchSplitCount = AudioProps.DefaultPitchSplitCount;
             if (view.TrackNumber == 0 && view.TrackProps.AudioProps.PitchSplitLayout == null)
                 view.TrackProps.AudioProps.PitchSplitLayout = AudioProps.DefaultPitchSplitLayout;
             view.TrackProps.AudioProps.LineColor = view.TrackProps.MaterialProps.GetSysColor(true, view.TrackProps.GlobalProps.MaterialProps);
@@ -1132,15 +1143,15 @@ namespace VisualMusic
                 if (ch.ShapeStabilityWeight != shape)
                     ch.ShapeStabilityWeight = shape;
 
-                // Pitch split: count, layout, and the MIDI-guided per-voice separated audio (or none →
-                // the channel renders unsplit; audio-only separation is not supported).
-                int splitCount = EffectivePitchSplitCount(tp);
+                // Pitch split: the voice count is automatic (= number of source-channel voice WAVs the
+                // track loaded). Layout stays user-selectable. A track with no voices renders unsplit.
+                int splitCount = ch.LoadedVoices?.Length ?? 1;
                 if (ch.SplitCount != splitCount)
                     ch.SplitCount = splitCount;
                 var splitLayout = (LibSidWiz.SplitLayout)EffectivePitchSplitLayout(tp);
                 if (ch.SplitLayout != splitLayout)
                     ch.SplitLayout = splitLayout;
-                PushVoiceSet(_trackViews[t], tp, ch, splitCount);
+                PublishVoiceSet(_trackViews[t], ch);
 
                 // Fill under the waveform in the track colour, at the global opacity (0 = no fill).
                 int fillAlpha = (int)(Props.AudioVisFillOpacity * 255);
@@ -1181,55 +1192,37 @@ namespace VisualMusic
             }
         }
 
-        // Identity of the inputs a ChannelVoiceSet was separated from. Equal keys ⇒ the cached
-        // separation is still valid; any change (song, offsets, split count, or reloaded audio →
-        // a fresh decoded array) yields a new key and triggers a recompute.
+        // Identity of the inputs a ChannelVoiceSet was built from. Equal keys ⇒ the published set is
+        // still valid; any change (song, offsets, or a reloaded set of voice buffers) yields a new key
+        // and rebuilds the spans.
         sealed class SidWizVoiceKey
         {
             public Midi.Song Song;
             public int TrackNumber;
             public float OffsetT, OffsetS;
-            public int VoiceCount;
-            public float[] Samples; // decoded-buffer identity (by reference)
+            public LibSidWiz.LoadedVoice[] Voices; // decoded-voice identity (by reference)
 
             public bool Matches(SidWizVoiceKey o) =>
-                o != null && ReferenceEquals(Song, o.Song) && ReferenceEquals(Samples, o.Samples)
-                && TrackNumber == o.TrackNumber && OffsetT == o.OffsetT && OffsetS == o.OffsetS
-                && VoiceCount == o.VoiceCount;
+                o != null && ReferenceEquals(Song, o.Song) && ReferenceEquals(Voices, o.Voices)
+                && TrackNumber == o.TrackNumber && OffsetT == o.OffsetT && OffsetS == o.OffsetS;
         }
 
-        sealed class SeparationJob
-        {
-            public SidWizVoiceKey Key;
-            public System.Threading.CancellationTokenSource Cts;
-            public System.Threading.Tasks.Task<LibSidWiz.ChannelVoiceSet> Task;
-        }
-
-        // In-flight/finished separation jobs, keyed by track number. Accessed only from the single
-        // thread that drives RefreshSidWizChannels for this Project instance (UI thread in preview,
-        // export thread during export), so no locking is needed.
-        //
-        // Memory: each ready set holds VoiceCount full-track short (Q15) buffers (a 3-minute 44.1 kHz
-        // track at 4 voices ≈ 64 MB).
-        Dictionary<int, SeparationJob> _separationJobs;
-        SidWizVoiceKey _lastFailedKey; // don't re-launch a key that just faulted, every frame
+        // Each note's active span extends this far past note-off so decay tails stay attributed to it.
+        const double VoiceReleaseSec = 0.15;
 
         /// <summary>
-        /// Ensures a split channel has (or is computing) its per-voice separated audio, publishing it
-        /// to the channel when ready and showing a "(separating…)" label suffix meanwhile. Clears the
-        /// voice set and any job when the track isn't eligible (unsplit, no notes, or audio not loaded)
-        /// — such a track renders unsplit. During export (Synchronous) it blocks until separation is
-        /// ready so no exported frame shows the unsplit fallback.
+        /// Publishes the exact per-voice split for a track: one <see cref="LibSidWiz.VoiceAudio"/> per
+        /// decoded voice buffer (<see cref="LibSidWiz.Channel.LoadedVoices"/>), with active spans built
+        /// from the track's MIDI notes filtered by each voice's source channel. Synchronous and cheap
+        /// (one pass over the notes). Clears the voice set when the track has no voices (renders
+        /// unsplit). Replaces the old background NNLS separation entirely.
         /// </summary>
-        void PushVoiceSet(TrackView tv, TrackProps tp, LibSidWiz.Channel ch, int splitCount)
+        void PublishVoiceSet(TrackView tv, LibSidWiz.Channel ch)
         {
-            float[] samples = ch.DecodedSamples;
-            bool desired = splitCount > 1 && tv.MidiTrack?.Notes != null && tv.MidiTrack.Notes.Count > 0
-                && samples != null && ch.SampleRate > 0 && !ch.Loading;
-
+            var loaded = ch.LoadedVoices;
+            bool desired = loaded != null && loaded.Length > 0 && ch.SampleRate > 0 && !ch.Loading;
             if (!desired)
             {
-                CancelJob(tv.TrackNumber);
                 if (ch.VoiceSet != null)
                     ch.VoiceSet = null;
                 ch.LabelSuffix = "";
@@ -1240,96 +1233,68 @@ namespace VisualMusic
             {
                 Song = _notes,
                 TrackNumber = tv.TrackNumber,
-                OffsetT = _playbackOffsetT,
+                OffsetT = PlaybackOffsetT,
                 OffsetS = Props.PlaybackOffsetS,
-                VoiceCount = splitCount,
-                Samples = samples
+                Voices = loaded
             };
-
-            // Already published and current: nothing to do (drop a stale finished job if any).
             if (ch.VoiceSet?.Key is SidWizVoiceKey pubKey && pubKey.Matches(key))
-            {
-                CancelJob(tv.TrackNumber);
-                ch.LabelSuffix = "";
-                return;
-            }
+                return; // already current
 
-            _separationJobs ??= new Dictionary<int, SeparationJob>();
-            if (_separationJobs.TryGetValue(tv.TrackNumber, out var job) && job.Key.Matches(key))
-            {
-                bool export = DrawHost?.WaveformPanel?.Synchronous == true;
-                if (export && !job.Task.IsCompleted)
-                {
-                    try { job.Task.Wait(); } catch { }
-                }
-                if (!job.Task.IsCompleted)
-                {
-                    ch.LabelSuffix = " (separating…)"; // still running (preview)
-                    return;
-                }
-                if (job.Task.Status == System.Threading.Tasks.TaskStatus.RanToCompletion && job.Task.Result != null)
-                {
-                    ch.VoiceSet = job.Task.Result;
-                    ch.LabelSuffix = "";
-                }
-                else
-                {
-                    _lastFailedKey = key; // faulted/cancelled: stay unsplit until the key changes
-                    if (ch.VoiceSet != null)
-                        ch.VoiceSet = null;
-                    ch.LabelSuffix = "";
-                }
-                _separationJobs.Remove(tv.TrackNumber);
-                return;
-            }
-
-            // Need a fresh job. Cancel any stale one and don't retry a just-failed key.
-            CancelJob(tv.TrackNumber);
-            if (key.Matches(_lastFailedKey))
-                return;
-
-            var voices = SidWizNoteSeparation.BuildVoices(this, tv.MidiTrack, splitCount);
-            if (voices == null)
-            {
-                if (ch.VoiceSet != null)
-                    ch.VoiceSet = null;
-                ch.LabelSuffix = "";
-                return;
-            }
-
-            var cts = new System.Threading.CancellationTokenSource();
-            var token = cts.Token;
-            int sampleRate = ch.SampleRate;
-            var task = System.Threading.Tasks.Task.Run(
-                () => SidWizNoteSeparation.Separate(samples, sampleRate, voices, key, token), token);
-            _separationJobs[tv.TrackNumber] = new SeparationJob { Key = key, Cts = cts, Task = task };
-            ch.LabelSuffix = " (separating…)";
-
-            // Export: block now so this frame already renders the finished split.
-            if (DrawHost?.WaveformPanel?.Synchronous == true)
-            {
-                try { task.Wait(); } catch { }
-                if (task.Status == System.Threading.Tasks.TaskStatus.RanToCompletion && task.Result != null)
-                {
-                    ch.VoiceSet = task.Result;
-                    ch.LabelSuffix = "";
-                }
-                else
-                {
-                    _lastFailedKey = key;
-                }
-                _separationJobs.Remove(tv.TrackNumber);
-            }
+            ch.VoiceSet = BuildExactVoiceSet(tv, ch, key);
+            ch.LabelSuffix = "";
         }
 
-        void CancelJob(int trackNumber)
+        // Build a ChannelVoiceSet directly from the decoded voice buffers plus MIDI note spans.
+        LibSidWiz.ChannelVoiceSet BuildExactVoiceSet(TrackView tv, LibSidWiz.Channel ch, SidWizVoiceKey key)
         {
-            if (_separationJobs != null && _separationJobs.TryGetValue(trackNumber, out var job))
+            var loaded = key.Voices;
+            int sampleRate = ch.SampleRate;
+            int len = ch.DecodedSamples?.Length ?? 0;
+            double offsetT = PlaybackOffsetT;
+            double offsetS = Props.PlaybackOffsetS;
+            var notes = tv.MidiTrack?.Notes;
+
+            var voiceAudios = new LibSidWiz.VoiceAudio[loaded.Length];
+            for (int v = 0; v < loaded.Length; v++)
             {
-                try { job.Cts.Cancel(); } catch { }
-                _separationJobs.Remove(trackNumber);
+                int srcChannel = loaded[v].SourceChannel & 0xF; // MIDI note channels are 0..15
+                var raw = new List<(int Start, int End)>();
+                if (notes != null)
+                {
+                    foreach (var n in notes)
+                    {
+                        if ((n.channel & 0xF) != srcChannel || n.stop <= n.start)
+                            continue;
+                        double startSec = TicksToSeconds(n.start + offsetT) - offsetS;
+                        double endSec = TicksToSeconds(n.stop + offsetT) - offsetS;
+                        if (endSec <= startSec)
+                            continue;
+                        int s = ClampInt((int)(startSec * sampleRate), 0, len);
+                        int e = ClampInt((int)((endSec + VoiceReleaseSec) * sampleRate), 0, len);
+                        if (e > s)
+                            raw.Add((s, e));
+                    }
+                }
+                raw.Sort((a, b) => a.Start.CompareTo(b.Start));
+
+                var starts = new List<int>();
+                var ends = new List<int>();
+                foreach (var (s, e) in raw)
+                {
+                    if (starts.Count > 0 && s <= ends[ends.Count - 1])
+                        ends[ends.Count - 1] = Math.Max(ends[ends.Count - 1], e);
+                    else
+                    {
+                        starts.Add(s);
+                        ends.Add(e);
+                    }
+                }
+                voiceAudios[v] = new LibSidWiz.VoiceAudio(loaded[v].Samples, starts.ToArray(), ends.ToArray());
             }
+            return new LibSidWiz.ChannelVoiceSet(key, voiceAudios);
         }
+
+        static int ClampInt(int v, int lo, int hi) => v < lo ? lo : (v > hi ? hi : v);
 
         /// <summary>
         /// Song-wide fade factor [0,1] from the project's fade in/out props, matching the
@@ -1415,7 +1380,6 @@ namespace VisualMusic
                 TriggerLookaheadFrames = outProps.AudioProps.TriggerLookaheadFrames,
                 TriggerLookaheadOnFailureFrames = outProps.AudioProps.TriggerLookaheadOnFailureFrames,
                 ShapeStability = outProps.AudioProps.ShapeStability,
-                PitchSplitCount = outProps.AudioProps.PitchSplitCount,
                 PitchSplitLayout = outProps.AudioProps.PitchSplitLayout
             };
             for (int i = 1; i < list.Count; i++)
@@ -2092,10 +2056,6 @@ namespace VisualMusic
                     () => EffectiveShapeStability(tv.TrackProps),
                     v => tv.TrackProps.AudioProps.ShapeStability = (float)v);
                     // interpolatable weight; fed to the channel via RefreshSidWizChannels
-                _propAccessors[$"{prefix}/PitchSplitCount"] = PropAccessor.Scalar(
-                    () => EffectivePitchSplitCount(tv.TrackProps),
-                    v => tv.TrackProps.AudioProps.PitchSplitCount = (int)Math.Round(v),
-                    alwaysHold: true);   // integer count; fed to the channel via RefreshSidWizChannels
                 // Split layout keyframed in ComboBox-index space (0 = Default/inherit, i = SplitLayout + 1),
                 // mirroring TriggerAlgorithmIndex.
                 _propAccessors[$"{prefix}/PitchSplitLayoutIndex"] = PropAccessor.Scalar(
@@ -2107,7 +2067,7 @@ namespace VisualMusic
                     v =>
                     {
                         int idx = (int)Math.Round(v);
-                        // Global track has nothing to inherit: "Default" becomes Stacked there.
+                        // Global track has nothing to inherit: "Default" becomes the default layout there.
                         tv.TrackProps.AudioProps.PitchSplitLayout =
                             idx <= 0 || idx > 3
                                 ? (tn == 0 ? AudioProps.DefaultPitchSplitLayout : (int?)null)
@@ -2502,14 +2462,16 @@ namespace VisualMusic
                 destProps.AudioProps.TriggerLookaheadFrames = sourceProps.AudioProps.TriggerLookaheadFrames;
                 destProps.AudioProps.TriggerLookaheadOnFailureFrames = sourceProps.AudioProps.TriggerLookaheadOnFailureFrames;
                 destProps.AudioProps.ShapeStability = sourceProps.AudioProps.ShapeStability;
-                destProps.AudioProps.PitchSplitCount = sourceProps.AudioProps.PitchSplitCount;
                 destProps.AudioProps.PitchSplitLayout = sourceProps.AudioProps.PitchSplitLayout;
                 destProps.AudioProps.Label = sourceProps.AudioProps.Label;
-                // Reload audio only for tracks whose filename actually changed, so ordinary
-                // undo/redo steps stay cheap.
+                // Reload audio only for tracks whose filename or voice-file list actually changed, so
+                // ordinary undo/redo steps stay cheap.
                 string oldFn = destProps.AudioProps.Filename ?? "";
                 string newFn = sourceProps.AudioProps.Filename ?? "";
-                if (!string.Equals(oldFn, newFn, StringComparison.OrdinalIgnoreCase))
+                bool voicesChanged = !VoiceFilesEqual(destProps.AudioProps.VoiceAudioFiles, sourceProps.AudioProps.VoiceAudioFiles);
+                if (voicesChanged)
+                    destProps.AudioProps.VoiceAudioFiles = sourceProps.AudioProps.VoiceAudioFiles;
+                if (voicesChanged || !string.Equals(oldFn, newFn, StringComparison.OrdinalIgnoreCase))
                 {
                     destProps.AudioProps.Filename = newFn;
                     _ = destProps.AudioProps.LoadAudioAsync();
@@ -2517,6 +2479,17 @@ namespace VisualMusic
             }
             PropertyKeyframes = source.PropertyKeyframes;
             //source.Dispose();
+        }
+
+        static bool VoiceFilesEqual(List<(int Channel, string Path)> a, List<(int Channel, string Path)> b)
+        {
+            int ca = a?.Count ?? 0, cb = b?.Count ?? 0;
+            if (ca != cb) return false;
+            for (int i = 0; i < ca; i++)
+                if (a[i].Channel != b[i].Channel ||
+                    !string.Equals(a[i].Path ?? "", b[i].Path ?? "", StringComparison.OrdinalIgnoreCase))
+                    return false;
+            return true;
         }
 
         internal void InitAfterDeserialization(WaveformPanel waveformPanel = null)

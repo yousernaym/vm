@@ -143,7 +143,6 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(TriggerLookaheadFrames));
             OnPropertyChanged(nameof(TriggerLookaheadOnFailureFrames));
             OnPropertyChanged(nameof(ShapeStability));
-            OnPropertyChanged(nameof(PitchSplitCount));
             OnPropertyChanged(nameof(PitchSplitLayoutIndex));
         }
 
@@ -240,7 +239,6 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(TriggerLookaheadFrames));
             OnPropertyChanged(nameof(TriggerLookaheadOnFailureFrames));
             OnPropertyChanged(nameof(ShapeStability));
-            OnPropertyChanged(nameof(PitchSplitCount));
             OnPropertyChanged(nameof(PitchSplitLayoutIndex));
         }
 
@@ -895,7 +893,8 @@ namespace VisualMusic.ViewModels
             {
                 value = value?.Trim() ?? "";   // don't try to load a whitespace-only path
                 if (value == AudioFilename) return;   // unchanged → no reload, no undo item
-                Apply(tp => tp.AudioProps.Filename = value);
+                // Manually assigning a file reverts a voice-split track to a plain single-file track.
+                Apply(tp => { tp.AudioProps.VoiceAudioFiles = null; tp.AudioProps.Filename = value; });
                 OnPropertyChanged();
                 _ = LoadSelectedTracksAudio?.Invoke();
                 Keyframes.KeyframeService.RaiseUndoSnapshot("Set track audio");
@@ -929,9 +928,10 @@ namespace VisualMusic.ViewModels
             bool hadAudio = false;
             Apply(tp =>
             {
-                if (!string.IsNullOrEmpty(tp.AudioProps.Filename))
+                if (!string.IsNullOrEmpty(tp.AudioProps.Filename) || tp.AudioProps.VoiceAudioFiles is { Count: > 0 })
                 {
                     hadAudio = true;
+                    tp.AudioProps.VoiceAudioFiles = null;
                     tp.AudioProps.Filename = "";
                 }
             });
@@ -1072,29 +1072,11 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// Pitch-split count (1 = off); empty = inherit the global track's value (which, when also
-        /// empty, falls back to <see cref="AudioProps.DefaultPitchSplitCount"/>). Same string/blank
-        /// semantics as <see cref="SilenceThreshold"/>.
-        /// </summary>
-        public double? PitchSplitCount
-        {
-            get => _mergedProps?.AudioProps?.PitchSplitCount;
-            set
-            {
-                if (value == null)
-                    Apply(tp => tp.AudioProps.PitchSplitCount = null);
-                else if (value >= 1)
-                    // Round, don't truncate: slider drags deliver fractional values (e.g. 1.98 for a
-                    // displayed "2"), which (int) would floor back to the previous step.
-                    Apply(tp => tp.AudioProps.PitchSplitCount = (int)Math.Round(value.Value));
-            }
-        }
-
-        /// <summary>
         /// Pitch-split layout as a ComboBox index: 0 = Default (inherit the global track's value,
-        /// which itself falls back to Stacked), i = <see cref="LibSidWiz.SplitLayout"/> + 1. Mirrors
-        /// <see cref="TriggerAlgorithmIndex"/>: the global track coerces "Default" to Stacked, and
-        /// selecting across differing tracks shows blank (-1).
+        /// which itself falls back to <see cref="AudioProps.DefaultPitchSplitLayout"/>),
+        /// i = <see cref="LibSidWiz.SplitLayout"/> + 1. Mirrors <see cref="TriggerAlgorithmIndex"/>:
+        /// the global track coerces "Default" to the default layout, and selecting across differing
+        /// tracks shows blank (-1).
         /// </summary>
         public int PitchSplitLayoutIndex
         {
@@ -1103,7 +1085,7 @@ namespace VisualMusic.ViewModels
                 var ap = _mergedProps?.AudioProps;
                 if (ap == null) return -1;
                 int? l = ap.PitchSplitLayout;
-                if (l == null) return IsOnlyGlobalSelected ? 1 : 0;
+                if (l == null) return IsOnlyGlobalSelected ? AudioProps.DefaultPitchSplitLayout + 1 : 0;
                 return l.Value + 1;
             }
             set

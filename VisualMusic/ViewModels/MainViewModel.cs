@@ -889,6 +889,12 @@ namespace VisualMusic.ViewModels
             for (int i = 1; i < tvs.Count; i++)   // index 0 = global
             {
                 var ap = tvs[i].TrackProps.AudioProps;
+                if (ap.VoiceAudioFiles is { Count: > 0 } voices)
+                {
+                    if (voices.Any(v => v.Path.StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase) && File.Exists(v.Path)))
+                        result.Add(ap);
+                    continue;
+                }
                 string fn = ap.Filename;
                 if (string.IsNullOrEmpty(fn)) continue;
                 if (fn.StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase) && File.Exists(fn))
@@ -912,8 +918,25 @@ namespace VisualMusic.ViewModels
             {
                 try
                 {
-                    // Temp track WAVs are named "<noteFile>-trackNN-<name>.wav"; swap the imported-file
-                    // prefix for the project name so exported files match the MIDI/master WAV naming.
+                    // Temp track WAVs are named "<noteFile>-trackNN[-chCC]-<name>.wav"; swap the
+                    // imported-file prefix for the project name so exported files match the MIDI/master
+                    // WAV naming. Voice-backed tracks copy and re-point every voice WAV.
+                    if (ap.VoiceAudioFiles is { Count: > 0 } voices)
+                    {
+                        var newList = new List<(int Channel, string Path)>(voices.Count);
+                        foreach (var (channel, path) in voices)
+                        {
+                            string voiceName = Path.GetFileName(path);
+                            int vIdx = voiceName.IndexOf("-track", StringComparison.OrdinalIgnoreCase);
+                            string voiceDestName = vIdx >= 0 ? projectName + voiceName.Substring(vIdx) : voiceName;
+                            string voiceDest = Path.Combine(destDir, voiceDestName);
+                            File.Copy(path, voiceDest, true);
+                            newList.Add((channel, voiceDest));
+                        }
+                        ap.VoiceAudioFiles = newList;
+                        continue;
+                    }
+
                     string original = Path.GetFileName(ap.Filename);
                     int idx = original.IndexOf("-track", StringComparison.OrdinalIgnoreCase);
                     string destName = idx >= 0 ? projectName + original.Substring(idx) : original;
@@ -1172,25 +1195,42 @@ namespace VisualMusic.ViewModels
             if (!options.IsProjectLoad && options.GeneratedTrackAudioPaths is { Count: > 0 } trackAudio)
             {
                 var targets = new List<AudioProps>();
-                foreach (var (track, path) in trackAudio)
+                // Items[0] = Global = MIDI track 0; real tracks align 1:1 with remuxer track numbers.
+                foreach (var group in trackAudio.GroupBy(x => x.Track))
                 {
-                    // Items[0] = Global = MIDI track 0; real tracks align 1:1 with remuxer track numbers.
-                    if (track >= 0 && track < TrackList.Items.Count)
+                    int track = group.Key;
+                    if (track < 0 || track >= TrackList.Items.Count)
+                        continue;
+                    var ap = TrackList.Items[track].TrackView.TrackProps.AudioProps;
+                    // Channel >= 0 → per-voice WAVs (exact split); Channel -1 → one whole-track WAV.
+                    var voiceEntries = group.Where(x => x.Channel >= 0)
+                        .OrderBy(x => x.Channel)
+                        .Select(x => (x.Channel, x.Path))
+                        .ToList();
+                    if (voiceEntries.Count > 0)
                     {
-                        var ap = TrackList.Items[track].TrackView.TrackProps.AudioProps;
-                        ap.Filename = path;
-                        targets.Add(ap);
+                        ap.VoiceAudioFiles = voiceEntries;
+                        ap.Filename = "";
                     }
+                    else
+                    {
+                        ap.VoiceAudioFiles = null;
+                        ap.Filename = group.First().Path;
+                    }
+                    targets.Add(ap);
                 }
                 if (targets.Count > 0)
                 {
                     await Task.WhenAll(targets.Select(ap => ap.LoadAudioAsync()));
-                    var failed = targets
-                        .Select(ap => ap.SidWizChannel)
-                        .FirstOrDefault(ch => !string.IsNullOrEmpty(ch.ErrorMessage));
-                    if (failed != null)
-                        MetroMessageBox.Show($"Couldn't load audio file:\n{failed.Filename}", Program.AppName,
+                    var failedAp = targets.FirstOrDefault(ap => !string.IsNullOrEmpty(ap.SidWizChannel.ErrorMessage));
+                    if (failedAp != null)
+                    {
+                        string fn = !string.IsNullOrEmpty(failedAp.Filename)
+                            ? failedAp.Filename
+                            : failedAp.VoiceAudioFiles?.FirstOrDefault().Path ?? "(track audio)";
+                        MetroMessageBox.Show($"Couldn't load audio file:\n{fn}", Program.AppName,
                             MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
             }
 
