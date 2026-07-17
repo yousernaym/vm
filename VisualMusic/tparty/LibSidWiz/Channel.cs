@@ -1,4 +1,4 @@
-﻿using LibSidWiz.Triggers;
+using LibSidWiz.Triggers;
 using NAudio.Wave;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -42,9 +42,9 @@ namespace LibSidWiz
         // once per frame by the render thread. null = no split ready (channel renders unsplit).
         private volatile ChannelVoiceSet _voiceSet;
         // Render-thread-only: the voice set latched for the frame currently being prepared/drawn, and
-        // the voice buffer GetSample should read (null = the mixed channel buffer).
+        // the Q15 voice buffer GetSample should read (null = the mixed float channel buffer).
         private ChannelVoiceSet _frameVoices;
-        private float[] _activeVoiceSamples;
+        private short[] _activeVoiceSamples;
         private string _labelSuffix = "";
         private string _filename;
         private string _externalTriggerFilename;
@@ -711,11 +711,12 @@ namespace LibSidWiz
             // When a voice buffer is routed in (per-slot trigger/render on a split channel), read it
             // for both trigger and display: a slot triggers and draws from its own separated audio.
             // ExternalTriggerFilename doesn't apply to slots — the voice buffer already isolates the note.
+            // Voice samples are Q15; Scale is applied at read time so auto-scaler still tracks.
             var voice = _activeVoiceSamples;
             if (voice != null)
             {
                 return sampleIndex < 0 || sampleIndex >= voice.Length
-                    ? 0 : voice[sampleIndex] * Scale * (forTrigger && InvertedTrigger ? -1 : 1);
+                    ? 0 : (voice[sampleIndex] * (1f / 32767f)) * Scale * (forTrigger && InvertedTrigger ? -1 : 1);
             }
             var source = forTrigger ? _samplesForTrigger : _samples;
             if (source == null)
@@ -723,14 +724,14 @@ namespace LibSidWiz
             return sampleIndex < 0 || sampleIndex >= source.Count ? 0 : source[sampleIndex] * Scale * (forTrigger && InvertedTrigger ? -1 : 1);
         }
 
-        // Render-thread-only: route subsequent GetSample reads to a voice buffer (null = mixed).
-        internal void SetActiveVoice(float[] samples) => _activeVoiceSamples = samples;
+        // Render-thread-only: route subsequent GetSample reads to a Q15 voice buffer (null = mixed).
+        internal void SetActiveVoice(short[] samples) => _activeVoiceSamples = samples;
 
         // The voice set latched for this frame is complete (matches the slot count).
         internal bool SplitPreparedThisFrame => SplitCount > 1 && _frameVoices != null;
 
         // Samples of voice k in the frame-latched voice set (render thread only).
-        internal float[] FrameVoiceSamples(int k) => _frameVoices.Voices[k].Samples;
+        internal short[] FrameVoiceSamples(int k) => _frameVoices.Voices[k].Samples;
 
         internal int GetTriggerPoint(int frameIndexSamples, int frameSamples, int previousTriggerPoint)
         {

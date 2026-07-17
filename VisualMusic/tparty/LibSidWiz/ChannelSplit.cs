@@ -17,7 +17,7 @@ namespace LibSidWiz
     /// <summary>
     /// Immutable per-voice separated audio for one channel, produced by MIDI-guided STFT masking and
     /// published whole by the app. The render thread latches one reference per frame and reads each
-    /// voice's <see cref="VoiceAudio.Samples"/> for its slot's trigger and waveform.
+    /// voice's Q15 <see cref="VoiceAudio.Samples"/> for its slot's trigger and waveform.
     /// </summary>
     public sealed class ChannelVoiceSet
     {
@@ -39,11 +39,12 @@ namespace LibSidWiz
     /// </summary>
     public sealed class VoiceAudio
     {
-        public readonly float[] Samples;   // full track length, same normalised domain as the channel
+        /// <summary>Full-track PCM as Q15 (−32767..32767 ≈ −1..1); halves memory vs float.</summary>
+        public readonly short[] Samples;
         public readonly int[] SpanStarts;  // sorted ascending
         public readonly int[] SpanEnds;    // non-overlapping ⇒ ascending
 
-        public VoiceAudio(float[] samples, int[] spanStarts, int[] spanEnds)
+        public VoiceAudio(short[] samples, int[] spanStarts, int[] spanEnds)
         {
             Samples = samples;
             SpanStarts = spanStarts;

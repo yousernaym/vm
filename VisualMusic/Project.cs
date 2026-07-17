@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
@@ -1209,8 +1209,8 @@ namespace VisualMusic
         // thread that drives RefreshSidWizChannels for this Project instance (UI thread in preview,
         // export thread during export), so no locking is needed.
         //
-        // Memory: each ready set holds VoiceCount full-track float buffers (a 3-minute 44.1 kHz track
-        // at 4 voices ≈ 127 MB). Acceptable at this scale; short[] storage is a phase-2 follow-up.
+        // Memory: each ready set holds VoiceCount full-track short (Q15) buffers (a 3-minute 44.1 kHz
+        // track at 4 voices ≈ 64 MB).
         Dictionary<int, SeparationJob> _separationJobs;
         SidWizVoiceKey _lastFailedKey; // don't re-launch a key that just faulted, every frame
 
