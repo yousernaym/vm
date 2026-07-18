@@ -183,14 +183,17 @@
 
                 <!-- MOD Archive browser -->
                 <ctrl:SongWebBrowserWpf x:Name="modBrowser"
+                    SourceFileType="Mod"
                     Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=ModBrowser}"/>
 
                 <!-- HVSC / SID browser -->
                 <ctrl:SongWebBrowserWpf x:Name="sidBrowser"
+                    SourceFileType="Sid"
                     Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=SidBrowser}"/>
 
                 <!-- BitMidi browser -->
                 <ctrl:SongWebBrowserWpf x:Name="midiBrowser"
+                    SourceFileType="Midi"
                     Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVis}, ConverterParameter=MidiBrowser}"/>
             </Grid>
         </DockPanel>

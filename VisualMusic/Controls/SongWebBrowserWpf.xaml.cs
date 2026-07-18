@@ -17,6 +17,9 @@ namespace VisualMusic.Controls
         public IImportService ImportService { get; set; }
         public Func<Project> GetProject { get; set; }
 
+        /// <summary>Import type for downloads from this browser (Mod / SID / MIDI).</summary>
+        public FileType SourceFileType { get; set; }
+
         public string Url
         {
             set
@@ -69,7 +72,7 @@ namespace VisualMusic.Controls
             e.IsCancelled = true;
             string url = e.Url;
             string fileName = e.SuggestedFileName;
-            Dispatcher.InvokeAsync(() => ImportService?.ImportFromUrl(url, fileName));
+            Dispatcher.InvokeAsync(() => ImportService?.ImportFromUrl(url, fileName, SourceFileType));
         }
 
         void OnBrowserStatusMessage(object sender, StatusMessageEventArgs args) =>

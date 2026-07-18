@@ -1742,11 +1742,11 @@ namespace VisualMusic.ViewModels
 
         // ---- IImportService (browser download import) ----
 
-        public void ImportFromUrl(string url, string suggestedFileName)
+        public void ImportFromUrl(string url, string suggestedFileName, FileType preferredFileType)
         {
             string ext = suggestedFileName.Split('.').Last().ToLower();
 
-            FileType? fileType = ImportFileFormats.FromExtension(ext);
+            FileType? fileType = ImportFileFormats.FromExtension(ext, preferredFileType);
 
             if (fileType == null)
             {
