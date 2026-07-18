@@ -6,7 +6,7 @@ namespace LibSidWiz
     /// <summary>How a pitch-split channel arranges its per-pitch waveforms.</summary>
     public enum SplitLayout
     {
-        /// <summary>Subdivide the channel's row into a fixed vertical slice per slot.</summary>
+        /// <summary>Subdivide the channel's row into a vertical slice per currently-visible slot.</summary>
         Stacked = 0,
         /// <summary>Draw all slots in the channel's row, distinguished by colour/brightness.</summary>
         Overlaid = 1,
@@ -115,5 +115,10 @@ namespace LibSidWiz
         public bool HasCurve;                          // a waveform has been captured at least once
         public bool VisibleThisFrame;                  // drawn this frame (recently active)
         public Rectangle Bounds;                       // set by the renderer during layout
+
+        // Per-slot amplitude silence detection (Separate/Stacked), mirroring channel-level caches.
+        public bool WasActive;                         // shown last frame — lookahead only bridges gaps while true
+        public int NextActiveSample = int.MinValue;    // earliest known upcoming active sample
+        public int SilentScannedUntil = int.MinValue;  // exclusive end of verified-silent stretch
     }
 }

@@ -913,7 +913,7 @@ namespace LibSidWiz
         /// <summary>Per-voice rendering slots (null when SplitCount &lt;= 1). Read by the renderer.</summary>
         internal WaveSlot[] Slots { get; private set; }
 
-        /// <summary>Rows this channel occupies in the strip layout this frame (Separate mode only differs from 1).</summary>
+        /// <summary>Rows this channel occupies in the strip layout this frame (Separate = one per visible slot).</summary>
         internal int LayoutRowsThisFrame { get; set; } = 1;
 
         /// <summary>Public row count for side-balancing in WaveformPanel (a separate assembly).</summary>
@@ -947,16 +947,22 @@ namespace LibSidWiz
                 slot.LastActiveEndSample = int.MinValue;
                 slot.HasCurve = false;
                 slot.VisibleThisFrame = false;
+                slot.WasActive = false;
+                slot.NextActiveSample = int.MinValue;
+                slot.SilentScannedUntil = int.MinValue;
             }
         }
 
         /// <summary>
         /// Per-frame split engine: for each voice, updates its slot's trigger from that voice's
-        /// separated buffer (holding the last curve while silent) and its visibility. Slot k always
-        /// renders voice k. Only called for channels with SplitCount &gt; 1, on the render thread
-        /// (single writer). Falls back to unsplit rendering for the frame if no voice set is ready.
+        /// separated buffer (holding the last curve while silent). When
+        /// <paramref name="setSpanVisibility"/> is true (Overlaid), also sets per-slot visibility
+        /// from MIDI spans + silence threshold. Separate/Stacked leave visibility to the renderer's
+        /// per-slot amplitude silence detection. Slot k always renders voice k. Only called for
+        /// channels with SplitCount &gt; 1, on the render thread (single writer). Falls back to
+        /// unsplit rendering for the frame if no voice set is ready.
         /// </summary>
-        internal void UpdateSlots(int frameStart, int frameSamples)
+        internal void UpdateSlots(int frameStart, int frameSamples, bool setSpanVisibility = true)
         {
             var slots = Slots;
             var vs = _voiceSet; // one volatile read per frame
@@ -991,11 +997,15 @@ namespace LibSidWiz
                     finally { SetActiveVoice(null); }
                 }
 
-                slot.VisibleThisFrame = slot.HasCurve && (frameStart - (long)slot.LastActiveEndSample) <= hideAfter;
-                if (slot.VisibleThisFrame)
-                    ++visible;
+                if (setSpanVisibility)
+                {
+                    slot.VisibleThisFrame = slot.HasCurve && (frameStart - (long)slot.LastActiveEndSample) <= hideAfter;
+                    if (slot.VisibleThisFrame)
+                        ++visible;
+                }
             }
-            LayoutRowsThisFrame = SplitLayout == SplitLayout.Separate ? Math.Max(1, visible) : 1;
+            if (setSpanVisibility)
+                LayoutRowsThisFrame = SplitLayout == SplitLayout.Separate ? Math.Max(1, visible) : 1;
         }
 
         /// <summary>

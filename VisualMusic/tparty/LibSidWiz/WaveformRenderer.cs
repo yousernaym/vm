@@ -253,11 +253,22 @@ namespace LibSidWiz
                 _prevTrigger[i] = trig;
                 _frameTriggers[i] = trig;
 
+                // Separate/Stacked: each split uses its own amplitude silence detection (with the
+                // usual lookahead). The channel stays in the strip while any split is visible —
+                // a silent split does not wait for its siblings to go quiet.
+                if (ch.SplitCount > 1 &&
+                    (ch.SplitLayout == SplitLayout.Separate || ch.SplitLayout == SplitLayout.Stacked))
+                {
+                    ch.UpdateSlots(frameIndexSamples, frameSamples, setSpanVisibility: false);
+                    if (ApplySplitSlotActivity(ch, frameIndexSamples, frameSamples))
+                        _activeThisFrame.Add(ch);
+                    continue;
+                }
+
                 if (IsChannelActive(i, ch, trig, frameIndexSamples, frameSamples))
                 {
                     _activeThisFrame.Add(ch);
-                    // Split channels compute their per-pitch slots here (single-writer: only the
-                    // authority renderer runs PrepareFrame; the other strip shares these Channels).
+                    // Overlaid (and any future mix-gated split): span-based slot visibility.
                     if (ch.SplitCount > 1)
                         ch.UpdateSlots(frameIndexSamples, frameSamples);
                     else
@@ -464,6 +475,99 @@ namespace LibSidWiz
             return false;
         }
 
+        /// <summary>
+        /// Per-slot amplitude silence detection for Separate/Stacked: each voice buffer is tested
+        /// independently with the same window + lookahead rules as <see cref="IsChannelActive"/>.
+        /// Sets <see cref="WaveSlot.VisibleThisFrame"/> and <see cref="Channel.LayoutRowsThisFrame"/>.
+        /// Returns true when at least one slot should stay in the strip.
+        /// </summary>
+        private bool ApplySplitSlotActivity(Channel ch, int frameStartSample, int frameSamples)
+        {
+            var slots = ch.Slots;
+            if (slots == null || !ch.SplitPreparedThisFrame)
+            {
+                ch.LayoutRowsThisFrame = 0;
+                return false;
+            }
+
+            int visible = 0;
+            for (int k = 0; k < slots.Length; ++k)
+            {
+                var slot = slots[k];
+                ch.SetActiveVoice(ch.FrameVoiceSamples(k));
+                try
+                {
+                    bool active = IsSlotActive(slot, ch, frameStartSample, frameSamples);
+                    // HasCurve is required to occupy a row — same gate as RenderPreparedFrame.
+                    slot.VisibleThisFrame = active && slot.HasCurve;
+                }
+                finally { ch.SetActiveVoice(null); }
+
+                if (slot.VisibleThisFrame)
+                    ++visible;
+            }
+
+            ch.LayoutRowsThisFrame = ch.SplitLayout == SplitLayout.Separate
+                ? visible
+                : (visible > 0 ? 1 : 0);
+            return visible > 0;
+        }
+
+        /// <summary>
+        /// Same amplitude + lookahead rules as <see cref="IsChannelActive"/>, but for one voice
+        /// buffer (already routed via <see cref="Channel.SetActiveVoice"/>) and one slot's caches.
+        /// </summary>
+        private bool IsSlotActive(WaveSlot slot, Channel ch, int frameStartSample, int frameSamples)
+        {
+            int width = ActivityWindowSamplesOverride > 0 ? ActivityWindowSamplesOverride : ch.ViewWidthInSamples;
+            // Centre on the playhead — not the held oscilloscope trigger, which would keep
+            // reading the last loud cycle forever after the voice goes quiet.
+            int triggerPoint = frameStartSample + frameSamples / 2;
+            int left = triggerPoint - width / 2;
+            int right = left + width;
+
+            int step = Math.Max(1, ActivitySubsampleStride);
+
+            for (int s = left; s < right; s += step)
+            {
+                float v = ch.GetSample(s, forTrigger: false);
+                if ((v >= 0 ? v : -v) >= ActivityThreshold)
+                {
+                    slot.NextActiveSample = int.MinValue;
+                    slot.SilentScannedUntil = int.MinValue;
+                    slot.WasActive = true;
+                    return true;
+                }
+            }
+
+            if (!slot.WasActive || ch.ActivityLookaheadSeconds <= 0f)
+            {
+                slot.WasActive = false;
+                return false;
+            }
+
+            int lookaheadSamples = (int)Math.Round(ch.ActivityLookaheadSeconds * SamplingRate);
+            int scanTo = frameStartSample + frameSamples + lookaheadSamples;
+
+            if (slot.NextActiveSample != int.MinValue && slot.NextActiveSample >= right)
+                return slot.WasActive = slot.NextActiveSample < scanTo;
+            slot.NextActiveSample = int.MinValue;
+
+            for (int s = Math.Max(right, slot.SilentScannedUntil); s < scanTo; s += step)
+            {
+                float v = ch.GetSample(s, forTrigger: false);
+                if ((v >= 0 ? v : -v) >= ActivityThreshold)
+                {
+                    slot.NextActiveSample = s;
+                    slot.SilentScannedUntil = s;
+                    return true;
+                }
+            }
+            slot.SilentScannedUntil = scanTo;
+            slot.WasActive = false;
+            return false;
+        }
+
         /// <summary>Rebuild channel.Bounds layout for the given visible set and repaint the template into _templateData.</summary>
         private void RebuildLayoutAndTemplateForVisible(IReadOnlyList<Channel> visible)
         {
@@ -573,13 +677,29 @@ namespace LibSidWiz
                         ++r;
                     }
                     break;
-                default: // Stacked: fixed vertical slices of the channel's single row
-                    int n = ch.SplitCount;
-                    for (int k = 0; k < s.Length; ++k)
+                default: // Stacked: vertical slices for currently-visible slots only (reflow)
+                    int n = 0;
+                    foreach (var slot in s)
+                        if (slot.VisibleThisFrame)
+                            ++n;
+                    if (n == 0)
                     {
-                        int y0 = ch.Bounds.Top + k * ch.Bounds.Height / n;
-                        int y1 = ch.Bounds.Top + (k + 1) * ch.Bounds.Height / n;
-                        s[k].Bounds = new Rectangle(ch.Bounds.Left, y0, ch.Bounds.Width, y1 - y0);
+                        foreach (var slot in s)
+                            slot.Bounds = Rectangle.Empty;
+                        break;
+                    }
+                    int vi = 0;
+                    foreach (var slot in s)
+                    {
+                        if (!slot.VisibleThisFrame)
+                        {
+                            slot.Bounds = Rectangle.Empty;
+                            continue;
+                        }
+                        int y0 = ch.Bounds.Top + vi * ch.Bounds.Height / n;
+                        int y1 = ch.Bounds.Top + (vi + 1) * ch.Bounds.Height / n;
+                        slot.Bounds = new Rectangle(ch.Bounds.Left, y0, ch.Bounds.Width, y1 - y0);
+                        ++vi;
                     }
                     break;
             }
@@ -692,9 +812,13 @@ namespace LibSidWiz
                             DrawBorder(g, channel, slot.Bounds, rb);
                         }
                         break;
-                    default: // Stacked: fixed slices
+                    default: // Stacked: zero line per visible slice; one border around the channel
                         foreach (var slot in channel.Slots)
+                        {
+                            if (!slot.VisibleThisFrame || slot.Bounds.Width <= 0 || slot.Bounds.Height <= 0)
+                                continue;
                             DrawZeroLine(g, channel, slot.Bounds);
+                        }
                         DrawBorder(g, channel, channel.Bounds, rb);
                         break;
                 }
@@ -711,12 +835,6 @@ namespace LibSidWiz
                 using (var brush = new SolidBrush(channel.LabelColor))
                 {
                     var stringFormat = new StringFormat();
-                    var layoutRectangle = new RectangleF(
-                        channel.Bounds.Left + channel.LabelMargins.Left,
-                        channel.Bounds.Top + channel.LabelMargins.Top,
-                        channel.Bounds.Width - channel.LabelMargins.Left - channel.LabelMargins.Right,
-                        channel.Bounds.Height - channel.LabelMargins.Top - channel.LabelMargins.Bottom);
-
                     switch (channel.LabelAlignment)
                     {
                         case ContentAlignment.TopLeft: stringFormat.Alignment = StringAlignment.Near; stringFormat.LineAlignment = StringAlignment.Near; break;
@@ -731,7 +849,32 @@ namespace LibSidWiz
                         default: throw new ArgumentOutOfRangeException();
                     }
 
-                    g.DrawString(channel.EffectiveLabel, channel.LabelFont, brush, layoutRectangle, stringFormat);
+                    // Separate: the same track label is drawn above each visible split row.
+                    if (channel.SplitLayout == SplitLayout.Separate
+                        && channel.SplitPreparedThisFrame
+                        && channel.Slots != null)
+                    {
+                        foreach (var slot in channel.Slots)
+                        {
+                            if (!slot.VisibleThisFrame || slot.Bounds.Width <= 0 || slot.Bounds.Height <= 0)
+                                continue;
+                            var layoutRectangle = new RectangleF(
+                                slot.Bounds.Left + channel.LabelMargins.Left,
+                                slot.Bounds.Top + channel.LabelMargins.Top,
+                                slot.Bounds.Width - channel.LabelMargins.Left - channel.LabelMargins.Right,
+                                slot.Bounds.Height - channel.LabelMargins.Top - channel.LabelMargins.Bottom);
+                            g.DrawString(channel.EffectiveLabel, channel.LabelFont, brush, layoutRectangle, stringFormat);
+                        }
+                    }
+                    else
+                    {
+                        var layoutRectangle = new RectangleF(
+                            channel.Bounds.Left + channel.LabelMargins.Left,
+                            channel.Bounds.Top + channel.LabelMargins.Top,
+                            channel.Bounds.Width - channel.LabelMargins.Left - channel.LabelMargins.Right,
+                            channel.Bounds.Height - channel.LabelMargins.Top - channel.LabelMargins.Bottom);
+                        g.DrawString(channel.EffectiveLabel, channel.LabelFont, brush, layoutRectangle, stringFormat);
+                    }
                 }
             }
         }

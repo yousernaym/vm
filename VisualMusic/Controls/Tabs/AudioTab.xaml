@@ -115,11 +115,11 @@
             <ComboBoxItem Content="Default"
                           ToolTip="Use the global track's setting. On the global track itself this selects Overlaid."/>
             <ComboBoxItem Content="Stacked"
-                          ToolTip="Subdivide the track's row into a fixed vertical slice per split waveform."/>
+                          ToolTip="Subdivide the track's row into a vertical slice per active split waveform (silent splits are removed independently)."/>
             <ComboBoxItem Content="Overlaid"
                           ToolTip="Draw all split waveforms in the track's row, distinguished by brightness."/>
             <ComboBoxItem Content="Separate"
-                          ToolTip="Give each active split waveform its own full-size row, like an independent channel (sharing this track's label and colour)."/>
+                          ToolTip="Give each active split waveform its own full-size row with this track's label above each, like an independent channel (silent splits are removed independently)."/>
         </ComboBox>
     </StackPanel>
 </UserControl>
