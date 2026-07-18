@@ -921,7 +921,7 @@ namespace LibSidWiz
         // Each slot renders one voice's exact per-channel audio (the source channel's rendered WAV,
         // gated to the notes that channel plays; built by the app in Project.BuildExactVoiceSet). The
         // slot→voice mapping is fixed 1:1, so this class only has to search each voice buffer's trigger
-        // per frame and drop the capture when that voice goes quiet — no per-frame pitch classification.
+        // per frame and park on the playhead while quiet — no per-frame pitch classification.
 
         /// <summary>Per-voice rendering slots (null when SplitCount &lt;= 1). Read by the renderer.</summary>
         internal WaveSlot[] Slots { get; private set; }
@@ -968,14 +968,15 @@ namespace LibSidWiz
 
         /// <summary>
         /// Per-frame split engine: for each voice, updates its slot's trigger from that voice's
-        /// separated buffer. A held curve is kept only while that voice still has audible energy
-        /// near the playhead — once the buffer is quiet the capture is dropped so multi-channel
-        /// instruments do not leave frozen oscilloscope traces after they go silent. When
-        /// <paramref name="setSpanVisibility"/> is true (Overlaid), also sets per-slot visibility
-        /// from recent audibility + silence threshold. Separate/Stacked leave visibility to the
-        /// renderer's per-slot amplitude silence detection. Slot k always renders voice k. Only
-        /// called for channels with SplitCount &gt; 1, on the render thread (single writer). Falls
-        /// back to unsplit rendering for the frame if no voice set is ready.
+        /// separated buffer. While a voice is audible the last sync point is held across failed
+        /// frames; once the buffer goes quiet the trigger parks on the playhead (live silence)
+        /// and the slot stays eligible until the silence threshold elapses — so gaps are bridged
+        /// without freezing a historical cycle. When <paramref name="setSpanVisibility"/> is true
+        /// (Overlaid), also sets per-slot visibility from recent audibility + silence threshold.
+        /// Separate/Stacked leave visibility to the renderer's per-slot amplitude silence detection.
+        /// Slot k always renders voice k. Only called for channels with SplitCount &gt; 1, on the
+        /// render thread (single writer). Falls back to unsplit rendering for the frame if no
+        /// voice set is ready.
         /// </summary>
         internal void UpdateSlots(int frameStart, int frameSamples, bool setSpanVisibility = true)
         {
@@ -1016,23 +1017,23 @@ namespace LibSidWiz
                             slot.LastActiveEndSample = audEnd;
                     }
 
-                    if (inSpan)
+                    if (inSpan || audible)
                         UpdateSlotTrigger(slot, frameStart, frameSamples, normalEnd, failEnd, audible);
                     else if (slot.HasCurve)
-                    {
-                        // Past MIDI spans: keep tracking only while the voice buffer still has
-                        // energy (ownership release tails); otherwise drop the held capture.
-                        if (audible)
-                            UpdateSlotTrigger(slot, frameStart, frameSamples, normalEnd, failEnd, audible: true);
-                        else
-                            slot.HasCurve = false;
-                    }
+                        // Still inside the silence-threshold window: follow the playhead so we
+                        // draw live zeros instead of a frozen cycle. Past the window HasCurve is
+                        // cleared below with visibility.
+                        ParkSlotOnPlayhead(slot, frameStart, frameSamples);
                 }
                 finally { SetActiveVoice(null); }
 
                 if (setSpanVisibility)
                 {
-                    slot.VisibleThisFrame = slot.HasCurve && (frameStart - (long)slot.LastActiveEndSample) <= hideAfter;
+                    bool withinThreshold = slot.HasCurve
+                        && (frameStart - (long)slot.LastActiveEndSample) <= hideAfter;
+                    if (slot.HasCurve && !withinThreshold)
+                        slot.HasCurve = false;
+                    slot.VisibleThisFrame = withinThreshold;
                     if (slot.VisibleThisFrame)
                         ++visible;
                 }
@@ -1043,8 +1044,9 @@ namespace LibSidWiz
 
         /// <summary>
         /// Searches a voice buffer for the slot's next trigger. The expected position advances with
-        /// the frame so the curve stays steady. On failure the previous curve is held only while
-        /// <paramref name="audible"/>; a silent buffer drops the capture instead of freezing it.
+        /// the frame so the curve stays steady. On failure the previous curve is held while
+        /// <paramref name="audible"/>; a silent buffer parks on the playhead so the silence
+        /// threshold can still keep the slot visible without freezing a historical cycle.
         /// The voice buffer must already be routed in via SetActiveVoice.
         /// </summary>
         private void UpdateSlotTrigger(WaveSlot slot, int frameStart, int frameSamples, int normalEnd, int failEnd, bool audible)
@@ -1065,12 +1067,37 @@ namespace LibSidWiz
                 slot.HasCurve = true;
             }
             else if (!audible)
-            {
-                // Note still "on" in MIDI (or a failed sync) but the voice is quiet — do not keep
-                // painting the last found cycle.
-                slot.HasCurve = false;
-            }
+                ParkSlotOnPlayhead(slot, frameStart, frameSamples);
             // else: hold the previous curve while there is still audible energy but no clean trigger.
+        }
+
+        /// <summary>
+        /// Centres the slot on the playhead and marks it as having a curve. Used when the voice is
+        /// quiet so RenderWave draws the live (flat) buffer during the silence-threshold linger.
+        /// </summary>
+        private static void ParkSlotOnPlayhead(WaveSlot slot, int frameStart, int frameSamples)
+        {
+            slot.LastTrigger = frameStart + frameSamples / 2;
+            slot.LastUpdateFrameStart = frameStart;
+            slot.HasCurve = true;
+        }
+
+        /// <summary>
+        /// True when any split slot still has a capture that may be aging out over the silence
+        /// threshold. Used so Overlaid channels keep updating after the mixed buffer goes quiet.
+        /// </summary>
+        internal bool HasLingeringSlots
+        {
+            get
+            {
+                var slots = Slots;
+                if (slots == null)
+                    return false;
+                foreach (var s in slots)
+                    if (s.HasCurve)
+                        return true;
+                return false;
+            }
         }
 
         /// <summary>

@@ -104,16 +104,16 @@ namespace LibSidWiz
     }
 
     /// <summary>
-    /// Per-voice rendering slot for a split channel. A slot holds its last trigger across frames
-    /// while the voice stays audible but fails to re-sync; once the voice buffer is quiet the
-    /// capture is cleared so silent channels do not keep a frozen oscilloscope trace.
+    /// Per-voice rendering slot for a split channel. While audible, a slot holds its last trigger
+    /// across failed sync frames; once quiet it parks on the playhead and stays eligible until
+    /// the silence threshold elapses (live flat line, not a frozen historical cycle).
     /// </summary>
     internal class WaveSlot
     {
         public int LastTrigger = -1;                   // absolute sample index the held curve is centred on
         public int LastUpdateFrameStart = int.MinValue; // frame-start sample of the last successful update
         public int LastActiveEndSample = int.MinValue;  // song-sample end of this voice's most recent audible energy
-        public bool HasCurve;                          // a waveform has been captured and not yet cleared
+        public bool HasCurve;                          // capture present (live or parked) until silence threshold clears it
         public bool VisibleThisFrame;                  // drawn this frame (recently active)
         public Rectangle Bounds;                       // set by the renderer during layout
 

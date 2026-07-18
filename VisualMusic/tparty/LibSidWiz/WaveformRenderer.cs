@@ -265,22 +265,23 @@ namespace LibSidWiz
                     continue;
                 }
 
-                if (IsChannelActive(i, ch, trig, frameIndexSamples, frameSamples))
+                // Overlaid splits: keep updating while the mix is active OR a slot is still
+                // lingering through the silence threshold (the mix goes quiet immediately, but
+                // slots age out over ActivityLookaheadSeconds).
+                bool mixActive = IsChannelActive(i, ch, trig, frameIndexSamples, frameSamples);
+                if (ch.SplitCount > 1)
                 {
-                    // Overlaid (and any future mix-gated split): span-based slot visibility.
-                    // If every split was cleared (voice buffers quiet), drop the channel so a
-                    // silent multi-channel instrument does not leave an empty strip row.
-                    if (ch.SplitCount > 1)
+                    if (mixActive || ch.HasLingeringSlots)
                     {
                         ch.UpdateSlots(frameIndexSamples, frameSamples);
                         if (ch.LayoutRowsThisFrame > 0)
                             _activeThisFrame.Add(ch);
                     }
-                    else
-                    {
-                        ch.LayoutRowsThisFrame = 1;
-                        _activeThisFrame.Add(ch);
-                    }
+                }
+                else if (mixActive)
+                {
+                    ch.LayoutRowsThisFrame = 1;
+                    _activeThisFrame.Add(ch);
                 }
             }
 
