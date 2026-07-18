@@ -15,15 +15,25 @@ using System.Threading.Tasks;
 
 namespace LibSidWiz
 {
-    /// <summary>One source (chip/mod) channel's WAV feeding an exact pitch split.</summary>
+    /// <summary>
+    /// One source (chip/mod) channel's WAV feeding an exact pitch split. The WAV holds the whole
+    /// channel (shared by every instrument track playing on it), so OwnedStartsSec/OwnedEndsSec
+    /// carry the note-ownership ranges (seconds, sorted, parallel arrays) this track owns; samples
+    /// outside them are zeroed at load. Null ranges = no gating (legacy pre-spliced voice WAVs).
+    /// </summary>
     public struct VoiceFile
     {
         public int SourceChannel;
         public string Path;
-        public VoiceFile(int sourceChannel, string path)
+        public double[] OwnedStartsSec;
+        public double[] OwnedEndsSec;
+        public VoiceFile(int sourceChannel, string path,
+            double[] ownedStartsSec = null, double[] ownedEndsSec = null)
         {
             SourceChannel = sourceChannel;
             Path = path;
+            OwnedStartsSec = ownedStartsSec;
+            OwnedEndsSec = ownedEndsSec;
         }
     }
 
@@ -226,9 +236,11 @@ namespace LibSidWiz
             }, token);
         }
 
-        // Voice-backed load: decode each voice WAV un-normalised (mono + high-pass), sum them into the
-        // track's mixed buffer, normalise the sum once, and quantise every voice to Q15 with that same
-        // gain — so lane levels stay comparable and the voices sum back to the mixed channel signal.
+        // Voice-backed load: decode each voice WAV un-normalised (mono + high-pass), gate it to the
+        // note ranges this track owns (the WAV holds the whole shared source channel), sum the gated
+        // voices into the track's mixed buffer, normalise the sum once, and quantise every voice to
+        // Q15 with that same gain — so lane levels stay comparable and the voices sum back to the
+        // track's signal.
         private void LoadVoiceData(CancellationToken token)
         {
             IsEmpty = false;
@@ -244,6 +256,7 @@ namespace LibSidWiz
                 token.ThrowIfCancellationRequested();
                 var dec = sb.Decoded ?? Array.Empty<float>();
                 if (rate == 0) rate = sb.SampleRate;
+                GateToOwnedRanges(dec, vf.OwnedStartsSec, vf.OwnedEndsSec, sb.SampleRate);
                 decodedVoices.Add((vf.SourceChannel, dec));
                 if (dec.LongLength > maxLen) maxLen = dec.LongLength;
             }
@@ -286,6 +299,31 @@ namespace LibSidWiz
             _samplesForTrigger = _samples;
             LoadedVoices = loaded;
             Loading = false;
+        }
+
+        // Zero every sample outside the voice's owned ranges (sorted, seconds), reducing a shared
+        // whole-channel WAV to exactly this track's signal. Null ranges = keep everything (legacy
+        // pre-spliced per-voice WAVs are already gated on disk).
+        private static void GateToOwnedRanges(float[] samples, double[] startsSec, double[] endsSec, int rate)
+        {
+            if (startsSec == null || endsSec == null || rate <= 0)
+                return;
+            long len = samples.LongLength;
+            long pos = 0; // everything before the next owned range gets zeroed
+            int n = Math.Min(startsSec.Length, endsSec.Length);
+            for (int r = 0; r < n && pos < len; r++)
+            {
+                double startF = startsSec[r] * rate;
+                double endF = endsSec[r] * rate; // double.MaxValue end => to end of buffer
+                long s = startF >= len ? len : Math.Max((long)startF, 0);
+                long e = endF >= len ? len : Math.Max((long)endF, 0);
+                for (long i = pos; i < s; i++)
+                    samples[i] = 0;
+                if (e > pos)
+                    pos = e;
+            }
+            for (long i = pos; i < len; i++)
+                samples[i] = 0;
         }
 
         [Category("Data")]

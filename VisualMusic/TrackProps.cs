@@ -1006,6 +1006,15 @@ namespace VisualMusic
         /// </summary>
         public List<(int Channel, string Path)> VoiceAudioFiles { get; set; }
 
+        /// <summary>
+        /// Transient note-ownership ranges per voice channel: (source channel, start seconds, end
+        /// seconds — parallel sorted arrays, audio-file time). The voice WAVs hold whole shared
+        /// source channels, so the load gates each one to the ranges this track's notes own.
+        /// Recomputed from the MIDI by <c>Project.PrepareVoiceOwnership</c> before every voice
+        /// load — never serialised.
+        /// </summary>
+        internal List<(int Channel, double[] StartsSec, double[] EndsSec)> VoiceOwnership { get; set; }
+
         /// <summary>User-supplied caption rendered above this track's waveform. Blank by default.</summary>
         public string Label
         {
@@ -1113,9 +1122,15 @@ namespace VisualMusic
         public async Task LoadAudioAsync()
         {
             // Sync the channel's voice-file list from our serialised state so a voice-backed track
-            // sums its voices; a plain track (null/empty) loads from Filename as before.
+            // sums its voices; a plain track (null/empty) loads from Filename as before. Each voice
+            // carries the ownership ranges (if computed) that gate the shared channel WAV down to
+            // this track's notes.
             SidWizChannel.VoiceFiles = VoiceAudioFiles?
-                .Select(v => new LibSidWiz.VoiceFile(v.Channel, v.Path)).ToList();
+                .Select(v =>
+                {
+                    var own = VoiceOwnership?.FirstOrDefault(o => o.Channel == v.Channel);
+                    return new LibSidWiz.VoiceFile(v.Channel, v.Path, own?.StartsSec, own?.EndsSec);
+                }).ToList();
             await SidWizChannel.LoadDataAsync();
         }
 

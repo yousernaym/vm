@@ -70,7 +70,7 @@ namespace LibSidWiz
             catch { }
         }
 
-        public float this[long index]
+        public float this[long index] 
         {
             get
             {

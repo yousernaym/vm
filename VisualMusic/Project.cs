@@ -1297,6 +1297,82 @@ namespace VisualMusic
         static int ClampInt(int v, int lo, int hi) => v < lo ? lo : (v > hi ? hi : v);
 
         /// <summary>
+        /// Recomputes the transient note-ownership ranges (<see cref="AudioProps.VoiceOwnership"/>)
+        /// for every voice-backed track. The generated voice WAVs hold whole source channels shared
+        /// by all instrument tracks playing on them, so each track's audio load gates its copy to
+        /// the ranges its own notes cover. Ownership rule (mirrors remuxer's run splitting): on a
+        /// given source channel a note owns the audio from its start until the next note's start on
+        /// that channel (any track); the last note owns to the end. Times are audio-file seconds —
+        /// no playback offsets. Call before <see cref="AudioProps.LoadAudioAsync"/> whenever a
+        /// voice-backed track (re)loads. MODs with more than 16 channels alias to MIDI channel % 16,
+        /// so ownership between aliased channels is approximate (pre-existing span limitation).
+        /// </summary>
+        public void PrepareVoiceOwnership()
+        {
+            if (_trackViews == null)
+                return;
+
+            // Per MIDI channel (0-15): every real track's note starts, as (startTick, trackIndex),
+            // sorted by tick. Built lazily on the first voice-backed track.
+            List<(int Start, int Track)>[] timelines = null;
+            for (int t = 1; t < _trackViews.Count; t++)
+            {
+                var ap = _trackViews[t].TrackProps.AudioProps;
+                if (ap.VoiceAudioFiles is not { Count: > 0 } voices)
+                {
+                    ap.VoiceOwnership = null;
+                    continue;
+                }
+                if (timelines == null)
+                {
+                    timelines = new List<(int, int)>[16];
+                    for (int c = 0; c < 16; c++)
+                        timelines[c] = new List<(int, int)>();
+                    for (int tt = 1; tt < _trackViews.Count; tt++)
+                    {
+                        var notes = _trackViews[tt].MidiTrack?.Notes;
+                        if (notes == null)
+                            continue;
+                        foreach (var n in notes)
+                            timelines[n.channel & 0xF].Add((n.start, tt));
+                    }
+                    foreach (var tl in timelines)
+                        tl.Sort((a, b) => a.Start.CompareTo(b.Start));
+                }
+
+                var ownership = new List<(int Channel, double[] StartsSec, double[] EndsSec)>(voices.Count);
+                foreach (var vf in voices)
+                {
+                    var tl = timelines[vf.Channel & 0xF];
+                    var starts = new List<double>();
+                    var ends = new List<double>();
+                    for (int i = 0; i < tl.Count; i++)
+                    {
+                        if (tl[i].Track != t)
+                            continue;
+                        double s = TicksToSeconds(tl[i].Start);
+                        // The owner runs until the next strictly later start on the channel
+                        // (simultaneous starts — only possible via >16-channel aliasing — are
+                        // skipped over rather than cutting the note to zero length).
+                        int j = i + 1;
+                        while (j < tl.Count && tl[j].Start == tl[i].Start)
+                            j++;
+                        double e = j < tl.Count ? TicksToSeconds(tl[j].Start) : double.MaxValue;
+                        if (starts.Count > 0 && s <= ends[ends.Count - 1])
+                            ends[ends.Count - 1] = Math.Max(ends[ends.Count - 1], e);
+                        else
+                        {
+                            starts.Add(s);
+                            ends.Add(e);
+                        }
+                    }
+                    ownership.Add((vf.Channel, starts.ToArray(), ends.ToArray()));
+                }
+                ap.VoiceOwnership = ownership;
+            }
+        }
+
+        /// <summary>
         /// Song-wide fade factor [0,1] from the project's fade in/out props, matching the
         /// SongFade computation used by the note shader (see NoteStyle.DrawTrack).
         /// </summary>
@@ -2413,6 +2489,10 @@ namespace VisualMusic
                     newList.Add(tv);
                 else { newList.Add(stv); adopted.Add(stv); }
             _trackViews = newList;
+            // Adopted voice-backed tracks reload below, and their gating ranges are transient
+            // (never serialized), so recompute them for the restored track set first.
+            if (adopted.Count > 0)
+                PrepareVoiceOwnership();
 
             // Wire adopted views (mirrors AddTrackView, but keeps Filename — AddTrackView clears it):
             foreach (var stv in adopted.OrderBy(v => v.TrackNumber))
@@ -2443,6 +2523,9 @@ namespace VisualMusic
             ReconcileTrackViews(source);
             //TrackViews = source.TrackViews;
             var srcByTn = source.TrackViews.ToDictionary(v => v.TrackNumber);
+            // Audio reloads are deferred until after the loop so PrepareVoiceOwnership sees every
+            // track's restored voice-file list before any gated load starts.
+            var reloadAudio = new List<AudioProps>();
             foreach (var tv in _trackViews)
             {
                 var destProps = tv.TrackProps;
@@ -2475,8 +2558,14 @@ namespace VisualMusic
                 if (voicesChanged || !string.Equals(oldFn, newFn, StringComparison.OrdinalIgnoreCase))
                 {
                     destProps.AudioProps.Filename = newFn;
-                    _ = destProps.AudioProps.LoadAudioAsync();
+                    reloadAudio.Add(destProps.AudioProps);
                 }
+            }
+            if (reloadAudio.Count > 0)
+            {
+                PrepareVoiceOwnership();
+                foreach (var ap in reloadAudio)
+                    _ = ap.LoadAudioAsync();
             }
             PropertyKeyframes = source.PropertyKeyframes;
             //source.Dispose();
@@ -2501,6 +2590,8 @@ namespace VisualMusic
             var wp = waveformPanel ?? DrawHost?.WaveformPanel;
             wp.ClearChannels();
 
+            // Voice gating ranges are transient — recompute them before the audio loads below.
+            PrepareVoiceOwnership();
             for (int i = 0; i < TrackViews.Count; i++)
             {
                 var tv = TrackViews[i];
