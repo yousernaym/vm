@@ -45,8 +45,10 @@ namespace VisualMusic
         /// Track-audio assignment only happens on fresh import; loads never re-assign.</summary>
         internal bool IsProjectLoad;
 
-        /// <summary>Per-track WAVs produced by the last remuxer run: (MIDI track number, WAV path).</summary>
-        internal List<(int Track, string Path)> GeneratedTrackAudioPaths { get; set; }
+        /// <summary>Per-track WAVs produced by the last remuxer run: (MIDI track number, source
+        /// channel, WAV path). Channel == -1 is a whole-track WAV (per-channel mode); Channel >= 0 is
+        /// a per-voice WAV for that source channel (per-instrument mode's exact split).</summary>
+        internal List<(int Track, int Channel, string Path)> GeneratedTrackAudioPaths { get; set; }
 
         public int SubSong;
         public int NumSubSongs;

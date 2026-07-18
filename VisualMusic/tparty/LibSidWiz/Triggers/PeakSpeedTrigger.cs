@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace LibSidWiz.Triggers
@@ -13,21 +12,10 @@ namespace LibSidWiz.Triggers
     /// Like the original single-pass peak-speed algorithm (based on code from オップナー2608), this
     /// stays stable for waves which cross the zero point more than once per cycle.
     /// </summary>
-    public class PeakSpeedTrigger : ITriggerAlgorithm
+    public class PeakSpeedTrigger : CandidateTriggerAlgorithm
     {
-        // Crossings whose following peak is at least this fraction of the window's best peak count
-        // as equally valid sync points; the tie is broken by proximity to the expected position.
-        private const float PeakTolerance = 0.7f;
-
-        // Reused across frames to avoid per-frame allocations; safe because triggers run
-        // sequentially on the render thread (WaveformRenderer.PrepareFrame).
-        private readonly List<KeyValuePair<int, float>> _candidates = new List<KeyValuePair<int, float>>();
-
-        public int GetTriggerPoint(Channel channel, int startIndex, int endIndex, int frameSamples, int previousIndex)
+        public override void CollectCandidates(Channel channel, int startIndex, int endIndex, List<TriggerCandidate> results)
         {
-            _candidates.Clear();
-            float maxPeak = float.MinValue;
-
             int i = startIndex;
             while (i < endIndex)
             {
@@ -56,40 +44,8 @@ namespace LibSidWiz.Triggers
                     }
                 }
 
-                _candidates.Add(new KeyValuePair<int, float>(crossing, peak));
-                if (peak > maxPeak)
-                {
-                    maxPeak = peak;
-                }
+                results.Add(new TriggerCandidate(crossing, peak));
             }
-
-            if (_candidates.Count == 0)
-            {
-                return -1;
-            }
-
-            // Among the crossings with a near-maximal peak, pick the one nearest the expected
-            // position so consecutive frames advance the view by ~frameSamples.
-            int expected = previousIndex + frameSamples;
-            float threshold = maxPeak * PeakTolerance;
-            int result = -1;
-            long bestDistance = long.MaxValue;
-            foreach (var candidate in _candidates)
-            {
-                if (candidate.Value < threshold)
-                {
-                    continue;
-                }
-
-                long distance = Math.Abs((long)candidate.Key - expected);
-                if (distance < bestDistance)
-                {
-                    bestDistance = distance;
-                    result = candidate.Key;
-                }
-            }
-
-            return result;
         }
     }
 }

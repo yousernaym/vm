@@ -889,6 +889,12 @@ namespace VisualMusic.ViewModels
             for (int i = 1; i < tvs.Count; i++)   // index 0 = global
             {
                 var ap = tvs[i].TrackProps.AudioProps;
+                if (ap.VoiceAudioFiles is { Count: > 0 } voices)
+                {
+                    if (voices.Any(v => v.Path.StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase) && File.Exists(v.Path)))
+                        result.Add(ap);
+                    continue;
+                }
                 string fn = ap.Filename;
                 if (string.IsNullOrEmpty(fn)) continue;
                 if (fn.StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase) && File.Exists(fn))
@@ -899,8 +905,10 @@ namespace VisualMusic.ViewModels
 
         /// <summary>
         /// Copies each track's temp WAV into <paramref name="destDir"/>, renaming it to use
-        /// <paramref name="projectName"/> as the prefix (keeping the "-trackNN-&lt;name&gt;.wav"
-        /// suffix), and re-points its filename to the copy. Best-effort; failures leave the original
+        /// <paramref name="projectName"/> as the prefix (keeping the "-trackNN-&lt;name&gt;.wav" /
+        /// "-chCC.wav" suffix), and re-points its filename to the copy. Voice WAVs are whole source
+        /// channels shared between tracks, so each distinct file is copied once and every
+        /// referencing track re-pointed to the same copy. Best-effort; failures leave the original
         /// path intact.
         /// </summary>
         static void SaveTrackAudioFiles(List<AudioProps> tracks, string destDir, string projectName)
@@ -908,18 +916,40 @@ namespace VisualMusic.ViewModels
             try { Directory.CreateDirectory(destDir); }
             catch { return; }
 
+            // Source path → saved copy, shared across all tracks (voice WAVs are per source
+            // channel, referenced by every instrument track playing on that channel).
+            var copied = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            string CopyOnce(string path)
+            {
+                if (copied.TryGetValue(path, out string existing))
+                    return existing;
+                // Temp track WAVs are named "<noteFile>-trackNN-<name>.wav" (whole-track) or
+                // "<noteFile>-chCC.wav" (shared channel); swap the imported-file prefix for the
+                // project name so exported files match the MIDI/master WAV naming.
+                string original = Path.GetFileName(path);
+                int idx = original.IndexOf("-track", StringComparison.OrdinalIgnoreCase);
+                if (idx < 0)
+                    idx = original.IndexOf("-ch", StringComparison.OrdinalIgnoreCase);
+                string destName = idx >= 0 ? projectName + original.Substring(idx) : original;
+                string dest = Path.Combine(destDir, destName);
+                File.Copy(path, dest, true);
+                copied[path] = dest;
+                return dest;
+            }
+
             foreach (var ap in tracks)
             {
                 try
                 {
-                    // Temp track WAVs are named "<noteFile>-trackNN-<name>.wav"; swap the imported-file
-                    // prefix for the project name so exported files match the MIDI/master WAV naming.
-                    string original = Path.GetFileName(ap.Filename);
-                    int idx = original.IndexOf("-track", StringComparison.OrdinalIgnoreCase);
-                    string destName = idx >= 0 ? projectName + original.Substring(idx) : original;
-                    string dest = Path.Combine(destDir, destName);
-                    File.Copy(ap.Filename, dest, true);
-                    ap.Filename = dest;
+                    if (ap.VoiceAudioFiles is { Count: > 0 } voices)
+                    {
+                        var newList = new List<(int Channel, string Path)>(voices.Count);
+                        foreach (var (channel, path) in voices)
+                            newList.Add((channel, CopyOnce(path)));
+                        ap.VoiceAudioFiles = newList;
+                    }
+                    else
+                        ap.Filename = CopyOnce(ap.Filename);
                 }
                 catch { /* best-effort per file */ }
             }
@@ -1172,25 +1202,45 @@ namespace VisualMusic.ViewModels
             if (!options.IsProjectLoad && options.GeneratedTrackAudioPaths is { Count: > 0 } trackAudio)
             {
                 var targets = new List<AudioProps>();
-                foreach (var (track, path) in trackAudio)
+                // Items[0] = Global = MIDI track 0; real tracks align 1:1 with remuxer track numbers.
+                foreach (var group in trackAudio.GroupBy(x => x.Track))
                 {
-                    // Items[0] = Global = MIDI track 0; real tracks align 1:1 with remuxer track numbers.
-                    if (track >= 0 && track < TrackList.Items.Count)
+                    int track = group.Key;
+                    if (track < 0 || track >= TrackList.Items.Count)
+                        continue;
+                    var ap = TrackList.Items[track].TrackView.TrackProps.AudioProps;
+                    // Channel >= 0 → per-voice WAVs (exact split); Channel -1 → one whole-track WAV.
+                    var voiceEntries = group.Where(x => x.Channel >= 0)
+                        .OrderBy(x => x.Channel)
+                        .Select(x => (x.Channel, x.Path))
+                        .ToList();
+                    if (voiceEntries.Count > 0)
                     {
-                        var ap = TrackList.Items[track].TrackView.TrackProps.AudioProps;
-                        ap.Filename = path;
-                        targets.Add(ap);
+                        ap.VoiceAudioFiles = voiceEntries;
+                        ap.Filename = "";
                     }
+                    else
+                    {
+                        ap.VoiceAudioFiles = null;
+                        ap.Filename = group.First().Path;
+                    }
+                    targets.Add(ap);
                 }
                 if (targets.Count > 0)
                 {
+                    // Voice WAVs hold whole shared source channels; compute the note-ownership
+                    // ranges each track gates its copy to before loading.
+                    Project.PrepareVoiceOwnership();
                     await Task.WhenAll(targets.Select(ap => ap.LoadAudioAsync()));
-                    var failed = targets
-                        .Select(ap => ap.SidWizChannel)
-                        .FirstOrDefault(ch => !string.IsNullOrEmpty(ch.ErrorMessage));
-                    if (failed != null)
-                        MetroMessageBox.Show($"Couldn't load audio file:\n{failed.Filename}", Program.AppName,
+                    var failedAp = targets.FirstOrDefault(ap => !string.IsNullOrEmpty(ap.SidWizChannel.ErrorMessage));
+                    if (failedAp != null)
+                    {
+                        string fn = !string.IsNullOrEmpty(failedAp.Filename)
+                            ? failedAp.Filename
+                            : failedAp.VoiceAudioFiles?.FirstOrDefault().Path ?? "(track audio)";
+                        MetroMessageBox.Show($"Couldn't load audio file:\n{fn}", Program.AppName,
                             MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
             }
 

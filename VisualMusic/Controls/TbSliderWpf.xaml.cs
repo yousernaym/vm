@@ -128,6 +128,16 @@ namespace VisualMusic.Controls
         double SliderToModel(double sliderPos)
             => IsExponential ? Math.Pow(ExpBase, sliderPos) : sliderPos;
 
+        /// <summary>
+        /// Rounds a model value to the control's displayed precision so the exposed <see cref="Value"/>
+        /// always equals the number shown in the textbox. With <see cref="Decimals"/> = 0 this makes the
+        /// emitted value an exact integer, so a mid-drag fractional slider position (e.g. 1.98 shown as
+        /// "2") can't be truncated back to the previous step by a consumer that casts to int. Establishes
+        /// the invariant "Value == displayed value" for every value the control itself produces.
+        /// </summary>
+        double QuantizeToDisplay(double modelVal)
+            => double.IsFinite(modelVal) ? Math.Round(modelVal, Math.Clamp(DisplayDecimals, 0, 15)) : modelVal;
+
         void RefreshFromValue()
         {
             if (_updating) return;
@@ -159,7 +169,7 @@ namespace VisualMusic.Controls
             _updating = true;
             try
             {
-                double model = SliderToModel(slider.Value);
+                double model = QuantizeToDisplay(SliderToModel(slider.Value));
                 textBox.Text = model.ToString("f" + DisplayDecimals);
                 Value = model;
             }
@@ -202,8 +212,12 @@ namespace VisualMusic.Controls
             _updating = true;
             try
             {
-                Value = parsed;
-                double sliderVal = ModelToSlider(parsed);
+                // Quantize to the displayed precision too (same invariant as the slider path). The
+                // textbox text is left as typed so the caret isn't disturbed; a later refresh rewrites
+                // it to the quantized value.
+                double model = QuantizeToDisplay(parsed);
+                Value = model;
+                double sliderVal = ModelToSlider(model);
                 if (double.IsFinite(sliderVal))
                     slider.Value = Math.Clamp(sliderVal, Min, Max);
             }

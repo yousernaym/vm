@@ -1,8 +1,9 @@
-﻿using LibSidWiz.Triggers;
+using LibSidWiz.Triggers;
 using NAudio.Wave;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
@@ -14,6 +15,35 @@ using System.Threading.Tasks;
 
 namespace LibSidWiz
 {
+    /// <summary>
+    /// One source (chip/mod) channel's WAV feeding an exact pitch split. The WAV holds the whole
+    /// channel (shared by every instrument track playing on it), so OwnedStartsSec/OwnedEndsSec
+    /// carry the note-ownership ranges (seconds, sorted, parallel arrays) this track owns; samples
+    /// outside them are zeroed at load. Null ranges = no gating (legacy pre-spliced voice WAVs).
+    /// </summary>
+    public struct VoiceFile
+    {
+        public int SourceChannel;
+        public string Path;
+        public double[] OwnedStartsSec;
+        public double[] OwnedEndsSec;
+        public VoiceFile(int sourceChannel, string path,
+            double[] ownedStartsSec = null, double[] ownedEndsSec = null)
+        {
+            SourceChannel = sourceChannel;
+            Path = path;
+            OwnedStartsSec = ownedStartsSec;
+            OwnedEndsSec = ownedEndsSec;
+        }
+    }
+
+    /// <summary>A decoded voice buffer (Q15) plus the source channel it came from.</summary>
+    public sealed class LoadedVoice
+    {
+        public int SourceChannel;
+        public short[] Samples;
+    }
+
     public struct Padding
     {
         public int Left { get; set; }
@@ -38,11 +68,23 @@ namespace LibSidWiz
         private readonly bool _autoReloadOnSettingChanged;
         private SampleBuffer _samples;
         private SampleBuffer _samplesForTrigger;
+        // Per-voice separated audio for the pitch split, published whole by the app thread and read
+        // once per frame by the render thread. null = no split ready (channel renders unsplit).
+        private volatile ChannelVoiceSet _voiceSet;
+        // Render-thread-only: the voice set latched for the frame currently being prepared/drawn, and
+        // the Q15 voice buffer GetSample should read (null = the mixed float channel buffer).
+        private ChannelVoiceSet _frameVoices;
+        private short[] _activeVoiceSamples;
+        private string _labelSuffix = "";
         private string _filename;
         private string _externalTriggerFilename;
         private ITriggerAlgorithm _algorithm;
         private int _triggerLookaheadFrames = 1; // Current frame plus one ahead
         private int _triggerLookaheadOnFailureFrames = 3; // Extra frames searched beyond the normal window on failure
+        private float _shapeStabilityWeight;
+        private int _splitCount = 1;
+        private SplitLayout _splitLayout = SplitLayout.Stacked;
+        internal const int MaxSplitCount = 4;
         private Color _lineColor = Color.White;
         private string _label = "";
         private float _lineWidth = 3;
@@ -91,6 +133,13 @@ namespace LibSidWiz
                     ErrorMessage = "";
 
                     _samples?.Dispose();
+
+                    if (VoiceFiles != null && VoiceFiles.Count > 0)
+                    {
+                        LoadVoiceData(token);
+                        return true;
+                    }
+                    LoadedVoices = null; // plain single-file track from here on
 
                     if (string.IsNullOrEmpty(Filename))
                     {
@@ -151,6 +200,7 @@ namespace LibSidWiz
                     _samplesForTrigger = null;
                     try { _samples?.Dispose(); } catch { }
                     _samples = null;
+                    LoadedVoices = null;
                     Loading = false;
                     return false;
                 }
@@ -171,6 +221,7 @@ namespace LibSidWiz
                     _samplesForTrigger = null;
                     try { _samples?.Dispose(); } catch { }
                     _samples = null;
+                    LoadedVoices = null;
                     Loading = false;
                     return false;
                 }
@@ -183,6 +234,96 @@ namespace LibSidWiz
                     Changed?.Invoke(this, false);
                 }
             }, token);
+        }
+
+        // Voice-backed load: decode each voice WAV un-normalised (mono + high-pass), gate it to the
+        // note ranges this track owns (the WAV holds the whole shared source channel), sum the gated
+        // voices into the track's mixed buffer, normalise the sum once, and quantise every voice to
+        // Q15 with that same gain — so lane levels stay comparable and the voices sum back to the
+        // track's signal.
+        private void LoadVoiceData(CancellationToken token)
+        {
+            IsEmpty = false;
+            Loading = true;
+
+            int rate = 0;
+            long maxLen = 0;
+            var decodedVoices = new List<(int SourceChannel, float[] Samples)>(VoiceFiles.Count);
+            foreach (var vf in VoiceFiles.OrderBy(v => v.SourceChannel))
+            {
+                var sb = new SampleBuffer(vf.Path, Side, HighPassFilter);
+                sb.Analyze(false); // raw amplitude; the sum is normalised below
+                token.ThrowIfCancellationRequested();
+                var dec = sb.Decoded ?? Array.Empty<float>();
+                if (rate == 0) rate = sb.SampleRate;
+                GateToOwnedRanges(dec, vf.OwnedStartsSec, vf.OwnedEndsSec, sb.SampleRate);
+                decodedVoices.Add((vf.SourceChannel, dec));
+                if (dec.LongLength > maxLen) maxLen = dec.LongLength;
+            }
+
+            var mixed = new float[maxLen];
+            foreach (var (_, dec) in decodedVoices)
+                for (long i = 0; i < dec.LongLength; i++)
+                    mixed[i] += dec[i];
+
+            float targetPeak = (float)Math.Pow(10.0, -1.0 / 20.0); // -1 dBFS, matches SampleBuffer
+            float peak = 0;
+            for (long i = 0; i < mixed.LongLength; i++)
+            {
+                float a = Math.Abs(mixed[i]);
+                if (a > peak) peak = a;
+            }
+            float gain = peak > 0 ? targetPeak / peak : 1.0f;
+            if (gain != 1.0f)
+                for (long i = 0; i < mixed.LongLength; i++)
+                    mixed[i] *= gain;
+
+            var loaded = new LoadedVoice[decodedVoices.Count];
+            for (int v = 0; v < decodedVoices.Count; v++)
+            {
+                var dec = decodedVoices[v].Samples;
+                var q15 = new short[dec.LongLength];
+                for (long i = 0; i < dec.LongLength; i++)
+                {
+                    int s = (int)Math.Round(dec[i] * gain * 32767f);
+                    q15[i] = s > 32767 ? (short)32767 : s < -32767 ? (short)-32767 : (short)s;
+                }
+                loaded[v] = new LoadedVoice { SourceChannel = decodedVoices[v].SourceChannel, Samples = q15 };
+            }
+
+            _samples = new SampleBuffer(mixed, rate);
+            SampleRate = rate;
+            Length = _samples.Length;
+            SampleCount = _samples.Count;
+            Max = Math.Max(Math.Abs(_samples.Max), Math.Abs(_samples.Min));
+            _samplesForTrigger = _samples;
+            LoadedVoices = loaded;
+            Loading = false;
+        }
+
+        // Zero every sample outside the voice's owned ranges (sorted, seconds), reducing a shared
+        // whole-channel WAV to exactly this track's signal. Null ranges = keep everything (legacy
+        // pre-spliced per-voice WAVs are already gated on disk).
+        private static void GateToOwnedRanges(float[] samples, double[] startsSec, double[] endsSec, int rate)
+        {
+            if (startsSec == null || endsSec == null || rate <= 0)
+                return;
+            long len = samples.LongLength;
+            long pos = 0; // everything before the next owned range gets zeroed
+            int n = Math.Min(startsSec.Length, endsSec.Length);
+            for (int r = 0; r < n && pos < len; r++)
+            {
+                double startF = startsSec[r] * rate;
+                double endF = endsSec[r] * rate; // double.MaxValue end => to end of buffer
+                long s = startF >= len ? len : Math.Max((long)startF, 0);
+                long e = endF >= len ? len : Math.Max((long)endF, 0);
+                for (long i = pos; i < s; i++)
+                    samples[i] = 0;
+                if (e > pos)
+                    pos = e;
+            }
+            for (long i = pos; i < len; i++)
+                samples[i] = 0;
         }
 
         [Category("Data")]
@@ -290,6 +431,48 @@ namespace LibSidWiz
             set
             {
                 _triggerLookaheadOnFailureFrames = value;
+                Changed?.Invoke(this, false);
+            }
+        }
+
+        [Category("Triggering")]
+        [Description("0 = pick the sync point nearest the expected position; higher values instead prefer the candidate whose surrounding waveform best matches the previous frame's, steadying complex timbres that hop between similar cycles. Only affects candidate-based algorithms (Peak speed, Biggest wave area, Biggest positive area).")]
+        public float ShapeStabilityWeight
+        {
+            get => _shapeStabilityWeight;
+            set
+            {
+                _shapeStabilityWeight = value;
+                Changed?.Invoke(this, false);
+            }
+        }
+
+        [Category("Triggering")]
+        [Description("Number of waveforms the channel is split into (1 = off). Driven by the number of source channels an instrument is played on (exact per-voice splitting).")]
+        public int SplitCount
+        {
+            get => _splitCount;
+            set
+            {
+                int clamped = value < 1 ? 1 : value; // no upper bound: as many voices as source channels
+                if (clamped == _splitCount)
+                    return;
+                _splitCount = clamped;
+                // Publish a fresh slot array (or null) as the last step so a worker reading the old
+                // reference mid-frame stays consistent.
+                Slots = clamped > 1 ? BuildSlots(clamped) : null;
+                Changed?.Invoke(this, false);
+            }
+        }
+
+        [Category("Triggering")]
+        [Description("How the split waveforms are arranged within the channel's area.")]
+        public SplitLayout SplitLayout
+        {
+            get => _splitLayout;
+            set
+            {
+                _splitLayout = value;
                 Changed?.Invoke(this, false);
             }
         }
@@ -446,6 +629,61 @@ namespace LibSidWiz
                 Changed?.Invoke(this, false);
             }
         }
+
+        // A transient suffix appended to the label while the pitch-split audio is still being
+        // separated (e.g. " (separating…)"). Render-only, never serialised; fires Changed so the
+        // renderer rebuilds its label template.
+        [Browsable(false)]
+        [JsonIgnore]
+        public string LabelSuffix
+        {
+            get => _labelSuffix;
+            set
+            {
+                value ??= "";
+                if (_labelSuffix == value)
+                    return;
+                _labelSuffix = value;
+                Changed?.Invoke(this, false);
+            }
+        }
+
+        internal string EffectiveLabel => _labelSuffix.Length == 0 ? _label : _label + _labelSuffix;
+
+        // The per-voice separated audio for the pitch split. Written by the app (UI thread in
+        // preview, export thread during export); the render thread latches it once per frame.
+        [Browsable(false)]
+        [JsonIgnore]
+        public ChannelVoiceSet VoiceSet
+        {
+            get => _voiceSet;
+            set => _voiceSet = value;
+        }
+
+        // The channel's whole decoded, normalised sample array (null while loading / on failure).
+        // Read by the separation job on a background thread; safe because the array is immutable
+        // after Analyze().
+        [Browsable(false)]
+        [JsonIgnore]
+        public float[] DecodedSamples => _samples?.Decoded;
+
+        // Per-voice source WAVs for an exact pitch split, set before LoadDataAsync. Empty/null = a
+        // plain single-file track. The app serialises this list on AudioProps, not here.
+        [Browsable(false)]
+        [JsonIgnore]
+        public IReadOnlyList<VoiceFile> VoiceFiles { get; set; }
+
+        // Per-voice decoded Q15 buffers produced by the voice-backed load, sorted by SourceChannel.
+        // null = not a split track. The app builds a ChannelVoiceSet from these plus the MIDI spans.
+        [Browsable(false)]
+        [JsonIgnore]
+        public LoadedVoice[] LoadedVoices { get; private set; }
+
+        // True when this channel has any audio source assigned — a single file or per-voice files.
+        // Gates that used to test Filename alone must use this, or voice-backed tracks vanish.
+        [Browsable(false)]
+        [JsonIgnore]
+        public bool HasAudioSource => !string.IsNullOrEmpty(Filename) || (VoiceFiles != null && VoiceFiles.Count > 0);
 
         [Category("Appearance")]
         [Description("The font for the channel label")]
@@ -617,11 +855,30 @@ namespace LibSidWiz
 
         internal float GetSample(int sampleIndex, bool forTrigger = true)
         {
+            // When a voice buffer is routed in (per-slot trigger/render on a split channel), read it
+            // for both trigger and display: a slot triggers and draws from its own separated audio.
+            // ExternalTriggerFilename doesn't apply to slots — the voice buffer already isolates the note.
+            // Voice samples are Q15; Scale is applied at read time so auto-scaler still tracks.
+            var voice = _activeVoiceSamples;
+            if (voice != null)
+            {
+                return sampleIndex < 0 || sampleIndex >= voice.Length
+                    ? 0 : (voice[sampleIndex] * (1f / 32767f)) * Scale * (forTrigger && InvertedTrigger ? -1 : 1);
+            }
             var source = forTrigger ? _samplesForTrigger : _samples;
             if (source == null)
                 return 0;
             return sampleIndex < 0 || sampleIndex >= source.Count ? 0 : source[sampleIndex] * Scale * (forTrigger && InvertedTrigger ? -1 : 1);
         }
+
+        // Render-thread-only: route subsequent GetSample reads to a Q15 voice buffer (null = mixed).
+        internal void SetActiveVoice(short[] samples) => _activeVoiceSamples = samples;
+
+        // The voice set latched for this frame is complete (matches the slot count).
+        internal bool SplitPreparedThisFrame => SplitCount > 1 && _frameVoices != null;
+
+        // Samples of voice k in the frame-latched voice set (render thread only).
+        internal short[] FrameVoiceSamples(int k) => _frameVoices.Voices[k].Samples;
 
         internal int GetTriggerPoint(int frameIndexSamples, int frameSamples, int previousTriggerPoint)
         {
@@ -645,6 +902,171 @@ namespace LibSidWiz
 
             return result;
         }
+
+        // ===================== Pitch split =====================
+        //
+        // Each slot renders one voice's exact per-channel audio (the source channel's rendered WAV,
+        // gated to the notes that channel plays; built by the app in Project.BuildExactVoiceSet). The
+        // slot→voice mapping is fixed 1:1, so this class only has to search each voice buffer's trigger
+        // per frame and hold the curve while silent — no per-frame pitch classification or allocation.
+
+        /// <summary>Per-voice rendering slots (null when SplitCount &lt;= 1). Read by the renderer.</summary>
+        internal WaveSlot[] Slots { get; private set; }
+
+        /// <summary>Rows this channel occupies in the strip layout this frame (Separate = one per visible slot).</summary>
+        internal int LayoutRowsThisFrame { get; set; } = 1;
+
+        /// <summary>Public row count for side-balancing in WaveformPanel (a separate assembly).</summary>
+        [JsonIgnore]
+        [Browsable(false)]
+        public int LayoutRows => SplitCount > 1 ? Math.Max(1, LayoutRowsThisFrame) : 1;
+
+        private Pen[] _slotPens;
+        private int _slotPenColorArgb = -1;
+        private float _slotPenWidth = -1;
+
+        private static WaveSlot[] BuildSlots(int n)
+        {
+            var slots = new WaveSlot[n];
+            for (int i = 0; i < n; ++i)
+                slots[i] = new WaveSlot();
+            return slots;
+        }
+
+        /// <summary>Clears all slot history, e.g. after seeking backwards or at export start.</summary>
+        internal void ResetSlots(int frameStartSample)
+        {
+            LayoutRowsThisFrame = 1;
+            var slots = Slots;
+            if (slots == null)
+                return;
+            foreach (var slot in slots)
+            {
+                slot.LastTrigger = -1;
+                slot.LastUpdateFrameStart = int.MinValue;
+                slot.LastActiveEndSample = int.MinValue;
+                slot.HasCurve = false;
+                slot.VisibleThisFrame = false;
+                slot.WasActive = false;
+                slot.NextActiveSample = int.MinValue;
+                slot.SilentScannedUntil = int.MinValue;
+            }
+        }
+
+        /// <summary>
+        /// Per-frame split engine: for each voice, updates its slot's trigger from that voice's
+        /// separated buffer (holding the last curve while silent). When
+        /// <paramref name="setSpanVisibility"/> is true (Overlaid), also sets per-slot visibility
+        /// from MIDI spans + silence threshold. Separate/Stacked leave visibility to the renderer's
+        /// per-slot amplitude silence detection. Slot k always renders voice k. Only called for
+        /// channels with SplitCount &gt; 1, on the render thread (single writer). Falls back to
+        /// unsplit rendering for the frame if no voice set is ready.
+        /// </summary>
+        internal void UpdateSlots(int frameStart, int frameSamples, bool setSpanVisibility = true)
+        {
+            var slots = Slots;
+            var vs = _voiceSet; // one volatile read per frame
+            _frameVoices = (slots != null && vs != null && vs.Voices.Length == slots.Length) ? vs : null;
+            if (slots == null || _frameVoices == null)
+            {
+                LayoutRowsThisFrame = 1; // renders unsplit this frame
+                if (slots != null)
+                    foreach (var s in slots)
+                        s.VisibleThisFrame = false;
+                return;
+            }
+
+            int normalEnd = frameStart + frameSamples * (TriggerLookaheadFrames + 1);
+            int failEnd = normalEnd + frameSamples * TriggerLookaheadOnFailureFrames;
+            long hideAfter = (long)(ActivityLookaheadSeconds * SampleRate);
+
+            int visible = 0;
+            for (int k = 0; k < slots.Length; ++k)
+            {
+                var slot = slots[k];
+                var voice = _frameVoices.Voices[k];
+
+                int lastEnd = voice.LastActiveEndBefore(failEnd);
+                if (lastEnd > slot.LastActiveEndSample)
+                    slot.LastActiveEndSample = lastEnd;
+
+                if (voice.SoundsIn(frameStart, failEnd))
+                {
+                    SetActiveVoice(voice.Samples);
+                    try { UpdateSlotTrigger(slot, frameStart, frameSamples, normalEnd, failEnd); }
+                    finally { SetActiveVoice(null); }
+                }
+
+                if (setSpanVisibility)
+                {
+                    slot.VisibleThisFrame = slot.HasCurve && (frameStart - (long)slot.LastActiveEndSample) <= hideAfter;
+                    if (slot.VisibleThisFrame)
+                        ++visible;
+                }
+            }
+            if (setSpanVisibility)
+                LayoutRowsThisFrame = SplitLayout == SplitLayout.Separate ? Math.Max(1, visible) : 1;
+        }
+
+        /// <summary>
+        /// Searches a voice buffer for the slot's next trigger. The voice buffer is silent outside
+        /// its notes, so the standard trigger path works unchanged; the expected position advances
+        /// with the frame so the curve stays steady. On failure the previous curve is held.
+        /// The voice buffer must already be routed in via SetActiveVoice.
+        /// </summary>
+        private void UpdateSlotTrigger(WaveSlot slot, int frameStart, int frameSamples, int normalEnd, int failEnd)
+        {
+            // previousTriggerPoint such that previousTriggerPoint + frameSamples == the expected centre.
+            int prev = slot.HasCurve
+                ? (int)Math.Min(int.MaxValue, (long)slot.LastTrigger + (frameStart - slot.LastUpdateFrameStart) - frameSamples)
+                : frameStart - frameSamples;
+
+            int result = Algorithm.GetTriggerPoint(this, frameStart, normalEnd, frameSamples, prev);
+            if (result < frameStart && TriggerLookaheadOnFailureFrames > 0)
+                result = Algorithm.GetTriggerPoint(this, normalEnd - 1, failEnd, frameSamples, prev);
+
+            if (result >= frameStart)
+            {
+                slot.LastTrigger = result;
+                slot.LastUpdateFrameStart = frameStart;
+                slot.HasCurve = true;
+            }
+            // else: hold the previous curve until it ages out of the visibility window.
+        }
+
+        /// <summary>Pen for a split slot in Overlaid mode; slot 0 is the base colour, others vary in brightness.</summary>
+        internal Pen GetSlotPen(int slotIndex)
+        {
+            int argb = _lineColor.ToArgb();
+            if (_slotPens == null || _slotPenColorArgb != argb || _slotPenWidth != Pen.Width)
+            {
+                if (_slotPens != null)
+                    foreach (var p in _slotPens) p?.Dispose();
+                _slotPens = new Pen[MaxSplitCount];
+                for (int i = 0; i < MaxSplitCount; ++i)
+                    _slotPens[i] = new Pen(SlotColor(i), Pen.Width);
+                _slotPenColorArgb = argb;
+                _slotPenWidth = Pen.Width;
+            }
+            return _slotPens[((slotIndex % MaxSplitCount) + MaxSplitCount) % MaxSplitCount];
+        }
+
+        private Color SlotColor(int i)
+        {
+            switch (i)
+            {
+                case 0: return _lineColor;
+                case 1: return Lerp(_lineColor, Color.White, 0.3f);
+                case 2: return Lerp(_lineColor, Color.Black, 0.3f);
+                default: return Lerp(_lineColor, Color.White, 0.55f);
+            }
+        }
+
+        private static Color Lerp(Color a, Color b, float t) => Color.FromArgb(
+            a.A,
+            (int)(a.R + (b.R - a.R) * t),
+            (int)(a.G + (b.G - a.G) * t),
+            (int)(a.B + (b.B - a.B) * t));
 
         public static string GuessNameFromMultidumperFilename(string filename)
         {
@@ -805,6 +1227,8 @@ namespace LibSidWiz
                 _samplesForTrigger.Dispose();
             }
             _labelFont?.Dispose();
+            if (_slotPens != null)
+                foreach (var p in _slotPens) p?.Dispose();
         }
 
         public string ToJson()

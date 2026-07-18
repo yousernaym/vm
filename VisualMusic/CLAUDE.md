@@ -15,7 +15,7 @@ Key characteristics:
 ## Build & Development
 
 ### Prerequisites
-- **Visual Studio 2022** with:
+- **Visual Studio 2026** with:
   - .NET desktop development workload
   - Desktop development with C++ workload
   - MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs
@@ -28,7 +28,7 @@ Key characteristics:
 
 ### Building
 
-Build `VisualMusic.sln` (in the repo root) via Visual Studio 2022 or:
+Build `VisualMusic.sln` (in the repo root) via Visual Studio 2026 or:
 
 ```bash
 msbuild VisualMusic.sln /p:Configuration=Release /p:Platform=x64
@@ -45,7 +45,7 @@ Debug|x64 but to `x64` for Release|x64; details in the root [CLAUDE.md](../CLAUD
 
 ### Running
 
-Open and run in Visual Studio 2022, or launch `VM.exe` directly from the bin folder.
+Open and run in Visual Studio 2026, or launch `VM.exe` directly from the bin folder.
 
 **Optional:** Place a `soundfont.sf2` in the executable folder for MIDI audio synthesis (required for hearing MIDI playback).
 

@@ -95,5 +95,31 @@
                           kf:Keyframing.PropertyId="TriggerLookaheadOnFailure"
                           kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
                           kf:Keyframing.Interpolatable="False"/>
+
+        <TextBlock Text="Shape stability" FontWeight="SemiBold" Margin="0,12,0,4"/>
+        <ctrl:TbSliderWpf Margin="2"
+                          Value="{Binding ShapeStability, Mode=TwoWay}"
+                          Min="0" Max="1" Decimals="2" SmallChange="0.05"
+                          AllowEmpty="True"
+                          ToolTip="0 = pick the sync point nearest the expected position; higher values prefer the candidate whose surrounding waveform best matches last frame's — steadies complex timbres (synth + reverb) that hop between similar cycles. Only affects candidate-based algorithms (Peak speed, Biggest wave area, Biggest positive area). Empty = use the global track's value (default 0)."
+                          kf:Keyframing.PropertyId="ShapeStability"
+                          kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                          kf:Keyframing.Interpolatable="True"/>
+
+        <TextBlock Text="Pitch split layout" FontWeight="SemiBold" Margin="0,12,0,4"/>
+        <ComboBox Margin="2" SelectedIndex="{Binding PitchSplitLayoutIndex, Mode=TwoWay}"
+                  ToolTip="How the split waveforms are arranged (a track is split into one waveform per source channel that plays its instrument). Default = use the global track's setting (whose Default is Overlaid)."
+                  kf:Keyframing.PropertyId="PitchSplitLayoutIndex"
+                  kf:Keyframing.Scope="{x:Static kf:KeyframeService+KfScope.Track}"
+                  kf:Keyframing.Interpolatable="False">
+            <ComboBoxItem Content="Default"
+                          ToolTip="Use the global track's setting. On the global track itself this selects Overlaid."/>
+            <ComboBoxItem Content="Stacked"
+                          ToolTip="Subdivide the track's row into a vertical slice per active split waveform (silent splits are removed independently)."/>
+            <ComboBoxItem Content="Overlaid"
+                          ToolTip="Draw all split waveforms in the track's row, distinguished by brightness."/>
+            <ComboBoxItem Content="Separate"
+                          ToolTip="Give each active split waveform its own full-size row with this track's label above each, like an independent channel (silent splits are removed independently)."/>
+        </ComboBox>
     </StackPanel>
 </UserControl>

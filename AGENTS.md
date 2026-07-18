@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance for AI coding agents when working with code in this repository.
 
 ## What this repository is
 
@@ -21,7 +21,7 @@ project dependencies so a single build produces a runnable app.
 | Project | Language | How VisualMusic uses it | Guide |
 |---|---|---|---|
 | VisualMusic | C# (net10.0-windows, WPF) | the app itself; assembly `VM.exe` | [VisualMusic/AGENTS.md](VisualMusic/AGENTS.md) |
-| midiLib | C# (net48) | `ProjectReference` — MIDI parsing (`Midi.Song`) | [Dependencies/midiLib/AGENTS.md](Dependencies/midiLib/AGENTS.md) |
+| midiLib | C# (net10.0) | `ProjectReference` — MIDI parsing (`Midi.Song`) | [Dependencies/midiLib/AGENTS.md](Dependencies/midiLib/AGENTS.md) |
 | MonoGame (WindowsDX) | C# (fork) | `ProjectReference` — 3D graphics framework | [Dependencies/MonoGame/AGENTS.md](Dependencies/MonoGame/AGENTS.md) |
 | Media | C++ → `media.dll` | P/Invoke ([VisualMusic/Media.cs](VisualMusic/Media.cs)) — FFmpeg video export + Media Foundation audio playback | [Dependencies/Media/AGENTS.md](Dependencies/Media/AGENTS.md) |
 | MidMix | C++ → `MidMix.dll` | P/Invoke ([VisualMusic/MidMix.cs](VisualMusic/MidMix.cs)) — Fluidsynth MIDI→WAV mixdown | [Dependencies/MidMix/AGENTS.md](Dependencies/MidMix/AGENTS.md) |

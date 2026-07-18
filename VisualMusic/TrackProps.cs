@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
@@ -134,6 +136,8 @@ namespace VisualMusic
             AudioProps.TriggerAlgorithmName = isGlobal ? AudioProps.TriggerAlgorithms[0].Type.Name : null;
             AudioProps.TriggerLookaheadFrames = isGlobal ? AudioProps.DefaultTriggerLookahead : (int?)null;
             AudioProps.TriggerLookaheadOnFailureFrames = isGlobal ? AudioProps.DefaultTriggerLookaheadOnFailure : (int?)null;
+            AudioProps.ShapeStability = isGlobal ? AudioProps.DefaultShapeStability : (float?)null;
+            AudioProps.PitchSplitLayout = isGlobal ? AudioProps.DefaultPitchSplitLayout : (int?)null;
         }
 
         public TrackProps Clone(ISongDrawHost host = null)
@@ -963,11 +967,53 @@ namespace VisualMusic
         /// value; when that is also null, <see cref="DefaultTriggerLookaheadOnFailure"/> is used.
         /// </summary>
         public int? TriggerLookaheadOnFailureFrames { get; set; }
+
+        /// <summary>Default/fallback shape-stability weight (used to seed the global track). 0 = off.</summary>
+        public const float DefaultShapeStability = 0f;
+
+        /// <summary>
+        /// Weight (0..1) for preferring the trigger candidate whose surrounding waveform best matches
+        /// the previous frame, steadying complex timbres that hop between similar cycles. 0 = position
+        /// only. Null = inherit the global track's value; when that is also null,
+        /// <see cref="DefaultShapeStability"/> is used.
+        /// </summary>
+        public float? ShapeStability { get; set; }
+
+        // Pitch-split count is no longer a setting: the number of split waveforms is automatic (one
+        // per source channel an instrument is played on; see Project.RefreshSidWizChannels).
+
+        /// <summary>Default/fallback pitch-split layout (used to seed the global track). 1 = Overlaid.</summary>
+        public const int DefaultPitchSplitLayout = 1;
+
+        /// <summary>
+        /// How split waveforms are arranged, as a <see cref="LibSidWiz.SplitLayout"/> value. Null =
+        /// inherit the global track's value; when that is also null,
+        /// <see cref="DefaultPitchSplitLayout"/> (Overlaid) is used.
+        /// </summary>
+        public int? PitchSplitLayout { get; set; }
+
         public string Filename
         {
             get => SidWizChannel.Filename;
             set => SidWizChannel.Filename = value;
         }
+
+        /// <summary>
+        /// Per-voice source WAVs for an exact pitch split: (source channel, path). Empty/null = a
+        /// plain single-file track (see <see cref="Filename"/>). Produced by a per-instrument import
+        /// with per-track audio; serialised as parallel arrays. Forwarded to the channel by
+        /// <see cref="LoadAudioAsync"/>, which then sums the voices and builds the split.
+        /// </summary>
+        public List<(int Channel, string Path)> VoiceAudioFiles { get; set; }
+
+        /// <summary>
+        /// Transient note-ownership ranges per voice channel: (source channel, start seconds, end
+        /// seconds — parallel sorted arrays, audio-file time). The voice WAVs hold whole shared
+        /// source channels, so the load gates each one to the ranges this track's notes own.
+        /// Recomputed from the MIDI by <c>Project.PrepareVoiceOwnership</c> before every voice
+        /// load — never serialised.
+        /// </summary>
+        internal List<(int Channel, double[] StartsSec, double[] EndsSec)> VoiceOwnership { get; set; }
 
         /// <summary>User-supplied caption rendered above this track's waveform. Blank by default.</summary>
         public string Label
@@ -1009,6 +1055,8 @@ namespace VisualMusic
 
         public AudioProps(SerializationInfo info, StreamingContext ctxt)
         {
+            int[] voiceChannels = null;
+            string[] voicePaths = null;
             foreach (SerializationEntry entry in info)
             {
                 if (entry.Name == "audioFile")
@@ -1016,6 +1064,10 @@ namespace VisualMusic
                     SidWizChannel.Filename = (string)entry.Value;
                     //SidWizChannel.LoadDataAsync();
                 }
+                else if (entry.Name == "voiceAudioChannels" && entry.Value != null)
+                    voiceChannels = (int[])entry.Value;
+                else if (entry.Name == "voiceAudioFiles" && entry.Value != null)
+                    voicePaths = (string[])entry.Value;
                 else if (entry.Name == "audioLabel" && entry.Value != null)
                     SidWizChannel.Label = (string)entry.Value;
                 else if (entry.Name == "silenceThreshold" && entry.Value != null)
@@ -1028,6 +1080,16 @@ namespace VisualMusic
                     TriggerLookaheadFrames = Convert.ToInt32(entry.Value);
                 else if (entry.Name == "triggerLookaheadOnFailure" && entry.Value != null)
                     TriggerLookaheadOnFailureFrames = Convert.ToInt32(entry.Value);
+                else if (entry.Name == "shapeStability" && entry.Value != null)
+                    ShapeStability = Convert.ToSingle(entry.Value);
+                else if (entry.Name == "pitchSplitLayout" && entry.Value != null)
+                    PitchSplitLayout = Convert.ToInt32(entry.Value);
+            }
+            if (voiceChannels != null && voicePaths != null && voiceChannels.Length == voicePaths.Length)
+            {
+                VoiceAudioFiles = new List<(int, string)>(voicePaths.Length);
+                for (int i = 0; i < voicePaths.Length; i++)
+                    VoiceAudioFiles.Add((voiceChannels[i], voicePaths[i]));
             }
         }
 
@@ -1046,12 +1108,30 @@ namespace VisualMusic
                 info.AddValue("triggerLookahead", TriggerLookaheadFrames.Value);
             if (TriggerLookaheadOnFailureFrames != null)
                 info.AddValue("triggerLookaheadOnFailure", TriggerLookaheadOnFailureFrames.Value);
+            if (ShapeStability != null)
+                info.AddValue("shapeStability", ShapeStability.Value);
+            if (PitchSplitLayout != null)
+                info.AddValue("pitchSplitLayout", PitchSplitLayout.Value);
+            if (VoiceAudioFiles != null && VoiceAudioFiles.Count > 0)
+            {
+                info.AddValue("voiceAudioChannels", VoiceAudioFiles.Select(v => v.Channel).ToArray());
+                info.AddValue("voiceAudioFiles", VoiceAudioFiles.Select(v => v.Path).ToArray());
+            }
         }
 
         public async Task LoadAudioAsync()
         {
+            // Sync the channel's voice-file list from our serialised state so a voice-backed track
+            // sums its voices; a plain track (null/empty) loads from Filename as before. Each voice
+            // carries the ownership ranges (if computed) that gate the shared channel WAV down to
+            // this track's notes.
+            SidWizChannel.VoiceFiles = VoiceAudioFiles?
+                .Select(v =>
+                {
+                    var own = VoiceOwnership?.FirstOrDefault(o => o.Channel == v.Channel);
+                    return new LibSidWiz.VoiceFile(v.Channel, v.Path, own?.StartsSec, own?.EndsSec);
+                }).ToList();
             await SidWizChannel.LoadDataAsync();
-
         }
 
         public void Dispose()

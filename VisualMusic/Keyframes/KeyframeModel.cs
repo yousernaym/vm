@@ -510,7 +510,8 @@ namespace VisualMusic.Keyframes
             {
                 if (entry.Name == "tracks") _tracks = (Dictionary<string, PropertyKeyframeTrack>)entry.Value ?? _tracks;
                 else if (entry.Name == "descriptions") _descriptions = (Dictionary<int, string>)entry.Value ?? _descriptions;
-                else if (entry.Name == "markers") _markers = (HashSet<int>)entry.Value ?? _markers;
+                else if (entry.Name == "markers" && entry.Value is IEnumerable<int> markers)
+                    _markers = new HashSet<int>(markers);
             }
         }
 
@@ -518,7 +519,7 @@ namespace VisualMusic.Keyframes
         {
             info.AddValue("tracks", _tracks);
             info.AddValue("descriptions", _descriptions);
-            info.AddValue("markers", _markers);
+            info.AddValue("markers", _markers.ToArray(), typeof(int[]));
         }
     }
 }

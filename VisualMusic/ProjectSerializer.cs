@@ -21,6 +21,7 @@ namespace VisualMusic
             typeof(Quaternion), typeof(XnaColor), typeof(BindingList<LyricsSegment>), typeof(LyricsSegment),
             typeof(ProjProps),
             typeof(List<TrackProps>), typeof(AudioProps),
+            typeof(int[]), typeof(string[]), // AudioProps voice-audio parallel arrays
             // Per-property keyframe model
             typeof(KeyframeSet),
             typeof(Dictionary<string, PropertyKeyframeTrack>),
@@ -29,7 +30,6 @@ namespace VisualMusic
             typeof(PropertyKeyframe),
             typeof(KfInterpolation),
             typeof(Dictionary<int, string>),
-            typeof(HashSet<int>),
             typeof(KfValue),
             typeof(ScalarKfValue),
             typeof(ColorKfValue),
