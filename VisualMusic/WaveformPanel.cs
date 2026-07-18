@@ -165,8 +165,9 @@ namespace VisualMusic
             // waveforms stay 100% opaque regardless of the opacity setting.
             float bgAlpha = fade * opacity;
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-            DrawStrip(_leftStrip, fade, bgAlpha);
-            DrawStrip(_rightStrip, fade, bgAlpha);
+            DrawBackdrops(bgAlpha);
+            DrawStrip(_leftStrip, fade);
+            DrawStrip(_rightStrip, fade);
             _spriteBatch.End();
         }
 
@@ -351,14 +352,43 @@ namespace VisualMusic
             return sum;
         }
 
-        void DrawStrip(Strip strip, float fade, float bgAlpha)
+        /// <summary>
+        /// Draws the dark overlay behind the waveforms. When both sides are on and their strips
+        /// abut or overlap, a single rectangle is used so the join never shows a gap or a darker
+        /// double-blended seam.
+        /// </summary>
+        void DrawBackdrops(float bgAlpha)
+        {
+            if (bgAlpha <= 0 || _pixel == null)
+                return;
+            var color = Microsoft.Xna.Framework.Color.Black * bgAlpha;
+            if (_leftStrip != null && _rightStrip != null)
+            {
+                var L = _leftStrip.Rect;
+                var R = _rightStrip.Rect;
+                if (R.X <= L.X + L.Width)
+                {
+                    // Abutting or overlapping — one continuous backdrop (avoids a 1px gap or a
+                    // darker seam from alpha-blending black twice in the overlap).
+                    int x0 = L.X;
+                    int x1 = R.X + R.Width;
+                    _spriteBatch.Draw(_pixel, new Rectangle(x0, L.Y, x1 - x0, L.Height), color);
+                    return;
+                }
+                _spriteBatch.Draw(_pixel, L, color);
+                _spriteBatch.Draw(_pixel, R, color);
+                return;
+            }
+            if (_leftStrip != null)
+                _spriteBatch.Draw(_pixel, _leftStrip.Rect, color);
+            else if (_rightStrip != null)
+                _spriteBatch.Draw(_pixel, _rightStrip.Rect, color);
+        }
+
+        void DrawStrip(Strip strip, float fade)
         {
             if (strip == null || strip.Tex == null)
                 return;
-            // Dark backdrop behind the waveforms (the texture itself has a transparent background),
-            // drawn first and dimmed by the opacity slider. Color.Black * a is premultiplied black.
-            if (bgAlpha > 0)
-                _spriteBatch.Draw(_pixel, strip.Rect, Microsoft.Xna.Framework.Color.Black * bgAlpha);
 
             // Upload the latest finished frame, if there is a new one. Otherwise the texture just
             // keeps showing the previous frame — the UI never waits for waveform rendering.
@@ -394,10 +424,9 @@ namespace VisualMusic
             _leftStrip = null;
             _rightStrip = null;
 
-            int sides = (left ? 1 : 0) + (right ? 1 : 0);
-            float frac = sides == 2 ? widthFrac * 0.5f : widthFrac;  // sides SHARE total width
-            int stripW = (int)(vpW * frac);
-            if (stripW <= 0)
+            // Round (not truncate) so odd viewport widths don't leave a 1px center gap at 100%.
+            int covered = Math.Min(vpW, (int)Math.Round(vpW * (double)widthFrac));
+            if (covered <= 0)
                 return;
 
             // Both strips hold EVERY channel; which side actually draws a given active channel is
@@ -408,10 +437,26 @@ namespace VisualMusic
             // Both strips span the full viewport height; per-frame row layout (uniform track
             // heights across the two sides, empty slots at the bottom of the sparser side) is
             // handled inside WaveformRenderer via LayoutSlots — see RenderFrameCore().
-            if (left)
-                _leftStrip = BuildStrip(_channels, new Rectangle(0, 0, stripW, vpH), stripW, vpH);
-            if (right)
-                _rightStrip = BuildStrip(_channels, new Rectangle(vpW - stripW, 0, stripW, vpH), stripW, vpH);
+            if (left && right)
+            {
+                // Sides share total width: grow from the left/right edges and meet in the middle.
+                // Put any odd leftover pixel on the right so leftW + rightW == covered exactly
+                // (no gap, no overlap) when covered == vpW.
+                int leftW = covered / 2;
+                int rightW = covered - leftW;
+                if (leftW <= 0 || rightW <= 0)
+                    return;
+                _leftStrip = BuildStrip(_channels, new Rectangle(0, 0, leftW, vpH), leftW, vpH);
+                _rightStrip = BuildStrip(_channels, new Rectangle(vpW - rightW, 0, rightW, vpH), rightW, vpH);
+            }
+            else if (left)
+            {
+                _leftStrip = BuildStrip(_channels, new Rectangle(0, 0, covered, vpH), covered, vpH);
+            }
+            else // right only
+            {
+                _rightStrip = BuildStrip(_channels, new Rectangle(vpW - covered, 0, covered, vpH), covered, vpH);
+            }
         }
 
         Strip BuildStrip(List<Channel> channels, Rectangle rect, int stripW, int stripH)
