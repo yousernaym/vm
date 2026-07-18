@@ -641,6 +641,12 @@ namespace LibSidWiz
         [JsonIgnore]
         public LoadedVoice[] LoadedVoices { get; private set; }
 
+        // True when this channel has any audio source assigned — a single file or per-voice files.
+        // Gates that used to test Filename alone must use this, or voice-backed tracks vanish.
+        [Browsable(false)]
+        [JsonIgnore]
+        public bool HasAudioSource => !string.IsNullOrEmpty(Filename) || (VoiceFiles != null && VoiceFiles.Count > 0);
+
         [Category("Appearance")]
         [Description("The font for the channel label")]
         public Font LabelFont

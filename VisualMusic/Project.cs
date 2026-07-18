@@ -2426,7 +2426,8 @@ namespace VisualMusic
                 stv.TrackProps.AudioProps.LineColor = stv.TrackProps.MaterialProps
                     .GetSysColor(true, stv.TrackProps.GlobalProps.MaterialProps);   // not serialized
                 DrawHost?.WaveformPanel?.AddChannel(stv.TrackProps.AudioProps.SidWizChannel);
-                if (!string.IsNullOrEmpty(stv.TrackProps.AudioProps.Filename))
+                if (!string.IsNullOrEmpty(stv.TrackProps.AudioProps.Filename)
+                    || stv.TrackProps.AudioProps.VoiceAudioFiles is { Count: > 0 })
                     _ = stv.TrackProps.AudioProps.LoadAudioAsync();
             }
 

@@ -120,7 +120,7 @@ namespace VisualMusic
             // still draw (fully opaque) even at opacity 0.
             if (songPosS < 0 || fade <= 0 || (!left && !right) || widthFrac <= 0)
                 return;
-            if (!_channels.Exists(c => !string.IsNullOrEmpty(c.Filename)))
+            if (!_channels.Exists(c => c.HasAudioSource))
                 return;
 
             var vp = _gfxDevice.Viewport;
