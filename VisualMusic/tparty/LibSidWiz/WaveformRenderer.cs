@@ -267,12 +267,20 @@ namespace LibSidWiz
 
                 if (IsChannelActive(i, ch, trig, frameIndexSamples, frameSamples))
                 {
-                    _activeThisFrame.Add(ch);
                     // Overlaid (and any future mix-gated split): span-based slot visibility.
+                    // If every split was cleared (voice buffers quiet), drop the channel so a
+                    // silent multi-channel instrument does not leave an empty strip row.
                     if (ch.SplitCount > 1)
+                    {
                         ch.UpdateSlots(frameIndexSamples, frameSamples);
+                        if (ch.LayoutRowsThisFrame > 0)
+                            _activeThisFrame.Add(ch);
+                    }
                     else
+                    {
                         ch.LayoutRowsThisFrame = 1;
+                        _activeThisFrame.Add(ch);
+                    }
                 }
             }
 

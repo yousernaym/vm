@@ -921,7 +921,7 @@ namespace LibSidWiz
         // Each slot renders one voice's exact per-channel audio (the source channel's rendered WAV,
         // gated to the notes that channel plays; built by the app in Project.BuildExactVoiceSet). The
         // slot→voice mapping is fixed 1:1, so this class only has to search each voice buffer's trigger
-        // per frame and hold the curve while silent — no per-frame pitch classification or allocation.
+        // per frame and drop the capture when that voice goes quiet — no per-frame pitch classification.
 
         /// <summary>Per-voice rendering slots (null when SplitCount &lt;= 1). Read by the renderer.</summary>
         internal WaveSlot[] Slots { get; private set; }
@@ -968,12 +968,14 @@ namespace LibSidWiz
 
         /// <summary>
         /// Per-frame split engine: for each voice, updates its slot's trigger from that voice's
-        /// separated buffer (holding the last curve while silent). When
+        /// separated buffer. A held curve is kept only while that voice still has audible energy
+        /// near the playhead — once the buffer is quiet the capture is dropped so multi-channel
+        /// instruments do not leave frozen oscilloscope traces after they go silent. When
         /// <paramref name="setSpanVisibility"/> is true (Overlaid), also sets per-slot visibility
-        /// from MIDI spans + silence threshold. Separate/Stacked leave visibility to the renderer's
-        /// per-slot amplitude silence detection. Slot k always renders voice k. Only called for
-        /// channels with SplitCount &gt; 1, on the render thread (single writer). Falls back to
-        /// unsplit rendering for the frame if no voice set is ready.
+        /// from recent audibility + silence threshold. Separate/Stacked leave visibility to the
+        /// renderer's per-slot amplitude silence detection. Slot k always renders voice k. Only
+        /// called for channels with SplitCount &gt; 1, on the render thread (single writer). Falls
+        /// back to unsplit rendering for the frame if no voice set is ready.
         /// </summary>
         internal void UpdateSlots(int frameStart, int frameSamples, bool setSpanVisibility = true)
         {
@@ -999,16 +1001,34 @@ namespace LibSidWiz
                 var slot = slots[k];
                 var voice = _frameVoices.Voices[k];
 
-                int lastEnd = voice.LastActiveEndBefore(failEnd);
-                if (lastEnd > slot.LastActiveEndSample)
-                    slot.LastActiveEndSample = lastEnd;
-
-                if (voice.SoundsIn(frameStart, failEnd))
+                SetActiveVoice(voice.Samples);
+                try
                 {
-                    SetActiveVoice(voice.Samples);
-                    try { UpdateSlotTrigger(slot, frameStart, frameSamples, normalEnd, failEnd); }
-                    finally { SetActiveVoice(null); }
+                    bool inSpan = voice.SoundsIn(frameStart, failEnd);
+                    bool audible = IsActiveVoiceAudible(frameStart, frameSamples);
+
+                    // Age visibility from real audio, not MIDI note-off: ownership can leave zeros
+                    // (or other instruments' audio) in the buffer long after this voice stopped.
+                    if (audible)
+                    {
+                        int audEnd = frameStart + frameSamples;
+                        if (audEnd > slot.LastActiveEndSample)
+                            slot.LastActiveEndSample = audEnd;
+                    }
+
+                    if (inSpan)
+                        UpdateSlotTrigger(slot, frameStart, frameSamples, normalEnd, failEnd, audible);
+                    else if (slot.HasCurve)
+                    {
+                        // Past MIDI spans: keep tracking only while the voice buffer still has
+                        // energy (ownership release tails); otherwise drop the held capture.
+                        if (audible)
+                            UpdateSlotTrigger(slot, frameStart, frameSamples, normalEnd, failEnd, audible: true);
+                        else
+                            slot.HasCurve = false;
+                    }
                 }
+                finally { SetActiveVoice(null); }
 
                 if (setSpanVisibility)
                 {
@@ -1018,16 +1038,16 @@ namespace LibSidWiz
                 }
             }
             if (setSpanVisibility)
-                LayoutRowsThisFrame = SplitLayout == SplitLayout.Separate ? Math.Max(1, visible) : 1;
+                LayoutRowsThisFrame = SplitLayout == SplitLayout.Separate ? visible : (visible > 0 ? 1 : 0);
         }
 
         /// <summary>
-        /// Searches a voice buffer for the slot's next trigger. The voice buffer is silent outside
-        /// its notes, so the standard trigger path works unchanged; the expected position advances
-        /// with the frame so the curve stays steady. On failure the previous curve is held.
+        /// Searches a voice buffer for the slot's next trigger. The expected position advances with
+        /// the frame so the curve stays steady. On failure the previous curve is held only while
+        /// <paramref name="audible"/>; a silent buffer drops the capture instead of freezing it.
         /// The voice buffer must already be routed in via SetActiveVoice.
         /// </summary>
-        private void UpdateSlotTrigger(WaveSlot slot, int frameStart, int frameSamples, int normalEnd, int failEnd)
+        private void UpdateSlotTrigger(WaveSlot slot, int frameStart, int frameSamples, int normalEnd, int failEnd, bool audible)
         {
             // previousTriggerPoint such that previousTriggerPoint + frameSamples == the expected centre.
             int prev = slot.HasCurve
@@ -1044,7 +1064,33 @@ namespace LibSidWiz
                 slot.LastUpdateFrameStart = frameStart;
                 slot.HasCurve = true;
             }
-            // else: hold the previous curve until it ages out of the visibility window.
+            else if (!audible)
+            {
+                // Note still "on" in MIDI (or a failed sync) but the voice is quiet — do not keep
+                // painting the last found cycle.
+                slot.HasCurve = false;
+            }
+            // else: hold the previous curve while there is still audible energy but no clean trigger.
+        }
+
+        /// <summary>
+        /// True when the active voice buffer has any sample above the renderer's activity threshold
+        /// in the playhead-centred view window. Voice must already be routed via SetActiveVoice.
+        /// </summary>
+        private bool IsActiveVoiceAudible(int frameStart, int frameSamples)
+        {
+            float threshold = Renderer?.ActivityThreshold ?? 0.004f;
+            int step = Math.Max(1, Renderer?.ActivitySubsampleStride ?? 4);
+            int width = Math.Max(1, ViewWidthInSamples);
+            int left = frameStart + frameSamples / 2 - width / 2;
+            int right = left + width;
+            for (int s = left; s < right; s += step)
+            {
+                float v = GetSample(s, forTrigger: false);
+                if ((v >= 0 ? v : -v) >= threshold)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>Pen for a split slot in Overlaid mode; slot 0 is the base colour, others vary in brightness.</summary>
