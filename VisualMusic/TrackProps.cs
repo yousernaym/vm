@@ -999,10 +999,11 @@ namespace VisualMusic
         }
 
         /// <summary>
-        /// Per-voice source WAVs for an exact pitch split: (source channel, path). Empty/null = a
-        /// plain single-file track (see <see cref="Filename"/>). Produced by a per-instrument import
-        /// with per-track audio; serialised as parallel arrays. Forwarded to the channel by
-        /// <see cref="LoadAudioAsync"/>, which then sums the voices and builds the split.
+        /// Per-voice source WAVs for a pitch split: (source channel, path to a shared
+        /// "&lt;base&gt;-chCC.wav"). Empty/null = a plain single-file track (see
+        /// <see cref="Filename"/>). Produced by a per-instrument import with per-track audio;
+        /// serialised as parallel arrays. Forwarded to the channel by <see cref="LoadAudioAsync"/>,
+        /// which then gates/sums the voices and builds the split.
         /// </summary>
         public List<(int Channel, string Path)> VoiceAudioFiles { get; set; }
 

@@ -424,12 +424,12 @@ namespace VisualMusic
         static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
 
         // Matches the "TrackAudio: <miditrack>|<path>" lines emitted by remuxer.exe after processing
-        // (whole-track WAVs, per-channel import mode).
+        // (per-channel MIDI mode; path is always "<base>-chCC.wav").
         static readonly Regex RemuxerTrackAudioRegex = new Regex(@"^TrackAudio:\s*(\d+)\|(.+)$", RegexOptions.Compiled);
 
-        // Matches the "TrackVoiceAudio: <miditrack>|<channel>|<path>" lines (per-voice WAVs, per-
-        // instrument import mode's exact split). A distinct prefix keeps the anchored regex above
-        // from mis-parsing the extra field into the path.
+        // Matches the "TrackVoiceAudio: <miditrack>|<channel>|<path>" lines (per-instrument mode;
+        // same "-chCC.wav" path, shared by instrument tracks on that channel). A distinct prefix
+        // keeps the anchored regex above from mis-parsing the extra field into the path.
         static readonly Regex RemuxerTrackVoiceAudioRegex = new Regex(@"^TrackVoiceAudio:\s*(\d+)\|(\d+)\|(.+)$", RegexOptions.Compiled);
 
         // Remuxer writes a 58-byte IEEE-float WAV header before the data chunk.
@@ -463,7 +463,7 @@ namespace VisualMusic
             {
                 var ap = _trackViews[i].TrackProps.AudioProps;
                 var voices = ap.VoiceAudioFiles;
-                if (voices != null && voices.Count > 0)   // per-instrument exact split: one WAV per voice
+                if (voices != null && voices.Count > 0)   // per-instrument: shared channel WAVs
                 {
                     any = true;
                     foreach (var vf in voices)
@@ -517,8 +517,10 @@ namespace VisualMusic
                 string trackAudioArg = null, trackAudioBase = null;
                 if (options.TrackAudio && !(options.IsProjectLoad && AllSerializedTrackAudioPresent()))
                 {
+                    // Always "-chn" (not "-ins"): channel solo WAVs are identical with or without -i,
+                    // so both import modes share one cache folder.
                     string trackAudioDir = Path.Combine(Program.TempDirRoot, "trackaudio",
-                        $"{noteFile}-s{options.SubSong}-{(options.InsTrack ? "ins" : "chn")}");
+                        $"{noteFile}-s{options.SubSong}-chn");
                     Directory.CreateDirectory(trackAudioDir);
                     trackAudioBase = Path.Combine(trackAudioDir, noteFile);
                     trackAudioArg = $"-t\"{trackAudioBase}\"";
@@ -548,7 +550,8 @@ namespace VisualMusic
                         ?? throw new IOException("Couldn't start remuxer.");
 
                     // Collected per-track WAV lines. The stdout handler runs on a pool thread, so
-                    // guard the list with a lock. Channel -1 = whole-track WAV; >= 0 = per-voice WAV.
+                    // guard the list with a lock. Paths are always "-chCC.wav". Channel -1 = assign
+                    // as Filename (per-channel MIDI); >= 0 = shared channel WAV for that voice.
                     var trackAudioFiles = new List<(int Track, int Channel, string Path)>();
 
                     // Parse the "Progress: N%", "TrackAudio:" and "TrackVoiceAudio:" lines remuxer

@@ -905,31 +905,30 @@ namespace VisualMusic.ViewModels
 
         /// <summary>
         /// Copies each track's temp WAV into <paramref name="destDir"/>, renaming it to use
-        /// <paramref name="projectName"/> as the prefix (keeping the "-trackNN-&lt;name&gt;.wav" /
-        /// "-chCC.wav" suffix), and re-points its filename to the copy. Voice WAVs are whole source
-        /// channels shared between tracks, so each distinct file is copied once and every
-        /// referencing track re-pointed to the same copy. Best-effort; failures leave the original
-        /// path intact.
+        /// <paramref name="projectName"/> as the prefix (keeping the "-chCC.wav" suffix), and
+        /// re-points its filename to the copy. Channel WAVs are whole source channels that may be
+        /// shared between tracks, so each distinct file is copied once and every referencing track
+        /// re-pointed to the same copy. Best-effort; failures leave the original path intact.
         /// </summary>
         static void SaveTrackAudioFiles(List<AudioProps> tracks, string destDir, string projectName)
         {
             try { Directory.CreateDirectory(destDir); }
             catch { return; }
 
-            // Source path → saved copy, shared across all tracks (voice WAVs are per source
-            // channel, referenced by every instrument track playing on that channel).
+            // Source path → saved copy, shared across all tracks (channel WAVs may be referenced by
+            // every instrument track playing on that channel).
             var copied = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             string CopyOnce(string path)
             {
                 if (copied.TryGetValue(path, out string existing))
                     return existing;
-                // Temp track WAVs are named "<noteFile>-trackNN-<name>.wav" (whole-track) or
-                // "<noteFile>-chCC.wav" (shared channel); swap the imported-file prefix for the
-                // project name so exported files match the MIDI/master WAV naming.
+                // Temp track WAVs are named "<noteFile>-chCC.wav"; swap the imported-file prefix for
+                // the project name so exported files match the MIDI/master WAV naming. Also accept
+                // legacy "-trackNN-<name>.wav" names from older imports.
                 string original = Path.GetFileName(path);
-                int idx = original.IndexOf("-track", StringComparison.OrdinalIgnoreCase);
+                int idx = original.IndexOf("-ch", StringComparison.OrdinalIgnoreCase);
                 if (idx < 0)
-                    idx = original.IndexOf("-ch", StringComparison.OrdinalIgnoreCase);
+                    idx = original.IndexOf("-track", StringComparison.OrdinalIgnoreCase);
                 string destName = idx >= 0 ? projectName + original.Substring(idx) : original;
                 string dest = Path.Combine(destDir, destName);
                 File.Copy(path, dest, true);
@@ -1209,7 +1208,7 @@ namespace VisualMusic.ViewModels
                     if (track < 0 || track >= TrackList.Items.Count)
                         continue;
                     var ap = TrackList.Items[track].TrackView.TrackProps.AudioProps;
-                    // Channel >= 0 → per-voice WAVs (exact split); Channel -1 → one whole-track WAV.
+                    // Channel >= 0 → shared channel WAV(s); Channel -1 → one Filename assignment.
                     var voiceEntries = group.Where(x => x.Channel >= 0)
                         .OrderBy(x => x.Channel)
                         .Select(x => (x.Channel, x.Path))
