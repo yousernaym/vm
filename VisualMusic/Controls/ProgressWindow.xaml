@@ -6,13 +6,10 @@
                  ResizeMode="NoResize"
                  SizeToContent="WidthAndHeight"
                  WindowStartupLocation="CenterOwner"
+                 ShowInTaskbar="False"
                  ShowMinButton="False"
                  ShowMaxRestoreButton="False"
                  Closing="Window_Closing">
-
-    <mah:MetroWindow.TaskbarItemInfo>
-        <TaskbarItemInfo x:Name="taskbarInfo"/>
-    </mah:MetroWindow.TaskbarItemInfo>
 
     <StackPanel Margin="16" MinWidth="320">
         <ProgressBar Minimum="0" Maximum="100"

@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,6 +21,12 @@ namespace VisualMusic.Controls
     /// </summary>
     public partial class ProgressWindow : MetroWindow, IRenderProgressCallback, INotifyPropertyChanged
     {
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
         // ---- INotifyPropertyChanged ----
         public event PropertyChangedEventHandler PropertyChanged;
         void Notify([CallerMemberName] string name = null)
@@ -48,7 +55,12 @@ namespace VisualMusic.Controls
         public double Progress
         {
             get => _progress;
-            private set { _progress = value; Notify(); }
+            private set
+            {
+                if (_progress == value) return;
+                _progress = value;
+                Notify();
+            }
         }
 
         readonly string _titlePrefix;   // fixed base, never includes the "%"
@@ -57,28 +69,48 @@ namespace VisualMusic.Controls
         public string TitleText
         {
             get => _titleText;
-            private set { _titleText = value; Notify(); }
+            private set
+            {
+                if (_titleText == value) return;
+                _titleText = value;
+                Notify();
+            }
         }
 
         string _elapsedText = "";
         public string ElapsedText
         {
             get => _elapsedText;
-            private set { _elapsedText = value; Notify(); }
+            private set
+            {
+                if (_elapsedText == value) return;
+                _elapsedText = value;
+                Notify();
+            }
         }
 
         string _remainingText = "";
         public string RemainingText
         {
             get => _remainingText;
-            private set { _remainingText = value; Notify(); }
+            private set
+            {
+                if (_remainingText == value) return;
+                _remainingText = value;
+                Notify();
+            }
         }
 
         bool _isIndeterminate;
         public bool IsIndeterminate
         {
             get => _isIndeterminate;
-            set { _isIndeterminate = value; Notify(); }
+            set
+            {
+                if (_isIndeterminate == value) return;
+                _isIndeterminate = value;
+                Notify();
+            }
         }
 
         // ---- Public result (non-null only for download jobs) ----
@@ -90,6 +122,8 @@ namespace VisualMusic.Controls
         readonly ProgressAtTime[] _progressBuf = new ProgressAtTime[100];
         int _progressBufIndex0 = 1;   // trails index1 by ~100 frames → smoothed sliding window
         int _progressBufIndex1 = 0;
+        int _lastTitlePercent = -1;
+        float _lastTaskbarProgress = float.NaN;
 
         struct ProgressAtTime { public double time; public double normProgress; }
 
@@ -126,7 +160,12 @@ namespace VisualMusic.Controls
             InitializeComponent();
             _liveLoopSuspension = MonoGameHost.SuspendLiveLoop();
             Loaded += OnLoaded;
-            Closed += (_, _) => _liveLoopSuspension?.Dispose();
+            Activated += (_, _) => ApplyDeferredChrome(_progress / 100.0);
+            Closed += (_, _) =>
+            {
+                ClearOwnerTaskbar();
+                _liveLoopSuspension?.Dispose();
+            };
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
@@ -139,7 +178,9 @@ namespace VisualMusic.Controls
                 return;
             }
 
-            taskbarInfo.ProgressState = TaskbarItemProgressState.Normal;
+            var taskbar = EnsureOwnerTaskbar();
+            if (taskbar != null)
+                taskbar.ProgressState = TaskbarItemProgressState.Normal;
             _stopwatch.Start();
             _job(this).ContinueWith(OnJobFinished);
         }
@@ -151,12 +192,13 @@ namespace VisualMusic.Controls
             normProgress = Math.Max(0f, Math.Min(1f, normProgress));
 
             Progress = normProgress * 100.0;
-            int percent = (int)(normProgress * 100.0 + 0.5);
-            TitleText = $"{_titlePrefix}: {percent}%";
             IsIndeterminate = false;
 
-            // Taskbar
-            taskbarInfo.ProgressValue = normProgress;
+            // Title / taskbar chrome can yank Alt+Tab back to this app while the switcher is
+            // open (foreground is Explorer/DWM, not us). Keep in-window progress updating;
+            // defer chrome until we are foreground again (Activated reapplies).
+            if (IsCurrentProcessForeground())
+                ApplyDeferredChrome(normProgress);
 
             // Record sample in circular buffer
             _progressBuf[_progressBufIndex1] = new ProgressAtTime
@@ -186,6 +228,54 @@ namespace VisualMusic.Controls
             if (++_progressBufIndex1 >= _progressBuf.Length) _progressBufIndex1 = 0;
         }
 
+        void ApplyDeferredChrome(double normProgress)
+        {
+            if (double.IsNaN(normProgress) || normProgress < 0)
+                return;
+
+            int percent = (int)(normProgress * 100.0 + 0.5);
+            if (percent != _lastTitlePercent)
+            {
+                _lastTitlePercent = percent;
+                TitleText = $"{_titlePrefix}: {percent}%";
+            }
+
+            float taskbarValue = (float)normProgress;
+            if (taskbarValue != _lastTaskbarProgress)
+            {
+                _lastTaskbarProgress = taskbarValue;
+                var taskbar = EnsureOwnerTaskbar();
+                if (taskbar != null)
+                    taskbar.ProgressValue = normProgress;
+            }
+        }
+
+        /// <summary>
+        /// Owned modals use ShowInTaskbar=false, so progress must live on the owner's taskbar button.
+        /// </summary>
+        TaskbarItemInfo EnsureOwnerTaskbar()
+        {
+            var owner = Owner ?? Application.Current?.MainWindow;
+            if (owner == null) return null;
+            return owner.TaskbarItemInfo ??= new TaskbarItemInfo();
+        }
+
+        void ClearOwnerTaskbar()
+        {
+            var taskbar = (Owner ?? Application.Current?.MainWindow)?.TaskbarItemInfo;
+            if (taskbar == null) return;
+            taskbar.ProgressState = TaskbarItemProgressState.None;
+            taskbar.ProgressValue = 0;
+        }
+
+        static bool IsCurrentProcessForeground()
+        {
+            IntPtr fg = GetForegroundWindow();
+            if (fg == IntPtr.Zero) return true;
+            GetWindowThreadProcessId(fg, out uint pid);
+            return pid == (uint)Environment.ProcessId;
+        }
+
         // ---- Job completion ----
 
         void OnJobFinished(Task<object> task)
@@ -198,7 +288,7 @@ namespace VisualMusic.Controls
 
         void CloseForm()
         {
-            taskbarInfo.ProgressState = TaskbarItemProgressState.None;
+            ClearOwnerTaskbar();
             if (_doneMessage != null && !Cancel)
                 MetroMessageBox.Show(this, _doneMessage, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Information);
             _cts.Dispose();
