@@ -64,8 +64,9 @@ namespace LibSidWiz
 
         public void Dispose()
         {
+            // _reader is null for in-memory buffers (float[] ctor).
             // Guard against cross-thread COM release errors (e.g. MP3/MediaFoundation).
-            try { _reader.Dispose(); }
+            try { _reader?.Dispose(); }
             catch { }
         }
 
