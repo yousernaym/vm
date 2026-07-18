@@ -1190,24 +1190,19 @@ namespace VisualMusic.ViewModels
             if (options.EraseCurrent)
                 _currentProjectPath = "";
 
-            var wfp = GetRendererWaveformPanel?.Invoke();
-            Project.InitAfterDeserialization(wfp);
-
-            TrackList.Rebuild(Project);
-
-            // Assign freshly generated per-track WAVs to their tracks. Fresh imports only — the
-            // project-load path never re-assigns (InitAfterDeserialization already loads the
-            // serialized filenames). Done before the undo baseline so it isn't a dirtying edit.
+            // Assign freshly generated per-track WAVs before InitAfterDeserialization so ownership
+            // prep and the single audio load see the correct paths (avoids a second load racing the
+            // first and disposing NAudio readers mid-Read).
+            var trackAudioTargets = new List<AudioProps>();
             if (!options.IsProjectLoad && options.GeneratedTrackAudioPaths is { Count: > 0 } trackAudio)
             {
-                var targets = new List<AudioProps>();
-                // Items[0] = Global = MIDI track 0; real tracks align 1:1 with remuxer track numbers.
+                // TrackViews[0] = Global = MIDI track 0; real tracks align 1:1 with remuxer track numbers.
                 foreach (var group in trackAudio.GroupBy(x => x.Track))
                 {
                     int track = group.Key;
-                    if (track < 0 || track >= TrackList.Items.Count)
+                    if (track < 0 || track >= Project.TrackViews.Count)
                         continue;
-                    var ap = TrackList.Items[track].TrackView.TrackProps.AudioProps;
+                    var ap = Project.TrackViews[track].TrackProps.AudioProps;
                     // Channel >= 0 → shared channel WAV(s); Channel -1 → one Filename assignment.
                     var voiceEntries = group.Where(x => x.Channel >= 0)
                         .OrderBy(x => x.Channel)
@@ -1223,23 +1218,28 @@ namespace VisualMusic.ViewModels
                         ap.VoiceAudioFiles = null;
                         ap.Filename = group.First().Path;
                     }
-                    targets.Add(ap);
+                    trackAudioTargets.Add(ap);
                 }
-                if (targets.Count > 0)
+            }
+
+            var wfp = GetRendererWaveformPanel?.Invoke();
+            // Skip Init's fire-and-forget loads when we have fresh track WAVs — we await one load below.
+            bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
+            Project.InitAfterDeserialization(wfp, loadAudio: !deferTrackAudioLoad);
+
+            TrackList.Rebuild(Project);
+
+            if (deferTrackAudioLoad)
+            {
+                await Task.WhenAll(trackAudioTargets.Select(ap => ap.LoadAudioAsync()));
+                var failedAp = trackAudioTargets.FirstOrDefault(ap => !string.IsNullOrEmpty(ap.SidWizChannel.ErrorMessage));
+                if (failedAp != null)
                 {
-                    // Voice WAVs hold whole shared source channels; compute the note-ownership
-                    // ranges each track gates its copy to before loading.
-                    Project.PrepareVoiceOwnership();
-                    await Task.WhenAll(targets.Select(ap => ap.LoadAudioAsync()));
-                    var failedAp = targets.FirstOrDefault(ap => !string.IsNullOrEmpty(ap.SidWizChannel.ErrorMessage));
-                    if (failedAp != null)
-                    {
-                        string fn = !string.IsNullOrEmpty(failedAp.Filename)
-                            ? failedAp.Filename
-                            : failedAp.VoiceAudioFiles?.FirstOrDefault().Path ?? "(track audio)";
-                        MetroMessageBox.Show($"Couldn't load audio file:\n{fn}", Program.AppName,
-                            MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
+                    string fn = !string.IsNullOrEmpty(failedAp.Filename)
+                        ? failedAp.Filename
+                        : failedAp.VoiceAudioFiles?.FirstOrDefault().Path ?? "(track audio)";
+                    MetroMessageBox.Show($"Couldn't load audio file:\n{fn}", Program.AppName,
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
 

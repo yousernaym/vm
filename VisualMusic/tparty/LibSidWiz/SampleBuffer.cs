@@ -23,24 +23,29 @@ namespace LibSidWiz
 
         public SampleBuffer(string filename, Channel.Sides side, bool filter)
         {
-            _reader = new AudioFileReader(filename);
-            Count = _reader.Length / (_reader.WaveFormat.BitsPerSample / 8) / _reader.WaveFormat.Channels;
-            SampleRate = _reader.WaveFormat.SampleRate;
-            Length = _reader.TotalTime;
+            // AudioFileReader already implements ISampleProvider (IEEE float). Use it directly —
+            // wrapping with ToSampleProvider() again builds a WaveToSampleProvider on top of the
+            // float WaveStream path and can NRE in WaveFileReader.Position if the reader is
+            // disposed while a concurrent reload is mid-Read.
+            var reader = new AudioFileReader(filename);
+            _reader = reader;
+            Count = reader.Length / (reader.WaveFormat.BitsPerSample / 8) / reader.WaveFormat.Channels;
+            SampleRate = reader.WaveFormat.SampleRate;
+            Length = reader.TotalTime;
+            ISampleProvider sp = reader;
             switch (side)
             {
                 case Channel.Sides.Left:
-                    _sampleProvider = _reader.ToSampleProvider().ToMono(1.0f, 0.0f);
+                    sp = sp.ToMono(1.0f, 0.0f);
                     break;
                 case Channel.Sides.Right:
-                    _sampleProvider = _reader.ToSampleProvider().ToMono(0.0f, 1.0f);
+                    sp = sp.ToMono(0.0f, 1.0f);
                     break;
                 case Channel.Sides.Mix:
-                    _sampleProvider = _reader.ToSampleProvider().ToMono();
+                    sp = sp.ToMono();
                     break;
             }
-            if (filter)
-                _sampleProvider = new HighPassSampleProvider(_sampleProvider);
+            _sampleProvider = filter ? new HighPassSampleProvider(sp) : sp;
         }
 
         // In-memory buffer from an already-decoded mono float array (e.g. the summed voice buffer of a

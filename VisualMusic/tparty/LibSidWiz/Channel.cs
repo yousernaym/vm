@@ -124,114 +124,127 @@ namespace LibSidWiz
 
         public event Action<Channel, bool> Changed;
 
+        // Serialises loads on this channel so a second LoadDataAsync (common during import:
+        // InitAfterDeserialization fire-and-forget, then assign paths and load again) cannot
+        // Dispose the WaveFileReader under an in-flight Analyze Read (NAudio NRE in Position).
+        private readonly object _loadLock = new object();
+        private int _loadGeneration;
+
         public Task<bool> LoadDataAsync(CancellationToken token = new CancellationToken())
         {
-            return Task.Factory.StartNew(() =>
+            int gen = Interlocked.Increment(ref _loadGeneration);
+            return Task.Run(() =>
             {
-                try
+                lock (_loadLock)
                 {
-                    ErrorMessage = "";
-
-                    _samples?.Dispose();
-
-                    if (VoiceFiles != null && VoiceFiles.Count > 0)
+                    // A newer LoadDataAsync was requested — skip this superseded run.
+                    if (gen != _loadGeneration)
+                        return false;
+                    try
                     {
-                        LoadVoiceData(token);
+                        ErrorMessage = "";
+
+                        _samples?.Dispose();
+
+                        if (VoiceFiles != null && VoiceFiles.Count > 0)
+                        {
+                            LoadVoiceData(token);
+                            return true;
+                        }
+                        LoadedVoices = null; // plain single-file track from here on
+
+                        if (string.IsNullOrEmpty(Filename))
+                        {
+                            _samples = null;
+                            SampleCount = 0;
+                            Max = 0;
+                            Length = TimeSpan.Zero;
+                            Loading = false;
+                            IsEmpty = true;
+                            return false;
+                        }
+
+                        IsEmpty = false;
+                        Loading = true;
+
+                        Console.WriteLine($"- Reading {Filename}");
+                        _samples = new SampleBuffer(Filename, Side, HighPassFilter);
+                        SampleRate = _samples.SampleRate;
+                        Length = _samples.Length;
+
+                        token.ThrowIfCancellationRequested();
+
+                        _samples.Analyze();
+
+                        SampleCount = _samples.Count;
+
+                        token.ThrowIfCancellationRequested();
+
+                        Max = Math.Max(Math.Abs(_samples.Max), Math.Abs(_samples.Min));
+
+                        Console.WriteLine($"- Peak sample amplitude for {Filename} is {Max}");
+
+                        if (string.IsNullOrEmpty(ExternalTriggerFilename))
+                        {
+                            // Point at the same SampleBuffer
+                            _samplesForTrigger = _samples;
+                        }
+                        else
+                        {
+                            _samplesForTrigger = new SampleBuffer(ExternalTriggerFilename, Side, HighPassFilter);
+                        }
+
+                        Loading = false;
                         return true;
                     }
-                    LoadedVoices = null; // plain single-file track from here on
-
-                    if (string.IsNullOrEmpty(Filename))
+                    catch (TaskCanceledException)
                     {
-                        _samples = null;
-                        SampleCount = 0;
+                        // Blank out if cancelled
                         Max = 0;
+                        SampleRate = 0;
                         Length = TimeSpan.Zero;
+                        try
+                        {
+                            if (_samplesForTrigger != _samples)
+                                _samplesForTrigger?.Dispose();
+                        }
+                        catch { }
+                        _samplesForTrigger = null;
+                        try { _samples?.Dispose(); } catch { }
+                        _samples = null;
+                        LoadedVoices = null;
                         Loading = false;
-                        IsEmpty = true;
                         return false;
                     }
-
-                    IsEmpty = false;
-                    Loading = true;
-
-                    Console.WriteLine($"- Reading {Filename}");
-                    _samples = new SampleBuffer(Filename, Side, HighPassFilter);
-                    SampleRate = _samples.SampleRate;
-                    Length = _samples.Length;
-
-                    token.ThrowIfCancellationRequested();
-
-                    _samples.Analyze();
-
-                    SampleCount = _samples.Count;
-
-                    token.ThrowIfCancellationRequested();
-
-                    Max = Math.Max(Math.Abs(_samples.Max), Math.Abs(_samples.Min));
-
-                    Console.WriteLine($"- Peak sample amplitude for {Filename} is {Max}");
-
-                    if (string.IsNullOrEmpty(ExternalTriggerFilename))
+                    catch (Exception ex)
                     {
-                        // Point at the same SampleBuffer
-                        _samplesForTrigger = _samples;
+                        ErrorMessage = ex.ToString();
+                        Max = 0;
+                        SampleRate = 0;
+                        Length = TimeSpan.Zero;
+                        // Dispose may itself throw (e.g. MP3 COM Release across apartments). Guard it so
+                        // we don't lose the original error and crash the awaiting async void handler.
+                        try
+                        {
+                            if (_samplesForTrigger != _samples)
+                                _samplesForTrigger?.Dispose();
+                        }
+                        catch { }
+                        _samplesForTrigger = null;
+                        try { _samples?.Dispose(); } catch { }
+                        _samples = null;
+                        LoadedVoices = null;
+                        Loading = false;
+                        return false;
                     }
-                    else
+                    finally
                     {
-                        _samplesForTrigger = new SampleBuffer(ExternalTriggerFilename, Side, HighPassFilter);
+                        // Only propagate a non-zero rate; a failed load leaves SampleRate==0 and would
+                        // otherwise zero the renderer's rate, halting rendering of every other channel.
+                        if (Renderer != null && SampleRate != 0)
+                            Renderer.SamplingRate = SampleRate;
+                        Changed?.Invoke(this, false);
                     }
-
-                    Loading = false;
-                    return true;
-                }
-                catch (TaskCanceledException)
-                {
-                    // Blank out if cancelled
-                    Max = 0;
-                    SampleRate = 0;
-                    Length = TimeSpan.Zero;
-                    try
-                    {
-                        if (_samplesForTrigger != _samples)
-                            _samplesForTrigger?.Dispose();
-                    }
-                    catch { }
-                    _samplesForTrigger = null;
-                    try { _samples?.Dispose(); } catch { }
-                    _samples = null;
-                    LoadedVoices = null;
-                    Loading = false;
-                    return false;
-                }
-                catch (Exception ex)
-                {
-                    ErrorMessage = ex.ToString();
-                    Max = 0;
-                    SampleRate = 0;
-                    Length = TimeSpan.Zero;
-                    // Dispose may itself throw (e.g. MP3 COM Release across apartments). Guard it so
-                    // we don't lose the original error and crash the awaiting async void handler.
-                    try
-                    {
-                        if (_samplesForTrigger != _samples)
-                            _samplesForTrigger?.Dispose();
-                    }
-                    catch { }
-                    _samplesForTrigger = null;
-                    try { _samples?.Dispose(); } catch { }
-                    _samples = null;
-                    LoadedVoices = null;
-                    Loading = false;
-                    return false;
-                }
-                finally
-                {
-                    // Only propagate a non-zero rate; a failed load leaves SampleRate==0 and would
-                    // otherwise zero the renderer's rate, halting rendering of every other channel.
-                    if (Renderer != null && SampleRate != 0)
-                        Renderer.SamplingRate = SampleRate;
-                    Changed?.Invoke(this, false);
                 }
             }, token);
         }
@@ -251,7 +264,7 @@ namespace LibSidWiz
             var decodedVoices = new List<(int SourceChannel, float[] Samples)>(VoiceFiles.Count);
             foreach (var vf in VoiceFiles.OrderBy(v => v.SourceChannel))
             {
-                var sb = new SampleBuffer(vf.Path, Side, HighPassFilter);
+                using var sb = new SampleBuffer(vf.Path, Side, HighPassFilter);
                 sb.Analyze(false); // raw amplitude; the sum is normalised below
                 token.ThrowIfCancellationRequested();
                 var dec = sb.Decoded ?? Array.Empty<float>();

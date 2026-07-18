@@ -2585,7 +2585,12 @@ namespace VisualMusic
             return true;
         }
 
-        internal void InitAfterDeserialization(WaveformPanel waveformPanel = null)
+        /// <param name="loadAudio">
+        /// When false, wires the waveform panel and recomputes voice ownership but does not start
+        /// per-track audio loads (caller will LoadAudioAsync after assigning fresh paths — avoids
+        /// a race with a second load disposing NAudio readers mid-Read).
+        /// </param>
+        internal void InitAfterDeserialization(WaveformPanel waveformPanel = null, bool loadAudio = true)
         {
             if (PropertyKeyframes == null)
                 PropertyKeyframes = new Keyframes.KeyframeSet();
@@ -2601,7 +2606,8 @@ namespace VisualMusic
                 tv.TrackProps.LoadContent();
                 if (i > 0)
                 {
-                    _ = tv.TrackProps.AudioProps.LoadAudioAsync();
+                    if (loadAudio)
+                        _ = tv.TrackProps.AudioProps.LoadAudioAsync();
                     wp.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
                 }
             }
