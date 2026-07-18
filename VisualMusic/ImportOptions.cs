@@ -41,8 +41,16 @@ namespace VisualMusic
         /// <summary>Render one WAV per track (in addition to the mixdown) and auto-assign them.</summary>
         public bool TrackAudio;
 
+        /// <summary>
+        /// Directory where per-track/channel WAVs were saved next to the project (the
+        /// "&lt;project&gt;-sources" folder). When set and <see cref="TrackAudio"/> is on, remuxer
+        /// writes regenerated WAVs here instead of the session temp folder. Cleared only by a
+        /// fresh import that does not inherit it.
+        /// </summary>
+        public string TrackAudioOutputDir;
+
         /// <summary>True when this import is re-running the remuxer on project load (not a fresh import).
-        /// Track-audio assignment only happens on fresh import; loads never re-assign.</summary>
+        /// Track views are preserved; freshly generated track-audio paths are still re-assigned.</summary>
         internal bool IsProjectLoad;
 
         /// <summary>Per-track WAVs produced by the last remuxer run: (MIDI track number, source
@@ -101,6 +109,8 @@ namespace VisualMusic
                     InsTrack = (bool)entry.Value;
                 else if (entry.Name == "trackAudio")
                     TrackAudio = (bool)entry.Value;
+                else if (entry.Name == "trackAudioOutputDir")
+                    TrackAudioOutputDir = (string)entry.Value;
                 else if (entry.Name == "noteFileType")
                     NoteFileType = (FileType)entry.Value;
                 else if (entry.Name == "subSong")
@@ -123,6 +133,8 @@ namespace VisualMusic
                 info.AddValue("audioPath", AudioPath);
             info.AddValue("insTrack", InsTrack);
             info.AddValue("trackAudio", TrackAudio);
+            if (!string.IsNullOrEmpty(TrackAudioOutputDir))
+                info.AddValue("trackAudioOutputDir", TrackAudioOutputDir);
             info.AddValue("noteFileType", NoteFileType);
             info.AddValue("subSong", SubSong);
             info.AddValue("numSubSong", NumSubSongs);

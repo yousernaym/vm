@@ -449,35 +449,6 @@ namespace VisualMusic
             }
         }
 
-        /// <summary>
-        /// True when every real track that carries a serialized per-track audio filename already has
-        /// that file present on disk (and at least one such track exists). Used on project load to
-        /// skip the extra remuxer track-audio render passes when the WAVs are already available
-        /// (either the temp copies or ones saved next to the project).
-        /// </summary>
-        bool AllSerializedTrackAudioPresent()
-        {
-            if (_trackViews == null) return false;
-            bool any = false;
-            for (int i = 1; i < _trackViews.Count; i++)   // index 0 = global/MIDI track 0
-            {
-                var ap = _trackViews[i].TrackProps.AudioProps;
-                var voices = ap.VoiceAudioFiles;
-                if (voices != null && voices.Count > 0)   // per-instrument: shared channel WAVs
-                {
-                    any = true;
-                    foreach (var vf in voices)
-                        if (!File.Exists(vf.Path)) return false;
-                    continue;
-                }
-                string fn = ap.Filename;
-                if (string.IsNullOrEmpty(fn)) continue;
-                any = true;
-                if (!File.Exists(fn)) return false;
-            }
-            return any;
-        }
-
         async public Task<bool> ImportSong(ImportOptions options, IProgress<float> progress = null, CancellationToken ct = default)
         { //`Open project` and `import files` meet here
             options.CheckSourceFile();
@@ -510,19 +481,34 @@ namespace VisualMusic
                     File.Delete(generatedAudioPath);
                 }
 
-                // Per-track WAVs, if requested. They live under the stable TempDirRoot (not the random
-                // per-session TempDir) so a reload regenerates identical paths — keeping serialized
-                // AudioProps.Filename values valid. On project load we skip the extra passes when the
-                // WAVs are already present on disk.
+                // Per-track WAVs: when the project previously saved them next to itself
+                // (TrackAudioOutputDir), regenerate into that folder using the project-name prefix.
+                // Otherwise write under the per-session TempDir (deleted on exit).
                 string trackAudioArg = null, trackAudioBase = null;
-                if (options.TrackAudio && !(options.IsProjectLoad && AllSerializedTrackAudioPresent()))
+                if (options.TrackAudio)
                 {
-                    // Always "-chn" (not "-ins"): channel solo WAVs are identical with or without -i,
-                    // so both import modes share one cache folder.
-                    string trackAudioDir = Path.Combine(Program.TempDirRoot, "trackaudio",
-                        $"{noteFile}-s{options.SubSong}-chn");
-                    Directory.CreateDirectory(trackAudioDir);
-                    trackAudioBase = Path.Combine(trackAudioDir, noteFile);
+                    string trackAudioDir;
+                    string trackAudioBaseName;
+                    if (!string.IsNullOrEmpty(options.TrackAudioOutputDir))
+                    {
+                        trackAudioDir = options.TrackAudioOutputDir;
+                        Directory.CreateDirectory(trackAudioDir);
+                        // "<project>-sources" → "<project>" so regenerated names match the saved copies.
+                        string folderName = Path.GetFileName(
+                            trackAudioDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                        const string sourcesSuffix = "-sources";
+                        trackAudioBaseName = folderName.EndsWith(sourcesSuffix, StringComparison.OrdinalIgnoreCase)
+                            ? folderName.Substring(0, folderName.Length - sourcesSuffix.Length)
+                            : noteFile;
+                    }
+                    else
+                    {
+                        trackAudioDir = Path.Combine(Program.TempDir, "trackaudio",
+                            $"{noteFile}-s{options.SubSong}-chn");
+                        Directory.CreateDirectory(trackAudioDir);
+                        trackAudioBaseName = noteFile;
+                    }
+                    trackAudioBase = Path.Combine(trackAudioDir, trackAudioBaseName);
                     trackAudioArg = $"-t\"{trackAudioBase}\"";
                 }
 

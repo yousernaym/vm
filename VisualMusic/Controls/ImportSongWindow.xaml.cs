@@ -29,21 +29,10 @@ namespace VisualMusic.Controls
         /// <summary>
         /// Update the session cache for <paramref name="type"/> without opening the dialog.
         /// Call this after a silent import or project load so the dialog is pre-filled correctly
-        /// if the user opens it manually afterward.
+        /// if the user opens it manually afterward (including the saved TrackAudio flag).
         /// </summary>
         internal static void UpdateSession(FileType type, bool erase, string notePath, string audioPath, bool insTrack, bool trackAudio = false)
             => s_session[type] = (erase, notePath, audioPath, insTrack, trackAudio);
-
-        /// <summary>
-        /// Uncheck "generate audio file for each track" in the session cache for <paramref name="type"/>
-        /// (leaves the persisted per-type preference alone). Called after the per-track WAVs are saved
-        /// next to the project, when regeneration is no longer wanted.
-        /// </summary>
-        internal static void ClearSessionTrackAudio(FileType type)
-        {
-            if (s_session.TryGetValue(type, out var s))
-                s_session[type] = (s.Erase, s.NotePath, s.AudioPath, s.InsTrack, false);
-        }
 
         // ---- Bound properties ----
 

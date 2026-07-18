@@ -736,12 +736,21 @@ namespace VisualMusic.ViewModels
                 return;
             }
 
+            // Re-point tracks at freshly generated per-track WAVs before Init loads audio.
+            var io = tempProject.ImportOptions;
+            var trackAudioTargets = ApplyGeneratedTrackAudio(tempProject, io);
+
             var rendererWfp = GetRendererWaveformPanel?.Invoke();
-            tempProject.InitAfterDeserialization(rendererWfp);
+            bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
+            tempProject.InitAfterDeserialization(rendererWfp, loadAudio: !deferTrackAudioLoad);
+            if (deferTrackAudioLoad)
+                await LoadTrackAudioAsync(trackAudioTargets);
 
             // Pre-fill the import dialog with this project's saved import options so that
-            // opening the dialog after loading a project shows the correct file paths and settings.
-            var io = tempProject.ImportOptions;
+            // opening the dialog after loading a project shows the correct file paths and settings
+            // (including whether "Generate audio file for each track" was on when saved).
+            // erase: true — LoadContent clears EraseCurrent for merge semantics; the dialog should
+            // still default to replace-project after an Open.
             if (io != null)
             {
                 if (io.NoteFileType == FileType.Audio)
@@ -823,7 +832,7 @@ namespace VisualMusic.ViewModels
             bool wavAvail = !io.HasSuppliedAudio
                 && !string.IsNullOrEmpty(io.GeneratedAudioPath) && File.Exists(io.GeneratedAudioPath);
 
-            // Per-track WAVs are savable when any real track references a WAV under the trackaudio
+            // Per-track WAVs are savable when any real track references a WAV under the session
             // temp dir that still exists (i.e. not already copied next to the project).
             var trackWavTracks = GetTempTrackAudioTracks();
             bool trackWavsAvail = trackWavTracks.Count > 0;
@@ -860,32 +869,88 @@ namespace VisualMusic.ViewModels
 
             // Copy per-track WAVs into the same "<project>-sources" folder (renamed to the project
             // name prefix) and re-point each track's filename there (so the serialized paths survive
-            // temp cleanup).
+            // temp cleanup). Regeneration is no longer needed on load — clear TrackAudio and remember
+            // the folder so a later re-enable writes here instead of temp.
             if (dlg.SaveTrackWavs && trackWavsAvail)
             {
                 SaveTrackAudioFiles(trackWavTracks, sourcesDir, name);
-                // The tracks now reference the saved WAVs directly, so the project no longer needs
-                // to regenerate them on load: save "generate audio file for each track" as off and
-                // uncheck it in the import dialog.
                 io.TrackAudio = false;
-                ImportSongWindow.ClearSessionTrackAudio(io.NoteFileType);
+                io.TrackAudioOutputDir = sourcesDir;
             }
 
             // Wire the saved WAV as supplied audio (recorded in the project, reused on load).
             if (savedWavPath != null) io.AudioPath = savedWavPath;
             // Saving MIDI turns this into a MIDI project.
             if (savedMidiPath != null) Project.ConvertToMidiProject(savedMidiPath, io.AudioPath);
+
+            if (dlg.SaveTrackWavs && trackWavsAvail && io.NoteFileType != FileType.Audio)
+            {
+                ImportSongWindow.UpdateSession(io.NoteFileType, erase: true,
+                    notePath: io.RawNotePath ?? "", audioPath: io.AudioPath ?? "",
+                    insTrack: io.InsTrack, trackAudio: false);
+            }
         }
 
         /// <summary>
-        /// Real tracks whose per-track audio filename points under the trackaudio temp dir and exists.
+        /// Assigns <see cref="ImportOptions.GeneratedTrackAudioPaths"/> onto the project's track
+        /// AudioProps. Returns the AudioProps that received new paths (for a deferred load).
+        /// </summary>
+        static List<AudioProps> ApplyGeneratedTrackAudio(Project project, ImportOptions options)
+        {
+            var targets = new List<AudioProps>();
+            if (project?.TrackViews == null || options?.GeneratedTrackAudioPaths is not { Count: > 0 } trackAudio)
+                return targets;
+
+            // TrackViews[0] = Global = MIDI track 0; real tracks align 1:1 with remuxer track numbers.
+            foreach (var group in trackAudio.GroupBy(x => x.Track))
+            {
+                int track = group.Key;
+                if (track < 0 || track >= project.TrackViews.Count)
+                    continue;
+                var ap = project.TrackViews[track].TrackProps.AudioProps;
+                // Channel >= 0 → shared channel WAV(s); Channel -1 → one Filename assignment.
+                var voiceEntries = group.Where(x => x.Channel >= 0)
+                    .OrderBy(x => x.Channel)
+                    .Select(x => (x.Channel, x.Path))
+                    .ToList();
+                if (voiceEntries.Count > 0)
+                {
+                    ap.VoiceAudioFiles = voiceEntries;
+                    ap.Filename = "";
+                }
+                else
+                {
+                    ap.VoiceAudioFiles = null;
+                    ap.Filename = group.First().Path;
+                }
+                targets.Add(ap);
+            }
+            return targets;
+        }
+
+        static async Task LoadTrackAudioAsync(List<AudioProps> trackAudioTargets)
+        {
+            await Task.WhenAll(trackAudioTargets.Select(ap => ap.LoadAudioAsync()));
+            var failedAp = trackAudioTargets.FirstOrDefault(ap => !string.IsNullOrEmpty(ap.SidWizChannel.ErrorMessage));
+            if (failedAp != null)
+            {
+                string fn = !string.IsNullOrEmpty(failedAp.Filename)
+                    ? failedAp.Filename
+                    : failedAp.VoiceAudioFiles?.FirstOrDefault().Path ?? "(track audio)";
+                MetroMessageBox.Show($"Couldn't load audio file:\n{fn}", Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        /// <summary>
+        /// Real tracks whose per-track audio filename points under the session temp dir and exists.
         /// </summary>
         List<AudioProps> GetTempTrackAudioTracks()
         {
             var result = new List<AudioProps>();
             var tvs = Project?.TrackViews;
             if (tvs == null) return result;
-            string tempRoot = Path.Combine(Program.TempDirRoot, "trackaudio");
+            string tempRoot = Program.TempDir;
             for (int i = 1; i < tvs.Count; i++)   // index 0 = global
             {
                 var ap = tvs[i].TrackProps.AudioProps;
@@ -1139,6 +1204,16 @@ namespace VisualMusic.ViewModels
             if (options.EraseCurrent && !ConfirmSaveChangesBefore("importing a new song"))
                 return;
 
+            // Keep the "<project>-sources" folder once track WAVs were saved next to the project,
+            // so re-enabling "Generate audio file for each track" regenerates there (not temp).
+            if (Project?.ImportOptions is { } prev
+                && !string.IsNullOrEmpty(prev.TrackAudioOutputDir)
+                && string.Equals(prev.RawNotePath ?? "", options.RawNotePath ?? "",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                options.TrackAudioOutputDir = prev.TrackAudioOutputDir;
+            }
+
             // Ensure a project object exists to import into.
             if (Project == null)
             {
@@ -1193,34 +1268,7 @@ namespace VisualMusic.ViewModels
             // Assign freshly generated per-track WAVs before InitAfterDeserialization so ownership
             // prep and the single audio load see the correct paths (avoids a second load racing the
             // first and disposing NAudio readers mid-Read).
-            var trackAudioTargets = new List<AudioProps>();
-            if (!options.IsProjectLoad && options.GeneratedTrackAudioPaths is { Count: > 0 } trackAudio)
-            {
-                // TrackViews[0] = Global = MIDI track 0; real tracks align 1:1 with remuxer track numbers.
-                foreach (var group in trackAudio.GroupBy(x => x.Track))
-                {
-                    int track = group.Key;
-                    if (track < 0 || track >= Project.TrackViews.Count)
-                        continue;
-                    var ap = Project.TrackViews[track].TrackProps.AudioProps;
-                    // Channel >= 0 → shared channel WAV(s); Channel -1 → one Filename assignment.
-                    var voiceEntries = group.Where(x => x.Channel >= 0)
-                        .OrderBy(x => x.Channel)
-                        .Select(x => (x.Channel, x.Path))
-                        .ToList();
-                    if (voiceEntries.Count > 0)
-                    {
-                        ap.VoiceAudioFiles = voiceEntries;
-                        ap.Filename = "";
-                    }
-                    else
-                    {
-                        ap.VoiceAudioFiles = null;
-                        ap.Filename = group.First().Path;
-                    }
-                    trackAudioTargets.Add(ap);
-                }
-            }
+            var trackAudioTargets = ApplyGeneratedTrackAudio(Project, options);
 
             var wfp = GetRendererWaveformPanel?.Invoke();
             // Skip Init's fire-and-forget loads when we have fresh track WAVs — we await one load below.
@@ -1230,18 +1278,7 @@ namespace VisualMusic.ViewModels
             TrackList.Rebuild(Project);
 
             if (deferTrackAudioLoad)
-            {
-                await Task.WhenAll(trackAudioTargets.Select(ap => ap.LoadAudioAsync()));
-                var failedAp = trackAudioTargets.FirstOrDefault(ap => !string.IsNullOrEmpty(ap.SidWizChannel.ErrorMessage));
-                if (failedAp != null)
-                {
-                    string fn = !string.IsNullOrEmpty(failedAp.Filename)
-                        ? failedAp.Filename
-                        : failedAp.VoiceAudioFiles?.FirstOrDefault().Path ?? "(track audio)";
-                    MetroMessageBox.Show($"Couldn't load audio file:\n{fn}", Program.AppName,
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
+                await LoadTrackAudioAsync(trackAudioTargets);
 
             OnProjectLoaded?.Invoke(Project);
             LoadStaticBackgroundIfUnkeyframed(Project);
