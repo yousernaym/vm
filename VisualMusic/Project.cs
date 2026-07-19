@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -423,6 +424,10 @@ namespace VisualMusic
             info.AddValue("props", Props);
         }
 
+        /// <summary>Formats the Remuxer <c>-l</c> flag using invariant culture (matches Remuxer parse).</summary>
+        internal static string FormatRemuxerSongLengthFlag(float songLengthS)
+            => "-l" + songLengthS.ToString(CultureInfo.InvariantCulture);
+
         // Matches the "Progress: N%" lines emitted by remuxer.exe (see Remuxer/Program.cs).
         internal static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
 
@@ -519,7 +524,8 @@ namespace VisualMusic
                 if (midiArg != null || audioArg != null || trackAudioArg != null)
                 {
                     string insTrackFlag = options.InsTrack ? "-i" : "";
-                    string songLengthsFlag = $"-l{options.SongLengthS.ToString()}";
+                    // Remuxer parses -l with InvariantCulture; must not use the UI culture (e.g. "23,079").
+                    string songLengthsFlag = FormatRemuxerSongLengthFlag(options.SongLengthS);
                     string subSongFlag = $"-s{options.SubSong.ToString()}";
                     string supressErrorFlag = "-e";
                     string cancelSignalPath = Path.Combine(Program.TempDir, Path.GetRandomFileName() + ".cancel");
