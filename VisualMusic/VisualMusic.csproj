@@ -15,6 +15,14 @@
     <NoWarn>$(NoWarn);CA1416</NoWarn>
     <SupportedOSPlatformVersion>10.0.26100.0</SupportedOSPlatformVersion>
   </PropertyGroup>
+  <!-- Keep the sibling test project out of this app's compile glob. -->
+  <ItemGroup>
+    <Compile Remove="VisualMusic.Tests\**" />
+    <None Remove="VisualMusic.Tests\**" />
+    <EmbeddedResource Remove="VisualMusic.Tests\**" />
+    <Page Remove="VisualMusic.Tests\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Remove="Content\Bar.fx" />
     <None Remove="Content\Content.mgcb" />
@@ -66,7 +74,9 @@
     <ProjectReference Include="..\Dependencies\midilib\midilib.csproj" />
     <ProjectReference Include="..\Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <!-- SolutionDir is empty / "*Undefined*" when the csproj is built outside VisualMusic.sln
+       (e.g. VisualMusic.Tests via `dotnet test`). Skip native/remuxer copy in that case. -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SolutionDir)' != '' and '$(SolutionDir)' != '*Undefined*'">
     <Exec Command="xcopy &quot;$(SolutionDir)Dependencies\Remuxer\Remuxer\bin\$(ConfigurationName)\&quot; &quot;$(TargetDir)Remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /Y /D&#xD;&#xA;&#xD;&#xA;" />
   </Target>
   <Target Name="BuildMonoGameContent" BeforeTargets="BeforeBuild" Condition="'$(MSBuildProjectFile)' == 'VisualMusic.csproj' and '$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Content\Content.mgcb')">

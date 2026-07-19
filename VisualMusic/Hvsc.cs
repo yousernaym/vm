@@ -40,6 +40,15 @@ namespace VisualMusic
         {
             string dbPath = ResolveDbPath();
             if (dbPath == null) return null;
+            return GetSongLengths(sidPath, dbPath);
+        }
+
+        /// <summary>
+        /// Looks up per-subsong lengths in the given HVSC <paramref name="dbPath"/> for <paramref name="sidPath"/>.
+        /// </summary>
+        internal static string[] GetSongLengths(string sidPath, string dbPath)
+        {
+            if (dbPath == null || !File.Exists(dbPath)) return null;
 
             string hash;
             using (var stream = File.OpenRead(sidPath))

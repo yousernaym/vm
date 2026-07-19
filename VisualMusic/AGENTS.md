@@ -193,12 +193,14 @@ From `todo.txt`:
 
 ## Testing
 
-No dedicated unit test projects in the solution. Testing is primarily manual:
-1. Import MIDI/MOD/SID files
-2. Verify visualization and playback sync
-3. Test export video functionality
-4. Verify undo/redo operations
+`VisualMusic.Tests` (xUnit) covers import formats, undo stack, keyframe interpolation, download helpers,
+HVSC length lookup, remuxer stdout regexes, and Project tempo math with a fake `ISongDrawHost`.
 
-To test programmatically, integration tests would need to:
-- Create mock `ISongDrawHost` implementations
-- Load Project XMLs and verify rendering output
+```powershell
+dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --nologo
+```
+
+Shared fixtures: repo-root [`test-files/`](../test-files/). Dependency/native integration tests and the full
+run matrix are documented in the root [AGENTS.md](../AGENTS.md).
+
+Manual checks still useful: import MIDI/MOD/SID, playback sync, video export, undo/redo in the UI.

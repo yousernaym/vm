@@ -243,8 +243,11 @@ namespace VisualMusic
             get { return _trackViews; }
             set
             {
-                foreach (var tv in _trackViews)
-                    tv.Geo?.Dispose();
+                if (_trackViews != null)
+                {
+                    foreach (var tv in _trackViews)
+                        tv.Geo?.Dispose();
+                }
                 _trackViews = value;
             }
         }
@@ -421,16 +424,16 @@ namespace VisualMusic
         }
 
         // Matches the "Progress: N%" lines emitted by remuxer.exe (see Remuxer/Program.cs).
-        static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
+        internal static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
 
         // Matches the "TrackAudio: <miditrack>|<path>" lines emitted by remuxer.exe after processing
         // (per-channel MIDI mode; path is always "<base>-chCC.wav").
-        static readonly Regex RemuxerTrackAudioRegex = new Regex(@"^TrackAudio:\s*(\d+)\|(.+)$", RegexOptions.Compiled);
+        internal static readonly Regex RemuxerTrackAudioRegex = new Regex(@"^TrackAudio:\s*(\d+)\|(.+)$", RegexOptions.Compiled);
 
         // Matches the "TrackVoiceAudio: <miditrack>|<channel>|<path>" lines (per-instrument mode;
         // same "-chCC.wav" path, shared by instrument tracks on that channel). A distinct prefix
         // keeps the anchored regex above from mis-parsing the extra field into the path.
-        static readonly Regex RemuxerTrackVoiceAudioRegex = new Regex(@"^TrackVoiceAudio:\s*(\d+)\|(\d+)\|(.+)$", RegexOptions.Compiled);
+        internal static readonly Regex RemuxerTrackVoiceAudioRegex = new Regex(@"^TrackVoiceAudio:\s*(\d+)\|(\d+)\|(.+)$", RegexOptions.Compiled);
 
         // Remuxer writes a 58-byte IEEE-float WAV header before the data chunk.
         const long EmptyGeneratedWavBytes = 58;
@@ -2431,6 +2434,8 @@ namespace VisualMusic
             // Only called on undo snapshots, which share AudioProps with the live project via clone().
             // Disposing AudioProps here would dispose the live SampleBuffer/AudioFileReader and cause
             // NREs the next time a chunk is loaded (e.g. after seeking).
+            if (_trackViews == null)
+                return;
             foreach (var tv in _trackViews)
             {
                 tv.Geo?.Dispose();

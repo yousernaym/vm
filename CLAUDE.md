@@ -116,5 +116,6 @@ upstream and change only what Visual Music requires.
 
 ## Testing
 
-There are no automated test projects for the app; verification is manual (import a MIDI/MOD/SID file, check
-the visualization and audio sync, exercise export and undo/redo). See [VisualMusic/CLAUDE.md](VisualMusic/CLAUDE.md).
+Essential automated tests live in each first-party repo (xUnit for C#, GoogleTest for libRemuxer Song/FileFormat).
+Fixtures are under repo-root [`test-files/`](test-files/). MonoGame is not covered. Full commands are in
+[AGENTS.md](AGENTS.md) (unit / GoogleTest / Integration after `VisualMusic.sln` Debug|x64).

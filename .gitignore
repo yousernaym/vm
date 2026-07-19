@@ -42,6 +42,10 @@ packages/
 *.png
 *.jpeg
 *.jpg
-*.sf2
+soundfont.sf2
 *.rtf
 *.md5
+
+# Allow checked-in test fixtures under test-files/
+!test-files/
+!test-files/**

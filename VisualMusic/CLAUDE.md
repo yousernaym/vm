@@ -193,12 +193,6 @@ From `todo.txt`:
 
 ## Testing
 
-No dedicated unit test projects in the solution. Testing is primarily manual:
-1. Import MIDI/MOD/SID files
-2. Verify visualization and playback sync
-3. Test export video functionality
-4. Verify undo/redo operations
-
-To test programmatically, integration tests would need to:
-- Create mock `ISongDrawHost` implementations
-- Load Project XMLs and verify rendering output
+`VisualMusic.Tests` (xUnit) covers import formats, undo, keyframes, download helpers, HVSC lookup,
+remuxer stdout regexes, and Project tempo math. See [AGENTS.md](AGENTS.md) and the root
+[AGENTS.md](../AGENTS.md) for commands. Fixtures: [`test-files/`](../test-files/).

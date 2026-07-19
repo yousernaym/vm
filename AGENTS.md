@@ -116,5 +116,33 @@ upstream and change only what Visual Music requires.
 
 ## Testing
 
-There are no automated test projects for the app; verification is manual (import a MIDI/MOD/SID file, check
-the visualization and audio sync, exercise export and undo/redo). See [VisualMusic/AGENTS.md](VisualMusic/AGENTS.md).
+Essential automated tests live in each first-party repo (xUnit for C#, GoogleTest for libRemuxer Song/FileFormat).
+Fixtures are under repo-root [`test-files/`](test-files/). MonoGame is not covered.
+
+**Unit tests** (no native build required beyond what `dotnet` restores):
+
+```powershell
+dotnet test D:\dev\vm\Dependencies\midiLib\midiLib.Tests\midiLib.Tests.csproj --nologo
+dotnet test D:\dev\vm\Dependencies\Remuxer\Remuxer.Tests\Remuxer.Tests.csproj --filter "Category!=Integration" --nologo
+dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --nologo
+```
+
+**GoogleTest** (after building `libRemuxer.Tests` x64; first build restores gtest via vcpkg manifest):
+
+```powershell
+$msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+  -latest -prerelease -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe"
+& $msbuild D:\dev\vm\Dependencies\Remuxer\libRemuxer\tests\libRemuxer.Tests.vcxproj /p:Configuration=Debug /p:Platform=x64
+& D:\dev\vm\Dependencies\Remuxer\libRemuxer\tests\x64\Debug\libRemuxer.Tests.exe
+```
+
+**Integration tests** (build `VisualMusic.sln` Debug|x64 first so `media.dll` / `MidMix.dll` / `Remuxer.exe` exist):
+
+```powershell
+& $msbuild D:\dev\vm\VisualMusic.sln /p:Configuration=Debug /p:Platform=x64 /m /nologo
+dotnet test D:\dev\vm\Dependencies\Remuxer\Remuxer.Tests\Remuxer.Tests.csproj --filter "Category=Integration" --nologo
+dotnet test D:\dev\vm\Dependencies\Media\Media.Tests\Media.Tests.csproj --filter "Category=Integration" --nologo
+dotnet test D:\dev\vm\Dependencies\MidMix\MidMix.Tests\MidMix.Tests.csproj --filter "Category=Integration" --nologo
+```
+
+Manual UI checks (import, export, undo) remain useful; see [VisualMusic/AGENTS.md](VisualMusic/AGENTS.md).
