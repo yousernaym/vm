@@ -50,7 +50,7 @@ namespace VisualMusic.Controls
             set { _audioFilePath = value; Notify(); }
         }
 
-        string _audioLabel = "Audio file:";
+        string _audioLabel = "Audio file (optional):";
         public string AudioLabel
         {
             get => _audioLabel;
@@ -151,7 +151,7 @@ namespace VisualMusic.Controls
                 case FileType.Sid:
                     Title = "Import SID Song";
                     _noteFilter = BuildFilter("SID files", ImportFileFormats.Sid);
-                    AudioLabel = "Audio file (leave empty for SID audio):";
+                    AudioLabel = "Audio file (optional; leave empty for SID audio):";
                     break;
                 case FileType.Hvl:
                     Title = "Import HVL Song";

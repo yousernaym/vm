@@ -748,7 +748,7 @@ namespace VisualMusic.ViewModels
 
             // Pre-fill the import dialog with this project's saved import options so that
             // opening the dialog after loading a project shows the correct file paths and settings
-            // (including whether "Generate audio file for each track" was on when saved).
+            // (including whether "Generate audio per track" was on when saved).
             // erase: true — LoadContent clears EraseCurrent for merge semantics; the dialog should
             // still default to replace-project after an Open.
             if (io != null)
@@ -1183,7 +1183,7 @@ namespace VisualMusic.ViewModels
             Exception failure = null;
 
             var w = new Controls.ProgressWindow(
-                "Converting song",
+                "Importing song",
                 async cb =>
                 {
                     try { imported = await convert(new Progress<float>(cb.UpdateProgress), cb.CancelToken); }
@@ -1205,7 +1205,7 @@ namespace VisualMusic.ViewModels
                 return;
 
             // Keep the "<project>-sources" folder once track WAVs were saved next to the project,
-            // so re-enabling "Generate audio file for each track" regenerates there (not temp).
+            // so re-enabling "Generate audio per track" regenerates there (not temp).
             if (Project?.ImportOptions is { } prev
                 && !string.IsNullOrEmpty(prev.TrackAudioOutputDir)
                 && string.Equals(prev.RawNotePath ?? "", options.RawNotePath ?? "",
