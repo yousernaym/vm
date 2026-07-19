@@ -117,5 +117,6 @@ upstream and change only what Visual Music requires.
 ## Testing
 
 Essential automated tests live in each first-party repo (xUnit for C#, GoogleTest for libRemuxer Song/FileFormat).
-Fixtures are under repo-root [`test-files/`](test-files/). MonoGame is not covered. Full commands are in
-[AGENTS.md](AGENTS.md) (unit / GoogleTest / Integration after `VisualMusic.sln` Debug|x64).
+Fixtures live in the deepest owning submodule (`midiLib/test-files/`, `Remuxer/libRemuxer/test-files/`,
+`Media/test-files/`, `MidMix/test-files/`). MonoGame is not covered. Full commands are in
+[AGENTS.md](AGENTS.md) (unit with `Category!=Integration` / GoogleTest / Integration after `VisualMusic.sln` Debug|x64).

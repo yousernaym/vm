@@ -194,5 +194,6 @@ From `todo.txt`:
 ## Testing
 
 `VisualMusic.Tests` (xUnit) covers import formats, undo, keyframes, download helpers, HVSC lookup,
-remuxer stdout regexes, and Project tempo math. See [AGENTS.md](AGENTS.md) and the root
-[AGENTS.md](../AGENTS.md) for commands. Fixtures: [`test-files/`](../test-files/).
+remuxer stdout regexes, Project tempo math, and Media/MidMix P/Invoke Integration smokes.
+Use `--filter "Category!=Integration"` for unit-only runs; Integration needs a prior `VisualMusic.sln`
+x64 build. See [AGENTS.md](AGENTS.md) and the root [AGENTS.md](../AGENTS.md).

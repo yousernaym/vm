@@ -117,14 +117,16 @@ upstream and change only what Visual Music requires.
 ## Testing
 
 Essential automated tests live in each first-party repo (xUnit for C#, GoogleTest for libRemuxer Song/FileFormat).
-Fixtures are under repo-root [`test-files/`](test-files/). MonoGame is not covered.
+Fixtures live in the deepest owning submodule (`midiLib/test-files/`, `Remuxer/libRemuxer/test-files/`,
+`Media/test-files/`, `MidMix/test-files/`); parents discover them by walking up from the test assembly.
+MonoGame is not covered. `Remuxer.Tests` still needs the sibling `midiLib` checkout to validate generated MIDI.
 
 **Unit tests** (no native build required beyond what `dotnet` restores):
 
 ```powershell
 dotnet test D:\dev\vm\Dependencies\midiLib\midiLib.Tests\midiLib.Tests.csproj --nologo
 dotnet test D:\dev\vm\Dependencies\Remuxer\Remuxer.Tests\Remuxer.Tests.csproj --filter "Category!=Integration" --nologo
-dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --nologo
+dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --filter "Category!=Integration" --nologo
 ```
 
 **GoogleTest** (after building `libRemuxer.Tests` x64; first build restores gtest via vcpkg manifest):
@@ -136,13 +138,13 @@ $msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere
 & D:\dev\vm\Dependencies\Remuxer\libRemuxer\tests\x64\Debug\libRemuxer.Tests.exe
 ```
 
-**Integration tests** (build `VisualMusic.sln` Debug|x64 first so `media.dll` / `MidMix.dll` / `Remuxer.exe` exist):
+**Integration tests** (build `VisualMusic.sln` Debug|x64 first so `media.dll` / `MidMix.dll` / `Remuxer.exe`
+exist and VisualMusic.Tests copies a complete native runtime beside the test assembly):
 
 ```powershell
 & $msbuild D:\dev\vm\VisualMusic.sln /p:Configuration=Debug /p:Platform=x64 /m /nologo
+dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --filter "Category=Integration" --nologo
 dotnet test D:\dev\vm\Dependencies\Remuxer\Remuxer.Tests\Remuxer.Tests.csproj --filter "Category=Integration" --nologo
-dotnet test D:\dev\vm\Dependencies\Media\Media.Tests\Media.Tests.csproj --filter "Category=Integration" --nologo
-dotnet test D:\dev\vm\Dependencies\MidMix\MidMix.Tests\MidMix.Tests.csproj --filter "Category=Integration" --nologo
 ```
 
 Manual UI checks (import, export, undo) remain useful; see [VisualMusic/AGENTS.md](VisualMusic/AGENTS.md).

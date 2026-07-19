@@ -23,4 +23,64 @@
     <ProjectReference Include="..\VisualMusic.csproj" />
   </ItemGroup>
 
+  <!--
+    After a VisualMusic.sln x64 build, make $(TargetDir) a complete native runtime dir for
+    Media/MidMix Integration tests. Unit-only builds (no x64\<Config>\ natives) skip cleanly.
+  -->
+  <Target Name="CopyNativeRuntimeForIntegration" AfterTargets="Build">
+    <PropertyGroup>
+      <_RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\'))</_RepoRoot>
+      <_SlnNativeOut>$(_RepoRoot)x64\$(Configuration)\</_SlnNativeOut>
+      <_MediaApplocal>$(_RepoRoot)Dependencies\Media\Media\x64\$(Configuration)\</_MediaApplocal>
+      <_MidMixApplocal>$(_RepoRoot)Dependencies\MidMix\MidMix\x64\$(Configuration)\</_MidMixApplocal>
+      <_HasSlnNatives Condition="Exists('$(_SlnNativeOut)media.dll') and Exists('$(_SlnNativeOut)MidMix.dll')">true</_HasSlnNatives>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MediaApplocal)')">
+      <_NativeDlls Include="$(_MediaApplocal)*.dll" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MidMixApplocal)')">
+      <_NativeDlls Include="$(_MidMixApplocal)*.dll" />
+    </ItemGroup>
+    <!-- Solution outputs last so freshly built media.dll / MidMix.dll win. -->
+    <ItemGroup Condition="'$(_HasSlnNatives)'=='true'">
+      <_NativeDlls Include="$(_SlnNativeOut)*.dll" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_NativeDlls)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="'$(_HasSlnNatives)'=='true' and '@(_NativeDlls)'!=''" />
+
+    <PropertyGroup Condition="'$(_HasSlnNatives)'=='true'">
+      <_MissingNative Condition="!Exists('$(TargetDir)media.dll')">media.dll</_MissingNative>
+      <_MissingNative Condition="'$(_MissingNative)'=='' and !Exists('$(TargetDir)MidMix.dll')">MidMix.dll</_MissingNative>
+    </PropertyGroup>
+
+    <!-- Glob checks for versioned dependency DLLs -->
+    <ItemGroup Condition="'$(_HasSlnNatives)'=='true'">
+      <_FluidsynthDll Include="$(TargetDir)libfluidsynth-*.dll" />
+      <_AvcodecDll Include="$(TargetDir)avcodec-*.dll" />
+      <_AvformatDll Include="$(TargetDir)avformat-*.dll" />
+      <_AvutilDll Include="$(TargetDir)avutil-*.dll" />
+      <_SwscaleDll Include="$(TargetDir)swscale-*.dll" />
+      <_SwresampleDll Include="$(TargetDir)swresample-*.dll" />
+      <_Libx264Dll Include="$(TargetDir)libx264-*.dll" />
+    </ItemGroup>
+    <PropertyGroup Condition="'$(_HasSlnNatives)'=='true'">
+      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_FluidsynthDll)'==''">libfluidsynth-*.dll</_MissingNative>
+      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_AvcodecDll)'==''">avcodec-*.dll</_MissingNative>
+      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_AvformatDll)'==''">avformat-*.dll</_MissingNative>
+      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_AvutilDll)'==''">avutil-*.dll</_MissingNative>
+      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_SwscaleDll)'==''">swscale-*.dll</_MissingNative>
+      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_SwresampleDll)'==''">swresample-*.dll</_MissingNative>
+      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_Libx264Dll)'==''">libx264-*.dll</_MissingNative>
+    </PropertyGroup>
+
+    <Error Condition="'$(_HasSlnNatives)'=='true' and '$(_MissingNative)'!=''"
+           Text="VisualMusic.Tests native runtime incomplete in $(TargetDir): missing $(_MissingNative). Build VisualMusic.sln Debug|x64 (or matching Configuration) so media.dll, MidMix.dll, and FFmpeg/Fluidsynth applocal DLLs are available under x64\$(Configuration)\ and Dependencies\Media\Media\x64\$(Configuration)\ / Dependencies\MidMix\MidMix\x64\$(Configuration)\." />
+
+    <Message Importance="high"
+             Condition="'$(_HasSlnNatives)'!='true'"
+             Text="VisualMusic.Tests: skipped native runtime copy (no $(_SlnNativeOut)media.dll + MidMix.dll). Unit tests are fine; Integration tests need a prior VisualMusic.sln x64 build." />
+  </Target>
+
 </Project>

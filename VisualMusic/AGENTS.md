@@ -194,13 +194,21 @@ From `todo.txt`:
 ## Testing
 
 `VisualMusic.Tests` (xUnit) covers import formats, undo stack, keyframe interpolation, download helpers,
-HVSC length lookup, remuxer stdout regexes, and Project tempo math with a fake `ISongDrawHost`.
+HVSC length lookup, remuxer stdout regexes, Project tempo math with a fake `ISongDrawHost`, and
+Media/MidMix P/Invoke Integration smokes (next to [Media.cs](Media.cs) / [MidMix.cs](MidMix.cs)).
+
+**Unit** (no native build required):
 
 ```powershell
-dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --nologo
+dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --filter "Category!=Integration" --nologo
 ```
 
-Shared fixtures: repo-root [`test-files/`](../test-files/). Dependency/native integration tests and the full
-run matrix are documented in the root [AGENTS.md](../AGENTS.md).
+**Integration** (after `VisualMusic.sln` Debug|x64 so the test project copies `media.dll` / `MidMix.dll` + FFmpeg/Fluidsynth):
+
+```powershell
+dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --filter "Category=Integration" --nologo
+```
+
+Fixtures are discovered under submodule `test-files/` trees (see root [AGENTS.md](../AGENTS.md)).
 
 Manual checks still useful: import MIDI/MOD/SID, playback sync, video export, undo/redo in the UI.

@@ -46,6 +46,5 @@ packages/
 *.rtf
 *.md5
 
-# Allow checked-in test fixtures under test-files/
-!test-files/
-!test-files/**
+# Test fixtures live in submodule test-files/ trees (midiLib, Media, MidMix,
+# Remuxer/libRemuxer). Those repos own their own un-ignores if needed.
