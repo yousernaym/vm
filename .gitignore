@@ -42,7 +42,7 @@ packages/
 *.png
 *.jpeg
 *.jpg
-soundfont.sf2
+*.sf2
 *.rtf
 *.md5
 
