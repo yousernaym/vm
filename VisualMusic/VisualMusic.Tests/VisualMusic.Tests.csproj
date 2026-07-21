@@ -51,15 +51,21 @@
       <_HasSlnNatives Condition="Exists('$(_SlnNativeOut)media.dll') and Exists('$(_SlnNativeOut)MidMix.dll')">true</_HasSlnNatives>
     </PropertyGroup>
 
-    <!-- Third-party FFmpeg/Fluidsynth DLLs from the canonical vcpkg_installed trees. -->
-    <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MediaVcpkgBin)')">
-      <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MidMixVcpkgBin)')">
-      <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" />
-    </ItemGroup>
-    <!-- Solution outputs last so freshly built media.dll / MidMix.dll win. -->
+    <!--
+      Once the first-party natives are built this is a real native runtime, so the third-party
+      vcpkg trees must be present too. A missing tree would produce a *partial* copy (media.dll /
+      MidMix.dll without their FFmpeg / Fluidsynth DLLs), yielding Integration tests that fail to
+      load the natives at runtime with no build error. Fail loud instead (mirrors CopyNativeOutputs).
+    -->
+    <Error Condition="'$(_HasSlnNatives)'=='true' and !Exists('$(_MediaVcpkgBin)')"
+           Text="VisualMusic.Tests: media.dll is built but the FFmpeg vcpkg runtime is missing at '$(_MediaVcpkgBin)'. Restore it by building VisualMusic.sln (Any CPU) so Dependencies\Media\vcpkg_installed is populated." />
+    <Error Condition="'$(_HasSlnNatives)'=='true' and !Exists('$(_MidMixVcpkgBin)')"
+           Text="VisualMusic.Tests: MidMix.dll is built but the Fluidsynth vcpkg runtime is missing at '$(_MidMixVcpkgBin)'. Restore it by building VisualMusic.sln (Any CPU) so Dependencies\MidMix\vcpkg_installed is populated." />
+
+    <!-- Third-party FFmpeg/Fluidsynth DLLs from vcpkg_installed (existence guaranteed by the checks above); solution outputs last so freshly built media.dll / MidMix.dll win. -->
     <ItemGroup Condition="'$(_HasSlnNatives)'=='true'">
+      <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" />
+      <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" />
       <_NativeDlls Include="$(_SlnNativeOut)*.dll" />
     </ItemGroup>
 
