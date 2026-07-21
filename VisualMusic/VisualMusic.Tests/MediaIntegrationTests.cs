@@ -14,7 +14,7 @@ namespace VisualMusic.Tests
             string dll = Path.Combine(AppContext.BaseDirectory, "media.dll");
             if (!File.Exists(dll))
                 throw new FileNotFoundException(
-                    "media.dll not found beside the test assembly. Build VisualMusic.sln (x64) so VisualMusic.Tests copies native runtime DLLs.");
+                    "media.dll not found beside the test assembly. Build VisualMusic.sln (Any CPU) so VisualMusic.Tests copies native runtime DLLs.");
             NativeLibrary.Load(dll);
         }
 
