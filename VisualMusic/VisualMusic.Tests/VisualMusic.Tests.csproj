@@ -23,10 +23,19 @@
     <ProjectReference Include="..\VisualMusic.csproj" />
   </ItemGroup>
 
+  <!-- Fixtures live in owning submodules; flatten into output test-files/ (PreserveNewest). -->
+  <ItemGroup>
+    <None Include="..\..\Dependencies\midiLib\test-files\**\*" LinkBase="test-files" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\Media\test-files\**\*" LinkBase="test-files" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\MidMix\test-files\**\*" LinkBase="test-files" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\Remuxer\libRemuxer\test-files\**\*" LinkBase="test-files" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <!--
     After a VisualMusic.sln x64 build, make $(TargetDir) a complete native runtime dir for
     Media/MidMix Integration tests. Unit-only builds (no x64\<Config>\ natives) skip cleanly.
   -->
+
   <Target Name="CopyNativeRuntimeForIntegration" AfterTargets="Build">
     <PropertyGroup>
       <_RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\'))</_RepoRoot>

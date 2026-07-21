@@ -118,7 +118,8 @@ upstream and change only what Visual Music requires.
 
 Essential automated tests live in each first-party repo (xUnit for C#, GoogleTest for libRemuxer Song/FileFormat).
 Fixtures live in the deepest owning submodule (`midiLib/test-files/`, `Remuxer/libRemuxer/test-files/`,
-`Media/test-files/`, `MidMix/test-files/`); parents discover them by walking up from the test assembly.
+`Media/test-files/`, `MidMix/test-files/`); each test csproj copies the trees it needs into output
+`test-files/` (`PreserveNewest`), and `TestFiles.PathTo` resolves under the test assembly directory.
 MonoGame is not covered. `Remuxer.Tests` still needs the sibling `midiLib` checkout to validate generated MIDI.
 
 **Unit tests** (no native build required beyond what `dotnet` restores):
