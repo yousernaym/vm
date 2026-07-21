@@ -207,6 +207,6 @@ dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --f
 dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --filter "Category=Integration" --nologo
 ```
 
-Fixtures are copied from submodule `test-files/` trees into the test output (see root [AGENTS.md](../AGENTS.md)).
+Fixtures are copied from submodule `test-files/` trees into output `test-files/<owner>/` (see root [AGENTS.md](../AGENTS.md)).
 
 Manual checks still useful: import MIDI/MOD/SID, playback sync, video export, undo/redo in the UI.

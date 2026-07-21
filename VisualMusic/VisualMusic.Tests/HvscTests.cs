@@ -8,7 +8,7 @@ namespace VisualMusic.Tests
         [Fact]
         public void GetSongLengths_reads_matching_md5_line()
         {
-            string sid = TestFiles.PathTo("minimal.sid");
+            string sid = TestFiles.PathTo("libRemuxer", "minimal.sid");
             string hash = Hvsc.ComputeMd5Hex(sid);
 
             using var db = TestFiles.TempPath.File("vm_songlengths_", ".md5");
@@ -21,7 +21,7 @@ namespace VisualMusic.Tests
         [Fact]
         public void GetSongLengths_missing_entry_returns_null()
         {
-            string sid = TestFiles.PathTo("minimal.sid");
+            string sid = TestFiles.PathTo("libRemuxer", "minimal.sid");
             using var db = TestFiles.TempPath.File("vm_songlengths_", ".md5");
             File.WriteAllText(db.Path, "00000000000000000000000000000000=1:00\n");
             Assert.Null(Hvsc.GetSongLengths(sid, db.Path));

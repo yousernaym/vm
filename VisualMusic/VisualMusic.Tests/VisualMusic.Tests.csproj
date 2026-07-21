@@ -30,12 +30,15 @@
     <ProjectReference Include="..\VisualMusic.csproj" />
   </ItemGroup>
 
-  <!-- Fixtures live in owning submodules; flatten into output test-files/ (PreserveNewest). -->
+  <!--
+    Fixtures live in owning submodules. Copy into output test-files/<owner>/ (not flattened)
+    so same relative names across submodules cannot collide (last-writer-wins).
+  -->
   <ItemGroup>
-    <None Include="..\..\Dependencies\midiLib\test-files\**\*" LinkBase="test-files" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\..\Dependencies\Media\test-files\**\*" LinkBase="test-files" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\..\Dependencies\MidMix\test-files\**\*" LinkBase="test-files" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\..\Dependencies\Remuxer\libRemuxer\test-files\**\*" LinkBase="test-files" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\midiLib\test-files\**\*" LinkBase="test-files\midiLib" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\Media\test-files\**\*" LinkBase="test-files\Media" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\MidMix\test-files\**\*" LinkBase="test-files\MidMix" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\Remuxer\libRemuxer\test-files\**\*" LinkBase="test-files\libRemuxer" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!--

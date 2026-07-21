@@ -26,9 +26,9 @@ namespace VisualMusic.Tests
                 VmMidMix.Close();
 
                 // 2) With tiny.sf2 as soundfont.sf2
-                File.Copy(TestFiles.PathTo(Path.Combine("soundfont", "tiny.sf2")),
+                File.Copy(TestFiles.PathTo("MidMix", Path.Combine("soundfont", "tiny.sf2")),
                     Path.Combine(sfDir.Path, "soundfont.sf2"));
-                File.Copy(TestFiles.PathTo(Path.Combine("soundfont", "sf-LICENSE.txt")),
+                File.Copy(TestFiles.PathTo("MidMix", Path.Combine("soundfont", "sf-LICENSE.txt")),
                     Path.Combine(sfDir.Path, "sf-LICENSE.txt"));
                 Directory.SetCurrentDirectory(sfDir.Path);
                 VmMidMix.Init();
@@ -36,7 +36,7 @@ namespace VisualMusic.Tests
                 {
                     Assert.True(VmMidMix.SfLoaded(), "expected soundfont to load");
 
-                    string midi = TestFiles.PathTo("minimal.mid");
+                    string midi = TestFiles.PathTo("midiLib", "minimal.mid");
                     string wavOut = Path.Combine(sfDir.Path, "mix.wav");
                     VmMidMix.Mixdown(midi, wavOut);
                     Assert.True(File.Exists(wavOut));

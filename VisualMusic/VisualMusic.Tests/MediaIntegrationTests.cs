@@ -12,7 +12,7 @@ namespace VisualMusic.Tests
         public void Playback_lifecycle()
         {
             TestFiles.EnsureNativeLoaded("media.dll");
-            string wav = TestFiles.PathTo("silence.wav");
+            string wav = TestFiles.PathTo("Media", "silence.wav");
             Assert.True(VmMedia.InitMF());
             try
             {

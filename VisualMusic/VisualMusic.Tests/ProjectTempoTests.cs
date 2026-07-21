@@ -13,7 +13,7 @@ namespace VisualMusic.Tests
             try
             {
                 var song = new Song();
-                song.OpenMidiFile(TestFiles.PathTo("minimal.mid"));
+                song.OpenMidiFile(TestFiles.PathTo("midiLib", "minimal.mid"));
 
                 var project = new Project();
                 project.TrackViews = new System.Collections.Generic.List<TrackView>();

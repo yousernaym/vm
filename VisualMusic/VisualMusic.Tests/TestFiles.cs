@@ -7,16 +7,17 @@ namespace VisualMusic.Tests
     static class TestFiles
     {
         /// <summary>
-        /// Resolves a fixture under the test assembly's copied <c>test-files/</c> tree
-        /// (see Content items in the test csproj).
+        /// Resolves a fixture under the test assembly's copied <c>test-files/&lt;owner&gt;/</c>
+        /// tree (see None items in the test csproj). <paramref name="owner"/> is the
+        /// submodule namespace (<c>midiLib</c>, <c>Media</c>, <c>MidMix</c>, <c>libRemuxer</c>).
         /// </summary>
-        public static string PathTo(string relative)
+        public static string PathTo(string owner, string relative)
         {
-            string candidate = Path.Combine(AppContext.BaseDirectory, "test-files", relative);
+            string candidate = Path.Combine(AppContext.BaseDirectory, "test-files", owner, relative);
             if (!File.Exists(candidate))
             {
                 throw new FileNotFoundException(
-                    "Could not locate test fixture '" + relative + "' under " +
+                    "Could not locate test fixture '" + owner + "/" + relative + "' under " +
                     Path.Combine(AppContext.BaseDirectory, "test-files") + ".");
             }
             return candidate;
