@@ -15,31 +15,29 @@ namespace VisualMusic.Tests
         {
             TestFiles.EnsureNativeLoaded("MidMix.dll");
             string originalCwd = Directory.GetCurrentDirectory();
-            string emptyDir = Path.Combine(Path.GetTempPath(), "vm_midmix_empty_" + Guid.NewGuid().ToString("N"));
-            string sfDir = Path.Combine(Path.GetTempPath(), "vm_midmix_sf_" + Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(emptyDir);
-            Directory.CreateDirectory(sfDir);
+            using var emptyDir = TestFiles.TempPath.Directory("vm_midmix_empty_");
+            using var sfDir = TestFiles.TempPath.Directory("vm_midmix_sf_");
             try
             {
                 // 1) No soundfont
-                Directory.SetCurrentDirectory(emptyDir);
+                Directory.SetCurrentDirectory(emptyDir.Path);
                 VmMidMix.Init();
                 Assert.False(VmMidMix.SfLoaded(), "expected no soundfont in empty cwd");
                 VmMidMix.Close();
 
                 // 2) With tiny.sf2 as soundfont.sf2
                 File.Copy(TestFiles.PathTo(Path.Combine("soundfont", "tiny.sf2")),
-                    Path.Combine(sfDir, "soundfont.sf2"));
+                    Path.Combine(sfDir.Path, "soundfont.sf2"));
                 File.Copy(TestFiles.PathTo(Path.Combine("soundfont", "sf-LICENSE.txt")),
-                    Path.Combine(sfDir, "sf-LICENSE.txt"));
-                Directory.SetCurrentDirectory(sfDir);
+                    Path.Combine(sfDir.Path, "sf-LICENSE.txt"));
+                Directory.SetCurrentDirectory(sfDir.Path);
                 VmMidMix.Init();
                 try
                 {
                     Assert.True(VmMidMix.SfLoaded(), "expected soundfont to load");
 
                     string midi = TestFiles.PathTo("minimal.mid");
-                    string wavOut = Path.Combine(sfDir, "mix.wav");
+                    string wavOut = Path.Combine(sfDir.Path, "mix.wav");
                     VmMidMix.Mixdown(midi, wavOut);
                     Assert.True(File.Exists(wavOut));
                     Assert.True(new FileInfo(wavOut).Length > 44);
@@ -57,8 +55,6 @@ namespace VisualMusic.Tests
             finally
             {
                 Directory.SetCurrentDirectory(originalCwd);
-                try { Directory.Delete(emptyDir, true); } catch { }
-                try { Directory.Delete(sfDir, true); } catch { }
             }
         }
     }

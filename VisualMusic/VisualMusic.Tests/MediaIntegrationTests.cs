@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Xunit;
 using VmMedia = VisualMusic.Media;
@@ -44,13 +43,13 @@ namespace VisualMusic.Tests
         public void Encode_smoke_writes_mkv()
         {
             TestFiles.EnsureNativeLoaded("media.dll");
-            string outPath = Path.Combine(Path.GetTempPath(), "vm_enc_" + Guid.NewGuid().ToString("N") + ".mkv");
+            using var outFile = TestFiles.TempPath.File("vm_enc_", ".mkv");
             Assert.True(VmMedia.InitMF());
             try
             {
                 var fmt = new VideoFormat(64, 64, 10f);
                 Assert.True(VmMedia.BeginVideoEnc(
-                    outPath,
+                    outFile.Path,
                     audioFile: null,
                     fmt,
                     audioOffsetSeconds: 0,
@@ -71,13 +70,12 @@ namespace VisualMusic.Tests
                     VmMedia.EndVideoEnc();
                 }
 
-                Assert.True(File.Exists(outPath));
-                Assert.True(new FileInfo(outPath).Length > 0);
+                Assert.True(File.Exists(outFile.Path));
+                Assert.True(new FileInfo(outFile.Path).Length > 0);
             }
             finally
             {
                 VmMedia.CloseMF();
-                try { File.Delete(outPath); } catch { }
             }
         }
     }
