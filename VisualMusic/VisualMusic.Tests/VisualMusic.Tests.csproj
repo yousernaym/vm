@@ -10,6 +10,9 @@
     <RootNamespace>VisualMusic.Tests</RootNamespace>
   </PropertyGroup>
 
+  <!-- Shared native-runtime paths (vcpkg_installed + x64\<Config>\); see NativePaths.props. -->
+  <Import Project="..\..\NativePaths.props" />
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
@@ -41,32 +44,15 @@
 
   <Target Name="CopyNativeRuntimeForIntegration" AfterTargets="Build">
     <PropertyGroup>
-      <_RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\'))</_RepoRoot>
-      <_SlnNativeOut>$(_RepoRoot)x64\$(Configuration)\</_SlnNativeOut>
-      <_MediaApplocal>$(_RepoRoot)Dependencies\Media\Media\x64\$(Configuration)\</_MediaApplocal>
-      <_MidMixApplocal>$(_RepoRoot)Dependencies\MidMix\MidMix\x64\$(Configuration)\</_MidMixApplocal>
-      <!-- Manifest install trees — reliable when vcpkg applocal skipped/failed or IncrementalClean removed deps. -->
-      <_MediaVcpkgRoot>$(_RepoRoot)Dependencies\Media\vcpkg_installed\x64-windows\x64-windows\</_MediaVcpkgRoot>
-      <_MidMixVcpkgRoot>$(_RepoRoot)Dependencies\MidMix\vcpkg_installed\x64-windows\x64-windows\</_MidMixVcpkgRoot>
-      <_MediaVcpkgBin Condition="'$(Configuration)'=='Debug'">$(_MediaVcpkgRoot)debug\bin\</_MediaVcpkgBin>
-      <_MediaVcpkgBin Condition="'$(Configuration)'!='Debug'">$(_MediaVcpkgRoot)bin\</_MediaVcpkgBin>
-      <_MidMixVcpkgBin Condition="'$(Configuration)'=='Debug'">$(_MidMixVcpkgRoot)debug\bin\</_MidMixVcpkgBin>
-      <_MidMixVcpkgBin Condition="'$(Configuration)'!='Debug'">$(_MidMixVcpkgRoot)bin\</_MidMixVcpkgBin>
       <_HasSlnNatives Condition="Exists('$(_SlnNativeOut)media.dll') and Exists('$(_SlnNativeOut)MidMix.dll')">true</_HasSlnNatives>
     </PropertyGroup>
 
-    <!-- vcpkg_installed first; applocal / solution outputs override with fresher builds. -->
+    <!-- Third-party FFmpeg/Fluidsynth DLLs from the canonical vcpkg_installed trees. -->
     <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MediaVcpkgBin)')">
       <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" />
     </ItemGroup>
     <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MidMixVcpkgBin)')">
       <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MediaApplocal)')">
-      <_NativeDlls Include="$(_MediaApplocal)*.dll" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MidMixApplocal)')">
-      <_NativeDlls Include="$(_MidMixApplocal)*.dll" />
     </ItemGroup>
     <!-- Solution outputs last so freshly built media.dll / MidMix.dll win. -->
     <ItemGroup Condition="'$(_HasSlnNatives)'=='true'">
@@ -102,7 +88,7 @@
     </PropertyGroup>
 
     <Error Condition="'$(_HasSlnNatives)'=='true' and '$(_MissingNative)'!=''"
-           Text="VisualMusic.Tests native runtime incomplete in $(TargetDir): missing $(_MissingNative). Build VisualMusic.sln Debug|Any CPU (or matching Configuration) so media.dll, MidMix.dll, and FFmpeg/Fluidsynth applocal DLLs are available under x64\$(Configuration)\ and Dependencies\Media\Media\x64\$(Configuration)\ / Dependencies\MidMix\MidMix\x64\$(Configuration)\." />
+           Text="VisualMusic.Tests native runtime incomplete in $(TargetDir): missing $(_MissingNative). Build VisualMusic.sln Debug|Any CPU (or matching Configuration) so media.dll and MidMix.dll are under x64\$(Configuration)\ and FFmpeg/Fluidsynth DLLs are restored under Dependencies\Media\vcpkg_installed\ / Dependencies\MidMix\vcpkg_installed\." />
 
     <Message Importance="high"
              Condition="'$(_HasSlnNatives)'!='true'"

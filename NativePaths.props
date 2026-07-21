@@ -1,0 +1,25 @@
+<Project>
+  <!--
+    Shared native-runtime paths, imported by VisualMusic.csproj (CopyNativeOutputs) and
+    VisualMusic.Tests.csproj (CopyNativeRuntimeForIntegration) so the vcpkg_installed layout
+    is defined in exactly one place.
+
+    vcpkg_installed is the canonical source for the third-party FFmpeg/Fluidsynth DLLs: it is
+    always complete and, unlike the C++ applocal outputs under x64\<Config>\, is never pruned by
+    MSBuild IncrementalClean. First-party media.dll / MidMix.dll still come from the solution's
+    x64\<Config>\ build output.
+
+    _RepoRoot resolves to this file's directory (the repo root) regardless of which project imports
+    it, so the paths are identical from both the app and the test project.
+  -->
+  <PropertyGroup>
+    <_RepoRoot>$(MSBuildThisFileDirectory)</_RepoRoot>
+    <_SlnNativeOut>$(_RepoRoot)x64\$(Configuration)\</_SlnNativeOut>
+    <_MediaVcpkgRoot>$(_RepoRoot)Dependencies\Media\vcpkg_installed\x64-windows\x64-windows\</_MediaVcpkgRoot>
+    <_MidMixVcpkgRoot>$(_RepoRoot)Dependencies\MidMix\vcpkg_installed\x64-windows\x64-windows\</_MidMixVcpkgRoot>
+    <_MediaVcpkgBin Condition="'$(Configuration)'=='Debug'">$(_MediaVcpkgRoot)debug\bin\</_MediaVcpkgBin>
+    <_MediaVcpkgBin Condition="'$(Configuration)'!='Debug'">$(_MediaVcpkgRoot)bin\</_MediaVcpkgBin>
+    <_MidMixVcpkgBin Condition="'$(Configuration)'=='Debug'">$(_MidMixVcpkgRoot)debug\bin\</_MidMixVcpkgBin>
+    <_MidMixVcpkgBin Condition="'$(Configuration)'!='Debug'">$(_MidMixVcpkgRoot)bin\</_MidMixVcpkgBin>
+  </PropertyGroup>
+</Project>

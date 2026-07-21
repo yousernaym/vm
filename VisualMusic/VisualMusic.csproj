@@ -15,6 +15,8 @@
     <NoWarn>$(NoWarn);CA1416</NoWarn>
     <SupportedOSPlatformVersion>10.0.26100.0</SupportedOSPlatformVersion>
   </PropertyGroup>
+  <!-- Shared native-runtime paths (vcpkg_installed + x64\<Config>\); see NativePaths.props. -->
+  <Import Project="..\NativePaths.props" />
   <!-- Keep the sibling test project out of this app's compile glob. -->
   <ItemGroup>
     <Compile Remove="VisualMusic.Tests\**" />
@@ -82,19 +84,11 @@
   <Target Name="CopyNativeOutputs" AfterTargets="Build"
           Condition="'$(DesignTimeBuild)' != 'true' and '$(SkipVisualMusicNativeCopy)' != 'true'">
     <PropertyGroup>
-      <_RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\'))</_RepoRoot>
       <_RemuxerBin>$(_RepoRoot)Dependencies\Remuxer\Remuxer\bin\$(Configuration)\</_RemuxerBin>
-      <_SlnNativeOut>$(_RepoRoot)x64\$(Configuration)\</_SlnNativeOut>
-      <!-- Fallback when vcpkg applocal left FFmpeg/Fluidsynth out of x64\<Config>\ (IncrementalClean / pwsh). -->
-      <_MediaVcpkgRoot>$(_RepoRoot)Dependencies\Media\vcpkg_installed\x64-windows\x64-windows\</_MediaVcpkgRoot>
-      <_MidMixVcpkgRoot>$(_RepoRoot)Dependencies\MidMix\vcpkg_installed\x64-windows\x64-windows\</_MidMixVcpkgRoot>
-      <_MediaVcpkgBin Condition="'$(Configuration)'=='Debug'">$(_MediaVcpkgRoot)debug\bin\</_MediaVcpkgBin>
-      <_MediaVcpkgBin Condition="'$(Configuration)'!='Debug'">$(_MediaVcpkgRoot)bin\</_MediaVcpkgBin>
-      <_MidMixVcpkgBin Condition="'$(Configuration)'=='Debug'">$(_MidMixVcpkgRoot)debug\bin\</_MidMixVcpkgBin>
-      <_MidMixVcpkgBin Condition="'$(Configuration)'!='Debug'">$(_MidMixVcpkgRoot)bin\</_MidMixVcpkgBin>
     </PropertyGroup>
     <ItemGroup>
       <_RemuxerFiles Include="$(_RemuxerBin)**\*" />
+      <!-- Third-party FFmpeg/Fluidsynth DLLs from vcpkg_installed; media.dll / MidMix.dll from the build output. -->
       <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" Condition="Exists('$(_MediaVcpkgBin)')" />
       <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" Condition="Exists('$(_MidMixVcpkgBin)')" />
       <_NativeDlls Include="$(_SlnNativeOut)*.dll" />
