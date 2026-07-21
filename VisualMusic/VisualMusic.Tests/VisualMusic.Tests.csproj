@@ -45,9 +45,23 @@
       <_SlnNativeOut>$(_RepoRoot)x64\$(Configuration)\</_SlnNativeOut>
       <_MediaApplocal>$(_RepoRoot)Dependencies\Media\Media\x64\$(Configuration)\</_MediaApplocal>
       <_MidMixApplocal>$(_RepoRoot)Dependencies\MidMix\MidMix\x64\$(Configuration)\</_MidMixApplocal>
+      <!-- Manifest install trees — reliable when vcpkg applocal skipped/failed or IncrementalClean removed deps. -->
+      <_MediaVcpkgRoot>$(_RepoRoot)Dependencies\Media\vcpkg_installed\x64-windows\x64-windows\</_MediaVcpkgRoot>
+      <_MidMixVcpkgRoot>$(_RepoRoot)Dependencies\MidMix\vcpkg_installed\x64-windows\x64-windows\</_MidMixVcpkgRoot>
+      <_MediaVcpkgBin Condition="'$(Configuration)'=='Debug'">$(_MediaVcpkgRoot)debug\bin\</_MediaVcpkgBin>
+      <_MediaVcpkgBin Condition="'$(Configuration)'!='Debug'">$(_MediaVcpkgRoot)bin\</_MediaVcpkgBin>
+      <_MidMixVcpkgBin Condition="'$(Configuration)'=='Debug'">$(_MidMixVcpkgRoot)debug\bin\</_MidMixVcpkgBin>
+      <_MidMixVcpkgBin Condition="'$(Configuration)'!='Debug'">$(_MidMixVcpkgRoot)bin\</_MidMixVcpkgBin>
       <_HasSlnNatives Condition="Exists('$(_SlnNativeOut)media.dll') and Exists('$(_SlnNativeOut)MidMix.dll')">true</_HasSlnNatives>
     </PropertyGroup>
 
+    <!-- vcpkg_installed first; applocal / solution outputs override with fresher builds. -->
+    <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MediaVcpkgBin)')">
+      <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MidMixVcpkgBin)')">
+      <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" />
+    </ItemGroup>
     <ItemGroup Condition="'$(_HasSlnNatives)'=='true' and Exists('$(_MediaApplocal)')">
       <_NativeDlls Include="$(_MediaApplocal)*.dll" />
     </ItemGroup>
