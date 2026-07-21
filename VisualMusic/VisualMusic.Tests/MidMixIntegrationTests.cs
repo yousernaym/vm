@@ -20,8 +20,14 @@ namespace VisualMusic.Tests
             // 1) Missing soundfont — pass an absolute path that does not exist (no cwd mutation)
             string missingSf = Path.Combine(emptyDir.Path, Program.SoundFontFileName);
             VmMidMix.Init(missingSf);
-            Assert.False(VmMidMix.SfLoaded(), "expected no soundfont when path is missing");
-            VmMidMix.Close();
+            try
+            {
+                Assert.False(VmMidMix.SfLoaded(), "expected no soundfont when path is missing");
+            }
+            finally
+            {
+                VmMidMix.Close();
+            }
 
             // 2) With tiny.sf2 at an absolute path
             string sfPath = Path.Combine(sfDir.Path, Program.SoundFontFileName);
