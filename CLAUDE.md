@@ -41,8 +41,8 @@ Full prerequisites and the exact vcpkg steps are in [README.md](README.md). In s
   vcpkg **manifest mode**: Media and MidMix each ship a `vcpkg.json` (pinning versions with a
   `builtin-baseline`), and the first x64 build installs them into a local `vcpkg_installed/` per submodule.
 - Clone with `--recurse-submodules` — the `Dependencies/*` repos must be present or the solution won't load.
-- Build `VisualMusic.sln` (Debug/Release). Use the **x64** solution platform: the native DLLs
-  are 64-bit, so the app must run 64-bit. The first build auto-runs `dotnet tool restore` (the MonoGame
+- Build `VisualMusic.sln` (Debug/Release). Use the **Any CPU** solution platform (the only one);
+  C++ projects still build as x64 under the hood. The first build auto-runs `dotnet tool restore` (the MonoGame
   content-builder tool, pinned in [VisualMusic/.config/dotnet-tools.json](VisualMusic/.config/dotnet-tools.json)).
 
 ### Building from the command line (agents: read this)
@@ -55,52 +55,50 @@ VS, at a fixed path) and call it by full path. From the repo root (`d:\dev\vm`),
 ```powershell
 $msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
     -latest -prerelease -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe"
-& $msbuild d:\dev\vm\VisualMusic.sln /p:Configuration=Debug /p:Platform=x64 /m /nologo
+& $msbuild d:\dev\vm\VisualMusic.sln /p:Configuration=Debug /p:Platform="Any CPU" /m /nologo
 ```
 
 Notes:
 - **Pass the full path to the `.sln`.** The agent PowerShell shell does **not** reliably start in the repo
   root, so a bare `VisualMusic.sln` fails with `MSB1009: Project file does not exist`. Use the absolute
   path `d:\dev\vm\VisualMusic.sln` (the Bash tool, by contrast, does persist its cwd at the repo root).
-- The platform **must** be `x64` (not `Any CPU` / `Win32`); the native DLLs are 64-bit.
+- The solution platform is **`Any CPU`** (the only supported solution platform). That still builds the C++
+  projects as **x64** (via sln project mappings); native DLLs land in repo-root `x64\<Config>\`.
 - Use `/p:Configuration=Release` for a release build. `/m` enables parallel builds; `/t:Rebuild` forces a
   clean rebuild.
 - On this dev machine MSBuild also happens to be on `PATH` (a VS Developer shell), so a bare
-  `msbuild VisualMusic.sln /p:Platform=x64` may work too — but the `vswhere` form above is the reliable one
+  `msbuild VisualMusic.sln /p:Platform="Any CPU"` may work too — but the `vswhere` form above is the reliable one
   for agents and fresh shells.
 - First build only: if you hit a missing-tool error, run `dotnet tool restore` in [VisualMusic/](VisualMusic/) first.
 - **Reading the output:** a successful build is ~126 KB and noisy with *pre-existing, benign* warnings
   (MVVMTK0034 "should not be directly referenced", SYSLIB0003, CS0618, CS0168) plus a transient
   `VisualMusic_<hash>_wpftmp.csproj` (WPF's markup-compile pass — not an error). To find real failures
   grep for `": error "` and exclude `aka.ms` / `/errors/` (those substrings appear in warning help-links
-  and cause false positives). Success indicators: `VM.dll ->` is emitted and the post-build `File(s) copied`
-  lines run.
+  and cause false positives). Success indicators: `VM.dll ->` is emitted and the post-build native/remuxer
+  copy target runs without errors.
 
 ### Where the app output lands (sln vs csproj — easy to get wrong)
 
-The `.sln` maps the VisualMusic *project* to different project platforms per configuration, so the app's
-output folder depends on how you build:
+- `VisualMusic.sln` with `/p:Configuration=<Config> /p:Platform="Any CPU"`: the app is **Any CPU**, so the
+  runnable output is always
+  `VisualMusic\bin\<Config>\net10.0-windows10.0.26100.0\` — **no `x64\` segment**. (The C# assembly is
+  platform-agnostic; the native DLLs copied in are still x64 from `x64\<Config>\`.)
+- Building `VisualMusic.csproj` directly: **don't** for a runnable app. The `CopyNativeOutputs` target
+  requires `x64\<Config>\media.dll` / `MidMix.dll` and a packaged Remuxer bin (with `libRemuxer.dll`);
+  without a prior solution build it fails with a clear error. `VisualMusic.Tests` passes
+  `SkipVisualMusicNativeCopy=true` so unit tests can build the managed assembly alone. Always build the `.sln`
+  for a complete `VM.exe`.
 
-- `VisualMusic.sln` with `/p:Configuration=Debug /p:Platform=x64` (the normal build): the sln maps the
-  app project to **Any CPU**, so the runnable output is
-  `VisualMusic\bin\Debug\net10.0-windows10.0.26100.0\` — **no `x64\` segment**. (The C# assembly is
-  platform-agnostic; the native DLLs xcopied in are still x64.)
-- `VisualMusic.sln` with `/p:Configuration=Release /p:Platform=x64`: the sln maps Release|x64 to **x64**,
-  so the output is `VisualMusic\bin\x64\Release\net10.0-windows10.0.26100.0\` (asymmetric with Debug).
-- Building `VisualMusic.csproj` directly: **don't.** `$(SolutionDir)` is undefined outside the solution,
-  so after compiling, the post-build xcopy of native DLLs + remuxer fails with `MSB3073`, and the output
-  goes to yet another folder (`bin\x64\Debug\...`) that lacks the native DLLs. Always build the `.sln`.
-
-Stale copies of `VM.exe`/`VM.dll` can linger in the folders you are *not* building to (e.g.
-`bin\x64\Debug\` from an old direct-csproj build). To confirm where a build landed, read the
+Stale copies of `VM.exe`/`VM.dll` can linger in old folders (e.g. `bin\x64\Debug\` from a former project-x64
+config). To confirm where a build landed, read the
 `VM.dll -> <path>` line in the build log, or find the newest binary:
 `Get-ChildItem d:\dev\vm\VisualMusic\bin -Recurse -Filter VM.exe | Sort-Object LastWriteTime -Descending`
 
 How the pieces reach the app output (this part trips people up — it's spread across several project files):
 
 1. The C++ projects (Media, MidMix, libRemuxer + its vendored libs) build into the repo-root `x64\<Config>\`
-   (their `OutDir` is `$(SolutionDir)$(Platform)\$(Configuration)\`).
-2. VisualMusic's post-build (in `VisualMusic.csproj`) `xcopy`s `x64\<Config>\*.dll` into the app output, and
+   (project platform is x64 even when the solution platform is Any CPU).
+2. VisualMusic's `CopyNativeOutputs` target copies `x64\<Config>\*.dll` into the app output, and
    copies the entire Remuxer build into `<app output>\remuxer\`.
 3. MonoGame `.fx`/content is copied via the `Content\` items in `VisualMusic.csproj`.
 
@@ -120,4 +118,4 @@ Essential automated tests live in each first-party repo (xUnit for C#, GoogleTes
 Fixtures live in the deepest owning submodule (`midiLib/test-files/`, `Remuxer/libRemuxer/test-files/`,
 `Media/test-files/`, `MidMix/test-files/`); test projects copy them into output `test-files/`. MonoGame is
 not covered. Full commands are in [AGENTS.md](AGENTS.md) (unit with `Category!=Integration` / GoogleTest /
-Integration after `VisualMusic.sln` Debug|x64).
+Integration after `VisualMusic.sln` Debug|Any CPU).

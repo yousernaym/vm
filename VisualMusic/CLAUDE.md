@@ -31,17 +31,15 @@ Key characteristics:
 Build `VisualMusic.sln` (in the repo root) via Visual Studio 2026 or:
 
 ```bash
-msbuild VisualMusic.sln /p:Configuration=Release /p:Platform=x64
+msbuild VisualMusic.sln /p:Configuration=Release /p:Platform="Any CPU"
 ```
 
-**Output locations** (they differ by configuration — the sln maps the app project to `Any CPU` for
-Debug|x64 but to `x64` for Release|x64; details in the root [CLAUDE.md](../CLAUDE.md) build section):
-- Debug (sln x64 build): `VisualMusic/bin/Debug/net10.0-windows10.0.26100.0/` — no `x64/` segment
-- Release (sln x64 build): `VisualMusic/bin/x64/Release/net10.0-windows10.0.26100.0/`
+**Output location** (details in the root [CLAUDE.md](../CLAUDE.md) build section):
+- `VisualMusic/bin/<Config>/net10.0-windows10.0.26100.0/` — no `x64/` segment (app is Any CPU; natives copied from repo-root `x64/<Config>/`)
 - Assembly name: `VM.exe`
-- Post-build copies native DLLs and Remuxer binaries to the output folder — **solution builds only**:
-  building `VisualMusic.csproj` directly leaves `$(SolutionDir)` undefined, so the copy fails (MSB3073)
-  and its output (`bin/x64/Debug/...`) lacks the native DLLs. Always build the `.sln`.
+- Post-build `CopyNativeOutputs` packages native DLLs and Remuxer into the output folder. Building
+  `VisualMusic.csproj` alone fails that target unless natives already exist under `x64\<Config>\` (or
+  `SkipVisualMusicNativeCopy=true` for unit tests). Always build the `.sln` for a runnable app.
 
 ### Running
 
@@ -196,4 +194,4 @@ From `todo.txt`:
 `VisualMusic.Tests` (xUnit) covers import formats, undo, keyframes, download helpers, HVSC lookup,
 remuxer stdout regexes, Project tempo math, and Media/MidMix P/Invoke Integration smokes.
 Use `--filter "Category!=Integration"` for unit-only runs; Integration needs a prior `VisualMusic.sln`
-x64 build. See [AGENTS.md](AGENTS.md) and the root [AGENTS.md](../AGENTS.md).
+Any CPU build. See [AGENTS.md](AGENTS.md) and the root [AGENTS.md](../AGENTS.md).

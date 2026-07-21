@@ -20,7 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VisualMusic.csproj" />
+    <!-- Unit tests only need the managed app assembly; skip native/remuxer packaging. -->
+    <ProjectReference Include="..\VisualMusic.csproj">
+      <AdditionalProperties>SkipVisualMusicNativeCopy=true</AdditionalProperties>
+    </ProjectReference>
   </ItemGroup>
 
   <!-- Fixtures live in owning submodules; flatten into output test-files/ (PreserveNewest). -->
@@ -32,8 +35,8 @@
   </ItemGroup>
 
   <!--
-    After a VisualMusic.sln x64 build, make $(TargetDir) a complete native runtime dir for
-    Media/MidMix Integration tests. Unit-only builds (no x64\<Config>\ natives) skip cleanly.
+    After a VisualMusic.sln Any CPU build (natives still under x64\<Config>\), make $(TargetDir)
+    a complete native runtime dir for Media/MidMix Integration tests. Unit-only builds skip cleanly.
   -->
 
   <Target Name="CopyNativeRuntimeForIntegration" AfterTargets="Build">
@@ -85,11 +88,11 @@
     </PropertyGroup>
 
     <Error Condition="'$(_HasSlnNatives)'=='true' and '$(_MissingNative)'!=''"
-           Text="VisualMusic.Tests native runtime incomplete in $(TargetDir): missing $(_MissingNative). Build VisualMusic.sln Debug|x64 (or matching Configuration) so media.dll, MidMix.dll, and FFmpeg/Fluidsynth applocal DLLs are available under x64\$(Configuration)\ and Dependencies\Media\Media\x64\$(Configuration)\ / Dependencies\MidMix\MidMix\x64\$(Configuration)\." />
+           Text="VisualMusic.Tests native runtime incomplete in $(TargetDir): missing $(_MissingNative). Build VisualMusic.sln Debug|Any CPU (or matching Configuration) so media.dll, MidMix.dll, and FFmpeg/Fluidsynth applocal DLLs are available under x64\$(Configuration)\ and Dependencies\Media\Media\x64\$(Configuration)\ / Dependencies\MidMix\MidMix\x64\$(Configuration)\." />
 
     <Message Importance="high"
              Condition="'$(_HasSlnNatives)'!='true'"
-             Text="VisualMusic.Tests: skipped native runtime copy (no $(_SlnNativeOut)media.dll + MidMix.dll). Unit tests are fine; Integration tests need a prior VisualMusic.sln x64 build." />
+             Text="VisualMusic.Tests: skipped native runtime copy (no $(_SlnNativeOut)media.dll + MidMix.dll). Unit tests are fine; Integration tests need a prior VisualMusic.sln Any CPU build." />
   </Target>
 
 </Project>

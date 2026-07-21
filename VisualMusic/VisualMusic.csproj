@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <StartupObject>VisualMusic.App</StartupObject>
-    <Platforms>AnyCPU;x64</Platforms>
+    <Platforms>AnyCPU</Platforms>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
@@ -74,10 +74,32 @@
     <ProjectReference Include="..\Dependencies\midilib\midilib.csproj" />
     <ProjectReference Include="..\Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj" />
   </ItemGroup>
-  <!-- SolutionDir is empty / "*Undefined*" when the csproj is built outside VisualMusic.sln
-       (e.g. VisualMusic.Tests via `dotnet test`). Skip native/remuxer copy in that case. -->
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SolutionDir)' != '' and '$(SolutionDir)' != '*Undefined*'">
-    <Exec Command="xcopy &quot;$(SolutionDir)Dependencies\Remuxer\Remuxer\bin\$(ConfigurationName)\&quot; &quot;$(TargetDir)Remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /Y /D&#xD;&#xA;&#xD;&#xA;" />
+  <!--
+    Package remuxer + native DLLs next to VM.exe. Paths are relative to this project (no SolutionDir).
+    Soft-skip only when VisualMusic.Tests builds this project without natives
+    (SkipVisualMusicNativeCopy=true via AdditionalProperties).
+  -->
+  <Target Name="CopyNativeOutputs" AfterTargets="Build"
+          Condition="'$(DesignTimeBuild)' != 'true' and '$(SkipVisualMusicNativeCopy)' != 'true'">
+    <PropertyGroup>
+      <_RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\'))</_RepoRoot>
+      <_RemuxerBin>$(_RepoRoot)Dependencies\Remuxer\Remuxer\bin\$(Configuration)\</_RemuxerBin>
+      <_SlnNativeOut>$(_RepoRoot)x64\$(Configuration)\</_SlnNativeOut>
+    </PropertyGroup>
+    <ItemGroup>
+      <_RemuxerFiles Include="$(_RemuxerBin)**\*" />
+      <_NativeDlls Include="$(_SlnNativeOut)*.dll" />
+    </ItemGroup>
+    <Error Text="Remuxer output not found at '$(_RemuxerBin)'. Build VisualMusic.sln (Any CPU) so Remuxer packages natives, or set SkipVisualMusicNativeCopy=true for managed-only unit builds."
+           Condition="!Exists('$(_RemuxerBin)Remuxer.exe')" />
+    <Error Text="libRemuxer.dll missing from '$(_RemuxerBin)'. Build libRemuxer (x64|$(Configuration)) then Remuxer so natives are packaged beside Remuxer.exe."
+           Condition="Exists('$(_RemuxerBin)Remuxer.exe') and !Exists('$(_RemuxerBin)libRemuxer.dll')" />
+    <Error Text="Native DLLs not found at '$(_SlnNativeOut)' (need media.dll and MidMix.dll). Build VisualMusic.sln (Any CPU) first, or set SkipVisualMusicNativeCopy=true for managed-only unit builds."
+           Condition="!Exists('$(_SlnNativeOut)media.dll') or !Exists('$(_SlnNativeOut)MidMix.dll')" />
+    <Copy SourceFiles="@(_RemuxerFiles)"
+          DestinationFiles="@(_RemuxerFiles->'$(TargetDir)Remuxer\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_NativeDlls)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" />
   </Target>
   <Target Name="BuildMonoGameContent" BeforeTargets="BeforeBuild" Condition="'$(MSBuildProjectFile)' == 'VisualMusic.csproj' and '$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Content\Content.mgcb')">
     <Exec WorkingDirectory="$(MSBuildProjectDirectory)\Content" Command="dotnet tool run mgcb -- /@:Content.mgcb /platform:Windows" />
