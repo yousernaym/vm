@@ -39,7 +39,7 @@ Full prerequisites and the exact vcpkg steps are in [README.md](README.md). In s
   Spectre-mitigated MSVC v143 x64/x86 libs).
 - vcpkg with `vcpkg integrate install`. Fluidsynth and `ffmpeg[x264]` are restored automatically via
   vcpkg **manifest mode**: Media and MidMix each ship a `vcpkg.json` (pinning versions with a
-  `builtin-baseline`), and the first x64 build installs them into a local `vcpkg_installed/` per submodule.
+  `builtin-baseline`), and the first solution build installs them into a local `vcpkg_installed/` per submodule.
 - Clone with `--recurse-submodules` — the `Dependencies/*` repos must be present or the solution won't load.
 - Build `VisualMusic.sln` (Debug/Release). Use the **Any CPU** solution platform (the only one);
   C++ projects still build as x64 under the hood. The first build auto-runs `dotnet tool restore` (the MonoGame
