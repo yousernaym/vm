@@ -66,29 +66,10 @@
     <Copy SourceFiles="@(_NativeDlls)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
           Condition="'$(_HasSlnNatives)'=='true' and '@(_NativeDlls)'!=''" />
 
+    <!-- First-party names only; third-party FFmpeg/Fluidsynth set is whatever vcpkg_installed shipped (same as CopyNativeOutputs). -->
     <PropertyGroup Condition="'$(_HasSlnNatives)'=='true'">
       <_MissingNative Condition="!Exists('$(TargetDir)media.dll')">media.dll</_MissingNative>
       <_MissingNative Condition="'$(_MissingNative)'=='' and !Exists('$(TargetDir)MidMix.dll')">MidMix.dll</_MissingNative>
-    </PropertyGroup>
-
-    <!-- Glob checks for versioned dependency DLLs -->
-    <ItemGroup Condition="'$(_HasSlnNatives)'=='true'">
-      <_FluidsynthDll Include="$(TargetDir)libfluidsynth-*.dll" />
-      <_AvcodecDll Include="$(TargetDir)avcodec-*.dll" />
-      <_AvformatDll Include="$(TargetDir)avformat-*.dll" />
-      <_AvutilDll Include="$(TargetDir)avutil-*.dll" />
-      <_SwscaleDll Include="$(TargetDir)swscale-*.dll" />
-      <_SwresampleDll Include="$(TargetDir)swresample-*.dll" />
-      <_Libx264Dll Include="$(TargetDir)libx264-*.dll" />
-    </ItemGroup>
-    <PropertyGroup Condition="'$(_HasSlnNatives)'=='true'">
-      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_FluidsynthDll)'==''">libfluidsynth-*.dll</_MissingNative>
-      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_AvcodecDll)'==''">avcodec-*.dll</_MissingNative>
-      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_AvformatDll)'==''">avformat-*.dll</_MissingNative>
-      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_AvutilDll)'==''">avutil-*.dll</_MissingNative>
-      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_SwscaleDll)'==''">swscale-*.dll</_MissingNative>
-      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_SwresampleDll)'==''">swresample-*.dll</_MissingNative>
-      <_MissingNative Condition="'$(_MissingNative)'=='' and '@(_Libx264Dll)'==''">libx264-*.dll</_MissingNative>
     </PropertyGroup>
 
     <Error Condition="'$(_HasSlnNatives)'=='true' and '$(_MissingNative)'!=''"
