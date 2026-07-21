@@ -5,7 +5,7 @@ namespace VisualMusic
     static class MidMix
     {
         [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "init")]
-        public static extern void Init();
+        public static extern void Init(string soundfontPath);
         [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "mixdown")]
         public static extern void Mixdown(string midiPath, string mixdownPath);
         [DllImport("MidMix.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "sfLoaded")]
