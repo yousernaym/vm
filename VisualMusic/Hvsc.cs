@@ -50,12 +50,7 @@ namespace VisualMusic
         {
             if (dbPath == null || !File.Exists(dbPath)) return null;
 
-            string hash;
-            using (var stream = File.OpenRead(sidPath))
-            {
-                byte[] bytes = MD5.HashData(stream);
-                hash = BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
-            }
+            string hash = ComputeMd5Hex(sidPath);
 
             using var reader = new StreamReader(dbPath);
             while (!reader.EndOfStream)
@@ -164,6 +159,16 @@ namespace VisualMusic
         }
 
         // ---- Internal helpers ----
+
+        /// <summary>
+        /// MD5 of the file at <paramref name="path"/> as a lowercase hex string (no dashes).
+        /// </summary>
+        internal static string ComputeMd5Hex(string path)
+        {
+            using var stream = File.OpenRead(path);
+            byte[] bytes = MD5.HashData(stream);
+            return BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
+        }
 
         /// <summary>
         /// Finds whichever local DB file exists: the canonical name first, then the
