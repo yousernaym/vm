@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Xunit;
 using VmMedia = VisualMusic.Media;
 
@@ -9,20 +8,11 @@ namespace VisualMusic.Tests
     [Collection("MediaSequential")]
     public class MediaIntegrationTests
     {
-        static void EnsureNativeLoaded()
-        {
-            string dll = Path.Combine(AppContext.BaseDirectory, "media.dll");
-            if (!File.Exists(dll))
-                throw new FileNotFoundException(
-                    "media.dll not found beside the test assembly. Build VisualMusic.sln (Any CPU) so VisualMusic.Tests copies native runtime DLLs.");
-            NativeLibrary.Load(dll);
-        }
-
         [Fact]
         [Trait("Category", "Integration")]
         public void Playback_lifecycle()
         {
-            EnsureNativeLoaded();
+            TestFiles.EnsureNativeLoaded("media.dll");
             string wav = TestFiles.PathTo("silence.wav");
             Assert.True(VmMedia.InitMF());
             try
@@ -53,7 +43,7 @@ namespace VisualMusic.Tests
         [Trait("Category", "Integration")]
         public void Encode_smoke_writes_mkv()
         {
-            EnsureNativeLoaded();
+            TestFiles.EnsureNativeLoaded("media.dll");
             string outPath = Path.Combine(Path.GetTempPath(), "vm_enc_" + Guid.NewGuid().ToString("N") + ".mkv");
             Assert.True(VmMedia.InitMF());
             try

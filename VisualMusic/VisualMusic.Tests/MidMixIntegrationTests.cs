@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using Xunit;
 using VmMidMix = VisualMusic.MidMix;
@@ -10,20 +9,11 @@ namespace VisualMusic.Tests
     [Collection("MidMixSequential")]
     public class MidMixIntegrationTests
     {
-        static void EnsureNativeLoaded()
-        {
-            string dll = Path.Combine(AppContext.BaseDirectory, "MidMix.dll");
-            if (!File.Exists(dll))
-                throw new FileNotFoundException(
-                    "MidMix.dll not found beside the test assembly. Build VisualMusic.sln (Any CPU) so VisualMusic.Tests copies native runtime DLLs.");
-            NativeLibrary.Load(dll);
-        }
-
         [Fact]
         [Trait("Category", "Integration")]
         public void Init_sfLoaded_and_mixdown_sequence()
         {
-            EnsureNativeLoaded();
+            TestFiles.EnsureNativeLoaded("MidMix.dll");
             string originalCwd = Directory.GetCurrentDirectory();
             string emptyDir = Path.Combine(Path.GetTempPath(), "vm_midmix_empty_" + Guid.NewGuid().ToString("N"));
             string sfDir = Path.Combine(Path.GetTempPath(), "vm_midmix_sf_" + Guid.NewGuid().ToString("N"));
