@@ -93,11 +93,21 @@
     <Message Importance="high"
              Condition="'$(_NativesReady)' != 'true'"
              Text="CopyNativeOutputs skipped: natives not ready (need Remuxer.exe + libRemuxer.dll under '$(_RemuxerBin)' and media.dll + MidMix.dll under '$(_SlnNativeOut)'). Managed-only builds are fine; for a runnable VM.exe build VisualMusic.sln (Any CPU)." />
+    <!--
+      Once the first-party natives are built this is a real runnable build, so the third-party
+      vcpkg trees must be present too. A missing tree here would produce a *partial* copy (media.dll /
+      MidMix.dll shipped without their FFmpeg / Fluidsynth DLLs), yielding a VM.exe that fails to load
+      the natives at runtime with no build error. Fail loud instead.
+    -->
+    <Error Condition="'$(_NativesReady)' == 'true' and !Exists('$(_MediaVcpkgBin)')"
+           Text="CopyNativeOutputs: media.dll is built but the FFmpeg vcpkg runtime is missing at '$(_MediaVcpkgBin)'. Restore it by building VisualMusic.sln (Any CPU) so Dependencies\Media\vcpkg_installed is populated." />
+    <Error Condition="'$(_NativesReady)' == 'true' and !Exists('$(_MidMixVcpkgBin)')"
+           Text="CopyNativeOutputs: MidMix.dll is built but the Fluidsynth vcpkg runtime is missing at '$(_MidMixVcpkgBin)'. Restore it by building VisualMusic.sln (Any CPU) so Dependencies\MidMix\vcpkg_installed is populated." />
     <ItemGroup Condition="'$(_NativesReady)' == 'true'">
       <_RemuxerFiles Include="$(_RemuxerBin)**\*" />
-      <!-- Third-party FFmpeg/Fluidsynth DLLs from vcpkg_installed; media.dll / MidMix.dll from the build output. -->
-      <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" Condition="Exists('$(_MediaVcpkgBin)')" />
-      <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" Condition="Exists('$(_MidMixVcpkgBin)')" />
+      <!-- Third-party FFmpeg/Fluidsynth DLLs from vcpkg_installed (existence guaranteed by the checks above); media.dll / MidMix.dll from the build output. -->
+      <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" />
+      <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" />
       <_NativeDlls Include="$(_SlnNativeOut)*.dll" />
     </ItemGroup>
     <Copy SourceFiles="@(_RemuxerFiles)"
