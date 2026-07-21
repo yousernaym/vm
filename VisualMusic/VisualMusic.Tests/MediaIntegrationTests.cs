@@ -59,13 +59,18 @@ namespace VisualMusic.Tests
                     sphericalStereo: false,
                     AVCodecID.AV_CODEC_ID_H264,
                     crf: "28"));
-
-                uint[] frame = new uint[64 * 64];
-                for (int i = 0; i < frame.Length; i++)
-                    frame[i] = 0xFF0080FF; // BGRA-ish solid
-                for (int f = 0; f < 5; f++)
-                    Assert.True(VmMedia.WriteFrame(frame));
-                VmMedia.EndVideoEnc();
+                try
+                {
+                    uint[] frame = new uint[64 * 64];
+                    for (int i = 0; i < frame.Length; i++)
+                        frame[i] = 0xFF0080FF; // BGRA-ish solid
+                    for (int f = 0; f < 5; f++)
+                        Assert.True(VmMedia.WriteFrame(frame));
+                }
+                finally
+                {
+                    VmMedia.EndVideoEnc();
+                }
 
                 Assert.True(File.Exists(outPath));
                 Assert.True(new FileInfo(outPath).Length > 0);
