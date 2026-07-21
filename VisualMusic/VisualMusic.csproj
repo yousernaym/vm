@@ -78,31 +78,34 @@
   </ItemGroup>
   <!--
     Package remuxer + native DLLs next to VM.exe. Paths are relative to this project (no SolutionDir).
-    Soft-skip only when VisualMusic.Tests builds this project without natives
-    (SkipVisualMusicNativeCopy=true via AdditionalProperties).
+
+    Soft-skip when the full native set is not ready so VisualMusic.Tests can ProjectReference this
+    project for managed-only unit builds without AdditionalProperties (which would create a second
+    MSBuild project instance writing the same bin\<Config>\ output and race under /m).
+    Optional: /p:SkipVisualMusicNativeCopy=true forces skip even when natives exist.
   -->
   <Target Name="CopyNativeOutputs" AfterTargets="Build"
           Condition="'$(DesignTimeBuild)' != 'true' and '$(SkipVisualMusicNativeCopy)' != 'true'">
     <PropertyGroup>
       <_RemuxerBin>$(_RepoRoot)Dependencies\Remuxer\Remuxer\bin\$(Configuration)\</_RemuxerBin>
+      <_NativesReady Condition="Exists('$(_RemuxerBin)Remuxer.exe') and Exists('$(_RemuxerBin)libRemuxer.dll') and Exists('$(_SlnNativeOut)media.dll') and Exists('$(_SlnNativeOut)MidMix.dll')">true</_NativesReady>
     </PropertyGroup>
-    <ItemGroup>
+    <Message Importance="high"
+             Condition="'$(_NativesReady)' != 'true'"
+             Text="CopyNativeOutputs skipped: natives not ready (need Remuxer.exe + libRemuxer.dll under '$(_RemuxerBin)' and media.dll + MidMix.dll under '$(_SlnNativeOut)'). Managed-only builds are fine; for a runnable VM.exe build VisualMusic.sln (Any CPU)." />
+    <ItemGroup Condition="'$(_NativesReady)' == 'true'">
       <_RemuxerFiles Include="$(_RemuxerBin)**\*" />
       <!-- Third-party FFmpeg/Fluidsynth DLLs from vcpkg_installed; media.dll / MidMix.dll from the build output. -->
       <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" Condition="Exists('$(_MediaVcpkgBin)')" />
       <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" Condition="Exists('$(_MidMixVcpkgBin)')" />
       <_NativeDlls Include="$(_SlnNativeOut)*.dll" />
     </ItemGroup>
-    <Error Text="Remuxer output not found at '$(_RemuxerBin)'. Build VisualMusic.sln (Any CPU) so Remuxer packages natives, or set SkipVisualMusicNativeCopy=true for managed-only unit builds."
-           Condition="!Exists('$(_RemuxerBin)Remuxer.exe')" />
-    <Error Text="libRemuxer.dll missing from '$(_RemuxerBin)'. Build libRemuxer (x64|$(Configuration)) then Remuxer so natives are packaged beside Remuxer.exe."
-           Condition="Exists('$(_RemuxerBin)Remuxer.exe') and !Exists('$(_RemuxerBin)libRemuxer.dll')" />
-    <Error Text="Native DLLs not found at '$(_SlnNativeOut)' (need media.dll and MidMix.dll). Build VisualMusic.sln (Any CPU) first, or set SkipVisualMusicNativeCopy=true for managed-only unit builds."
-           Condition="!Exists('$(_SlnNativeOut)media.dll') or !Exists('$(_SlnNativeOut)MidMix.dll')" />
     <Copy SourceFiles="@(_RemuxerFiles)"
           DestinationFiles="@(_RemuxerFiles->'$(TargetDir)Remuxer\%(RecursiveDir)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(_NativeDlls)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" />
+          SkipUnchangedFiles="true"
+          Condition="'$(_NativesReady)' == 'true'" />
+    <Copy SourceFiles="@(_NativeDlls)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="'$(_NativesReady)' == 'true'" />
   </Target>
   <Target Name="BuildMonoGameContent" BeforeTargets="BeforeBuild" Condition="'$(MSBuildProjectFile)' == 'VisualMusic.csproj' and '$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Content\Content.mgcb')">
     <Exec WorkingDirectory="$(MSBuildProjectDirectory)\Content" Command="dotnet tool run mgcb -- /@:Content.mgcb /platform:Windows" />

@@ -23,10 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Unit tests only need the managed app assembly; skip native/remuxer packaging. -->
-    <ProjectReference Include="..\VisualMusic.csproj">
-      <AdditionalProperties>SkipVisualMusicNativeCopy=true</AdditionalProperties>
-    </ProjectReference>
+    <!--
+      Same global properties as the sln's VisualMusic build (no AdditionalProperties) so MSBuild
+      shares one project instance / output. CopyNativeOutputs soft-skips when natives are absent.
+    -->
+    <ProjectReference Include="..\VisualMusic.csproj" />
   </ItemGroup>
 
   <!-- Fixtures live in owning submodules; flatten into output test-files/ (PreserveNewest). -->

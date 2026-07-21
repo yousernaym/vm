@@ -37,9 +37,9 @@ msbuild VisualMusic.sln /p:Configuration=Release /p:Platform="Any CPU"
 **Output location** (details in the root [CLAUDE.md](../CLAUDE.md) build section):
 - `VisualMusic/bin/<Config>/net10.0-windows10.0.26100.0/` — no `x64/` segment (app is Any CPU; natives copied from repo-root `x64/<Config>/`)
 - Assembly name: `VM.exe`
-- Post-build `CopyNativeOutputs` packages native DLLs and Remuxer into the output folder. Building
-  `VisualMusic.csproj` alone fails that target unless natives already exist under `x64\<Config>\` (or
-  `SkipVisualMusicNativeCopy=true` for unit tests). Always build the `.sln` for a runnable app.
+- Post-build `CopyNativeOutputs` packages native DLLs and Remuxer into the output folder; it
+  soft-skips when natives are missing (managed-only / unit-test builds). Always build the `.sln`
+  for a runnable app.
 
 ### Running
 

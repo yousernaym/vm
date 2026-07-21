@@ -83,11 +83,10 @@ Notes:
   runnable output is always
   `VisualMusic\bin\<Config>\net10.0-windows10.0.26100.0\` — **no `x64\` segment**. (The C# assembly is
   platform-agnostic; the native DLLs copied in are still x64 from `x64\<Config>\`.)
-- Building `VisualMusic.csproj` directly: **don't** for a runnable app. The `CopyNativeOutputs` target
-  requires `x64\<Config>\media.dll` / `MidMix.dll` and a packaged Remuxer bin (with `libRemuxer.dll`);
-  without a prior solution build it fails with a clear error. `VisualMusic.Tests` passes
-  `SkipVisualMusicNativeCopy=true` so unit tests can build the managed assembly alone. Always build the `.sln`
-  for a complete `VM.exe`.
+- Building `VisualMusic.csproj` directly: **don't** for a runnable app. `CopyNativeOutputs` soft-skips
+  when `x64\<Config>\media.dll` / `MidMix.dll` or a packaged Remuxer bin are missing (so
+  `VisualMusic.Tests` can build the managed assembly alone without `AdditionalProperties`). Always
+  build the `.sln` for a complete `VM.exe`.
 
 Stale copies of `VM.exe`/`VM.dll` can linger in old folders (e.g. `bin\x64\Debug\` from a former project-x64
 config). To confirm where a build landed, read the
