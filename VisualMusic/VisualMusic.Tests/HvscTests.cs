@@ -26,5 +26,15 @@ namespace VisualMusic.Tests
             File.WriteAllText(db.Path, "00000000000000000000000000000000=1:00\n");
             Assert.Null(Hvsc.GetSongLengths(sid, db.Path));
         }
+
+        [Fact]
+        public void GetSongLengths_missing_sid_returns_null()
+        {
+            using var db = TestFiles.TempPath.File("vm_songlengths_", ".md5");
+            File.WriteAllText(db.Path, "00000000000000000000000000000000=1:00\n");
+            Assert.Null(Hvsc.GetSongLengths(
+                Path.Combine(Path.GetTempPath(), "vm_missing_sid_" + Path.GetRandomFileName() + ".sid"),
+                db.Path));
+        }
     }
 }

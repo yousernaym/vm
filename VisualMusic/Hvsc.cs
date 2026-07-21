@@ -34,7 +34,8 @@ namespace VisualMusic
 
         /// <summary>
         /// Returns the per-subsong M:SS length strings from the HVSC song-length DB
-        /// for the given SID file, or null if the DB is absent or the file isn't listed.
+        /// for the given SID file, or null if the DB is absent, the SID is missing/unreadable,
+        /// or the file isn't listed.
         /// </summary>
         public static string[] GetSongLengths(string sidPath)
         {
@@ -45,12 +46,26 @@ namespace VisualMusic
 
         /// <summary>
         /// Looks up per-subsong lengths in the given HVSC <paramref name="dbPath"/> for <paramref name="sidPath"/>.
+        /// Returns null if the DB is absent, the SID is missing/unreadable, or the file isn't listed.
         /// </summary>
         internal static string[] GetSongLengths(string sidPath, string dbPath)
         {
             if (dbPath == null || !File.Exists(dbPath)) return null;
+            if (string.IsNullOrEmpty(sidPath)) return null;
 
-            string hash = ComputeMd5Hex(sidPath);
+            string hash;
+            try
+            {
+                hash = ComputeMd5Hex(sidPath);
+            }
+            catch (IOException)
+            {
+                return null;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return null;
+            }
 
             using var reader = new StreamReader(dbPath);
             while (!reader.EndOfStream)
