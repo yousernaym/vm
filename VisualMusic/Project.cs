@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -243,8 +244,11 @@ namespace VisualMusic
             get { return _trackViews; }
             set
             {
-                foreach (var tv in _trackViews)
-                    tv.Geo?.Dispose();
+                if (_trackViews != null)
+                {
+                    foreach (var tv in _trackViews)
+                        tv.Geo?.Dispose();
+                }
                 _trackViews = value;
             }
         }
@@ -420,17 +424,21 @@ namespace VisualMusic
             info.AddValue("props", Props);
         }
 
+        /// <summary>Formats the Remuxer <c>-l</c> flag using invariant culture (matches Remuxer parse).</summary>
+        internal static string FormatRemuxerSongLengthFlag(float songLengthS)
+            => "-l" + songLengthS.ToString(CultureInfo.InvariantCulture);
+
         // Matches the "Progress: N%" lines emitted by remuxer.exe (see Remuxer/Program.cs).
-        static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
+        internal static readonly Regex RemuxerProgressRegex = new Regex(@"^Progress:\s*(\d+)%", RegexOptions.Compiled);
 
         // Matches the "TrackAudio: <miditrack>|<path>" lines emitted by remuxer.exe after processing
         // (per-channel MIDI mode; path is always "<base>-chCC.wav").
-        static readonly Regex RemuxerTrackAudioRegex = new Regex(@"^TrackAudio:\s*(\d+)\|(.+)$", RegexOptions.Compiled);
+        internal static readonly Regex RemuxerTrackAudioRegex = new Regex(@"^TrackAudio:\s*(\d+)\|(.+)$", RegexOptions.Compiled);
 
         // Matches the "TrackVoiceAudio: <miditrack>|<channel>|<path>" lines (per-instrument mode;
         // same "-chCC.wav" path, shared by instrument tracks on that channel). A distinct prefix
         // keeps the anchored regex above from mis-parsing the extra field into the path.
-        static readonly Regex RemuxerTrackVoiceAudioRegex = new Regex(@"^TrackVoiceAudio:\s*(\d+)\|(\d+)\|(.+)$", RegexOptions.Compiled);
+        internal static readonly Regex RemuxerTrackVoiceAudioRegex = new Regex(@"^TrackVoiceAudio:\s*(\d+)\|(\d+)\|(.+)$", RegexOptions.Compiled);
 
         // Remuxer writes a 58-byte IEEE-float WAV header before the data chunk.
         const long EmptyGeneratedWavBytes = 58;
@@ -516,7 +524,8 @@ namespace VisualMusic
                 if (midiArg != null || audioArg != null || trackAudioArg != null)
                 {
                     string insTrackFlag = options.InsTrack ? "-i" : "";
-                    string songLengthsFlag = $"-l{options.SongLengthS.ToString()}";
+                    // Remuxer parses -l with InvariantCulture; must not use the UI culture (e.g. "23,079").
+                    string songLengthsFlag = FormatRemuxerSongLengthFlag(options.SongLengthS);
                     string subSongFlag = $"-s{options.SubSong.ToString()}";
                     string supressErrorFlag = "-e";
                     string cancelSignalPath = Path.Combine(Program.TempDir, Path.GetRandomFileName() + ".cancel");
@@ -2431,6 +2440,8 @@ namespace VisualMusic
             // Only called on undo snapshots, which share AudioProps with the live project via clone().
             // Disposing AudioProps here would dispose the live SampleBuffer/AudioFileReader and cause
             // NREs the next time a chunk is loaded (e.g. after seeking).
+            if (_trackViews == null)
+                return;
             foreach (var tv in _trackViews)
             {
                 tv.Geo?.Dispose();

@@ -34,18 +34,37 @@ namespace VisualMusic
 
         /// <summary>
         /// Returns the per-subsong M:SS length strings from the HVSC song-length DB
-        /// for the given SID file, or null if the DB is absent or the file isn't listed.
+        /// for the given SID file, or null if the DB is absent, the SID is missing/unreadable,
+        /// or the file isn't listed.
         /// </summary>
         public static string[] GetSongLengths(string sidPath)
         {
             string dbPath = ResolveDbPath();
             if (dbPath == null) return null;
+            return GetSongLengths(sidPath, dbPath);
+        }
+
+        /// <summary>
+        /// Looks up per-subsong lengths in the given HVSC <paramref name="dbPath"/> for <paramref name="sidPath"/>.
+        /// Returns null if the DB is absent, the SID is missing/unreadable, or the file isn't listed.
+        /// </summary>
+        internal static string[] GetSongLengths(string sidPath, string dbPath)
+        {
+            if (dbPath == null || !File.Exists(dbPath)) return null;
+            if (string.IsNullOrEmpty(sidPath)) return null;
 
             string hash;
-            using (var stream = File.OpenRead(sidPath))
+            try
             {
-                byte[] bytes = MD5.HashData(stream);
-                hash = BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
+                hash = ComputeMd5Hex(sidPath);
+            }
+            catch (IOException)
+            {
+                return null;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return null;
             }
 
             using var reader = new StreamReader(dbPath);
@@ -155,6 +174,16 @@ namespace VisualMusic
         }
 
         // ---- Internal helpers ----
+
+        /// <summary>
+        /// MD5 of the file at <paramref name="path"/> as a lowercase hex string (no dashes).
+        /// </summary>
+        internal static string ComputeMd5Hex(string path)
+        {
+            using var stream = File.OpenRead(path);
+            byte[] bytes = MD5.HashData(stream);
+            return BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
+        }
 
         /// <summary>
         /// Finds whichever local DB file exists: the canonical name first, then the

@@ -1,0 +1,89 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>VisualMusic.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Shared native-runtime paths (vcpkg_installed + x64\<Config>\); see NativePaths.props. -->
+  <Import Project="..\..\NativePaths.props" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Same global properties as the sln's VisualMusic build (no AdditionalProperties) so MSBuild
+      shares one project instance / output. CopyNativeOutputs soft-skips when natives are absent.
+    -->
+    <ProjectReference Include="..\VisualMusic.csproj" />
+  </ItemGroup>
+
+  <!--
+    Fixtures live in owning submodules. Copy into output test-files/<owner>/ (not flattened)
+    so same relative names across submodules cannot collide (last-writer-wins).
+  -->
+  <ItemGroup>
+    <None Include="..\..\Dependencies\midiLib\test-files\**\*" LinkBase="test-files\midiLib" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\Media\test-files\**\*" LinkBase="test-files\Media" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\MidMix\test-files\**\*" LinkBase="test-files\MidMix" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Dependencies\Remuxer\libRemuxer\test-files\**\*" LinkBase="test-files\libRemuxer" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!--
+    After a VisualMusic.sln Any CPU build (natives still under x64\<Config>\), make $(TargetDir)
+    a complete native runtime dir for Media/MidMix Integration tests. Unit-only builds skip cleanly.
+  -->
+
+  <Target Name="CopyNativeRuntimeForIntegration" AfterTargets="Build">
+    <PropertyGroup>
+      <_HasSlnNatives Condition="Exists('$(_SlnNativeOut)media.dll') and Exists('$(_SlnNativeOut)MidMix.dll')">true</_HasSlnNatives>
+    </PropertyGroup>
+
+    <!--
+      Once the first-party natives are built this is a real native runtime, so the third-party
+      vcpkg trees must be present too. A missing tree would produce a *partial* copy (media.dll /
+      MidMix.dll without their FFmpeg / Fluidsynth DLLs), yielding Integration tests that fail to
+      load the natives at runtime with no build error. Fail loud instead (mirrors CopyNativeOutputs).
+    -->
+    <Error Condition="'$(_HasSlnNatives)'=='true' and !Exists('$(_MediaVcpkgBin)')"
+           Text="VisualMusic.Tests: media.dll is built but the FFmpeg vcpkg runtime is missing at '$(_MediaVcpkgBin)'. Restore it by building VisualMusic.sln (Any CPU) so Dependencies\Media\vcpkg_installed is populated." />
+    <Error Condition="'$(_HasSlnNatives)'=='true' and !Exists('$(_MidMixVcpkgBin)')"
+           Text="VisualMusic.Tests: MidMix.dll is built but the Fluidsynth vcpkg runtime is missing at '$(_MidMixVcpkgBin)'. Restore it by building VisualMusic.sln (Any CPU) so Dependencies\MidMix\vcpkg_installed is populated." />
+
+    <!-- Third-party FFmpeg/Fluidsynth DLLs from vcpkg_installed (existence guaranteed by the checks above); solution outputs last so freshly built media.dll / MidMix.dll win. -->
+    <ItemGroup Condition="'$(_HasSlnNatives)'=='true'">
+      <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" />
+      <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" />
+      <_NativeDlls Include="$(_SlnNativeOut)*.dll" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_NativeDlls)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="'$(_HasSlnNatives)'=='true' and '@(_NativeDlls)'!=''" />
+
+    <!-- First-party names only; third-party FFmpeg/Fluidsynth set is whatever vcpkg_installed shipped (same as CopyNativeOutputs). -->
+    <PropertyGroup Condition="'$(_HasSlnNatives)'=='true'">
+      <_MissingNative Condition="!Exists('$(TargetDir)media.dll')">media.dll</_MissingNative>
+      <_MissingNative Condition="'$(_MissingNative)'=='' and !Exists('$(TargetDir)MidMix.dll')">MidMix.dll</_MissingNative>
+    </PropertyGroup>
+
+    <Error Condition="'$(_HasSlnNatives)'=='true' and '$(_MissingNative)'!=''"
+           Text="VisualMusic.Tests native runtime incomplete in $(TargetDir): missing $(_MissingNative). Build VisualMusic.sln Debug|Any CPU (or matching Configuration) so media.dll and MidMix.dll are under x64\$(Configuration)\ and FFmpeg/Fluidsynth DLLs are restored under Dependencies\Media\vcpkg_installed\ / Dependencies\MidMix\vcpkg_installed\." />
+
+    <Message Importance="high"
+             Condition="'$(_HasSlnNatives)'!='true'"
+             Text="VisualMusic.Tests: skipped native runtime copy (no $(_SlnNativeOut)media.dll + MidMix.dll). Unit tests are fine; Integration tests need a prior VisualMusic.sln Any CPU build." />
+  </Target>
+
+</Project>

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Visual Music"
-#define BinFolder "..\VisualMusic\bin\Release\net7.0-windows"
+#define BinFolder "..\VisualMusic\bin\Release\net10.0-windows10.0.26100.0"
 #define MyAppPublisher "Mikesoft"
 #define MyAppAssemblyName "VM"
 #define MyAppExeName MyAppAssemblyName + ".exe"

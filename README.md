@@ -26,11 +26,11 @@ Run a [Windows installer](https://github.com/yousernaym/vm/releases)
     C++ projects use vcpkg [manifest mode](https://learn.microsoft.com/vcpkg/concepts/manifest-mode):
     each declares its dependencies in a `vcpkg.json` and pins the package versions via
     `builtin-baseline` (currently vcpkg release `2026.06.01` = `f3e10653cc27d62a37a3763cd84b38bca07c6075`), so the
-    first x64 build of `VisualMusic.sln` restores them automatically into a local
+    first solution build of `VisualMusic.sln` restores them automatically into a local
     `vcpkg_installed/` folder. (`vcpkg integrate install` is still required — it's what
     locates the vcpkg root and runs the manifest restore during the build.)
 
-    > **Heads-up:** the **first** x64 build compiles Ffmpeg/x264 and Fluidsynth from
+    > **Heads-up:** the **first** solution build compiles Ffmpeg/x264 and Fluidsynth from
     > source — expect **~30–40 minutes** and an internet connection. The result is
     > cached (in the per-project `vcpkg_installed/` and vcpkg's binary cache), so every
     > later build reuses it and is fast; the dependencies are not rebuilt unless you

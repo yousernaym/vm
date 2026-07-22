@@ -8,13 +8,23 @@
     <UseWPF>true</UseWPF>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <StartupObject>VisualMusic.App</StartupObject>
-    <Platforms>AnyCPU;x64</Platforms>
+    <Platforms>AnyCPU</Platforms>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <NoWarn>$(NoWarn);CA1416</NoWarn>
     <SupportedOSPlatformVersion>10.0.26100.0</SupportedOSPlatformVersion>
   </PropertyGroup>
+  <!-- Shared native-runtime paths (vcpkg_installed + x64\<Config>\); see NativePaths.props. -->
+  <Import Project="..\NativePaths.props" />
+  <!-- Keep the sibling test project out of this app's compile glob. -->
+  <ItemGroup>
+    <Compile Remove="VisualMusic.Tests\**" />
+    <None Remove="VisualMusic.Tests\**" />
+    <EmbeddedResource Remove="VisualMusic.Tests\**" />
+    <Page Remove="VisualMusic.Tests\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Remove="Content\Bar.fx" />
     <None Remove="Content\Content.mgcb" />
@@ -66,8 +76,46 @@
     <ProjectReference Include="..\Dependencies\midilib\midilib.csproj" />
     <ProjectReference Include="..\Dependencies\MonoGame\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(SolutionDir)Dependencies\Remuxer\Remuxer\bin\$(ConfigurationName)\&quot; &quot;$(TargetDir)Remuxer&quot; /D /Y /S /I&#xD;&#xA;xcopy &quot;$(SolutionDir)x64\$(ConfigurationName)\*.dll&quot; &quot;$(TargetDir)&quot; /Y /D&#xD;&#xA;&#xD;&#xA;" />
+  <!--
+    Package remuxer + native DLLs next to VM.exe. Paths are relative to this project (no SolutionDir).
+
+    Soft-skip when the full native set is not ready so VisualMusic.Tests can ProjectReference this
+    project for managed-only unit builds without AdditionalProperties (which would create a second
+    MSBuild project instance writing the same bin\<Config>\ output and race under /m).
+    Optional: /p:SkipVisualMusicNativeCopy=true forces skip even when natives exist.
+  -->
+  <Target Name="CopyNativeOutputs" AfterTargets="Build"
+          Condition="'$(DesignTimeBuild)' != 'true' and '$(SkipVisualMusicNativeCopy)' != 'true'">
+    <PropertyGroup>
+      <_RemuxerBin>$(_RepoRoot)Dependencies\Remuxer\Remuxer\bin\$(Configuration)\</_RemuxerBin>
+      <_NativesReady Condition="Exists('$(_RemuxerBin)Remuxer.exe') and Exists('$(_RemuxerBin)libRemuxer.dll') and Exists('$(_SlnNativeOut)media.dll') and Exists('$(_SlnNativeOut)MidMix.dll')">true</_NativesReady>
+    </PropertyGroup>
+    <Message Importance="high"
+             Condition="'$(_NativesReady)' != 'true'"
+             Text="CopyNativeOutputs skipped: natives not ready (need Remuxer.exe + libRemuxer.dll under '$(_RemuxerBin)' and media.dll + MidMix.dll under '$(_SlnNativeOut)'). Managed-only builds are fine; for a runnable VM.exe build VisualMusic.sln (Any CPU)." />
+    <!--
+      Once the first-party natives are built this is a real runnable build, so the third-party
+      vcpkg trees must be present too. A missing tree here would produce a *partial* copy (media.dll /
+      MidMix.dll shipped without their FFmpeg / Fluidsynth DLLs), yielding a VM.exe that fails to load
+      the natives at runtime with no build error. Fail loud instead.
+    -->
+    <Error Condition="'$(_NativesReady)' == 'true' and !Exists('$(_MediaVcpkgBin)')"
+           Text="CopyNativeOutputs: media.dll is built but the FFmpeg vcpkg runtime is missing at '$(_MediaVcpkgBin)'. Restore it by building VisualMusic.sln (Any CPU) so Dependencies\Media\vcpkg_installed is populated." />
+    <Error Condition="'$(_NativesReady)' == 'true' and !Exists('$(_MidMixVcpkgBin)')"
+           Text="CopyNativeOutputs: MidMix.dll is built but the Fluidsynth vcpkg runtime is missing at '$(_MidMixVcpkgBin)'. Restore it by building VisualMusic.sln (Any CPU) so Dependencies\MidMix\vcpkg_installed is populated." />
+    <ItemGroup Condition="'$(_NativesReady)' == 'true'">
+      <_RemuxerFiles Include="$(_RemuxerBin)**\*" />
+      <!-- Third-party FFmpeg/Fluidsynth DLLs from vcpkg_installed (existence guaranteed by the checks above); media.dll / MidMix.dll from the build output. -->
+      <_NativeDlls Include="$(_MediaVcpkgBin)*.dll" />
+      <_NativeDlls Include="$(_MidMixVcpkgBin)*.dll" />
+      <_NativeDlls Include="$(_SlnNativeOut)*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_RemuxerFiles)"
+          DestinationFiles="@(_RemuxerFiles->'$(TargetDir)Remuxer\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true"
+          Condition="'$(_NativesReady)' == 'true'" />
+    <Copy SourceFiles="@(_NativeDlls)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
+          Condition="'$(_NativesReady)' == 'true'" />
   </Target>
   <Target Name="BuildMonoGameContent" BeforeTargets="BeforeBuild" Condition="'$(MSBuildProjectFile)' == 'VisualMusic.csproj' and '$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Content\Content.mgcb')">
     <Exec WorkingDirectory="$(MSBuildProjectDirectory)\Content" Command="dotnet tool run mgcb -- /@:Content.mgcb /platform:Windows" />

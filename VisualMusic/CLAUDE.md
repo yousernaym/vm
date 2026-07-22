@@ -22,7 +22,7 @@ Key characteristics:
 - **vcpkg** with `vcpkg integrate install` (no specific checkout needed — versions are pinned per-project)
 - **Fluidsynth** and **FFmpeg** are restored automatically via vcpkg **manifest mode**: the Media and
   MidMix submodules each ship a `vcpkg.json` (with `builtin-baseline`
-  `f3e10653cc27d62a37a3763cd84b38bca07c6075`, vcpkg release `2026.06.01`), so the first x64 build installs them into a local
+  `f3e10653cc27d62a37a3763cd84b38bca07c6075`, vcpkg release `2026.06.01`), so the first solution build installs them into a local
   `vcpkg_installed/` — no manual `vcpkg install` step.
 - **.NET 10.0** (project targets `net10.0-windows10.0.26100.0`)
 
@@ -31,17 +31,15 @@ Key characteristics:
 Build `VisualMusic.sln` (in the repo root) via Visual Studio 2026 or:
 
 ```bash
-msbuild VisualMusic.sln /p:Configuration=Release /p:Platform=x64
+msbuild VisualMusic.sln /p:Configuration=Release /p:Platform="Any CPU"
 ```
 
-**Output locations** (they differ by configuration — the sln maps the app project to `Any CPU` for
-Debug|x64 but to `x64` for Release|x64; details in the root [CLAUDE.md](../CLAUDE.md) build section):
-- Debug (sln x64 build): `VisualMusic/bin/Debug/net10.0-windows10.0.26100.0/` — no `x64/` segment
-- Release (sln x64 build): `VisualMusic/bin/x64/Release/net10.0-windows10.0.26100.0/`
+**Output location** (details in the root [CLAUDE.md](../CLAUDE.md) build section):
+- `VisualMusic/bin/<Config>/net10.0-windows10.0.26100.0/` — no `x64/` segment (app is Any CPU; natives copied from repo-root `x64/<Config>/`)
 - Assembly name: `VM.exe`
-- Post-build copies native DLLs and Remuxer binaries to the output folder — **solution builds only**:
-  building `VisualMusic.csproj` directly leaves `$(SolutionDir)` undefined, so the copy fails (MSB3073)
-  and its output (`bin/x64/Debug/...`) lacks the native DLLs. Always build the `.sln`.
+- Post-build `CopyNativeOutputs` packages native DLLs and Remuxer into the output folder; it
+  soft-skips when natives are missing (managed-only / unit-test builds). Always build the `.sln`
+  for a runnable app.
 
 ### Running
 
@@ -193,12 +191,7 @@ From `todo.txt`:
 
 ## Testing
 
-No dedicated unit test projects in the solution. Testing is primarily manual:
-1. Import MIDI/MOD/SID files
-2. Verify visualization and playback sync
-3. Test export video functionality
-4. Verify undo/redo operations
-
-To test programmatically, integration tests would need to:
-- Create mock `ISongDrawHost` implementations
-- Load Project XMLs and verify rendering output
+`VisualMusic.Tests` (xUnit) covers import formats, undo, keyframes, download helpers, HVSC lookup,
+remuxer stdout regexes, Project tempo math, and Media/MidMix P/Invoke Integration smokes.
+Use `--filter "Category!=Integration"` for unit-only runs; Integration needs a prior `VisualMusic.sln`
+Any CPU build. See [AGENTS.md](AGENTS.md) and the root [AGENTS.md](../AGENTS.md).

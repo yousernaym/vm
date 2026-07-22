@@ -17,7 +17,7 @@ namespace VisualMusic
                 AppSettings.Instance.ThemeColorSchemeOrDefault);
 
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-            MidMix.Init();
+            MidMix.Init(Program.SoundFontPath);
             if (!Media.InitMF())
             {
                 MessageBox.Show("Couldn't initialize Media library.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);

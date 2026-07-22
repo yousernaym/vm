@@ -22,7 +22,7 @@ Key characteristics:
 - **vcpkg** with `vcpkg integrate install` (no specific checkout needed — versions are pinned per-project)
 - **Fluidsynth** and **FFmpeg** are restored automatically via vcpkg **manifest mode**: the Media and
   MidMix submodules each ship a `vcpkg.json` (with `builtin-baseline`
-  `f3e10653cc27d62a37a3763cd84b38bca07c6075`, vcpkg release `2026.06.01`), so the first x64 build installs them into a local
+  `f3e10653cc27d62a37a3763cd84b38bca07c6075`, vcpkg release `2026.06.01`), so the first solution build installs them into a local
   `vcpkg_installed/` — no manual `vcpkg install` step.
 - **.NET 10.0** (project targets `net10.0-windows10.0.26100.0`)
 
@@ -31,17 +31,15 @@ Key characteristics:
 Build `VisualMusic.sln` (in the repo root) via Visual Studio 2026 or:
 
 ```bash
-msbuild VisualMusic.sln /p:Configuration=Release /p:Platform=x64
+msbuild VisualMusic.sln /p:Configuration=Release /p:Platform="Any CPU"
 ```
 
-**Output locations** (they differ by configuration — the sln maps the app project to `Any CPU` for
-Debug|x64 but to `x64` for Release|x64; details in the root [AGENTS.md](../AGENTS.md) build section):
-- Debug (sln x64 build): `VisualMusic/bin/Debug/net10.0-windows10.0.26100.0/` — no `x64/` segment
-- Release (sln x64 build): `VisualMusic/bin/x64/Release/net10.0-windows10.0.26100.0/`
+**Output location** (details in the root [AGENTS.md](../AGENTS.md) build section):
+- `VisualMusic/bin/<Config>/net10.0-windows10.0.26100.0/` — no `x64/` segment (app is Any CPU; natives copied from repo-root `x64/<Config>/`)
 - Assembly name: `VM.exe`
-- Post-build copies native DLLs and Remuxer binaries to the output folder — **solution builds only**:
-  building `VisualMusic.csproj` directly leaves `$(SolutionDir)` undefined, so the copy fails (MSB3073)
-  and its output (`bin/x64/Debug/...`) lacks the native DLLs. Always build the `.sln`.
+- Post-build `CopyNativeOutputs` packages native DLLs and Remuxer into the output folder; it
+  soft-skips when natives are missing (managed-only / unit-test builds). Always build the `.sln`
+  for a runnable app.
 
 ### Running
 
@@ -193,12 +191,22 @@ From `todo.txt`:
 
 ## Testing
 
-No dedicated unit test projects in the solution. Testing is primarily manual:
-1. Import MIDI/MOD/SID files
-2. Verify visualization and playback sync
-3. Test export video functionality
-4. Verify undo/redo operations
+`VisualMusic.Tests` (xUnit) covers import formats, undo stack, keyframe interpolation, download helpers,
+HVSC length lookup, remuxer stdout regexes, Project tempo math with a fake `ISongDrawHost`, and
+Media/MidMix P/Invoke Integration smokes (next to [Media.cs](Media.cs) / [MidMix.cs](MidMix.cs)).
 
-To test programmatically, integration tests would need to:
-- Create mock `ISongDrawHost` implementations
-- Load Project XMLs and verify rendering output
+**Unit** (no native build required):
+
+```powershell
+dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --filter "Category!=Integration" --nologo
+```
+
+**Integration** (after `VisualMusic.sln` Debug|Any CPU so the test project copies `media.dll` / `MidMix.dll` + FFmpeg/Fluidsynth):
+
+```powershell
+dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --filter "Category=Integration" --nologo
+```
+
+Fixtures are copied from submodule `test-files/` trees into output `test-files/<owner>/` (see root [AGENTS.md](../AGENTS.md)).
+
+Manual checks still useful: import MIDI/MOD/SID, playback sync, video export, undo/redo in the UI.

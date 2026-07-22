@@ -45,3 +45,6 @@ packages/
 *.sf2
 *.rtf
 *.md5
+
+# Test fixtures live in submodule test-files/ trees (midiLib, Media, MidMix,
+# Remuxer/libRemuxer). Those repos own their own un-ignores if needed.
