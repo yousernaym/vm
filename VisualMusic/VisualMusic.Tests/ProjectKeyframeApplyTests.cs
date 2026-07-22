@@ -76,7 +76,8 @@ namespace VisualMusic.Tests
                 project.PropertyKeyframes.Add("proj/AudioVisLeft", 100, KfInterpolation.Linear,
                     new ScalarKfValue(0));
 
-                project.NormSongPos = 0.5;
+                // Past midpoint: Linear would yield ~0.25 → false (v >= 0.5); Hold keeps 1 → true.
+                project.NormSongPos = 0.75;
                 project.InterpolatePropertyKeyframes();
 
                 // Bool accessors force Hold regardless of keyframe interpolation mode.
@@ -94,6 +95,7 @@ namespace VisualMusic.Tests
             Project.SetDrawHost(new FakeSongDrawHost());
             var previous = KeyframeService.Project;
             var previousIds = KeyframeService.SelectedTrackIds;
+            var previousUndo = KeyframeService.RequestUndoSnapshot;
             KeyframeService.RequestUndoSnapshot = null;
             try
             {
@@ -112,6 +114,10 @@ namespace VisualMusic.Tests
 
                 KeyframeService.AddKey("BackgroundImageOpacity", KeyframeService.KfScope.Project);
                 Assert.True(project.PropertyKeyframes.HasKeyAt("proj/BackgroundImageOpacity", 25));
+                var added = project.PropertyKeyframes.Tracks["proj/BackgroundImageOpacity"].FindBrackets(25).Before;
+                Assert.NotNull(added);
+                Assert.Equal(0.75, ((ScalarKfValue)added.Value).V, 5);
+                Assert.Equal(KfInterpolation.Smooth, added.Interpolation);
 
                 KeyframeService.RemoveKey("BackgroundImageOpacity", KeyframeService.KfScope.Project);
                 Assert.False(project.PropertyKeyframes.HasKeyAt("proj/BackgroundImageOpacity", 25));
@@ -120,6 +126,7 @@ namespace VisualMusic.Tests
             {
                 KeyframeService.Project = previous;
                 KeyframeService.SelectedTrackIds = previousIds;
+                KeyframeService.RequestUndoSnapshot = previousUndo;
                 Project.SetDrawHost(null);
             }
         }

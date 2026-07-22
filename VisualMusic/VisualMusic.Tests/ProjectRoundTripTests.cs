@@ -88,6 +88,14 @@ namespace VisualMusic.Tests
 
             Assert.True(loaded.PropertyKeyframes.HasKeyAt("proj/BackgroundImageOpacity", 0));
             Assert.True(loaded.PropertyKeyframes.HasKeyAt("track/1/Transp", 100));
+            Assert.Equal(KfInterpolation.Linear,
+                loaded.PropertyKeyframes.GetInterpolation("proj/BackgroundImageOpacity", 0));
+            Assert.Equal(KfInterpolation.Smooth,
+                loaded.PropertyKeyframes.GetInterpolation("track/1/Transp", 100));
+            var opacityKf = loaded.PropertyKeyframes.Tracks["proj/BackgroundImageOpacity"].FindBrackets(0).Before;
+            var transpKf = loaded.PropertyKeyframes.Tracks["track/1/Transp"].FindBrackets(100).Before;
+            Assert.Equal(0.2, ((ScalarKfValue)opacityKf.Value).V, 5);
+            Assert.Equal(0.5, ((ScalarKfValue)transpKf.Value).V, 5);
 
             // Notes are not part of the project file payload.
             Assert.Null(loaded.Notes);

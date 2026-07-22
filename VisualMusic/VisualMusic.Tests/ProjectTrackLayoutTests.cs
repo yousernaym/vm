@@ -65,6 +65,7 @@ namespace VisualMusic.Tests
         public void CreateTrackViews_eraseCurrent_builds_fresh_views()
         {
             Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
             try
             {
                 var song = EmptySong(3);
@@ -80,6 +81,7 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
         }
@@ -88,6 +90,7 @@ namespace VisualMusic.Tests
         public void CreateTrackViews_preserveTrackSet_keeps_sparse_saved_set()
         {
             Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
             try
             {
                 var song = EmptySong(4);
@@ -108,6 +111,7 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
         }
@@ -116,6 +120,7 @@ namespace VisualMusic.Tests
         public void CreateTrackViews_without_preserve_appends_missing_tracks()
         {
             Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
             try
             {
                 var song = EmptySong(3);
@@ -130,6 +135,7 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
         }

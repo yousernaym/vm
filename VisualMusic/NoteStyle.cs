@@ -183,6 +183,9 @@ namespace VisualMusic
         public static void SetProject(Project p) => s_projectOverride = p;
         public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm) => s_contentOverride = cm;
 
+        /// <summary>False until <see cref="SetContent"/> runs (deserialize / headless tests).</summary>
+        internal static bool HasContent => s_contentOverride != null;
+
         protected static GraphicsDevice GraphicsDevice => s_graphicsDeviceOverride;
         protected static Project Project => s_projectOverride;
         protected static Microsoft.Xna.Framework.Content.ContentManager Content => s_contentOverride;
