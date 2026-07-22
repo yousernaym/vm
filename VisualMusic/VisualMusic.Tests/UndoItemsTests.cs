@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Midi;
 using Xunit;
 
 namespace VisualMusic.Tests
@@ -10,6 +11,22 @@ namespace VisualMusic.Tests
             var p = new Project();
             p.TrackViews = new List<TrackView>();
             return p;
+        }
+
+        static Project ProjectWithAudioTrack(string filename)
+        {
+            var song = new Song
+            {
+                TicksPerBeat = 480,
+                TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
+                Tracks = new List<Track> { new Track { Length = 480 } },
+                SongLengthT = 480,
+            };
+            var project = new Project();
+            project.Notes = song;
+            project.TrackViews = new List<TrackView> { new TrackView(0, 1, song) };
+            project.TrackViews[0].TrackProps.AudioProps.Filename = filename;
+            return project;
         }
 
         [Fact]
@@ -50,6 +67,22 @@ namespace VisualMusic.Tests
             Assert.True(undo.IsCurrentSaved);
             undo.Add("b", live);
             Assert.False(undo.IsCurrentSaved);
+        }
+
+        [Fact]
+        public void Snapshot_AudioProps_isolated_from_live_edits()
+        {
+            var undo = new UndoItems();
+            var live = ProjectWithAudioTrack("a.wav");
+
+            undo.Add("snap", live);
+            live.TrackViews[0].TrackProps.AudioProps.Filename = "b.wav";
+
+            Assert.Equal("b.wav", live.TrackViews[0].TrackProps.AudioProps.Filename);
+            Assert.Equal("a.wav", undo.Current.Project.TrackViews[0].TrackProps.AudioProps.Filename);
+            Assert.NotSame(
+                live.TrackViews[0].TrackProps.AudioProps,
+                undo.Current.Project.TrackViews[0].TrackProps.AudioProps);
         }
     }
 }

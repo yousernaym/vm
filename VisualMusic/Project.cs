@@ -837,7 +837,7 @@ namespace VisualMusic
         /// assigning visuals from index 1 and <see cref="AddTrackView"/> sets GlobalProps from
         /// Tracks[0], mirroring the MOD/SID Remuxer convention).
         /// </summary>
-        static void SplitTracksByChannel(Midi.Song song)
+        internal static void SplitTracksByChannel(Midi.Song song)
         {
             var byChannel = new SortedDictionary<int, List<Midi.Note>>();
             foreach (var track in song.Tracks)

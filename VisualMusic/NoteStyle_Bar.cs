@@ -61,6 +61,7 @@ namespace VisualMusic
 
         override public void LoadFx()
         {
+            if (Content == null) return;
             _fx = Content.Load<Effect>("Bar");
         }
 
