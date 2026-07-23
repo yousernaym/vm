@@ -1849,8 +1849,9 @@ namespace VisualMusic.ViewModels
         /// After a failed Open: restore NoteStyle + SongRenderer to the live <see cref="Project"/>.
         /// When <paramref name="panelTouched"/> is non-null, Init (or a later step) may have replaced
         /// that panel's channels for the abandoned temp project — re-wire the live project's channels
-        /// without reloading audio. Best-effort: never lets a restore bake failure replace the original
-        /// Open error or leave the abandoned temp project bound.
+        /// without reloading audio. Also rebinds Media to the live <see cref="Project.AudioFilePath"/>
+        /// (LoadContent's OpenAudioFile closes/replaces it). Best-effort: never lets a restore bake
+        /// failure replace the original Open error or leave the abandoned temp project bound.
         /// </summary>
         internal void RestoreAfterFailedOpen(WaveformPanel panelTouched)
         {
@@ -1868,8 +1869,14 @@ namespace VisualMusic.ViewModels
             catch
             {
                 // Sync/bake failed — still point NoteStyle at live (or null) so draw does not keep temp.
+                // SetProject with previous==null does not clear live FX; if bake still fails, bind
+                // the override without bake so NoteStyle.Project matches ForceSync.
                 try { NoteStyle.SetProject(Project); }
-                catch { /* leave cleared; caller reports the original failure */ }
+                catch
+                {
+                    try { NoteStyle.BindProjectWithoutBake(Project); }
+                    catch { /* leave cleared; caller reports the original failure */ }
+                }
                 // Sync(null) above cleared SongRenderer.Project; the normal Project setter may throw on
                 // bake and leave it null (black Song view). Force the renderer reference without bake.
                 try
@@ -1890,6 +1897,33 @@ namespace VisualMusic.ViewModels
 
             // Always attempt rewire/clear even when BindDrawProject failed (panel may still hold temp channels).
             RewireWaveformChannels(panelTouched);
+
+            // LoadContent → OpenAudioFile always Media.CloseAudioFile()'s first; restore live audio
+            // (or close Media when there is no live project / path) so HasAudio / playback match Project.
+            try { RebindMediaAfterFailedOpen(); }
+            catch { /* best-effort */ }
+        }
+
+        /// <summary>
+        /// Test seam: when set, <see cref="RestoreAfterFailedOpen"/> uses this instead of Media P/Invoke.
+        /// </summary>
+        internal Action RestoreMediaAudio { get; set; }
+
+        /// <summary>
+        /// Reopens Media from the live project's <see cref="Project.AudioFilePath"/>, or closes Media
+        /// when there is no live audio path (so a temp Open file cannot linger).
+        /// </summary>
+        internal void RebindMediaAfterFailedOpen()
+        {
+            if (RestoreMediaAudio != null)
+            {
+                RestoreMediaAudio();
+                return;
+            }
+            if (Project != null)
+                Project.RebindMediaToAudioFilePath();
+            else
+                Media.CloseAudioFile();
         }
 
         /// <summary>

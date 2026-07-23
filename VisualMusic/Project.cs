@@ -1020,6 +1020,22 @@ namespace VisualMusic
             }
         }
 
+        /// <summary>
+        /// Reopens Media from <see cref="AudioFilePath"/> after a failed Open closed or replaced it.
+        /// When the path is empty, closes Media so an abandoned temp file is not left open.
+        /// </summary>
+        internal void RebindMediaToAudioFilePath()
+        {
+            Media.CloseAudioFile();
+            if (string.IsNullOrEmpty(AudioFilePath))
+                return;
+            if (!Media.OpenAudioFile(AudioFilePath))
+                throw new IOException("Unexpected error while reopening audio file:\r\n" + AudioFilePath);
+        }
+
+        /// <summary>Test seam: set <see cref="AudioFilePath"/> without opening Media.</summary>
+        internal void SetAudioFilePathForTest(string path) => AudioFilePath = path ?? "";
+
         void AddTrackView(TrackView view)
         {
             _trackViews.Add(view);

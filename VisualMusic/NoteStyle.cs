@@ -220,14 +220,27 @@ namespace VisualMusic
             }
             catch
             {
-                // Roll back so a failed bake does not leave a new Project override with half-loaded FX.
+                // Roll back so a failed bake does not leave a new Project override installed.
                 s_projectOverride = previous;
-                p.ClearStyleFxAndGeos();
-                // Previous project may still need FX/geo if Content was already installed.
-                TryRebakeAfterRollback();
+                if (previous != null)
+                {
+                    // Switching away from a live project: drop partial FX/geo on p and re-bake previous.
+                    p.ClearStyleFxAndGeos();
+                    TryRebakeAfterRollback();
+                }
+                // else: previous is null (Open restore after SetProject(null), or first bind). Do not
+                // ClearStyleFxAndGeos(p) — that would wipe a live project that was already rendering
+                // and leave Draw with _fx == null (NRE) when ForceSync rebinds without bake.
                 throw;
             }
         }
+
+        /// <summary>
+        /// Points NoteStyle at <paramref name="p"/> without FX/geo bake. Open restore uses this when
+        /// <see cref="SetProject"/> bake fails after <c>SetProject(null)</c> so NoteStyle stays
+        /// aligned with the live project without a second clear of its FX.
+        /// </summary>
+        internal static void BindProjectWithoutBake(Project p) => s_projectOverride = p;
 
         /// <summary>
         /// Installs the MonoGame content manager. When non-null, also finishes deferred style FX /

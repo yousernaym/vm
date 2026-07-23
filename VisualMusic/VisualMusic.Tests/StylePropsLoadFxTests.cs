@@ -25,7 +25,9 @@ namespace VisualMusic.Tests
         [Fact]
         public void SetContent_failure_restores_previous_content()
         {
+            NoteStyle.SetProject(null);
             Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasProject);
             Project.SetDrawHost(new FakeSongDrawHost());
             var previousNumTracks = TrackView.NumTracks;
             var cm1 = new ContentManager(new EmptyServices(), "Content-missing-1");
@@ -189,9 +191,86 @@ namespace VisualMusic.Tests
         }
 
         [Fact]
+        public void SetProject_bake_failure_with_null_previous_preserves_geos()
+        {
+            // Open restore: SetProject(null) then SetProject(live). Bake failure must not
+            // ClearStyleFxAndGeos(live) — that blanks a project that was already rendering.
+            Assert.False(NoteStyle.HasContent);
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                var marker = new MarkerGeo().AddRef();
+                project.TrackViews[1].Geo = marker;
+
+                NoteStyle.SetContent(cm);
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SetProject(project));
+
+                Assert.False(NoteStyle.HasProject);
+                Assert.Same(marker, project.TrackViews[1].Geo);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void SetProject_bake_failure_with_previous_clears_new_project_geos()
+        {
+            // Switching Project A → B: failed bake on B must clear B's partial state and keep A.
+            Assert.False(NoteStyle.HasContent);
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
+            try
+            {
+                // Build incoming before Content is installed (StyleProps ctor LoadFx soft-skips).
+                var incoming = BuildProjectWithNoteOnTrack1();
+                incoming.CreateTrackViews(2, eraseCurrent: true);
+                var marker = new MarkerGeo().AddRef();
+                incoming.TrackViews[1].Geo = marker;
+
+                var holder = new Project
+                {
+                    Notes = incoming.Notes,
+                    TrackViews = new List<TrackView>(),
+                };
+                NoteStyle.SetContent(cm);
+                NoteStyle.SetProject(holder);
+                Assert.True(NoteStyle.HasProject);
+
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SetProject(incoming));
+
+                Assert.True(NoteStyle.HasProject);
+                Assert.Null(incoming.TrackViews[1].Geo);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        sealed class MarkerGeo : Geo
+        {
+            protected override void ReleaseResources() { }
+        }
+
+        [Fact]
         public void StyleProps_LoadFx_attempts_Content_Load_when_HasContent()
         {
+            NoteStyle.SetProject(null);
             Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasProject);
             var styles = new StyleProps(1);
             var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
             try
@@ -205,6 +284,7 @@ namespace VisualMusic.Tests
             finally
             {
                 NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
             }
 
             Assert.False(NoteStyle.HasContent);

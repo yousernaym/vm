@@ -175,6 +175,111 @@ namespace VisualMusic.Tests
         }
 
         [Fact]
+        public void RestoreAfterFailedOpen_invokes_media_rebind()
+        {
+            // LoadContent → OpenAudioFile always closes Media first; restore must rebind (or close)
+            // so HasAudio / playback match the live project.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var vm = new MainViewModel();
+            try
+            {
+                var live = BuildProjectWithNoteOnTrack1();
+                live.CreateTrackViews(2, eraseCurrent: true);
+                live.SetAudioFilePathForTest(@"C:\live\audio.wav");
+                vm.Project = live;
+                NoteStyle.SetProject(live);
+
+                string reboundPath = null;
+                vm.RestoreMediaAudio = () =>
+                {
+                    Assert.Same(live, vm.Project);
+                    reboundPath = vm.Project.AudioFilePath;
+                };
+
+                vm.RestoreAfterFailedOpen(panelTouched: null);
+
+                Assert.Equal(@"C:\live\audio.wav", reboundPath);
+            }
+            finally
+            {
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void RestoreAfterFailedOpen_null_project_invokes_media_rebind()
+        {
+            // No live project — restore must still run media cleanup (close abandoned temp audio).
+            var vm = new MainViewModel();
+            bool mediaRestoreRan = false;
+            vm.RestoreMediaAudio = () => mediaRestoreRan = true;
+
+            vm.RestoreAfterFailedOpen(panelTouched: null);
+
+            Assert.True(mediaRestoreRan);
+        }
+
+        [Fact]
+        public void RestoreAfterFailedOpen_bake_failure_preserves_live_geo_and_binds_NoteStyle()
+        {
+            // After SetProject(null), a failing SetProject(live) bake must not wipe live geos, and
+            // BindProjectWithoutBake must still install the override for Draw.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var cm = new Microsoft.Xna.Framework.Content.ContentManager(
+                new EmptyServiceProvider(), "Content-missing-for-test");
+            var vm = new MainViewModel();
+            try
+            {
+                var live = BuildProjectWithNoteOnTrack1();
+                live.CreateTrackViews(2, eraseCurrent: true);
+                var marker = new MarkerGeo().AddRef();
+                live.TrackViews[1].Geo = marker;
+                vm.Project = live;
+                NoteStyle.SetProject(live);
+
+                // Content without an active Project so SetContent does not bake yet.
+                NoteStyle.SetProject(null);
+                NoteStyle.SetContent(cm);
+
+                vm.SyncRendererProject = p =>
+                {
+                    if (p != null)
+                        throw new InvalidOperationException("simulated SyncRenderer / bake failure");
+                };
+                Project forceSynced = null;
+                vm.ForceSyncRendererProject = p => forceSynced = p;
+                vm.RestoreMediaAudio = () => { };
+
+                vm.RestoreAfterFailedOpen(panelTouched: null);
+
+                Assert.Same(marker, live.TrackViews[1].Geo);
+                Assert.True(NoteStyle.HasProject);
+                Assert.Same(live, forceSynced);
+            }
+            finally
+            {
+                NoteStyle.SetProject(null);
+                NoteStyle.SetContent(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        sealed class EmptyServiceProvider : System.IServiceProvider
+        {
+            public object GetService(System.Type serviceType) => null;
+        }
+
+        sealed class MarkerGeo : Geo
+        {
+            protected override void ReleaseResources() { }
+        }
+
+        [Fact]
         public void RestoreAfterFailedOpen_null_project_clears_panel_channels()
         {
             // First Open with no live project: Init may have put temp channels on the panel;
