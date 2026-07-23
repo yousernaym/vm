@@ -232,6 +232,70 @@ namespace VisualMusic.Tests
         }
 
         [Fact]
+        public void RecoverAfterImportInitFailure_null_panelTouched_uses_GetRendererWaveformPanel()
+        {
+            // RequireRendererWaveformPanel can throw before panelTouched is assigned; recovery must
+            // still resolve the live panel and re-wire channels for the mutated import Project.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var wp = new WaveformPanel();
+            var vm = new MainViewModel();
+            vm.GetRendererWaveformPanel = () => wp;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                vm.Project = project;
+                project.InitAfterDeserialization(wp, loadAudio: false);
+                Assert.Equal(1, wp.ChannelCount);
+                wp.ClearChannels();
+
+                vm.RecoverAfterImportInitFailure(panelTouched: null);
+
+                Assert.Equal(1, wp.ChannelCount);
+                wp.RemoveChannel(project.TrackViews[1].TrackProps.AudioProps.SidWizChannel);
+                Assert.Equal(0, wp.ChannelCount);
+            }
+            finally
+            {
+                wp.Dispose();
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void RecoverAfterImportInitFailure_with_no_panel_still_refreshes_playback_offset()
+        {
+            // When no WaveformPanel is available, recovery must still Init (allowMissing) so
+            // OnPlaybackOffsetSChanged / SongLengthS refresh after ImportSong mutated notes.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var vm = new MainViewModel();
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                vm.Project = project;
+                // Simulate notes loaded after Props (deserialization order) — SongLengthS stale until Init.
+                project.Props.PlaybackOffsetS = 0;
+                project.Notes.SongLengthT = 960;
+
+                vm.RecoverAfterImportInitFailure(panelTouched: null);
+
+                Assert.True(project.SongLengthS > 0);
+                Assert.Equal(2, vm.TrackList.Items.Count); // Global + track 1
+            }
+            finally
+            {
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
         public void BindDrawProject_invokes_SyncRendererProject()
         {
             Project.SetDrawHost(new FakeSongDrawHost());

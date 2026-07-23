@@ -1223,7 +1223,17 @@ namespace VisualMusic.ViewModels
 
             // Same SongRenderer / NoteStyle / DrawHost alignment Open uses (first import especially:
             // SongRenderer.Project was previously left null until OnProjectLoaded).
-            BindDrawProject(Project);
+            // SetProject can throw on style FX bake failure — catch here like OpenProject does.
+            try
+            {
+                BindDrawProject(Project);
+            }
+            catch (Exception ex)
+            {
+                MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
             try { options.CheckSourceFile(); }
             catch (FileImportException ex)
@@ -1828,18 +1838,40 @@ namespace VisualMusic.ViewModels
 
         /// <summary>
         /// After ImportSong succeeded but Init / track-audio load failed: re-bind the renderer
-        /// (early BindDrawProject may have run before the MonoGame host existed), re-wire waveforms
-        /// if the panel was cleared, and rebuild the track list / song props so the UI matches the
-        /// already mutated <see cref="Project"/> (Import reuses the same object, so OnProjectChanged
-        /// does not fire).
+        /// (early BindDrawProject may have run before the MonoGame host existed), always re-run
+        /// <see cref="Project.InitAfterDeserialization"/> so ownership/tempo/accessors refresh even
+        /// when <paramref name="panelTouched"/> is null (RequireRenderer threw before assignment),
+        /// load per-track audio (deferred LoadTrackAudioAsync may have been the failure), and rebuild
+        /// the track list / song props so the UI matches the already mutated <see cref="Project"/>
+        /// (Import reuses the same object, so OnProjectChanged does not fire).
         /// </summary>
         internal void RecoverAfterImportInitFailure(WaveformPanel panelTouched)
         {
             // RequireRendererWaveformPanel may have built the host after the pre-import BindDrawProject
             // no-op'd (SyncRenderer returns when Renderer is null). Rebind so SongRenderer.Project
             // matches NoteStyle / the mutated Project instead of staying null (black Song view).
-            BindDrawProject(Project);
-            RewireWaveformChannels(panelTouched);
+            try { BindDrawProject(Project); }
+            catch { /* best-effort; caller still reports the original failure */ }
+
+            // Prefer the panel Init already touched; otherwise retry GetRenderer (host may exist now).
+            // Unlike Open restore, Import mutates Project in place — always Init so stale channels /
+            // missing PrepareVoiceOwnership / unloaded deferred track audio are not left behind.
+            var panel = panelTouched ?? GetRendererWaveformPanel?.Invoke();
+            try
+            {
+                if (Project?.TrackViews != null)
+                {
+                    if (panel != null)
+                        Project.InitAfterDeserialization(panel, loadAudio: true);
+                    else
+                        Project.InitAfterDeserialization(null, loadAudio: true, allowMissingWaveformPanel: true);
+                }
+            }
+            catch
+            {
+                // Leave panel as-is; caller still reports the original failure.
+            }
+
             TrackList.Rebuild(Project);
             SongProps.RefreshAll();
             OnPropertyChanged(nameof(HasAudio));
