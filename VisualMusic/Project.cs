@@ -652,6 +652,9 @@ namespace VisualMusic
             }
             // CreateTrackViews before OpenAudioFile so a master-audio open failure still leaves
             // TrackViews matched to the new Notes (DoImport recovery can Init/rebuild from there).
+            // Clear AudioFilePath first so a throw here cannot leave recovery thinking this import
+            // opened Media (stale path + previous project's audio would rewrite SongLengthT).
+            AudioFilePath = "";
             CreateTrackViews(_notes.Tracks.Count, resetProject, options.IsProjectLoad);
             InitPropertyAccessors();
 
@@ -823,15 +826,17 @@ namespace VisualMusic
             if (!Media.OpenAudioFile(file))
                 throw new IOException("Unexpected error while opening audio file:\r\n" + file);
 
-            SyncSongLengthFromOpenAudio(options.NoteFileType == FileType.Audio);
+            // Before Sync so import-failure recovery can see that this project's audio is open
+            // even if SyncSongLengthFromOpenAudio throws.
             AudioFilePath = file;
+            SyncSongLengthFromOpenAudio(options.NoteFileType == FileType.Audio);
         }
 
         /// <summary>
         /// Sets <see cref="Midi.Song.SongLengthT"/> from the currently open Media audio (plus audio
         /// offset). For audio-only projects, also copies that length onto every note-less track.
-        /// Used by <see cref="OpenAudioFile"/> and by import-failure recovery when Media is open
-        /// but length was never applied (e.g. throw after open, or CreateTrackViews before audio).
+        /// Used by <see cref="OpenAudioFile"/> and by import-failure recovery when
+        /// <see cref="AudioFilePath"/> is set (open succeeded) but length was never applied.
         /// </summary>
         internal void SyncSongLengthFromOpenAudio(bool propagateToAudioOnlyTracks)
         {

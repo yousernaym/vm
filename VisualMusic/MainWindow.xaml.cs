@@ -83,16 +83,31 @@ namespace VisualMusic
                     notches => _vm.AdjustSelectedViewWidth(notches);
             }
 
-            void SyncRendererProject(Project project)
+            void WireRendererSongPosChanged()
             {
                 if (monoGameHost.Renderer == null) return;
-                monoGameHost.Renderer.Project = project;
                 monoGameHost.Renderer.OnSongPosChanged = () =>
                     Dispatcher.InvokeAsync(() => _vm.NotifyScrollPositionChanged());
             }
 
+            void SyncRendererProject(Project project)
+            {
+                if (monoGameHost.Renderer == null) return;
+                monoGameHost.Renderer.Project = project;
+                WireRendererSongPosChanged();
+            }
+
+            void ForceSyncRendererProject(Project project)
+            {
+                if (monoGameHost.Renderer == null) return;
+                // No NoteStyle bake — restore path rebinds NoteStyle separately when bake fails.
+                monoGameHost.Renderer.ForceProjectReference(project);
+                WireRendererSongPosChanged();
+            }
+
             // Open binds the temp project here before LoadContent/Init so DrawSong and NoteStyle agree.
             _vm.SyncRendererProject = SyncRendererProject;
+            _vm.ForceSyncRendererProject = ForceSyncRendererProject;
 
             _vm.OnProjectLoaded = project =>
             {

@@ -128,6 +128,8 @@ namespace VisualMusic.Tests
         {
             // If restoring live throws (style bake / SyncRenderer), Open must still re-wire the
             // panel and must not leave NoteStyle on the abandoned temp project.
+            // ForceSync must still assign the live project after Sync(null) so SongRenderer is not
+            // left null (black Song view) when the baking Sync path throws.
             Project.SetDrawHost(new FakeSongDrawHost());
             var previousNumTracks = TrackView.NumTracks;
             var wp = new WaveformPanel();
@@ -147,15 +149,18 @@ namespace VisualMusic.Tests
                 NoteStyle.SetProject(temp);
                 Assert.NotSame(liveCh, temp.TrackViews[1].TrackProps.AudioProps.SidWizChannel);
 
+                Project forceSynced = null;
                 vm.SyncRendererProject = p =>
                 {
                     if (p != null)
                         throw new InvalidOperationException("simulated SyncRenderer / bake failure");
                 };
+                vm.ForceSyncRendererProject = p => forceSynced = p;
 
                 vm.RestoreAfterFailedOpen(wp);
 
                 Assert.True(NoteStyle.HasProject);
+                Assert.Same(live, forceSynced);
                 Assert.Equal(1, wp.ChannelCount);
                 wp.RemoveChannel(liveCh);
                 Assert.Equal(0, wp.ChannelCount);
@@ -468,6 +473,49 @@ namespace VisualMusic.Tests
 
                 Assert.Equal(0, project.Notes.SongLengthT);
                 Assert.Equal(0, project.Notes.Tracks[1].Length);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void RecoverAfterImportInitFailure_skips_song_length_sync_without_AudioFilePath()
+        {
+            // CreateTrackViews can throw before OpenAudioFile while a previous project's Media is
+            // still open. Recovery must not rewrite SongLengthT when AudioFilePath was cleared
+            // (or never set for this import attempt).
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var vm = new MainViewModel();
+            try
+            {
+                var song = new Song
+                {
+                    TicksPerBeat = 480,
+                    TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
+                    Tracks = new List<Track>
+                    {
+                        new Track { Length = 480 },
+                        new Track { Length = 480 },
+                    },
+                    SongLengthT = 480,
+                };
+                var project = new Project
+                {
+                    Notes = song,
+                    ImportOptions = new MidiImportOptions(),
+                };
+                project.CreateTrackViews(2, eraseCurrent: true);
+                Assert.True(string.IsNullOrEmpty(project.AudioFilePath));
+                vm.Project = project;
+
+                vm.RecoverAfterImportInitFailure(panelTouched: null);
+
+                Assert.Equal(480, project.Notes.SongLengthT);
+                Assert.Equal(480, project.Notes.Tracks[1].Length);
             }
             finally
             {

@@ -1801,6 +1801,13 @@ namespace VisualMusic.ViewModels
         public Action<Project> SyncRendererProject { get; set; }
 
         /// <summary>
+        /// Assigns <see cref="SongRenderer.Project"/> without style bake (see
+        /// <see cref="SongRenderer.ForceProjectReference"/>). Open restore uses this when
+        /// <see cref="BindDrawProject"/> / <see cref="SyncRendererProject"/> fails after Sync(null).
+        /// </summary>
+        public Action<Project> ForceSyncRendererProject { get; set; }
+
+        /// <summary>
         /// Point NoteStyle and the live SongRenderer at <paramref name="project"/> so DrawSong and
         /// style globals stay consistent (Open binds temp before VM.Project swaps on success).
         /// </summary>
@@ -1855,6 +1862,16 @@ namespace VisualMusic.ViewModels
                 // Sync/bake failed — still point NoteStyle at live (or null) so draw does not keep temp.
                 try { NoteStyle.SetProject(Project); }
                 catch { /* leave cleared; caller reports the original failure */ }
+                // Sync(null) above cleared SongRenderer.Project; the normal Project setter may throw on
+                // bake and leave it null (black Song view). Force the renderer reference without bake.
+                try
+                {
+                    if (ForceSyncRendererProject != null)
+                        ForceSyncRendererProject(Project);
+                    else
+                        SyncRendererProject?.Invoke(Project);
+                }
+                catch { /* best-effort */ }
                 try
                 {
                     var drawHost = GetDrawHost?.Invoke();
@@ -1928,11 +1945,15 @@ namespace VisualMusic.ViewModels
                 // Leave panel as-is; caller still reports the original failure.
             }
 
-            // Audio-only: CreateTrackViews runs before OpenAudioFile; if audio opened but length
-            // sync never ran (or recovery after a partial failure), pull length from open Media.
+            // If OpenAudioFile opened Media but SyncSongLength never ran (throws after open),
+            // AudioFilePath is already set — pull length from that open file. Do not sync when
+            // AudioFilePath is empty: CreateTrackViews can throw before OpenAudioFile while the
+            // previous project's Media is still open (stale length must not overwrite new notes).
             try
             {
-                if (Project?.Notes != null && Media.GetAudioLength() > 0)
+                if (Project?.Notes != null
+                    && !string.IsNullOrEmpty(Project.AudioFilePath)
+                    && Media.GetAudioLength() > 0)
                 {
                     bool audioOnly = Project.ImportOptions?.NoteFileType == FileType.Audio;
                     Project.SyncSongLengthFromOpenAudio(propagateToAudioOnlyTracks: audioOnly);

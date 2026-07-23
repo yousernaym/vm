@@ -103,6 +103,17 @@ namespace VisualMusic
                 Project.SetDrawHost(value != null ? this : null);
             }
         }
+
+        /// <summary>
+        /// Points the draw loop at <paramref name="project"/> without <see cref="NoteStyle.SetProject"/> /
+        /// style bake. Open failure restore uses this when the normal <see cref="Project"/> setter cannot
+        /// finish bake — NoteStyle is rebound separately so SongRenderer is not left null (black view).
+        /// </summary>
+        internal void ForceProjectReference(Project project)
+        {
+            _project = project;
+            Project.SetDrawHost(project != null ? this : null);
+        }
         public float NormMouseX { get; set; }
         public float NormMouseY { get; set; }
         public bool LeftMbPressed => _leftMbPressed;
