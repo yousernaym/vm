@@ -539,6 +539,9 @@ namespace VisualMusic
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
+                        // Remuxer emits UTF-8 (TrackAudio paths may be non-ASCII under user profiles).
+                        StandardOutputEncoding = Encoding.UTF8,
+                        StandardErrorEncoding = Encoding.UTF8,
                         CreateNoWindow = true,
                     };
                     using var process = Process.Start(startInfo)
