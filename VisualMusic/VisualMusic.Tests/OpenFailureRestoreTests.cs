@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Midi;
 using VisualMusic.ViewModels;
@@ -116,6 +117,85 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void RestoreAfterFailedOpen_rewires_even_when_BindDrawProject_throws()
+        {
+            // If restoring live throws (style bake / SyncRenderer), Open must still re-wire the
+            // panel and must not leave NoteStyle on the abandoned temp project.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var wp = new WaveformPanel();
+            var vm = new MainViewModel();
+            try
+            {
+                var live = BuildProjectWithNoteOnTrack1();
+                live.CreateTrackViews(2, eraseCurrent: true);
+                vm.Project = live;
+                NoteStyle.SetProject(live);
+                live.InitAfterDeserialization(wp, loadAudio: false);
+                var liveCh = live.TrackViews[1].TrackProps.AudioProps.SidWizChannel;
+
+                var temp = BuildProjectWithNoteOnTrack1();
+                temp.CreateTrackViews(2, eraseCurrent: true);
+                temp.InitAfterDeserialization(wp, loadAudio: false);
+                NoteStyle.SetProject(temp);
+                Assert.NotSame(liveCh, temp.TrackViews[1].TrackProps.AudioProps.SidWizChannel);
+
+                vm.SyncRendererProject = p =>
+                {
+                    if (p != null)
+                        throw new InvalidOperationException("simulated SyncRenderer / bake failure");
+                };
+
+                vm.RestoreAfterFailedOpen(wp);
+
+                Assert.True(NoteStyle.HasProject);
+                Assert.Equal(1, wp.ChannelCount);
+                wp.RemoveChannel(liveCh);
+                Assert.Equal(0, wp.ChannelCount);
+            }
+            finally
+            {
+                wp.Dispose();
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void RestoreAfterFailedOpen_null_project_clears_panel_channels()
+        {
+            // First Open with no live project: Init may have put temp channels on the panel;
+            // restore must clear them rather than no-op on Project == null.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var wp = new WaveformPanel();
+            var vm = new MainViewModel();
+            try
+            {
+                Assert.Null(vm.Project);
+
+                var temp = BuildProjectWithNoteOnTrack1();
+                temp.CreateTrackViews(2, eraseCurrent: true);
+                NoteStyle.SetProject(temp);
+                temp.InitAfterDeserialization(wp, loadAudio: false);
+                Assert.Equal(1, wp.ChannelCount);
+
+                vm.RestoreAfterFailedOpen(wp);
+
+                Assert.False(NoteStyle.HasProject);
+                Assert.Equal(0, wp.ChannelCount);
+            }
+            finally
+            {
+                wp.Dispose();
                 NoteStyle.SetProject(null);
                 TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);

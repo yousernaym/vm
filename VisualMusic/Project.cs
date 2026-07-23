@@ -641,13 +641,6 @@ namespace VisualMusic
                 OpenSyntheticSong(resetProject);
             else
                 OpenNoteFile(options, resetProject);
-            OpenAudioFile(options);
-
-            // Audio-only: OpenAudioFile set SongLengthT from the master audio length; propagate it to
-            // every (note-less) track so their reported length matches the song.
-            if (options.NoteFileType == FileType.Audio)
-                foreach (var track in _notes.Tracks)
-                    track.Length = _notes.SongLengthT;
 
             ImportOptions = options;
             if (resetProject)
@@ -657,8 +650,19 @@ namespace VisualMusic
                     ? ImportOptions.AudioPath : ImportOptions.NotePath;
                 DefaultFileName = Path.GetFileName(sourceName) + "." + DefaultFileExt;
             }
+            // CreateTrackViews before OpenAudioFile so a master-audio open failure still leaves
+            // TrackViews matched to the new Notes (DoImport recovery can Init/rebuild from there).
             CreateTrackViews(_notes.Tracks.Count, resetProject, options.IsProjectLoad);
             InitPropertyAccessors();
+
+            OpenAudioFile(options);
+
+            // Audio-only: OpenAudioFile set SongLengthT from the master audio length; propagate it to
+            // every (note-less) track so their reported length matches the song.
+            if (options.NoteFileType == FileType.Audio)
+                foreach (var track in _notes.Tracks)
+                    track.Length = _notes.SongLengthT;
+
             return true;
         }
 

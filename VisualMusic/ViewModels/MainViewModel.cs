@@ -1260,12 +1260,16 @@ namespace VisualMusic.ViewModels
             }
             catch (FileImportException ex)
             {
+                // ImportSong may have mutated Notes/TrackViews before throwing (e.g. OpenAudioFile
+                // after OpenNoteFile) — refresh UI/waveforms to match the live Project.
+                RecoverAfterImportInitFailure(panelTouched: null);
                 MetroMessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (Exception ex)
             {
+                RecoverAfterImportInitFailure(panelTouched: null);
                 MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -1810,22 +1814,54 @@ namespace VisualMusic.ViewModels
         /// After a failed Open: restore NoteStyle + SongRenderer to the live <see cref="Project"/>.
         /// When <paramref name="panelTouched"/> is non-null, Init (or a later step) may have replaced
         /// that panel's channels for the abandoned temp project — re-wire the live project's channels
-        /// without reloading audio.
+        /// without reloading audio. Best-effort: never lets a restore bake failure replace the original
+        /// Open error or leave the abandoned temp project bound.
         /// </summary>
         internal void RestoreAfterFailedOpen(WaveformPanel panelTouched)
         {
-            BindDrawProject(Project);
+            // Drop the abandoned temp override first. SetProject rolls back to previous on bake
+            // failure — if previous is still temp, Open restore would leave temp drawn.
+            try { NoteStyle.SetProject(null); }
+            catch { /* best-effort clear */ }
+            try { SyncRendererProject?.Invoke(null); }
+            catch { /* best-effort clear */ }
+
+            try
+            {
+                BindDrawProject(Project);
+            }
+            catch
+            {
+                // Sync/bake failed — still point NoteStyle at live (or null) so draw does not keep temp.
+                try { NoteStyle.SetProject(Project); }
+                catch { /* leave cleared; caller reports the original failure */ }
+                try
+                {
+                    var drawHost = GetDrawHost?.Invoke();
+                    if (drawHost != null) Project.SetDrawHost(drawHost);
+                }
+                catch { /* best-effort */ }
+            }
+
+            // Always attempt rewire/clear even when BindDrawProject failed (panel may still hold temp channels).
             RewireWaveformChannels(panelTouched);
         }
 
         /// <summary>
         /// Re-attach the live project's SidWiz channels after Init cleared/replaced the panel.
+        /// When there is no live project, clears the panel so abandoned temp channels do not linger.
         /// Best-effort: swallows re-Init failures so the original Open/Import error still surfaces.
         /// </summary>
         internal void RewireWaveformChannels(WaveformPanel panelTouched)
         {
-            if (panelTouched == null || Project?.TrackViews == null)
+            if (panelTouched == null)
                 return;
+            if (Project?.TrackViews == null)
+            {
+                try { panelTouched.ClearChannels(); }
+                catch { /* best-effort */ }
+                return;
+            }
             try
             {
                 Project.InitAfterDeserialization(panelTouched, loadAudio: false);
