@@ -955,14 +955,17 @@ namespace VisualMusic
             // Keep the static count in sync with the actual view set (it can be < numTracks when
             // preserveTrackSet drops trailing note-file tracks that were removed before saving).
             TrackView.NumTracks = _trackViews.Count;
-            // Deserialized / headless views may still lack FX until Content exists; SetContent retries.
+            // Deserialized / headless views may still lack FX until Content exists;
+            // SetContent / SetProject / SetGraphicsDevice retry via LoadStyleFxAndCreateGeos.
             LoadStyleFxAndCreateGeos();
         }
 
         /// <summary>
-        /// Loads each track's style effects and bakes note geometry. Soft-skips while
-        /// <see cref="NoteStyle.HasContent"/> is false; <see cref="NoteStyle.SetContent"/> calls this
-        /// again once the content manager is installed.
+        /// Loads each track's style effects and bakes note geometry. <see cref="StyleProps.LoadFx"/>
+        /// soft-skips while <see cref="NoteStyle.HasContent"/> is false; <see cref="TrackView.CreateGeo"/>
+        /// soft-skips while <see cref="NoteStyle.CanCreateGeo"/> is false.
+        /// <see cref="NoteStyle.SetContent"/> / <see cref="NoteStyle.SetProject"/> /
+        /// <see cref="NoteStyle.SetGraphicsDevice"/> call this again once prerequisites are installed.
         /// </summary>
         internal void LoadStyleFxAndCreateGeos()
         {

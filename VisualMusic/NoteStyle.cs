@@ -179,23 +179,61 @@ namespace VisualMusic
         static Project s_projectOverride;
         static Microsoft.Xna.Framework.Content.ContentManager s_contentOverride;
 
-        public static void SetGraphicsDevice(GraphicsDevice gd) => s_graphicsDeviceOverride = gd;
-        public static void SetProject(Project p) => s_projectOverride = p;
+        public static void SetGraphicsDevice(GraphicsDevice gd)
+        {
+            s_graphicsDeviceOverride = gd;
+            // GD may arrive after Content + Project (or the reverse); finish deferred bake when all three exist.
+            TryFinishDeferredStyleFxAndGeos();
+        }
+
+        public static void SetProject(Project p)
+        {
+            s_projectOverride = p;
+            // Content may already be installed (SetContent ran before Project was assigned) — finish deferred bake.
+            TryFinishDeferredStyleFxAndGeos();
+        }
 
         /// <summary>
         /// Installs the MonoGame content manager. When non-null, also finishes deferred style FX /
         /// geometry for <see cref="SetProject"/>'s current project (CreateTrackViews soft-skips those
         /// while content is missing — e.g. import while the Song host is still Collapsed).
+        /// On failure, clears the install so <see cref="HasContent"/> does not stay true with half-loaded FX.
         /// </summary>
         public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm)
         {
             s_contentOverride = cm;
-            if (cm != null)
-                s_projectOverride?.LoadStyleFxAndCreateGeos();
+            if (cm == null)
+                return;
+            try
+            {
+                TryFinishDeferredStyleFxAndGeos();
+            }
+            catch
+            {
+                s_contentOverride = null;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// When Content, GraphicsDevice, and Project are all set, loads style FX and bakes geometry
+        /// (CreateTrackViews / Set* may arrive in any order).
+        /// </summary>
+        static void TryFinishDeferredStyleFxAndGeos()
+        {
+            if (s_contentOverride == null || s_projectOverride == null)
+                return;
+            s_projectOverride.LoadStyleFxAndCreateGeos();
         }
 
         /// <summary>False until <see cref="SetContent"/> runs (deserialize / headless tests).</summary>
         internal static bool HasContent => s_contentOverride != null;
+
+        /// <summary>False until <see cref="SetGraphicsDevice"/> runs.</summary>
+        internal static bool HasGraphicsDevice => s_graphicsDeviceOverride != null;
+
+        /// <summary>True when vertex buffers / style geo bake can proceed (needs Content + device).</summary>
+        internal static bool CanCreateGeo => HasContent && HasGraphicsDevice;
 
         protected static GraphicsDevice GraphicsDevice => s_graphicsDeviceOverride;
         protected static Project Project => s_projectOverride;

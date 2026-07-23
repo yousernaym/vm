@@ -164,7 +164,7 @@ namespace VisualMusic.Tests
                 project.Notes = song;
                 project.TrackViews = new List<TrackView>();
 
-                // Would NRE in CreateGeoChunk if CreateGeo did not gate on HasContent
+                // Would NRE in CreateGeoChunk if CreateGeo did not gate on CanCreateGeo
                 // (LoadFx was also skipped, so Bar/Line _fx is null).
                 project.CreateTrackViews(3, eraseCurrent: true);
 

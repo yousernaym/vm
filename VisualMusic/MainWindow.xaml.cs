@@ -103,6 +103,14 @@ namespace VisualMusic
             _vm.GetRendererWaveformPanel = () =>
                 monoGameHost.Renderer?.WaveformPanel;
 
+            // Open/Import switch to Song then call this so a previously Collapsed HwndHost can
+            // BuildWindowCore before InitAfterDeserialization requires WaveformPanel.
+            _vm.EnsureSongHostReady = () =>
+            {
+                UpdateLayout();
+                monoGameHost.UpdateLayout();
+            };
+
             _vm.RenderVideo = (file, cb, opts) =>
                 monoGameHost.Renderer?.RenderVideo(file, cb, opts);
         }

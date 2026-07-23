@@ -201,8 +201,8 @@ namespace VisualMusic.Tests
         [Fact]
         public void Undo_CopyPropsFrom_then_LoadStyleFxAndCreateGeos_attempts_fx_reload()
         {
-            // Mirrors MainViewModel undo: CopyPropsFrom then rebuild; without Content geo stays null,
-            // and installing Content retries FX load on the restored StyleProps.
+            // Mirrors MainViewModel.ApplyUndoItem: CopyPropsFrom then LoadStyleFxAndCreateGeos.
+            // Without Content, FX soft-skips and geo stays null; SetContent retries and hits Content.Load.
             Project.SetDrawHost(new FakeSongDrawHost());
             var previousNumTracks = TrackView.NumTracks;
             try
@@ -223,12 +223,13 @@ namespace VisualMusic.Tests
                 Assert.Equal(NoteStyleType.Bar, live.TrackViews[1].TrackProps.StyleProps.Type);
                 Assert.Equal(0.25f, live.TrackViews[1].TrackProps.MaterialProps.Transp!.Value);
 
-                live.CreateGeos(false);
+                live.LoadStyleFxAndCreateGeos();
                 Assert.Null(live.TrackViews[1].Geo);
 
                 NoteStyle.SetProject(live);
                 var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
                 Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm));
+                Assert.False(NoteStyle.HasContent);
             }
             finally
             {

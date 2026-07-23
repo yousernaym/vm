@@ -56,6 +56,39 @@ namespace VisualMusic.Tests
                 // Empty root → Content.Load("Bar") fails, proving SetContent entered the retry path.
                 var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
                 Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm));
+                // Failed install must not leave HasContent true with half-loaded FX.
+                Assert.False(NoteStyle.HasContent);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+        }
+
+        [Fact]
+        public void SetProject_retries_LoadStyleFxAndCreateGeos_when_HasContent()
+        {
+            // Content installed before Project (SongRenderer.Initialize can race Open/Import):
+            // SetProject must finish the deferred bake that SetContent skipped.
+            Assert.False(NoteStyle.HasContent);
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                Assert.Null(project.TrackViews[1].Geo);
+
+                NoteStyle.SetContent(cm);
+                Assert.True(NoteStyle.HasContent);
+
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SetProject(project));
             }
             finally
             {
@@ -91,9 +124,12 @@ namespace VisualMusic.Tests
         }
 
         [Fact]
-        public void CreateGeo_attempts_bake_when_HasContent()
+        public void CreateGeo_soft_skips_without_graphics_device()
         {
+            // HasContent alone is not enough — vertex buffers need a GraphicsDevice.
             Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasGraphicsDevice);
+            Assert.False(NoteStyle.CanCreateGeo);
             Project.SetDrawHost(new FakeSongDrawHost());
             var previousNumTracks = TrackView.NumTracks;
             var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
@@ -103,14 +139,13 @@ namespace VisualMusic.Tests
                 project.CreateTrackViews(2, eraseCurrent: true);
                 Assert.Null(project.TrackViews[1].Geo);
 
-                // HasContent without retrying FX (no SetProject yet). CreateGeo must pass the
-                // soft-skip and reach CreateGeoChunk → VertexBuffer with a null GraphicsDevice.
+                // Content without Project (avoids SetContent retry LoadFx) and without GraphicsDevice.
                 NoteStyle.SetContent(cm);
                 Assert.True(NoteStyle.HasContent);
-                NoteStyle.SetProject(project);
+                Assert.False(NoteStyle.CanCreateGeo);
 
-                Assert.ThrowsAny<Exception>(() =>
-                    project.TrackViews[1].CreateGeo(project, project.GlobalTrackProps));
+                project.TrackViews[1].CreateGeo(project, project.GlobalTrackProps);
+                Assert.Null(project.TrackViews[1].Geo);
             }
             finally
             {

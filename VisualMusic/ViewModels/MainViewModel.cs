@@ -740,9 +740,8 @@ namespace VisualMusic.ViewModels
             var io = tempProject.ImportOptions;
             var trackAudioTargets = ApplyGeneratedTrackAudio(tempProject, io);
 
-            var rendererWfp = GetRendererWaveformPanel?.Invoke();
             bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
-            tempProject.InitAfterDeserialization(rendererWfp, loadAudio: !deferTrackAudioLoad);
+            tempProject.InitAfterDeserialization(RequireRendererWaveformPanel(), loadAudio: !deferTrackAudioLoad);
             if (deferTrackAudioLoad)
                 await LoadTrackAudioAsync(trackAudioTargets);
 
@@ -1270,10 +1269,10 @@ namespace VisualMusic.ViewModels
             // first and disposing NAudio readers mid-Read).
             var trackAudioTargets = ApplyGeneratedTrackAudio(Project, options);
 
-            var wfp = GetRendererWaveformPanel?.Invoke();
             // Skip Init's fire-and-forget loads when we have fresh track WAVs — we await one load below.
             bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
-            Project.InitAfterDeserialization(wfp, loadAudio: !deferTrackAudioLoad);
+            // RequireRendererWaveformPanel switches to Song so a Collapsed HwndHost can BuildWindowCore.
+            Project.InitAfterDeserialization(RequireRendererWaveformPanel(), loadAudio: !deferTrackAudioLoad);
 
             TrackList.Rebuild(Project);
 
@@ -1303,7 +1302,6 @@ namespace VisualMusic.ViewModels
             UpdateUndoRedo();
 
             WindowTitle = $"{Program.AppName} — {options.DisplayName}";
-            CurrentScreen = AppScreen.Song;
         }
 
         static void WarnIfMidiAudioWillBeDisabled(ImportOptions options)
@@ -1460,8 +1458,8 @@ namespace VisualMusic.ViewModels
             bool tracksChanged = Project != null && !Project.TrackViews.Select(v => v.TrackNumber)
                 .SequenceEqual(_undoItems.Current.Project.TrackViews.Select(v => v.TrackNumber));
             Project?.CopyPropsFrom(_undoItems.Current.Project);
-            // Rebuild geometry for any style/material/spatial changes in the restored snapshot.
-            Project?.CreateGeos();
+            // Reload style FX (DCS clone drops Effect refs) and rebuild geometry for restored props.
+            Project?.LoadStyleFxAndCreateGeos();
             // Refresh the Song and Track property panels so they reflect restored values.
             SongProps.RefreshAll();
             if (tracksChanged) TrackList.Rebuild(Project);
@@ -1739,6 +1737,28 @@ namespace VisualMusic.ViewModels
         // ---- Renderer WaveformPanel accessor (set by MainWindow) ----
 
         public Func<WaveformPanel> GetRendererWaveformPanel { get; set; }
+
+        /// <summary>
+        /// Optional: force layout so a newly Visible <see cref="MonoGameHost"/> can run BuildWindowCore
+        /// before Open/Import call <see cref="Project.InitAfterDeserialization"/>.
+        /// </summary>
+        public Action EnsureSongHostReady { get; set; }
+
+        /// <summary>
+        /// Switches to the Song screen (so the HwndHost is Visible), optionally forces layout, and
+        /// returns the live WaveformPanel. Throws if the host still has no panel — Open/Import must
+        /// not leave stale SidWiz channels from a previous project.
+        /// </summary>
+        WaveformPanel RequireRendererWaveformPanel()
+        {
+            CurrentScreen = AppScreen.Song;
+            EnsureSongHostReady?.Invoke();
+            var wfp = GetRendererWaveformPanel?.Invoke();
+            if (wfp == null)
+                throw new InvalidOperationException(
+                    "WaveformPanel is unavailable (MonoGame host not ready). Open the Song screen and try again.");
+            return wfp;
+        }
 
         // ---- IImportService (browser download import) ----
 

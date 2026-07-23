@@ -127,10 +127,11 @@ namespace VisualMusic
         {
             if (MidiTrack.Notes.Count == 0)
                 return;
-            // Style FX / vertex buffers need MonoGame Content. CreateTrackViews can run headless
-            // (unit tests) or before SetContent (e.g. import while Song host is Collapsed); soft-skip
-            // here — NoteStyle.SetContent retries via Project.LoadStyleFxAndCreateGeos.
-            if (!NoteStyle.HasContent)
+            // Style FX / vertex buffers need MonoGame Content + GraphicsDevice. CreateTrackViews can
+            // run headless (unit tests) or before SetContent/SetGraphicsDevice (e.g. import while Song
+            // host is Collapsed); soft-skip here — SetContent / SetProject / SetGraphicsDevice retry
+            // via Project.LoadStyleFxAndCreateGeos.
+            if (!NoteStyle.CanCreateGeo)
                 return;
             Midi.Note firstNote = _midiTrack.Notes[0];
             Midi.Note lastNote = _midiTrack.Notes[_midiTrack.Notes.Count - 1];
