@@ -694,19 +694,17 @@ namespace VisualMusic.ViewModels
                 return;
             }
 
-            // Set DrawHost before loadContent so NoteStyle.createGeoChunk and Project.drawSong()
-            // (both called from inside loadContent) can access the renderer. NoteStyle.SetProject
-            // and post-load Init share one try so any failure restores the previous static Project.
-            var drawHost = GetDrawHost?.Invoke();
-            if (drawHost != null) Project.SetDrawHost(drawHost);
-
+            // BindDrawProject + post-load Init share one try so any failure restores the live
+            // NoteStyle / SongRenderer.Project / waveform channels (not a half-open temp project).
             ImportOptions io;
             // Non-null once RequireRendererWaveformPanel succeeds — Init (or a later step) may have
             // cleared/replaced the live panel's channels for tempProject; failure must re-wire Project.
             WaveformPanel panelTouched = null;
             try
             {
-                NoteStyle.SetProject(tempProject);
+                // Align NoteStyle + SongRenderer.Project before LoadContent/Init so the draw loop
+                // does not keep drawing the previous Project while NoteStyle reads the temp one.
+                BindDrawProject(tempProject);
 
                 // A MOD/SID/HVL project re-runs the external remuxer on load (unless its converted
                 // outputs are already cached), so show the same progress window a fresh import does.
@@ -717,7 +715,7 @@ namespace VisualMusic.ViewModels
                     if (!RunConversionBehindProgress((p, ct) => tempProject.LoadContent(p, ct)))
                     {
                         // Conversion was cancelled or produced nothing — keep the current project.
-                        NoteStyle.SetProject(Project);
+                        RestoreAfterFailedOpen(panelTouched);
                         return;
                     }
                 }
@@ -736,10 +734,9 @@ namespace VisualMusic.ViewModels
             }
             catch (FileImportException ex)
             {
-                // Loading failed (e.g. the referenced song file couldn't be downloaded). The renderer's
-                // animation loop is still drawing the previous live project (Project), and its note
-                // rendering reads the static NoteStyle.Project — so restore it to Project rather than
-                // null, otherwise the next Draw() dereferences a null Project (NoteStyle.DrawTrack).
+                // Loading failed (e.g. the referenced song file couldn't be downloaded). Restore
+                // NoteStyle + SongRenderer.Project to the live project (and re-wire waveforms if
+                // Init already replaced the panel's channels for the abandoned temp project).
                 RestoreAfterFailedOpen(panelTouched);
                 MetroMessageBox.Show($"Could not load project file: {ex.Message}\n\nMissing file: {ex.FileName}",
                     Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
@@ -1271,6 +1268,7 @@ namespace VisualMusic.ViewModels
             if (options.EraseCurrent)
                 _currentProjectPath = "";
 
+            WaveformPanel panelTouched = null;
             try
             {
                 // Assign freshly generated per-track WAVs before InitAfterDeserialization so ownership
@@ -1281,7 +1279,8 @@ namespace VisualMusic.ViewModels
                 // Skip Init's fire-and-forget loads when we have fresh track WAVs — we await one load below.
                 bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
                 // RequireRendererWaveformPanel switches to Song so a Collapsed HwndHost can BuildWindowCore.
-                Project.InitAfterDeserialization(RequireRendererWaveformPanel(), loadAudio: !deferTrackAudioLoad);
+                panelTouched = RequireRendererWaveformPanel();
+                Project.InitAfterDeserialization(panelTouched, loadAudio: !deferTrackAudioLoad);
 
                 TrackList.Rebuild(Project);
 
@@ -1290,7 +1289,9 @@ namespace VisualMusic.ViewModels
             }
             catch (Exception ex)
             {
-                // ImportSong already mutated Project; surface host/Init/audio failures instead of crashing.
+                // ImportSong already mutated Project; re-wire waveforms if Init cleared the panel,
+                // then surface the failure instead of crashing with an empty channel list.
+                RewireWaveformChannels(panelTouched);
                 MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -1764,6 +1765,26 @@ namespace VisualMusic.ViewModels
         public Action EnsureSongHostReady { get; set; }
 
         /// <summary>
+        /// Keeps <see cref="SongRenderer.Project"/> / <see cref="NoteStyle"/> / DrawHost aligned.
+        /// Open binds the temp project before LoadContent/Init; failure restore binds the live project.
+        /// </summary>
+        public Action<Project> SyncRendererProject { get; set; }
+
+        /// <summary>
+        /// Point NoteStyle and the live SongRenderer at <paramref name="project"/> so DrawSong and
+        /// style globals stay consistent (Open binds temp before VM.Project swaps on success).
+        /// </summary>
+        internal void BindDrawProject(Project project)
+        {
+            SyncRendererProject?.Invoke(project);
+            // SyncRenderer no-ops when the host is not built yet — still need NoteStyle for LoadContent.
+            // Idempotent when SyncRenderer already applied SongRenderer.Project (setter calls SetProject).
+            var drawHost = GetDrawHost?.Invoke();
+            if (drawHost != null) Project.SetDrawHost(drawHost);
+            NoteStyle.SetProject(project);
+        }
+
+        /// <summary>
         /// Switches to the Song screen (so the HwndHost is Visible), optionally forces layout, and
         /// returns the live WaveformPanel. Throws if the host still has no panel — Open/Import must
         /// not leave stale SidWiz channels from a previous project.
@@ -1780,17 +1801,33 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// After a failed Open: restore <see cref="NoteStyle"/> to the live <see cref="Project"/>.
+        /// After a failed Open: restore NoteStyle + SongRenderer to the live <see cref="Project"/>.
         /// When <paramref name="panelTouched"/> is non-null, Init (or a later step) may have replaced
         /// that panel's channels for the abandoned temp project — re-wire the live project's channels
         /// without reloading audio.
         /// </summary>
         internal void RestoreAfterFailedOpen(WaveformPanel panelTouched)
         {
-            NoteStyle.SetProject(Project);
+            BindDrawProject(Project);
+            RewireWaveformChannels(panelTouched);
+        }
+
+        /// <summary>
+        /// Re-attach the live project's SidWiz channels after Init cleared/replaced the panel.
+        /// Best-effort: swallows re-Init failures so the original Open/Import error still surfaces.
+        /// </summary>
+        internal void RewireWaveformChannels(WaveformPanel panelTouched)
+        {
             if (panelTouched == null || Project?.TrackViews == null)
                 return;
-            Project.InitAfterDeserialization(panelTouched, loadAudio: false);
+            try
+            {
+                Project.InitAfterDeserialization(panelTouched, loadAudio: false);
+            }
+            catch
+            {
+                // Leave panel as-is; caller still reports the original failure.
+            }
         }
 
         // ---- IImportService (browser download import) ----

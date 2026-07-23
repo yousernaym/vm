@@ -89,6 +89,74 @@ namespace VisualMusic.Tests
             }
         }
 
+        [Fact]
+        public void RestoreAfterFailedOpen_invokes_SyncRendererProject_with_live_project()
+        {
+            // Open binds SongRenderer.Project to temp via SyncRendererProject; failure must bind live.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var vm = new MainViewModel();
+            Project synced = null;
+            vm.SyncRendererProject = p => synced = p;
+            try
+            {
+                var live = BuildProjectWithNoteOnTrack1();
+                live.CreateTrackViews(2, eraseCurrent: true);
+                vm.Project = live;
+                NoteStyle.SetProject(live);
+
+                var temp = BuildProjectWithNoteOnTrack1();
+                vm.BindDrawProject(temp);
+                Assert.Same(temp, synced);
+
+                vm.RestoreAfterFailedOpen(panelTouched: null);
+
+                Assert.Same(live, synced);
+                Assert.True(NoteStyle.HasProject);
+            }
+            finally
+            {
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void RewireWaveformChannels_restores_live_channels_after_clear()
+        {
+            // Import Init failure path: panel was cleared for a partial Init; rewire live channels.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var wp = new WaveformPanel();
+            var vm = new MainViewModel();
+            try
+            {
+                var live = BuildProjectWithNoteOnTrack1();
+                live.CreateTrackViews(2, eraseCurrent: true);
+                vm.Project = live;
+                live.InitAfterDeserialization(wp, loadAudio: false);
+                var liveCh = live.TrackViews[1].TrackProps.AudioProps.SidWizChannel;
+                Assert.Equal(1, wp.ChannelCount);
+
+                wp.ClearChannels();
+                Assert.Equal(0, wp.ChannelCount);
+
+                vm.RewireWaveformChannels(wp);
+
+                Assert.Equal(1, wp.ChannelCount);
+                wp.RemoveChannel(liveCh);
+                Assert.Equal(0, wp.ChannelCount);
+            }
+            finally
+            {
+                wp.Dispose();
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
         static Project BuildProjectWithNoteOnTrack1()
         {
             var song = new Song
