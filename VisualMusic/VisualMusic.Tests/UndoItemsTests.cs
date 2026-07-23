@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework.Content;
 using Midi;
 using VisualMusic.Keyframes;
+using VisualMusic.ViewModels;
 using Xunit;
 
 namespace VisualMusic.Tests
@@ -240,6 +242,48 @@ namespace VisualMusic.Tests
             {
                 NoteStyle.SetContent(null);
                 NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void ApplyUndoItem_restores_track_set_and_rebuilds_track_list()
+        {
+            // MainViewModel.ApplyUndoItem must CopyPropsFrom (ReconcileTrackViews) and rebuild
+            // TrackList when TrackNumbers change — not only refresh prop fields.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var vm = new MainViewModel();
+            try
+            {
+                var live = ProjectWithNoteOnTrack1();
+                Assert.Equal(2, live.TrackViews.Count);
+                vm.Project = live;
+                Assert.Equal(2, vm.TrackList.Items.Count);
+
+                vm.AddUndoItem("before add track");
+
+                live.Notes.Tracks.Add(new Track { Length = 480, Name = "extra" });
+                live.CreateTrackViews(3, eraseCurrent: false);
+                Assert.Equal(3, live.TrackViews.Count);
+                vm.TrackList.Rebuild(live);
+                Assert.Equal(3, vm.TrackList.Items.Count);
+                vm.AddUndoItem("after add track");
+
+                Assert.True(vm.CanUndo);
+                Assert.True(vm.UndoCommand.CanExecute(null));
+                vm.UndoCommand.Execute(null);
+
+                Assert.Equal(2, live.TrackViews.Count);
+                Assert.Equal(new[] { 0, 1 }, live.TrackViews.Select(v => v.TrackNumber));
+                Assert.Equal(2, vm.TrackList.Items.Count);
+                Assert.Equal(NoteStyleType.Default,
+                    live.TrackViews[1].TrackProps.StyleProps.Type);
+            }
+            finally
+            {
+                Keyframes.KeyframeService.Project = null;
                 TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }

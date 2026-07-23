@@ -468,5 +468,56 @@ namespace VisualMusic.Tests
             Assert.False(NoteStyle.HasGraphicsDevice);
             Assert.False(NoteStyle.HasStylesInited);
         }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void SetGraphicsDevice_failure_restores_previous_device()
+        {
+            // SetGraphicsDevice triggers deferred FX bake; on failure it must roll back the device
+            // override (and HasStylesInited) so HasGraphicsDevice is not left true with empty FX.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager badCm = null;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                badCm = new ContentManager(new ServiceContainer(), "Content-missing-for-gd-rollback");
+
+                // First Content install with a Project that has styles — bake fails, cm stays installed.
+                NoteStyle.SetProject(project);
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(badCm));
+                Assert.True(NoteStyle.HasContent);
+                Assert.False(NoteStyle.HasGraphicsDevice);
+
+                // Installing GD retries bake and fails — must restore previous GD (null).
+                Assert.Throws<ContentLoadException>(() =>
+                    NoteStyle.SetGraphicsDevice(gds.GraphicsDevice));
+                Assert.False(NoteStyle.HasGraphicsDevice);
+                Assert.False(NoteStyle.HasStylesInited);
+                Assert.False(project.TrackViews[1].TrackProps.StyleProps.GetBarStyle().HasFx);
+                Assert.Null(project.TrackViews[1].Geo);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                badCm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasGraphicsDevice);
+        }
     }
 }

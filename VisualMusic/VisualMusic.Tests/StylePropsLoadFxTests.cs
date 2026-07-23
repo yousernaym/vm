@@ -51,6 +51,8 @@ namespace VisualMusic.Tests
                 holder.TrackViews = project.TrackViews;
                 Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm2));
                 Assert.True(NoteStyle.HasContent);
+                Assert.Equal(cm1.RootDirectory, NoteStyle.ContentRootDirectory);
+                Assert.NotEqual(cm2.RootDirectory, NoteStyle.ContentRootDirectory);
                 Assert.True(NoteStyle.HasProject);
                 Assert.False(project.TrackViews[1].TrackProps.StyleProps.GetBarStyle().HasFx);
             }
@@ -223,7 +225,10 @@ namespace VisualMusic.Tests
                 project.CreateTrackViews(2, eraseCurrent: true);
 
                 NoteStyle.SetContent(cm);
+                // Isolate the SInit gate: assume a device without allocating one (unit test).
+                NoteStyle.TestAssumeGraphicsDevice = true;
                 Assert.True(NoteStyle.HasContent);
+                Assert.True(NoteStyle.HasGraphicsDevice);
                 Assert.False(NoteStyle.HasStylesInited);
                 Assert.False(NoteStyle.CanCreateGeo);
 
@@ -232,6 +237,7 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                NoteStyle.TestAssumeGraphicsDevice = false;
                 NoteStyle.SetContent(null);
                 NoteStyle.SetProject(null);
                 TrackView.NumTracks = previousNumTracks;

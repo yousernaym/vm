@@ -1280,15 +1280,23 @@ namespace VisualMusic.ViewModels
             catch (FileImportException ex)
             {
                 // ImportSong may have mutated Notes/TrackViews before throwing (e.g. OpenAudioFile
-                // after OpenNoteFile) — refresh UI/waveforms to match the live Project.
-                RecoverAfterImportInitFailure(panelTouched: null);
+                // after OpenNoteFile) — refresh UI/waveforms to match the live Project. If this was
+                // a first-import shell and notes never loaded (remuxer/MidMix failed early), abandon
+                // instead of leaving HasProject true with an empty project.
+                if (createdProjectForImport && ShouldAbandonCreatedImportProject(Project))
+                    AbandonCreatedImportProject();
+                else
+                    RecoverAfterImportInitFailure(panelTouched: null);
                 MetroMessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (Exception ex)
             {
-                RecoverAfterImportInitFailure(panelTouched: null);
+                if (createdProjectForImport && ShouldAbandonCreatedImportProject(Project))
+                    AbandonCreatedImportProject();
+                else
+                    RecoverAfterImportInitFailure(panelTouched: null);
                 MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -1987,6 +1995,13 @@ namespace VisualMusic.ViewModels
             catch { /* best-effort */ }
             Project = null;
         }
+
+        /// <summary>
+        /// True when a first-import Project still has no notes (ImportSong failed before
+        /// OpenNoteFile / OpenSyntheticSong). Used to abandon the shell instead of Recover.
+        /// </summary>
+        internal static bool ShouldAbandonCreatedImportProject(Project project) =>
+            project?.Notes == null;
 
         // ---- IImportService (browser download import) ----
 

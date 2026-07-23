@@ -288,11 +288,27 @@ namespace VisualMusic
         /// <summary>False until <see cref="SetContent"/> runs (deserialize / headless tests).</summary>
         internal static bool HasContent => s_contentOverride != null;
 
+        /// <summary>Installed Content root directory (tests: which manager survived a failed SetContent).</summary>
+        internal static string ContentRootDirectory => s_contentOverride?.RootDirectory;
+
         /// <summary>False until a successful <see cref="SetProject"/> (rolled back on bake failure).</summary>
         internal static bool HasProject => s_projectOverride != null;
 
         /// <summary>False until <see cref="SetGraphicsDevice"/> runs.</summary>
-        internal static bool HasGraphicsDevice => s_graphicsDeviceOverride != null;
+        internal static bool HasGraphicsDevice =>
+            s_testAssumeGraphicsDevice || s_graphicsDeviceOverride != null;
+
+        /// <summary>
+        /// Test seam: treat a GraphicsDevice as present without allocating one (isolates the
+        /// <see cref="HasStylesInited"/> gate in <see cref="CanCreateGeo"/>).
+        /// </summary>
+        internal static bool TestAssumeGraphicsDevice
+        {
+            get => s_testAssumeGraphicsDevice;
+            set => s_testAssumeGraphicsDevice = value;
+        }
+
+        static bool s_testAssumeGraphicsDevice;
 
         /// <summary>False until <see cref="SInitAllStyles"/> after the current GraphicsDevice.</summary>
         internal static bool HasStylesInited => s_stylesInited;

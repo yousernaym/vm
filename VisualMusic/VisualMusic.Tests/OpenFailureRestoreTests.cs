@@ -524,6 +524,45 @@ namespace VisualMusic.Tests
             }
         }
 
+        [Fact]
+        public void ShouldAbandonCreatedImportProject_when_notes_never_loaded()
+        {
+            Assert.True(MainViewModel.ShouldAbandonCreatedImportProject(null));
+            Assert.True(MainViewModel.ShouldAbandonCreatedImportProject(new Project()));
+
+            var withNotes = BuildProjectWithNoteOnTrack1();
+            Assert.False(MainViewModel.ShouldAbandonCreatedImportProject(withNotes));
+        }
+
+        [Fact]
+        public void AbandonCreatedImportProject_used_when_first_import_has_no_notes()
+        {
+            // Mirrors DoImport catch: createdProjectForImport + Notes == null → abandon, not Recover.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var vm = new MainViewModel();
+            Project synced = null;
+            vm.SyncRendererProject = p => synced = p;
+            try
+            {
+                var shell = new Project();
+                vm.Project = shell;
+                NoteStyle.SetProject(shell);
+                Assert.True(MainViewModel.ShouldAbandonCreatedImportProject(vm.Project));
+
+                vm.AbandonCreatedImportProject();
+
+                Assert.Null(vm.Project);
+                Assert.False(vm.HasProject);
+                Assert.False(NoteStyle.HasProject);
+                Assert.Null(synced);
+            }
+            finally
+            {
+                NoteStyle.SetProject(null);
+                Project.SetDrawHost(null);
+            }
+        }
+
         static Project BuildProjectWithNoteOnTrack1()
         {
             var song = new Song
