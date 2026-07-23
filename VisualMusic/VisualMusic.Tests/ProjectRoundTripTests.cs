@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
+using LibSidWiz;
+using Microsoft.Xna.Framework.Content;
 using Midi;
 using VisualMusic.Keyframes;
 using Xunit;
@@ -146,6 +149,7 @@ namespace VisualMusic.Tests
                 // CreateTrackViews already re-called StyleProps.LoadFx (soft-skip without Content;
                 // SetContent would retry once a real ContentManager is installed).
                 loaded.InitAfterDeserialization(waveformPanel: null, loadAudio: false);
+                Assert.Null(loaded.TrackViews[1].Geo);
 
                 // 480 ticks at 120 bpm = 0.5s — deferred OnPlaybackOffsetSChanged finally runs with Notes set.
                 Assert.Equal(0.5, loaded.SongLengthS, 3);
@@ -154,12 +158,60 @@ namespace VisualMusic.Tests
                 loaded.NormSongPos = 0.5; // SongPosT == 240; keyframes at 0 and 100 → past end holds 0.5
                 loaded.InterpolatePropertyKeyframes();
                 Assert.Equal(0.5f, loaded.TrackViews[1].TrackProps.MaterialProps.Transp!.Value, 3);
+
+                // After rewire, installing Content retries FX load (empty root → ContentLoadException).
+                NoteStyle.SetProject(loaded);
+                var cm = new ContentManager(new EmptyServiceProvider(), "Content-missing-for-test");
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm));
             }
             finally
             {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
                 TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
+        }
+
+        [Fact]
+        public void InitAfterDeserialization_wires_non_null_waveform_panel()
+        {
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var wp = new WaveformPanel();
+            try
+            {
+                var loaded = RoundTrip(BuildSampleProject());
+                var notes = EmptySong(2);
+                notes.Tracks[1].Notes.Add(new Note
+                {
+                    start = 10, stop = 20, pitch = 60, velocity = 80, channel = 0,
+                });
+                loaded.Notes = notes;
+                loaded.CreateTrackViews(notes.Tracks.Count, eraseCurrent: false, preserveTrackSet: true);
+
+                // Stale channel must be cleared; track 1's SidWizChannel is then added (track 0 skipped).
+                wp.AddChannel(new Channel(autoReloadOnSettingChanged: false));
+                Assert.Equal(1, wp.ChannelCount);
+
+                loaded.InitAfterDeserialization(waveformPanel: wp, loadAudio: false);
+
+                Assert.Equal(1, wp.ChannelCount);
+                var expected = loaded.TrackViews[1].TrackProps.AudioProps.SidWizChannel;
+                wp.RemoveChannel(expected);
+                Assert.Equal(0, wp.ChannelCount);
+            }
+            finally
+            {
+                wp.Dispose();
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        sealed class EmptyServiceProvider : IServiceProvider
+        {
+            public object GetService(Type serviceType) => null;
         }
 
         [Fact]

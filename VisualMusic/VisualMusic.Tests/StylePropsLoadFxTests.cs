@@ -48,26 +48,7 @@ namespace VisualMusic.Tests
             var previousNumTracks = TrackView.NumTracks;
             try
             {
-                var song = new Song
-                {
-                    TicksPerBeat = 480,
-                    TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
-                    Tracks = new List<Track>
-                    {
-                        new Track { Length = 480 },
-                        new Track
-                        {
-                            Length = 480,
-                            Notes = new List<Note>
-                            {
-                                new Note { start = 0, stop = 120, channel = 0, pitch = 60, velocity = 100 },
-                            },
-                        },
-                    },
-                    SongLengthT = 480,
-                };
-                var project = new Project();
-                project.Notes = song;
+                var project = BuildProjectWithNoteOnTrack1();
                 project.CreateTrackViews(2, eraseCurrent: true);
                 Assert.Null(project.TrackViews[1].Geo);
 
@@ -85,6 +66,86 @@ namespace VisualMusic.Tests
             }
 
             Assert.False(NoteStyle.HasContent);
+        }
+
+        [Fact]
+        public void StyleProps_LoadFx_attempts_Content_Load_when_HasContent()
+        {
+            Assert.False(NoteStyle.HasContent);
+            var styles = new StyleProps(1);
+            var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
+            try
+            {
+                // Install Content without a Project so SetContent does not retry LoadStyleFxAndCreateGeos.
+                NoteStyle.SetContent(cm);
+                Assert.True(NoteStyle.HasContent);
+                // Soft-skip is skipped: LoadFx reaches Content.Load and fails on the empty root.
+                Assert.Throws<ContentLoadException>(() => styles.LoadFx());
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+        }
+
+        [Fact]
+        public void CreateGeo_attempts_bake_when_HasContent()
+        {
+            Assert.False(NoteStyle.HasContent);
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                Assert.Null(project.TrackViews[1].Geo);
+
+                // HasContent without retrying FX (no SetProject yet). CreateGeo must pass the
+                // soft-skip and reach CreateGeoChunk → VertexBuffer with a null GraphicsDevice.
+                NoteStyle.SetContent(cm);
+                Assert.True(NoteStyle.HasContent);
+                NoteStyle.SetProject(project);
+
+                Assert.ThrowsAny<Exception>(() =>
+                    project.TrackViews[1].CreateGeo(project, project.GlobalTrackProps));
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+        }
+
+        static Project BuildProjectWithNoteOnTrack1()
+        {
+            var song = new Song
+            {
+                TicksPerBeat = 480,
+                TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
+                Tracks = new List<Track>
+                {
+                    new Track { Length = 480 },
+                    new Track
+                    {
+                        Length = 480,
+                        Notes = new List<Note>
+                        {
+                            new Note { start = 0, stop = 120, channel = 0, pitch = 60, velocity = 100 },
+                        },
+                    },
+                },
+                SongLengthT = 480,
+            };
+            var project = new Project();
+            project.Notes = song;
+            return project;
         }
     }
 }

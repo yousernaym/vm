@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Content;
 using Midi;
 using VisualMusic.Keyframes;
 using Xunit;
@@ -7,6 +9,11 @@ namespace VisualMusic.Tests
 {
     public class UndoItemsTests
     {
+        sealed class EmptyServices : IServiceProvider
+        {
+            public object GetService(Type serviceType) => null;
+        }
+
         static Project MinimalProject()
         {
             var p = new Project();
@@ -27,6 +34,37 @@ namespace VisualMusic.Tests
             project.Notes = song;
             project.TrackViews = new List<TrackView> { new TrackView(0, 1, song) };
             project.TrackViews[0].TrackProps.AudioProps.Filename = filename;
+            return project;
+        }
+
+        static Project ProjectWithNoteOnTrack1()
+        {
+            var song = new Song
+            {
+                TicksPerBeat = 480,
+                TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
+                Tracks = new List<Track>
+                {
+                    new Track { Length = 480 },
+                    new Track
+                    {
+                        Length = 480,
+                        Notes = new List<Note>
+                        {
+                            new Note { start = 0, stop = 120, channel = 0, pitch = 60, velocity = 100 },
+                        },
+                    },
+                },
+                SongLengthT = 480,
+            };
+            var project = new Project();
+            project.Notes = song;
+            project.TrackViews = new List<TrackView>
+            {
+                new TrackView(0, 2, song),
+                new TrackView(1, 2, song),
+            };
+            project.TrackViews[1].TrackProps.GlobalProps = project.TrackViews[0].TrackProps;
             return project;
         }
 
@@ -155,6 +193,47 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void Undo_CopyPropsFrom_then_LoadStyleFxAndCreateGeos_attempts_fx_reload()
+        {
+            // Mirrors MainViewModel undo: CopyPropsFrom then rebuild; without Content geo stays null,
+            // and installing Content retries FX load on the restored StyleProps.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var live = ProjectWithNoteOnTrack1();
+                live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Bar;
+                live.TrackViews[1].TrackProps.MaterialProps.Transp = 0.25f;
+
+                var undo = new UndoItems();
+                undo.Add("before", live);
+
+                live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Line;
+                live.TrackViews[1].TrackProps.MaterialProps.Transp = 0.9f;
+                undo.Add("after", live);
+
+                undo--;
+                live.CopyPropsFrom(undo.Current.Project);
+                Assert.Equal(NoteStyleType.Bar, live.TrackViews[1].TrackProps.StyleProps.Type);
+                Assert.Equal(0.25f, live.TrackViews[1].TrackProps.MaterialProps.Transp!.Value);
+
+                live.CreateGeos(false);
+                Assert.Null(live.TrackViews[1].Geo);
+
+                NoteStyle.SetProject(live);
+                var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm));
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
                 TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }

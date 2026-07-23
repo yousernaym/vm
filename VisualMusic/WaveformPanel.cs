@@ -485,6 +485,9 @@ namespace VisualMusic
             return strip;
         }
 
+        /// <summary>Channel list size (tests / diagnostics). UI-thread only.</summary>
+        internal int ChannelCount => _channels.Count;
+
         internal void ClearChannels()
         {
             _channels.Clear();
