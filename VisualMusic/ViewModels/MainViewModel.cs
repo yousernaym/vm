@@ -1459,7 +1459,9 @@ namespace VisualMusic.ViewModels
                 .SequenceEqual(_undoItems.Current.Project.TrackViews.Select(v => v.TrackNumber));
             Project?.CopyPropsFrom(_undoItems.Current.Project);
             // Reload style FX (DCS clone drops Effect refs) and rebuild geometry for restored props.
-            Project?.LoadStyleFxAndCreateGeos();
+            // resetVertScale: true — CopyPropsFrom restores SpatialProps but keeps live Geo; must not
+            // re-bake at the pre-undo RefWidthQn (CreateGeos(false) would).
+            Project?.LoadStyleFxAndCreateGeos(resetVertScale: true);
             // Refresh the Song and Track property panels so they reflect restored values.
             SongProps.RefreshAll();
             if (tracksChanged) TrackList.Rebuild(Project);

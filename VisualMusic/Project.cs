@@ -967,13 +967,18 @@ namespace VisualMusic
         /// <see cref="NoteStyle.SetContent"/> / <see cref="NoteStyle.SetProject"/> /
         /// <see cref="NoteStyle.SetGraphicsDevice"/> call this again once prerequisites are installed.
         /// </summary>
-        internal void LoadStyleFxAndCreateGeos()
+        /// <param name="resetVertScale">
+        /// Passed to <see cref="CreateGeos"/>. Default false preserves an existing geo ref width
+        /// (CreateTrackViews / deferred Set* retry). Undo/redo after <see cref="CopyPropsFrom"/> must
+        /// pass true so bake uses restored <see cref="EffectiveViewWidthQn"/>, not stale Geo.RefWidthQn.
+        /// </param>
+        internal void LoadStyleFxAndCreateGeos(bool resetVertScale = false)
         {
             if (_trackViews == null)
                 return;
             foreach (var tv in _trackViews)
                 tv.TrackProps?.StyleProps?.LoadFx();
-            CreateGeos(false);
+            CreateGeos(resetVertScale);
         }
 
         void AddTrackView(TrackView view)

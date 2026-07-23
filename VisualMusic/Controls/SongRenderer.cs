@@ -96,8 +96,10 @@ namespace VisualMusic
             get => _project;
             set
             {
-                _project = value;
+                // SetProject first: on bake failure it rolls back the static override and throws
+                // without updating _project / DrawHost (avoids a live Project with no DrawHost).
                 NoteStyle.SetProject(value);
+                _project = value;
                 Project.SetDrawHost(value != null ? this : null);
             }
         }

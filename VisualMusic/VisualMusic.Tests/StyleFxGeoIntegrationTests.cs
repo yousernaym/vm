@@ -231,5 +231,75 @@ namespace VisualMusic.Tests
             Assert.False(NoteStyle.HasContent);
             Assert.False(NoteStyle.HasGraphicsDevice);
         }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Undo_LoadStyleFxAndCreateGeos_resetVertScale_rebakes_at_restored_ViewWidthQn()
+        {
+            // ApplyUndoItem: CopyPropsFrom keeps live Geo (stale RefWidthQn) while restoring SpatialProps.
+            // CreateGeos(false) would re-bake at Geo.RefWidthQn; undo must pass resetVertScale: true.
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(cm);
+                NoteStyle.SetProject(project);
+                Assert.NotNull(project.TrackViews[1].Geo);
+                Assert.Equal(ProjProps.DefaultViewWidthQn, project.TrackViews[1].Geo.RefWidthQn);
+
+                var undo = new UndoItems();
+                undo.Add("before width", project);
+
+                const float widenedQn = 32f;
+                project.TrackViews[1].TrackProps.SpatialProps.ViewWidthQn = widenedQn;
+                project.CreateGeos(); // UI commit path: resetVertScale true
+                Assert.Equal(widenedQn, project.TrackViews[1].Geo.RefWidthQn);
+
+                undo.Add("after width", project);
+                undo--;
+                project.CopyPropsFrom(undo.Current.Project);
+                Assert.Equal(ProjProps.DefaultViewWidthQn,
+                    project.EffectiveViewWidthQn(project.TrackViews[1].TrackProps));
+                // Live Geo still reflects the widened bake until LoadStyleFxAndCreateGeos.
+                Assert.Equal(widenedQn, project.TrackViews[1].Geo.RefWidthQn);
+
+                project.LoadStyleFxAndCreateGeos(resetVertScale: false);
+                Assert.Equal(widenedQn, project.TrackViews[1].Geo.RefWidthQn); // stale path
+
+                project.LoadStyleFxAndCreateGeos(resetVertScale: true);
+                Assert.Equal(ProjProps.DefaultViewWidthQn, project.TrackViews[1].Geo.RefWidthQn);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasGraphicsDevice);
+            Assert.False(NoteStyle.HasProject);
+        }
     }
 }

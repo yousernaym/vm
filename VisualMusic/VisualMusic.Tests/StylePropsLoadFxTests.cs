@@ -89,6 +89,8 @@ namespace VisualMusic.Tests
                 Assert.True(NoteStyle.HasContent);
 
                 Assert.Throws<ContentLoadException>(() => NoteStyle.SetProject(project));
+                // Failed SetProject must not leave the project override installed (mirrors SetContent).
+                Assert.False(NoteStyle.HasProject);
             }
             finally
             {

@@ -181,16 +181,40 @@ namespace VisualMusic
 
         public static void SetGraphicsDevice(GraphicsDevice gd)
         {
+            var previous = s_graphicsDeviceOverride;
             s_graphicsDeviceOverride = gd;
-            // GD may arrive after Content + Project (or the reverse); finish deferred bake when all three exist.
-            TryFinishDeferredStyleFxAndGeos();
+            if (gd == null)
+                return;
+            try
+            {
+                // GD may arrive after Content + Project (or the reverse); finish deferred bake when ready.
+                TryFinishDeferredStyleFxAndGeos();
+            }
+            catch
+            {
+                // Roll back so HasGraphicsDevice is not true after a failed bake (mirrors SetContent).
+                s_graphicsDeviceOverride = previous;
+                throw;
+            }
         }
 
         public static void SetProject(Project p)
         {
+            var previous = s_projectOverride;
             s_projectOverride = p;
-            // Content may already be installed (SetContent ran before Project was assigned) — finish deferred bake.
-            TryFinishDeferredStyleFxAndGeos();
+            if (p == null)
+                return;
+            try
+            {
+                // Content may already be installed (SetContent ran before Project was assigned) — finish deferred bake.
+                TryFinishDeferredStyleFxAndGeos();
+            }
+            catch
+            {
+                // Roll back so a failed bake does not leave a new Project override with half-loaded FX.
+                s_projectOverride = previous;
+                throw;
+            }
         }
 
         /// <summary>
@@ -216,8 +240,9 @@ namespace VisualMusic
         }
 
         /// <summary>
-        /// When Content, GraphicsDevice, and Project are all set, loads style FX and bakes geometry
-        /// (CreateTrackViews / Set* may arrive in any order).
+        /// When Content and Project are set, loads style FX and attempts geometry bake
+        /// (CreateTrackViews / Set* may arrive in any order). Geometry soft-skips until
+        /// <see cref="CanCreateGeo"/> (Content + GraphicsDevice); a later SetGraphicsDevice retries.
         /// </summary>
         static void TryFinishDeferredStyleFxAndGeos()
         {
@@ -228,6 +253,9 @@ namespace VisualMusic
 
         /// <summary>False until <see cref="SetContent"/> runs (deserialize / headless tests).</summary>
         internal static bool HasContent => s_contentOverride != null;
+
+        /// <summary>False until a successful <see cref="SetProject"/> (rolled back on bake failure).</summary>
+        internal static bool HasProject => s_projectOverride != null;
 
         /// <summary>False until <see cref="SetGraphicsDevice"/> runs.</summary>
         internal static bool HasGraphicsDevice => s_graphicsDeviceOverride != null;
