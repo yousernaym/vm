@@ -359,5 +359,114 @@ namespace VisualMusic.Tests
             Assert.False(NoteStyle.HasGraphicsDevice);
             Assert.False(NoteStyle.HasProject);
         }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void SetContent_failure_rebakes_fx_and_geo_with_previous_content()
+        {
+            // After a successful bake, a failed SetContent must restore the previous Content and
+            // re-bake so HasContent is not left true with empty FX / null Geo.
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager goodCm = null;
+            ContentManager badCm = null;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                goodCm = new ContentManager(svc, contentRoot);
+                badCm = new ContentManager(new ServiceContainer(), "Content-missing-for-rebake-test");
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(goodCm);
+                NoteStyle.SetProject(project);
+                Assert.True(project.TrackViews[1].TrackProps.StyleProps.GetBarStyle().HasFx);
+                Assert.NotNull(project.TrackViews[1].Geo);
+
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(badCm));
+                Assert.True(NoteStyle.HasContent);
+                Assert.True(project.TrackViews[1].TrackProps.StyleProps.GetBarStyle().HasFx);
+                Assert.NotNull(project.TrackViews[1].Geo);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                goodCm?.Dispose();
+                badCm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasGraphicsDevice);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void SInitAllStyles_failure_clears_partial_fx_and_keeps_styles_inited()
+        {
+            // Content-before-SInit: bake runs inside SInitAllStyles. On LoadFx failure, decls stay
+            // (HasStylesInited) but partial FX/geo must be cleared.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager badCm = null;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                badCm = new ContentManager(new ServiceContainer(), "Content-missing-for-sinit-test");
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SetContent(badCm);
+                var holder = new Project
+                {
+                    Notes = project.Notes,
+                    TrackViews = new List<TrackView>(),
+                };
+                NoteStyle.SetProject(holder);
+                holder.TrackViews = project.TrackViews;
+
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SInitAllStyles());
+                Assert.True(NoteStyle.HasStylesInited);
+                Assert.True(NoteStyle.HasContent);
+                Assert.False(project.TrackViews[1].TrackProps.StyleProps.GetBarStyle().HasFx);
+                Assert.Null(project.TrackViews[1].Geo);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                badCm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasGraphicsDevice);
+            Assert.False(NoteStyle.HasStylesInited);
+        }
     }
 }

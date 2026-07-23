@@ -701,6 +701,9 @@ namespace VisualMusic.ViewModels
             if (drawHost != null) Project.SetDrawHost(drawHost);
 
             ImportOptions io;
+            // Non-null once RequireRendererWaveformPanel succeeds — Init (or a later step) may have
+            // cleared/replaced the live panel's channels for tempProject; failure must re-wire Project.
+            WaveformPanel panelTouched = null;
             try
             {
                 NoteStyle.SetProject(tempProject);
@@ -726,7 +729,8 @@ namespace VisualMusic.ViewModels
                 var trackAudioTargets = ApplyGeneratedTrackAudio(tempProject, io);
                 bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
                 // RequireRendererWaveformPanel switches to Song so a Collapsed HwndHost can BuildWindowCore.
-                tempProject.InitAfterDeserialization(RequireRendererWaveformPanel(), loadAudio: !deferTrackAudioLoad);
+                panelTouched = RequireRendererWaveformPanel();
+                tempProject.InitAfterDeserialization(panelTouched, loadAudio: !deferTrackAudioLoad);
                 if (deferTrackAudioLoad)
                     await LoadTrackAudioAsync(trackAudioTargets);
             }
@@ -736,14 +740,14 @@ namespace VisualMusic.ViewModels
                 // animation loop is still drawing the previous live project (Project), and its note
                 // rendering reads the static NoteStyle.Project — so restore it to Project rather than
                 // null, otherwise the next Draw() dereferences a null Project (NoteStyle.DrawTrack).
-                NoteStyle.SetProject(Project);
+                RestoreAfterFailedOpen(panelTouched);
                 MetroMessageBox.Show($"Could not load project file: {ex.Message}\n\nMissing file: {ex.FileName}",
                     Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (Exception ex)
             {
-                NoteStyle.SetProject(Project);
+                RestoreAfterFailedOpen(panelTouched);
                 MetroMessageBox.Show("Error loading project: " + ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
@@ -1267,20 +1271,30 @@ namespace VisualMusic.ViewModels
             if (options.EraseCurrent)
                 _currentProjectPath = "";
 
-            // Assign freshly generated per-track WAVs before InitAfterDeserialization so ownership
-            // prep and the single audio load see the correct paths (avoids a second load racing the
-            // first and disposing NAudio readers mid-Read).
-            var trackAudioTargets = ApplyGeneratedTrackAudio(Project, options);
+            try
+            {
+                // Assign freshly generated per-track WAVs before InitAfterDeserialization so ownership
+                // prep and the single audio load see the correct paths (avoids a second load racing the
+                // first and disposing NAudio readers mid-Read).
+                var trackAudioTargets = ApplyGeneratedTrackAudio(Project, options);
 
-            // Skip Init's fire-and-forget loads when we have fresh track WAVs — we await one load below.
-            bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
-            // RequireRendererWaveformPanel switches to Song so a Collapsed HwndHost can BuildWindowCore.
-            Project.InitAfterDeserialization(RequireRendererWaveformPanel(), loadAudio: !deferTrackAudioLoad);
+                // Skip Init's fire-and-forget loads when we have fresh track WAVs — we await one load below.
+                bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
+                // RequireRendererWaveformPanel switches to Song so a Collapsed HwndHost can BuildWindowCore.
+                Project.InitAfterDeserialization(RequireRendererWaveformPanel(), loadAudio: !deferTrackAudioLoad);
 
-            TrackList.Rebuild(Project);
+                TrackList.Rebuild(Project);
 
-            if (deferTrackAudioLoad)
-                await LoadTrackAudioAsync(trackAudioTargets);
+                if (deferTrackAudioLoad)
+                    await LoadTrackAudioAsync(trackAudioTargets);
+            }
+            catch (Exception ex)
+            {
+                // ImportSong already mutated Project; surface host/Init/audio failures instead of crashing.
+                MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
             OnProjectLoaded?.Invoke(Project);
             LoadStaticBackgroundIfUnkeyframed(Project);
@@ -1763,6 +1777,20 @@ namespace VisualMusic.ViewModels
                 throw new InvalidOperationException(
                     "WaveformPanel is unavailable (MonoGame host not ready). Open the Song screen and try again.");
             return wfp;
+        }
+
+        /// <summary>
+        /// After a failed Open: restore <see cref="NoteStyle"/> to the live <see cref="Project"/>.
+        /// When <paramref name="panelTouched"/> is non-null, Init (or a later step) may have replaced
+        /// that panel's channels for the abandoned temp project — re-wire the live project's channels
+        /// without reloading audio.
+        /// </summary>
+        internal void RestoreAfterFailedOpen(WaveformPanel panelTouched)
+        {
+            NoteStyle.SetProject(Project);
+            if (panelTouched == null || Project?.TrackViews == null)
+                return;
+            Project.InitAfterDeserialization(panelTouched, loadAudio: false);
         }
 
         // ---- IImportService (browser download import) ----

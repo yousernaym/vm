@@ -201,6 +201,8 @@ namespace VisualMusic
                 s_graphicsDeviceOverride = previous;
                 s_stylesInited = previousInited;
                 s_projectOverride?.ClearStyleFxAndGeos();
+                // Re-bake with the restored device so HasGraphicsDevice is not left true with empty FX.
+                TryRebakeAfterRollback();
                 throw;
             }
         }
@@ -221,6 +223,8 @@ namespace VisualMusic
                 // Roll back so a failed bake does not leave a new Project override with half-loaded FX.
                 s_projectOverride = previous;
                 p.ClearStyleFxAndGeos();
+                // Previous project may still need FX/geo if Content was already installed.
+                TryRebakeAfterRollback();
                 throw;
             }
         }
@@ -229,8 +233,8 @@ namespace VisualMusic
         /// Installs the MonoGame content manager. When non-null, also finishes deferred style FX /
         /// geometry for <see cref="SetProject"/>'s current project (CreateTrackViews soft-skips those
         /// while content is missing — e.g. import while the Song host is still Collapsed).
-        /// On failure, restores the previous Content override (if any) and clears partial FX/geo on
-        /// the current project so <see cref="HasContent"/> does not stay true with half-loaded FX.
+        /// On failure, restores the previous Content override (if any), clears partial FX/geo, then
+        /// re-bakes with the restored Content so <see cref="HasContent"/> is not left true with empty FX.
         /// </summary>
         public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm)
         {
@@ -246,8 +250,19 @@ namespace VisualMusic
             {
                 s_contentOverride = previous;
                 s_projectOverride?.ClearStyleFxAndGeos();
+                TryRebakeAfterRollback();
                 throw;
             }
+        }
+
+        /// <summary>
+        /// After a failed Set* rollback, reload FX/geo from the restored overrides. Swallows bake
+        /// errors so the original failure still propagates (previous Content may also be unloadable).
+        /// </summary>
+        static void TryRebakeAfterRollback()
+        {
+            try { TryFinishDeferredStyleFxAndGeos(); }
+            catch { /* leave cleared; caller still throws the original exception */ }
         }
 
         /// <summary>
@@ -339,10 +354,20 @@ namespace VisualMusic
         {
             NoteStyle_Bar.SInit();
             NoteStyle_Line.SInit();
+            // Decls succeeded — keep HasStylesInited even if the deferred bake throws (re-running
+            // SInit would leak device buffers). Clear partial FX/geo on failure instead.
             s_stylesInited = true;
-            // Initialize used to call SetContent before SInit; geo must wait for decls.
-            // Finish any deferred bake now that CanCreateGeo is true.
-            TryFinishDeferredStyleFxAndGeos();
+            try
+            {
+                // Initialize used to call SetContent before SInit; geo must wait for decls.
+                // Finish any deferred bake now that CanCreateGeo is true.
+                TryFinishDeferredStyleFxAndGeos();
+            }
+            catch
+            {
+                s_projectOverride?.ClearStyleFxAndGeos();
+                throw;
+            }
         }
 
         /// <summary>Drops loaded Effect refs (Content may be rolled back after a failed bake).</summary>

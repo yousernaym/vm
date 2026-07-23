@@ -47,10 +47,12 @@ namespace VisualMusic.Tests
                 Assert.True(NoteStyle.HasContent);
 
                 // Attach styles, then SetContent(cm2) retries LoadFx and fails — cm1 must remain.
+                // Re-bake with cm1 also fails (empty root); FX stay cleared but HasContent stays true.
                 holder.TrackViews = project.TrackViews;
                 Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm2));
                 Assert.True(NoteStyle.HasContent);
                 Assert.True(NoteStyle.HasProject);
+                Assert.False(project.TrackViews[1].TrackProps.StyleProps.GetBarStyle().HasFx);
             }
             finally
             {
