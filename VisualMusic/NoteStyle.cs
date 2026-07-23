@@ -181,7 +181,18 @@ namespace VisualMusic
 
         public static void SetGraphicsDevice(GraphicsDevice gd) => s_graphicsDeviceOverride = gd;
         public static void SetProject(Project p) => s_projectOverride = p;
-        public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm) => s_contentOverride = cm;
+
+        /// <summary>
+        /// Installs the MonoGame content manager. When non-null, also finishes deferred style FX /
+        /// geometry for <see cref="SetProject"/>'s current project (CreateTrackViews soft-skips those
+        /// while content is missing — e.g. import while the Song host is still Collapsed).
+        /// </summary>
+        public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm)
+        {
+            s_contentOverride = cm;
+            if (cm != null)
+                s_projectOverride?.LoadStyleFxAndCreateGeos();
+        }
 
         /// <summary>False until <see cref="SetContent"/> runs (deserialize / headless tests).</summary>
         internal static bool HasContent => s_contentOverride != null;

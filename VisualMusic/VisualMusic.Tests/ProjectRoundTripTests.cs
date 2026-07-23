@@ -135,7 +135,8 @@ namespace VisualMusic.Tests
                 Assert.Single(loaded.TrackViews[1].MidiTrack.Notes);
                 Assert.Same(loaded.TrackViews[0].TrackProps, loaded.TrackViews[1].TrackProps.GlobalProps);
 
-                // CreateTrackViews already re-called StyleProps.LoadFx (soft-skip without Content).
+                // CreateTrackViews already re-called StyleProps.LoadFx (soft-skip without Content;
+                // SetContent would retry once a real ContentManager is installed).
                 loaded.InitAfterDeserialization(waveformPanel: null, loadAudio: false);
 
                 // 480 ticks at 120 bpm = 0.5s — deferred OnPlaybackOffsetSChanged finally runs with Notes set.

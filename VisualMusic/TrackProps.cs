@@ -584,7 +584,7 @@ namespace VisualMusic
         public void LoadFx()
         {
             // StyleProps is constructed / deserialized before MonoGame Content exists; CreateTrackViews
-            // re-calls this once Content is ready. Skip rather than NRE in Bar/Line LoadFx.
+            // and NoteStyle.SetContent re-call this once Content is ready. Skip rather than NRE.
             if (!NoteStyle.HasContent)
                 return;
             foreach (NoteStyle ns in _styles)

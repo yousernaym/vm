@@ -935,9 +935,6 @@ namespace VisualMusic
                 // Update note information
                 _trackViews[i].MidiTrack = _notes.Tracks[_trackViews[i].TrackNumber];
                 _trackViews[i].CreateCurve();
-
-                // If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
-                _trackViews[i].TrackProps.StyleProps.LoadFx();
             }
             if (!preserveTrackSet)
                 for (int i = startTrack; i < numTracks; i++)
@@ -958,6 +955,21 @@ namespace VisualMusic
             // Keep the static count in sync with the actual view set (it can be < numTracks when
             // preserveTrackSet drops trailing note-file tracks that were removed before saving).
             TrackView.NumTracks = _trackViews.Count;
+            // Deserialized / headless views may still lack FX until Content exists; SetContent retries.
+            LoadStyleFxAndCreateGeos();
+        }
+
+        /// <summary>
+        /// Loads each track's style effects and bakes note geometry. Soft-skips while
+        /// <see cref="NoteStyle.HasContent"/> is false; <see cref="NoteStyle.SetContent"/> calls this
+        /// again once the content manager is installed.
+        /// </summary>
+        internal void LoadStyleFxAndCreateGeos()
+        {
+            if (_trackViews == null)
+                return;
+            foreach (var tv in _trackViews)
+                tv.TrackProps?.StyleProps?.LoadFx();
             CreateGeos(false);
         }
 

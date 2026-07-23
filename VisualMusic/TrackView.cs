@@ -127,8 +127,9 @@ namespace VisualMusic
         {
             if (MidiTrack.Notes.Count == 0)
                 return;
-            // Style FX / vertex buffers need MonoGame Content. CreateTrackViews → CreateGeos can
-            // run headless (unit tests) or before SetContent; skip rather than NRE in CreateGeoChunk.
+            // Style FX / vertex buffers need MonoGame Content. CreateTrackViews can run headless
+            // (unit tests) or before SetContent (e.g. import while Song host is Collapsed); soft-skip
+            // here — NoteStyle.SetContent retries via Project.LoadStyleFxAndCreateGeos.
             if (!NoteStyle.HasContent)
                 return;
             Midi.Note firstNote = _midiTrack.Notes[0];
