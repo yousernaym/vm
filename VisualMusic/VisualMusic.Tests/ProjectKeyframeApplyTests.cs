@@ -44,6 +44,7 @@ namespace VisualMusic.Tests
         public void InterpolatePropertyKeyframes_lerps_background_opacity()
         {
             Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
             try
             {
                 var project = BuildProjectWithSong();
@@ -59,6 +60,7 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
         }
@@ -67,6 +69,7 @@ namespace VisualMusic.Tests
         public void InterpolatePropertyKeyframes_lerps_track_Transp()
         {
             Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
             try
             {
                 var project = BuildProjectWithSong();
@@ -83,6 +86,7 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
         }
@@ -91,6 +95,7 @@ namespace VisualMusic.Tests
         public void InterpolatePropertyKeyframes_holds_bool_AudioVisLeft()
         {
             Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
             try
             {
                 var project = BuildProjectWithSong();
@@ -109,6 +114,7 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
         }
@@ -117,6 +123,7 @@ namespace VisualMusic.Tests
         public void KeyframeService_AddKey_RemoveKey_and_ResolveIds()
         {
             Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
             var previous = KeyframeService.Project;
             var previousIds = KeyframeService.SelectedTrackIds;
             var previousUndo = KeyframeService.RequestUndoSnapshot;
@@ -151,6 +158,7 @@ namespace VisualMusic.Tests
                 KeyframeService.Project = previous;
                 KeyframeService.SelectedTrackIds = previousIds;
                 KeyframeService.RequestUndoSnapshot = previousUndo;
+                TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
         }

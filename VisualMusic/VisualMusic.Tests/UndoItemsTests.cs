@@ -73,23 +73,32 @@ namespace VisualMusic.Tests
         [Fact]
         public void Snapshot_AudioProps_isolated_from_live_edits()
         {
-            var undo = new UndoItems();
-            var live = ProjectWithAudioTrack("a.wav");
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var undo = new UndoItems();
+                var live = ProjectWithAudioTrack("a.wav");
 
-            undo.Add("snap", live);
-            live.TrackViews[0].TrackProps.AudioProps.Filename = "b.wav";
+                undo.Add("snap", live);
+                live.TrackViews[0].TrackProps.AudioProps.Filename = "b.wav";
 
-            Assert.Equal("b.wav", live.TrackViews[0].TrackProps.AudioProps.Filename);
-            Assert.Equal("a.wav", undo.Current.Project.TrackViews[0].TrackProps.AudioProps.Filename);
-            Assert.NotSame(
-                live.TrackViews[0].TrackProps.AudioProps,
-                undo.Current.Project.TrackViews[0].TrackProps.AudioProps);
+                Assert.Equal("b.wav", live.TrackViews[0].TrackProps.AudioProps.Filename);
+                Assert.Equal("a.wav", undo.Current.Project.TrackViews[0].TrackProps.AudioProps.Filename);
+                Assert.NotSame(
+                    live.TrackViews[0].TrackProps.AudioProps,
+                    undo.Current.Project.TrackViews[0].TrackProps.AudioProps);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+            }
         }
 
         [Fact]
         public void Undo_CopyPropsFrom_restores_proj_and_track_props()
         {
             Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
             try
             {
                 var live = ProjectWithAudioTrack("a.wav");
@@ -146,6 +155,7 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
         }

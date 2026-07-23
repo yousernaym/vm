@@ -67,38 +67,46 @@ namespace VisualMusic.Tests
         [Fact]
         public void DataContractSerializer_round_trips_persisted_fields()
         {
-            var source = BuildSampleProject();
-            var loaded = RoundTrip(source);
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var source = BuildSampleProject();
+                var loaded = RoundTrip(source);
 
-            Assert.NotNull(loaded.ImportOptions);
-            Assert.Equal(FileType.Midi, loaded.ImportOptions.NoteFileType);
-            Assert.True(loaded.ImportOptions.InsTrack);
-            Assert.Equal(12.5f, loaded.ImportOptions.SongLengthS);
-            Assert.Equal(@"C:\songs\sample.mid", loaded.ImportOptions.RawNotePath);
+                Assert.NotNull(loaded.ImportOptions);
+                Assert.Equal(FileType.Midi, loaded.ImportOptions.NoteFileType);
+                Assert.True(loaded.ImportOptions.InsTrack);
+                Assert.Equal(12.5f, loaded.ImportOptions.SongLengthS);
+                Assert.Equal(@"C:\songs\sample.mid", loaded.ImportOptions.RawNotePath);
 
-            Assert.Equal(1.25f, loaded.Props.FadeIn);
-            Assert.Equal(0.9f, loaded.Props.Camera.Fov, 5);
-            Assert.Single(loaded.Props.LyricsSegments);
-            Assert.Equal("hello", loaded.Props.LyricsSegments[0].Lyrics);
-            Assert.Equal(4.0f, loaded.Props.LyricsSegments[0].Beat);
+                Assert.Equal(1.25f, loaded.Props.FadeIn);
+                Assert.Equal(0.9f, loaded.Props.Camera.Fov, 5);
+                Assert.Single(loaded.Props.LyricsSegments);
+                Assert.Equal("hello", loaded.Props.LyricsSegments[0].Lyrics);
+                Assert.Equal(4.0f, loaded.Props.LyricsSegments[0].Beat);
 
-            Assert.Equal(2, loaded.TrackViews.Count);
-            Assert.Equal(0, loaded.TrackViews[0].TrackNumber);
-            Assert.Equal(1, loaded.TrackViews[1].TrackNumber);
+                Assert.Equal(2, loaded.TrackViews.Count);
+                Assert.Equal(0, loaded.TrackViews[0].TrackNumber);
+                Assert.Equal(1, loaded.TrackViews[1].TrackNumber);
 
-            Assert.True(loaded.PropertyKeyframes.HasKeyAt("proj/BackgroundImageOpacity", 0));
-            Assert.True(loaded.PropertyKeyframes.HasKeyAt("track/1/Transp", 100));
-            Assert.Equal(KfInterpolation.Linear,
-                loaded.PropertyKeyframes.GetInterpolation("proj/BackgroundImageOpacity", 0));
-            Assert.Equal(KfInterpolation.Smooth,
-                loaded.PropertyKeyframes.GetInterpolation("track/1/Transp", 100));
-            var opacityKf = loaded.PropertyKeyframes.Tracks["proj/BackgroundImageOpacity"].FindBrackets(0).Before;
-            var transpKf = loaded.PropertyKeyframes.Tracks["track/1/Transp"].FindBrackets(100).Before;
-            Assert.Equal(0.2, ((ScalarKfValue)opacityKf.Value).V, 5);
-            Assert.Equal(0.5, ((ScalarKfValue)transpKf.Value).V, 5);
+                Assert.True(loaded.PropertyKeyframes.HasKeyAt("proj/BackgroundImageOpacity", 0));
+                Assert.True(loaded.PropertyKeyframes.HasKeyAt("track/1/Transp", 100));
+                Assert.Equal(KfInterpolation.Linear,
+                    loaded.PropertyKeyframes.GetInterpolation("proj/BackgroundImageOpacity", 0));
+                Assert.Equal(KfInterpolation.Smooth,
+                    loaded.PropertyKeyframes.GetInterpolation("track/1/Transp", 100));
+                var opacityKf = loaded.PropertyKeyframes.Tracks["proj/BackgroundImageOpacity"].FindBrackets(0).Before;
+                var transpKf = loaded.PropertyKeyframes.Tracks["track/1/Transp"].FindBrackets(100).Before;
+                Assert.Equal(0.2, ((ScalarKfValue)opacityKf.Value).V, 5);
+                Assert.Equal(0.5, ((ScalarKfValue)transpKf.Value).V, 5);
 
-            // Notes are not part of the project file payload.
-            Assert.Null(loaded.Notes);
+                // Notes are not part of the project file payload.
+                Assert.Null(loaded.Notes);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+            }
         }
 
         [Fact]
@@ -157,19 +165,27 @@ namespace VisualMusic.Tests
         [Fact]
         public void Clone_shareAudioProps_false_preserves_fields_and_shares_Notes()
         {
-            var source = BuildSampleProject();
-            var clone = source.Clone(shareAudioProps: false);
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var source = BuildSampleProject();
+                var clone = source.Clone(shareAudioProps: false);
 
-            Assert.Same(source.Notes, clone.Notes);
-            Assert.Equal(source.Props.FadeIn, clone.Props.FadeIn);
-            Assert.Equal(source.Props.Camera.Fov, clone.Props.Camera.Fov, 5);
-            Assert.Equal(source.ImportOptions.InsTrack, clone.ImportOptions.InsTrack);
-            Assert.True(clone.PropertyKeyframes.HasKeyAt("proj/BackgroundImageOpacity", 0));
-            Assert.True(clone.PropertyKeyframes.HasKeyAt("track/1/Transp", 100));
-            Assert.Equal(2, clone.TrackViews.Count);
-            Assert.NotSame(
-                source.TrackViews[1].TrackProps.AudioProps,
-                clone.TrackViews[1].TrackProps.AudioProps);
+                Assert.Same(source.Notes, clone.Notes);
+                Assert.Equal(source.Props.FadeIn, clone.Props.FadeIn);
+                Assert.Equal(source.Props.Camera.Fov, clone.Props.Camera.Fov, 5);
+                Assert.Equal(source.ImportOptions.InsTrack, clone.ImportOptions.InsTrack);
+                Assert.True(clone.PropertyKeyframes.HasKeyAt("proj/BackgroundImageOpacity", 0));
+                Assert.True(clone.PropertyKeyframes.HasKeyAt("track/1/Transp", 100));
+                Assert.Equal(2, clone.TrackViews.Count);
+                Assert.NotSame(
+                    source.TrackViews[1].TrackProps.AudioProps,
+                    clone.TrackViews[1].TrackProps.AudioProps);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+            }
         }
     }
 }
