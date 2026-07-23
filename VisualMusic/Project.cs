@@ -956,7 +956,7 @@ namespace VisualMusic
             // preserveTrackSet drops trailing note-file tracks that were removed before saving).
             TrackView.NumTracks = _trackViews.Count;
             // Deserialized / headless views may still lack FX until Content exists;
-            // SetContent / SetProject / SetGraphicsDevice retry via LoadStyleFxAndCreateGeos.
+            // SetContent / SetProject / SetGraphicsDevice / SInitAllStyles retry via LoadStyleFxAndCreateGeos.
             LoadStyleFxAndCreateGeos();
         }
 
@@ -965,7 +965,8 @@ namespace VisualMusic
         /// soft-skips while <see cref="NoteStyle.HasContent"/> is false; <see cref="TrackView.CreateGeo"/>
         /// soft-skips while <see cref="NoteStyle.CanCreateGeo"/> is false.
         /// <see cref="NoteStyle.SetContent"/> / <see cref="NoteStyle.SetProject"/> /
-        /// <see cref="NoteStyle.SetGraphicsDevice"/> call this again once prerequisites are installed.
+        /// <see cref="NoteStyle.SetGraphicsDevice"/> / <see cref="NoteStyle.SInitAllStyles"/> call
+        /// this again once prerequisites are installed.
         /// </summary>
         /// <param name="resetVertScale">
         /// Passed to <see cref="CreateGeos"/>. Default false preserves an existing geo ref width
@@ -979,6 +980,22 @@ namespace VisualMusic
             foreach (var tv in _trackViews)
                 tv.TrackProps?.StyleProps?.LoadFx();
             CreateGeos(resetVertScale);
+        }
+
+        /// <summary>
+        /// Drops style Effect refs and baked geometry after a failed deferred bake so a rolled-back
+        /// <see cref="NoteStyle.SetContent"/> / <see cref="NoteStyle.SetProject"/> /
+        /// <see cref="NoteStyle.SetGraphicsDevice"/> does not leave half-loaded FX or partial Geos.
+        /// </summary>
+        internal void ClearStyleFxAndGeos()
+        {
+            if (_trackViews == null)
+                return;
+            foreach (var tv in _trackViews)
+            {
+                tv.Geo = null;
+                tv.TrackProps?.StyleProps?.ClearFx();
+            }
         }
 
         void AddTrackView(TrackView view)

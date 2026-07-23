@@ -146,9 +146,11 @@ namespace VisualMusic
             };
 
             _content = new ContentManager(_services, "Content");
+            // SInit before SetContent: Set* may finish a deferred geo bake when Project is already
+            // set (Open/Import forcing first host build). CreateGeoChunk needs decls from SInit.
             NoteStyle.SetGraphicsDevice(_graphicsDevice);
-            NoteStyle.SetContent(_content);
             NoteStyle.SInitAllStyles();
+            NoteStyle.SetContent(_content);
             LyricsFont = _content.Load<SpriteFont>("Font");
 
             _regionSelectTexture = new Texture2D(_graphicsDevice, 1, 1);

@@ -14,6 +14,85 @@ namespace VisualMusic.Tests
         }
 
         [Fact]
+        public void CanCreateGeo_requires_styles_inited()
+        {
+            Assert.False(NoteStyle.HasStylesInited);
+            Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasGraphicsDevice);
+            Assert.False(NoteStyle.CanCreateGeo);
+        }
+
+        [Fact]
+        public void SetContent_failure_restores_previous_content()
+        {
+            Assert.False(NoteStyle.HasContent);
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var cm1 = new ContentManager(new EmptyServices(), "Content-missing-1");
+            var cm2 = new ContentManager(new EmptyServices(), "Content-missing-2");
+            try
+            {
+                // Build views without Content so StyleProps.LoadFx soft-skips during construction.
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+
+                // Install cm1 with an empty view list so SetProject does not hit LoadFx yet.
+                var holder = new Project
+                {
+                    Notes = project.Notes,
+                    TrackViews = new List<TrackView>(),
+                };
+                NoteStyle.SetContent(cm1);
+                NoteStyle.SetProject(holder);
+                Assert.True(NoteStyle.HasContent);
+
+                // Attach styles, then SetContent(cm2) retries LoadFx and fails — cm1 must remain.
+                holder.TrackViews = project.TrackViews;
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm2));
+                Assert.True(NoteStyle.HasContent);
+                Assert.True(NoteStyle.HasProject);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+        }
+
+        [Fact]
+        public void SetContent_failure_clears_style_fx_and_geo_on_project()
+        {
+            Assert.False(NoteStyle.HasContent);
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                NoteStyle.SetProject(project);
+
+                var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
+                Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm));
+                Assert.False(NoteStyle.HasContent);
+                Assert.True(NoteStyle.HasProject);
+                Assert.Null(project.TrackViews[1].Geo);
+                Assert.False(project.TrackViews[0].TrackProps.StyleProps.GetBarStyle().HasFx);
+                Assert.False(project.TrackViews[1].TrackProps.StyleProps.GetBarStyle().HasFx);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
         public void StyleProps_ctor_and_LoadFx_are_safe_without_content()
         {
             Assert.False(NoteStyle.HasContent);
@@ -123,6 +202,37 @@ namespace VisualMusic.Tests
             }
 
             Assert.False(NoteStyle.HasContent);
+        }
+
+        [Fact]
+        public void CreateGeo_soft_skips_without_styles_inited()
+        {
+            // Content + device are not enough — SInitAllStyles must run before CanCreateGeo.
+            Assert.False(NoteStyle.HasStylesInited);
+            Assert.False(NoteStyle.CanCreateGeo);
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+
+                NoteStyle.SetContent(cm);
+                Assert.True(NoteStyle.HasContent);
+                Assert.False(NoteStyle.HasStylesInited);
+                Assert.False(NoteStyle.CanCreateGeo);
+
+                project.TrackViews[1].CreateGeo(project, project.GlobalTrackProps);
+                Assert.Null(project.TrackViews[1].Geo);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
         }
 
         [Fact]

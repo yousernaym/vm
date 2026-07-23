@@ -694,14 +694,17 @@ namespace VisualMusic.ViewModels
                 return;
             }
 
-            // Set static references before loadContent so NoteStyle.createGeoChunk and
-            // Project.drawSong() (both called from inside loadContent) can access the renderer.
+            // Set DrawHost before loadContent so NoteStyle.createGeoChunk and Project.drawSong()
+            // (both called from inside loadContent) can access the renderer. NoteStyle.SetProject
+            // and post-load Init share one try so any failure restores the previous static Project.
             var drawHost = GetDrawHost?.Invoke();
             if (drawHost != null) Project.SetDrawHost(drawHost);
-            NoteStyle.SetProject(tempProject);
 
+            ImportOptions io;
             try
             {
+                NoteStyle.SetProject(tempProject);
+
                 // A MOD/SID/HVL project re-runs the external remuxer on load (unless its converted
                 // outputs are already cached), so show the same progress window a fresh import does.
                 // MIDI and audio-only projects rebuild in-process, so no progress window is needed.
@@ -717,6 +720,15 @@ namespace VisualMusic.ViewModels
                 }
                 else
                     await tempProject.LoadContent();
+
+                // Re-point tracks at freshly generated per-track WAVs before Init loads audio.
+                io = tempProject.ImportOptions;
+                var trackAudioTargets = ApplyGeneratedTrackAudio(tempProject, io);
+                bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
+                // RequireRendererWaveformPanel switches to Song so a Collapsed HwndHost can BuildWindowCore.
+                tempProject.InitAfterDeserialization(RequireRendererWaveformPanel(), loadAudio: !deferTrackAudioLoad);
+                if (deferTrackAudioLoad)
+                    await LoadTrackAudioAsync(trackAudioTargets);
             }
             catch (FileImportException ex)
             {
@@ -735,15 +747,6 @@ namespace VisualMusic.ViewModels
                 MetroMessageBox.Show("Error loading project: " + ex.Message, Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
-            // Re-point tracks at freshly generated per-track WAVs before Init loads audio.
-            var io = tempProject.ImportOptions;
-            var trackAudioTargets = ApplyGeneratedTrackAudio(tempProject, io);
-
-            bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
-            tempProject.InitAfterDeserialization(RequireRendererWaveformPanel(), loadAudio: !deferTrackAudioLoad);
-            if (deferTrackAudioLoad)
-                await LoadTrackAudioAsync(trackAudioTargets);
 
             // Pre-fill the import dialog with this project's saved import options so that
             // opening the dialog after loading a project shows the correct file paths and settings

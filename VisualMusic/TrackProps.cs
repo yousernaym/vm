@@ -584,8 +584,8 @@ namespace VisualMusic
         public void LoadFx()
         {
             // StyleProps is constructed / deserialized before MonoGame Content exists; CreateTrackViews
-            // and NoteStyle.SetContent / SetProject / SetGraphicsDevice re-call this once Content is ready.
-            // Skip rather than NRE.
+            // and NoteStyle.SetContent / SetProject / SetGraphicsDevice / SInitAllStyles re-call this
+            // once Content is ready. Skip rather than NRE.
             if (!NoteStyle.HasContent)
                 return;
             foreach (NoteStyle ns in _styles)
@@ -593,6 +593,13 @@ namespace VisualMusic
                 if (ns != null)
                     ns.LoadFx();
             }
+        }
+
+        /// <summary>Clears Effect refs on all styles (failed bake rollback).</summary>
+        internal void ClearFx()
+        {
+            foreach (NoteStyle ns in _styles)
+                ns?.ClearFx();
         }
 
         public StyleProps Clone()

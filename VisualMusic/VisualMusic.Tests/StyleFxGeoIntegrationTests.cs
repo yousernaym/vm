@@ -159,6 +159,8 @@ namespace VisualMusic.Tests
                 Assert.Null(project.TrackViews[1].Geo);
 
                 NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                Assert.False(NoteStyle.HasStylesInited);
+                Assert.False(NoteStyle.CanCreateGeo);
                 NoteStyle.SInitAllStyles();
                 Assert.True(NoteStyle.CanCreateGeo);
                 Assert.Null(project.TrackViews[1].Geo); // Project not set yet — no deferred bake
@@ -230,6 +232,62 @@ namespace VisualMusic.Tests
 
             Assert.False(NoteStyle.HasContent);
             Assert.False(NoteStyle.HasGraphicsDevice);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Initialize_order_SetContent_before_SInit_soft_skips_geo_then_SInit_bakes()
+        {
+            // SongRenderer.Initialize now calls SInit before SetContent, but Open/Import can
+            // SetProject first and force a first-time host build — SetContent must not bake geo
+            // with null vertex decls; SInitAllStyles finishes the deferred bake.
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                Assert.Null(project.TrackViews[1].Geo);
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetProject(project);
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                // Deliberately SetContent before SInit (pre-fix Initialize order).
+                NoteStyle.SetContent(cm);
+                Assert.True(NoteStyle.HasContent);
+                Assert.False(NoteStyle.HasStylesInited);
+                Assert.False(NoteStyle.CanCreateGeo);
+                Assert.Null(project.TrackViews[1].Geo);
+
+                NoteStyle.SInitAllStyles();
+                Assert.True(NoteStyle.CanCreateGeo);
+                Assert.NotNull(project.TrackViews[1].Geo);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasGraphicsDevice);
+            Assert.False(NoteStyle.HasStylesInited);
         }
 
         [Fact]
