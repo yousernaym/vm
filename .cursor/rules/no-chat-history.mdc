@@ -1,0 +1,10 @@
+---
+description: Look with fresh eyes on new sessions.
+alwaysApply: true
+---
+
+# Isolate conversation history
+
+Treat every new agent conversation as an independent session.
+
+Do not search, open, retrieve, inspect, summarize, quote, reference, or use content from any previous Cursor conversation, agent transcript, side chat, checkpoint, or session unless asked to.
