@@ -1217,9 +1217,15 @@ namespace VisualMusic.ViewModels
                 options.TrackAudioOutputDir = prev.TrackAudioOutputDir;
             }
 
-            // Ensure a project object exists to import into.
+            // Ensure a project object exists to import into. Track whether we created it so early
+            // failures (BindDrawProject / CheckSourceFile) do not leave HasProject true with an
+            // empty shell that was never imported.
+            bool createdProjectForImport = false;
             if (Project == null)
+            {
                 Project = new Project();
+                createdProjectForImport = true;
+            }
 
             // Same SongRenderer / NoteStyle / DrawHost alignment Open uses (first import especially:
             // SongRenderer.Project was previously left null until OnProjectLoaded).
@@ -1230,6 +1236,8 @@ namespace VisualMusic.ViewModels
             }
             catch (Exception ex)
             {
+                if (createdProjectForImport)
+                    AbandonCreatedImportProject();
                 MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -1238,6 +1246,8 @@ namespace VisualMusic.ViewModels
             try { options.CheckSourceFile(); }
             catch (FileImportException ex)
             {
+                if (createdProjectForImport)
+                    AbandonCreatedImportProject();
                 MetroMessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -1253,10 +1263,19 @@ namespace VisualMusic.ViewModels
                     // the conversion advance and can cancel it. MIDI and audio-only imports take the
                     // direct in-process path (no remuxer, no progress window).
                     if (!RunConversionBehindProgress((p, ct) => Project.ImportSong(options, p, ct)))
+                    {
+                        // Cancelled / nothing imported — drop an unused shell created for this attempt.
+                        if (createdProjectForImport)
+                            AbandonCreatedImportProject();
                         return;
+                    }
                 }
                 else if (!await Project.ImportSong(options))
+                {
+                    if (createdProjectForImport)
+                        AbandonCreatedImportProject();
                     return;
+                }
             }
             catch (FileImportException ex)
             {
@@ -1301,6 +1320,7 @@ namespace VisualMusic.ViewModels
             {
                 // ImportSong already mutated Project; keep waveforms + track list in sync with the
                 // new tracks, then surface the failure instead of crashing or leaving stale UI.
+                // (Do not abandon: notes/audio from ImportSong are already on Project.)
                 RecoverAfterImportInitFailure(panelTouched);
                 MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
@@ -1908,6 +1928,18 @@ namespace VisualMusic.ViewModels
                 // Leave panel as-is; caller still reports the original failure.
             }
 
+            // Audio-only: CreateTrackViews runs before OpenAudioFile; if audio opened but length
+            // sync never ran (or recovery after a partial failure), pull length from open Media.
+            try
+            {
+                if (Project?.Notes != null && Media.GetAudioLength() > 0)
+                {
+                    bool audioOnly = Project.ImportOptions?.NoteFileType == FileType.Audio;
+                    Project.SyncSongLengthFromOpenAudio(propagateToAudioOnlyTracks: audioOnly);
+                }
+            }
+            catch { /* best-effort */ }
+
             TrackList.Rebuild(Project);
             SongProps.RefreshAll();
             OnPropertyChanged(nameof(HasAudio));
@@ -1918,6 +1950,21 @@ namespace VisualMusic.ViewModels
             NudgeForwardCommand.NotifyCanExecuteChanged();
             JumpBackCommand.NotifyCanExecuteChanged();
             JumpForwardCommand.NotifyCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Clears a Project that was allocated only for this import attempt and never successfully
+        /// imported, so <see cref="HasProject"/> does not stay true with an empty shell.
+        /// </summary>
+        internal void AbandonCreatedImportProject()
+        {
+            try { NoteStyle.SetProject(null); }
+            catch { /* best-effort */ }
+            try { SyncRendererProject?.Invoke(null); }
+            catch { /* best-effort */ }
+            try { GetRendererWaveformPanel?.Invoke()?.ClearChannels(); }
+            catch { /* best-effort */ }
+            Project = null;
         }
 
         // ---- IImportService (browser download import) ----

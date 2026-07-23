@@ -233,8 +233,11 @@ namespace VisualMusic
         /// Installs the MonoGame content manager. When non-null, also finishes deferred style FX /
         /// geometry for <see cref="SetProject"/>'s current project (CreateTrackViews soft-skips those
         /// while content is missing — e.g. import while the Song host is still Collapsed).
-        /// On failure, restores the previous Content override (if any), clears partial FX/geo, then
-        /// re-bakes with the restored Content so <see cref="HasContent"/> is not left true with empty FX.
+        /// On failure, clears partial FX/geo. When a previous Content override exists, restores it and
+        /// re-bakes so <see cref="HasContent"/> is not left true with empty FX. When this is the first
+        /// Content (previous null — typical <see cref="SongRenderer.Initialize"/>), keeps <paramref name="cm"/>
+        /// installed: rolling back to null would leave <see cref="HasContent"/> false permanently because
+        /// the HwndHost does not re-run Initialize after a failed first build.
         /// </summary>
         public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm)
         {
@@ -248,9 +251,13 @@ namespace VisualMusic
             }
             catch
             {
-                s_contentOverride = previous;
                 s_projectOverride?.ClearStyleFxAndGeos();
-                TryRebakeAfterRollback();
+                if (previous != null)
+                {
+                    s_contentOverride = previous;
+                    TryRebakeAfterRollback();
+                }
+                // else: keep cm — first Content must stick for later LoadFx retries / render loop.
                 throw;
             }
         }

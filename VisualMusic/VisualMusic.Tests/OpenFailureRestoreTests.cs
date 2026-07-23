@@ -402,6 +402,80 @@ namespace VisualMusic.Tests
             }
         }
 
+        [Fact]
+        public void AbandonCreatedImportProject_clears_project_and_draw_binding()
+        {
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var wp = new WaveformPanel();
+            var vm = new MainViewModel();
+            Project synced = new Project(); // sentinel: Sync must be invoked with null
+            try
+            {
+                var shell = BuildProjectWithNoteOnTrack1();
+                shell.CreateTrackViews(2, eraseCurrent: true);
+                vm.Project = shell;
+                NoteStyle.SetProject(shell);
+                vm.SyncRendererProject = p => synced = p;
+                vm.GetRendererWaveformPanel = () => wp;
+                shell.InitAfterDeserialization(wp, loadAudio: false);
+                Assert.Equal(1, wp.ChannelCount);
+
+                vm.AbandonCreatedImportProject();
+
+                Assert.Null(vm.Project);
+                Assert.False(vm.HasProject);
+                Assert.False(NoteStyle.HasProject);
+                Assert.Null(synced);
+                Assert.Equal(0, wp.ChannelCount);
+            }
+            finally
+            {
+                wp.Dispose();
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void SyncSongLengthFromOpenAudio_noops_when_media_has_no_audio()
+        {
+            // Without an open Media file, recovery must not invent a song length.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var song = new Song
+                {
+                    TicksPerBeat = 480,
+                    TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
+                    Tracks = new List<Track>
+                    {
+                        new Track { Length = 0 },
+                        new Track { Length = 0 },
+                    },
+                    SongLengthT = 0,
+                };
+                var project = new Project
+                {
+                    Notes = song,
+                    ImportOptions = new AudioImportOptions(),
+                };
+                project.CreateTrackViews(2, eraseCurrent: true);
+
+                project.SyncSongLengthFromOpenAudio(propagateToAudioOnlyTracks: true);
+
+                Assert.Equal(0, project.Notes.SongLengthT);
+                Assert.Equal(0, project.Notes.Tracks[1].Length);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
         static Project BuildProjectWithNoteOnTrack1()
         {
             var song = new Song

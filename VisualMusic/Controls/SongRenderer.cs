@@ -150,7 +150,17 @@ namespace VisualMusic
             // set (Open/Import forcing first host build). CreateGeoChunk needs decls from SInit.
             NoteStyle.SetGraphicsDevice(_graphicsDevice);
             NoteStyle.SInitAllStyles();
-            NoteStyle.SetContent(_content);
+            // Bake can fail when Project was bound before the first host build (Open/Import).
+            // SetContent keeps Content installed on first-install failure; still finish fonts /
+            // WaveformPanel so BuildWindowCore succeeds — the HwndHost never re-calls Initialize.
+            try
+            {
+                NoteStyle.SetContent(_content);
+            }
+            catch
+            {
+                // Content stays installed (see SetContent); FX/geo cleared. Continue host init.
+            }
             LyricsFont = _content.Load<SpriteFont>("Font");
 
             _regionSelectTexture = new Texture2D(_graphicsDevice, 1, 1);

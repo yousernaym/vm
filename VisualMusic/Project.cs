@@ -656,13 +656,6 @@ namespace VisualMusic
             InitPropertyAccessors();
 
             OpenAudioFile(options);
-
-            // Audio-only: OpenAudioFile set SongLengthT from the master audio length; propagate it to
-            // every (note-less) track so their reported length matches the song.
-            if (options.NoteFileType == FileType.Audio)
-                foreach (var track in _notes.Tracks)
-                    track.Length = _notes.SongLengthT;
-
             return true;
         }
 
@@ -830,9 +823,29 @@ namespace VisualMusic
             if (!Media.OpenAudioFile(file))
                 throw new IOException("Unexpected error while opening audio file:\r\n" + file);
 
-            if (_notes != null)
-                _notes.SongLengthT = (int)SecondsToTicks((float)(Media.GetAudioLength() + Props.AudioOffset));
+            SyncSongLengthFromOpenAudio(options.NoteFileType == FileType.Audio);
             AudioFilePath = file;
+        }
+
+        /// <summary>
+        /// Sets <see cref="Midi.Song.SongLengthT"/> from the currently open Media audio (plus audio
+        /// offset). For audio-only projects, also copies that length onto every note-less track.
+        /// Used by <see cref="OpenAudioFile"/> and by import-failure recovery when Media is open
+        /// but length was never applied (e.g. throw after open, or CreateTrackViews before audio).
+        /// </summary>
+        internal void SyncSongLengthFromOpenAudio(bool propagateToAudioOnlyTracks)
+        {
+            if (_notes == null)
+                return;
+            double audioLen = Media.GetAudioLength();
+            if (audioLen <= 0)
+                return;
+            _notes.SongLengthT = (int)SecondsToTicks((float)(audioLen + Props.AudioOffset));
+            if (propagateToAudioOnlyTracks)
+            {
+                foreach (var track in _notes.Tracks)
+                    track.Length = _notes.SongLengthT;
+            }
         }
 
         /// <summary>

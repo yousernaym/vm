@@ -79,7 +79,8 @@ namespace VisualMusic.Tests
 
                 var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
                 Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm));
-                Assert.False(NoteStyle.HasContent);
+                // First Content install keeps cm on bake failure (HwndHost never re-Initialize).
+                Assert.True(NoteStyle.HasContent);
                 Assert.True(NoteStyle.HasProject);
                 Assert.Null(project.TrackViews[1].Geo);
                 Assert.False(project.TrackViews[0].TrackProps.StyleProps.GetBarStyle().HasFx);
@@ -137,8 +138,9 @@ namespace VisualMusic.Tests
                 // Empty root → Content.Load("Bar") fails, proving SetContent entered the retry path.
                 var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
                 Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm));
-                // Failed install must not leave HasContent true with half-loaded FX.
-                Assert.False(NoteStyle.HasContent);
+                // First Content stays installed so Initialize/host can finish; FX were cleared.
+                Assert.True(NoteStyle.HasContent);
+                Assert.False(project.TrackViews[1].TrackProps.StyleProps.GetBarStyle().HasFx);
             }
             finally
             {

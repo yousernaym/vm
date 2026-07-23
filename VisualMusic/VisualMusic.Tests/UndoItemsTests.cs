@@ -234,7 +234,7 @@ namespace VisualMusic.Tests
                 NoteStyle.SetProject(live);
                 var cm = new ContentManager(new EmptyServices(), "Content-missing-for-test");
                 Assert.Throws<ContentLoadException>(() => NoteStyle.SetContent(cm));
-                Assert.False(NoteStyle.HasContent);
+                Assert.True(NoteStyle.HasContent);
             }
             finally
             {
