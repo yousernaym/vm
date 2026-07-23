@@ -102,6 +102,58 @@ namespace VisualMusic.Tests
         }
 
         [Fact]
+        public void RoundTrip_CreateTrackViews_and_InitAfterDeserialization_rewire_live_state()
+        {
+            // Mirrors OpenProject after DCS: re-open notes → CreateTrackViews(preserve) → InitAfterDeserialization.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var loaded = RoundTrip(BuildSampleProject());
+
+                Assert.Null(loaded.Notes);
+                Assert.Null(loaded.TrackViews[0].MidiTrack);
+                Assert.Null(loaded.TrackViews[1].MidiTrack);
+                // Project ctor rewires these during deserialize (not serialized on TrackProps).
+                Assert.Same(loaded.TrackViews[0].TrackProps, loaded.TrackViews[1].TrackProps.GlobalProps);
+                Assert.Same(loaded.TrackViews[0], loaded.TrackViews[0].TrackProps.TrackView);
+                Assert.Same(loaded.TrackViews[1], loaded.TrackViews[1].TrackProps.TrackView);
+
+                // Fresh note data (as OpenNoteFile would assign), with a distinctive track-1 note.
+                var notes = EmptySong(2);
+                notes.Tracks[1].Notes.Add(new Note
+                {
+                    start = 10, stop = 20, pitch = 60, velocity = 80, channel = 0,
+                });
+                loaded.Notes = notes;
+
+                loaded.CreateTrackViews(notes.Tracks.Count, eraseCurrent: false, preserveTrackSet: true);
+
+                Assert.Equal(2, loaded.TrackViews.Count);
+                Assert.Same(notes.Tracks[0], loaded.TrackViews[0].MidiTrack);
+                Assert.Same(notes.Tracks[1], loaded.TrackViews[1].MidiTrack);
+                Assert.Single(loaded.TrackViews[1].MidiTrack.Notes);
+                Assert.Same(loaded.TrackViews[0].TrackProps, loaded.TrackViews[1].TrackProps.GlobalProps);
+
+                // CreateTrackViews already re-called StyleProps.LoadFx (soft-skip without Content).
+                loaded.InitAfterDeserialization(waveformPanel: null, loadAudio: false);
+
+                // 480 ticks at 120 bpm = 0.5s — deferred OnPlaybackOffsetSChanged finally runs with Notes set.
+                Assert.Equal(0.5, loaded.SongLengthS, 3);
+
+                loaded.TrackViews[1].TrackProps.MaterialProps.Transp = 0f;
+                loaded.NormSongPos = 0.5; // SongPosT == 240; keyframes at 0 and 100 → past end holds 0.5
+                loaded.InterpolatePropertyKeyframes();
+                Assert.Equal(0.5f, loaded.TrackViews[1].TrackProps.MaterialProps.Transp!.Value, 3);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
         public void Clone_shareAudioProps_false_preserves_fields_and_shares_Notes()
         {
             var source = BuildSampleProject();

@@ -2592,8 +2592,9 @@ namespace VisualMusic
             if (PropertyKeyframes == null)
                 PropertyKeyframes = new Keyframes.KeyframeSet();
             ImportOptions.UpdateImportForm();
+            // WaveformPanel may be null headless / before the renderer host exists (same soft skip as AddTrackView).
             var wp = waveformPanel ?? DrawHost?.WaveformPanel;
-            wp.ClearChannels();
+            wp?.ClearChannels();
 
             // Voice gating ranges are transient — recompute them before the audio loads below.
             PrepareVoiceOwnership();
@@ -2605,7 +2606,7 @@ namespace VisualMusic
                 {
                     if (loadAudio)
                         _ = tv.TrackProps.AudioProps.LoadAudioAsync();
-                    wp.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
+                    wp?.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
                 }
             }
 
