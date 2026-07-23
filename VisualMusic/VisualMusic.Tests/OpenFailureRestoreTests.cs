@@ -157,6 +157,76 @@ namespace VisualMusic.Tests
             }
         }
 
+        [Fact]
+        public void RecoverAfterImportInitFailure_rebuilds_track_list_for_mutated_project()
+        {
+            // ImportSong mutates Project in place (OnProjectChanged does not fire). If Init fails
+            // before TrackList.Rebuild, recover must still rebuild rows for the new track set.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var wp = new WaveformPanel();
+            var vm = new MainViewModel();
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                vm.Project = project;
+                Assert.Equal(2, vm.TrackList.Items.Count); // Global + track 1
+
+                // Simulate erase-import growing the track set without assigning Project=.
+                project.Notes.Tracks.Add(new Track
+                {
+                    Length = 480,
+                    Notes = new List<Note>
+                    {
+                        new Note { start = 0, stop = 60, channel = 1, pitch = 64, velocity = 100 },
+                    },
+                });
+                project.CreateTrackViews(3, eraseCurrent: true);
+                Assert.Equal(2, vm.TrackList.Items.Count); // still stale
+                wp.ClearChannels();
+
+                vm.RecoverAfterImportInitFailure(wp);
+
+                Assert.Equal(3, vm.TrackList.Items.Count); // Global + 2 note tracks
+                Assert.Equal(2, wp.ChannelCount);
+            }
+            finally
+            {
+                wp.Dispose();
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void BindDrawProject_invokes_SyncRendererProject()
+        {
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var vm = new MainViewModel();
+            Project synced = null;
+            vm.SyncRendererProject = p => synced = p;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                vm.Project = project;
+
+                vm.BindDrawProject(project);
+
+                Assert.Same(project, synced);
+                Assert.True(NoteStyle.HasProject);
+            }
+            finally
+            {
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
         static Project BuildProjectWithNoteOnTrack1()
         {
             var song = new Song

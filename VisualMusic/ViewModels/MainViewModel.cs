@@ -1219,15 +1219,11 @@ namespace VisualMusic.ViewModels
 
             // Ensure a project object exists to import into.
             if (Project == null)
-            {
-                var fresh = new Project();
-                NoteStyle.SetProject(fresh);
-                Project = fresh;
-            }
+                Project = new Project();
 
-            var drawHost = GetDrawHost?.Invoke();
-            if (drawHost != null) Project.SetDrawHost(drawHost);
-            NoteStyle.SetProject(Project);
+            // Same SongRenderer / NoteStyle / DrawHost alignment Open uses (first import especially:
+            // SongRenderer.Project was previously left null until OnProjectLoaded).
+            BindDrawProject(Project);
 
             try { options.CheckSourceFile(); }
             catch (FileImportException ex)
@@ -1289,9 +1285,9 @@ namespace VisualMusic.ViewModels
             }
             catch (Exception ex)
             {
-                // ImportSong already mutated Project; re-wire waveforms if Init cleared the panel,
-                // then surface the failure instead of crashing with an empty channel list.
-                RewireWaveformChannels(panelTouched);
+                // ImportSong already mutated Project; keep waveforms + track list in sync with the
+                // new tracks, then surface the failure instead of crashing or leaving stale UI.
+                RecoverAfterImportInitFailure(panelTouched);
                 MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -1828,6 +1824,26 @@ namespace VisualMusic.ViewModels
             {
                 // Leave panel as-is; caller still reports the original failure.
             }
+        }
+
+        /// <summary>
+        /// After ImportSong succeeded but Init / track-audio load failed: re-wire waveforms if the
+        /// panel was cleared, and rebuild the track list / song props so the UI matches the already
+        /// mutated <see cref="Project"/> (Import reuses the same object, so OnProjectChanged does not fire).
+        /// </summary>
+        internal void RecoverAfterImportInitFailure(WaveformPanel panelTouched)
+        {
+            RewireWaveformChannels(panelTouched);
+            TrackList.Rebuild(Project);
+            SongProps.RefreshAll();
+            OnPropertyChanged(nameof(HasAudio));
+            TogglePlaybackCommand.NotifyCanExecuteChanged();
+            GoToBeginningCommand.NotifyCanExecuteChanged();
+            GoToEndCommand.NotifyCanExecuteChanged();
+            NudgeBackCommand.NotifyCanExecuteChanged();
+            NudgeForwardCommand.NotifyCanExecuteChanged();
+            JumpBackCommand.NotifyCanExecuteChanged();
+            JumpForwardCommand.NotifyCanExecuteChanged();
         }
 
         // ---- IImportService (browser download import) ----
