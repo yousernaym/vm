@@ -201,6 +201,37 @@ namespace VisualMusic.Tests
         }
 
         [Fact]
+        public void RecoverAfterImportInitFailure_invokes_SyncRendererProject()
+        {
+            // Pre-import BindDrawProject can no-op while the MonoGame host is still null; after
+            // RequireRendererWaveformPanel builds it, Init failure must still SyncRendererProject
+            // so SongRenderer.Project is not left null (black Song view with a correct track list).
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var vm = new MainViewModel();
+            Project synced = null;
+            vm.SyncRendererProject = p => synced = p;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                vm.Project = project;
+                NoteStyle.SetProject(project);
+
+                vm.RecoverAfterImportInitFailure(panelTouched: null);
+
+                Assert.Same(project, synced);
+                Assert.True(NoteStyle.HasProject);
+            }
+            finally
+            {
+                NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
         public void BindDrawProject_invokes_SyncRendererProject()
         {
             Project.SetDrawHost(new FakeSongDrawHost());

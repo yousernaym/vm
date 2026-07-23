@@ -1827,12 +1827,18 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// After ImportSong succeeded but Init / track-audio load failed: re-wire waveforms if the
-        /// panel was cleared, and rebuild the track list / song props so the UI matches the already
-        /// mutated <see cref="Project"/> (Import reuses the same object, so OnProjectChanged does not fire).
+        /// After ImportSong succeeded but Init / track-audio load failed: re-bind the renderer
+        /// (early BindDrawProject may have run before the MonoGame host existed), re-wire waveforms
+        /// if the panel was cleared, and rebuild the track list / song props so the UI matches the
+        /// already mutated <see cref="Project"/> (Import reuses the same object, so OnProjectChanged
+        /// does not fire).
         /// </summary>
         internal void RecoverAfterImportInitFailure(WaveformPanel panelTouched)
         {
+            // RequireRendererWaveformPanel may have built the host after the pre-import BindDrawProject
+            // no-op'd (SyncRenderer returns when Renderer is null). Rebind so SongRenderer.Project
+            // matches NoteStyle / the mutated Project instead of staying null (black Song view).
+            BindDrawProject(Project);
             RewireWaveformChannels(panelTouched);
             TrackList.Rebuild(Project);
             SongProps.RefreshAll();
