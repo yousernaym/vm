@@ -21,6 +21,17 @@ namespace VisualMusic.Tests
             return song;
         }
 
+        /// <summary>Same as <see cref="EmptySong"/> but track 1 has a note so CreateGeos reaches CreateGeo.</summary>
+        static Song SongWithNoteOnTrack1(int trackCount = 3, int lengthT = 960)
+        {
+            var song = EmptySong(trackCount, lengthT);
+            song.Tracks[1].Notes = new List<Note>
+            {
+                new Note { start = 0, stop = 120, channel = 0, pitch = 60, velocity = 100 },
+            };
+            return song;
+        }
+
         [Fact]
         public void SplitTracksByChannel_groups_notes_and_leaves_track0_empty()
         {
@@ -132,6 +143,34 @@ namespace VisualMusic.Tests
 
                 Assert.Equal(3, project.TrackViews.Count);
                 Assert.Equal(new[] { 0, 1, 2 }, project.TrackViews.Select(v => v.TrackNumber).ToArray());
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void CreateTrackViews_with_notes_skips_geo_bake_without_content()
+        {
+            Assert.False(NoteStyle.HasContent);
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var song = SongWithNoteOnTrack1();
+                var project = new Project();
+                project.Notes = song;
+                project.TrackViews = new List<TrackView>();
+
+                // Would NRE in CreateGeoChunk if CreateGeo did not gate on HasContent
+                // (LoadFx was also skipped, so Bar/Line _fx is null).
+                project.CreateTrackViews(3, eraseCurrent: true);
+
+                Assert.Equal(3, project.TrackViews.Count);
+                Assert.Single(project.TrackViews[1].MidiTrack.Notes);
+                Assert.Null(project.TrackViews[1].Geo);
             }
             finally
             {

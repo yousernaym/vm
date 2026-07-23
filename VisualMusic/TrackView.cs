@@ -127,6 +127,10 @@ namespace VisualMusic
         {
             if (MidiTrack.Notes.Count == 0)
                 return;
+            // Style FX / vertex buffers need MonoGame Content. CreateTrackViews → CreateGeos can
+            // run headless (unit tests) or before SetContent; skip rather than NRE in CreateGeoChunk.
+            if (!NoteStyle.HasContent)
+                return;
             Midi.Note firstNote = _midiTrack.Notes[0];
             Midi.Note lastNote = _midiTrack.Notes[_midiTrack.Notes.Count - 1];
             Vector2 minPos2d = project.GetScreenPos(firstNote.start, project.Props.MinPitch);
