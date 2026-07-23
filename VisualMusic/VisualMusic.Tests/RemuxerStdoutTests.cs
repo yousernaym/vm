@@ -52,5 +52,28 @@ namespace VisualMusic.Tests
             Assert.Equal("0", m.Groups[2].Value);
             Assert.Equal(@"D:\a-ch00.wav", m.Groups[3].Value);
         }
+
+        [Fact]
+        public void TrackAudio_regex_preserves_non_ascii_path()
+        {
+            // Mirrors Remuxer stdout under a non-ASCII profile; ImportSong parses these with
+            // StandardOutputEncoding UTF-8 (see ImportSong_track_audio_under_non_ascii_paths).
+            const string path = @"C:\Users\café_日本語\AppData\Local\Temp\track-ch00.wav";
+            var m = Project.RemuxerTrackAudioRegex.Match("TrackAudio: 1|" + path);
+            Assert.True(m.Success);
+            Assert.Equal("1", m.Groups[1].Value);
+            Assert.Equal(path, m.Groups[2].Value);
+        }
+
+        [Fact]
+        public void TrackVoiceAudio_regex_preserves_non_ascii_path()
+        {
+            const string path = @"D:\tmp\café_日本語\out-ch02.wav";
+            var m = Project.RemuxerTrackVoiceAudioRegex.Match("TrackVoiceAudio: 4|2|" + path);
+            Assert.True(m.Success);
+            Assert.Equal("4", m.Groups[1].Value);
+            Assert.Equal("2", m.Groups[2].Value);
+            Assert.Equal(path, m.Groups[3].Value);
+        }
     }
 }

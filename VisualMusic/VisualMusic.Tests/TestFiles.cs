@@ -37,6 +37,20 @@ namespace VisualMusic.Tests
         }
 
         /// <summary>
+        /// Ensures <c>remuxer/remuxer.exe</c> + <c>libRemuxer.dll</c> sit beside the test assembly
+        /// (same layout <see cref="Program.Dir"/> / ImportSong expects).
+        /// </summary>
+        public static void EnsureRemuxerAvailable()
+        {
+            string exe = Path.Combine(AppContext.BaseDirectory, "remuxer", "remuxer.exe");
+            string dll = Path.Combine(AppContext.BaseDirectory, "remuxer", "libRemuxer.dll");
+            if (!File.Exists(exe) || !File.Exists(dll))
+                throw new FileNotFoundException(
+                    "remuxer/remuxer.exe (+ libRemuxer.dll) not found beside the test assembly. " +
+                    "Build VisualMusic.sln (Any CPU) so VisualMusic.Tests copies the Remuxer package.");
+        }
+
+        /// <summary>
         /// Unique path under the system temp dir; deletes the file or directory on Dispose.
         /// </summary>
         public sealed class TempPath : IDisposable
