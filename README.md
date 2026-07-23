@@ -70,4 +70,3 @@ Right-click on a control to add a key frame for that control at the current play
 ## Third-party projects
 * [MonoGame](https://github.com/yousernaym/monogame) (C# library) - Graphics (with a few forked changes necessary for Visual Music to function properly)
 * [CefSharp](https://github.com/cefsharp/CefSharp) (C# library) - Web browser
-* [XNA for WinForms](https://github.com/SimonDarksideJ/XNAGameStudio/wiki/WinForms-Series-1-Graphics-Device) (C# code) - Integration of MonoGame with Winforms
