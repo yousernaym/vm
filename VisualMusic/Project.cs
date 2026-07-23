@@ -2599,14 +2599,30 @@ namespace VisualMusic
         /// per-track audio loads (caller will LoadAudioAsync after assigning fresh paths — avoids
         /// a race with a second load disposing NAudio readers mid-Read).
         /// </param>
-        internal void InitAfterDeserialization(WaveformPanel waveformPanel = null, bool loadAudio = true)
+        /// <param name="allowMissingWaveformPanel">
+        /// When false (default), a missing panel is a programming error — Open/Import must wire the
+        /// live WaveformPanel or stale channels from a previous project remain. Headless unit tests
+        /// that do not exercise waveforms pass true.
+        /// </param>
+        internal void InitAfterDeserialization(
+            WaveformPanel waveformPanel = null,
+            bool loadAudio = true,
+            bool allowMissingWaveformPanel = false)
         {
             if (PropertyKeyframes == null)
                 PropertyKeyframes = new Keyframes.KeyframeSet();
             ImportOptions.UpdateImportForm();
-            // WaveformPanel may be null headless / before the renderer host exists (same soft skip as AddTrackView).
             var wp = waveformPanel ?? DrawHost?.WaveformPanel;
-            wp?.ClearChannels();
+            if (wp == null)
+            {
+                if (!allowMissingWaveformPanel)
+                    throw new InvalidOperationException(
+                        "InitAfterDeserialization requires a WaveformPanel (pass allowMissingWaveformPanel for headless).");
+            }
+            else
+            {
+                wp.ClearChannels();
+            }
 
             // Voice gating ranges are transient — recompute them before the audio loads below.
             PrepareVoiceOwnership();

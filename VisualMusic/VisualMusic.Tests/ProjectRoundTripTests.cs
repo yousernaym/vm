@@ -148,7 +148,8 @@ namespace VisualMusic.Tests
 
                 // CreateTrackViews already re-called StyleProps.LoadFx (soft-skip without Content;
                 // SetContent would retry once a real ContentManager is installed).
-                loaded.InitAfterDeserialization(waveformPanel: null, loadAudio: false);
+                loaded.InitAfterDeserialization(
+                    waveformPanel: null, loadAudio: false, allowMissingWaveformPanel: true);
                 Assert.Null(loaded.TrackViews[1].Geo);
 
                 // 480 ticks at 120 bpm = 0.5s — deferred OnPlaybackOffsetSChanged finally runs with Notes set.
@@ -168,6 +169,28 @@ namespace VisualMusic.Tests
             {
                 NoteStyle.SetContent(null);
                 NoteStyle.SetProject(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void InitAfterDeserialization_throws_when_waveform_panel_missing()
+        {
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var loaded = RoundTrip(BuildSampleProject());
+                loaded.Notes = EmptySong(2);
+                loaded.CreateTrackViews(2, eraseCurrent: false, preserveTrackSet: true);
+
+                var ex = Assert.Throws<InvalidOperationException>(() =>
+                    loaded.InitAfterDeserialization(waveformPanel: null, loadAudio: false));
+                Assert.Contains("WaveformPanel", ex.Message);
+            }
+            finally
+            {
                 TrackView.NumTracks = previousNumTracks;
                 Project.SetDrawHost(null);
             }
