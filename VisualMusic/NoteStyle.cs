@@ -178,10 +178,158 @@ namespace VisualMusic
         static GraphicsDevice s_graphicsDeviceOverride;
         static Project s_projectOverride;
         static Microsoft.Xna.Framework.Content.ContentManager s_contentOverride;
+        static bool s_stylesInited;
 
-        public static void SetGraphicsDevice(GraphicsDevice gd) => s_graphicsDeviceOverride = gd;
-        public static void SetProject(Project p) => s_projectOverride = p;
-        public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm) => s_contentOverride = cm;
+        public static void SetGraphicsDevice(GraphicsDevice gd)
+        {
+            var previous = s_graphicsDeviceOverride;
+            var previousInited = s_stylesInited;
+            s_graphicsDeviceOverride = gd;
+            // Mesh/instance decls are device-bound — require SInitAllStyles after every GD change.
+            s_stylesInited = false;
+            if (gd == null)
+                return;
+            try
+            {
+                // GD may arrive after Content + Project (or the reverse); finish deferred bake when ready.
+                // Geo soft-skips until SInitAllStyles; FX can load once Content + Project exist.
+                TryFinishDeferredStyleFxAndGeos();
+            }
+            catch
+            {
+                // Roll back so HasGraphicsDevice is not true after a failed bake (mirrors SetContent).
+                s_graphicsDeviceOverride = previous;
+                s_stylesInited = previousInited;
+                s_projectOverride?.ClearStyleFxAndGeos();
+                // Re-bake with the restored device so HasGraphicsDevice is not left true with empty FX.
+                TryRebakeAfterRollback();
+                throw;
+            }
+        }
+
+        public static void SetProject(Project p)
+        {
+            var previous = s_projectOverride;
+            s_projectOverride = p;
+            if (p == null)
+                return;
+            try
+            {
+                // Content may already be installed (SetContent ran before Project was assigned) — finish deferred bake.
+                TryFinishDeferredStyleFxAndGeos();
+            }
+            catch
+            {
+                // Roll back so a failed bake does not leave a new Project override installed.
+                s_projectOverride = previous;
+                if (previous != null)
+                {
+                    // Switching away from a live project: drop partial FX/geo on p and re-bake previous.
+                    p.ClearStyleFxAndGeos();
+                    TryRebakeAfterRollback();
+                }
+                // else: previous is null (Open restore after SetProject(null), or first bind). Do not
+                // ClearStyleFxAndGeos(p) — that would wipe a live project that was already rendering
+                // and leave Draw with _fx == null (NRE) when ForceSync rebinds without bake.
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Points NoteStyle at <paramref name="p"/> without FX/geo bake. Open restore uses this when
+        /// <see cref="SetProject"/> bake fails after <c>SetProject(null)</c> so NoteStyle stays
+        /// aligned with the live project without a second clear of its FX.
+        /// </summary>
+        internal static void BindProjectWithoutBake(Project p) => s_projectOverride = p;
+
+        /// <summary>
+        /// Installs the MonoGame content manager. When non-null, also finishes deferred style FX /
+        /// geometry for <see cref="SetProject"/>'s current project (CreateTrackViews soft-skips those
+        /// while content is missing — e.g. import while the Song host is still Collapsed).
+        /// On failure, clears partial FX/geo. When a previous Content override exists, restores it and
+        /// re-bakes so <see cref="HasContent"/> is not left true with empty FX. When this is the first
+        /// Content (previous null — typical <see cref="SongRenderer.Initialize"/>), keeps <paramref name="cm"/>
+        /// installed: rolling back to null would leave <see cref="HasContent"/> false permanently because
+        /// the HwndHost does not re-run Initialize after a failed first build.
+        /// </summary>
+        public static void SetContent(Microsoft.Xna.Framework.Content.ContentManager cm)
+        {
+            var previous = s_contentOverride;
+            s_contentOverride = cm;
+            if (cm == null)
+                return;
+            try
+            {
+                TryFinishDeferredStyleFxAndGeos();
+            }
+            catch
+            {
+                s_projectOverride?.ClearStyleFxAndGeos();
+                if (previous != null)
+                {
+                    s_contentOverride = previous;
+                    TryRebakeAfterRollback();
+                }
+                // else: keep cm — first Content must stick for later LoadFx retries / render loop.
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// After a failed Set* rollback, reload FX/geo from the restored overrides. Swallows bake
+        /// errors so the original failure still propagates (previous Content may also be unloadable).
+        /// </summary>
+        static void TryRebakeAfterRollback()
+        {
+            try { TryFinishDeferredStyleFxAndGeos(); }
+            catch { /* leave cleared; caller still throws the original exception */ }
+        }
+
+        /// <summary>
+        /// When Content and Project are set, loads style FX and attempts geometry bake
+        /// (CreateTrackViews / Set* may arrive in any order). Geometry soft-skips until
+        /// <see cref="CanCreateGeo"/> (Content + GraphicsDevice + <see cref="SInitAllStyles"/>);
+        /// a later SetGraphicsDevice / SInitAllStyles / SetContent retries.
+        /// </summary>
+        static void TryFinishDeferredStyleFxAndGeos()
+        {
+            if (s_contentOverride == null || s_projectOverride == null)
+                return;
+            s_projectOverride.LoadStyleFxAndCreateGeos();
+        }
+
+        /// <summary>False until <see cref="SetContent"/> runs (deserialize / headless tests).</summary>
+        internal static bool HasContent => s_contentOverride != null;
+
+        /// <summary>Installed Content root directory (tests: which manager survived a failed SetContent).</summary>
+        internal static string ContentRootDirectory => s_contentOverride?.RootDirectory;
+
+        /// <summary>False until a successful <see cref="SetProject"/> (rolled back on bake failure).</summary>
+        internal static bool HasProject => s_projectOverride != null;
+
+        /// <summary>False until <see cref="SetGraphicsDevice"/> runs.</summary>
+        internal static bool HasGraphicsDevice =>
+            s_testAssumeGraphicsDevice || s_graphicsDeviceOverride != null;
+
+        /// <summary>
+        /// Test seam: treat a GraphicsDevice as present without allocating one (isolates the
+        /// <see cref="HasStylesInited"/> gate in <see cref="CanCreateGeo"/>).
+        /// </summary>
+        internal static bool TestAssumeGraphicsDevice
+        {
+            get => s_testAssumeGraphicsDevice;
+            set => s_testAssumeGraphicsDevice = value;
+        }
+
+        static bool s_testAssumeGraphicsDevice;
+
+        /// <summary>False until <see cref="SInitAllStyles"/> after the current GraphicsDevice.</summary>
+        internal static bool HasStylesInited => s_stylesInited;
+
+        /// <summary>
+        /// True when vertex buffers / style geo bake can proceed (needs Content + device + SInit).
+        /// </summary>
+        internal static bool CanCreateGeo => HasContent && HasGraphicsDevice && HasStylesInited;
 
         protected static GraphicsDevice GraphicsDevice => s_graphicsDeviceOverride;
         protected static Project Project => s_projectOverride;
@@ -242,7 +390,28 @@ namespace VisualMusic
         {
             NoteStyle_Bar.SInit();
             NoteStyle_Line.SInit();
+            // Decls succeeded — keep HasStylesInited even if the deferred bake throws (re-running
+            // SInit would leak device buffers). Clear partial FX/geo on failure instead.
+            s_stylesInited = true;
+            try
+            {
+                // Initialize used to call SetContent before SInit; geo must wait for decls.
+                // Finish any deferred bake now that CanCreateGeo is true.
+                TryFinishDeferredStyleFxAndGeos();
+            }
+            catch
+            {
+                s_projectOverride?.ClearStyleFxAndGeos();
+                throw;
+            }
         }
+
+        /// <summary>Drops loaded Effect refs (Content may be rolled back after a failed bake).</summary>
+        internal void ClearFx() => _fx = null;
+
+        /// <summary>True when <see cref="LoadFx"/> has installed an Effect (tests / diagnostics).</summary>
+        internal bool HasFx => _fx != null;
+
         public abstract void LoadFx();
         public abstract void CreateGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial);
         public abstract void DrawGeoChunk(Geo geo);

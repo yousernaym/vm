@@ -96,10 +96,23 @@ namespace VisualMusic
             get => _project;
             set
             {
-                _project = value;
+                // SetProject first: on bake failure it rolls back the static override and throws
+                // without updating _project / DrawHost (avoids a live Project with no DrawHost).
                 NoteStyle.SetProject(value);
+                _project = value;
                 Project.SetDrawHost(value != null ? this : null);
             }
+        }
+
+        /// <summary>
+        /// Points the draw loop at <paramref name="project"/> without <see cref="NoteStyle.SetProject"/> /
+        /// style bake. Open failure restore uses this when the normal <see cref="Project"/> setter cannot
+        /// finish bake — NoteStyle is rebound separately so SongRenderer is not left null (black view).
+        /// </summary>
+        internal void ForceProjectReference(Project project)
+        {
+            _project = project;
+            Project.SetDrawHost(project != null ? this : null);
         }
         public float NormMouseX { get; set; }
         public float NormMouseY { get; set; }
@@ -144,9 +157,21 @@ namespace VisualMusic
             };
 
             _content = new ContentManager(_services, "Content");
+            // SInit before SetContent: Set* may finish a deferred geo bake when Project is already
+            // set (Open/Import forcing first host build). CreateGeoChunk needs decls from SInit.
             NoteStyle.SetGraphicsDevice(_graphicsDevice);
-            NoteStyle.SetContent(_content);
             NoteStyle.SInitAllStyles();
+            // Bake can fail when Project was bound before the first host build (Open/Import).
+            // SetContent keeps Content installed on first-install failure; still finish fonts /
+            // WaveformPanel so BuildWindowCore succeeds — the HwndHost never re-calls Initialize.
+            try
+            {
+                NoteStyle.SetContent(_content);
+            }
+            catch
+            {
+                // Content stays installed (see SetContent); FX/geo cleared. Continue host init.
+            }
             LyricsFont = _content.Load<SpriteFont>("Font");
 
             _regionSelectTexture = new Texture2D(_graphicsDevice, 1, 1);

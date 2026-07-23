@@ -105,6 +105,8 @@ namespace VisualMusic
         }
         override public void LoadFx()
         {
+            if (Content == null)
+                throw new InvalidOperationException("NoteStyle.SetContent must run before LoadFx.");
             _fx = Content.Load<Effect>("Line");
         }
 

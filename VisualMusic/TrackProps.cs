@@ -500,9 +500,9 @@ namespace VisualMusic
                 if ((NoteStyleType)styleTypes[i] != NoteStyleType.Default)
                 {
                     _styles[i] = (NoteStyle)Activator.CreateInstance(System.Type.GetType("VisualMusic.NoteStyle_" + styleNames[i]));
-                    _styles[i].LoadFx();
                 }
             }
+            LoadFx();
             if (trackNumber == 0)
             {
                 Type = NoteStyleType.Bar;
@@ -583,11 +583,23 @@ namespace VisualMusic
 
         public void LoadFx()
         {
+            // StyleProps is constructed / deserialized before MonoGame Content exists; CreateTrackViews
+            // and NoteStyle.SetContent / SetProject / SetGraphicsDevice / SInitAllStyles re-call this
+            // once Content is ready. Skip rather than NRE.
+            if (!NoteStyle.HasContent)
+                return;
             foreach (NoteStyle ns in _styles)
             {
                 if (ns != null)
                     ns.LoadFx();
             }
+        }
+
+        /// <summary>Clears Effect refs on all styles (failed bake rollback).</summary>
+        internal void ClearFx()
+        {
+            foreach (NoteStyle ns in _styles)
+                ns?.ClearFx();
         }
 
         public StyleProps Clone()

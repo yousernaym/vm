@@ -641,13 +641,6 @@ namespace VisualMusic
                 OpenSyntheticSong(resetProject);
             else
                 OpenNoteFile(options, resetProject);
-            OpenAudioFile(options);
-
-            // Audio-only: OpenAudioFile set SongLengthT from the master audio length; propagate it to
-            // every (note-less) track so their reported length matches the song.
-            if (options.NoteFileType == FileType.Audio)
-                foreach (var track in _notes.Tracks)
-                    track.Length = _notes.SongLengthT;
 
             ImportOptions = options;
             if (resetProject)
@@ -657,8 +650,15 @@ namespace VisualMusic
                     ? ImportOptions.AudioPath : ImportOptions.NotePath;
                 DefaultFileName = Path.GetFileName(sourceName) + "." + DefaultFileExt;
             }
+            // CreateTrackViews before OpenAudioFile so a master-audio open failure still leaves
+            // TrackViews matched to the new Notes (DoImport recovery can Init/rebuild from there).
+            // Clear AudioFilePath first so a throw here cannot leave recovery thinking this import
+            // opened Media (stale path + previous project's audio would rewrite SongLengthT).
+            AudioFilePath = "";
             CreateTrackViews(_notes.Tracks.Count, resetProject, options.IsProjectLoad);
             InitPropertyAccessors();
+
+            OpenAudioFile(options);
             return true;
         }
 
@@ -826,9 +826,31 @@ namespace VisualMusic
             if (!Media.OpenAudioFile(file))
                 throw new IOException("Unexpected error while opening audio file:\r\n" + file);
 
-            if (_notes != null)
-                _notes.SongLengthT = (int)SecondsToTicks((float)(Media.GetAudioLength() + Props.AudioOffset));
+            // Before Sync so import-failure recovery can see that this project's audio is open
+            // even if SyncSongLengthFromOpenAudio throws.
             AudioFilePath = file;
+            SyncSongLengthFromOpenAudio(options.NoteFileType == FileType.Audio);
+        }
+
+        /// <summary>
+        /// Sets <see cref="Midi.Song.SongLengthT"/> from the currently open Media audio (plus audio
+        /// offset). For audio-only projects, also copies that length onto every note-less track.
+        /// Used by <see cref="OpenAudioFile"/> and by import-failure recovery when
+        /// <see cref="AudioFilePath"/> is set (open succeeded) but length was never applied.
+        /// </summary>
+        internal void SyncSongLengthFromOpenAudio(bool propagateToAudioOnlyTracks)
+        {
+            if (_notes == null)
+                return;
+            double audioLen = Media.GetAudioLength();
+            if (audioLen <= 0)
+                return;
+            _notes.SongLengthT = (int)SecondsToTicks((float)(audioLen + Props.AudioOffset));
+            if (propagateToAudioOnlyTracks)
+            {
+                foreach (var track in _notes.Tracks)
+                    track.Length = _notes.SongLengthT;
+            }
         }
 
         /// <summary>
@@ -837,7 +859,7 @@ namespace VisualMusic
         /// assigning visuals from index 1 and <see cref="AddTrackView"/> sets GlobalProps from
         /// Tracks[0], mirroring the MOD/SID Remuxer convention).
         /// </summary>
-        static void SplitTracksByChannel(Midi.Song song)
+        internal static void SplitTracksByChannel(Midi.Song song)
         {
             var byChannel = new SortedDictionary<int, List<Midi.Note>>();
             foreach (var track in song.Tracks)
@@ -935,9 +957,6 @@ namespace VisualMusic
                 // Update note information
                 _trackViews[i].MidiTrack = _notes.Tracks[_trackViews[i].TrackNumber];
                 _trackViews[i].CreateCurve();
-
-                // If a project file is being loaded, track views was deserialized, and further init involving the graphics device is needed here, because it was not initialized at the time of deserialization.
-                _trackViews[i].TrackProps.StyleProps.LoadFx();
             }
             if (!preserveTrackSet)
                 for (int i = startTrack; i < numTracks; i++)
@@ -958,8 +977,64 @@ namespace VisualMusic
             // Keep the static count in sync with the actual view set (it can be < numTracks when
             // preserveTrackSet drops trailing note-file tracks that were removed before saving).
             TrackView.NumTracks = _trackViews.Count;
-            CreateGeos(false);
+            // Deserialized / headless views may still lack FX until Content exists;
+            // SetContent / SetProject / SetGraphicsDevice / SInitAllStyles retry via LoadStyleFxAndCreateGeos.
+            LoadStyleFxAndCreateGeos();
         }
+
+        /// <summary>
+        /// Loads each track's style effects and bakes note geometry. <see cref="StyleProps.LoadFx"/>
+        /// soft-skips while <see cref="NoteStyle.HasContent"/> is false; <see cref="TrackView.CreateGeo"/>
+        /// soft-skips while <see cref="NoteStyle.CanCreateGeo"/> is false.
+        /// <see cref="NoteStyle.SetContent"/> / <see cref="NoteStyle.SetProject"/> /
+        /// <see cref="NoteStyle.SetGraphicsDevice"/> / <see cref="NoteStyle.SInitAllStyles"/> call
+        /// this again once prerequisites are installed.
+        /// </summary>
+        /// <param name="resetVertScale">
+        /// Passed to <see cref="CreateGeos"/>. Default false preserves an existing geo ref width
+        /// (CreateTrackViews / deferred Set* retry). Undo/redo after <see cref="CopyPropsFrom"/> must
+        /// pass true so bake uses restored <see cref="EffectiveViewWidthQn"/>, not stale Geo.RefWidthQn.
+        /// </param>
+        internal void LoadStyleFxAndCreateGeos(bool resetVertScale = false)
+        {
+            if (_trackViews == null)
+                return;
+            foreach (var tv in _trackViews)
+                tv.TrackProps?.StyleProps?.LoadFx();
+            CreateGeos(resetVertScale);
+        }
+
+        /// <summary>
+        /// Drops style Effect refs and baked geometry after a failed deferred bake so a rolled-back
+        /// <see cref="NoteStyle.SetContent"/> / <see cref="NoteStyle.SetProject"/> /
+        /// <see cref="NoteStyle.SetGraphicsDevice"/> does not leave half-loaded FX or partial Geos.
+        /// </summary>
+        internal void ClearStyleFxAndGeos()
+        {
+            if (_trackViews == null)
+                return;
+            foreach (var tv in _trackViews)
+            {
+                tv.Geo = null;
+                tv.TrackProps?.StyleProps?.ClearFx();
+            }
+        }
+
+        /// <summary>
+        /// Reopens Media from <see cref="AudioFilePath"/> after a failed Open closed or replaced it.
+        /// When the path is empty, closes Media so an abandoned temp file is not left open.
+        /// </summary>
+        internal void RebindMediaToAudioFilePath()
+        {
+            Media.CloseAudioFile();
+            if (string.IsNullOrEmpty(AudioFilePath))
+                return;
+            if (!Media.OpenAudioFile(AudioFilePath))
+                throw new IOException("Unexpected error while reopening audio file:\r\n" + AudioFilePath);
+        }
+
+        /// <summary>Test seam: set <see cref="AudioFilePath"/> without opening Media.</summary>
+        internal void SetAudioFilePathForTest(string path) => AudioFilePath = path ?? "";
 
         void AddTrackView(TrackView view)
         {
@@ -2587,13 +2662,30 @@ namespace VisualMusic
         /// per-track audio loads (caller will LoadAudioAsync after assigning fresh paths — avoids
         /// a race with a second load disposing NAudio readers mid-Read).
         /// </param>
-        internal void InitAfterDeserialization(WaveformPanel waveformPanel = null, bool loadAudio = true)
+        /// <param name="allowMissingWaveformPanel">
+        /// When false (default), a missing panel is a programming error — Open/Import must wire the
+        /// live WaveformPanel or stale channels from a previous project remain. Headless unit tests
+        /// that do not exercise waveforms pass true.
+        /// </param>
+        internal void InitAfterDeserialization(
+            WaveformPanel waveformPanel = null,
+            bool loadAudio = true,
+            bool allowMissingWaveformPanel = false)
         {
             if (PropertyKeyframes == null)
                 PropertyKeyframes = new Keyframes.KeyframeSet();
             ImportOptions.UpdateImportForm();
             var wp = waveformPanel ?? DrawHost?.WaveformPanel;
-            wp.ClearChannels();
+            if (wp == null)
+            {
+                if (!allowMissingWaveformPanel)
+                    throw new InvalidOperationException(
+                        "InitAfterDeserialization requires a WaveformPanel (pass allowMissingWaveformPanel for headless).");
+            }
+            else
+            {
+                wp.ClearChannels();
+            }
 
             // Voice gating ranges are transient — recompute them before the audio loads below.
             PrepareVoiceOwnership();
@@ -2605,7 +2697,7 @@ namespace VisualMusic
                 {
                     if (loadAudio)
                         _ = tv.TrackProps.AudioProps.LoadAudioAsync();
-                    wp.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
+                    wp?.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
                 }
             }
 

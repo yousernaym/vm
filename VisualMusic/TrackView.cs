@@ -127,6 +127,12 @@ namespace VisualMusic
         {
             if (MidiTrack.Notes.Count == 0)
                 return;
+            // Style FX / vertex buffers need MonoGame Content + GraphicsDevice + SInitAllStyles.
+            // CreateTrackViews can run headless (unit tests) or before SetContent/SetGraphicsDevice/
+            // SInit (e.g. import while Song host is Collapsed); soft-skip here — SetContent /
+            // SetProject / SetGraphicsDevice / SInitAllStyles retry via Project.LoadStyleFxAndCreateGeos.
+            if (!NoteStyle.CanCreateGeo)
+                return;
             Midi.Note firstNote = _midiTrack.Notes[0];
             Midi.Note lastNote = _midiTrack.Notes[_midiTrack.Notes.Count - 1];
             Vector2 minPos2d = project.GetScreenPos(firstNote.start, project.Props.MinPitch);

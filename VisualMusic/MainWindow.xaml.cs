@@ -83,14 +83,35 @@ namespace VisualMusic
                     notches => _vm.AdjustSelectedViewWidth(notches);
             }
 
+            void WireRendererSongPosChanged()
+            {
+                if (monoGameHost.Renderer == null) return;
+                monoGameHost.Renderer.OnSongPosChanged = () =>
+                    Dispatcher.InvokeAsync(() => _vm.NotifyScrollPositionChanged());
+            }
+
+            void SyncRendererProject(Project project)
+            {
+                if (monoGameHost.Renderer == null) return;
+                monoGameHost.Renderer.Project = project;
+                WireRendererSongPosChanged();
+            }
+
+            void ForceSyncRendererProject(Project project)
+            {
+                if (monoGameHost.Renderer == null) return;
+                // No NoteStyle bake — restore path rebinds NoteStyle separately when bake fails.
+                monoGameHost.Renderer.ForceProjectReference(project);
+                WireRendererSongPosChanged();
+            }
+
+            // Open binds the temp project here before LoadContent/Init so DrawSong and NoteStyle agree.
+            _vm.SyncRendererProject = SyncRendererProject;
+            _vm.ForceSyncRendererProject = ForceSyncRendererProject;
+
             _vm.OnProjectLoaded = project =>
             {
-                if (monoGameHost.Renderer != null)
-                {
-                    monoGameHost.Renderer.Project = project;
-                    monoGameHost.Renderer.OnSongPosChanged = () =>
-                        Dispatcher.InvokeAsync(() => _vm.NotifyScrollPositionChanged());
-                }
+                SyncRendererProject(project);
                 keyframeListView.SetProject(project);
             };
 
@@ -102,6 +123,14 @@ namespace VisualMusic
 
             _vm.GetRendererWaveformPanel = () =>
                 monoGameHost.Renderer?.WaveformPanel;
+
+            // Open/Import switch to Song then call this so a previously Collapsed HwndHost can
+            // BuildWindowCore before InitAfterDeserialization requires WaveformPanel.
+            _vm.EnsureSongHostReady = () =>
+            {
+                UpdateLayout();
+                monoGameHost.UpdateLayout();
+            };
 
             _vm.RenderVideo = (file, cb, opts) =>
                 monoGameHost.Renderer?.RenderVideo(file, cb, opts);
