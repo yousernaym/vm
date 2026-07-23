@@ -139,5 +139,68 @@ namespace VisualMusic.Tests
                 Project.SetDrawHost(null);
             }
         }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void OpenNoteFile_midi_without_InsTrack_splits_by_channel()
+        {
+            // OpenNoteFile → StopPlayback P/Invokes media.dll.
+            TestFiles.EnsureNativeLoaded("media.dll");
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var project = new Project();
+                project.TrackViews = new List<TrackView>();
+                var options = new ImportOptions(FileType.Midi)
+                {
+                    MidiOutputPath = TestFiles.PathTo("midiLib", "minimal.mid"),
+                    InsTrack = false,
+                    EraseCurrent = true,
+                };
+
+                Assert.True(project.OpenNoteFile(options));
+
+                Assert.Equal(2, project.Notes.Tracks.Count);
+                Assert.Empty(project.Notes.Tracks[0].Notes);
+                Assert.Equal("Channel 1", project.Notes.Tracks[1].Name);
+                Assert.Single(project.Notes.Tracks[1].Notes);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void OpenNoteFile_midi_with_InsTrack_keeps_file_tracks()
+        {
+            TestFiles.EnsureNativeLoaded("media.dll");
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var project = new Project();
+                project.TrackViews = new List<TrackView>();
+                var options = new ImportOptions(FileType.Midi)
+                {
+                    MidiOutputPath = TestFiles.PathTo("midiLib", "minimal.mid"),
+                    InsTrack = true,
+                    EraseCurrent = true,
+                };
+
+                Assert.True(project.OpenNoteFile(options));
+
+                Assert.Single(project.Notes.Tracks);
+                Assert.Single(project.Notes.Tracks[0].Notes);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
     }
 }

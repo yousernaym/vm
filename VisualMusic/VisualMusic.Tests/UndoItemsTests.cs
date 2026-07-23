@@ -84,5 +84,35 @@ namespace VisualMusic.Tests
                 live.TrackViews[0].TrackProps.AudioProps,
                 undo.Current.Project.TrackViews[0].TrackProps.AudioProps);
         }
+
+        [Fact]
+        public void Undo_CopyPropsFrom_restores_proj_and_track_props()
+        {
+            Project.SetDrawHost(new FakeSongDrawHost());
+            try
+            {
+                var live = ProjectWithAudioTrack("a.wav");
+                live.Props.FadeIn = 1.5f;
+                live.TrackViews[0].TrackProps.MaterialProps.Transp = 0.25f;
+
+                var undo = new UndoItems();
+                undo.Add("before edit", live);
+
+                live.Props.FadeIn = 3f;
+                live.TrackViews[0].TrackProps.MaterialProps.Transp = 0.9f;
+                undo.Add("after edit", live);
+
+                undo--;
+                live.CopyPropsFrom(undo.Current.Project);
+
+                Assert.Equal(1.5f, live.Props.FadeIn);
+                Assert.Equal(0.25f, live.TrackViews[0].TrackProps.MaterialProps.Transp!.Value);
+                Assert.Equal("a.wav", live.TrackViews[0].TrackProps.AudioProps.Filename);
+            }
+            finally
+            {
+                Project.SetDrawHost(null);
+            }
+        }
     }
 }

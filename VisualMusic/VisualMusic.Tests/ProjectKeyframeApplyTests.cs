@@ -64,6 +64,30 @@ namespace VisualMusic.Tests
         }
 
         [Fact]
+        public void InterpolatePropertyKeyframes_lerps_track_Transp()
+        {
+            Project.SetDrawHost(new FakeSongDrawHost());
+            try
+            {
+                var project = BuildProjectWithSong();
+                project.TrackViews[1].TrackProps.MaterialProps.Transp = 0f;
+                project.PropertyKeyframes.Add("track/1/Transp", 0, KfInterpolation.Linear,
+                    new ScalarKfValue(0));
+                project.PropertyKeyframes.Add("track/1/Transp", 100, KfInterpolation.Linear,
+                    new ScalarKfValue(1));
+
+                project.NormSongPos = 0.5; // SongPosT == 50
+                project.InterpolatePropertyKeyframes();
+
+                Assert.Equal(0.5f, project.TrackViews[1].TrackProps.MaterialProps.Transp!.Value, 3);
+            }
+            finally
+            {
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
         public void InterpolatePropertyKeyframes_holds_bool_AudioVisLeft()
         {
             Project.SetDrawHost(new FakeSongDrawHost());
