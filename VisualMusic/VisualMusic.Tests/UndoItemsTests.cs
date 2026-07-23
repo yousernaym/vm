@@ -201,26 +201,30 @@ namespace VisualMusic.Tests
         [Fact]
         public void Undo_CopyPropsFrom_then_LoadStyleFxAndCreateGeos_attempts_fx_reload()
         {
-            // Mirrors MainViewModel.ApplyUndoItem: CopyPropsFrom then LoadStyleFxAndCreateGeos.
-            // Without Content, FX soft-skips and geo stays null; SetContent retries and hits Content.Load.
+            // Mirrors MainViewModel.ApplyUndoItem exactly: CopyPropsFrom then LoadStyleFxAndCreateGeos
+            // (not CreateGeos alone). Without Content, FX soft-skips and geo stays null; installing
+            // Content retries and hits Content.Load (empty root → ContentLoadException).
             Project.SetDrawHost(new FakeSongDrawHost());
             var previousNumTracks = TrackView.NumTracks;
             try
             {
                 var live = ProjectWithNoteOnTrack1();
                 live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Bar;
+                live.TrackViews[1].TrackProps.StyleProps.GetLineStyle().LineWidth = 3.5f;
                 live.TrackViews[1].TrackProps.MaterialProps.Transp = 0.25f;
 
                 var undo = new UndoItems();
                 undo.Add("before", live);
 
                 live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Line;
+                live.TrackViews[1].TrackProps.StyleProps.GetLineStyle().LineWidth = 9f;
                 live.TrackViews[1].TrackProps.MaterialProps.Transp = 0.9f;
                 undo.Add("after", live);
 
                 undo--;
                 live.CopyPropsFrom(undo.Current.Project);
                 Assert.Equal(NoteStyleType.Bar, live.TrackViews[1].TrackProps.StyleProps.Type);
+                Assert.Equal(3.5f, live.TrackViews[1].TrackProps.StyleProps.GetLineStyle().LineWidth!.Value);
                 Assert.Equal(0.25f, live.TrackViews[1].TrackProps.MaterialProps.Transp!.Value);
 
                 live.LoadStyleFxAndCreateGeos();

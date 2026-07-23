@@ -39,6 +39,9 @@
     <None Include="..\..\Dependencies\Media\test-files\**\*" LinkBase="test-files\Media" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\Dependencies\MidMix\test-files\**\*" LinkBase="test-files\MidMix" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\Dependencies\Remuxer\libRemuxer\test-files\**\*" LinkBase="test-files\libRemuxer" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Built MonoGame .xnb (after VisualMusic content build) for Style FX/geo Integration tests. -->
+    <None Include="..\Content\bin\Windows\*.xnb" LinkBase="Content" CopyToOutputDirectory="PreserveNewest"
+          Condition="Exists('..\Content\bin\Windows')" />
   </ItemGroup>
 
   <!--

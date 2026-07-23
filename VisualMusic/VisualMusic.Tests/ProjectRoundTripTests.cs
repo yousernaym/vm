@@ -38,6 +38,15 @@ namespace VisualMusic.Tests
             };
             project.TrackViews[1].TrackProps.GlobalProps = project.TrackViews[0].TrackProps;
 
+            // Distinctive persisted Style / Material fields (defaults alone wouldn't prove DCS write-back).
+            project.TrackViews[0].TrackProps.StyleProps.Type = NoteStyleType.Bar;
+            project.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Line;
+            project.TrackViews[1].TrackProps.StyleProps.GetLineStyle().LineWidth = 7.5f;
+            project.TrackViews[1].TrackProps.MaterialProps.Transp = 0.35f;
+            project.TrackViews[1].TrackProps.MaterialProps.Hue = 0.6f;
+            project.TrackViews[1].TrackProps.SpatialProps.XOffset = 1.25f;
+            project.TrackViews[1].TrackProps.LightProps.AmbientAmount = 0.42f;
+
             project.ImportOptions = new ImportOptions(FileType.Midi)
             {
                 RawNotePath = @"C:\songs\sample.mid",
@@ -91,6 +100,14 @@ namespace VisualMusic.Tests
                 Assert.Equal(2, loaded.TrackViews.Count);
                 Assert.Equal(0, loaded.TrackViews[0].TrackNumber);
                 Assert.Equal(1, loaded.TrackViews[1].TrackNumber);
+
+                Assert.Equal(NoteStyleType.Bar, loaded.TrackViews[0].TrackProps.StyleProps.Type);
+                Assert.Equal(NoteStyleType.Line, loaded.TrackViews[1].TrackProps.StyleProps.Type);
+                Assert.Equal(7.5f, loaded.TrackViews[1].TrackProps.StyleProps.GetLineStyle().LineWidth!.Value);
+                Assert.Equal(0.35f, loaded.TrackViews[1].TrackProps.MaterialProps.Transp!.Value);
+                Assert.Equal(0.6f, loaded.TrackViews[1].TrackProps.MaterialProps.Hue!.Value);
+                Assert.Equal(1.25f, loaded.TrackViews[1].TrackProps.SpatialProps.XOffset!.Value);
+                Assert.Equal(0.42f, loaded.TrackViews[1].TrackProps.LightProps.AmbientAmount!.Value);
 
                 Assert.True(loaded.PropertyKeyframes.HasKeyAt("proj/BackgroundImageOpacity", 0));
                 Assert.True(loaded.PropertyKeyframes.HasKeyAt("track/1/Transp", 100));
@@ -251,6 +268,9 @@ namespace VisualMusic.Tests
                 Assert.Equal(source.Props.FadeIn, clone.Props.FadeIn);
                 Assert.Equal(source.Props.Camera.Fov, clone.Props.Camera.Fov, 5);
                 Assert.Equal(source.ImportOptions.InsTrack, clone.ImportOptions.InsTrack);
+                Assert.Equal(NoteStyleType.Line, clone.TrackViews[1].TrackProps.StyleProps.Type);
+                Assert.Equal(7.5f, clone.TrackViews[1].TrackProps.StyleProps.GetLineStyle().LineWidth!.Value);
+                Assert.Equal(0.35f, clone.TrackViews[1].TrackProps.MaterialProps.Transp!.Value);
                 Assert.True(clone.PropertyKeyframes.HasKeyAt("proj/BackgroundImageOpacity", 0));
                 Assert.True(clone.PropertyKeyframes.HasKeyAt("track/1/Transp", 100));
                 Assert.Equal(2, clone.TrackViews.Count);
