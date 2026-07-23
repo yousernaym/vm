@@ -55,6 +55,41 @@ namespace VisualMusic.Tests
                 VmMidMix.Close();
             }
         }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Init_and_mixdown_under_non_ascii_paths()
+        {
+            TestFiles.EnsureNativeLoaded("MidMix.dll");
+            using var dir = TestFiles.TempPath.NonAsciiDirectory("vm_midmix_utf8_");
+
+            string sfPath = Path.Combine(dir.Path, Program.SoundFontFileName);
+            File.Copy(TestFiles.PathTo("MidMix", Path.Combine("soundfont", "tiny.sf2")), sfPath);
+            File.Copy(TestFiles.PathTo("MidMix", Path.Combine("soundfont", "sf-LICENSE.txt")),
+                Path.Combine(dir.Path, "sf-LICENSE.txt"));
+
+            string midi = Path.Combine(dir.Path, "minimal.mid");
+            File.Copy(TestFiles.PathTo("midiLib", "minimal.mid"), midi);
+            string wavOut = Path.Combine(dir.Path, "mix.wav");
+
+            VmMidMix.Init(sfPath);
+            try
+            {
+                Assert.True(VmMidMix.SfLoaded(), "expected soundfont to load from non-ASCII path");
+                VmMidMix.Mixdown(midi, wavOut);
+                Assert.True(File.Exists(wavOut));
+                Assert.True(new FileInfo(wavOut).Length > 44);
+                byte[] hdr = new byte[12];
+                using (var fs = File.OpenRead(wavOut))
+                    Assert.Equal(12, fs.Read(hdr, 0, 12));
+                Assert.Equal("RIFF", Encoding.ASCII.GetString(hdr, 0, 4));
+                Assert.Equal("WAVE", Encoding.ASCII.GetString(hdr, 8, 4));
+            }
+            finally
+            {
+                VmMidMix.Close();
+            }
+        }
     }
 
     [CollectionDefinition("MidMixSequential", DisableParallelization = true)]

@@ -40,6 +40,29 @@ namespace VisualMusic.Tests
 
         [Fact]
         [Trait("Category", "Integration")]
+        public void Playback_opens_non_ascii_path()
+        {
+            TestFiles.EnsureNativeLoaded("media.dll");
+            using var dir = TestFiles.TempPath.NonAsciiDirectory("vm_media_play_");
+            string wav = Path.Combine(dir.Path, "silence.wav");
+            File.Copy(TestFiles.PathTo("Media", "silence.wav"), wav);
+
+            Assert.True(VmMedia.InitMF());
+            try
+            {
+                Assert.True(VmMedia.OpenAudioFile(wav));
+                Assert.Equal(wav, VmMedia.GetAudioFilePath());
+                Assert.True(VmMedia.GetAudioLength() > 0);
+                Assert.True(VmMedia.CloseAudioFile());
+            }
+            finally
+            {
+                VmMedia.CloseMF();
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
         public void Encode_smoke_writes_mkv()
         {
             TestFiles.EnsureNativeLoaded("media.dll");
@@ -72,6 +95,51 @@ namespace VisualMusic.Tests
 
                 Assert.True(File.Exists(outFile.Path));
                 Assert.True(new FileInfo(outFile.Path).Length > 0);
+            }
+            finally
+            {
+                VmMedia.CloseMF();
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Encode_with_audio_under_non_ascii_paths()
+        {
+            TestFiles.EnsureNativeLoaded("media.dll");
+            using var dir = TestFiles.TempPath.NonAsciiDirectory("vm_media_enc_");
+            string audio = Path.Combine(dir.Path, "silence.wav");
+            string mkv = Path.Combine(dir.Path, "out.mkv");
+            File.Copy(TestFiles.PathTo("Media", "silence.wav"), audio);
+
+            Assert.True(VmMedia.InitMF());
+            try
+            {
+                var fmt = new VideoFormat(64, 64, 10f);
+                Assert.True(VmMedia.BeginVideoEnc(
+                    mkv,
+                    audioFile: audio,
+                    fmt,
+                    audioOffsetSeconds: 0.05,
+                    spherical: false,
+                    sphericalStereo: false,
+                    AVCodecID.AV_CODEC_ID_H264,
+                    crf: "28"));
+                try
+                {
+                    uint[] frame = new uint[64 * 64];
+                    for (int i = 0; i < frame.Length; i++)
+                        frame[i] = 0xFF0080FF;
+                    for (int f = 0; f < 5; f++)
+                        Assert.True(VmMedia.WriteFrame(frame));
+                }
+                finally
+                {
+                    VmMedia.EndVideoEnc();
+                }
+
+                Assert.True(File.Exists(mkv));
+                Assert.True(new FileInfo(mkv).Length > 0);
             }
             finally
             {

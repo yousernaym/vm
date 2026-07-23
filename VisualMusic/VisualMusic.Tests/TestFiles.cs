@@ -70,6 +70,20 @@ namespace VisualMusic.Tests
                 return new TempPath(path, isDirectory: true);
             }
 
+            /// <summary>
+            /// Unique directory whose name includes non-ASCII characters. Used by Media/MidMix
+            /// Integration tests so a regression to ANSI P/Invoke marshalling fails loudly —
+            /// ASCII-only temp paths would still pass under the system code page.
+            /// </summary>
+            public static TempPath NonAsciiDirectory(string asciiPrefix = "vm_utf8_")
+            {
+                // café is Latin-1; 日本語 is outside Windows-1252. Together they corrupt under ANSI.
+                string path = System.IO.Path.Combine(System.IO.Path.GetTempPath(),
+                    asciiPrefix + "café_日本語_" + Guid.NewGuid().ToString("N"));
+                System.IO.Directory.CreateDirectory(path);
+                return new TempPath(path, isDirectory: true);
+            }
+
             public void Dispose()
             {
                 try
