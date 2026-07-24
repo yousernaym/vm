@@ -1242,14 +1242,12 @@ namespace VisualMusic
                     ch.SmoothLines = Props.AudioVisSmoothLines;
 
                 // Label font scales with the output height (so the caption stays proportional across
-                // preview vs export) and the global label-size slider. Recreated only when the size
-                // actually changes. Colour follows the track colour; scale 0 hides the label.
+                // preview vs export) and the global label-size slider. Only the desired size is set
+                // here — SyncGdiState on the waveform worker creates/disposes the Font so we never
+                // race DrawString. Colour follows the track colour; scale 0 hides the label.
                 float labelPx = System.Math.Max(1f, (ch.Renderer?.Height ?? 1080) / 30f * Props.AudioVisLabelScale);
-                if (ch.LabelFont == null || System.Math.Abs(ch.LabelFont.Size - labelPx) > 0.5f)
-                {
-                    ch.LabelFont?.Dispose();
-                    ch.LabelFont = new System.Drawing.Font("Arial", labelPx, System.Drawing.GraphicsUnit.Pixel);
-                }
+                if (ch.LabelFontSizePx != labelPx)
+                    ch.LabelFontSizePx = labelPx;
                 var labelColor = Props.AudioVisLabelScale <= 0 ? System.Drawing.Color.Transparent : color;
                 if (ch.LabelColor.ToArgb() != labelColor.ToArgb())
                     ch.LabelColor = labelColor;

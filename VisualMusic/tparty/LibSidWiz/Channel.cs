@@ -501,8 +501,11 @@ namespace LibSidWiz
             get => _lineColor;
             set
             {
+                // Only store the colour here — never mutate Pen from the UI thread. WaveformPanel
+                // draws on a background worker that holds Pen during GDI+ DrawLines; setting
+                // Pen.Color concurrently throws "Object is currently in use elsewhere".
+                // SyncGdiState() applies this to Pen on the render thread before each frame.
                 _lineColor = value;
-                Pen.Color = value;
                 Changed?.Invoke(this, false);
             }
         }
@@ -514,12 +517,43 @@ namespace LibSidWiz
             get => _lineWidth;
             set
             {
-                _lineWidth = value;
+                // Same UI/worker race as LineColor — width is applied to Pen in SyncGdiState.
                 // Scale with the renderer height (not width) so the thickness tracks the output
                 // resolution but stays constant when the overlay-width setting changes the strip
                 // width. Equals the old width-based scaling for a 16:9 viewport at 25% width.
-                Pen.Width = value * (Renderer?.Height ?? 1080) / 1080;
+                _lineWidth = value;
                 Changed?.Invoke(this, false);
+            }
+        }
+
+        /// <summary>
+        /// Desired label font size in pixels. Applied to <see cref="LabelFont"/> by
+        /// <see cref="SyncGdiState"/> on the render thread (creating/disposing Font on the UI
+        /// thread races with DrawString on the worker).
+        /// </summary>
+        [Browsable(false)]
+        [JsonIgnore]
+        public float LabelFontSizePx { get; set; }
+
+        /// <summary>
+        /// Pushes LineColor / LineWidth / LabelFontSizePx into the GDI+ objects used for drawing.
+        /// Must run on the thread that owns waveform rendering (worker or sync export), never the UI.
+        /// </summary>
+        internal void SyncGdiState()
+        {
+            Color color = _lineColor;
+            float width = _lineWidth * (Renderer?.Height ?? 1080) / 1080f;
+            if (Pen.Color.ToArgb() != color.ToArgb())
+                Pen.Color = color;
+            if (Pen.Width != width)
+                Pen.Width = width;
+
+            float labelPx = LabelFontSizePx;
+            if (labelPx > 0 &&
+                (_labelFont == null || System.Math.Abs(_labelFont.Size - labelPx) > 0.5f))
+            {
+                _labelFont?.Dispose();
+                _labelFont = new Font("Arial", labelPx, GraphicsUnit.Pixel);
             }
         }
 

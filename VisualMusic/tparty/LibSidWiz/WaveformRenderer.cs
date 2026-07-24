@@ -155,7 +155,7 @@ namespace LibSidWiz
             _visibleSignature = string.Join("-", _visible.Select(c => _channels.IndexOf(c)));
             _templateDirty = false;
             foreach (var ch in _channels)
-                ch.LineWidth = ch.LineWidth;
+                ch.SyncGdiState();
         }
 
         public void Dispose()
@@ -298,6 +298,11 @@ namespace LibSidWiz
         {
             if (!_framePrepared)
                 return _frameData;
+
+            // Apply UI-thread colour/width/font-size writes to GDI objects on this thread only —
+            // mutating Pen/Font while DrawLines/DrawString holds them throws.
+            foreach (var ch in _channels)
+                ch.SyncGdiState();
 
             // The active set may be split across two strips; draw only our assigned channels.
             List<Channel> visibleNow;
