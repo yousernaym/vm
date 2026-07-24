@@ -607,7 +607,7 @@ namespace VisualMusic
         void DrawHighLights(Midi.Track midiTrack, TrackProps trackProps, float songPosP)
         {
             List<Midi.Note> noteList = midiTrack.Notes;
-            int hlNoteIndex = midiTrack.GetLastNoteIndexAtTime((int)(Project.SongPosT - Project.PlaybackOffsetT));
+            int hlNoteIndex = midiTrack.GetLastStartedNoteIndexAtTime((int)(Project.SongPosT - Project.PlaybackOffsetT));
             if (hlNoteIndex < 0)
                 return;
             Midi.Note note = noteList[hlNoteIndex], nextNote;
