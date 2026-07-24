@@ -75,14 +75,30 @@
     <Copy SourceFiles="@(_NativeDlls)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"
           Condition="'$(_HasSlnNatives)'=='true' and '@(_NativeDlls)'!=''" />
 
+    <!-- Remuxer package for Project.ImportSong Integration (same layout as VM.exe: remuxer\). -->
+    <PropertyGroup Condition="'$(_HasSlnNatives)'=='true'">
+      <_RemuxerBin>$(_RepoRoot)Dependencies\Remuxer\Remuxer\bin\$(Configuration)\</_RemuxerBin>
+      <_HasRemuxer Condition="Exists('$(_RemuxerBin)Remuxer.exe') and Exists('$(_RemuxerBin)libRemuxer.dll')">true</_HasRemuxer>
+    </PropertyGroup>
+    <Error Condition="'$(_HasSlnNatives)'=='true' and '$(_HasRemuxer)'!='true'"
+           Text="VisualMusic.Tests: media.dll/MidMix.dll are built but Remuxer is missing at '$(_RemuxerBin)'. Build VisualMusic.sln (Any CPU) so Remuxer.exe + libRemuxer.dll are packaged." />
+    <ItemGroup Condition="'$(_HasRemuxer)'=='true'">
+      <_RemuxerFiles Include="$(_RemuxerBin)**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_RemuxerFiles)"
+          DestinationFiles="@(_RemuxerFiles->'$(TargetDir)remuxer\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true"
+          Condition="'$(_HasRemuxer)'=='true'" />
+
     <!-- First-party names only; third-party FFmpeg/Fluidsynth set is whatever vcpkg_installed shipped (same as CopyNativeOutputs). -->
     <PropertyGroup Condition="'$(_HasSlnNatives)'=='true'">
       <_MissingNative Condition="!Exists('$(TargetDir)media.dll')">media.dll</_MissingNative>
       <_MissingNative Condition="'$(_MissingNative)'=='' and !Exists('$(TargetDir)MidMix.dll')">MidMix.dll</_MissingNative>
+      <_MissingNative Condition="'$(_MissingNative)'=='' and !Exists('$(TargetDir)remuxer\remuxer.exe')">remuxer/remuxer.exe</_MissingNative>
     </PropertyGroup>
 
     <Error Condition="'$(_HasSlnNatives)'=='true' and '$(_MissingNative)'!=''"
-           Text="VisualMusic.Tests native runtime incomplete in $(TargetDir): missing $(_MissingNative). Build VisualMusic.sln Debug|Any CPU (or matching Configuration) so media.dll and MidMix.dll are under x64\$(Configuration)\ and FFmpeg/Fluidsynth DLLs are restored under Dependencies\Media\vcpkg_installed\ / Dependencies\MidMix\vcpkg_installed\." />
+           Text="VisualMusic.Tests native runtime incomplete in $(TargetDir): missing $(_MissingNative). Build VisualMusic.sln Debug|Any CPU (or matching Configuration) so media.dll and MidMix.dll are under x64\$(Configuration)\, Remuxer is under Dependencies\Remuxer\Remuxer\bin\$(Configuration)\, and FFmpeg/Fluidsynth DLLs are restored under Dependencies\Media\vcpkg_installed\ / Dependencies\MidMix\vcpkg_installed\." />
 
     <Message Importance="high"
              Condition="'$(_HasSlnNatives)'!='true'"
