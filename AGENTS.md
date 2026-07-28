@@ -119,7 +119,10 @@ Fixtures live in the deepest owning submodule (`midiLib/test-files/`, `Remuxer/l
 `test-files/<owner>/` (`PreserveNewest`) so relative names cannot collide across submodules;
 `TestFiles.PathTo(owner, relative)` resolves under the test assembly directory.
 MonoGame is not covered. `Remuxer.Tests` still needs the sibling `midiLib` checkout to validate generated MIDI.
-FX pattern layout (`FX.XM` / `FX.S3M` / `FX.IT`) lives in libRemuxer GoogleTest; MIDI conversion coverage is Remuxer Integration.
+Module fixtures come in two sets — per-note effects (`FX.XM` / `FX.S3M` / `FX.IT`) and transport effects
+(`mod-transport/`: position jump, pattern break, pattern delay, pattern loop, speed/tempo) — each a hand-authored
+XM plus generated S3M / IT twins. Pattern and order layout for both lives in libRemuxer GoogleTest; MIDI conversion
+coverage is Remuxer Integration (`FxMidiTests`, `ModTransportMidiTests`).
 
 **Unit tests** (no native build required beyond what `dotnet` restores):
 
