@@ -128,11 +128,13 @@ dotnet test D:\dev\vm\Dependencies\Remuxer\Remuxer.Tests\Remuxer.Tests.csproj --
 dotnet test D:\dev\vm\VisualMusic\VisualMusic.Tests\VisualMusic.Tests.csproj --filter "Category!=Integration" --nologo
 ```
 
-**GoogleTest** (after building `libRemuxer.Tests` x64; first build restores gtest via vcpkg manifest):
+**GoogleTest** (links libopenmpt; first build also restores gtest for the `x64-windows-static` triplet).
+Prefer `VisualMusic.sln` / `Remuxer.sln` so openmpt is built first; standalone needs libopenmpt x64 first:
 
 ```powershell
 $msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
-  -latest -prerelease -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe"
+ -latest -prerelease -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe"
+& $msbuild D:\dev\vm\Dependencies\Remuxer\libRemuxer\openmpt\build\vs2022win10\libopenmpt.vcxproj /p:Configuration=Debug /p:Platform=x64
 & $msbuild D:\dev\vm\Dependencies\Remuxer\libRemuxer\tests\libRemuxer.Tests.vcxproj /p:Configuration=Debug /p:Platform=x64
 & D:\dev\vm\Dependencies\Remuxer\libRemuxer\tests\x64\Debug\libRemuxer.Tests.exe
 ```
