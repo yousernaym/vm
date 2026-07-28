@@ -113,8 +113,9 @@ upstream and change only what Visual Music requires.
 
 ## Testing
 
-Essential automated tests live in each first-party repo (xUnit for C#, GoogleTest for libRemuxer Song/FileFormat).
+Essential automated tests live in each first-party repo (xUnit for C#, GoogleTest for libRemuxer Song/FileFormat/FX fixtures).
 Fixtures live in the deepest owning submodule (`midiLib/test-files/`, `Remuxer/libRemuxer/test-files/`,
 `Media/test-files/`, `MidMix/test-files/`). `VisualMusic.Tests` copies each into `test-files/<owner>/`. MonoGame is
-not covered. Full commands are in [AGENTS.md](AGENTS.md) (unit with `Category!=Integration` / GoogleTest /
-Integration after `VisualMusic.sln` Debug|Any CPU).
+not covered. FX pattern layout (`FX.XM` / `FX.S3M` / `FX.IT`) lives in libRemuxer GoogleTest; MIDI conversion
+coverage is Remuxer Integration. Full commands are in [AGENTS.md](AGENTS.md) (unit with `Category!=Integration` /
+GoogleTest / Integration after `VisualMusic.sln` Debug|Any CPU).
