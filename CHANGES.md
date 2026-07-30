@@ -1,15 +1,18 @@
-#1.0.0 (2026-06-27)
-- Pitch offset in Spatial tab
-- Background image
-- SidWiz integration
-- Metro UI
-- Configurable song-browser urls
-- Per-property keyframes, supporting most properties
-- Configurable keyframe interpolation types
-- Update .net and all dependencies to latest stable versions
-- Migrate to Vcpkg manifest mode
-- Add HVL/AHX support through Hvl-Replayer
-- Camera rotation with mouse (activate with middle mouse button)
-- Remove dependency on libmikmod
-- Remove XMPlay mixdown and custom third-party mixdown
-- New module formats suupported: mptm, 667, ams, c67, cba, dbm, digi, dmf, dsym, dtm, etx, fc/fc13/fc14, fmt, fst, ftm, gmc, gtk, gt2, ims, ice, itp, j2b, m15, mdl, mms, mo3, mt2, mtp, nru, nst, oxm, plm, ppm, psm, pt36, ptm, puma, rtm, sfx/sfx2, smod, ss, st26, stk, stx, stp, symmod, tcb, umx, unic, wow, xmf, xpk, mmcmp
+#1.0.0 (2026-07-30)
+- Pitch offset in Spatial tab.
+- Viewport width now configurable per track.
+- Optional background images.
+- SidWiz integration with optional audio-only mode.
+- Metro UI with configurable theme.
+- Configurable song-browser urls.
+- Per-property keyframes, supporting most properties.
+- Configurable keyframe interpolation.
+- Update .net and all dependencies to latest stable versions.
+- Vcpkg manifest mode.
+- HVL/AHX support through Hvl-Replayer.
+- Mouse-controlled camera rotation.
+- Remove dependency on libmikmod.
+- Remove XMPlay mixdown and custom third-party mixdown.
+- New module formats suupported through libopenmpt: mptm, 667, ams, c67, cba, dbm, digi, dmf, dsym, dtm, etx, fc/fc13/fc14, fmt, fst, ftm, gmc, gtk, gt2, ims, ice, itp, j2b, m15, mdl, mms, mo3, mt2, mtp, nru, nst, oxm, plm, ppm, psm, pt36, ptm, puma, rtm, sfx/sfx2, smod, ss, st26, stk, stx, stp, symmod, tcb, umx, unic, wow, xmf, xpk, mmcmp.
+- Module and SID reader fixes.
+- Integration/unit tests.

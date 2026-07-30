@@ -65,28 +65,28 @@ Source: "..\Dependencies\Remuxer\libRemuxer\roms\*"; DestDir: "{app}\Remuxer\Rom
 
 ;Cefsharp
 Source: "{#BinFolder}\runtimes\win-x64\*"; DestDir: "{app}\runtimes\win-x64\"; Flags: ignoreversion recursesubdirs
-Source: "{#BinFolder}\Web Data"; DestDir: "{app}\"; Flags: ignoreversion
-Source: "{#BinFolder}\CefSharp.WinForms.dll"; DestDir: "{app}\"; Flags: ignoreversion
+;Source: "{#BinFolder}\Web Data"; DestDir: "{app}\"; Flags: ignoreversion
+Source: "{#BinFolder}\CefSharp.Wpf.dll"; DestDir: "{app}\"; Flags: ignoreversion
 Source: "Files\cef-LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 
 ;Midmix + fluidsynth
 Source: "{#BinFolder}\MidMix.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinFolder}\libfluidsynth-3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\iconv-2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\intl-8.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\pcre.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\glib-2.0-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\iconv-2.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\intl-8.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\pcre.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\glib-2.0-0.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Files\soundfont.sf2"; DestDir: "{app}"; Flags: ignoreversion
 
 ;Media + Ffmpeg
 Source: "{#BinFolder}\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\avcodec-58.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\avformat-58.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\avutil-56.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\libx264-163.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\swresample-3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\swscale-5.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\avcodec-58.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\avformat-58.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\avutil-56.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\libx264-163.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\swresample-3.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BinFolder}\swscale-5.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 ;Runtimes
 Source: "Files\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
@@ -95,11 +95,8 @@ Source: "Files\windowsdesktop-runtime-7.0.4-win-x64.exe"; DestDir: "{tmp}"; Flag
 ;Misc
 Source: "{#BinFolder}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinFolder}\{#MyAppAssemblyName}.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\{#MyAppAssemblyName}.dll.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinFolder}\{#MyAppAssemblyName}.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinFolder}\{#MyAppAssemblyName}.deps.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Files\songlengths.md5"; DestDir: "{#MyAppDataDir}\tparty\hvsc"; Flags: ignoreversion
 
 [Icons]
@@ -109,7 +106,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; Parameters:  "/quiet /norestart";  StatusMsg: "Installing Visual C++ Redistributable"
-Filename: "{tmp}\windowsdesktop-runtime-7.0.4-win-x64.exe"; Parameters:  "/quiet";  StatusMsg: "Installing .NET 7 Windows desktop runtime"
+Filename: "{tmp}\windowsdesktop-runtime-10.0.10-win-x64.exe"; Parameters:  "/quiet";  StatusMsg: "Installing .NET 10 Windows desktop runtime"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: postinstall skipifsilent
 
 [Dirs]
