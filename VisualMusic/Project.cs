@@ -145,6 +145,10 @@ namespace VisualMusic
 
         TimeSpan _pbStartSysTime = new TimeSpan(0);
         double _pbStartSongTimeS;
+        const int MaxAudioStartAttempts = 3;
+        static readonly TimeSpan AudioStartRetryInterval = TimeSpan.FromMilliseconds(100);
+        int _audioStartAttempts;
+        TimeSpan _lastAudioStartAttemptSysTime;
         IAudioPlayback _audioPlayback = MediaAudioPlayback.Instance;
         internal IAudioPlayback AudioPlayback
         {
@@ -1675,6 +1679,37 @@ namespace VisualMusic
             return TicksToSeconds(norm * SongLengthT);
         }
 
+        void ResetAudioStartAttempts()
+        {
+            _audioStartAttempts = 0;
+            _lastAudioStartAttemptSysTime = TimeSpan.Zero;
+        }
+
+        bool TryStartAudioAtTime(double audioTimeS, TimeSpan currentTime)
+        {
+            // A prior Start call can report failure just before the native session begins running.
+            // Adopt that late start before issuing another seek.
+            if (_audioStartAttempts > 0 && _audioPlayback.IsRunning())
+            {
+                AudioHasStarted = true;
+                return true;
+            }
+
+            if (_audioStartAttempts >= MaxAudioStartAttempts)
+                return false;
+            if (_audioStartAttempts > 0
+                && currentTime - _lastAudioStartAttemptSysTime < AudioStartRetryInterval)
+                return false;
+
+            _audioStartAttempts++;
+            _lastAudioStartAttemptSysTime = currentTime;
+            if (!_audioPlayback.StartAtTime(Math.Max(0, audioTimeS)))
+                return false;
+
+            AudioHasStarted = true;
+            return true;
+        }
+
         public void Update(double deltaTimeS)
         {
             // Integrate on the live render camera; per-property camera keyframes are synced via SyncLiveCameraEdit.
@@ -1694,13 +1729,9 @@ namespace VisualMusic
                 if (!AudioHasStarted)
                 {
                     timeS = renderClockTimeS;
-                    if (timeS > Props.AudioOffset + Props.PlaybackOffsetS)
-                    {
-                        if (_audioPlayback.StartAtTime(0))
-                            AudioHasStarted = true;
-                        else
-                            IsPlaying = false;
-                    }
+                    double audioStartTimeS = Props.AudioOffset + Props.PlaybackOffsetS;
+                    if (timeS >= audioStartTimeS)
+                        TryStartAudioAtTime(timeS - audioStartTimeS, currentTime);
                 }
                 else
                 {
@@ -1735,30 +1766,32 @@ namespace VisualMusic
             double audioLengthS = _audioPlayback.GetLength();
             if (audioLengthS == 0)
                 return;
-            bool audioWasStarted = AudioHasStarted;
+            bool nativeAudioMayBeActive = AudioHasStarted || _audioStartAttempts > 0;
             IsPlaying = !IsPlaying;
             //bAudioPlayback = !bAudioPlayback;
             if (!IsPlaying)
             {
-                if (audioWasStarted)
+                ResetAudioStartAttempts();
+                if (nativeAudioMayBeActive)
                     _audioPlayback.Pause();
                 //MessageBox.Show("An error occured while pausing playback.");
             }
             else
             {
+                ResetAudioStartAttempts();
                 double songPosS = SongPosS;
-                _pbStartSysTime = DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero;
+                TimeSpan currentTime = DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero;
+                _pbStartSysTime = currentTime;
                 _pbStartSongTimeS = songPosS;
                 double startTime = songPosS - Props.AudioOffset - Props.PlaybackOffsetS;
                 if (startTime >= 0)
                 {
-                    // Reject a real past-end seek up front. Do not use PlaybackIsRunning here:
-                    // Media Foundation's clock can still report PAUSED for a moment after a
-                    // successful MESessionStarted, even though native audio is about to run.
-                    if (startTime >= audioLengthS || !_audioPlayback.StartAtTime(startTime))
+                    // Reject a real past-end seek up front. A transient first-start failure is not
+                    // terminal; Update keeps the render clock moving and retries from its new time.
+                    if (startTime >= audioLengthS)
                         IsPlaying = false;
                     else
-                        AudioHasStarted = true;
+                        TryStartAudioAtTime(startTime, currentTime);
                 }
                 else
                 {

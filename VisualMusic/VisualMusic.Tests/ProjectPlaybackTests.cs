@@ -120,7 +120,52 @@ namespace VisualMusic.Tests
                 Assert.True(project.IsPlaying);
                 Assert.True(project.AudioHasStarted);
                 Assert.Equal(0, audio.PauseCalls);
-                Assert.Equal(0, audio.LastStartTime, 3);
+                Assert.Equal(0.01, audio.LastStartTime, 3);
+            }
+            finally
+            {
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void Crossing_zero_retries_transient_first_audio_start_failure()
+        {
+            var host = new FakeSongDrawHost();
+            Project.SetDrawHost(host);
+            try
+            {
+                var audio = new FakeAudioPlayback
+                {
+                    Length = 10,
+                    StartSucceeds = true,
+                    StartFailuresRemaining = 1
+                };
+                Project project = CreateProject(audio, playbackOffsetS: 0.1f);
+
+                project.TogglePlayback();
+                host.TotalTimeElapsed = TimeSpan.FromSeconds(0.11);
+                project.Update(0.11);
+
+                Assert.True(project.IsPlaying);
+                Assert.False(project.AudioHasStarted);
+                Assert.Equal(1, audio.StartCalls);
+                Assert.Equal(0.11, project.SongPosS, 3);
+
+                // The retry is throttled, but the render clock must keep advancing meanwhile.
+                host.TotalTimeElapsed = TimeSpan.FromSeconds(0.15);
+                project.Update(0.04);
+                Assert.True(project.IsPlaying);
+                Assert.Equal(1, audio.StartCalls);
+                Assert.Equal(0.15, project.SongPosS, 3);
+
+                host.TotalTimeElapsed = TimeSpan.FromSeconds(0.22);
+                project.Update(0.07);
+
+                Assert.True(project.IsPlaying);
+                Assert.True(project.AudioHasStarted);
+                Assert.Equal(2, audio.StartCalls);
+                Assert.Equal(0.12, audio.LastStartTime, 3);
             }
             finally
             {
@@ -179,6 +224,8 @@ namespace VisualMusic.Tests
             public bool Running { get; set; }
             public double Position { get; set; }
             public bool StartSucceeds { get; set; }
+            public int StartFailuresRemaining { get; set; }
+            public int StartCalls { get; private set; }
             public double LastStartTime { get; private set; } = double.NaN;
             public bool FailStartAfterPrematurePause { get; set; }
             public int PauseCalls { get; private set; }
@@ -188,7 +235,13 @@ namespace VisualMusic.Tests
             public double GetPosition() => Position;
             public bool StartAtTime(double timeS)
             {
+                StartCalls++;
                 LastStartTime = timeS;
+                if (StartFailuresRemaining > 0)
+                {
+                    StartFailuresRemaining--;
+                    return false;
+                }
                 return StartSucceeds && (!FailStartAfterPrematurePause || PauseCalls == 0);
             }
             public bool Pause()
