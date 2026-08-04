@@ -145,6 +145,12 @@ namespace VisualMusic
 
         TimeSpan _pbStartSysTime = new TimeSpan(0);
         double _pbStartSongTimeS;
+        IAudioPlayback _audioPlayback = MediaAudioPlayback.Instance;
+        internal IAudioPlayback AudioPlayback
+        {
+            get => _audioPlayback;
+            set => _audioPlayback = value ?? MediaAudioPlayback.Instance;
+        }
         // Set while CreateGeos bakes a track so screen-position mapping uses that track's ref width.
         float? _geoWidthOverrideQn;
 
@@ -1682,25 +1688,34 @@ namespace VisualMusic
             //Scroll song depending on user input or playback position.
             if (IsPlaying)
             {
+                TimeSpan currentTime = DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero;
+                double renderClockTimeS = (currentTime - _pbStartSysTime).TotalSeconds + _pbStartSongTimeS;
                 double timeS;
                 if (!AudioHasStarted)
                 {
-                    timeS = ((DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero) - _pbStartSysTime).TotalSeconds + _pbStartSongTimeS;
+                    timeS = renderClockTimeS;
                     if (timeS > Props.AudioOffset + Props.PlaybackOffsetS)
                     {
-                        AudioHasStarted = true;
-                        Media.StartPlaybackAtTime(0);
+                        if (_audioPlayback.StartAtTime(0))
+                            AudioHasStarted = true;
+                        else
+                            IsPlaying = false;
                     }
                 }
                 else
                 {
-                    if (!Media.PlaybackIsRunning()) //playback reached end of song
-                    {
+                    double playbackPosS = _audioPlayback.GetPosition();
+                    double audioLengthS = _audioPlayback.GetLength();
+                    double audioClockTimeS = playbackPosS + Props.AudioOffset + Props.PlaybackOffsetS;
+                    // A successful Media Foundation start/seek can still expose a stale clock
+                    // position for several frames. Keep visuals moving until that clock catches up.
+                    timeS = Math.Max(renderClockTimeS, audioClockTimeS);
+
+                    // MESessionStarted can arrive just before IMFPresentationClock reports RUNNING.
+                    // Treat a stopped clock as end-of-audio only when its position is at the end;
+                    // otherwise keep following the clock while that start/seek transition settles.
+                    if (!_audioPlayback.IsRunning() && playbackPosS >= audioLengthS - 0.001)
                         IsPlaying = false;
-                        timeS = SongPosS;
-                    }
-                    else
-                        timeS = Media.GetPlaybackPos() + Props.AudioOffset + Props.PlaybackOffsetS;
                 }
 
                 SetSongPosS(timeS, true);
@@ -1717,32 +1732,36 @@ namespace VisualMusic
         public void TogglePlayback()
         {
             // Note: playback may be toggled while mouse-look is active (Ctrl+Space works when locked).
-            if (Media.GetAudioLength() == 0)
+            double audioLengthS = _audioPlayback.GetLength();
+            if (audioLengthS == 0)
                 return;
+            bool audioWasStarted = AudioHasStarted;
             IsPlaying = !IsPlaying;
             //bAudioPlayback = !bAudioPlayback;
             if (!IsPlaying)
             {
-                Media.PausePlayback();
+                if (audioWasStarted)
+                    _audioPlayback.Pause();
                 //MessageBox.Show("An error occured while pausing playback.");
             }
             else
             {
                 double songPosS = SongPosS;
+                _pbStartSysTime = DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero;
+                _pbStartSongTimeS = songPosS;
                 double startTime = songPosS - Props.AudioOffset - Props.PlaybackOffsetS;
                 if (startTime >= 0)
                 {
-                    Media.StartPlaybackAtTime(startTime);
-                    //MessageBox.Show("An error occured while starting playback.");
-                    if (!Media.PlaybackIsRunning()) //Assuming this is because we tried to start playback after end of audio
+                    // Reject a real past-end seek up front. Do not use PlaybackIsRunning here:
+                    // Media Foundation's clock can still report PAUSED for a moment after a
+                    // successful MESessionStarted, even though native audio is about to run.
+                    if (startTime >= audioLengthS || !_audioPlayback.StartAtTime(startTime))
                         IsPlaying = false;
                     else
                         AudioHasStarted = true;
                 }
                 else
                 {
-                    _pbStartSysTime = DrawHost?.TotalTimeElapsed ?? TimeSpan.Zero;
-                    _pbStartSongTimeS = songPosS;
                     AudioHasStarted = false;
                 }
             }
@@ -1758,7 +1777,7 @@ namespace VisualMusic
         {
             IsPlaying = false;
             //			bAudioPlayback = false;
-            Media.StopPlayback();
+            _audioPlayback.Stop();
             // MessageBox.Show("An error occured while stopping playback.");
             NormSongPos = 0;
         }

@@ -67,4 +67,33 @@ namespace VisualMusic
         [DllImport("media.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "getAudioLength")]
         public static extern double GetAudioLength();
     }
+
+    /// <summary>
+    /// Playback-only Media seam used by <see cref="Project"/>. Media Foundation can report a
+    /// transitional clock state immediately after a successful seek/start, so Project owns the
+    /// higher-level playback state while this interface exposes the native facts it needs.
+    /// </summary>
+    internal interface IAudioPlayback
+    {
+        double GetLength();
+        bool IsRunning();
+        double GetPosition();
+        bool StartAtTime(double timeS);
+        bool Pause();
+        bool Stop();
+    }
+
+    internal sealed class MediaAudioPlayback : IAudioPlayback
+    {
+        public static MediaAudioPlayback Instance { get; } = new MediaAudioPlayback();
+
+        MediaAudioPlayback() { }
+
+        public double GetLength() => Media.GetAudioLength();
+        public bool IsRunning() => Media.PlaybackIsRunning();
+        public double GetPosition() => Media.GetPlaybackPos();
+        public bool StartAtTime(double timeS) => Media.StartPlaybackAtTime(timeS);
+        public bool Pause() => Media.PausePlayback();
+        public bool Stop() => Media.StopPlayback();
+    }
 }
