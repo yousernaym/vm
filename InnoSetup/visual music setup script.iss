@@ -70,27 +70,23 @@ Source: "{#BinFolder}\CefSharp.Wpf.dll"; DestDir: "{app}\"; Flags: ignoreversion
 Source: "Files\cef-LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 
-;Midmix + fluidsynth
+; MidMix + FluidSynth
 Source: "{#BinFolder}\MidMix.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinFolder}\libfluidsynth-3.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\iconv-2.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\intl-8.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\pcre.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\glib-2.0-0.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Files\soundfont.sf2"; DestDir: "{app}"; Flags: ignoreversion
 
-;Media + Ffmpeg
+; Media + FFmpeg
 Source: "{#BinFolder}\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\avcodec-58.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\avformat-58.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\avutil-56.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\libx264-163.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\swresample-3.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#BinFolder}\swscale-5.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BinFolder}\avcodec-62.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BinFolder}\avformat-62.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BinFolder}\avutil-60.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BinFolder}\libx264-164.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BinFolder}\swresample-6.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BinFolder}\swscale-9.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 ;Runtimes
 Source: "Files\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
-Source: "Files\windowsdesktop-runtime-7.0.4-win-x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
+Source: "Files\windowsdesktop-runtime-10.0.10-win-x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
 
 ;Misc
 Source: "{#BinFolder}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
