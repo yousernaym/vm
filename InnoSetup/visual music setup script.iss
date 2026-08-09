@@ -48,15 +48,10 @@ Name: "associateVmp"; Description: "Associate with .vmp files"
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
-;Monogame
-Source: "{#BinFolder}\MonoGame.Framework.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\SharpDX.Direct3D11.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\SharpDX.DXGI.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "{#BinFolder}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 
-;Midilib
-Source: "{#BinFolder}\midilib.dll"; DestDir: "{app}"; Flags: ignoreversion
+; MonoGame content
+Source: "{#BinFolder}\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
 
 ;Remuxer
 Source: "{#BinFolder}\Remuxer\*.dll"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
@@ -66,23 +61,11 @@ Source: "..\Dependencies\Remuxer\libRemuxer\roms\*"; DestDir: "{app}\Remuxer\Rom
 ;Cefsharp
 Source: "{#BinFolder}\runtimes\win-x64\*"; DestDir: "{app}\runtimes\win-x64\"; Flags: ignoreversion recursesubdirs
 ;Source: "{#BinFolder}\Web Data"; DestDir: "{app}\"; Flags: ignoreversion
-Source: "{#BinFolder}\CefSharp.Wpf.dll"; DestDir: "{app}\"; Flags: ignoreversion
 Source: "Files\cef-LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 
-; MidMix + FluidSynth
-Source: "{#BinFolder}\MidMix.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\libfluidsynth-3.dll"; DestDir: "{app}"; Flags: ignoreversion
+; SoundFont
 Source: "Files\soundfont.sf2"; DestDir: "{app}"; Flags: ignoreversion
-
-; Media + FFmpeg
-Source: "{#BinFolder}\Media.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\avcodec-62.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\avformat-62.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\avutil-60.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\libx264-164.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\swresample-6.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BinFolder}\swscale-9.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 ;Runtimes
 Source: "Files\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion
