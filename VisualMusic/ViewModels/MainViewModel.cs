@@ -2039,7 +2039,8 @@ namespace VisualMusic.ViewModels
 
         // ---- IImportService (browser download import) ----
 
-        public void ImportFromUrl(string url, string suggestedFileName, FileType preferredFileType)
+        public void ImportBrowserDownload(string url, string downloadedFilePath,
+            string suggestedFileName, FileType preferredFileType)
         {
             string ext = suggestedFileName.Split('.').Last().ToLower();
 
@@ -2054,9 +2055,8 @@ namespace VisualMusic.ViewModels
             }
 
             // Browser imports skip the dialog: always erase the current project, use no audio file,
-            // and use the saved per-type track-split preference. The note path is the original URL;
-            // setNotePath() downloads it to a temp file — the same path the dialog takes when a URL
-            // is typed into the note field, so re-importing the URL later behaves identically.
+            // and use the saved per-type track-split preference. Chromium already completed the
+            // download so the site's cookies, referrer, redirects, and request method were retained.
             ImportOptions options;
             switch (fileType.Value)
             {
@@ -2066,7 +2066,7 @@ namespace VisualMusic.ViewModels
                 default: options = new SidImportOptions(); break;
             }
             options.RawNotePath = url;       // preserve original URL for project save and dialog display
-            try { options.SetNotePath(); }    // downloads the URL to a temp file (WebClient)
+            try { options.SetBrowserDownloadedNotePath(downloadedFilePath); }
             catch (FileImportException)
             {
                 MetroMessageBox.Show("Download failed: " + url, Program.AppName,

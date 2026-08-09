@@ -15,6 +15,12 @@ namespace CefSharp.Example
 
         public bool ShowDialog { get; set; } = true;
 
+        /// <summary>
+        /// Resolves the full destination path passed to Chromium. When unset, the suggested
+        /// file name is used for backwards compatibility.
+        /// </summary>
+        public Func<DownloadItem, string> DownloadPathResolver { get; set; }
+
         public bool OnBeforeDownload(IWebBrowser chromiumWebBrowser, IBrowser browser, DownloadItem downloadItem, IBeforeDownloadCallback callback)
         {
             OnBeforeDownloadFired?.Invoke(this, downloadItem);
@@ -24,7 +30,11 @@ namespace CefSharp.Example
                 using (callback)
                 {
                     if (!downloadItem.IsCancelled)
-                        callback.Continue(downloadItem.SuggestedFileName, showDialog: ShowDialog);
+                    {
+                        string downloadPath = DownloadPathResolver?.Invoke(downloadItem)
+                            ?? downloadItem.SuggestedFileName;
+                        callback.Continue(downloadPath, showDialog: ShowDialog);
+                    }
                 }
             }
 

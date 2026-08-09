@@ -2,7 +2,8 @@ using CefSharp;
 using CefSharp.Example;
 using CefSharp.Wpf;
 using System;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,6 +14,9 @@ namespace VisualMusic.Controls
     {
         ChromiumWebBrowser _browser;
         string _initialUrl;
+        readonly HashSet<string> _completedDownloadIds = new HashSet<string>();
+        readonly string _downloadFolder = Path.Combine(
+            Program.TempDir, "browser-downloads", Path.GetRandomFileName());
 
         public IImportService ImportService { get; set; }
         public Func<Project> GetProject { get; set; }
@@ -52,8 +56,13 @@ namespace VisualMusic.Controls
                 RequestHandler = new DownloadNavigationHandler()
             };
 
-            var downloadHandler = new DownloadHandler { ShowDialog = false };
+            var downloadHandler = new DownloadHandler
+            {
+                ShowDialog = false,
+                DownloadPathResolver = GetBrowserDownloadPath
+            };
             downloadHandler.OnBeforeDownloadFired += OnBeforeDownload;
+            downloadHandler.OnDownloadUpdatedFired += OnDownloadUpdated;
             _browser.DownloadHandler = downloadHandler;
 
             _browser.LoadingStateChanged += OnLoadingStateChanged;
@@ -69,10 +78,58 @@ namespace VisualMusic.Controls
 
         void OnBeforeDownload(object sender, DownloadItem e)
         {
-            e.IsCancelled = true;
-            string url = e.Url;
-            string fileName = e.SuggestedFileName;
-            Dispatcher.InvokeAsync(() => ImportService?.ImportFromUrl(url, fileName, SourceFileType));
+            Dispatcher.InvokeAsync(() => statusLabel.Text = $"Downloading {e.SuggestedFileName}...");
+        }
+
+        void OnDownloadUpdated(object sender, DownloadItem e)
+        {
+            if (e.IsCancelled)
+            {
+                Dispatcher.InvokeAsync(() => statusLabel.Text = "Download failed.");
+                return;
+            }
+
+            if (!e.IsComplete)
+            {
+                if (e.PercentComplete >= 0)
+                    Dispatcher.InvokeAsync(() =>
+                        statusLabel.Text = $"Downloading {e.SuggestedFileName}... {e.PercentComplete}%");
+                return;
+            }
+
+            // CefSharp can report the terminal state more than once. Import each completed
+            // browser transaction once, after Chromium has closed the destination file.
+            lock (_completedDownloadIds)
+            {
+                if (!_completedDownloadIds.Add(e.Id.ToString()))
+                    return;
+            }
+
+            string url = string.IsNullOrWhiteSpace(e.OriginalUrl) ? e.Url : e.OriginalUrl;
+            string fileName = string.IsNullOrWhiteSpace(e.SuggestedFileName)
+                ? Path.GetFileName(e.FullPath)
+                : e.SuggestedFileName;
+            string downloadedFilePath = e.FullPath;
+
+            Dispatcher.InvokeAsync(() =>
+            {
+                statusLabel.Text = "";
+                ImportService?.ImportBrowserDownload(
+                    url, downloadedFilePath, fileName, SourceFileType);
+            });
+        }
+
+        string GetBrowserDownloadPath(DownloadItem item)
+        {
+            string fileName = Path.GetFileName(item.SuggestedFileName);
+            if (string.IsNullOrWhiteSpace(fileName))
+                fileName = Path.GetRandomFileName();
+
+            // A per-download directory avoids collisions while retaining the suggested file name,
+            // which is used for type detection and project titles.
+            string dir = Path.Combine(_downloadFolder, item.Id.ToString());
+            Directory.CreateDirectory(dir);
+            return Path.Combine(dir, fileName);
         }
 
         void OnBrowserStatusMessage(object sender, StatusMessageEventArgs args) =>

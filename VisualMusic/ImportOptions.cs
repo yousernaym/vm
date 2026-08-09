@@ -214,6 +214,19 @@ namespace VisualMusic
                 NotePath = _rawNotePath;
             }
         }
+
+        /// <summary>
+        /// Uses a file already downloaded by the embedded browser while retaining
+        /// <see cref="RawNotePath"/> as the source URL shown and serialized by the project.
+        /// </summary>
+        internal void SetBrowserDownloadedNotePath(string downloadedFilePath)
+        {
+            if (string.IsNullOrWhiteSpace(downloadedFilePath) || !File.Exists(downloadedFilePath))
+                throw new FileImportException("", ImportError.Missing, ImportFileType.Note,
+                    downloadedFilePath);
+
+            NotePath = downloadedFilePath;
+        }
     }
 
     [Serializable]
