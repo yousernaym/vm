@@ -110,6 +110,7 @@ namespace VisualMusic.ViewModels
             {
                 foreach (var item in TrackList.SelectedItems)
                     fn(item.TrackView.TrackProps);
+                NotifyScrollChangeSizesChanged();
                 // Trigger rendering refresh — the draw host invalidates on next frame tick.
             };
 
@@ -118,6 +119,7 @@ namespace VisualMusic.ViewModels
                 foreach (var item in TrackList.SelectedItems)
                     fn(item.TrackView.TrackProps);
                 Project?.CreateGeos();
+                NotifyScrollChangeSizesChanged();
             };
 
             SelectedTrackProps.RefreshTrackColors = TrackList.RefreshColors;
@@ -561,6 +563,26 @@ namespace VisualMusic.ViewModels
             set { if (Project != null) Project.NormSongPos = value; }
         }
 
+        /// <summary>One visible timeline width, expressed in the scrollbar's normalized range.</summary>
+        public double ScrollPageChange
+        {
+            get
+            {
+                if (Project?.Notes == null || Project.SongLengthT <= 0)
+                    return 1;
+                return Math.Min(1, Project.ViewWidthT / Project.SongLengthT);
+            }
+        }
+
+        /// <summary>One sixteenth of a timeline page, matching the keyboard nudge size.</summary>
+        public double ScrollLineChange => ScrollPageChange * SongRenderer.SmallScrollStep;
+
+        void NotifyScrollChangeSizesChanged()
+        {
+            OnPropertyChanged(nameof(ScrollPageChange));
+            OnPropertyChanged(nameof(ScrollLineChange));
+        }
+
         public void NotifyScrollPositionChanged()
         {
             OnPropertyChanged(nameof(ScrollPosition));
@@ -569,6 +591,8 @@ namespace VisualMusic.ViewModels
             // change, but NOT during a static control edit — so it never fights an in-progress edit).
             if (Project != null && !Project.IsPlaying)
                 Project.InterpolatePropertyKeyframes();
+            // View width is itself keyframeable, so the scrollbar page size can change while seeking.
+            NotifyScrollChangeSizesChanged();
             if (ShowSongProps)
                 SongProps.RefreshLiveValues();
             if (ShowTrackProps && Project?.HasTrackKeyframes == true)
@@ -1568,6 +1592,7 @@ namespace VisualMusic.ViewModels
             Keyframes.KeyframeService.SyncCurrentValues("ViewWidthQn",
                 Keyframes.KeyframeService.KfScope.Track);
             OnTrackListSelectionChanged();   // refresh the Spatial tab slider display
+            NotifyScrollChangeSizesChanged();
             ScheduleViewWidthUndo();
         }
 

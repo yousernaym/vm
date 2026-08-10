@@ -2,6 +2,7 @@ using MahApps.Metro.Controls;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using VisualMusic.ViewModels;
 
 namespace VisualMusic
@@ -87,7 +88,11 @@ namespace VisualMusic
             {
                 if (monoGameHost.Renderer == null) return;
                 monoGameHost.Renderer.OnSongPosChanged = () =>
-                    Dispatcher.InvokeAsync(() => _vm.NotifyScrollPositionChanged());
+                    // Position refresh can rebuild interpolated geometry. Queue it below input so
+                    // mouse move/up remains responsive while right-drag scrolling through that work.
+                    Dispatcher.InvokeAsync(
+                        () => _vm.NotifyScrollPositionChanged(),
+                        DispatcherPriority.Background);
             }
 
             void SyncRendererProject(Project project)

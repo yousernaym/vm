@@ -170,7 +170,8 @@
             <!-- Timeline scrollbar at bottom, confined to center column only -->
             <ScrollBar DockPanel.Dock="Bottom" Orientation="Horizontal"
                        Minimum="0" Maximum="1"
-                       SmallChange="0.0625" LargeChange="1.0"
+                       SmallChange="{Binding ScrollLineChange}"
+                       LargeChange="{Binding ScrollPageChange}"
                        Value="{Binding ScrollPosition, Mode=TwoWay}"
                        IsEnabled="{Binding HasProject}"
                        Visibility="{Binding CurrentScreen,
