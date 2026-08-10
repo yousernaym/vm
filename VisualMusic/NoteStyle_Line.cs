@@ -607,7 +607,8 @@ namespace VisualMusic
         void DrawHighLights(Midi.Track midiTrack, TrackProps trackProps, float songPosP)
         {
             List<Midi.Note> noteList = midiTrack.Notes;
-            int hlNoteIndex = midiTrack.GetLastStartedNoteIndexAtTime((int)(Project.SongPosT - Project.PlaybackOffsetT));
+            double playbackTick = Project.SongPosT - Project.PlaybackOffsetT;
+            int hlNoteIndex = GetHighlightedNoteIndex(midiTrack, playbackTick);
             if (hlNoteIndex < 0)
                 return;
             Midi.Note note = noteList[hlNoteIndex], nextNote;
@@ -727,6 +728,16 @@ namespace VisualMusic
                 _fx.CurrentTechnique.Passes[0].Apply();
                 GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, s_lineHlVerts, 0, 2);
             }
+        }
+
+        internal static int GetHighlightedNoteIndex(Midi.Track midiTrack, double playbackTick)
+        {
+            int noteIndex = midiTrack.GetLastStartedNoteIndexAtTime((int)playbackTick);
+            if (noteIndex < 0)
+                return -1;
+
+            Midi.Note note = midiTrack.Notes[noteIndex];
+            return playbackTick >= note.start && playbackTick < note.stop ? noteIndex : -1;
         }
 
         float CalcLerpFactor(int x, int x1, int x2)
