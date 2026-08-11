@@ -78,6 +78,7 @@ namespace VisualMusic.Controls
             _audioFolder = Path.GetDirectoryName(dlg.FileName);
             AppSettings.Instance.SetAudioFolder(FileType.Audio, _audioFolder);
             AppSettings.Instance.Save();
+            okButton.Focus();
         }
 
         // ---- OK / Cancel ----

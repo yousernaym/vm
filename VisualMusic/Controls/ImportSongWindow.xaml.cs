@@ -106,7 +106,7 @@ namespace VisualMusic.Controls
 
         // ---- File-dialog filters ----
         readonly string _noteFilter;
-        readonly string _audioFilter = "Wave files (*.wav)|*.wav|All files (*.*)|*.*";
+        readonly string _audioFilter = "Audio files (*.wav;*.mp3)|*.wav;*.mp3|All files (*.*)|*.*";
 
         string _noteFolder;
         string _audioFolder;
@@ -181,6 +181,7 @@ namespace VisualMusic.Controls
             _noteFolder = Path.GetDirectoryName(dlg.FileName);
             AppSettings.Instance.SetNoteFolder(_fileType, _noteFolder);
             AppSettings.Instance.Save();
+            okButton.Focus();
         }
 
         void BrowseAudio_Click(object sender, RoutedEventArgs e)
@@ -192,6 +193,7 @@ namespace VisualMusic.Controls
             _audioFolder = Path.GetDirectoryName(dlg.FileName);
             AppSettings.Instance.SetAudioFolder(_fileType, _audioFolder);
             AppSettings.Instance.Save();
+            okButton.Focus();
         }
 
         // ---- OK / Cancel ----
