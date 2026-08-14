@@ -33,12 +33,29 @@ struct VSOutput
 
 void VS(in VSInput IN, out VSOutput OUT)
 {
-	OUT.normal = IN.normal;
-	OUT.center = IN.center;
-	OUT.rawPos = IN.pos.xyz;
+	// The CPU tessellates the curve at a reference viewport width.  Scaling the
+	// already-expanded position would also scale/skew the baked line radius.
+	// Scale the centerline instead, then rebuild the offset at the live radius.
+	float3 center = IN.center;
+	center.x *= VertWidthScale;
+
+	float3 offset = IN.pos - IN.center;
+	// If x positions are scaled by s, a perpendicular (-dy, dx) becomes
+	// (-dy, s * dx).  Ribbon offsets are horizontal and remain unchanged.
+	offset.y *= VertWidthScale;
+	offset = normalize(offset) * Radius;
+
+	float3 normal = IN.normal;
+	normal.y *= VertWidthScale;
+	normal = normalize(normal);
+
+	float3 rawPos = center + offset;
+	OUT.normal = normal;
+	OUT.center = center;
+	OUT.rawPos = rawPos;
 	OUT.normPos = IN.normPos;
-	OUT.pos = float4(IN.pos.xy, 0, 1);
-	OUT.pos = wvpTransform(OUT.pos, VertWidthScale);
+	OUT.pos = float4(rawPos.xy, 0, 1);
+	OUT.pos = wvpTransform(OUT.pos, 1);
 	OUT.texCoords = IN.texCoords - TexScrollOffset;
 	OUT.texCoords2 = IN.texCoords2 - TexScrollOffset2;
 }
