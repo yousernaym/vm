@@ -192,11 +192,7 @@ namespace VisualMusic
             RenderNow();
 
             _clock.Start();
-            // Keep the live loop below input priority. A keyframed geometry property (notably line
-            // width) can make one tick expensive; if an overdue timer remains at Render priority it
-            // repeatedly wins over WM_MOUSEMOVE/WM_RBUTTONUP and leaves right-drag scrolling using
-            // the last mouse position until the costly interpolation segment has passed.
-            _timer = new DispatcherTimer(DispatcherPriority.Background, Dispatcher)
+            _timer = new DispatcherTimer(DispatcherPriority.Render, Dispatcher)
             {
                 Interval = TimeSpan.FromMilliseconds(1000.0 / 120)
             };
