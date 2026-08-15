@@ -283,7 +283,7 @@ namespace VisualMusic.ViewModels
         public double? LineWidth
         {
             get => (double?)LineStyle?.LineWidth;
-            set { if (value != null) Rebuild(tp => tp.StyleProps.GetLineStyle().LineWidth = (float)value); OnPropertyChanged(); }
+            set { if (value != null) Apply(tp => tp.StyleProps.GetLineStyle().LineWidth = (float)value); OnPropertyChanged(); }
         }
 
         public double? QnGapThreshold
@@ -359,8 +359,6 @@ namespace VisualMusic.ViewModels
         public Action ResetLight { get; set; }
         public Action ResetSpatial { get; set; }
         public Action ResetAudio { get; set; }
-        /// <summary>Re-bake geometry at the new effective viewport width after a commit (wired by MainViewModel).</summary>
-        public Action CommitViewWidth { get; set; }
 
         // ---- Per-tab save/load (track-properties context menu) ----
 

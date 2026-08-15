@@ -289,8 +289,6 @@ namespace VisualMusic
         {
             LineGeo lineGeo = new LineGeo();
             geo = lineGeo;
-            if (LineWidth == 0)
-                return;
             List<Midi.Note> noteList = midiTrack.Notes;
             //List<Midi.Note> noteList = getNotes(0, midiTrack, songDrawProps);
             if (noteList.Count == 0)
@@ -299,7 +297,10 @@ namespace VisualMusic
             int vertIndex = 3;
             int hLineVertIndex = 0;
             int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
-            float vpLineWidth = VpLineWidth;
+            // The live shader radius may be zero, but the reusable vertex data still needs a
+            // non-zero side vector and finite texture coordinates.  The shader normalizes this
+            // baked offset, so its magnitude does not affect the rendered line width.
+            float vpLineWidth = Math.Max(VpLineWidth, Project.NormalizeVpScalar(1f));
             float maxNumBboxesPerScreenWidth = 1000;
             float bboxMinSqLength = (float)Math.Pow(Project.Props.Camera.ViewportSize.X / maxNumBboxesPerScreenWidth, 2);
 
@@ -453,7 +454,7 @@ namespace VisualMusic
 
                     if (vertIndex >= MaxLineVerts - 2 || hLineVertIndex >= MaxHLineVerts - 2)
                     {
-                        CreateLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
+                        CreateLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
                         x -= step;
                     }
                     //break;
@@ -462,11 +463,11 @@ namespace VisualMusic
                 if (!(bool)Continuous)
                     endOfSegment = true; //One draw call per note. Can be used to avoid glitches between notes because of instant IN.normStepFromNoteStart interpolation from 1 to 0.
                 if (endOfSegment)
-                    CreateLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
+                    CreateLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
 
                 completeNoteListIndex++;
             }
-            CreateLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo, vpLineWidth);
+            CreateLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
         }
 
         float CalcLinearLineAngle(int noteIndex, Curve curve)
@@ -547,27 +548,24 @@ namespace VisualMusic
 
         }
 
-        void CreateLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo, float lineWidth)
+        void CreateLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo)
         {
             //Console.WriteLine(numVerts);
-            if (lineWidth > 0)
+            if (numVerts > 5 || numHLineVerts > 1)
             {
-                if (numVerts > 5 || numHLineVerts > 1)
+                if (numHLineVerts > 1)
                 {
-                    if (numHLineVerts > 1)
-                    {
-                        VertexBuffer vb = new VertexBuffer(GraphicsDevice, s_lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
-                        vb.SetData(s_hLineVerts, 0, numHLineVerts);
-                        geo.hLineVb.Add(vb);
-                        numHLineVerts = 0;
-                    }
-                    if (numVerts > 5)
-                    {
-                        VertexBuffer vb = new VertexBuffer(GraphicsDevice, s_lineVertDecl, numVerts, BufferUsage.WriteOnly);
-                        vb.SetData(s_lineVerts, 0, numVerts);
-                        geo.lineVb.Add(vb);
-                        numVerts = 3;
-                    }
+                    VertexBuffer vb = new VertexBuffer(GraphicsDevice, s_lineVertDecl, numHLineVerts, BufferUsage.WriteOnly);
+                    vb.SetData(s_hLineVerts, 0, numHLineVerts);
+                    geo.hLineVb.Add(vb);
+                    numHLineVerts = 0;
+                }
+                if (numVerts > 5)
+                {
+                    VertexBuffer vb = new VertexBuffer(GraphicsDevice, s_lineVertDecl, numVerts, BufferUsage.WriteOnly);
+                    vb.SetData(s_lineVerts, 0, numVerts);
+                    geo.lineVb.Add(vb);
+                    numVerts = 3;
                 }
             }
         }
@@ -590,13 +588,19 @@ namespace VisualMusic
             _fx.Parameters["Radius"].SetValue(radius);
             _fx.Parameters["InnerHlSize"].SetValue(0.0f);
 
-            _fx.CurrentTechnique = _fx.Techniques["Line"];
-            _fx.Parameters["DiscardAtOnce"].SetValue(true);
-            _fx.CurrentTechnique.Passes[0].Apply();
-            DrawGeoChunk(trackProps.TrackView.Geo);
-            _fx.Parameters["DiscardAtOnce"].SetValue(false);
-            _fx.CurrentTechnique.Passes[0].Apply();
-            DrawGeoChunk(trackProps.TrackView.Geo);
+            // Keep the buffers resident at zero width so a later shader-only width change can
+            // reveal them immediately.  Skipping the draw also avoids Radius == 0 in the pixel
+            // shader's normalized edge-distance calculation.
+            if (radius > 0)
+            {
+                _fx.CurrentTechnique = _fx.Techniques["Line"];
+                _fx.Parameters["DiscardAtOnce"].SetValue(true);
+                _fx.CurrentTechnique.Passes[0].Apply();
+                DrawGeoChunk(trackProps.TrackView.Geo);
+                _fx.Parameters["DiscardAtOnce"].SetValue(false);
+                _fx.CurrentTechnique.Passes[0].Apply();
+                DrawGeoChunk(trackProps.TrackView.Geo);
+            }
 
             DepthStencilState oldDss = GraphicsDevice.DepthStencilState;
             GraphicsDevice.DepthStencilState = DepthStencilState.None;

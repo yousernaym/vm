@@ -326,10 +326,6 @@ namespace VisualMusic.ViewModels
                 AddUndoItem("Reset audio");
             };
 
-            // Re-bake geometry at the new effective width on commit (undo snapshot comes from
-            // Keyframing.OnCommit on the same CommitChanges event).
-            SelectedTrackProps.CommitViewWidth = () => Project?.CreateGeos();
-
             SelectedTrackProps.AddModEntry = () =>
             {
                 foreach (var item in TrackList.SelectedItems)
@@ -1588,7 +1584,6 @@ namespace VisualMusic.ViewModels
                 tp.SpatialProps.ViewWidthQn =
                     (float)Math.Clamp(current * factor, MinViewWidthQn, MaxViewWidthQn);
             }
-            Project.CreateGeos();
             Keyframes.KeyframeService.SyncCurrentValues("ViewWidthQn",
                 Keyframes.KeyframeService.KfScope.Track);
             OnTrackListSelectionChanged();   // refresh the Spatial tab slider display

@@ -39,15 +39,18 @@ void VS(in VSInput IN, out VSOutput OUT)
 	float3 center = IN.center;
 	center.x *= VertWidthScale;
 
-	float3 offset = IN.pos - IN.center;
-	// If x positions are scaled by s, a perpendicular (-dy, dx) becomes
-	// (-dy, s * dx).  Ribbon offsets are horizontal and remain unchanged.
-	offset.y *= VertWidthScale;
-	offset = normalize(offset) * Radius;
-
 	float3 normal = IN.normal;
 	normal.y *= VertWidthScale;
 	normal = normalize(normal);
+
+	// normPos.y identifies the two sides of the strip.  Derive the direction
+	// from the corrected normal instead of the CPU-expanded position so geometry
+	// baked while the live width is zero remains reusable.
+	float side = IN.normPos.y * 2 - 1;
+	float3 offset = LineType == 1
+		? float3(side, 0, 0) // Ribbon offsets stay horizontal.
+		: normal * side;
+	offset *= Radius;
 
 	float3 rawPos = center + offset;
 	OUT.normal = normal;

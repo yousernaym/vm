@@ -2059,8 +2059,7 @@ namespace VisualMusic
                     needsRebuild: true, alwaysHold: true);
                 _propAccessors[$"track/{tn}/LineWidth"] = PropAccessor.Scalar(
                     () => tv.TrackProps.StyleProps.GetLineStyle().LineWidth ?? 0,
-                    v => { tv.TrackProps.StyleProps.GetLineStyle().LineWidth = (float)v; },
-                    needsRebuild: true);
+                    v => { tv.TrackProps.StyleProps.GetLineStyle().LineWidth = (float)v; });
                 _propAccessors[$"track/{tn}/QnGapThreshold"] = PropAccessor.Scalar(
                     () => tv.TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold ?? 0,
                     v => { tv.TrackProps.StyleProps.GetLineStyle().Qn_gapThreshold = (float)v; },

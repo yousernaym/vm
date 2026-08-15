@@ -236,6 +236,67 @@ namespace VisualMusic.Tests
 
         [Fact]
         [Trait("Category", "Integration")]
+        public void Zero_line_width_bakes_geometry_reused_by_width_keyframes()
+        {
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                var track = project.TrackViews[1];
+                track.TrackProps.StyleProps.Type = NoteStyleType.Line;
+                track.TrackProps.StyleProps.GetLineStyle().LineWidth = 0;
+                project.InitPropertyAccessors();
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(cm);
+                NoteStyle.SetProject(project);
+
+                var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
+                Assert.NotEmpty(bakedGeo.lineVb);
+
+                project.PropertyKeyframes.Add("track/1/LineWidth", 0,
+                    Keyframes.KfInterpolation.Linear, new Keyframes.ScalarKfValue(0));
+                project.PropertyKeyframes.Add("track/1/LineWidth", 480,
+                    Keyframes.KfInterpolation.Linear, new Keyframes.ScalarKfValue(20));
+                project.NormSongPos = 0.5;
+                project.InterpolatePropertyKeyframes();
+
+                Assert.Equal(10f, track.TrackProps.StyleProps.GetLineStyle().LineWidth!.Value, 3);
+                Assert.Same(bakedGeo, track.Geo);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+
+            Assert.False(NoteStyle.HasContent);
+            Assert.False(NoteStyle.HasGraphicsDevice);
+            Assert.False(NoteStyle.HasProject);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
         public void Initialize_order_SetContent_before_SInit_soft_skips_geo_then_SInit_bakes()
         {
             // SongRenderer.Initialize now calls SInit before SetContent, but Open/Import can
