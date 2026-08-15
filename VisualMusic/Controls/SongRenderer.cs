@@ -88,6 +88,21 @@ namespace VisualMusic
         /// </summary>
         public Action<int> OnCtrlWheelViewWidth { get; set; }
 
+        /// <summary>
+        /// Ctrl+F from the focused song panel (WPF key bindings do not reach the HWND). Wire on the
+        /// UI thread to toggle the FPS overlay command.
+        /// </summary>
+        public Action OnToggleFpsOverlay { get; set; }
+
+        /// <summary>When true, Draw() paints a frames-per-second readout in the viewport corner.</summary>
+        public bool ShowFpsOverlay { get; set; }
+
+        TimeSpan _fpsLastPresent;
+        bool _fpsHasLastPresent;
+        int _fpsWindowFrames;
+        double _fpsWindowS;
+        float _displayedFps;
+
         // --- Public properties ---
         public SpriteFont LyricsFont { get; private set; }
         Project _project;
@@ -227,26 +242,81 @@ namespace VisualMusic
             if (_graphicsDevice == null) return;
             _graphicsDevice.BlendState = _blendState;
             _graphicsDevice.Clear(Color.Black);
-            if (Project == null) return;
-
-            Project.DrawSong();
-
-            if (_selectingRegion && _selectedScreenRegion.Width != 0 && _selectedScreenRegion.Height != 0)
+            if (Project != null)
             {
-                _spriteBatch.Begin();
-                Rectangle normRect = NormalizeRect(_selectedScreenRegion);
-                _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
-                _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
-                _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
-                _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
-                _spriteBatch.End();
+                Project.DrawSong();
+
+                if (_selectingRegion && _selectedScreenRegion.Width != 0 && _selectedScreenRegion.Height != 0)
+                {
+                    _spriteBatch.Begin();
+                    Rectangle normRect = NormalizeRect(_selectedScreenRegion);
+                    _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, normRect.Width, 1), Color.White);
+                    _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Left, normRect.Top, 1, normRect.Height), Color.White);
+                    _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Left, normRect.Bottom, normRect.Width, 1), Color.White);
+                    _spriteBatch.Draw(_regionSelectTexture, new Rectangle(normRect.Right, normRect.Top, 1, normRect.Height), Color.White);
+                    _spriteBatch.End();
+                }
             }
+
+            DrawFpsOverlay();
         }
 
         public void EndDraw()
         {
             try { _graphicsDevice.Present(); }
-            catch { }
+            catch { return; }
+            NotePresentedFrame();
+        }
+
+        void NotePresentedFrame()
+        {
+            TimeSpan now = _stopwatch.Elapsed;
+            if (!_fpsHasLastPresent)
+            {
+                _fpsLastPresent = now;
+                _fpsHasLastPresent = true;
+                return;
+            }
+
+            double dt = (now - _fpsLastPresent).TotalSeconds;
+            _fpsLastPresent = now;
+            // Ignore the first sample after a long pause (export, modal dialog) so a hitch
+            // doesn't report 1 FPS for half a second.
+            if (dt <= 0 || dt > 1.0)
+                return;
+
+            _fpsWindowFrames++;
+            _fpsWindowS += dt;
+            if (_displayedFps <= 0)
+                _displayedFps = (float)(1.0 / dt);
+            if (_fpsWindowS >= 0.5)
+            {
+                _displayedFps = (float)(_fpsWindowFrames / _fpsWindowS);
+                _fpsWindowFrames = 0;
+                _fpsWindowS = 0;
+            }
+        }
+
+        void DrawFpsOverlay()
+        {
+            if (!ShowFpsOverlay || LyricsFont == null || _spriteBatch == null || _regionSelectTexture == null)
+                return;
+
+            string text = _displayedFps > 0 ? $"{_displayedFps:0} FPS" : "-- FPS";
+            Vector2 size = LyricsFont.MeasureString(text);
+            const int padX = 8;
+            const int padY = 4;
+            var dest = new Rectangle(8, 8, (int)Math.Ceiling(size.X) + padX * 2, (int)Math.Ceiling(size.Y) + padY * 2);
+            var textPos = new Vector2(dest.X + padX, dest.Y + padY);
+
+            var oldDepth = _graphicsDevice.DepthStencilState;
+            _graphicsDevice.DepthStencilState = DepthStencilState.None;
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            _spriteBatch.Draw(_regionSelectTexture, dest, new Color(0, 0, 0, 180));
+            _spriteBatch.DrawString(LyricsFont, text, textPos + new Vector2(1, 1), Color.Black);
+            _spriteBatch.DrawString(LyricsFont, text, textPos, Color.White);
+            _spriteBatch.End();
+            _graphicsDevice.DepthStencilState = oldDepth;
         }
 
         string HandleDeviceReset()
@@ -385,6 +455,14 @@ namespace VisualMusic
         /// <summary>True if the key is currently physically held (used after a modal that ate the key-up).</summary>
         static bool IsKeyPhysicallyDown(int vkCode) => (GetAsyncKeyState(vkCode) & 0x8000) != 0;
 
+        static bool IsCtrlOnly(ModifierKeys modifiers)
+        {
+            bool ctrl = (modifiers & ModifierKeys.Control) != 0 || IsKeyPhysicallyDown(0x11);
+            bool shift = (modifiers & ModifierKeys.Shift) != 0 || IsKeyPhysicallyDown(0x10);
+            bool alt = (modifiers & ModifierKeys.Alt) != 0 || IsKeyPhysicallyDown(0x12);
+            return ctrl && !shift && !alt;
+        }
+
         static bool IsCameraKey(Key key)
             => key is Key.W or Key.A or Key.S or Key.D
                    or Key.R or Key.F or Key.Q or Key.E;
@@ -425,13 +503,23 @@ namespace VisualMusic
         }
 
         /// <summary>Returns true if the key was fully handled (suppress further processing).</summary>
-        public bool HandleKeyDown(int vkCode)
+        public bool HandleKeyDown(int vkCode, bool isRepeat = false)
         {
+            var key = KeyInterop.KeyFromVirtualKey(vkCode);
+            var modifiers = Keyboard.Modifiers;
+
+            // Ctrl+F toggles the FPS overlay. Consume even on auto-repeat so holding F doesn't
+            // start a camera-down move, and so the overlay doesn't flicker.
+            if (key == Key.F && IsCtrlOnly(modifiers))
+            {
+                if (!isRepeat)
+                    OnToggleFpsOverlay?.Invoke();
+                return true;
+            }
+
             if (Project?.Notes == null) return false;
 
             bool suppress = false;
-            var key = KeyInterop.KeyFromVirtualKey(vkCode);
-            var modifiers = Keyboard.Modifiers;
             var camera = Project.Props.Camera;
 
             // Escape exits mouse-look mode.

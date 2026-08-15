@@ -35,6 +35,9 @@ namespace VisualMusic.ViewModels
         /// <summary>True while mouse-look mode is active; drives the yellow "MOUSE LOOK" label.</summary>
         [ObservableProperty] bool _isMouseLookMode;
 
+        /// <summary>True while the live viewport FPS overlay is shown (Ctrl+F).</summary>
+        [ObservableProperty] bool _showFpsOverlay;
+
         // ---- Child view models ----
 
         public TrackListViewModel TrackList { get; } = new();
@@ -679,6 +682,15 @@ namespace VisualMusic.ViewModels
         [RelayCommand] void ShowModBrowser() => CurrentScreen = AppScreen.ModBrowser;
         [RelayCommand] void ShowSidBrowser() => CurrentScreen = AppScreen.SidBrowser;
         [RelayCommand] void ShowMidiBrowser() => CurrentScreen = AppScreen.MidiBrowser;
+
+        [RelayCommand]
+        void ToggleFpsOverlay() => ShowFpsOverlay = !ShowFpsOverlay;
+
+        partial void OnShowFpsOverlayChanged(bool value)
+        {
+            if (GetDrawHost?.Invoke() is SongRenderer renderer)
+                renderer.ShowFpsOverlay = value;
+        }
 
         // ---- File commands ----
 

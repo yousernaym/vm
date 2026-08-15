@@ -54,6 +54,18 @@ namespace VisualMusic
                 monoGameHost.Renderer?.ToggleMouseLook();
                 e.Handled = true;
             }
+
+            // Ctrl+F toggles the viewport FPS overlay on the song screen. Skip browser screens so
+            // Chromium can keep Ctrl+F for Find. Repeat is ignored so holding the key doesn't flicker.
+            // Skip when the MonoGame host has WPF focus — SongRenderer.HandleKeyDown owns that path
+            // and both firing would toggle the overlay twice.
+            if (_vm.CurrentScreen == AppScreen.Song
+                && e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control && !e.IsRepeat
+                && !ReferenceEquals(Keyboard.FocusedElement, monoGameHost))
+            {
+                _vm.ToggleFpsOverlayCommand.Execute(null);
+                e.Handled = true;
+            }
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
@@ -82,6 +94,10 @@ namespace VisualMusic
                 // Ctrl+wheel over the focused song panel adjusts the selected tracks' viewport width.
                 monoGameHost.Renderer.OnCtrlWheelViewWidth =
                     notches => _vm.AdjustSelectedViewWidth(notches);
+
+                // Ctrl+F in the focused song panel (WPF KeyBindings do not reach the HWND).
+                monoGameHost.Renderer.OnToggleFpsOverlay =
+                    () => Dispatcher.InvokeAsync(() => _vm.ToggleFpsOverlayCommand.Execute(null));
             }
 
             void WireRendererSongPosChanged()

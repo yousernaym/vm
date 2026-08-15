@@ -130,6 +130,10 @@
                 <MenuItem Header="_Mod browser"  Command="{Binding ShowModBrowserCommand}" InputGestureText="F2"/>
                 <MenuItem Header="S_ID browser"  Command="{Binding ShowSidBrowserCommand}" InputGestureText="F3"/>
                 <MenuItem Header="M_IDI browser" Command="{Binding ShowMidiBrowserCommand}" InputGestureText="F4"/>
+                <Separator/>
+                <MenuItem Header="Show _FPS" IsCheckable="True"
+                          IsChecked="{Binding ShowFpsOverlay, Mode=TwoWay}"
+                          InputGestureText="Ctrl+F"/>
             </MenuItem>
         </Menu>
         </DockPanel>

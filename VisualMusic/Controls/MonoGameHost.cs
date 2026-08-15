@@ -335,7 +335,8 @@ namespace VisualMusic
 
                 case WM_KEYDOWN:
                     int vk = wParam.ToInt32();
-                    bool suppress = Renderer.HandleKeyDown(vk);
+                    bool isRepeat = (lp & 0x40000000L) != 0;
+                    bool suppress = Renderer.HandleKeyDown(vk, isRepeat);
                     if (suppress) handled = true;
                     break;
 
