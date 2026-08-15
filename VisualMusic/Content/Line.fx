@@ -8,20 +8,33 @@ float3 WorldPos;
 float HlSize;
 float InnerHlSize;
 bool Border;
+float2 TessellationViewportSize;
 
 struct VSInput
 {
-	float3 pos : POSITION0;
-	float3 normal : NORMAL0;
-	float3 center : POSITION1;
-	float2 normPos : POSITION2;
-	float2 texCoords : TEXCOORD0;
-	float2 texCoords2 : TEXCOORD1;
+	float3 center : POSITION0;
+	float4 texCoords : TEXCOORD0;
+	float4 texCoords2 : TEXCOORD1;
+	float2 patchData : TEXCOORD2;
 };
 
-struct VSOutput
+struct PatchControlPoint
 {
-	float4 pos : POSITION0;
+	float3 center : BEZIERPOS;
+	float4 texCoords : TEXCOORD0;
+	float4 texCoords2 : TEXCOORD1;
+	float2 patchData : TEXCOORD2;
+};
+
+struct PatchConstants
+{
+	float edgeTess[4] : SV_TessFactor;
+	float insideTess[2] : SV_InsideTessFactor;
+};
+
+struct LineOutput
+{
+	float4 pos : SV_POSITION;
 	float3 normal : TEXCOORD1;
 	float3 center : POSITION1;
 	float3 rawPos : POSITION2;
@@ -31,39 +44,151 @@ struct VSOutput
 	float2 texCoords2 : TEXCOORD2;
 };
 
-void VS(in VSInput IN, out VSOutput OUT)
+PatchControlPoint VS(VSInput input)
 {
-	// The CPU tessellates the curve at a reference viewport width.  Scaling the
-	// already-expanded position would also scale/skew the baked line radius.
-	// Scale the centerline instead, then rebuild the offset at the live radius.
-	float3 center = IN.center;
-	center.x *= VertWidthScale;
-
-	float3 normal = IN.normal;
-	normal.y *= VertWidthScale;
-	normal = normalize(normal);
-
-	// normPos.y identifies the two sides of the strip.  Derive the direction
-	// from the corrected normal instead of the CPU-expanded position so geometry
-	// baked while the live width is zero remains reusable.
-	float side = IN.normPos.y * 2 - 1;
-	float3 offset = LineType == 1
-		? float3(side, 0, 0) // Ribbon offsets stay horizontal.
-		: normal * side;
-	offset *= Radius;
-
-	float3 rawPos = center + offset;
-	OUT.normal = normal;
-	OUT.center = center;
-	OUT.rawPos = rawPos;
-	OUT.normPos = IN.normPos;
-	OUT.pos = float4(rawPos.xy, 0, 1);
-	OUT.pos = wvpTransform(OUT.pos, 1);
-	OUT.texCoords = IN.texCoords - TexScrollOffset;
-	OUT.texCoords2 = IN.texCoords2 - TexScrollOffset2;
+	PatchControlPoint output;
+	output.center = input.center;
+	output.texCoords = input.texCoords;
+	output.texCoords2 = input.texCoords2;
+	output.patchData = input.patchData;
+	return output;
 }
 
-float4 PS(in VSOutput IN) : COLOR0
+float2 projectToPixels(float3 center)
+{
+	center.x *= VertWidthScale;
+	float4 clipPosition = float4(center, 1);
+	clipPosition = wvpTransform(clipPosition, 1);
+	float safeW = abs(clipPosition.w) < 0.00001f
+		? (clipPosition.w < 0 ? -0.00001f : 0.00001f)
+		: clipPosition.w;
+	return clipPosition.xy / safeW * TessellationViewportSize * 0.5f;
+}
+
+float distanceToLine(float2 position, float2 start, float2 end)
+{
+	float2 chord = end - start;
+	float lineLength = length(chord);
+	if (lineLength < 0.0001f)
+		return length(position - start);
+	return abs(chord.x * (start.y - position.y) - (start.x - position.x) * chord.y) / lineLength;
+}
+
+PatchConstants PatchConstantFunction(InputPatch<PatchControlPoint, 4> patch)
+{
+	float2 p0 = projectToPixels(patch[0].center);
+	float2 p1 = projectToPixels(patch[1].center);
+	float2 p2 = projectToPixels(patch[2].center);
+	float2 p3 = projectToPixels(patch[3].center);
+	float flatness = max(distanceToLine(p1, p0, p3), distanceToLine(p2, p0, p3));
+	float segments = clamp(ceil(sqrt(max(flatness, 0) / 0.25f)), 1, 64);
+
+	PatchConstants output;
+	// u follows the curve and v crosses its width.  The v==0 and v==1 edges
+	// therefore receive the adaptive factor; only one segment is needed across.
+	output.edgeTess[0] = 1;
+	output.edgeTess[1] = segments;
+	output.edgeTess[2] = 1;
+	output.edgeTess[3] = segments;
+	output.insideTess[0] = segments;
+	output.insideTess[1] = 1;
+	return output;
+}
+
+[domain("quad")]
+[partitioning("integer")]
+[outputtopology("triangle_cw")]
+[outputcontrolpoints(4)]
+[patchconstantfunc("PatchConstantFunction")]
+[maxtessfactor(64.0)]
+PatchControlPoint HS(InputPatch<PatchControlPoint, 4> patch,
+	uint controlPointId : SV_OutputControlPointID)
+{
+	return patch[controlPointId];
+}
+
+float3 evaluatePosition(const OutputPatch<PatchControlPoint, 4> patch, float t)
+{
+	float s = 1 - t;
+	return patch[0].center * (s * s * s)
+		+ patch[1].center * (3 * s * s * t)
+		+ patch[2].center * (3 * s * t * t)
+		+ patch[3].center * (t * t * t);
+}
+
+float3 evaluateTangent(const OutputPatch<PatchControlPoint, 4> patch, float t)
+{
+	float s = 1 - t;
+	return (patch[1].center - patch[0].center) * (3 * s * s)
+		+ (patch[2].center - patch[1].center) * (6 * s * t)
+		+ (patch[3].center - patch[2].center) * (3 * t * t);
+}
+
+float4 evaluateTexCoords(const OutputPatch<PatchControlPoint, 4> patch, float t, bool second)
+{
+	float s = 1 - t;
+	float4 p0 = second ? patch[0].texCoords2 : patch[0].texCoords;
+	float4 p1 = second ? patch[1].texCoords2 : patch[1].texCoords;
+	float4 p2 = second ? patch[2].texCoords2 : patch[2].texCoords;
+	float4 p3 = second ? patch[3].texCoords2 : patch[3].texCoords;
+	return p0 * (s * s * s)
+		+ p1 * (3 * s * s * t)
+		+ p2 * (3 * s * t * t)
+		+ p3 * (t * t * t);
+}
+
+float2 evaluatePatchData(const OutputPatch<PatchControlPoint, 4> patch, float t)
+{
+	float s = 1 - t;
+	return patch[0].patchData * (s * s * s)
+		+ patch[1].patchData * (3 * s * s * t)
+		+ patch[2].patchData * (3 * s * t * t)
+		+ patch[3].patchData * (t * t * t);
+}
+
+[domain("quad")]
+LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocation,
+	const OutputPatch<PatchControlPoint, 4> patch)
+{
+	float curveT = domainLocation.x;
+	float sideT = domainLocation.y;
+	float side = sideT * 2 - 1;
+	float3 center = evaluatePosition(patch, curveT);
+	float3 tangent = evaluateTangent(patch, curveT);
+	center.x *= VertWidthScale;
+	tangent.x *= VertWidthScale;
+	float3 normal = normalize(float3(-tangent.y, tangent.x, 0));
+
+	float3 offset;
+	if (LineType == 1)
+	{
+		// A horizontal ribbon otherwise collapses to a zero-area surface.  Match
+		// the old one-pixel LineList fallback with a sub-pixel vertical span.
+		float horizontalFallback = saturate(1 - abs(normal.x) * 1000) * 0.5f;
+		offset = float3(side * Radius, side * horizontalFallback, 0);
+	}
+	else
+		offset = normal * side * Radius;
+
+	float3 rawPos = center + offset;
+	float4 packedTexCoords = evaluateTexCoords(patch, curveT, false);
+	float4 packedTexCoords2 = evaluateTexCoords(patch, curveT, true);
+	float2 patchData = evaluatePatchData(patch, curveT);
+
+	LineOutput output;
+	output.normal = normal;
+	output.center = center;
+	output.rawPos = rawPos;
+	output.normPos = float2(patchData.x, sideT);
+	output.worldSize = float2(patchData.y * VertWidthScale, Radius * 2);
+	output.pos = float4(rawPos.xy, 0, 1);
+	output.pos = wvpTransform(output.pos, 1);
+	output.texCoords = lerp(packedTexCoords.xy, packedTexCoords.zw, sideT) - TexScrollOffset;
+	output.texCoords2 = lerp(packedTexCoords2.xy, packedTexCoords2.zw, sideT) - TexScrollOffset2;
+	return output;
+}
+
+float4 PS(in LineOutput IN) : COLOR0
 {
 	float3 lightingNormal;
 	if (LineType == 1) //Ribbon
@@ -95,7 +220,9 @@ technique Line
 {
 	pass
 	{
-     	VertexShader = compile vs_5_0 VS();
+		VertexShader = compile vs_5_0 VS();
+		HullShader = compile hs_5_0 HS();
+		DomainShader = compile ds_5_0 DS();
 		PixelShader  = compile ps_5_0 PS();
 	}   
 

@@ -116,7 +116,9 @@ namespace VisualMusic.Tests
                         Length = 480,
                         Notes = new List<Note>
                         {
-                            new Note { start = 0, stop = 120, channel = 0, pitch = 60, velocity = 100 },
+                            new Note { start = 0, stop = 100, channel = 0, pitch = 60, velocity = 100 },
+                            new Note { start = 160, stop = 260, channel = 0, pitch = 72, velocity = 100 },
+                            new Note { start = 320, stop = 420, channel = 0, pitch = 60, velocity = 100 },
                         },
                     },
                 },
@@ -124,6 +126,9 @@ namespace VisualMusic.Tests
             };
             var project = new Project();
             project.Notes = song;
+            // Synthetic Song does not run the MIDI parser that populates Song.MinPitch/MaxPitch.
+            project.Props.MinPitch = 60;
+            project.Props.MaxPitch = 72;
             return project;
         }
 
@@ -266,6 +271,8 @@ namespace VisualMusic.Tests
 
                 var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
                 Assert.NotEmpty(bakedGeo.lineVb);
+                Assert.All(bakedGeo.lineVb,
+                    vb => Assert.Equal(0, vb.VertexCount % 4));
 
                 project.PropertyKeyframes.Add("track/1/LineWidth", 0,
                     Keyframes.KfInterpolation.Linear, new Keyframes.ScalarKfValue(0));
@@ -276,6 +283,32 @@ namespace VisualMusic.Tests
 
                 Assert.Equal(10f, track.TrackProps.StyleProps.GetLineStyle().LineWidth!.Value, 3);
                 Assert.Same(bakedGeo, track.Geo);
+
+                // Exercise the actual WindowsDX patch draw, including VS/HS/DS/PS binding.
+                track.TrackProps.StyleProps.GetLineStyle().LineWidth = 50;
+                track.TrackProps.SpatialProps.ViewWidthQn = 1;
+                Assert.Same(bakedGeo, track.Geo);
+                project.NormSongPos = 0.6; // between notes, so highlights cannot satisfy the pixel assertion
+                using (var target = new RenderTarget2D(gds.GraphicsDevice, 64, 64, false,
+                    SurfaceFormat.Color, DepthFormat.Depth24Stencil8))
+                {
+                    var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
+                    gds.GraphicsDevice.SetRenderTarget(target);
+                    gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+                    gds.GraphicsDevice.Clear(clearColor);
+                    try
+                    {
+                        track.DrawTrack(project.GlobalTrackProps, defaultStyle: false);
+                    }
+                    finally
+                    {
+                        gds.GraphicsDevice.SetRenderTarget(null);
+                    }
+
+                    var pixels = new Microsoft.Xna.Framework.Color[64 * 64];
+                    target.GetData(pixels);
+                    Assert.Contains(pixels, pixel => pixel != clearColor);
+                }
             }
             finally
             {
