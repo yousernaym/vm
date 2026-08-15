@@ -42,6 +42,22 @@ namespace VisualMusic
             _ => Array.Empty<string>(),
         };
 
+        /// <summary>OpenFileDialog filter for a note type, with an All-files fallback.</summary>
+        public static string NoteOpenFilter(FileType fileType) => fileType switch
+        {
+            FileType.Midi => BuildFilter("MIDI files", Midi),
+            FileType.Mod => BuildFilter("Module files", Mod),
+            FileType.Sid => BuildFilter("SID files", Sid),
+            FileType.Hvl => BuildFilter("HVL files", Hvl),
+            _ => "All files (*.*)|*.*",
+        };
+
+        public static string BuildFilter(string description, string[] exts)
+        {
+            string list = string.Join("; ", Array.ConvertAll(exts, e => $"*.{e}"));
+            return $"{description} ({list})|{list}|All files (*.*)|*.*";
+        }
+
         /// <summary>
         /// Maps a file extension to an import type. When <paramref name="preferred"/> is set
         /// (e.g. which browser started the download) and the extension is valid for that type,

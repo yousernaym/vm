@@ -413,8 +413,9 @@ namespace VisualMusic
             //Deserialization inits Path but not Texture because Texture2D is not serializable, and you can't load texture before the device is created.
             try
             {
-                if (!string.IsNullOrEmpty(Path))
-                    LoadTexture(Path, Project.StaticDrawHost);
+                if (string.IsNullOrEmpty(Path) || !File.Exists(Path))
+                    return;
+                LoadTexture(Path, Project.StaticDrawHost);
             }
             catch (Exception)
             {

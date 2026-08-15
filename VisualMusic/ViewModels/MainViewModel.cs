@@ -720,16 +720,26 @@ namespace VisualMusic.ViewModels
             // Non-null once RequireRendererWaveformPanel succeeds — Init (or a later step) may have
             // cleared/replaced the live panel's channels for tempProject; failure must re-wire Project.
             WaveformPanel panelTouched = null;
+            var missingFiles = MissingFileResolveResult.Continue(false);
             try
             {
                 // Align NoteStyle + SongRenderer.Project before LoadContent/Init so the draw loop
                 // does not keep drawing the previous Project while NoteStyle reads the temp one.
                 BindDrawProject(tempProject);
 
+                missingFiles = ProjectMissingFiles.Resolve(tempProject,
+                    new WpfMissingFilePrompt(Application.Current.MainWindow));
+                if (missingFiles.Aborted)
+                {
+                    RestoreAfterFailedOpen(panelTouched);
+                    return;
+                }
+
                 // A MOD/SID/HVL project re-runs the external remuxer on load (unless its converted
                 // outputs are already cached), so show the same progress window a fresh import does.
                 // MIDI and audio-only projects rebuild in-process, so no progress window is needed.
                 if (tempProject.ImportOptions != null &&
+                    !tempProject.ImportOptions.SkipNoteLoad &&
                     tempProject.ImportOptions.NoteFileType is not (FileType.Midi or FileType.Audio))
                 {
                     if (!RunConversionBehindProgress((p, ct) => tempProject.LoadContent(p, ct)))
@@ -792,7 +802,8 @@ namespace VisualMusic.ViewModels
 
             _undoItems.Clear();
             _undoItems.Add("", tempProject);
-            _undoItems.MarkSaved();
+            if (!missingFiles.ReplacedAny)
+                _undoItems.MarkSaved();
             UpdateUndoRedo();
             WindowTitle = $"{Program.AppName} — {Path.GetFileName(path)}";
         }
@@ -959,9 +970,16 @@ namespace VisualMusic.ViewModels
             {
                 string fn = !string.IsNullOrEmpty(failedAp.Filename)
                     ? failedAp.Filename
-                    : failedAp.VoiceAudioFiles?.FirstOrDefault().Path ?? "(track audio)";
-                MetroMessageBox.Show($"Couldn't load audio file:\n{fn}", Program.AppName,
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                    : failedAp.VoiceAudioFiles?.FirstOrDefault().Path ?? "";
+                bool existed = !string.IsNullOrEmpty(fn) && File.Exists(fn)
+                    || failedAp.VoiceAudioFiles?.Any(v => File.Exists(v.Path)) == true;
+                if (existed)
+                {
+                    if (string.IsNullOrEmpty(fn))
+                        fn = failedAp.VoiceAudioFiles?.FirstOrDefault().Path ?? "(track audio)";
+                    MetroMessageBox.Show($"Couldn't load audio file:\n{fn}", Program.AppName,
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
         }
 

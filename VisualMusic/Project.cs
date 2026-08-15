@@ -336,7 +336,8 @@ namespace VisualMusic
             if (ImportOptions == null)
                 return true;
 
-            ImportOptions.SetNotePath();
+            if (!ImportOptions.SkipNoteLoad)
+                ImportOptions.SetNotePath();
             ImportOptions.EraseCurrent = false;
             ImportOptions.IsProjectLoad = true;
             return await ImportSong(ImportOptions, progress, ct);
@@ -475,6 +476,10 @@ namespace VisualMusic
             {
                 // Audio-only project: there is no note file to convert. The master audio drives
                 // everything and is opened below by OpenAudioFile.
+            }
+            else if (options.SkipNoteLoad)
+            {
+                // Open ignored a missing note file — keep deserialized track views via OpenSyntheticSong.
             }
             else if (options.NoteFileType != FileType.Midi)
             {
@@ -638,7 +643,7 @@ namespace VisualMusic
                 options.MidiOutputPath = midiPath;
                 options.GeneratedAudioPath = generatedAudioPath;
             }
-            else if (!options.HasSuppliedAudio)
+            else if (!options.HasSuppliedAudio && !options.SkipAudioLoad)
             {
                 options.GeneratedAudioPath = null;
                 if (MidMix.SfLoaded())
@@ -651,7 +656,7 @@ namespace VisualMusic
 
             bool resetProject = options.EraseCurrent || (_notes == null && (_trackViews == null || _trackViews.Count == 0));
 
-            if (options.NoteFileType == FileType.Audio)
+            if (options.NoteFileType == FileType.Audio || options.SkipNoteLoad)
                 OpenSyntheticSong(resetProject);
             else
                 OpenNoteFile(options, resetProject);
@@ -832,6 +837,8 @@ namespace VisualMusic
         {
             Media.CloseAudioFile();
             AudioFilePath = "";
+            if (options.SkipAudioLoad)
+                return;
             string file = options.HasSuppliedAudio ? options.AudioPath : options.GeneratedAudioPath;
 
             if (string.IsNullOrWhiteSpace(file))

@@ -53,6 +53,12 @@ namespace VisualMusic
         /// Track views are preserved; freshly generated track-audio paths are still re-assigned.</summary>
         internal bool IsProjectLoad;
 
+        /// <summary>Session-only: Open ignored a missing note file. Skip remuxer / MIDI parse.</summary>
+        internal bool SkipNoteLoad;
+
+        /// <summary>Session-only: Open ignored a missing master audio file. Skip OpenAudioFile / MidMix.</summary>
+        internal bool SkipAudioLoad;
+
         /// <summary>Per-track WAVs produced by the last remuxer run: (MIDI track number, source
         /// channel, WAV path). Paths are always "&lt;base&gt;-chCC.wav". Channel == -1 assigns the
         /// file as Filename (per-channel MIDI mode); Channel >= 0 is a shared channel WAV for that
@@ -166,6 +172,8 @@ namespace VisualMusic
             // Audio-only projects have no note file — validate only the master audio.
             if (NoteFileType == FileType.Audio)
             {
+                if (SkipAudioLoad)
+                    return;
                 if (string.IsNullOrWhiteSpace(AudioPath) || !File.Exists(AudioPath))
                     throw new FileImportException("Audio file not found", ImportError.Missing, ImportFileType.Audio, AudioPath);
                 if (!Media.OpenAudioFile(AudioPath))
@@ -173,17 +181,20 @@ namespace VisualMusic
                 return;
             }
 
-            if (!SavedMidi)
+            if (!SkipNoteLoad)
             {
-                if (string.IsNullOrWhiteSpace(NotePath) || !File.Exists(NotePath))
-                    throw new FileImportException("Note file not found", ImportError.Missing, ImportFileType.Note, NotePath);
-            }
-            else if (!File.Exists(MidiOutputPath))
-            {
-                throw new FileImportException("Note file not found", ImportError.Missing, ImportFileType.Note, MidiOutputPath);
+                if (!SavedMidi)
+                {
+                    if (string.IsNullOrWhiteSpace(NotePath) || !File.Exists(NotePath))
+                        throw new FileImportException("Note file not found", ImportError.Missing, ImportFileType.Note, NotePath);
+                }
+                else if (!File.Exists(MidiOutputPath))
+                {
+                    throw new FileImportException("Note file not found", ImportError.Missing, ImportFileType.Note, MidiOutputPath);
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(AudioPath))
+            if (!SkipAudioLoad && !string.IsNullOrWhiteSpace(AudioPath))
             {
                 if (!File.Exists(AudioPath))
                     throw new FileImportException("Audio file not found", ImportError.Missing, ImportFileType.Audio, AudioPath);
@@ -205,6 +216,9 @@ namespace VisualMusic
 
             if (_rawNotePath.IsUrl())
             {
+                // Reuse a download from the missing-file pass so Open does not fetch twice.
+                if (!string.IsNullOrEmpty(NotePath) && File.Exists(NotePath))
+                    return;
                 NotePath = _rawNotePath.DownloadFile();
                 if (string.IsNullOrEmpty(NotePath))
                     throw new FileImportException("", ImportError.Missing, ImportFileType.Note, _rawNotePath);
@@ -213,6 +227,13 @@ namespace VisualMusic
             {
                 NotePath = _rawNotePath;
             }
+        }
+
+        /// <summary>Points the note source at a replacement file chosen while opening a project.</summary>
+        internal void ReplaceNotePath(string path)
+        {
+            _rawNotePath = path;
+            NotePath = path;
         }
 
         /// <summary>

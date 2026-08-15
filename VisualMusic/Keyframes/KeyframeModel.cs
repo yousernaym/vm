@@ -186,6 +186,7 @@ namespace VisualMusic.Keyframes
 
         public bool HasAny => _frames.Count > 0;
         public IList<int> Keys => _frames.Keys;
+        public IEnumerable<PropertyKeyframe> Frames => _frames.Values;
 
         public bool HasKeyAt(int tick) => _frames.ContainsKey(tick);
 
