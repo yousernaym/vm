@@ -165,6 +165,40 @@ namespace VisualMusic.Tests
             return project;
         }
 
+        static Project BuildGentleSeamsProject()
+        {
+            var song = new Song
+            {
+                TicksPerBeat = 480,
+                TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
+                Tracks = new List<Track>
+                {
+                    new Track { Length = 7000 },
+                    new Track
+                    {
+                        Length = 7000,
+                        Notes = new List<Note>
+                        {
+                            new Note { start = 480, stop = 1439, channel = 0, pitch = 65, velocity = 50 },
+                            new Note { start = 1440, stop = 1680, channel = 0, pitch = 65, velocity = 50 },
+                            new Note { start = 1680, stop = 3359, channel = 0, pitch = 67, velocity = 37 },
+                            new Note { start = 2400, stop = 3480, channel = 0, pitch = 67, velocity = 50 },
+                            new Note { start = 3360, stop = 3600, channel = 0, pitch = 67, velocity = 50 },
+                            new Note { start = 3600, stop = 4320, channel = 0, pitch = 69, velocity = 46 },
+                            new Note { start = 4320, stop = 5040, channel = 0, pitch = 67, velocity = 50 },
+                            new Note { start = 5280, stop = 5520, channel = 0, pitch = 67, velocity = 50 },
+                            new Note { start = 5520, stop = 6240, channel = 0, pitch = 69, velocity = 43 },
+                        },
+                    },
+                },
+                SongLengthT = 7000,
+            };
+            var project = new Project { Notes = song };
+            project.Props.MinPitch = 56;
+            project.Props.MaxPitch = 78;
+            return project;
+        }
+
         [Fact]
         [Trait("Category", "Integration")]
         public void SetContent_then_SetGraphicsDevice_then_SetProject_bakes_geo()
@@ -556,6 +590,121 @@ namespace VisualMusic.Tests
                     $"Expected the hardware round join to remove the sharp inner needle; "
                     + $"legacy gap row {legacyGap.Row}, hardware gap row {hardwareGap.Row}.");
                 Assert.InRange(hardwareGap.Width, 1, 4);
+            }
+            finally
+            {
+                NoteStyle_Line.SetHardwareTessellation(true);
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Hardware_line_does_not_add_blobs_at_gentle_note_seams()
+        {
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            try
+            {
+                var project = BuildGentleSeamsProject();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                var track = project.TrackViews[1];
+                track.TrackProps.StyleProps.Type = NoteStyleType.Line;
+                var lineStyle = track.TrackProps.StyleProps.GetLineStyle();
+                lineStyle.LineWidth = 7.6f;
+                lineStyle.HlSize = 0;
+                track.TrackProps.SpatialProps.ViewWidthQn = 16;
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(cm);
+                NoteStyle.SetProject(project);
+                project.NormSongPos = 0.5;
+
+                var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
+                Assert.Equal(1, bakedGeo.hardwareRoundJoinCount);
+
+                const int width = 896;
+                const int height = 504;
+                Microsoft.Xna.Framework.Color[] Render(bool hardware)
+                {
+                    NoteStyle_Line.SetHardwareTessellation(hardware);
+                    using var target = new RenderTarget2D(gds.GraphicsDevice, width, height,
+                        false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                    using var depthStencil = new DepthStencilState
+                    {
+                        StencilEnable = true,
+                        StencilFunction = CompareFunction.Greater,
+                        StencilPass = StencilOperation.Replace,
+                        ReferenceStencil = 1,
+                    };
+                    var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
+                    gds.GraphicsDevice.SetRenderTarget(target);
+                    gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+                    var oldDepthStencil = gds.GraphicsDevice.DepthStencilState;
+                    gds.GraphicsDevice.DepthStencilState = depthStencil;
+                    gds.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer
+                        | ClearOptions.Stencil, clearColor, 1, 0);
+                    try
+                    {
+                        track.DrawTrack(project.GlobalTrackProps, defaultStyle: false);
+                    }
+                    finally
+                    {
+                        gds.GraphicsDevice.SetRenderTarget(null);
+                        gds.GraphicsDevice.DepthStencilState = oldDepthStencil;
+                    }
+
+                    var pixels = new Microsoft.Xna.Framework.Color[width * height];
+                    target.GetData(pixels);
+                    Assert.Contains(pixels, pixel => pixel != clearColor);
+                    return pixels;
+                }
+
+                var hardwarePixels = Render(hardware: true);
+                var legacyPixels = Render(hardware: false);
+
+                int StrongBottom(Microsoft.Xna.Framework.Color[] pixels, int x)
+                {
+                    int bottom = -1;
+                    for (int y = 190; y < 230; y++)
+                    {
+                        if (pixels[y * width + x].R >= 100)
+                            bottom = y;
+                    }
+                    return bottom;
+                }
+
+                // The strict peak is centered near x=460. The old unconditional 2.5x join
+                // produced a five-pixel downward blob here; a gentle turn should track the
+                // legacy silhouette to rasterization tolerance.
+                for (int x = 450; x <= 470; x++)
+                {
+                    int legacyBottom = StrongBottom(legacyPixels, x);
+                    int hardwareBottom = StrongBottom(hardwarePixels, x);
+                    Assert.True(legacyBottom >= 0 && hardwareBottom >= 0);
+                    Assert.True(hardwareBottom <= legacyBottom + 1,
+                        $"Hardware line protruded at x={x}: legacy bottom {legacyBottom}, "
+                        + $"hardware bottom {hardwareBottom}.");
+                }
             }
             finally
             {

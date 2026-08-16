@@ -305,9 +305,16 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		float2 joinOffset = joinCoords * Radius;
 		// At a tight pitch extremum the inward normal offsets converge into a long
 		// needle. Extend only that half of the analytic join so its boundary becomes
-		// a rounded return without thickening the outside of the bend.
+		// a rounded return without thickening the outside of the bend. Curvature was
+		// baked at the reference viewport width; horizontal scaling changes it by the
+		// inverse square because extrema have a horizontal centerline tangent.
+		float widthScaleSquared = max(VertWidthScale * VertWidthScale, 0.00000001f);
+		float joinCurvature = max(abs(patch[0].endpointTangents.x),
+			abs(patch[0].endpointTangents.y)) / widthScaleSquared;
+		float joinTightness = Radius * joinCurvature;
+		float innerScale = lerp(1, 2.5f, smoothstep(1, 2, joinTightness));
 		if (joinCoords.y * patchData.w > 0)
-			joinOffset.y *= 2.5f;
+			joinOffset.y *= innerScale;
 		float3 rawPos = center + float3(joinOffset, 0);
 		float2 texCoords = lerp(patch[0].texCoords.xy, patch[0].texCoords.zw,
 			domainLocation.y);

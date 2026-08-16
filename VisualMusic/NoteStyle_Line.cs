@@ -203,6 +203,23 @@ namespace VisualMusic
                     + (P3 - P2) * (3 * t * t);
             }
 
+            public Vector3 SecondDerivative(float t)
+            {
+                return 6 * ((1 - t) * (P2 - 2 * P1 + P0)
+                    + t * (P3 - 2 * P2 + P1));
+            }
+
+            public float Curvature(float t)
+            {
+                Vector3 tangent = Derivative(t);
+                float tangentLengthSquared = tangent.X * tangent.X + tangent.Y * tangent.Y;
+                if (tangentLengthSquared < 0.0000000001f)
+                    return 0;
+                Vector3 secondDerivative = SecondDerivative(t);
+                return (tangent.X * secondDerivative.Y - tangent.Y * secondDerivative.X)
+                    / (tangentLengthSquared * MathF.Sqrt(tangentLengthSquared));
+            }
+
             public CubicBezier Slice(float start, float end)
             {
                 Vector3 startPos = Evaluate(start);
@@ -465,7 +482,7 @@ namespace VisualMusic
                     && noteList[n + 2].start > noteList[n + 1].start
                     && noteList[n + 2].start - noteList[n + 1].stop
                         <= Qn_gapThreshold * Project.Notes.TicksPerBeat
-                    && IsHardwareLocalExtremum(trackProps.TrackView.Curve, n + 1);
+                    && IsStrictHardwareLocalExtremum(trackProps.TrackView.Curve, n + 1);
                 Vector3 noteStartTangent = connectedStartTangent ?? noteCurve.Derivative(0);
                 Vector3 noteEndTangent = noteCurve.Derivative(1);
                 if (connectedStartTangent.HasValue)
@@ -490,6 +507,13 @@ namespace VisualMusic
                     joinVertex.center = noteCurve.P3;
                     joinVertex.patchData.Z = 2; // analytic round-join patch
                     joinVertex.patchData.W = Math.Sign(noteCurve.P0.Y - noteCurve.P3.Y);
+                    CubicBezier outgoingCurve = CreateNoteCurve(
+                        n + 1, noteList[n + 2].start, trackProps.TrackView.Curve);
+                    // Join patches do not use endpoint tangents. Carry the incoming/outgoing
+                    // reference-view curvature so the shader can decide at draw time whether
+                    // the current line width and viewport scale actually require extra fill.
+                    joinVertex.endpointTangents = new Vector4(
+                        noteCurve.Curvature(1), outgoingCurve.Curvature(0), 0, 0);
                     for (int controlPoint = 0; controlPoint < ControlPointsPerPatch; controlPoint++)
                         s_linePatchVerts[vertIndex++] = joinVertex;
                     lineGeo.hardwareRoundJoinCount++;
@@ -792,6 +816,16 @@ namespace VisualMusic
             float outgoingDelta = curve.Keys[keyIndex + 1].Value - key.Value;
             return (incomingDelta > 0 && outgoingDelta <= 0)
                 || (incomingDelta < 0 && outgoingDelta >= 0);
+        }
+
+        static bool IsStrictHardwareLocalExtremum(Curve curve, int keyIndex)
+        {
+            if (keyIndex <= 0 || keyIndex >= curve.Keys.Count - 1)
+                return false;
+            float incomingDelta = curve.Keys[keyIndex].Value - curve.Keys[keyIndex - 1].Value;
+            float outgoingDelta = curve.Keys[keyIndex + 1].Value - curve.Keys[keyIndex].Value;
+            return (incomingDelta > 0 && outgoingDelta < 0)
+                || (incomingDelta < 0 && outgoingDelta > 0);
         }
 
         LinePatchVertex CreatePatchVertex(CubicBezier patch, int controlPoint, float sampleT,
