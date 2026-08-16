@@ -268,6 +268,12 @@ namespace VisualMusic.ViewModels
                 if (SP == null) return;
                 var t = value < 0 ? (NoteStyleType?)null : (NoteStyleType)value;
                 Rebuild(tp => tp.StyleProps.Type = t);
+                // With several tracks selected _mergedProps is a detached clone that Rebuild
+                // doesn't touch; sync Type so LineStyleVisible / ModulationVisible (and the
+                // ComboBox re-read) see the newly chosen style. (With one track selected
+                // _mergedProps IS the live, already-updated TrackProps.)
+                if (SelectedTrackCount > 1 && _mergedProps != null)
+                    _mergedProps.StyleProps.Type = t;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(LineStyleVisible));
                 OnPropertyChanged(nameof(ModulationVisible));
