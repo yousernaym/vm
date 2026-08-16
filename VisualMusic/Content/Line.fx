@@ -97,15 +97,49 @@ PatchControlPoint PatchVS(PatchVSInput input)
 	return output;
 }
 
-float2 projectToPixels(float3 center)
+float2 projectScaledToPixels(float3 center)
 {
-	center.x *= VertWidthScale;
 	float4 clipPosition = float4(center, 1);
 	clipPosition = wvpTransform(clipPosition, 1);
 	float safeW = abs(clipPosition.w) < 0.00001f
 		? (clipPosition.w < 0 ? -0.00001f : 0.00001f)
 		: clipPosition.w;
 	return clipPosition.xy / safeW * TessellationViewportSize * 0.5f;
+}
+
+float2 projectToPixels(float3 center)
+{
+	center.x *= VertWidthScale;
+	return projectScaledToPixels(center);
+}
+
+float3 evaluateBezierPosition(float3 p0, float3 p1, float3 p2, float3 p3, float t)
+{
+	float s = 1 - t;
+	return p0 * (s * s * s)
+		+ p1 * (3 * s * s * t)
+		+ p2 * (3 * s * t * t)
+		+ p3 * (t * t * t);
+}
+
+float3 evaluateBezierTangent(float3 p0, float3 p1, float3 p2, float3 p3, float t)
+{
+	float s = 1 - t;
+	return (p1 - p0) * (3 * s * s)
+		+ (p2 - p1) * (6 * s * t)
+		+ (p3 - p2) * (3 * t * t);
+}
+
+float2 projectLineEdgeToPixels(float3 center, float3 tangent, float side)
+{
+	center.x *= VertWidthScale;
+	tangent.x *= VertWidthScale;
+	float tangentLength = length(tangent.xy);
+	float2 normal = tangentLength < 0.000001f
+		? float2(0, 1)
+		: float2(-tangent.y, tangent.x) / tangentLength;
+	center.xy += normal * side * Radius;
+	return projectScaledToPixels(center);
 }
 
 float distanceToLine(float2 position, float2 start, float2 end)
@@ -124,6 +158,40 @@ PatchConstants PatchConstantFunction(InputPatch<PatchControlPoint, 4> patch)
 	float2 p2 = projectToPixels(patch[2].center);
 	float2 p3 = projectToPixels(patch[3].center);
 	float flatness = max(distanceToLine(p1, p0, p3), distanceToLine(p2, p0, p3));
+
+	// Centerline flatness alone under-tessellates a wide line when viewport-width
+	// scaling squeezes its centers into an almost vertical chord.  Its normal can
+	// still rotate substantially, so measure both rendered edges as well.  This
+	// keeps bends round without rebuilding the patch buffer for the current view.
+	if (LineType == 0)
+	{
+		float3 center0 = patch[0].center;
+		float3 center1 = evaluateBezierPosition(patch[0].center, patch[1].center,
+			patch[2].center, patch[3].center, 1.0f / 3.0f);
+		float3 center2 = evaluateBezierPosition(patch[0].center, patch[1].center,
+			patch[2].center, patch[3].center, 2.0f / 3.0f);
+		float3 center3 = patch[3].center;
+		float3 tangent0 = float3(patch[0].endpointTangents.xy, 0);
+		float3 tangent1 = evaluateBezierTangent(patch[0].center, patch[1].center,
+			patch[2].center, patch[3].center, 1.0f / 3.0f);
+		float3 tangent2 = evaluateBezierTangent(patch[0].center, patch[1].center,
+			patch[2].center, patch[3].center, 2.0f / 3.0f);
+		float3 tangent3 = float3(patch[0].endpointTangents.zw, 0);
+
+		float2 edge0 = projectLineEdgeToPixels(center0, tangent0, -1);
+		float2 edge1 = projectLineEdgeToPixels(center1, tangent1, -1);
+		float2 edge2 = projectLineEdgeToPixels(center2, tangent2, -1);
+		float2 edge3 = projectLineEdgeToPixels(center3, tangent3, -1);
+		flatness = max(flatness,
+			max(distanceToLine(edge1, edge0, edge3), distanceToLine(edge2, edge0, edge3)));
+
+		edge0 = projectLineEdgeToPixels(center0, tangent0, 1);
+		edge1 = projectLineEdgeToPixels(center1, tangent1, 1);
+		edge2 = projectLineEdgeToPixels(center2, tangent2, 1);
+		edge3 = projectLineEdgeToPixels(center3, tangent3, 1);
+		flatness = max(flatness,
+			max(distanceToLine(edge1, edge0, edge3), distanceToLine(edge2, edge0, edge3)));
+	}
 	float segments = clamp(ceil(sqrt(max(flatness, 0) / 0.25f)), 1, 64);
 
 	PatchConstants output;
@@ -152,19 +220,14 @@ PatchControlPoint HS(InputPatch<PatchControlPoint, 4> patch,
 
 float3 evaluatePosition(const OutputPatch<PatchControlPoint, 4> patch, float t)
 {
-	float s = 1 - t;
-	return patch[0].center * (s * s * s)
-		+ patch[1].center * (3 * s * s * t)
-		+ patch[2].center * (3 * s * t * t)
-		+ patch[3].center * (t * t * t);
+	return evaluateBezierPosition(patch[0].center, patch[1].center,
+		patch[2].center, patch[3].center, t);
 }
 
 float3 evaluateTangent(const OutputPatch<PatchControlPoint, 4> patch, float t)
 {
-	float s = 1 - t;
-	return (patch[1].center - patch[0].center) * (3 * s * s)
-		+ (patch[2].center - patch[1].center) * (6 * s * t)
-		+ (patch[3].center - patch[2].center) * (3 * t * t);
+	return evaluateBezierTangent(patch[0].center, patch[1].center,
+		patch[2].center, patch[3].center, t);
 }
 
 float4 evaluateTexCoords(const OutputPatch<PatchControlPoint, 4> patch, float t, bool second)

@@ -304,15 +304,23 @@ namespace VisualMusic.Tests
                 Assert.Same(bakedGeo, track.Geo);
                 track.TrackProps.SpatialProps.ViewWidthQn = 16;
                 Assert.Same(bakedGeo, track.Geo);
+                // At the UI maximum, the centers collapse into an almost vertical line.
+                // Hardware tessellation must still account for the rotating, wide outer edges.
+                track.TrackProps.SpatialProps.ViewWidthQn = 1024;
+                Assert.Same(bakedGeo, track.Geo);
                 project.NormSongPos = 0.96; // puts tick 1920 at the left edge; playback is after the last note
 
-                void AssertLineRendererDraws(bool hardware)
+                const int captureWidth = 768;
+                const int captureHeight = 456;
+                var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
+
+                Microsoft.Xna.Framework.Color[] RenderLine(bool hardware)
                 {
                     NoteStyle_Line.SetHardwareTessellation(hardware);
                     Assert.Equal(hardware, NoteStyle_Line.UseHardwareTessellation);
-                    using var target = new RenderTarget2D(gds.GraphicsDevice, 64, 64, false,
+                    using var target = new RenderTarget2D(gds.GraphicsDevice,
+                        captureWidth, captureHeight, false,
                         SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
-                    var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
                     gds.GraphicsDevice.SetRenderTarget(target);
                     gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
                     gds.GraphicsDevice.Clear(clearColor);
@@ -325,15 +333,50 @@ namespace VisualMusic.Tests
                         gds.GraphicsDevice.SetRenderTarget(null);
                     }
 
-                    var pixels = new Microsoft.Xna.Framework.Color[64 * 64];
+                    var pixels = new Microsoft.Xna.Framework.Color[captureWidth * captureHeight];
                     target.GetData(pixels);
                     Assert.Contains(pixels, pixel => pixel != clearColor);
+                    return pixels;
                 }
 
-                AssertLineRendererDraws(hardware: true);  // VS/HS/DS/PS patch path
+                List<(int MinX, int MaxX)> GetTopProfile(
+                    Microsoft.Xna.Framework.Color[] pixels, int rowCount)
+                {
+                    var profile = new List<(int MinX, int MaxX)>();
+                    for (int y = 0; y < captureHeight && profile.Count < rowCount; y++)
+                    {
+                        int minX = captureWidth;
+                        int maxX = -1;
+                        for (int x = 0; x < captureWidth; x++)
+                        {
+                            if (pixels[y * captureWidth + x] == clearColor)
+                                continue;
+                            minX = Math.Min(minX, x);
+                            maxX = Math.Max(maxX, x);
+                        }
+                        if (maxX >= 0)
+                            profile.Add((minX, maxX));
+                    }
+                    return profile;
+                }
+
+                var hardwarePixels = RenderLine(hardware: true); // VS/HS/DS/PS patch path
                 Assert.Same(bakedGeo, track.Geo);
-                AssertLineRendererDraws(hardware: false); // legacy triangle-strip path
+                var legacyPixels = RenderLine(hardware: false);  // legacy triangle-strip path
                 Assert.Same(bakedGeo, track.Geo);
+
+                // The top of the max-width vertical line is the compressed first bend. Compare
+                // its silhouette to the dense legacy mesh; centerline-only tessellation rendered
+                // this as a visibly sharp corner.
+                var hardwareTop = GetTopProfile(hardwarePixels, rowCount: 24);
+                var legacyTop = GetTopProfile(legacyPixels, rowCount: 24);
+                Assert.Equal(24, hardwareTop.Count);
+                Assert.Equal(24, legacyTop.Count);
+                for (int row = 0; row < hardwareTop.Count; row++)
+                {
+                    Assert.InRange(Math.Abs(hardwareTop[row].MinX - legacyTop[row].MinX), 0, 2);
+                    Assert.InRange(Math.Abs(hardwareTop[row].MaxX - legacyTop[row].MaxX), 0, 2);
+                }
             }
             finally
             {
