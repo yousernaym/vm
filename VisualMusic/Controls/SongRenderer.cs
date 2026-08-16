@@ -94,8 +94,32 @@ namespace VisualMusic
         /// </summary>
         public Action OnToggleFpsOverlay { get; set; }
 
+        /// <summary>
+        /// Reports a successful Ctrl+Shift+H line-renderer switch so WPF can keep its checked
+        /// menu state synchronized with input received by the child HWND.
+        /// </summary>
+        public Action<bool> OnHardwareLineTessellationChanged { get; set; }
+
         /// <summary>When true, Draw() paints a frames-per-second readout in the viewport corner.</summary>
         public bool ShowFpsOverlay { get; set; }
+
+        public bool HardwareLineTessellationAvailable =>
+            NoteStyle_Line.HardwareTessellationAvailable;
+
+        public bool UseHardwareLineTessellation
+        {
+            get => NoteStyle_Line.UseHardwareTessellation;
+            set => NoteStyle_Line.SetHardwareTessellation(value);
+        }
+
+        public bool ToggleHardwareLineTessellation()
+        {
+            if (!NoteStyle_Line.ToggleHardwareTessellation())
+                return false;
+            OnHardwareLineTessellationChanged?.Invoke(UseHardwareLineTessellation);
+            Invalidate();
+            return true;
+        }
 
         TimeSpan _fpsLastPresent;
         bool _fpsHasLastPresent;
@@ -463,6 +487,14 @@ namespace VisualMusic
             return ctrl && !shift && !alt;
         }
 
+        static bool IsCtrlShiftOnly(ModifierKeys modifiers)
+        {
+            bool ctrl = (modifiers & ModifierKeys.Control) != 0 || IsKeyPhysicallyDown(0x11);
+            bool shift = (modifiers & ModifierKeys.Shift) != 0 || IsKeyPhysicallyDown(0x10);
+            bool alt = (modifiers & ModifierKeys.Alt) != 0 || IsKeyPhysicallyDown(0x12);
+            return ctrl && shift && !alt;
+        }
+
         static bool IsCameraKey(Key key)
             => key is Key.W or Key.A or Key.S or Key.D
                    or Key.R or Key.F or Key.Q or Key.E;
@@ -514,6 +546,15 @@ namespace VisualMusic
             {
                 if (!isRepeat)
                     OnToggleFpsOverlay?.Invoke();
+                return true;
+            }
+
+            // The child HWND owns focused viewport input, so mirror the WPF shortcut here.
+            // Consume repeats even when hardware tessellation is unavailable.
+            if (key == Key.H && IsCtrlShiftOnly(modifiers))
+            {
+                if (!isRepeat)
+                    ToggleHardwareLineTessellation();
                 return true;
             }
 

@@ -25,6 +25,17 @@ namespace VisualMusic
         public Vector4 texCoords;
         public Vector4 texCoords2;
         public Vector2 patchData;
+        public Vector4 endpointTangents;
+    }
+
+    public struct LineVertex
+    {
+        public Vector3 pos;
+        public Vector3 normal;
+        public Vector3 center;
+        public Vector2 normPos;
+        public Vector2 texCoords;
+        public Vector2 texCoords2;
     }
 
     [Serializable()]
@@ -33,9 +44,33 @@ namespace VisualMusic
         const int MaxLinePatchVerts = 100000;
         const int ControlPointsPerPatch = 4;
         const int MaxPatchSubdivisionsPerBeat = 16;
+        const int MaxLineVerts = 100000;
+        const int MaxHLineVerts = 30000;
+        static VertexDeclaration s_linePatchVertDecl;
         static VertexDeclaration s_lineVertDecl;
         static LinePatchVertex[] s_linePatchVerts = new LinePatchVertex[MaxLinePatchVerts];
+        static LineVertex[] s_lineVerts = new LineVertex[MaxLineVerts];
+        static LineVertex[] s_hLineVerts = new LineVertex[MaxHLineVerts];
         protected static LineHlVertex[] s_lineHlVerts = new LineHlVertex[4];
+
+        static bool s_hardwareTessellationAvailable;
+        static bool s_useHardwareTessellation = true;
+
+        public static bool HardwareTessellationAvailable =>
+            s_hardwareTessellationAvailable && GraphicsDevice != null;
+        public static bool UseHardwareTessellation =>
+            s_hardwareTessellationAvailable && s_useHardwareTessellation;
+
+        public static void SetHardwareTessellation(bool enabled) =>
+            s_useHardwareTessellation = enabled;
+
+        public static bool ToggleHardwareTessellation()
+        {
+            if (!s_hardwareTessellationAvailable)
+                return false;
+            s_useHardwareTessellation = !s_useHardwareTessellation;
+            return true;
+        }
 
         float VpLineWidth => Project.NormalizeVpScalar((float)LineWidth);
         public float? LineWidth { get; set; } = 5;
@@ -105,6 +140,33 @@ namespace VisualMusic
             if (Content == null)
                 throw new InvalidOperationException("NoteStyle.SetContent must run before LoadFx.");
             _fx = Content.Load<Effect>("Line");
+            // Reaching this point proves that the current device accepted the effect's
+            // hull/domain shaders.
+            s_hardwareTessellationAvailable = true;
+        }
+
+        void GetCurvePoint(out Vector3 pos, out Vector3 normal, out Vector3 vertexOffset,
+            float step, float x, TrackProps trackProps, float lineWidth)
+        {
+            Vector3[] points = new Vector3[3];
+            Vector3[] tangents = new Vector3[2];
+            step *= 0.1f;
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                points[i].X = x + i * step - step;
+                points[i].Y = Project.GetCurveScreenY(points[i].X, trackProps.TrackView.Curve);
+            }
+
+            for (int i = 0; i < tangents.Length; i++)
+                tangents[i] = points[i + 1] - points[i];
+
+            normal = tangents[0] + tangents[1];
+            normal = new Vector3(-normal.Y, normal.X, 0);
+            normal.Normalize();
+            pos = points[1];
+            vertexOffset = LineType == VisualMusic.LineType.Ribbon ? Vector3.UnitX : normal;
+            vertexOffset *= lineWidth / 2.0f;
         }
 
         readonly struct CubicBezier
@@ -336,6 +398,7 @@ namespace VisualMusic
             Vector3 boundsMax = new Vector3(float.MinValue, float.MinValue, 0.001f);
             float boundsStartTick = 0;
             bool hasBounds = false;
+            Vector3? connectedStartTangent = null;
 
             void IncludeBounds(CubicBezier patch, float startTick, float endTick)
             {
@@ -381,9 +444,20 @@ namespace VisualMusic
                     || nextNote.start - note.stop > Qn_gapThreshold * Project.Notes.TicksPerBeat;
                 float segmentEndTick = endsAtNoteStop ? noteEndTick : nextNote.start;
                 if (segmentEndTick <= note.start)
+                {
+                    // Duplicate/simultaneous note starts create a zero-duration curve interval.
+                    // The legacy triangle strip skips it without flushing, so preserve the edge
+                    // carried from the preceding valid patch unless this note really ends a segment.
+                    if (!(bool)Continuous || endsAtNoteStop)
+                        connectedStartTangent = null;
                     continue;
+                }
 
                 CubicBezier noteCurve = CreateNoteCurve(n, segmentEndTick, trackProps.TrackView.Curve);
+                Vector3 noteStartTangent = connectedStartTangent ?? noteCurve.Derivative(0);
+                Vector3 noteEndTangent = noteCurve.Derivative(1);
+                if (connectedStartTangent.HasValue)
+                    lineGeo.seamlessPatchJoinCount++;
                 double rawPatchCount = noteCurve.IsLinear
                     ? 1
                     : Math.Ceiling((segmentEndTick - note.start) / maxPatchTicks);
@@ -391,6 +465,7 @@ namespace VisualMusic
                     throw new OverflowException($"Too many line patches for note {n}, track {trackProps.TrackView.TrackNumber}.");
                 int patchCount = Math.Max(1, (int)rawPatchCount);
                 float noteLength = noteCurve.P3.X - noteCurve.P0.X;
+                Vector3 patchStartTangent = noteStartTangent;
 
                 for (int patchIndex = 0; patchIndex < patchCount; patchIndex++)
                 {
@@ -400,20 +475,221 @@ namespace VisualMusic
                     float patchStart = patchIndex / (float)patchCount;
                     float patchEnd = (patchIndex + 1) / (float)patchCount;
                     CubicBezier patch = noteCurve.Slice(patchStart, patchEnd);
+                    Vector3 patchEndTangent = patchIndex == patchCount - 1
+                        ? noteEndTangent
+                        : patch.Derivative(1);
                     for (int controlPoint = 0; controlPoint < ControlPointsPerPatch; controlPoint++)
                     {
                         float sampleT = controlPoint / 3f;
                         float noteT = MathHelper.Lerp(patchStart, patchEnd, sampleT);
                         s_linePatchVerts[vertIndex++] = CreatePatchVertex(
-                            patch, controlPoint, sampleT, noteT, noteLength, vpLineWidth, texMaterial);
+                            patch, controlPoint, sampleT, noteT, noteLength, vpLineWidth,
+                            patchStartTangent, patchEndTangent, texMaterial);
                     }
                     IncludeBounds(patch,
                         MathHelper.Lerp(note.start, segmentEndTick, patchStart),
                         MathHelper.Lerp(note.start, segmentEndTick, patchEnd));
+                    patchStartTangent = patchEndTangent;
                 }
+
+                connectedStartTangent = (bool)Continuous && !endsAtNoteStop
+                    ? noteEndTangent
+                    : null;
             }
             CreateLinePatchBuffer(ref vertIndex, lineGeo);
             FlushBounds();
+            CreateLegacyGeometry(lineGeo, midiTrack, trackProps, texMaterial, vpLineWidth);
+        }
+
+        void CreateLegacyGeometry(LineGeo lineGeo, Midi.Track midiTrack, TrackProps trackProps,
+            MaterialProps texMaterial, float vpLineWidth)
+        {
+            List<Midi.Note> noteList = midiTrack.Notes;
+            int vertIndex = 3;
+            int hLineVertIndex = 0;
+            int completeNoteListIndex = midiTrack.Notes.IndexOf(noteList[0]);
+
+            for (int n = 0; n < noteList.Count; n++)
+            {
+                Midi.Note note = noteList[n], nextNote;
+                if (note.start > Project.Notes.SongLengthT)
+                    continue;
+
+                if (n < noteList.Count - 1)
+                    nextNote = noteList[n + 1];
+                else if (completeNoteListIndex < midiTrack.Notes.Count - 1)
+                    nextNote = midiTrack.Notes[completeNoteListIndex + 1];
+                else
+                    nextNote = note;
+
+                Vector2 noteStart = Project.GetScreenPos(note.start, note.pitch);
+                float noteEnd = Project.GetScreenPos(note.stop, note.pitch).X;
+
+                Vector2 nextNoteStart = Project.GetScreenPos(nextNote.start, nextNote.pitch);
+                if (noteEnd > nextNoteStart.X && completeNoteListIndex < midiTrack.Notes.Count - 1)
+                    noteEnd = nextNoteStart.X;
+
+                bool endOfSegment = false;
+                if (nextNote.start - note.stop > Qn_gapThreshold * Project.Notes.TicksPerBeat
+                    || note == nextNote)
+                {
+                    if (nextNoteStart.X != noteStart.X)
+                        nextNoteStart.Y = (int)MathHelper.Lerp(noteStart.Y, nextNoteStart.Y,
+                            (noteEnd - noteStart.X) / (nextNoteStart.X - noteStart.X));
+                    nextNoteStart.X = noteEnd;
+                    endOfSegment = true;
+                }
+
+                float startDraw = noteStart.X;
+                float endDraw = nextNoteStart.X;
+                if (startDraw == endDraw)
+                    continue;
+
+                float curvature = CalcLinearLineAngle(n, trackProps.TrackView.Curve);
+                if (n < noteList.Count - 1)
+                    curvature = Math.Max(curvature,
+                        CalcLinearLineAngle(n + 1, trackProps.TrackView.Curve));
+
+                curvature = Math.Min(curvature, 0.97f * MathF.PI);
+                curvature = MathF.Pow(curvature, 2.25f) * 1000;
+                float step = curvature == 0 ? (endDraw - startDraw) * 0.999f : 1 / curvature;
+                if (step >= endDraw - startDraw)
+                    step = endDraw - startDraw;
+                int iterations = (int)((endDraw - startDraw) / step);
+                if (iterations < 0)
+                    throw new OverflowException(
+                        $"Too many legacy line vertices for note {n}, track {trackProps.TrackView.TrackNumber}.");
+                step = (endDraw - startDraw) / (iterations + 1);
+
+                for (float x = startDraw; x <= endDraw + 0.00001f; x += step)
+                {
+                    GetCurvePoint(out Vector3 center, out Vector3 normal,
+                        out Vector3 vertexOffset, step, x, trackProps, vpLineWidth);
+                    s_lineVerts[vertIndex].normal = s_lineVerts[vertIndex + 1].normal = normal;
+                    s_lineVerts[vertIndex].pos = center - vertexOffset;
+                    s_lineVerts[vertIndex + 1].pos = center + vertexOffset;
+                    s_lineVerts[vertIndex].center = s_lineVerts[vertIndex + 1].center = center;
+
+                    float normStepFromNoteStart =
+                        (x - startDraw) / (nextNoteStart.X - noteStart.X);
+                    s_lineVerts[vertIndex].normPos = new Vector2(normStepFromNoteStart, 0);
+                    s_lineVerts[vertIndex + 1].normPos = new Vector2(normStepFromNoteStart, 1);
+
+                    Texture2D texture = texMaterial.TexProps.Texture
+                        ?? texMaterial.TexProps.TransitionTexture;
+                    Texture2D texture2 = texMaterial.TexProps.TransitionTexture;
+                    if (texture != null)
+                    {
+                        CalcTexCoords(out s_lineVerts[vertIndex].texCoords,
+                            out s_lineVerts[vertIndex + 1].texCoords,
+                            texMaterial.TexProps, texture, x - startDraw, normStepFromNoteStart,
+                            vpLineWidth, s_lineVerts[vertIndex].pos,
+                            s_lineVerts[vertIndex + 1].pos);
+                        if (texture2 != null)
+                        {
+                            CalcTexCoords(out s_lineVerts[vertIndex].texCoords2,
+                                out s_lineVerts[vertIndex + 1].texCoords2,
+                                texMaterial.TexProps, texture2, x - startDraw,
+                                normStepFromNoteStart, vpLineWidth,
+                                s_lineVerts[vertIndex].pos, s_lineVerts[vertIndex + 1].pos);
+                        }
+                        else
+                        {
+                            s_lineVerts[vertIndex].texCoords2 = s_lineVerts[vertIndex].texCoords;
+                            s_lineVerts[vertIndex + 1].texCoords2 =
+                                s_lineVerts[vertIndex + 1].texCoords;
+                        }
+                    }
+
+                    if (LineType == VisualMusic.LineType.Ribbon)
+                    {
+                        float hLineStart = center.X;
+                        float hLineEnd = hLineStart;
+                        do
+                        {
+                            hLineEnd += step;
+                        } while ((int)center.Y ==
+                            (int)Project.GetCurveScreenY(hLineEnd + step,
+                                trackProps.TrackView.Curve) && hLineEnd < endDraw);
+                        if (hLineEnd > hLineStart + vpLineWidth / 2)
+                        {
+                            s_hLineVerts[hLineVertIndex++] = s_lineVerts[vertIndex];
+                            s_hLineVerts[hLineVertIndex++] = s_lineVerts[vertIndex + 1];
+                        }
+                    }
+
+                    if (x == startDraw && vertIndex > 3)
+                    {
+                        s_lineVerts[vertIndex].pos = s_lineVerts[vertIndex - 2].pos;
+                        s_lineVerts[vertIndex + 1].pos = s_lineVerts[vertIndex - 1].pos;
+                    }
+
+                    vertIndex += 2;
+                    if (vertIndex >= MaxLineVerts - 2 || hLineVertIndex >= MaxHLineVerts - 2)
+                    {
+                        CreateLegacyLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
+                        x -= step;
+                    }
+                }
+
+                if (!(bool)Continuous)
+                    endOfSegment = true;
+                if (endOfSegment)
+                    CreateLegacyLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
+
+                completeNoteListIndex++;
+            }
+
+            CreateLegacyLineSegment(ref vertIndex, ref hLineVertIndex, lineGeo);
+        }
+
+        float CalcLinearLineAngle(int noteIndex, Curve curve)
+        {
+            Vector2 prevVec = Vector2.UnitX;
+            if (noteIndex > 0)
+            {
+                prevVec = curve.Keys[noteIndex - 1].NextVector;
+                if (prevVec == Vector2.Zero)
+                    prevVec = Vector2.UnitX;
+            }
+
+            prevVec.X = Project.GetScreenPosX((int)prevVec.X);
+            prevVec.Y *= Project.Props.NoteHeight;
+
+            Vector2 nextVec = curve.Keys[noteIndex].NextVector;
+            if (nextVec == Vector2.Zero)
+                nextVec = Vector2.UnitX;
+            nextVec.X = Project.GetScreenPosX((int)nextVec.X);
+            nextVec.Y *= Project.Props.NoteHeight;
+
+            nextVec.Normalize();
+            prevVec.Normalize();
+            float dot = Vector2.Dot(nextVec, prevVec);
+            if (dot > 1)
+                return 0;
+            if (dot < -1)
+                return MathF.PI;
+            return MathF.Acos(dot);
+        }
+
+        void CreateLegacyLineSegment(ref int numVerts, ref int numHLineVerts, LineGeo geo)
+        {
+            if (numHLineVerts > 1)
+            {
+                var vb = new VertexBuffer(GraphicsDevice, s_lineVertDecl,
+                    numHLineVerts, BufferUsage.WriteOnly);
+                vb.SetData(s_hLineVerts, 0, numHLineVerts);
+                geo.hLineVb.Add(vb);
+                numHLineVerts = 0;
+            }
+            if (numVerts > 5)
+            {
+                var vb = new VertexBuffer(GraphicsDevice, s_lineVertDecl,
+                    numVerts, BufferUsage.WriteOnly);
+                vb.SetData(s_lineVerts, 0, numVerts);
+                geo.lineVb.Add(vb);
+                numVerts = 3;
+            }
         }
 
         CubicBezier CreateNoteCurve(int noteIndex, float endTick, Curve curve)
@@ -451,7 +727,8 @@ namespace VisualMusic
         }
 
         LinePatchVertex CreatePatchVertex(CubicBezier patch, int controlPoint, float sampleT,
-            float noteT, float noteLength, float lineWidth, MaterialProps texMaterial)
+            float noteT, float noteLength, float lineWidth, Vector3 startTangent,
+            Vector3 endTangent, MaterialProps texMaterial)
         {
             Vector3 sampleCenter = patch.Evaluate(sampleT);
             Vector3 tangent = patch.Derivative(sampleT);
@@ -490,13 +767,21 @@ namespace VisualMusic
                 texCoords = new Vector4(tex0.X, tex0.Y, tex1.X, tex1.Y),
                 texCoords2 = new Vector4(tex20.X, tex20.Y, tex21.X, tex21.Y),
                 patchData = new Vector2(noteT, noteLength),
+                endpointTangents = new Vector4(
+                    startTangent.X, startTangent.Y, endTangent.X, endTangent.Y),
             };
         }
 
         public override void DrawGeoChunk(Geo geo)
         {
             LineGeo lineGeo = (LineGeo)geo;
-            foreach (var vb in lineGeo.lineVb)
+            if (!UseHardwareTessellation)
+            {
+                DrawLegacyGeoChunk(lineGeo);
+                return;
+            }
+
+            foreach (var vb in lineGeo.patchVb)
             {
                 GraphicsDevice.SetVertexBuffer(vb);
                 GraphicsDevice.DrawPrimitives(PrimitiveType.PatchListWith4ControlPoints,
@@ -504,13 +789,29 @@ namespace VisualMusic
             }
         }
 
+        void DrawLegacyGeoChunk(LineGeo lineGeo)
+        {
+            foreach (var vb in lineGeo.lineVb)
+            {
+                GraphicsDevice.SetVertexBuffer(vb);
+                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleStrip,
+                    3, vb.VertexCount - 5);
+            }
+            foreach (var vb in lineGeo.hLineVb)
+            {
+                GraphicsDevice.SetVertexBuffer(vb);
+                GraphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, vb.VertexCount);
+            }
+        }
+
         void CreateLinePatchBuffer(ref int numVerts, LineGeo geo)
         {
             if (numVerts == 0)
                 return;
-            VertexBuffer vb = new VertexBuffer(GraphicsDevice, s_lineVertDecl, numVerts, BufferUsage.WriteOnly);
+            VertexBuffer vb = new VertexBuffer(GraphicsDevice, s_linePatchVertDecl,
+                numVerts, BufferUsage.WriteOnly);
             vb.SetData(s_linePatchVerts, 0, numVerts);
-            geo.lineVb.Add(vb);
+            geo.patchVb.Add(vb);
             numVerts = 0;
         }
 
@@ -539,7 +840,8 @@ namespace VisualMusic
             // shader's normalized edge-distance calculation.
             if (radius > 0)
             {
-                _fx.CurrentTechnique = _fx.Techniques["Line"];
+                _fx.CurrentTechnique = _fx.Techniques[
+                    UseHardwareTessellation ? "LineHardware" : "LineLegacy"];
                 _fx.Parameters["DiscardAtOnce"].SetValue(true);
                 _fx.CurrentTechnique.Passes[0].Apply();
                 DrawGeoChunk(trackProps.TrackView.Geo);
@@ -698,20 +1000,36 @@ namespace VisualMusic
 
         public static void SInit()
         {
-            s_lineVertDecl = new VertexDeclaration(
+            s_hardwareTessellationAvailable = false;
+            s_linePatchVertDecl = new VertexDeclaration(
                 new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
                 new VertexElement(12, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 0),
                 new VertexElement(28, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 1),
-                new VertexElement(44, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 2));
+                new VertexElement(44, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 2),
+                new VertexElement(52, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 3));
+            s_lineVertDecl = new VertexDeclaration(
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+                new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 1),
+                new VertexElement(36, VertexElementFormat.Vector2, VertexElementUsage.Position, 2),
+                new VertexElement(44, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+                new VertexElement(52, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1));
         }
     }
 
     public class LineGeo : Geo
     {
+        public List<VertexBuffer> patchVb = new List<VertexBuffer>();
         public List<VertexBuffer> lineVb = new List<VertexBuffer>();
+        public List<VertexBuffer> hLineVb = new List<VertexBuffer>();
+        internal int seamlessPatchJoinCount;
         protected override void ReleaseResources()
         {
+            foreach (var vb in patchVb)
+                vb.Dispose();
             foreach (var vb in lineVb)
+                vb.Dispose();
+            foreach (var vb in hLineVb)
                 vb.Dispose();
         }
     }

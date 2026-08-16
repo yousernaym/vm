@@ -38,6 +38,9 @@ namespace VisualMusic.ViewModels
         /// <summary>True while the live viewport FPS overlay is shown (Ctrl+F).</summary>
         [ObservableProperty] bool _showFpsOverlay;
 
+        /// <summary>True when line tracks use hull/domain shader tessellation.</summary>
+        [ObservableProperty] bool _useHardwareLineTessellation = true;
+
         // ---- Child view models ----
 
         public TrackListViewModel TrackList { get; } = new();
@@ -690,6 +693,20 @@ namespace VisualMusic.ViewModels
         {
             if (GetDrawHost?.Invoke() is SongRenderer renderer)
                 renderer.ShowFpsOverlay = value;
+        }
+
+        [RelayCommand]
+        void ToggleHardwareLineTessellation()
+        {
+            if (GetDrawHost?.Invoke() is SongRenderer renderer
+                && renderer.ToggleHardwareLineTessellation())
+                UseHardwareLineTessellation = renderer.UseHardwareLineTessellation;
+        }
+
+        partial void OnUseHardwareLineTessellationChanged(bool value)
+        {
+            if (GetDrawHost?.Invoke() is SongRenderer renderer)
+                renderer.UseHardwareLineTessellation = value;
         }
 
         // ---- File commands ----

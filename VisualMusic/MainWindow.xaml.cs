@@ -66,6 +66,18 @@ namespace VisualMusic
                 _vm.ToggleFpsOverlayCommand.Execute(null);
                 e.Handled = true;
             }
+
+            // Ctrl+Shift+H switches between hardware-tessellated patches and the retained legacy
+            // line buffers. The focused MonoGame HWND handles its own copy of this shortcut.
+            if (_vm.CurrentScreen == AppScreen.Song
+                && e.Key == Key.H
+                && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift)
+                && !e.IsRepeat
+                && !ReferenceEquals(Keyboard.FocusedElement, monoGameHost))
+            {
+                _vm.ToggleHardwareLineTessellationCommand.Execute(null);
+                e.Handled = true;
+            }
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
@@ -98,6 +110,10 @@ namespace VisualMusic
                 // Ctrl+F in the focused song panel (WPF KeyBindings do not reach the HWND).
                 monoGameHost.Renderer.OnToggleFpsOverlay =
                     () => Dispatcher.InvokeAsync(() => _vm.ToggleFpsOverlayCommand.Execute(null));
+
+                monoGameHost.Renderer.OnHardwareLineTessellationChanged =
+                    enabled => Dispatcher.InvokeAsync(
+                        () => _vm.UseHardwareLineTessellation = enabled);
             }
 
             void WireRendererSongPosChanged()

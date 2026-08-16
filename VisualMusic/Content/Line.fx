@@ -10,12 +10,13 @@ float InnerHlSize;
 bool Border;
 float2 TessellationViewportSize;
 
-struct VSInput
+struct PatchVSInput
 {
 	float3 center : POSITION0;
 	float4 texCoords : TEXCOORD0;
 	float4 texCoords2 : TEXCOORD1;
 	float2 patchData : TEXCOORD2;
+	float4 endpointTangents : TEXCOORD3;
 };
 
 struct PatchControlPoint
@@ -24,6 +25,7 @@ struct PatchControlPoint
 	float4 texCoords : TEXCOORD0;
 	float4 texCoords2 : TEXCOORD1;
 	float2 patchData : TEXCOORD2;
+	float4 endpointTangents : TEXCOORD3;
 };
 
 struct PatchConstants
@@ -44,13 +46,54 @@ struct LineOutput
 	float2 texCoords2 : TEXCOORD2;
 };
 
-PatchControlPoint VS(VSInput input)
+struct LegacyVSInput
+{
+	float3 pos : POSITION0;
+	float3 normal : NORMAL0;
+	float3 center : POSITION1;
+	float2 normPos : POSITION2;
+	float2 texCoords : TEXCOORD0;
+	float2 texCoords2 : TEXCOORD1;
+};
+
+LineOutput LegacyVS(LegacyVSInput input)
+{
+	// This is the pre-hardware-tessellation path. The CPU-expanded vertices stay
+	// resident beside the patches so Ctrl+Shift+H can switch without rebuilding.
+	float3 center = input.center;
+	center.x *= VertWidthScale;
+
+	float3 normal = input.normal;
+	normal.y *= VertWidthScale;
+	normal = normalize(normal);
+
+	float side = input.normPos.y * 2 - 1;
+	float3 offset = LineType == 1 ? float3(side, 0, 0) : normal * side;
+	offset *= Radius;
+
+	float3 rawPos = center + offset;
+	LineOutput output;
+	output.normal = normal;
+	output.center = center;
+	output.rawPos = rawPos;
+	output.normPos = input.normPos;
+	// The legacy vertex format never carried the note's world length.
+	output.worldSize = float2(0, Radius * 2);
+	output.pos = float4(rawPos.xy, 0, 1);
+	output.pos = wvpTransform(output.pos, 1);
+	output.texCoords = input.texCoords - TexScrollOffset;
+	output.texCoords2 = input.texCoords2 - TexScrollOffset2;
+	return output;
+}
+
+PatchControlPoint PatchVS(PatchVSInput input)
 {
 	PatchControlPoint output;
 	output.center = input.center;
 	output.texCoords = input.texCoords;
 	output.texCoords2 = input.texCoords2;
 	output.patchData = input.patchData;
+	output.endpointTangents = input.endpointTangents;
 	return output;
 }
 
@@ -155,6 +198,13 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 	float side = sideT * 2 - 1;
 	float3 center = evaluatePosition(patch, curveT);
 	float3 tangent = evaluateTangent(patch, curveT);
+	// Each connected patch uses the preceding patch's final cross-section at the
+	// shared endpoint. This also spans duplicate MIDI notes, whose zero-duration
+	// curve interval is skipped by the CPU builder.
+	if (curveT <= 0.000001f)
+		tangent.xy = patch[0].endpointTangents.xy;
+	else if (curveT >= 0.999999f)
+		tangent.xy = patch[0].endpointTangents.zw;
 	center.x *= VertWidthScale;
 	tangent.x *= VertWidthScale;
 	float3 normal = normalize(float3(-tangent.y, tangent.x, 0));
@@ -216,16 +266,25 @@ float4 PS(in LineOutput IN) : COLOR0
 }
 
 
-technique Line
+technique LineHardware
 {
 	pass
 	{
-		VertexShader = compile vs_5_0 VS();
+		VertexShader = compile vs_5_0 PatchVS();
 		HullShader = compile hs_5_0 HS();
 		DomainShader = compile ds_5_0 DS();
 		PixelShader  = compile ps_5_0 PS();
 	}   
 
+}
+
+technique LineLegacy
+{
+	pass
+	{
+		VertexShader = compile vs_5_0 LegacyVS();
+		PixelShader  = compile ps_5_0 PS();
+	}
 }
 
 //Highlights------------------------------

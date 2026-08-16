@@ -110,25 +110,28 @@ namespace VisualMusic.Tests
                 TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
                 Tracks = new List<Track>
                 {
-                    new Track { Length = 480 },
+                    new Track { Length = 6000 },
                     new Track
                     {
-                        Length = 480,
+                        Length = 6000,
                         Notes = new List<Note>
                         {
-                            new Note { start = 0, stop = 100, channel = 0, pitch = 60, velocity = 100 },
-                            new Note { start = 160, stop = 260, channel = 0, pitch = 72, velocity = 100 },
-                            new Note { start = 320, stop = 420, channel = 0, pitch = 60, velocity = 100 },
+                            new Note { start = 1920, stop = 3360, channel = 0, pitch = 70, velocity = 100 },
+                            new Note { start = 3360, stop = 3600, channel = 0, pitch = 70, velocity = 100 },
+                            new Note { start = 3600, stop = 3840, channel = 0, pitch = 69, velocity = 100 },
+                            new Note { start = 3600, stop = 3840, channel = 0, pitch = 69, velocity = 100 },
+                            new Note { start = 4320, stop = 5279, channel = 0, pitch = 67, velocity = 100 },
+                            new Note { start = 5280, stop = 5520, channel = 0, pitch = 65, velocity = 100 },
                         },
                     },
                 },
-                SongLengthT = 480,
+                SongLengthT = 6000,
             };
             var project = new Project();
             project.Notes = song;
             // Synthetic Song does not run the MIDI parser that populates Song.MinPitch/MaxPitch.
-            project.Props.MinPitch = 60;
-            project.Props.MaxPitch = 72;
+            project.Props.MinPitch = 65;
+            project.Props.MaxPitch = 70;
             return project;
         }
 
@@ -270,13 +273,24 @@ namespace VisualMusic.Tests
                 NoteStyle.SetProject(project);
 
                 var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
-                Assert.NotEmpty(bakedGeo.lineVb);
-                Assert.All(bakedGeo.lineVb,
+                Assert.True(NoteStyle_Line.HardwareTessellationAvailable);
+                NoteStyle_Line.SetHardwareTessellation(true);
+                Assert.True(NoteStyle_Line.ToggleHardwareTessellation());
+                Assert.False(NoteStyle_Line.UseHardwareTessellation);
+                Assert.True(NoteStyle_Line.ToggleHardwareTessellation());
+                Assert.True(NoteStyle_Line.UseHardwareTessellation);
+                Assert.NotEmpty(bakedGeo.patchVb);
+                Assert.All(bakedGeo.patchVb,
                     vb => Assert.Equal(0, vb.VertexCount % 4));
+                Assert.NotEmpty(bakedGeo.lineVb);
+
+                // t.vmp contains two identical notes at tick 3600. The zero-duration interval
+                // between those curve keys must not break the edge carried between valid patches.
+                Assert.Equal(4, bakedGeo.seamlessPatchJoinCount);
 
                 project.PropertyKeyframes.Add("track/1/LineWidth", 0,
                     Keyframes.KfInterpolation.Linear, new Keyframes.ScalarKfValue(0));
-                project.PropertyKeyframes.Add("track/1/LineWidth", 480,
+                project.PropertyKeyframes.Add("track/1/LineWidth", 6000,
                     Keyframes.KfInterpolation.Linear, new Keyframes.ScalarKfValue(20));
                 project.NormSongPos = 0.5;
                 project.InterpolatePropertyKeyframes();
@@ -284,14 +298,20 @@ namespace VisualMusic.Tests
                 Assert.Equal(10f, track.TrackProps.StyleProps.GetLineStyle().LineWidth!.Value, 3);
                 Assert.Same(bakedGeo, track.Geo);
 
-                // Exercise the actual WindowsDX patch draw, including VS/HS/DS/PS binding.
+                // Exercise both resident representations without replacing the geometry.
                 track.TrackProps.StyleProps.GetLineStyle().LineWidth = 50;
                 track.TrackProps.SpatialProps.ViewWidthQn = 1;
                 Assert.Same(bakedGeo, track.Geo);
-                project.NormSongPos = 0.6; // between notes, so highlights cannot satisfy the pixel assertion
-                using (var target = new RenderTarget2D(gds.GraphicsDevice, 64, 64, false,
-                    SurfaceFormat.Color, DepthFormat.Depth24Stencil8))
+                track.TrackProps.SpatialProps.ViewWidthQn = 16;
+                Assert.Same(bakedGeo, track.Geo);
+                project.NormSongPos = 0.96; // puts tick 1920 at the left edge; playback is after the last note
+
+                void AssertLineRendererDraws(bool hardware)
                 {
+                    NoteStyle_Line.SetHardwareTessellation(hardware);
+                    Assert.Equal(hardware, NoteStyle_Line.UseHardwareTessellation);
+                    using var target = new RenderTarget2D(gds.GraphicsDevice, 64, 64, false,
+                        SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
                     var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
                     gds.GraphicsDevice.SetRenderTarget(target);
                     gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
@@ -309,9 +329,15 @@ namespace VisualMusic.Tests
                     target.GetData(pixels);
                     Assert.Contains(pixels, pixel => pixel != clearColor);
                 }
+
+                AssertLineRendererDraws(hardware: true);  // VS/HS/DS/PS patch path
+                Assert.Same(bakedGeo, track.Geo);
+                AssertLineRendererDraws(hardware: false); // legacy triangle-strip path
+                Assert.Same(bakedGeo, track.Geo);
             }
             finally
             {
+                NoteStyle_Line.SetHardwareTessellation(true);
                 NoteStyle.SetContent(null);
                 NoteStyle.SetProject(null);
                 NoteStyle.SetGraphicsDevice(null);
@@ -326,6 +352,7 @@ namespace VisualMusic.Tests
             Assert.False(NoteStyle.HasContent);
             Assert.False(NoteStyle.HasGraphicsDevice);
             Assert.False(NoteStyle.HasProject);
+            Assert.False(NoteStyle_Line.HardwareTessellationAvailable);
         }
 
         [Fact]

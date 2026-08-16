@@ -134,6 +134,10 @@
                 <MenuItem Header="Show _FPS" IsCheckable="True"
                           IsChecked="{Binding ShowFpsOverlay, Mode=TwoWay}"
                           InputGestureText="Ctrl+F"/>
+                <MenuItem Header="_Hardware line tessellation" IsCheckable="True"
+                          IsChecked="{Binding UseHardwareLineTessellation, Mode=TwoWay}"
+                          IsEnabled="{Binding HasProject}"
+                          InputGestureText="Ctrl+Shift+H"/>
             </MenuItem>
         </Menu>
         </DockPanel>
