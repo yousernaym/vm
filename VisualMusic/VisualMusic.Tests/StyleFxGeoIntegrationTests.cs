@@ -486,6 +486,7 @@ namespace VisualMusic.Tests
             try
             {
                 var project = BuildSharpPeakProject();
+                project.Props.MaxPitch = 85;
                 project.CreateTrackViews(2, eraseCurrent: true);
                 var track = project.TrackViews[1];
                 track.TrackProps.StyleProps.Type = NoteStyleType.Line;
@@ -586,10 +587,103 @@ namespace VisualMusic.Tests
                 var legacyGap = FirstInteriorGap(legacyPixels);
 
                 Assert.True(legacyGap.Row >= 0);
-                Assert.True(hardwareGap.Row >= legacyGap.Row + 20,
-                    $"Expected the hardware round join to remove the sharp inner needle; "
-                    + $"legacy gap row {legacyGap.Row}, hardware gap row {hardwareGap.Row}.");
-                Assert.InRange(hardwareGap.Width, 1, 4);
+                // A stretched inner disk used to push this 20+ pixels past legacy (the
+                // hanging blob). Matching the offset curve's inner corner is enough to
+                // hide the clamped needle without a semicircle under the arch.
+                Assert.InRange(hardwareGap.Row - legacyGap.Row, -2, 8);
+                Assert.InRange(hardwareGap.Width, 1, 8);
+
+                int FirstSolidRow(Microsoft.Xna.Framework.Color[] pixels)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            if (pixels[y * width + x].R >= 100)
+                                return y;
+                        }
+                    }
+                    return -1;
+                }
+
+                (int Top, int FullWidthRow, int StraightWidth) OuterCap(Microsoft.Xna.Framework.Color[] pixels)
+                {
+                    var topRows = new List<(int Row, int Width)>();
+                    for (int y = 0; y < height; y++)
+                    {
+                        int minX = width;
+                        int maxX = -1;
+                        for (int x = 0; x < width; x++)
+                        {
+                            if (pixels[y * width + x].R < 100)
+                                continue;
+                            minX = Math.Min(minX, x);
+                            maxX = Math.Max(maxX, x);
+                        }
+                        if (maxX >= 0)
+                            topRows.Add((y, maxX - minX + 1));
+                    }
+
+                    Assert.NotEmpty(topRows);
+                    int topRow = topRows[0].Row;
+                    int capProbeEnd = Math.Min(topRow + 80, height - 1);
+                    int straightWidth = 0;
+                    foreach (var row in topRows)
+                    {
+                        if (row.Row > capProbeEnd)
+                            break;
+                        straightWidth = Math.Max(straightWidth, row.Width);
+                    }
+                    int fullWidthRow = topRow;
+                    foreach (var row in topRows)
+                    {
+                        if (row.Row > capProbeEnd)
+                            break;
+                        if (row.Width >= straightWidth)
+                        {
+                            fullWidthRow = row.Row;
+                            break;
+                        }
+                    }
+                    return (topRow, fullWidthRow, straightWidth);
+                }
+
+                // At a high viewport width the two arms are almost vertical. Their remaining
+                // center separation widens the combined stroke, so a one-radius cap develops
+                // short sloping shoulders unless its outward radius accounts for that span.
+                track.TrackProps.SpatialProps.ViewWidthQn = 1024;
+                var wideHardwareCap = OuterCap(Render(hardware: true));
+                Assert.True(wideHardwareCap.StraightWidth >= 30);
+                int outwardCapRadius = wideHardwareCap.FullWidthRow - wideHardwareCap.Top;
+                Assert.InRange(outwardCapRadius,
+                    wideHardwareCap.StraightWidth / 2 - 5, wideHardwareCap.StraightWidth / 2 + 1);
+
+                // Width 6 used to hang a stretched inner disk under the arch. Width 14 used to
+                // inflate the outer cap of a still-open bend. Compare both silhouettes to legacy.
+                foreach (var (viewWidth, maxExtraInner, maxExtraOuter) in new[]
+                {
+                    (6f, 8, 3),
+                    (8f, 8, 3),
+                    (10f, 8, 3),
+                    (12f, 8, 3),
+                    (14f, 8, 3),
+                })
+                {
+                    track.TrackProps.SpatialProps.ViewWidthQn = viewWidth;
+                    var viewportHardware = Render(hardware: true);
+                    var viewportLegacy = Render(hardware: false);
+                    var viewportHardwareGap = FirstInteriorGap(viewportHardware);
+                    var viewportLegacyGap = FirstInteriorGap(viewportLegacy);
+                    Assert.True(viewportHardwareGap.Row >= 0);
+                    Assert.True(viewportLegacyGap.Row >= 0);
+                    Assert.InRange(viewportHardwareGap.Row - viewportLegacyGap.Row,
+                        0, maxExtraInner);
+
+                    int hardwareTop = FirstSolidRow(viewportHardware);
+                    int legacyTop = FirstSolidRow(viewportLegacy);
+                    Assert.True(hardwareTop >= 0 && legacyTop >= 0);
+                    Assert.InRange(legacyTop - hardwareTop, -2, maxExtraOuter);
+                }
             }
             finally
             {

@@ -47,6 +47,8 @@ struct LineOutput
 	float capAmount : TEXCOORD3;
 	float edgeBlurMask : TEXCOORD4;
 	float2 roundJoinCoords : TEXCOORD5;
+	float2 joinArmIn : TEXCOORD6;
+	float2 joinArmOut : TEXCOORD7;
 };
 
 struct LegacyVSInput
@@ -89,6 +91,8 @@ LineOutput LegacyVS(LegacyVSInput input)
 	output.capAmount = 0;
 	output.edgeBlurMask = 1;
 	output.roundJoinCoords = float2(0, 0);
+	output.joinArmIn = float2(0, 0);
+	output.joinArmOut = float2(0, 0);
 	return output;
 }
 
@@ -169,8 +173,8 @@ PatchConstants PatchConstantFunction(InputPatch<PatchControlPoint, 4> patch)
 	float roundJoin = LineType == 0 && patch[0].patchData.z > 1.5f ? 1 : 0;
 	if (roundJoin > 0)
 	{
-		// The join is an analytic disk drawn from a single quad. Its round boundary
-		// is clipped per pixel, so additional hull tessellation cannot improve it.
+		// The join is a bounding quad clipped per pixel to the two thick arm
+		// segments. Extra hull tessellation cannot improve that boundary.
 		output.edgeTess[0] = 1;
 		output.edgeTess[1] = 1;
 		output.edgeTess[2] = 1;
@@ -302,19 +306,20 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		float3 center = patch[0].center;
 		center.x *= VertWidthScale;
 		float4 patchData = patch[0].patchData;
-		float2 joinOffset = joinCoords * Radius;
-		// At a tight pitch extremum the inward normal offsets converge into a long
-		// needle. Extend only that half of the analytic join so its boundary becomes
-		// a rounded return without thickening the outside of the bend. Curvature was
-		// baked at the reference viewport width; horizontal scaling changes it by the
-		// inverse square because extrema have a horizontal centerline tangent.
-		float widthScaleSquared = max(VertWidthScale * VertWidthScale, 0.00000001f);
-		float joinCurvature = max(abs(patch[0].endpointTangents.x),
-			abs(patch[0].endpointTangents.y)) / widthScaleSquared;
-		float joinTightness = Radius * joinCurvature;
-		float innerScale = lerp(1, 2.5f, smoothstep(1, 2, joinTightness));
-		if (joinCoords.y * patchData.w > 0)
-			joinOffset.y *= innerScale;
+		float2 armIn = patch[0].endpointTangents.xy;
+		armIn.x *= VertWidthScale;
+		float2 armOut = patch[0].endpointTangents.zw;
+		armOut.x *= VertWidthScale;
+		// When viewport scaling stacks both arms into one vertical stroke, the
+		// remaining center separation is wider than a one-radius cap. Expand the
+		// bounding quad (and the outer SDF radius) only while that span is a
+		// fraction of the line radius; a local peak still has a small span one
+		// radius down, but not this small, so its outer arc stays one radius.
+		float compressed = max(abs(armIn.x), abs(armOut.x));
+		float expansion = compressed
+			* (1 - smoothstep(Radius * 0.1f, Radius * 0.35f, compressed));
+		float bound = Radius + expansion;
+		float2 joinOffset = joinCoords * bound;
 		float3 rawPos = center + float3(joinOffset, 0);
 		float2 texCoords = lerp(patch[0].texCoords.xy, patch[0].texCoords.zw,
 			domainLocation.y);
@@ -332,10 +337,13 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		output.texCoords = texCoords - TexScrollOffset;
 		output.texCoords2 = texCoords2 - TexScrollOffset2;
 		output.capAmount = -1;
-		// Do not darken the two stroke arms where this disk overlaps them. Their
-		// existing edge blur supplies the visible antialiasing around the join.
+		// Interior join pixels overlay the stroke arms. Blurring this disk's edge
+		// would darken those overlapping pixels (the join is drawn first) and make
+		// the inner silhouette look like a hole to the coverage tests.
 		output.edgeBlurMask = 0;
-		output.roundJoinCoords = joinCoords;
+		output.roundJoinCoords = float2(expansion, 0);
+		output.joinArmIn = armIn;
+		output.joinArmOut = armOut;
 		return output;
 	}
 
@@ -438,6 +446,8 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 	output.capAmount = capAmount;
 	output.edgeBlurMask = LineType == 0 ? edgeBlurMask : 1;
 	output.roundJoinCoords = float2(0, 0);
+	output.joinArmIn = float2(0, 0);
+	output.joinArmOut = float2(0, 0);
 	return output;
 }
 
@@ -461,6 +471,7 @@ float4 PS(in LineOutput IN) : COLOR0
 	float3 normal = normalize(IN.normal);
 	float3 tPos = IN.rawPos - IN.center;
 	float normDistFromEdge = dot(tPos, normal) / Radius * 0.5f + 0.5f;
+	float2 joinOffset = IN.rawPos.xy - IN.center.xy;
 	float2 normPos = IN.normPos;
 	IN.rawPos.x -= SongPos;
 	color = modulate(normPos, IN.worldSize, color, lightingNormal, IN.rawPos);
@@ -468,7 +479,16 @@ float4 PS(in LineOutput IN) : COLOR0
 	float normDistFromCenter = abs(side);
 	if (IN.capAmount < -0.5f)
 	{
-		normDistFromCenter = length(IN.roundJoinCoords);
+		// A disk of one line-radius at the peak is the round join. Stretching that
+		// disk into an inner/outer ellipse was the blob at moderate viewport widths.
+		// Expand the outward half only when both arms sit inside a fraction of a
+		// radius, i.e. a single vertical stroke rather than an open bend.
+		float d = length(joinOffset);
+		float2 inward = IN.joinArmIn + IN.joinArmOut;
+		float inwardLength = length(inward);
+		bool inner = inwardLength > 0.000001f && dot(joinOffset, inward) > 0;
+		float joinRadius = Radius + (inner ? 0 : IN.roundJoinCoords.x);
+		normDistFromCenter = d / max(joinRadius, 0.000001f);
 		if (normDistFromCenter > 1)
 			discard;
 	}

@@ -203,21 +203,44 @@ namespace VisualMusic
                     + (P3 - P2) * (3 * t * t);
             }
 
-            public Vector3 SecondDerivative(float t)
+            public Vector2 OffsetAtVerticalDistance(bool fromEnd, float verticalDistance)
             {
-                return 6 * ((1 - t) * (P2 - 2 * P1 + P0)
-                    + t * (P3 - 2 * P2 + P1));
-            }
+                CubicBezier curve = this;
+                Vector3 endpoint = fromEnd ? curve.P3 : curve.P0;
+                float targetDistance = Math.Max(verticalDistance, 0);
 
-            public float Curvature(float t)
-            {
-                Vector3 tangent = Derivative(t);
-                float tangentLengthSquared = tangent.X * tangent.X + tangent.Y * tangent.Y;
-                if (tangentLengthSquared < 0.0000000001f)
-                    return 0;
-                Vector3 secondDerivative = SecondDerivative(t);
-                return (tangent.X * secondDerivative.Y - tangent.Y * secondDerivative.X)
-                    / (tangentLengthSquared * MathF.Sqrt(tangentLengthSquared));
+                float ParameterAtProgress(float progress) => fromEnd ? 1 - progress : progress;
+                float VerticalDistance(float progress) =>
+                    Math.Abs(curve.Evaluate(ParameterAtProgress(progress)).Y - endpoint.Y);
+
+                float progressAtDistance;
+                if (VerticalDistance(1) <= targetDistance)
+                {
+                    progressAtDistance = 1;
+                }
+                else
+                {
+                    float low = 0;
+                    float high = 1;
+                    for (int iteration = 0; iteration < 16; iteration++)
+                    {
+                        float middle = (low + high) * 0.5f;
+                        if (VerticalDistance(middle) < targetDistance)
+                            low = middle;
+                        else
+                            high = middle;
+                    }
+                    progressAtDistance = high;
+                }
+
+                Vector3 sample = curve.Evaluate(ParameterAtProgress(progressAtDistance));
+                var offset = new Vector2(sample.X - endpoint.X, sample.Y - endpoint.Y);
+                if (offset.LengthSquared() < 0.0000000001f)
+                {
+                    float inwardY = fromEnd ? P0.Y - P3.Y : P3.Y - P0.Y;
+                    offset = new Vector2(0, Math.Sign(inwardY) * targetDistance);
+                }
+                return offset;
             }
 
             public CubicBezier Slice(float start, float end)
@@ -510,10 +533,15 @@ namespace VisualMusic
                     CubicBezier outgoingCurve = CreateNoteCurve(
                         n + 1, noteList[n + 2].start, trackProps.TrackView.Curve);
                     // Join patches do not use endpoint tangents. Carry the incoming/outgoing
-                    // reference-view curvature so the shader can decide at draw time whether
-                    // the current line width and viewport scale actually require extra fill.
+                    // centerline samples one radius inside the turn so the shader can tell a
+                    // stacked vertical stroke (expand the outer cap) from an open bend.
+                    float joinRadius = vpLineWidth * 0.5f;
+                    Vector2 incomingArm = noteCurve.OffsetAtVerticalDistance(
+                        fromEnd: true, joinRadius);
+                    Vector2 outgoingArm = outgoingCurve.OffsetAtVerticalDistance(
+                        fromEnd: false, joinRadius);
                     joinVertex.endpointTangents = new Vector4(
-                        noteCurve.Curvature(1), outgoingCurve.Curvature(0), 0, 0);
+                        incomingArm.X, incomingArm.Y, outgoingArm.X, outgoingArm.Y);
                     for (int controlPoint = 0; controlPoint < ControlPointsPerPatch; controlPoint++)
                         s_linePatchVerts[vertIndex++] = joinVertex;
                     lineGeo.hardwareRoundJoinCount++;
