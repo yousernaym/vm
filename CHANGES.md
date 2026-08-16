@@ -1,4 +1,5 @@
-#1.0.0 (2026-07-30)
+#1.0.0 (2026-08-16)
+- Hardware tesselation for line rendering, fix edge-case artifacts.
 - Pitch offset in Spatial tab.
 - Viewport width now configurable per track.
 - Optional background images.

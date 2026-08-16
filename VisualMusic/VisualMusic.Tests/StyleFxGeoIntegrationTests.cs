@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -606,7 +607,8 @@ namespace VisualMusic.Tests
                     return -1;
                 }
 
-                (int Top, int FullWidthRow, int StraightWidth) OuterCap(Microsoft.Xna.Framework.Color[] pixels)
+                (int Top, int FullWidthRow, int StraightWidth, int PinchPx, int TipWidth) OuterCap(
+                    Microsoft.Xna.Framework.Color[] pixels)
                 {
                     var topRows = new List<(int Row, int Width)>();
                     for (int y = 0; y < height; y++)
@@ -626,7 +628,9 @@ namespace VisualMusic.Tests
 
                     Assert.NotEmpty(topRows);
                     int topRow = topRows[0].Row;
-                    int capProbeEnd = Math.Min(topRow + 80, height - 1);
+                    // Cap geometry lives in the first ~one-diameter. Further down, a
+                    // still-opening V can keep widening and is not the stem under the cap.
+                    int capProbeEnd = Math.Min(topRow + 30, height - 1);
                     int straightWidth = 0;
                     foreach (var row in topRows)
                     {
@@ -645,18 +649,43 @@ namespace VisualMusic.Tests
                             break;
                         }
                     }
-                    return (topRow, fullWidthRow, straightWidth);
+                    // A mushroom is a grow-then-pinch: the silhouette widens, then
+                    // narrows again before the stem. A round cap only ever widens.
+                    int runningMax = 0;
+                    int pinchPx = 0;
+                    foreach (var row in topRows)
+                    {
+                        if (row.Row > capProbeEnd)
+                            break;
+                        runningMax = Math.Max(runningMax, row.Width);
+                        pinchPx = Math.Max(pinchPx, runningMax - row.Width);
+                    }
+                    return (topRow, fullWidthRow, straightWidth, pinchPx, topRows[0].Width);
                 }
 
-                // At a high viewport width the two arms are almost vertical. Their remaining
-                // center separation widens the combined stroke, so a one-radius cap develops
-                // short sloping shoulders unless its outward radius accounts for that span.
-                track.TrackProps.SpatialProps.ViewWidthQn = 1024;
-                var wideHardwareCap = OuterCap(Render(hardware: true));
-                Assert.True(wideHardwareCap.StraightWidth >= 30);
-                int outwardCapRadius = wideHardwareCap.FullWidthRow - wideHardwareCap.Top;
-                Assert.InRange(outwardCapRadius,
-                    wideHardwareCap.StraightWidth / 2 - 5, wideHardwareCap.StraightWidth / 2 + 1);
+                void AssertStackedCap(float viewWidth, int maxMushroomPx)
+                {
+                    track.TrackProps.SpatialProps.ViewWidthQn = viewWidth;
+                    var cap = OuterCap(Render(hardware: true));
+                    Assert.True(cap.StraightWidth >= 30, $"stem too thin at width {viewWidth}");
+                    int outwardCapRadius = cap.FullWidthRow - cap.Top;
+                    Assert.InRange(outwardCapRadius,
+                        cap.StraightWidth / 2 - 5, cap.StraightWidth / 2 + 1);
+                    Assert.True(cap.TipWidth * 3 <= cap.StraightWidth,
+                        $"Flat top at viewport width {viewWidth}: tip {cap.TipWidth}px, "
+                        + $"stem {cap.StraightWidth}px.");
+                    Assert.True(cap.PinchPx <= maxMushroomPx,
+                        $"Mushroom cap at viewport width {viewWidth}: silhouette pinched "
+                        + $"{cap.PinchPx}px after widening.");
+                }
+
+                // Squeezed vertical stroke: round cap sized to the stem, no mushroom overhang,
+                // and the cap must still be present at the UI maximum (1024 QN).
+                AssertStackedCap(64f, 2);
+                AssertStackedCap(128f, 2);
+                AssertStackedCap(256f, 2);
+                AssertStackedCap(512f, 2);
+                AssertStackedCap(1024f, 2);
 
                 // Width 6 used to hang a stretched inner disk under the arch. Width 14 used to
                 // inflate the outer cap of a still-open bend. Compare both silhouettes to legacy.

@@ -310,16 +310,29 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		armIn.x *= VertWidthScale;
 		float2 armOut = patch[0].endpointTangents.zw;
 		armOut.x *= VertWidthScale;
-		// When viewport scaling stacks both arms into one vertical stroke, the
-		// remaining center separation is wider than a one-radius cap. Expand the
-		// bounding quad (and the outer SDF radius) only while that span is a
-		// fraction of the line radius; a local peak still has a small span one
-		// radius down, but not this small, so its outer arc stays one radius.
-		float compressed = max(abs(armIn.x), abs(armOut.x));
-		float expansion = compressed
-			* (1 - smoothstep(Radius * 0.1f, Radius * 0.35f, compressed));
-		float bound = Radius + expansion;
-		float2 joinOffset = joinCoords * bound;
+		// Round join is the outer circular sector only. Size it to the local stem
+		// (the arms' projected X extent) so a diagonal overlap cannot grow a
+		// mushroom brim, then expand back toward that stem once the arms are a
+		// single vertical stroke. Open bends keep one line-radius.
+		float nInX = abs(armIn.y) / max(length(armIn), 0.000001f);
+		float nOutX = abs(armOut.y) / max(length(armOut), 0.000001f);
+		float stemLeft = min(armIn.x - Radius * nInX, armOut.x - Radius * nOutX);
+		float stemRight = max(armIn.x + Radius * nInX, armOut.x + Radius * nOutX);
+		float stemHalf = 0.5f * (stemRight - stemLeft);
+		float armSpan = max(abs(armIn.x), abs(armOut.x));
+		// Open bends (viewport width 6–14) keep a several-radius span. High zoom
+		// collapses that span so the arms read as one stem; the cap must then
+		// match the stem, including at the UI maximum (1024 QN).
+		float stacked = 1 - smoothstep(Radius * 0.15f, Radius * 0.8f, armSpan);
+		float outerRadius = Radius;
+		if (stemHalf > Radius * 0.05f)
+		{
+			if (stemHalf < Radius)
+				outerRadius = stemHalf;
+			else
+				outerRadius = lerp(Radius, stemHalf, stacked);
+		}
+		float2 joinOffset = joinCoords * outerRadius;
 		float3 rawPos = center + float3(joinOffset, 0);
 		float2 texCoords = lerp(patch[0].texCoords.xy, patch[0].texCoords.zw,
 			domainLocation.y);
@@ -341,7 +354,7 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		// would darken those overlapping pixels (the join is drawn first) and make
 		// the inner silhouette look like a hole to the coverage tests.
 		output.edgeBlurMask = 0;
-		output.roundJoinCoords = float2(expansion, 0);
+		output.roundJoinCoords = float2(outerRadius - Radius, stacked);
 		output.joinArmIn = armIn;
 		output.joinArmOut = armOut;
 		return output;
@@ -479,18 +492,31 @@ float4 PS(in LineOutput IN) : COLOR0
 	float normDistFromCenter = abs(side);
 	if (IN.capAmount < -0.5f)
 	{
-		// A disk of one line-radius at the peak is the round join. Stretching that
-		// disk into an inner/outer ellipse was the blob at moderate viewport widths.
-		// Expand the outward half only when both arms sit inside a fraction of a
-		// radius, i.e. a single vertical stroke rather than an open bend.
+		// Exterior circular sector plus, once the arms stack, a rectangular stem
+		// plug on the inner side. A full inner disk pinches below the equator
+		// (mushroom). Leaving the inner empty reveals the curvature-clamped neck
+		// (same brim). Open bends keep the inner empty so the arch stays hollow.
 		float d = length(joinOffset);
 		float2 inward = IN.joinArmIn + IN.joinArmOut;
-		float inwardLength = length(inward);
-		bool inner = inwardLength > 0.000001f && dot(joinOffset, inward) > 0;
-		float joinRadius = Radius + (inner ? 0 : IN.roundJoinCoords.x);
-		normDistFromCenter = d / max(joinRadius, 0.000001f);
-		if (normDistFromCenter > 1)
+		bool inner = length(inward) > 0.000001f && dot(joinOffset, inward) > 0;
+		float outerRadius = Radius + IN.roundJoinCoords.x;
+		float stacked = saturate(IN.roundJoinCoords.y);
+		if (outerRadius < 0.0001f)
 			discard;
+		if (inner)
+		{
+			if (stacked < 0.5f)
+				discard;
+			if (abs(joinOffset.x) > outerRadius || abs(joinOffset.y) > outerRadius)
+				discard;
+			normDistFromCenter = abs(joinOffset.x) / outerRadius;
+		}
+		else
+		{
+			normDistFromCenter = d / outerRadius;
+			if (normDistFromCenter > 1)
+				discard;
+		}
 	}
 	else if (IN.capAmount > 0)
 	{
