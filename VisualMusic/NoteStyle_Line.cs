@@ -24,7 +24,9 @@ namespace VisualMusic
         public Vector3 center;
         public Vector4 texCoords;
         public Vector4 texCoords2;
-        public Vector2 patchData;
+        // x/y are normalized note position and note length; z/w mark a real
+        // continuous-segment start/end for hardware-only rounded caps.
+        public Vector4 patchData;
         public Vector4 endpointTangents;
     }
 
@@ -454,6 +456,11 @@ namespace VisualMusic
                 }
 
                 CubicBezier noteCurve = CreateNoteCurve(n, segmentEndTick, trackProps.TrackView.Curve);
+                bool startsSegment = !connectedStartTangent.HasValue;
+                bool endsSegment = !(bool)Continuous || endsAtNoteStop;
+                bool addRoundJoin = LineType == VisualMusic.LineType.Standard
+                    && connectedStartTangent.HasValue
+                    && IsHardwareLocalExtremum(trackProps.TrackView.Curve, n);
                 Vector3 noteStartTangent = connectedStartTangent ?? noteCurve.Derivative(0);
                 Vector3 noteEndTangent = noteCurve.Derivative(1);
                 if (connectedStartTangent.HasValue)
@@ -478,18 +485,41 @@ namespace VisualMusic
                     Vector3 patchEndTangent = patchIndex == patchCount - 1
                         ? noteEndTangent
                         : patch.Derivative(1);
+                    bool patchStartsSegment = startsSegment && patchIndex == 0;
+                    bool patchEndsSegment = endsSegment && patchIndex == patchCount - 1;
+                    if (patchStartsSegment)
+                        lineGeo.hardwareStartCapCount++;
+                    if (patchEndsSegment)
+                        lineGeo.hardwareEndCapCount++;
                     for (int controlPoint = 0; controlPoint < ControlPointsPerPatch; controlPoint++)
                     {
                         float sampleT = controlPoint / 3f;
                         float noteT = MathHelper.Lerp(patchStart, patchEnd, sampleT);
                         s_linePatchVerts[vertIndex++] = CreatePatchVertex(
                             patch, controlPoint, sampleT, noteT, noteLength, vpLineWidth,
-                            patchStartTangent, patchEndTangent, texMaterial);
+                            patchStartTangent, patchEndTangent,
+                            patchStartsSegment, patchEndsSegment,
+                            texMaterial);
                     }
                     IncludeBounds(patch,
                         MathHelper.Lerp(note.start, segmentEndTick, patchStart),
                         MathHelper.Lerp(note.start, segmentEndTick, patchEnd));
                     patchStartTangent = patchEndTangent;
+                }
+
+                if (addRoundJoin)
+                {
+                    if (vertIndex > MaxLinePatchVerts - ControlPointsPerPatch)
+                        CreateLinePatchBuffer(ref vertIndex, lineGeo);
+                    LinePatchVertex joinVertex = CreatePatchVertex(
+                        noteCurve, 0, 0, 0, noteLength, vpLineWidth,
+                        noteStartTangent, noteEndTangent,
+                        startsSegment: false, endsSegment: false, texMaterial: texMaterial);
+                    joinVertex.center = noteCurve.P0;
+                    joinVertex.patchData.Z = 2; // analytic round-join patch
+                    for (int controlPoint = 0; controlPoint < ControlPointsPerPatch; controlPoint++)
+                        s_linePatchVerts[vertIndex++] = joinVertex;
+                    lineGeo.hardwareRoundJoinCount++;
                 }
 
                 connectedStartTangent = (bool)Continuous && !endsAtNoteStop
@@ -709,12 +739,14 @@ namespace VisualMusic
                         Project.GetScreenPosX(endKey.Position),
                         Project.GetScreenPosY(endKey.Value), 0);
                     float dx = (p3.X - p0.X) / 3f;
+                    float tangentOut = GetHardwareCurveTangent(curve, noteIndex, outgoing: true);
+                    float tangentIn = GetHardwareCurveTangent(curve, noteIndex + 1, outgoing: false);
                     CubicBezier fullCurve = new CubicBezier(
                         p0,
                         new Vector3(p0.X + dx,
-                            p0.Y + startKey.TangentOut * Project.Props.NoteHeight / 3f, 0),
+                            p0.Y + tangentOut * Project.Props.NoteHeight / 3f, 0),
                         new Vector3(p3.X - dx,
-                            p3.Y - endKey.TangentIn * Project.Props.NoteHeight / 3f, 0),
+                            p3.Y - tangentIn * Project.Props.NoteHeight / 3f, 0),
                         p3);
                     float end = MathHelper.Clamp((endTick - startKey.Position) / duration, 0, 1);
                     return fullCurve.Slice(0, end);
@@ -726,9 +758,40 @@ namespace VisualMusic
             return new CubicBezier(p0, p0 + delta, p0 + delta * 2, lineEnd);
         }
 
+        static float GetHardwareCurveTangent(Curve curve, int keyIndex, bool outgoing)
+        {
+            CurveKey key = curve.Keys[keyIndex];
+            float tangent = outgoing ? key.TangentOut : key.TangentIn;
+
+            // XNA's Smooth tangent can point through a local pitch extremum when its two
+            // neighbours have different heights. A thick offset curve then folds its inner
+            // edge back over itself and leaves a sharp cusp. The hardware curve uses the
+            // shape-preserving tangent expected at a peak/valley; the legacy Curve is untouched.
+            if (IsHardwareLocalExtremum(curve, keyIndex))
+                return 0;
+
+            // The final note continues horizontally to its stop time.
+            if (keyIndex == curve.Keys.Count - 1)
+                return 0;
+
+            return tangent;
+        }
+
+        static bool IsHardwareLocalExtremum(Curve curve, int keyIndex)
+        {
+            if (keyIndex <= 0 || keyIndex >= curve.Keys.Count - 1)
+                return false;
+            CurveKey key = curve.Keys[keyIndex];
+            float incomingDelta = key.Value - curve.Keys[keyIndex - 1].Value;
+            float outgoingDelta = curve.Keys[keyIndex + 1].Value - key.Value;
+            return (incomingDelta > 0 && outgoingDelta <= 0)
+                || (incomingDelta < 0 && outgoingDelta >= 0);
+        }
+
         LinePatchVertex CreatePatchVertex(CubicBezier patch, int controlPoint, float sampleT,
             float noteT, float noteLength, float lineWidth, Vector3 startTangent,
-            Vector3 endTangent, MaterialProps texMaterial)
+            Vector3 endTangent, bool startsSegment, bool endsSegment,
+            MaterialProps texMaterial)
         {
             Vector3 sampleCenter = patch.Evaluate(sampleT);
             Vector3 tangent = patch.Derivative(sampleT);
@@ -766,7 +829,8 @@ namespace VisualMusic
                 center = patch.GetControlPoint(controlPoint),
                 texCoords = new Vector4(tex0.X, tex0.Y, tex1.X, tex1.Y),
                 texCoords2 = new Vector4(tex20.X, tex20.Y, tex21.X, tex21.Y),
-                patchData = new Vector2(noteT, noteLength),
+                patchData = new Vector4(noteT, noteLength,
+                    startsSegment ? 1 : 0, endsSegment ? 1 : 0),
                 endpointTangents = new Vector4(
                     startTangent.X, startTangent.Y, endTangent.X, endTangent.Y),
             };
@@ -1005,8 +1069,8 @@ namespace VisualMusic
                 new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
                 new VertexElement(12, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 0),
                 new VertexElement(28, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 1),
-                new VertexElement(44, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 2),
-                new VertexElement(52, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 3));
+                new VertexElement(44, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 2),
+                new VertexElement(60, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 3));
             s_lineVertDecl = new VertexDeclaration(
                 new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
                 new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
@@ -1023,6 +1087,9 @@ namespace VisualMusic
         public List<VertexBuffer> lineVb = new List<VertexBuffer>();
         public List<VertexBuffer> hLineVb = new List<VertexBuffer>();
         internal int seamlessPatchJoinCount;
+        internal int hardwareStartCapCount;
+        internal int hardwareEndCapCount;
+        internal int hardwareRoundJoinCount;
         protected override void ReleaseResources()
         {
             foreach (var vb in patchVb)

@@ -121,10 +121,8 @@ float4 wvpTransform(inout float4 vertPos, float widthScale)
 	return mul(vertPos, VpMat);
 }
 
-float4 blurEdges(float4 color, float normPosY)
+float4 blurEdgeDistance(float4 color, float normDistFromCenter)
 {
-	float normDistFromCenter = abs(normPosY - 0.5f) * 2; // 1 at edge, 0 at center
-
 	float ddxy = length(float2(ddx(normDistFromCenter), ddy(normDistFromCenter)));
 
 	//If line radius is less than number of pixels to blur + 2, than decrease number of pixels to blur accordingly
@@ -140,6 +138,11 @@ float4 blurEdges(float4 color, float normPosY)
 																									//return float4(0, 1, 0, 1);
 	float lum = saturate(1 - shadeAmount);
 	return color * lum;
+}
+
+float4 blurEdges(float4 color, float normPosY)
+{
+	return blurEdgeDistance(color, abs(normPosY - 0.5f) * 2);
 }
 
 float3 calcLighting(float3 color, float3 normal, float3 worldPos)

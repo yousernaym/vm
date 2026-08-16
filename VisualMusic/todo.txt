@@ -1,5 +1,4 @@
 ﻿Todo:
-- Use hardware tesselation for lines (when Monogame supports it)
 - Individual world matrices  for different tracks
 - Normal/parallax mapping.
 - Increase minimum width for ribbons.

@@ -135,6 +135,36 @@ namespace VisualMusic.Tests
             return project;
         }
 
+        static Project BuildSharpPeakProject()
+        {
+            var song = new Song
+            {
+                TicksPerBeat = 480,
+                TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
+                Tracks = new List<Track>
+                {
+                    new Track { Length = 10000 },
+                    new Track
+                    {
+                        Length = 10000,
+                        Notes = new List<Note>
+                        {
+                            new Note { start = 5520, stop = 5760, channel = 0, pitch = 72, velocity = 100 },
+                            new Note { start = 6000, stop = 6720, channel = 0, pitch = 72, velocity = 100 },
+                            new Note { start = 6480, stop = 6960, channel = 0, pitch = 82, velocity = 100 },
+                            new Note { start = 7200, stop = 9120, channel = 0, pitch = 69, velocity = 100 },
+                            new Note { start = 8160, stop = 8640, channel = 0, pitch = 67, velocity = 100 },
+                        },
+                    },
+                },
+                SongLengthT = 10000,
+            };
+            var project = new Project { Notes = song };
+            project.Props.MinPitch = 67;
+            project.Props.MaxPitch = 82;
+            return project;
+        }
+
         [Fact]
         [Trait("Category", "Integration")]
         public void SetContent_then_SetGraphicsDevice_then_SetProject_bakes_geo()
@@ -287,6 +317,8 @@ namespace VisualMusic.Tests
                 // t.vmp contains two identical notes at tick 3600. The zero-duration interval
                 // between those curve keys must not break the edge carried between valid patches.
                 Assert.Equal(4, bakedGeo.seamlessPatchJoinCount);
+                Assert.Equal(1, bakedGeo.hardwareStartCapCount);
+                Assert.Equal(1, bakedGeo.hardwareEndCapCount);
 
                 project.PropertyKeyframes.Add("track/1/LineWidth", 0,
                     Keyframes.KfInterpolation.Linear, new Keyframes.ScalarKfValue(0));
@@ -368,15 +400,24 @@ namespace VisualMusic.Tests
                 // The top of the max-width vertical line is the compressed first bend. Compare
                 // its silhouette to the dense legacy mesh; centerline-only tessellation rendered
                 // this as a visibly sharp corner.
-                var hardwareTop = GetTopProfile(hardwarePixels, rowCount: 24);
-                var legacyTop = GetTopProfile(legacyPixels, rowCount: 24);
-                Assert.Equal(24, hardwareTop.Count);
-                Assert.Equal(24, legacyTop.Count);
-                for (int row = 0; row < hardwareTop.Count; row++)
+                var hardwareProfile = GetTopProfile(hardwarePixels, rowCount: captureHeight);
+                var legacyProfile = GetTopProfile(legacyPixels, rowCount: captureHeight);
+                Assert.True(hardwareProfile.Count >= 24);
+                Assert.True(legacyProfile.Count >= 24);
+                for (int row = 0; row < 24; row++)
                 {
-                    Assert.InRange(Math.Abs(hardwareTop[row].MinX - legacyTop[row].MinX), 0, 2);
-                    Assert.InRange(Math.Abs(hardwareTop[row].MaxX - legacyTop[row].MaxX), 0, 2);
+                    Assert.InRange(Math.Abs(hardwareProfile[row].MinX - legacyProfile[row].MinX), 0, 2);
+                    Assert.InRange(Math.Abs(hardwareProfile[row].MaxX - legacyProfile[row].MaxX), 0, 2);
                 }
+
+                // The legacy end is flat. The hardware-only semicircle extends by roughly one
+                // radius and converges to a narrow final row instead of another full-width edge.
+                Assert.True(hardwareProfile.Count >= legacyProfile.Count + 8);
+                int widestHardwareRow = 0;
+                foreach (var row in hardwareProfile)
+                    widestHardwareRow = Math.Max(widestHardwareRow, row.MaxX - row.MinX + 1);
+                int lastHardwareRowWidth = hardwareProfile[^1].MaxX - hardwareProfile[^1].MinX + 1;
+                Assert.True(lastHardwareRowWidth < widestHardwareRow / 2);
             }
             finally
             {
@@ -396,6 +437,99 @@ namespace VisualMusic.Tests
             Assert.False(NoteStyle.HasGraphicsDevice);
             Assert.False(NoteStyle.HasProject);
             Assert.False(NoteStyle_Line.HardwareTessellationAvailable);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Hardware_line_rounds_local_extremum()
+        {
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            try
+            {
+                var project = BuildSharpPeakProject();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                var track = project.TrackViews[1];
+                track.TrackProps.StyleProps.Type = NoteStyleType.Line;
+                var lineStyle = track.TrackProps.StyleProps.GetLineStyle();
+                lineStyle.LineWidth = 50;
+                lineStyle.HlSize = 0;
+                track.TrackProps.SpatialProps.ViewWidthQn = 12.771335f;
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(cm);
+                NoteStyle.SetProject(project);
+                project.NormSongPos = 0.72;
+
+                var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
+                Assert.Equal(1, bakedGeo.hardwareRoundJoinCount);
+
+                void Render(bool hardware)
+                {
+                    NoteStyle_Line.SetHardwareTessellation(hardware);
+                    const int width = 768;
+                    const int height = 456;
+                    using var target = new RenderTarget2D(gds.GraphicsDevice, width, height,
+                        false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                    using var depthStencil = new DepthStencilState
+                    {
+                        StencilEnable = true,
+                        StencilFunction = CompareFunction.Greater,
+                        StencilPass = StencilOperation.Replace,
+                        ReferenceStencil = 1,
+                    };
+                    var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
+                    gds.GraphicsDevice.SetRenderTarget(target);
+                    gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+                    var oldDepthStencil = gds.GraphicsDevice.DepthStencilState;
+                    gds.GraphicsDevice.DepthStencilState = depthStencil;
+                    gds.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer
+                        | ClearOptions.Stencil, clearColor, 1, 0);
+                    try
+                    {
+                        track.DrawTrack(project.GlobalTrackProps, defaultStyle: false);
+                    }
+                    finally
+                    {
+                        gds.GraphicsDevice.SetRenderTarget(null);
+                        gds.GraphicsDevice.DepthStencilState = oldDepthStencil;
+                    }
+
+                    using (var stream = File.Create(Path.Combine(Path.GetTempPath(),
+                        hardware ? "vm-peak-hardware.png" : "vm-peak-legacy.png")))
+                        target.SaveAsPng(stream, width, height);
+                    var pixels = new Microsoft.Xna.Framework.Color[width * height];
+                    target.GetData(pixels);
+                    Assert.Contains(pixels, pixel => pixel != clearColor);
+                }
+
+                Render(hardware: true);
+                Render(hardware: false);
+            }
+            finally
+            {
+                NoteStyle_Line.SetHardwareTessellation(true);
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
         }
 
         [Fact]

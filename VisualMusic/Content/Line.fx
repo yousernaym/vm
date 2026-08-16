@@ -15,7 +15,7 @@ struct PatchVSInput
 	float3 center : POSITION0;
 	float4 texCoords : TEXCOORD0;
 	float4 texCoords2 : TEXCOORD1;
-	float2 patchData : TEXCOORD2;
+	float4 patchData : TEXCOORD2;
 	float4 endpointTangents : TEXCOORD3;
 };
 
@@ -24,7 +24,7 @@ struct PatchControlPoint
 	float3 center : BEZIERPOS;
 	float4 texCoords : TEXCOORD0;
 	float4 texCoords2 : TEXCOORD1;
-	float2 patchData : TEXCOORD2;
+	float4 patchData : TEXCOORD2;
 	float4 endpointTangents : TEXCOORD3;
 };
 
@@ -44,6 +44,9 @@ struct LineOutput
 	float2 worldSize : POSITION4;
 	float2 texCoords : TEXCOORD0;
 	float2 texCoords2 : TEXCOORD2;
+	float capAmount : TEXCOORD3;
+	float edgeBlurMask : TEXCOORD4;
+	float2 roundJoinCoords : TEXCOORD5;
 };
 
 struct LegacyVSInput
@@ -83,6 +86,9 @@ LineOutput LegacyVS(LegacyVSInput input)
 	output.pos = wvpTransform(output.pos, 1);
 	output.texCoords = input.texCoords - TexScrollOffset;
 	output.texCoords2 = input.texCoords2 - TexScrollOffset2;
+	output.capAmount = 0;
+	output.edgeBlurMask = 1;
+	output.roundJoinCoords = float2(0, 0);
 	return output;
 }
 
@@ -130,6 +136,12 @@ float3 evaluateBezierTangent(float3 p0, float3 p1, float3 p2, float3 p3, float t
 		+ (p3 - p2) * (3 * t * t);
 }
 
+float3 evaluateBezierSecondDerivative(float3 p0, float3 p1, float3 p2, float3 p3, float t)
+{
+	return 6 * ((1 - t) * (p2 - 2 * p1 + p0)
+		+ t * (p3 - 2 * p2 + p1));
+}
+
 float2 projectLineEdgeToPixels(float3 center, float3 tangent, float side)
 {
 	center.x *= VertWidthScale;
@@ -153,6 +165,21 @@ float distanceToLine(float2 position, float2 start, float2 end)
 
 PatchConstants PatchConstantFunction(InputPatch<PatchControlPoint, 4> patch)
 {
+	PatchConstants output;
+	float roundJoin = LineType == 0 && patch[0].patchData.z > 1.5f ? 1 : 0;
+	if (roundJoin > 0)
+	{
+		// The join is an analytic disk drawn from a single quad. Its round boundary
+		// is clipped per pixel, so additional hull tessellation cannot improve it.
+		output.edgeTess[0] = 1;
+		output.edgeTess[1] = 1;
+		output.edgeTess[2] = 1;
+		output.edgeTess[3] = 1;
+		output.insideTess[0] = 1;
+		output.insideTess[1] = 1;
+		return output;
+	}
+
 	float2 p0 = projectToPixels(patch[0].center);
 	float2 p1 = projectToPixels(patch[1].center);
 	float2 p2 = projectToPixels(patch[2].center);
@@ -192,11 +219,17 @@ PatchConstants PatchConstantFunction(InputPatch<PatchControlPoint, 4> patch)
 		flatness = max(flatness,
 			max(distanceToLine(edge1, edge0, edge3), distanceToLine(edge2, edge0, edge3)));
 	}
-	float segments = clamp(ceil(sqrt(max(flatness, 0) / 0.25f)), 1, 64);
+	float startCap = LineType == 0
+		&& patch[0].patchData.z > 0.5f && patch[0].patchData.z < 1.5f ? 1 : 0;
+	float endCap = LineType == 0 && patch[0].patchData.w > 0.5f ? 1 : 0;
+	float segments = max(ceil(sqrt(max(flatness, 0) / 0.25f)), 1);
+	// Reserve one u interval for each cap. The remaining intervals retain the
+	// adaptive centerline/edge density of the curve itself.
+	segments = clamp(segments + startCap + endCap, 1, 64);
 
-	PatchConstants output;
 	// u follows the curve and v crosses its width.  The v==0 and v==1 edges
-	// therefore receive the adaptive factor; only one segment is needed across.
+	// therefore receive the adaptive curve factor. Caps are clipped analytically
+	// from a one-interval rectangle, so they need no subdivision across the width.
 	output.edgeTess[0] = 1;
 	output.edgeTess[1] = segments;
 	output.edgeTess[2] = 1;
@@ -230,6 +263,12 @@ float3 evaluateTangent(const OutputPatch<PatchControlPoint, 4> patch, float t)
 		patch[2].center, patch[3].center, t);
 }
 
+float3 evaluateSecondDerivative(const OutputPatch<PatchControlPoint, 4> patch, float t)
+{
+	return evaluateBezierSecondDerivative(patch[0].center, patch[1].center,
+		patch[2].center, patch[3].center, t);
+}
+
 float4 evaluateTexCoords(const OutputPatch<PatchControlPoint, 4> patch, float t, bool second)
 {
 	float s = 1 - t;
@@ -243,7 +282,7 @@ float4 evaluateTexCoords(const OutputPatch<PatchControlPoint, 4> patch, float t,
 		+ p3 * (t * t * t);
 }
 
-float2 evaluatePatchData(const OutputPatch<PatchControlPoint, 4> patch, float t)
+float4 evaluatePatchData(const OutputPatch<PatchControlPoint, 4> patch, float t)
 {
 	float s = 1 - t;
 	return patch[0].patchData * (s * s * s)
@@ -256,11 +295,62 @@ float2 evaluatePatchData(const OutputPatch<PatchControlPoint, 4> patch, float t)
 LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocation,
 	const OutputPatch<PatchControlPoint, 4> patch)
 {
-	float curveT = domainLocation.x;
+	float roundJoin = LineType == 0 && patch[0].patchData.z > 1.5f ? 1 : 0;
+	if (roundJoin > 0)
+	{
+		float2 joinCoords = domainLocation * 2 - 1;
+		float3 center = patch[0].center;
+		center.x *= VertWidthScale;
+		float3 rawPos = center + float3(joinCoords * Radius, 0);
+		float4 patchData = patch[0].patchData;
+		float2 texCoords = lerp(patch[0].texCoords.xy, patch[0].texCoords.zw,
+			domainLocation.y);
+		float2 texCoords2 = lerp(patch[0].texCoords2.xy, patch[0].texCoords2.zw,
+			domainLocation.y);
+
+		LineOutput output;
+		output.normal = float3(0, 1, 0);
+		output.center = center;
+		output.rawPos = rawPos;
+		output.normPos = float2(patchData.x, domainLocation.y);
+		output.worldSize = float2(patchData.y * VertWidthScale, Radius * 2);
+		output.pos = float4(rawPos.xy, 0, 1);
+		output.pos = wvpTransform(output.pos, 1);
+		output.texCoords = texCoords - TexScrollOffset;
+		output.texCoords2 = texCoords2 - TexScrollOffset2;
+		output.capAmount = -1;
+		// Do not darken the two stroke arms where this disk overlaps them. Their
+		// existing edge blur supplies the visible antialiasing around the join.
+		output.edgeBlurMask = 0;
+		output.roundJoinCoords = joinCoords;
+		return output;
+	}
+
+	float startCap = LineType == 0
+		&& patch[0].patchData.z > 0.5f && patch[0].patchData.z < 1.5f ? 1 : 0;
+	float endCap = LineType == 0 && patch[0].patchData.w > 0.5f ? 1 : 0;
+	float tessellatedIntervals = max(constants.insideTess[0], 1);
+	float startCapSpan = startCap / tessellatedIntervals;
+	float endCapSpan = endCap / tessellatedIntervals;
+	float curveSpan = max(1 - startCapSpan - endCapSpan, 0.000001f);
+	float curveT = saturate((domainLocation.x - startCapSpan) / curveSpan);
+	float capAmount = 0;
+	float capDirection = 0;
+	if (startCap > 0 && domainLocation.x < startCapSpan)
+	{
+		capAmount = 1 - domainLocation.x / startCapSpan;
+		capDirection = -1;
+	}
+	else if (endCap > 0 && domainLocation.x > 1 - endCapSpan)
+	{
+		capAmount = (domainLocation.x - (1 - endCapSpan)) / endCapSpan;
+		capDirection = 1;
+	}
 	float sideT = domainLocation.y;
 	float side = sideT * 2 - 1;
 	float3 center = evaluatePosition(patch, curveT);
 	float3 tangent = evaluateTangent(patch, curveT);
+	float3 secondDerivative = evaluateSecondDerivative(patch, curveT);
 	// Each connected patch uses the preceding patch's final cross-section at the
 	// shared endpoint. This also spans duplicate MIDI notes, whose zero-duration
 	// curve interval is skipped by the CPU builder.
@@ -270,9 +360,12 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		tangent.xy = patch[0].endpointTangents.zw;
 	center.x *= VertWidthScale;
 	tangent.x *= VertWidthScale;
+	secondDerivative.x *= VertWidthScale;
+	float3 tangentDirection = normalize(tangent);
 	float3 normal = normalize(float3(-tangent.y, tangent.x, 0));
 
 	float3 offset;
+	float edgeBlurMask = 1;
 	if (LineType == 1)
 	{
 		// A horizontal ribbon otherwise collapses to a zero-area surface.  Match
@@ -281,12 +374,43 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		offset = float3(side * Radius, side * horizontalFallback, 0);
 	}
 	else
-		offset = normal * side * Radius;
+	{
+		float signedOffset = side * Radius;
+		// A normal-offset strip folds over itself when the requested inner radius
+		// exceeds the centerline's local radius of curvature. Clamp only that inner
+		// side to the curvature center; this closes the cusp while retaining the full
+		// outer width. Endpoint-cap patches stay full width for a seamless capsule.
+		if (startCap == 0 && endCap == 0)
+		{
+			float tangentLengthSquared = dot(tangent.xy, tangent.xy);
+			if (tangentLengthSquared > 0.0000000001f)
+			{
+				float signedCurvature = (tangent.x * secondDerivative.y
+					- tangent.y * secondDerivative.x)
+					/ (tangentLengthSquared * sqrt(tangentLengthSquared));
+				if (Radius * abs(signedCurvature) > 0.8f)
+					edgeBlurMask = 0;
+				if (signedOffset * signedCurvature > 0 && abs(signedCurvature) > 0.000001f)
+				{
+					float maxInnerOffset = 0.8f / abs(signedCurvature);
+					if (abs(signedOffset) > maxInnerOffset)
+					{
+						signedOffset = sign(signedOffset) * maxInnerOffset;
+						edgeBlurMask = 0;
+					}
+				}
+			}
+		}
+		offset = normal * signedOffset;
+		// Extend a rectangle by one radius. The pixel shader clips this cap region
+		// to a semicircle, avoiding a faceted arc or degenerate fan triangles.
+		offset += tangentDirection * capDirection * capAmount * Radius;
+	}
 
 	float3 rawPos = center + offset;
 	float4 packedTexCoords = evaluateTexCoords(patch, curveT, false);
 	float4 packedTexCoords2 = evaluateTexCoords(patch, curveT, true);
-	float2 patchData = evaluatePatchData(patch, curveT);
+	float4 patchData = evaluatePatchData(patch, curveT);
 
 	LineOutput output;
 	output.normal = normal;
@@ -298,6 +422,9 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 	output.pos = wvpTransform(output.pos, 1);
 	output.texCoords = lerp(packedTexCoords.xy, packedTexCoords.zw, sideT) - TexScrollOffset;
 	output.texCoords2 = lerp(packedTexCoords2.xy, packedTexCoords2.zw, sideT) - TexScrollOffset2;
+	output.capAmount = capAmount;
+	output.edgeBlurMask = LineType == 0 ? edgeBlurMask : 1;
+	output.roundJoinCoords = float2(0, 0);
 	return output;
 }
 
@@ -324,7 +451,22 @@ float4 PS(in LineOutput IN) : COLOR0
 	float2 normPos = IN.normPos;
 	IN.rawPos.x -= SongPos;
 	color = modulate(normPos, IN.worldSize, color, lightingNormal, IN.rawPos);
-	color = blurEdges(color, normPos.y);
+	float side = normPos.y * 2 - 1;
+	float normDistFromCenter = abs(side);
+	if (IN.capAmount < -0.5f)
+	{
+		normDistFromCenter = length(IN.roundJoinCoords);
+		if (normDistFromCenter > 1)
+			discard;
+	}
+	else if (IN.capAmount > 0)
+	{
+		normDistFromCenter = sqrt(side * side + IN.capAmount * IN.capAmount);
+		if (normDistFromCenter > 1)
+			discard;
+	}
+	if (IN.edgeBlurMask > 0.999f)
+		color = blurEdgeDistance(color, normDistFromCenter);
     return color;
 }
 
