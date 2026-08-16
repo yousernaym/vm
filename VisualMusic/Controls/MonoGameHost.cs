@@ -120,6 +120,7 @@ namespace VisualMusic
         const int WM_CAPTURECHANGED = 0x0215;
         const int WM_KEYDOWN = 0x0100;
         const int WM_KEYUP = 0x0101;
+        const int WM_KILLFOCUS = 0x0008;
         const int WM_SIZE = 0x0005;
 
         const int MK_SHIFT = 0x0004;
@@ -342,6 +343,10 @@ namespace VisualMusic
 
                 case WM_KEYUP:
                     Renderer.HandleKeyUp(wParam.ToInt32());
+                    break;
+
+                case WM_KILLFOCUS:
+                    Renderer.HandleFocusLost();
                     break;
             }
 

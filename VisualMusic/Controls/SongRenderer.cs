@@ -61,6 +61,8 @@ namespace VisualMusic
         bool _isPausingWhileScrolling = false;
         Rectangle _selectedScreenRegion;
         bool _forceDefaultNoteStyle = false;
+        // Original per-track geos while Z is held (index = track number). Null slots were already bars.
+        Geo[] _barPreviewSavedGeos;
 
         // --- Dependencies ---
         ITrackSelectionService _trackSelection;
@@ -135,6 +137,8 @@ namespace VisualMusic
             get => _project;
             set
             {
+                // Restore line geos onto the outgoing project before the new one is bound.
+                EndBarStylePreview();
                 // SetProject first: on bake failure it rolls back the static override and throws
                 // without updating _project / DrawHost (avoids a live Project with no DrawHost).
                 NoteStyle.SetProject(value);
@@ -150,6 +154,7 @@ namespace VisualMusic
         /// </summary>
         internal void ForceProjectReference(Project project)
         {
+            EndBarStylePreview();
             _project = project;
             Project.SetDrawHost(project != null ? this : null);
         }
@@ -164,11 +169,7 @@ namespace VisualMusic
         public WaveformPanel WaveformPanel { get; private set; } = new WaveformPanel();
         public TimeSpan TotalTimeElapsed => _stopwatch.Elapsed;
 
-        public bool ForceDefaultNoteStyle
-        {
-            get => _forceDefaultNoteStyle;
-            set => _forceDefaultNoteStyle = value;
-        }
+        public bool ForceDefaultNoteStyle => _forceDefaultNoteStyle;
 
         public const float SmallScrollStep = 1.0f / 16;
         public const float LargeScrollStep = 1.0f;
@@ -479,9 +480,12 @@ namespace VisualMusic
         /// <summary>True if the key is currently physically held (used after a modal that ate the key-up).</summary>
         static bool IsKeyPhysicallyDown(int vkCode) => (GetAsyncKeyState(vkCode) & 0x8000) != 0;
 
+        static bool IsCtrlHeld(ModifierKeys modifiers)
+            => (modifiers & ModifierKeys.Control) != 0 || IsKeyPhysicallyDown(0x11);
+
         static bool IsCtrlOnly(ModifierKeys modifiers)
         {
-            bool ctrl = (modifiers & ModifierKeys.Control) != 0 || IsKeyPhysicallyDown(0x11);
+            bool ctrl = IsCtrlHeld(modifiers);
             bool shift = (modifiers & ModifierKeys.Shift) != 0 || IsKeyPhysicallyDown(0x10);
             bool alt = (modifiers & ModifierKeys.Alt) != 0 || IsKeyPhysicallyDown(0x12);
             return ctrl && !shift && !alt;
@@ -595,23 +599,11 @@ namespace VisualMusic
                 suppress = true;
             }
 
-            if (key == Key.Z)
+            // Hold Z: preview every track as bars. Ctrl+Z is Undo and must not start the preview.
+            if (key == Key.Z && !IsCtrlHeld(modifiers))
             {
-                ForceDefaultNoteStyle = true;
-                if (Project != null)
-                {
-                    for (int t = 1; t < Project.TrackViews.Count; t++)
-                    {
-                        TrackProps tprops = Project.TrackViews[t].TrackProps;
-                        NoteStyleType currentNoteStyle = (NoteStyleType)tprops.StyleProps.Type;
-                        if (tprops.ActiveNoteStyle.GetType() != typeof(NoteStyle_Bar))
-                        {
-                            tprops.StyleProps.Type = NoteStyleType.Bar;
-                            Project.TrackViews[t].CreateGeo(Project, Project.GlobalTrackProps);
-                            tprops.StyleProps.Type = currentNoteStyle;
-                        }
-                    }
-                }
+                BeginBarStylePreview();
+                return true;
             }
 
             return suppress;
@@ -620,9 +612,15 @@ namespace VisualMusic
         /// <summary>Resets camera velocity when a movement/rotation key is released.</summary>
         public void HandleKeyUp(int vkCode)
         {
+            var key = KeyInterop.KeyFromVirtualKey(vkCode);
+            if (key == Key.Z)
+            {
+                EndBarStylePreview();
+                return;
+            }
+
             if (Project?.Notes == null) return;
 
-            var key = KeyInterop.KeyFromVirtualKey(vkCode);
             var modifiers = Keyboard.Modifiers;
             var camera = Project.Props.Camera;
 
@@ -633,6 +631,81 @@ namespace VisualMusic
             if (camera.Control(key, false, modifiers))
             {
                 Project.SyncLiveCameraEdit();
+            }
+        }
+
+        /// <summary>
+        /// Focus left the song HWND. End hold-to-preview so a missed WM_KEYUP (click-away, Alt+Tab)
+        /// cannot leave every track stuck as bars.
+        /// </summary>
+        public void HandleFocusLost() => EndBarStylePreview();
+
+        /// <summary>
+        /// Hold-Z preview: draw every track with bar style. Line tracks swap in bar geometry while
+        /// the key is down; <see cref="EndBarStylePreview"/> puts the original geos back.
+        /// </summary>
+        internal void BeginBarStylePreview()
+        {
+            if (_forceDefaultNoteStyle)
+                return;
+            _forceDefaultNoteStyle = true;
+
+            var tracks = _project?.TrackViews;
+            if (tracks == null)
+                return;
+
+            _barPreviewSavedGeos = new Geo[tracks.Count];
+            for (int t = 1; t < tracks.Count; t++)
+            {
+                var tv = tracks[t];
+                if (tv.TrackProps.ActiveNoteStyle is NoteStyle_Bar)
+                    continue;
+
+                _barPreviewSavedGeos[t] = tv.Geo?.AddRef();
+                var currentType = tv.TrackProps.StyleProps.Type;
+                tv.TrackProps.StyleProps.Type = NoteStyleType.Bar;
+                try
+                {
+                    tv.CreateGeo(_project, _project.GlobalTrackProps);
+                }
+                finally
+                {
+                    tv.TrackProps.StyleProps.Type = currentType;
+                }
+            }
+        }
+
+        internal void EndBarStylePreview()
+        {
+            if (!_forceDefaultNoteStyle)
+                return;
+            _forceDefaultNoteStyle = false;
+
+            var saved = _barPreviewSavedGeos;
+            _barPreviewSavedGeos = null;
+            if (saved == null)
+                return;
+
+            try
+            {
+                var tracks = _project?.TrackViews;
+                if (tracks == null)
+                    return;
+
+                int n = Math.Min(tracks.Count, saved.Length);
+                for (int t = 1; t < n; t++)
+                {
+                    if (saved[t] == null)
+                        continue;
+                    tracks[t].Geo = saved[t];
+                    saved[t].Dispose();
+                    saved[t] = null;
+                }
+            }
+            finally
+            {
+                for (int i = 0; i < saved.Length; i++)
+                    saved[i]?.Dispose();
             }
         }
 

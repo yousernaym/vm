@@ -301,8 +301,14 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		float2 joinCoords = domainLocation * 2 - 1;
 		float3 center = patch[0].center;
 		center.x *= VertWidthScale;
-		float3 rawPos = center + float3(joinCoords * Radius, 0);
 		float4 patchData = patch[0].patchData;
+		float2 joinOffset = joinCoords * Radius;
+		// At a tight pitch extremum the inward normal offsets converge into a long
+		// needle. Extend only that half of the analytic join so its boundary becomes
+		// a rounded return without thickening the outside of the bend.
+		if (joinCoords.y * patchData.w > 0)
+			joinOffset.y *= 2.5f;
+		float3 rawPos = center + float3(joinOffset, 0);
 		float2 texCoords = lerp(patch[0].texCoords.xy, patch[0].texCoords.zw,
 			domainLocation.y);
 		float2 texCoords2 = lerp(patch[0].texCoords2.xy, patch[0].texCoords2.zw,

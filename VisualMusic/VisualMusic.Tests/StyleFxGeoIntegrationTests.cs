@@ -475,11 +475,11 @@ namespace VisualMusic.Tests
                 var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
                 Assert.Equal(1, bakedGeo.hardwareRoundJoinCount);
 
-                void Render(bool hardware)
+                const int width = 768;
+                const int height = 456;
+                Microsoft.Xna.Framework.Color[] Render(bool hardware)
                 {
                     NoteStyle_Line.SetHardwareTessellation(hardware);
-                    const int width = 768;
-                    const int height = 456;
                     using var target = new RenderTarget2D(gds.GraphicsDevice, width, height,
                         false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
                     using var depthStencil = new DepthStencilState
@@ -506,16 +506,56 @@ namespace VisualMusic.Tests
                         gds.GraphicsDevice.DepthStencilState = oldDepthStencil;
                     }
 
-                    using (var stream = File.Create(Path.Combine(Path.GetTempPath(),
-                        hardware ? "vm-peak-hardware.png" : "vm-peak-legacy.png")))
-                        target.SaveAsPng(stream, width, height);
                     var pixels = new Microsoft.Xna.Framework.Color[width * height];
                     target.GetData(pixels);
                     Assert.Contains(pixels, pixel => pixel != clearColor);
+                    return pixels;
                 }
 
-                Render(hardware: true);
-                Render(hardware: false);
+                (int Row, int Width) FirstInteriorGap(
+                    Microsoft.Xna.Framework.Color[] pixels)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        int firstSolid = -1;
+                        int lastSolid = -1;
+                        for (int x = 0; x < width; x++)
+                        {
+                            if (pixels[y * width + x].R < 100)
+                                continue;
+                            if (firstSolid < 0)
+                                firstSolid = x;
+                            lastSolid = x;
+                        }
+
+                        int longestGap = 0;
+                        int currentGap = 0;
+                        for (int x = firstSolid + 1; x < lastSolid; x++)
+                        {
+                            if (pixels[y * width + x].R < 100)
+                            {
+                                currentGap++;
+                                longestGap = Math.Max(longestGap, currentGap);
+                            }
+                            else
+                                currentGap = 0;
+                        }
+                        if (longestGap > 0)
+                            return (y, longestGap);
+                    }
+                    return (-1, 0);
+                }
+
+                var hardwarePixels = Render(hardware: true);
+                var legacyPixels = Render(hardware: false);
+                var hardwareGap = FirstInteriorGap(hardwarePixels);
+                var legacyGap = FirstInteriorGap(legacyPixels);
+
+                Assert.True(legacyGap.Row >= 0);
+                Assert.True(hardwareGap.Row >= legacyGap.Row + 20,
+                    $"Expected the hardware round join to remove the sharp inner needle; "
+                    + $"legacy gap row {legacyGap.Row}, hardware gap row {hardwareGap.Row}.");
+                Assert.InRange(hardwareGap.Width, 1, 4);
             }
             finally
             {

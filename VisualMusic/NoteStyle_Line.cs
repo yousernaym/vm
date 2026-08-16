@@ -458,9 +458,14 @@ namespace VisualMusic
                 CubicBezier noteCurve = CreateNoteCurve(n, segmentEndTick, trackProps.TrackView.Curve);
                 bool startsSegment = !connectedStartTangent.HasValue;
                 bool endsSegment = !(bool)Continuous || endsAtNoteStop;
-                bool addRoundJoin = LineType == VisualMusic.LineType.Standard
-                    && connectedStartTangent.HasValue
-                    && IsHardwareLocalExtremum(trackProps.TrackView.Curve, n);
+                bool endsAtRoundJoin = LineType == VisualMusic.LineType.Standard
+                    && (bool)Continuous
+                    && !endsAtNoteStop
+                    && n + 2 < noteList.Count
+                    && noteList[n + 2].start > noteList[n + 1].start
+                    && noteList[n + 2].start - noteList[n + 1].stop
+                        <= Qn_gapThreshold * Project.Notes.TicksPerBeat
+                    && IsHardwareLocalExtremum(trackProps.TrackView.Curve, n + 1);
                 Vector3 noteStartTangent = connectedStartTangent ?? noteCurve.Derivative(0);
                 Vector3 noteEndTangent = noteCurve.Derivative(1);
                 if (connectedStartTangent.HasValue)
@@ -473,6 +478,22 @@ namespace VisualMusic
                 int patchCount = Math.Max(1, (int)rawPatchCount);
                 float noteLength = noteCurve.P3.X - noteCurve.P0.X;
                 Vector3 patchStartTangent = noteStartTangent;
+
+                if (endsAtRoundJoin)
+                {
+                    if (vertIndex > MaxLinePatchVerts - ControlPointsPerPatch)
+                        CreateLinePatchBuffer(ref vertIndex, lineGeo);
+                    LinePatchVertex joinVertex = CreatePatchVertex(
+                        noteCurve, 3, 1, 1, noteLength, vpLineWidth,
+                        noteStartTangent, noteEndTangent,
+                        startsSegment: false, endsSegment: false, texMaterial: texMaterial);
+                    joinVertex.center = noteCurve.P3;
+                    joinVertex.patchData.Z = 2; // analytic round-join patch
+                    joinVertex.patchData.W = Math.Sign(noteCurve.P0.Y - noteCurve.P3.Y);
+                    for (int controlPoint = 0; controlPoint < ControlPointsPerPatch; controlPoint++)
+                        s_linePatchVerts[vertIndex++] = joinVertex;
+                    lineGeo.hardwareRoundJoinCount++;
+                }
 
                 for (int patchIndex = 0; patchIndex < patchCount; patchIndex++)
                 {
@@ -505,21 +526,6 @@ namespace VisualMusic
                         MathHelper.Lerp(note.start, segmentEndTick, patchStart),
                         MathHelper.Lerp(note.start, segmentEndTick, patchEnd));
                     patchStartTangent = patchEndTangent;
-                }
-
-                if (addRoundJoin)
-                {
-                    if (vertIndex > MaxLinePatchVerts - ControlPointsPerPatch)
-                        CreateLinePatchBuffer(ref vertIndex, lineGeo);
-                    LinePatchVertex joinVertex = CreatePatchVertex(
-                        noteCurve, 0, 0, 0, noteLength, vpLineWidth,
-                        noteStartTangent, noteEndTangent,
-                        startsSegment: false, endsSegment: false, texMaterial: texMaterial);
-                    joinVertex.center = noteCurve.P0;
-                    joinVertex.patchData.Z = 2; // analytic round-join patch
-                    for (int controlPoint = 0; controlPoint < ControlPointsPerPatch; controlPoint++)
-                        s_linePatchVerts[vertIndex++] = joinVertex;
-                    lineGeo.hardwareRoundJoinCount++;
                 }
 
                 connectedStartTangent = (bool)Continuous && !endsAtNoteStop
