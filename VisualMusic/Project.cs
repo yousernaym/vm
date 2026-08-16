@@ -1579,10 +1579,17 @@ namespace VisualMusic
                     {
                         if (propertyInfo.DeclaringType == typeof(StyleProps)) //parent type
                         {
+                            // SelectedStyle is internal, so the public-property walk never recurses
+                            // into Bar/Line. Merge it here so mixed line controls (width, type, etc.)
+                            // blank instead of showing the first track's values.
                             NoteStyle firstStyle = ((StyleProps)first).SelectedStyle;
                             NoteStyle secondStyle = ((StyleProps)second).SelectedStyle;
-                            if (firstStyle.ModEntries != null && secondStyle.ModEntries != null && firstStyle.ModEntries.Count != secondStyle.ModEntries.Count)
-                                firstStyle.ModEntries = null;
+                            if (firstStyle != null && secondStyle != null)
+                            {
+                                MergeObjects(firstStyle, secondStyle);
+                                if (firstStyle.ModEntries != null && secondStyle.ModEntries != null && firstStyle.ModEntries.Count != secondStyle.ModEntries.Count)
+                                    firstStyle.ModEntries = null;
+                            }
                         }
                     }
                     else if (propertyInfo.Name == "SelectedModEntryIndex" && subMerge != null && (int)subMerge != -1)

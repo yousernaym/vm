@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Midi;
 using VisualMusic.ViewModels;
@@ -118,6 +119,117 @@ namespace VisualMusic.Tests
             }
             finally
             {
+                TrackView.NumTracks = previousNumTracks;
+            }
+        }
+
+        static Project TwoLineTracks(Action<NoteStyle_Line, NoteStyle_Line> configure)
+        {
+            var song = EmptySong(3);
+            var project = new Project
+            {
+                Notes = song,
+                TrackViews = new List<TrackView>(),
+            };
+            for (int i = 0; i < 3; i++)
+                project.TrackViews.Add(new TrackView(i, 3, song));
+            var a = project.TrackViews[1].TrackProps.StyleProps;
+            var b = project.TrackViews[2].TrackProps.StyleProps;
+            a.Type = NoteStyleType.Line;
+            b.Type = NoteStyleType.Line;
+            configure(a.GetLineStyle(), b.GetLineStyle());
+            return project;
+        }
+
+        [Fact]
+        public void Multi_select_line_tracks_blanks_controls_that_differ()
+        {
+            var previousNumTracks = TrackView.NumTracks;
+            Project.SetDrawHost(new FakeSongDrawHost());
+            try
+            {
+                var project = TwoLineTracks((a, b) =>
+                {
+                    a.LineWidth = 5;
+                    b.LineWidth = 20;
+                    a.Qn_gapThreshold = 3;
+                    b.Qn_gapThreshold = 3;
+                    a.Continuous = true;
+                    b.Continuous = false;
+                    a.LineType = LineType.Ribbon;
+                    b.LineType = LineType.Standard;
+                    a.HlType = LineHlType.Arrow;
+                    b.HlType = LineHlType.Circle;
+                    a.HlSize = 20;
+                    b.HlSize = 20;
+                    a.HlMovementPow = 1;
+                    b.HlMovementPow = 2;
+                    a.MovingHl = false;
+                    b.MovingHl = true;
+                    a.ShrinkingHl = false;
+                    b.ShrinkingHl = false;
+                    a.HlBorder = true;
+                    b.HlBorder = false;
+                });
+
+                var vm = new TrackPropsViewModel
+                {
+                    SelectedTrackCount = 2,
+                    MergedProps = project.MergeTrackProps(new[] { 1, 2 }),
+                };
+
+                Assert.True(vm.LineStyleVisible);
+                Assert.Null(vm.LineWidth);
+                Assert.Equal(3, vm.QnGapThreshold);
+                Assert.Null(vm.Continuous);
+                Assert.Equal(-1, vm.LineTypeIndex);
+                Assert.Equal(-1, vm.LineHlTypeIndex);
+                Assert.Equal(20, vm.HlSize);
+                Assert.Null(vm.HlMovementPow);
+                Assert.Null(vm.MovingHl);
+                Assert.False(vm.ShrinkingHl);
+                Assert.Null(vm.HlBorder);
+
+                // Live tracks must keep their own values.
+                Assert.Equal(5f, project.TrackViews[1].TrackProps.StyleProps.GetLineStyle().LineWidth);
+                Assert.Equal(20f, project.TrackViews[2].TrackProps.StyleProps.GetLineStyle().LineWidth);
+                Assert.Equal(LineType.Ribbon, project.TrackViews[1].TrackProps.StyleProps.GetLineStyle().LineType);
+            }
+            finally
+            {
+                Project.SetDrawHost(null);
+                TrackView.NumTracks = previousNumTracks;
+            }
+        }
+
+        [Fact]
+        public void Multi_select_line_tracks_keeps_matching_line_type()
+        {
+            var previousNumTracks = TrackView.NumTracks;
+            Project.SetDrawHost(new FakeSongDrawHost());
+            try
+            {
+                var project = TwoLineTracks((a, b) =>
+                {
+                    a.LineType = LineType.Ribbon;
+                    b.LineType = LineType.Ribbon;
+                    a.LineWidth = 8;
+                    b.LineWidth = 8;
+                });
+
+                var vm = new TrackPropsViewModel
+                {
+                    SelectedTrackCount = 2,
+                    MergedProps = project.MergeTrackProps(new[] { 1, 2 }),
+                };
+
+                Assert.True(vm.LineStyleVisible);
+                Assert.Equal((int)LineType.Ribbon, vm.LineTypeIndex);
+                Assert.Equal(8, vm.LineWidth);
+            }
+            finally
+            {
+                Project.SetDrawHost(null);
                 TrackView.NumTracks = previousNumTracks;
             }
         }

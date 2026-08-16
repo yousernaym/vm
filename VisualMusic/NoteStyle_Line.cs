@@ -107,7 +107,7 @@ namespace VisualMusic
                     Qn_gapThreshold = (float)entry.Value;
                 else if (entry.Name == "continuous")
                     Continuous = (bool)entry.Value;
-                else if (entry.Name == "lineType")
+                else if (entry.Name == "lineType" || entry.Name == "LineType")
                     LineType = (LineType)entry.Value;
                 else if (entry.Name == "hlType")
                     HlType = (LineHlType)entry.Value;
