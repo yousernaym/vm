@@ -713,7 +713,9 @@ namespace VisualMusic
                 {
                     if (saved[t] == null)
                         continue;
-                    tracks[t].Geo = saved[t];
+                    // Undo during hold-Z can restore Type to Bar while this still holds LineGeo.
+                    if (NoteStyle.GeoMatchesStyle(saved[t], tracks[t].TrackProps.ActiveNoteStyle))
+                        tracks[t].Geo = saved[t];
                     saved[t].Dispose();
                     saved[t] = null;
                 }

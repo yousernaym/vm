@@ -34,8 +34,17 @@ namespace VisualMusic.ViewModels
         /// <summary>Refreshes track-list color swatches after material color edits.</summary>
         public Action RefreshTrackColors { get; set; }
 
-        void Apply(Action<TrackProps> fn) => ApplyToSelected?.Invoke(fn);
-        void Rebuild(Action<TrackProps> fn) => ApplyAndRebuild?.Invoke(fn);
+        void Apply(Action<TrackProps> fn)
+        {
+            // ComboBox two-way write-back during undo/redo must not clobber restored props.
+            if (Keyframes.KeyframeService.SuppressingUndoSnapshots) return;
+            ApplyToSelected?.Invoke(fn);
+        }
+        void Rebuild(Action<TrackProps> fn)
+        {
+            if (Keyframes.KeyframeService.SuppressingUndoSnapshots) return;
+            ApplyAndRebuild?.Invoke(fn);
+        }
         void ApplyMaterial(Action<TrackProps> fn)
         {
             Apply(fn);

@@ -33,7 +33,29 @@ namespace VisualMusic.Keyframes
         /// </summary>
         public static Action<string> RequestUndoSnapshot { get; set; }
 
-        internal static void RaiseUndoSnapshot(string desc) => RequestUndoSnapshot?.Invoke(desc);
+        static int s_undoSnapshotSuppressDepth;
+
+        /// <summary>
+        /// True while undo/redo is restoring project state. ComboBox.SelectionChanged treats a
+        /// binding refresh as a user edit when the control still has keyboard focus, which would
+        /// take a new snapshot and wipe the redo stack.
+        /// </summary>
+        internal static bool SuppressingUndoSnapshots => s_undoSnapshotSuppressDepth > 0;
+
+        /// <summary>Disables <see cref="RaiseUndoSnapshot"/> (and ComboBox edit interception) for the scope.</summary>
+        internal static IDisposable SuppressUndoSnapshots() => new UndoSnapshotSuppressScope();
+
+        sealed class UndoSnapshotSuppressScope : IDisposable
+        {
+            public UndoSnapshotSuppressScope() => s_undoSnapshotSuppressDepth++;
+            public void Dispose() => s_undoSnapshotSuppressDepth--;
+        }
+
+        internal static void RaiseUndoSnapshot(string desc)
+        {
+            if (s_undoSnapshotSuppressDepth > 0) return;
+            RequestUndoSnapshot?.Invoke(desc);
+        }
 
         // ---- Events (fired on the WPF UI thread) ----
 

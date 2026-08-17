@@ -135,7 +135,8 @@ namespace VisualMusic
 
         public override void DrawGeoChunk(Geo geo)
         {
-            BarGeo barGeo = (BarGeo)geo;
+            if (geo is not BarGeo barGeo)
+                return;
             GraphicsDevice.Indices = s_indexBuf;
             _fx.CurrentTechnique = _fx.Techniques["Technique1"];
             _fx.CurrentTechnique.Passes["Pass1"].Apply();

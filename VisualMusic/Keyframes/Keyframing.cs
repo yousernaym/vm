@@ -232,6 +232,11 @@ namespace VisualMusic.Keyframes
 
         static void OnCommit(FrameworkElement fe)
         {
+            // Undo/redo refreshes ComboBox.SelectedIndex while the control still has focus, which
+            // fires SelectionChanged. Do not prompt, sync keyframes, or snapshot — that would
+            // clobber the restore and truncate redo.
+            if (KeyframeService.SuppressingUndoSnapshots) return;
+
             var propId = GetPropertyId(fe);
             var scope = GetScope(fe);
             if (string.IsNullOrEmpty(propId)) return;

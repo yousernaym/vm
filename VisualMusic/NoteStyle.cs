@@ -331,6 +331,17 @@ namespace VisualMusic
         /// </summary>
         internal static bool CanCreateGeo => HasContent && HasGraphicsDevice && HasStylesInited;
 
+        /// <summary>
+        /// Whether <paramref name="geo"/> was baked for <paramref name="style"/>. A mismatch
+        /// (e.g. <see cref="LineGeo"/> with bar style after undo) must not be drawn as that style.
+        /// </summary>
+        internal static bool GeoMatchesStyle(Geo geo, NoteStyle style)
+        {
+            if (style is NoteStyle_Bar) return geo is BarGeo;
+            if (style is NoteStyle_Line) return geo is LineGeo;
+            return geo == null;
+        }
+
         protected static GraphicsDevice GraphicsDevice => s_graphicsDeviceOverride;
         protected static Project Project => s_projectOverride;
         protected static Microsoft.Xna.Framework.Content.ContentManager Content => s_contentOverride;

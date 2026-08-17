@@ -288,5 +288,151 @@ namespace VisualMusic.Tests
                 Project.SetDrawHost(null);
             }
         }
+
+        [Fact]
+        public void RaiseUndoSnapshot_is_no_op_while_suppressed()
+        {
+            int n = 0;
+            var previous = KeyframeService.RequestUndoSnapshot;
+            KeyframeService.RequestUndoSnapshot = _ => n++;
+            try
+            {
+                using (KeyframeService.SuppressUndoSnapshots())
+                    KeyframeService.RaiseUndoSnapshot("Edit Note style");
+                Assert.Equal(0, n);
+
+                KeyframeService.RaiseUndoSnapshot("Edit Note style");
+                Assert.Equal(1, n);
+            }
+            finally
+            {
+                KeyframeService.RequestUndoSnapshot = previous;
+            }
+        }
+
+        [Fact]
+        public void Undo_redo_note_style_survives_combo_snapshot_during_restore()
+        {
+            // After Bar→Line, ComboBox still has keyboard focus. Undo refreshes SelectedIndex,
+            // SelectionChanged would RaiseUndoSnapshot and truncate redo unless restore suppresses it.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var previousUndo = KeyframeService.RequestUndoSnapshot;
+            var vm = new MainViewModel();
+            try
+            {
+                var live = ProjectWithNoteOnTrack1();
+                live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Bar;
+                vm.Project = live;
+                vm.AddUndoItem("before style");
+
+                live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Line;
+                vm.AddUndoItem("after style");
+
+                KeyframeService.RequestUndoSnapshot = desc => vm.AddUndoItem(desc);
+                vm.UndoCommand.Execute(null);
+                // ApplyUndoItem itself must not snapshot (the hooked RequestUndoSnapshot would).
+                Assert.True(vm.CanRedo);
+                Assert.Equal(NoteStyleType.Bar, live.TrackViews[1].TrackProps.StyleProps.Type);
+
+                vm.RedoCommand.Execute(null);
+                Assert.Equal(NoteStyleType.Line, live.TrackViews[1].TrackProps.StyleProps.Type);
+            }
+            finally
+            {
+                KeyframeService.RequestUndoSnapshot = previousUndo;
+                KeyframeService.Project = null;
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void CopyPropsFrom_replaces_geo_when_restored_style_type_differs()
+        {
+            // Live Geo stays LineGeo until CreateGeos; restoring Bar Type without swapping Geo
+            // made DrawGeoChunk InvalidCastException (LineGeo → BarGeo).
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var live = ProjectWithNoteOnTrack1();
+                live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Bar;
+                live.TrackViews[1].Geo = new BarGeo();
+
+                var undo = new UndoItems();
+                undo.Add("bar", live);
+
+                live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Line;
+                live.TrackViews[1].Geo = new LineGeo();
+                undo.Add("line", live);
+
+                undo--;
+                live.CopyPropsFrom(undo.Current.Project);
+                Assert.Equal(NoteStyleType.Bar, live.TrackViews[1].TrackProps.StyleProps.Type);
+                Assert.IsType<BarGeo>(live.TrackViews[1].Geo);
+
+                undo++;
+                live.CopyPropsFrom(undo.Current.Project);
+                Assert.Equal(NoteStyleType.Line, live.TrackViews[1].TrackProps.StyleProps.Type);
+                Assert.IsType<LineGeo>(live.TrackViews[1].Geo);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void CreateGeo_deferred_bake_keeps_existing_geo()
+        {
+            // Hold-Z preview calls CreateGeo while Type is temporarily Bar. Soft-skip must not
+            // drop the live LineGeo (that used to blank the track when bake was deferred).
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                Assert.False(NoteStyle.CanCreateGeo);
+                var live = ProjectWithNoteOnTrack1();
+                var lineGeo = new LineGeo();
+                live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Bar;
+                live.TrackViews[1].Geo = lineGeo;
+
+                live.TrackViews[1].CreateGeo(live, live.GlobalTrackProps);
+                Assert.Same(lineGeo, live.TrackViews[1].Geo);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void StyleTypeIndex_writeback_is_ignored_while_undo_is_restoring()
+        {
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var live = ProjectWithNoteOnTrack1();
+                live.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Bar;
+                var vm = new TrackPropsViewModel
+                {
+                    SelectedTrackCount = 1,
+                    ApplyAndRebuild = fn => fn(live.TrackViews[1].TrackProps),
+                    MergedProps = live.TrackViews[1].TrackProps,
+                };
+
+                using (KeyframeService.SuppressUndoSnapshots())
+                    vm.StyleTypeIndex = (int)NoteStyleType.Line;
+
+                Assert.Equal(NoteStyleType.Bar, live.TrackViews[1].TrackProps.StyleProps.Type);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+            }
+        }
     }
 }

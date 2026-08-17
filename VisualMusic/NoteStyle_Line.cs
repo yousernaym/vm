@@ -906,7 +906,8 @@ namespace VisualMusic
 
         public override void DrawGeoChunk(Geo geo)
         {
-            LineGeo lineGeo = (LineGeo)geo;
+            if (geo is not LineGeo lineGeo)
+                return;
             if (!UseHardwareTessellation)
             {
                 DrawLegacyGeoChunk(lineGeo);

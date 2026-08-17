@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using VisualMusic.Controls;
 
 namespace VisualMusic.ViewModels
@@ -1575,23 +1576,38 @@ namespace VisualMusic.ViewModels
         void ApplyUndoItem()
         {
             if (_undoItems.Current == null) return;
-            // Did the restore change the track set or order? If so the track-list rows must be
-            // rebuilt (and rebuilt BEFORE OnTrackListSelectionChanged, which reseeds the positional
-            // indices the per-frame merged-props path relies on).
-            bool tracksChanged = Project != null && !Project.TrackViews.Select(v => v.TrackNumber)
-                .SequenceEqual(_undoItems.Current.Project.TrackViews.Select(v => v.TrackNumber));
-            Project?.CopyPropsFrom(_undoItems.Current.Project);
-            // Reload style FX (DCS clone drops Effect refs) and rebuild geometry for restored props.
-            // resetVertScale: true — CopyPropsFrom restores SpatialProps but keeps live Geo; must not
-            // re-bake at the pre-undo RefWidthQn (CreateGeos(false) would).
-            Project?.LoadStyleFxAndCreateGeos(resetVertScale: true);
-            // Refresh the Song and Track property panels so they reflect restored values.
-            SongProps.RefreshAll();
-            if (tracksChanged) TrackList.Rebuild(Project);
-            OnTrackListSelectionChanged();
-            TrackList.RefreshColors();
-            // Refresh keyframe panel and list.
-            Keyframes.KeyframeService.RaiseKeyframesChanged();
+            // ComboBox.SelectionChanged fires when the binding refresh updates SelectedIndex, and
+            // IsKeyboardFocusWithin is still true from the user's edit — that would snapshot the
+            // restored state and truncate redo. Suppress commits for the whole restore.
+            using (Keyframes.KeyframeService.SuppressUndoSnapshots())
+            {
+                // Drop hold-Z bar preview first so its saved LineGeo is not written onto a track
+                // whose style was just restored to Bar (InvalidCastException in DrawGeoChunk).
+                if (GetDrawHost?.Invoke() is SongRenderer renderer)
+                    renderer.EndBarStylePreview();
+                // Unfocus the style ComboBox so it accepts the restored SelectedIndex. Keyboard
+                // requires STA (the WPF UI thread); unit tests skip this.
+                if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
+                    Keyboard.ClearFocus();
+
+                // Did the restore change the track set or order? If so the track-list rows must be
+                // rebuilt (and rebuilt BEFORE OnTrackListSelectionChanged, which reseeds the positional
+                // indices the per-frame merged-props path relies on).
+                bool tracksChanged = Project != null && !Project.TrackViews.Select(v => v.TrackNumber)
+                    .SequenceEqual(_undoItems.Current.Project.TrackViews.Select(v => v.TrackNumber));
+                Project?.CopyPropsFrom(_undoItems.Current.Project);
+                // Reload style FX (DCS clone drops Effect refs) and rebuild geometry for restored props.
+                // resetVertScale: true — CopyPropsFrom restores SpatialProps but keeps live Geo; must not
+                // re-bake at the pre-undo RefWidthQn (CreateGeos(false) would).
+                Project?.LoadStyleFxAndCreateGeos(resetVertScale: true);
+                // Refresh the Song and Track property panels so they reflect restored values.
+                SongProps.RefreshAll();
+                if (tracksChanged) TrackList.Rebuild(Project);
+                OnTrackListSelectionChanged();
+                TrackList.RefreshColors();
+                // Refresh keyframe panel and list.
+                Keyframes.KeyframeService.RaiseKeyframesChanged();
+            }
         }
 
         void UpdateUndoRedo()

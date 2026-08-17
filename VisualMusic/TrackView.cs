@@ -126,11 +126,16 @@ namespace VisualMusic
         public void CreateGeo(Project project, TrackProps globalTrackProps)
         {
             if (MidiTrack.Notes.Count == 0)
+            {
+                Geo = null;
                 return;
+            }
             // Style FX / vertex buffers need MonoGame Content + GraphicsDevice + SInitAllStyles.
             // CreateTrackViews can run headless (unit tests) or before SetContent/SetGraphicsDevice/
             // SInit (e.g. import while Song host is Collapsed); soft-skip here — SetContent /
             // SetProject / SetGraphicsDevice / SInitAllStyles retry via Project.LoadStyleFxAndCreateGeos.
+            // Do not drop existing Geo when bake is deferred: hold-Z preview temporarily sets
+            // Type=Bar and calls CreateGeo; nulling a LineGeo here would lose the saved style.
             if (!NoteStyle.CanCreateGeo)
                 return;
             Midi.Note firstNote = _midiTrack.Notes[0];

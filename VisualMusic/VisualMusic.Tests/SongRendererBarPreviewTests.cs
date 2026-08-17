@@ -90,6 +90,39 @@ namespace VisualMusic.Tests
             }
         }
 
+        [Fact]
+        public void Bar_preview_end_does_not_restore_line_geo_after_style_became_bar()
+        {
+            // Undo during hold-Z used to write the saved LineGeo onto a track whose Type was
+            // restored to Bar, then DrawGeoChunk cast LineGeo → BarGeo.
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var renderer = new SongRenderer();
+            try
+            {
+                var project = BuildProjectWithLineTrack();
+                project.TrackViews[1].Geo = new LineGeo();
+                renderer.ForceProjectReference(project);
+
+                renderer.BeginBarStylePreview();
+                // Preview bake is skipped without a GPU; simulate the BarGeo Begin would have installed.
+                var barGeo = new BarGeo();
+                project.TrackViews[1].Geo = barGeo;
+                project.TrackViews[1].TrackProps.StyleProps.Type = NoteStyleType.Bar;
+                renderer.EndBarStylePreview();
+
+                Assert.False(renderer.ForceDefaultNoteStyle);
+                Assert.Equal(NoteStyleType.Bar, project.TrackViews[1].TrackProps.StyleProps.Type);
+                Assert.Same(barGeo, project.TrackViews[1].Geo);
+            }
+            finally
+            {
+                renderer.ForceProjectReference(null);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
         static Project BuildProjectWithLineTrack()
         {
             var song = new Song

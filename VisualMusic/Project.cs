@@ -2676,6 +2676,11 @@ namespace VisualMusic
                 // same object) — skip to avoid self-assign and a duplicate audio load.
                 if (ReferenceEquals(destProps, sourceProps)) continue;
                 destProps.StyleProps = sourceProps.StyleProps;
+                // CopyPropsFrom does not otherwise touch Geo. After a Bar↔Line change the live Geo
+                // is the wrong subclass until CreateGeos; a draw in between (or a skipped bake)
+                // InvalidCastException in DrawGeoChunk. Snapshot Geo matches the restored Type.
+                if (!NoteStyle.GeoMatchesStyle(tv.Geo, destProps.ActiveNoteStyle))
+                    tv.Geo = srcByTn[tv.TrackNumber].Geo;
                 destProps.MaterialProps = sourceProps.MaterialProps;
                 destProps.LightProps = sourceProps.LightProps;
                 destProps.SpatialProps = sourceProps.SpatialProps;
