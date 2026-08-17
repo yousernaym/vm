@@ -846,6 +846,153 @@ namespace VisualMusic.Tests
 
         [Fact]
         [Trait("Category", "Integration")]
+        public void Hardware_line_stays_seamless_across_duplicate_note_starts()
+        {
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            try
+            {
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                var track = project.TrackViews[1];
+                track.TrackProps.StyleProps.Type = NoteStyleType.Line;
+                var lineStyle = track.TrackProps.StyleProps.GetLineStyle();
+                lineStyle.LineWidth = 50;
+                lineStyle.HlSize = 0;
+                track.TrackProps.SpatialProps.ViewWidthQn = 16;
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(cm);
+                NoteStyle.SetProject(project);
+                project.NormSongPos = 0.55;
+
+                var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
+                Assert.Equal(4, bakedGeo.seamlessPatchJoinCount);
+
+                const int width = 768;
+                const int height = 456;
+                Microsoft.Xna.Framework.Color[] Render(bool hardware)
+                {
+                    NoteStyle_Line.SetHardwareTessellation(hardware);
+                    using var target = new RenderTarget2D(gds.GraphicsDevice, width, height,
+                        false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                    using var depthStencil = new DepthStencilState
+                    {
+                        StencilEnable = true,
+                        StencilFunction = CompareFunction.Greater,
+                        StencilPass = StencilOperation.Replace,
+                        ReferenceStencil = 1,
+                    };
+                    var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
+                    gds.GraphicsDevice.SetRenderTarget(target);
+                    gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+                    var oldDepthStencil = gds.GraphicsDevice.DepthStencilState;
+                    gds.GraphicsDevice.DepthStencilState = depthStencil;
+                    gds.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer
+                        | ClearOptions.Stencil, clearColor, 1, 0);
+                    try
+                    {
+                        track.DrawTrack(project.GlobalTrackProps, defaultStyle: false);
+                    }
+                    finally
+                    {
+                        gds.GraphicsDevice.SetRenderTarget(null);
+                        gds.GraphicsDevice.DepthStencilState = oldDepthStencil;
+                    }
+
+                    var pixels = new Microsoft.Xna.Framework.Color[width * height];
+                    target.GetData(pixels);
+                    Assert.Contains(pixels, pixel => pixel != clearColor);
+                    return pixels;
+                }
+
+                List<(int MinX, int MaxX)> Profile(Microsoft.Xna.Framework.Color[] pixels)
+                {
+                    var rows = new List<(int MinX, int MaxX)>();
+                    for (int y = 0; y < height; y++)
+                    {
+                        int minX = width;
+                        int maxX = -1;
+                        for (int x = 0; x < width; x++)
+                        {
+                            if (pixels[y * width + x].R < 100)
+                                continue;
+                            minX = Math.Min(minX, x);
+                            maxX = Math.Max(maxX, x);
+                        }
+                        rows.Add(maxX >= 0 ? (minX, maxX) : (-1, -1));
+                    }
+                    return rows;
+                }
+
+                var hardwareProfile = Profile(Render(hardware: true));
+                var legacyProfile = Profile(Render(hardware: false));
+
+                int maxLeftSpike = 0;
+                int maxRightSpike = 0;
+                int comparedRows = 0;
+                for (int y = 1; y < height; y++)
+                {
+                    if (hardwareProfile[y].MaxX < 0 || hardwareProfile[y - 1].MaxX < 0
+                        || legacyProfile[y].MaxX < 0 || legacyProfile[y - 1].MaxX < 0)
+                        continue;
+                    int hardwareWidth = hardwareProfile[y].MaxX - hardwareProfile[y].MinX + 1;
+                    int legacyWidth = legacyProfile[y].MaxX - legacyProfile[y].MinX + 1;
+                    // The start/end capsules and the first on-screen row of a new
+                    // component are not the duplicate-note join.
+                    if (hardwareWidth < 30 || hardwareWidth > 80
+                        || legacyWidth < 30 || legacyWidth > 80
+                        || Math.Abs(hardwareWidth - legacyWidth) > 6)
+                        continue;
+                    int hardwareLeftJump = hardwareProfile[y].MinX - hardwareProfile[y - 1].MinX;
+                    int legacyLeftJump = legacyProfile[y].MinX - legacyProfile[y - 1].MinX;
+                    int hardwareRightJump = hardwareProfile[y].MaxX - hardwareProfile[y - 1].MaxX;
+                    int legacyRightJump = legacyProfile[y].MaxX - legacyProfile[y - 1].MaxX;
+                    if (Math.Abs(legacyLeftJump) > 8 || Math.Abs(legacyRightJump) > 8)
+                        continue;
+                    comparedRows++;
+                    maxLeftSpike = Math.Max(maxLeftSpike,
+                        Math.Abs(hardwareLeftJump - legacyLeftJump));
+                    maxRightSpike = Math.Max(maxRightSpike,
+                        Math.Abs(hardwareRightJump - legacyRightJump));
+                }
+
+                Assert.True(comparedRows >= 20, $"Too few diagonal rows compared: {comparedRows}");
+                Assert.True(maxLeftSpike <= 3,
+                    $"Hardware left edge jumped {maxLeftSpike}px more than legacy "
+                    + "across a duplicate-note join.");
+                Assert.True(maxRightSpike <= 3,
+                    $"Hardware right edge jumped {maxRightSpike}px more than legacy "
+                    + "across a duplicate-note join.");
+            }
+            finally
+            {
+                NoteStyle_Line.SetHardwareTessellation(true);
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
         public void Initialize_order_SetContent_before_SInit_soft_skips_geo_then_SInit_bakes()
         {
             // SongRenderer.Initialize now calls SInit before SetContent, but Open/Import can

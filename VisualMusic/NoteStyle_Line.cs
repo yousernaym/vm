@@ -495,7 +495,8 @@ namespace VisualMusic
                     continue;
                 }
 
-                CubicBezier noteCurve = CreateNoteCurve(n, segmentEndTick, trackProps.TrackView.Curve);
+                CubicBezier noteCurve = CreateNoteCurve(
+                    n, segmentEndTick, trackProps.TrackView.Curve, connectedStartTangent);
                 bool startsSegment = !connectedStartTangent.HasValue;
                 bool endsSegment = !(bool)Continuous || endsAtNoteStop;
                 bool endsAtRoundJoin = LineType == VisualMusic.LineType.Standard
@@ -780,7 +781,8 @@ namespace VisualMusic
             }
         }
 
-        CubicBezier CreateNoteCurve(int noteIndex, float endTick, Curve curve)
+        CubicBezier CreateNoteCurve(int noteIndex, float endTick, Curve curve,
+            Vector3? startTangentOverride = null)
         {
             CurveKey startKey = curve.Keys[noteIndex];
             Vector3 p0 = new Vector3(
@@ -799,10 +801,22 @@ namespace VisualMusic
                     float dx = (p3.X - p0.X) / 3f;
                     float tangentOut = GetHardwareCurveTangent(curve, noteIndex, outgoing: true);
                     float tangentIn = GetHardwareCurveTangent(curve, noteIndex + 1, outgoing: false);
+                    Vector3 p1 = new Vector3(p0.X + dx,
+                        p0.Y + tangentOut * Project.Props.NoteHeight / 3f, 0);
+                    // Connected notes share a cross-section at the join. Match this
+                    // curve's opening slope to the previous patch so a duplicate MIDI
+                    // note (zero-duration key) cannot twist the offset strip.
+                    if (startTangentOverride.HasValue)
+                    {
+                        Vector3 carried = startTangentOverride.Value;
+                        if (Math.Abs(carried.X) > 0.0001f)
+                            p1.Y = p0.Y + dx * carried.Y / carried.X;
+                        else if (carried.LengthSquared() > 0.0000001f)
+                            p1 = p0 + carried / 3f;
+                    }
                     CubicBezier fullCurve = new CubicBezier(
                         p0,
-                        new Vector3(p0.X + dx,
-                            p0.Y + tangentOut * Project.Props.NoteHeight / 3f, 0),
+                        p1,
                         new Vector3(p3.X - dx,
                             p3.Y - tangentIn * Project.Props.NoteHeight / 3f, 0),
                         p3);
@@ -835,13 +849,27 @@ namespace VisualMusic
             return tangent;
         }
 
-        static bool IsHardwareLocalExtremum(Curve curve, int keyIndex)
+        static int NearestKeyWithDistinctPosition(Curve curve, int keyIndex, int step)
+        {
+            float position = curve.Keys[keyIndex].Position;
+            int index = keyIndex + step;
+            int last = curve.Keys.Count - 1;
+            while (index > 0 && index < last && curve.Keys[index].Position == position)
+                index += step;
+            return index;
+        }
+
+        internal static bool IsHardwareLocalExtremum(Curve curve, int keyIndex)
         {
             if (keyIndex <= 0 || keyIndex >= curve.Keys.Count - 1)
                 return false;
-            CurveKey key = curve.Keys[keyIndex];
-            float incomingDelta = key.Value - curve.Keys[keyIndex - 1].Value;
-            float outgoingDelta = curve.Keys[keyIndex + 1].Value - key.Value;
+            int prev = NearestKeyWithDistinctPosition(curve, keyIndex, -1);
+            int next = NearestKeyWithDistinctPosition(curve, keyIndex, 1);
+            if (curve.Keys[prev].Position == curve.Keys[keyIndex].Position
+                || curve.Keys[next].Position == curve.Keys[keyIndex].Position)
+                return false;
+            float incomingDelta = curve.Keys[keyIndex].Value - curve.Keys[prev].Value;
+            float outgoingDelta = curve.Keys[next].Value - curve.Keys[keyIndex].Value;
             return (incomingDelta > 0 && outgoingDelta <= 0)
                 || (incomingDelta < 0 && outgoingDelta >= 0);
         }
@@ -850,8 +878,13 @@ namespace VisualMusic
         {
             if (keyIndex <= 0 || keyIndex >= curve.Keys.Count - 1)
                 return false;
-            float incomingDelta = curve.Keys[keyIndex].Value - curve.Keys[keyIndex - 1].Value;
-            float outgoingDelta = curve.Keys[keyIndex + 1].Value - curve.Keys[keyIndex].Value;
+            int prev = NearestKeyWithDistinctPosition(curve, keyIndex, -1);
+            int next = NearestKeyWithDistinctPosition(curve, keyIndex, 1);
+            if (curve.Keys[prev].Position == curve.Keys[keyIndex].Position
+                || curve.Keys[next].Position == curve.Keys[keyIndex].Position)
+                return false;
+            float incomingDelta = curve.Keys[keyIndex].Value - curve.Keys[prev].Value;
+            float outgoingDelta = curve.Keys[next].Value - curve.Keys[keyIndex].Value;
             return (incomingDelta > 0 && outgoingDelta < 0)
                 || (incomingDelta < 0 && outgoingDelta > 0);
         }
