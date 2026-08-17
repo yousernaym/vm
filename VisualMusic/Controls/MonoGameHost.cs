@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using VisualMusic.MonoGameInterop;
@@ -36,6 +37,9 @@ namespace VisualMusic
 
         [DllImport("user32.dll")]
         static extern IntPtr SetFocus(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetFocus();
 
         [DllImport("user32.dll")]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
@@ -120,8 +124,17 @@ namespace VisualMusic
         const int WM_CAPTURECHANGED = 0x0215;
         const int WM_KEYDOWN = 0x0100;
         const int WM_KEYUP = 0x0101;
+        const int WM_SYSKEYDOWN = 0x0104;
+        const int WM_SYSKEYUP = 0x0105;
         const int WM_KILLFOCUS = 0x0008;
+        const int WM_GETDLGCODE = 0x0087;
         const int WM_SIZE = 0x0005;
+
+        // Claim keyboard input so WPF does not treat WASD as dialog mnemonics (track-tab
+        // access keys _Style / _Audio, Default * buttons) and steal focus mid-move.
+        const int DLGC_WANTARROWS = 0x0001;
+        const int DLGC_WANTALLKEYS = 0x0004;
+        const int DLGC_WANTCHARS = 0x0080;
 
         const int MK_SHIFT = 0x0004;
         const int MK_CONTROL = 0x0008;
@@ -262,6 +275,52 @@ namespace VisualMusic
             RenderNow();
         }
 
+        // Clicks land on the child HWND, so WPF Keyboard.FocusedElement can stay on a track-prop
+        // textbox. Give the child Win32 focus for WM_KEYDOWN / wheel, then (after this WndProc)
+        // move WPF focus onto the host so WASD is not typed into that textbox.
+        void ClaimKeyboardFocus()
+        {
+            if (_hwnd != IntPtr.Zero)
+                SetFocus(_hwnd);
+            Dispatcher.BeginInvoke(() =>
+            {
+                if (!IsKeyboardFocusWithin)
+                    Focus();
+            }, DispatcherPriority.Input);
+        }
+
+        // Default TabIntoCore returns false, so Keyboard.Focus(this) would fail and WPF would
+        // keep the previous control (e.g. line-width textbox).
+        protected override bool TabIntoCore(TraversalRequest request)
+        {
+            if (_hwnd == IntPtr.Zero)
+                return false;
+            SetFocus(_hwnd);
+            return true;
+        }
+
+        // When WPF focus is on this host but Win32 focus is still the parent HwndSource, keys
+        // arrive here instead of WM_KEYDOWN. Skip if the child already owns Win32 focus so Space
+        // / WASD are not handled twice.
+        protected override bool TranslateAcceleratorCore(ref MSG msg, ModifierKeys modifiers)
+        {
+            if (Renderer == null || _hwnd == IntPtr.Zero || GetFocus() == _hwnd)
+                return false;
+
+            int vk = unchecked((int)msg.wParam.ToInt64());
+            if (msg.message is WM_KEYDOWN or WM_SYSKEYDOWN)
+            {
+                bool isRepeat = (msg.lParam.ToInt64() & 0x40000000L) != 0;
+                return Renderer.HandleKeyDown(vk, isRepeat);
+            }
+            if (msg.message is WM_KEYUP or WM_SYSKEYUP)
+            {
+                Renderer.HandleKeyUp(vk);
+                return true;
+            }
+            return false;
+        }
+
         // ---- Input via WndProc ----
 
         protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -279,21 +338,25 @@ namespace VisualMusic
                     handled = true;
                     return (IntPtr)1;
 
+                case WM_GETDLGCODE:
+                    handled = true;
+                    return (IntPtr)(DLGC_WANTALLKEYS | DLGC_WANTCHARS | DLGC_WANTARROWS);
+
                 case WM_LBUTTONDOWN:
                     bool isShift = (wParam.ToInt32() & MK_SHIFT) != 0;
-                    SetFocus(_hwnd);
+                    ClaimKeyboardFocus();
                     Renderer.HandleMouseDown(true, isShift, lo, hi);
                     SetCapture(_hwnd);
                     break;
 
                 case WM_RBUTTONDOWN:
-                    SetFocus(_hwnd);
+                    ClaimKeyboardFocus();
                     Renderer.HandleMouseDown(false, false, lo, hi);
                     SetCapture(_hwnd);
                     break;
 
                 case WM_MBUTTONDOWN:
-                    SetFocus(_hwnd);
+                    ClaimKeyboardFocus();
                     Renderer.ToggleMouseLook();
                     handled = true;
                     break;

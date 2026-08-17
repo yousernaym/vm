@@ -80,6 +80,22 @@ namespace VisualMusic
             }
         }
 
+        // If a track-prop control kept WPF focus, the song HWND still gets the key-down; the
+        // matching key-up can land here instead. Stop that axis so the camera does not keep sliding.
+        void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (_vm.CurrentScreen != AppScreen.Song) return;
+            if (ReferenceEquals(Keyboard.FocusedElement, monoGameHost)) return;
+
+            var key = e.Key == Key.System ? e.SystemKey : e.Key;
+            if (key is not (Key.W or Key.A or Key.S or Key.D or Key.R or Key.F or Key.Q or Key.E))
+                return;
+
+            int vk = KeyInterop.VirtualKeyFromKey(key);
+            if (vk != 0)
+                monoGameHost.Renderer?.HandleKeyUp(vk);
+        }
+
         void OnLoaded(object sender, RoutedEventArgs e)
         {
             modBrowser.ImportService = _vm;

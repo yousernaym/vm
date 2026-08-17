@@ -234,6 +234,8 @@ namespace VisualMusic
             _oldTime = newTime;
 
             SelectRegion();
+            if (!AnyCameraKeyHeld())
+                Project.Props.Camera.StopKeyboardMotion();
             Project.Update(_deltaTimeS);
             ScrollSong();
         }
@@ -499,9 +501,21 @@ namespace VisualMusic
             return ctrl && shift && !alt;
         }
 
+        static readonly int[] CameraVirtualKeys = { 0x57, 0x41, 0x53, 0x44, 0x52, 0x46, 0x51, 0x45 };
+
         static bool IsCameraKey(Key key)
             => key is Key.W or Key.A or Key.S or Key.D
                    or Key.R or Key.F or Key.Q or Key.E;
+
+        static bool AnyCameraKeyHeld()
+        {
+            foreach (int vk in CameraVirtualKeys)
+            {
+                if (IsKeyPhysicallyDown(vk))
+                    return true;
+            }
+            return false;
+        }
 
         /// <summary>True if the key+modifiers form a camera move/rotate gesture (mirrors Camera.Control gating).</summary>
         static bool IsCameraGesture(Key key, ModifierKeys modifiers)
@@ -636,7 +650,9 @@ namespace VisualMusic
 
         /// <summary>
         /// Focus left the song HWND. End hold-to-preview so a missed WM_KEYUP (click-away, Alt+Tab)
-        /// cannot leave every track stuck as bars.
+        /// cannot leave every track stuck as bars. Camera velocity is not cleared here: focusing the
+        /// hosted HWND makes Win32 focus hop to the parent HwndSource and back, and treating that as
+        /// a real focus loss would stutter WASD motion.
         /// </summary>
         public void HandleFocusLost() => EndBarStylePreview();
 

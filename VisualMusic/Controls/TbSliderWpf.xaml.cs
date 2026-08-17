@@ -8,10 +8,13 @@ namespace VisualMusic.Controls
     public partial class TbSliderWpf : UserControl
     {
         bool _updating;
+        double? _valueWhenFocused;
 
         public TbSliderWpf()
         {
             InitializeComponent();
+            GotKeyboardFocus += (_, _) => _valueWhenFocused = Value;
+            LostKeyboardFocus += OnLostKeyboardFocus;
         }
 
         // ---- DependencyProperties ----
@@ -177,16 +180,30 @@ namespace VisualMusic.Controls
             ValueChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        void RaiseCommit()
+        {
+            _valueWhenFocused = Value;
+            CommitChanges?.Invoke(this, EventArgs.Empty);
+        }
+
+        void OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            // Tabbing between the slider and its textbox is not leaving the control.
+            if (IsKeyboardFocusWithin) return;
+            if (Equals(Value, _valueWhenFocused)) return;
+            RaiseCommit();
+        }
+
         void Slider_MouseUp(object sender, MouseButtonEventArgs e)
         {
             // Only the left button commits a value edit; right-click is reserved for the context menu.
             if (e.ChangedButton == MouseButton.Left)
-                CommitChanges?.Invoke(this, EventArgs.Empty);
+                RaiseCommit();
         }
 
         void Slider_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter) CommitChanges?.Invoke(this, EventArgs.Empty);
+            if (e.Key == Key.Enter) RaiseCommit();
         }
 
         // ---- TextBox events ----
@@ -227,7 +244,7 @@ namespace VisualMusic.Controls
 
         void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter) CommitChanges?.Invoke(this, EventArgs.Empty);
+            if (e.Key == Key.Enter) RaiseCommit();
         }
 
         void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -241,8 +258,5 @@ namespace VisualMusic.Controls
                 e.Handled = true;
             }
         }
-
-        void TextBox_LostFocus(object sender, RoutedEventArgs e)
-            => CommitChanges?.Invoke(this, EventArgs.Empty);
     }
 }

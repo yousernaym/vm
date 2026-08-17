@@ -5,6 +5,7 @@
     <ListView x:Name="trackListView"
               SelectionMode="Extended"
               AllowDrop="True"
+              IsTextSearchEnabled="False"
               ItemsSource="{Binding Items}"
               SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
               SelectionChanged="OnSelectionChanged"

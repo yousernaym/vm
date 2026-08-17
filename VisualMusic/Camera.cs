@@ -204,11 +204,28 @@ namespace VisualMusic
                 OnUserUpdating?.Invoke();
         }
 
+        /// <summary>
+        /// Clears WASD/RF/QE velocity. Used when the song HWND loses focus so a missed key-up
+        /// cannot leave the camera sliding.
+        /// </summary>
+        public void StopKeyboardMotion()
+        {
+            if (_moveVel == Vector3.Zero && _rotVel == Vector3.Zero)
+                return;
+            _moveVel = Vector3.Zero;
+            _rotVel = Vector3.Zero;
+            _controlScale = 0;
+            OnUserUpdating?.Invoke();
+            OnUserUpdated?.Invoke();
+        }
+
         public bool Control(Key key, bool keyDown, ModifierKeys modifiers)
         {
             bool shifting = modifiers == ModifierKeys.Shift;
             if (modifiers != ModifierKeys.None && !shifting)
                 return false;
+            Vector3 prevMove = _moveVel;
+            Vector3 prevRot = _rotVel;
             _controlScale = keyDown ? 1 : 0;
             bool keyMatch = false;
             float scaledRotSpeed = rotSpeed * _controlScale;
@@ -289,7 +306,8 @@ namespace VisualMusic
             if (keyMatch)
             {
                 OnUserUpdating?.Invoke();
-                if (!keyDown)
+                // Skip the commit if velocity was already zero (duplicate key-up after focus-lost).
+                if (!keyDown && (prevMove != _moveVel || prevRot != _rotVel))
                     OnUserUpdated?.Invoke();
             }
             return keyMatch;
