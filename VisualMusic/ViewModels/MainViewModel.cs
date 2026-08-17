@@ -9,7 +9,6 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using VisualMusic.Controls;
 
 namespace VisualMusic.ViewModels
@@ -1585,10 +1584,6 @@ namespace VisualMusic.ViewModels
                 // whose style was just restored to Bar (InvalidCastException in DrawGeoChunk).
                 if (GetDrawHost?.Invoke() is SongRenderer renderer)
                     renderer.EndBarStylePreview();
-                // Unfocus the style ComboBox so it accepts the restored SelectedIndex. Keyboard
-                // requires STA (the WPF UI thread); unit tests skip this.
-                if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
-                    Keyboard.ClearFocus();
 
                 // Did the restore change the track set or order? If so the track-list rows must be
                 // rebuilt (and rebuilt BEFORE OnTrackListSelectionChanged, which reseeds the positional
