@@ -68,5 +68,33 @@ namespace VisualMusic.Tests
             Curve curve = CurveWithKeys((0, 70), (100, 69), (200, 69), (300, 67));
             Assert.True(NoteStyle_Line.IsHardwareLocalExtremum(curve, 1));
         }
+
+        [Fact]
+        public void Line_segment_bounds_hug_the_stroke_instead_of_a_far_aabb()
+        {
+            const float halfWidth = 2f;
+            BoundingBoxEx horizontal = NoteStyle_Line.CreateLineSegmentBounds(
+                new Vector3(0, 50, 0), new Vector3(100, 50, 0), halfWidth, LineType.Standard);
+
+            Assert.InRange(horizontal.Aabb.Max.Y - horizontal.Aabb.Min.Y, 3.9f, 4.1f);
+            Assert.True(horizontal.ContainsPoint(new Vector3(50, 50, 0)));
+            Assert.True(horizontal.ContainsPoint(new Vector3(50, 51.5f, 0)));
+            Assert.False(horizontal.ContainsPoint(new Vector3(50, 70, 0)));
+
+            BoundingBoxEx diagonal = NoteStyle_Line.CreateLineSegmentBounds(
+                new Vector3(0, 0, 0), new Vector3(100, 100, 0), halfWidth, LineType.Standard);
+            Assert.True(diagonal.ContainsPoint(new Vector3(50, 50, 0)));
+            // Control-point / multi-beat AABBs treated this corner as part of the line.
+            Assert.False(diagonal.ContainsPoint(new Vector3(100, 0, 0)));
+        }
+
+        [Fact]
+        public void Horizontal_ribbon_bounds_stay_selectable()
+        {
+            BoundingBoxEx ribbon = NoteStyle_Line.CreateLineSegmentBounds(
+                new Vector3(0, 0, 0), new Vector3(40, 0, 0), 3f, LineType.Ribbon);
+            Assert.True(ribbon.ContainsPoint(new Vector3(20, 0, 0)));
+            Assert.False(ribbon.ContainsPoint(new Vector3(20, 20, 0)));
+        }
     }
 }

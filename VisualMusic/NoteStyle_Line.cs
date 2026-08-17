@@ -423,6 +423,33 @@ namespace VisualMusic
         //	return typeof(T).GetProperties()[0].Name;
         //}
 
+        // Oriented box along an evaluated centerline sample. Control-point AABBs
+        // and multi-beat axis-aligned hulls extend far off the drawn stroke.
+        internal static BoundingBoxEx CreateLineSegmentBounds(Vector3 start, Vector3 end,
+            float halfWidth, LineType lineType)
+        {
+            Vector3 along = end - start;
+            Vector3 center = (start + end) * 0.5f;
+            Vector3 halfAlong = along * 0.5f;
+            Vector3 halfSide;
+            if (lineType == VisualMusic.LineType.Ribbon)
+            {
+                halfSide = new Vector3(halfWidth, 0, 0);
+                if (Vector3.Cross(along, halfSide).LengthSquared() < 0.0000001f)
+                    halfSide = new Vector3(0, halfWidth, 0);
+            }
+            else
+            {
+                halfSide = new Vector3(-along.Y, along.X, 0);
+                float sideLength = halfSide.Length();
+                if (sideLength > 0.0000001f)
+                    halfSide *= halfWidth / sideLength;
+                else
+                    halfSide = new Vector3(0, halfWidth, 0);
+            }
+            return new BoundingBoxEx(center, halfAlong, halfSide, Vector3.Zero);
+        }
+
         public override void CreateGeoChunk(out Geo geo, BoundingBox bbox, Midi.Track midiTrack, TrackProps trackProps, MaterialProps texMaterial)
         {
             LineGeo lineGeo = new LineGeo();
@@ -435,42 +462,46 @@ namespace VisualMusic
             float vpLineWidth = Math.Max(VpLineWidth, Project.NormalizeVpScalar(1f));
             float maxPatchTicks = Math.Max(1f,
                 Project.Notes.TicksPerBeat / (float)MaxPatchSubdivisionsPerBeat);
-            float boundsMargin = Project.NormalizeVpScalar(25f); // half of the UI's maximum line width
-            Vector3 boundsMin = new Vector3(float.MaxValue, float.MaxValue, -0.001f);
-            Vector3 boundsMax = new Vector3(float.MinValue, float.MinValue, 0.001f);
-            float boundsStartTick = 0;
-            bool hasBounds = false;
+            float bboxMinSqLength = (float)Math.Pow(Project.Props.Camera.ViewportSize.X / 1000f, 2);
+            float halfWidth = vpLineWidth * 0.5f;
+            Vector3 bboxStart = Vector3.Zero;
+            Vector3 lastBoundsSample = Vector3.Zero;
+            bool hasBoundsStart = false;
             Vector3? connectedStartTangent = null;
 
-            void IncludeBounds(CubicBezier patch, float startTick, float endTick)
+            void AddBoundsSegment(Vector3 bboxEnd, bool force)
             {
-                if (!hasBounds)
-                {
-                    boundsStartTick = startTick;
-                    hasBounds = true;
-                }
+                float alongSq = Vector3.DistanceSquared(bboxStart, bboxEnd);
+                if (alongSq < 0.0000001f || (!force && alongSq <= bboxMinSqLength))
+                    return;
+                lineGeo.bboxes.Add(CreateLineSegmentBounds(bboxStart, bboxEnd, halfWidth,
+                    LineType ?? VisualMusic.LineType.Standard));
+                bboxStart = bboxEnd;
+            }
 
-                for (int i = 0; i < ControlPointsPerPatch; i++)
+            void IncludeBounds(CubicBezier patch)
+            {
+                int sampleCount = patch.IsLinear ? 2 : 4;
+                for (int i = 0; i < sampleCount; i++)
                 {
-                    Vector3 point = patch.GetControlPoint(i);
-                    boundsMin.X = Math.Min(boundsMin.X, point.X - boundsMargin);
-                    boundsMin.Y = Math.Min(boundsMin.Y, point.Y - boundsMargin);
-                    boundsMax.X = Math.Max(boundsMax.X, point.X + boundsMargin);
-                    boundsMax.Y = Math.Max(boundsMax.Y, point.Y + boundsMargin);
+                    Vector3 sample = patch.Evaluate(i / (float)(sampleCount - 1));
+                    lastBoundsSample = sample;
+                    if (!hasBoundsStart)
+                    {
+                        bboxStart = sample;
+                        hasBoundsStart = true;
+                        continue;
+                    }
+                    AddBoundsSegment(sample, force: false);
                 }
-
-                if (endTick - boundsStartTick >= Project.Notes.TicksPerBeat * 4)
-                    FlushBounds();
             }
 
             void FlushBounds()
             {
-                if (!hasBounds)
+                if (!hasBoundsStart)
                     return;
-                lineGeo.bboxes.Add(new BoundingBoxEx(boundsMin, boundsMax));
-                boundsMin = new Vector3(float.MaxValue, float.MaxValue, -0.001f);
-                boundsMax = new Vector3(float.MinValue, float.MinValue, 0.001f);
-                hasBounds = false;
+                AddBoundsSegment(lastBoundsSample, force: true);
+                hasBoundsStart = false;
             }
 
             for (int n = 0; n < noteList.Count; n++)
@@ -491,7 +522,10 @@ namespace VisualMusic
                     // The legacy triangle strip skips it without flushing, so preserve the edge
                     // carried from the preceding valid patch unless this note really ends a segment.
                     if (!(bool)Continuous || endsAtNoteStop)
+                    {
                         connectedStartTangent = null;
+                        FlushBounds();
+                    }
                     continue;
                 }
 
@@ -575,15 +609,15 @@ namespace VisualMusic
                             patchStartsSegment, patchEndsSegment,
                             texMaterial);
                     }
-                    IncludeBounds(patch,
-                        MathHelper.Lerp(note.start, segmentEndTick, patchStart),
-                        MathHelper.Lerp(note.start, segmentEndTick, patchEnd));
+                    IncludeBounds(patch);
                     patchStartTangent = patchEndTangent;
                 }
 
                 connectedStartTangent = (bool)Continuous && !endsAtNoteStop
                     ? noteEndTangent
                     : null;
+                if (endsSegment)
+                    FlushBounds();
             }
             CreateLinePatchBuffer(ref vertIndex, lineGeo);
             FlushBounds();

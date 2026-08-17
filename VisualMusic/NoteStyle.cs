@@ -785,11 +785,35 @@ namespace VisualMusic
             _aabb = BoundingBox.CreateFromPoints(_corners);
         }
 
+        internal BoundingBox Aabb => _aabb;
+
         public BoundingBoxEx Clone()
         {
             var newBox = new BoundingBoxEx(_corners, _normals);
             newBox._aabb = _aabb;
             return newBox;
+        }
+
+        internal bool ContainsPoint(Vector3 point)
+        {
+            for (int axis = 0; axis < 3; axis++)
+            {
+                Vector3 normal = _normals[axis];
+                if (normal == Vector3.Zero)
+                    continue;
+                float min = float.MaxValue;
+                float max = float.MinValue;
+                for (int i = 0; i < 8; i++)
+                {
+                    float d = Vector3.Dot(_corners[i], normal);
+                    if (d < min) min = d;
+                    if (d > max) max = d;
+                }
+                float p = Vector3.Dot(point, normal);
+                if (p < min - 0.0001f || p > max + 0.0001f)
+                    return false;
+            }
+            return true;
         }
 
         public bool Intersects(BoundingFrustum frustum)
