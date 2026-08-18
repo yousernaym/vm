@@ -46,7 +46,7 @@ struct LineOutput
 	float2 texCoords2 : TEXCOORD2;
 	float capAmount : TEXCOORD3;
 	float edgeBlurMask : TEXCOORD4;
-	float2 roundJoinCoords : TEXCOORD5;
+	float3 roundJoinCoords : TEXCOORD5;
 	float2 joinArmIn : TEXCOORD6;
 	float2 joinArmOut : TEXCOORD7;
 };
@@ -90,7 +90,7 @@ LineOutput LegacyVS(LegacyVSInput input)
 	output.texCoords2 = input.texCoords2 - TexScrollOffset2;
 	output.capAmount = 0;
 	output.edgeBlurMask = 1;
-	output.roundJoinCoords = float2(0, 0);
+	output.roundJoinCoords = float3(0, 0, 0);
 	output.joinArmIn = float2(0, 0);
 	output.joinArmOut = float2(0, 0);
 	return output;
@@ -319,20 +319,32 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		float stemLeft = min(armIn.x - Radius * nInX, armOut.x - Radius * nOutX);
 		float stemRight = max(armIn.x + Radius * nInX, armOut.x + Radius * nOutX);
 		float stemHalf = 0.5f * (stemRight - stemLeft);
+		// The stem straddles the join only when both notes are equally far from the
+		// turn. Otherwise the arm with less horizontal reach shifts it sideways, so
+		// the cap has to follow: sizing it from the stem span while leaving it on
+		// the join point hangs a rectangular shelf off the short side.
+		float stemCenter = 0.5f * (stemLeft + stemRight);
 		float armSpan = max(abs(armIn.x), abs(armOut.x));
 		// Open bends (viewport width 6–14) keep a several-radius span. High zoom
 		// collapses that span so the arms read as one stem; the cap must then
 		// match the stem, including at the UI maximum (1024 QN).
 		float stacked = 1 - smoothstep(Radius * 0.15f, Radius * 0.8f, armSpan);
 		float outerRadius = Radius;
+		float outerCenter = 0;
 		if (stemHalf > Radius * 0.05f)
 		{
 			if (stemHalf < Radius)
+			{
 				outerRadius = stemHalf;
+				outerCenter = stemCenter;
+			}
 			else
+			{
 				outerRadius = lerp(Radius, stemHalf, stacked);
+				outerCenter = lerp(0, stemCenter, stacked);
+			}
 		}
-		float2 joinOffset = joinCoords * outerRadius;
+		float2 joinOffset = float2(outerCenter, 0) + joinCoords * outerRadius;
 		float3 rawPos = center + float3(joinOffset, 0);
 		float2 texCoords = lerp(patch[0].texCoords.xy, patch[0].texCoords.zw,
 			domainLocation.y);
@@ -354,7 +366,7 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		// would darken those overlapping pixels (the join is drawn first) and make
 		// the inner silhouette look like a hole to the coverage tests.
 		output.edgeBlurMask = 0;
-		output.roundJoinCoords = float2(outerRadius - Radius, stacked);
+		output.roundJoinCoords = float3(outerRadius - Radius, stacked, outerCenter);
 		output.joinArmIn = armIn;
 		output.joinArmOut = armOut;
 		return output;
@@ -458,7 +470,7 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 	output.texCoords2 = lerp(packedTexCoords2.xy, packedTexCoords2.zw, sideT) - TexScrollOffset2;
 	output.capAmount = capAmount;
 	output.edgeBlurMask = LineType == 0 ? edgeBlurMask : 1;
-	output.roundJoinCoords = float2(0, 0);
+	output.roundJoinCoords = float3(0, 0, 0);
 	output.joinArmIn = float2(0, 0);
 	output.joinArmOut = float2(0, 0);
 	return output;
@@ -496,6 +508,9 @@ float4 PS(in LineOutput IN) : COLOR0
 		// plug on the inner side. A full inner disk pinches below the equator
 		// (mushroom). Leaving the inner empty reveals the curvature-clamped neck
 		// (same brim). Open bends keep the inner empty so the arch stays hollow.
+		// Both regions are measured from the cap's center on the stem, not from
+		// the join point the arms meet at.
+		joinOffset.x -= IN.roundJoinCoords.z;
 		float d = length(joinOffset);
 		float2 inward = IN.joinArmIn + IN.joinArmOut;
 		bool inner = length(inward) > 0.000001f && dot(joinOffset, inward) > 0;

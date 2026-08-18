@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -1275,6 +1275,179 @@ namespace VisualMusic.Tests
 
             Assert.False(NoteStyle.HasContent);
             Assert.False(NoteStyle.HasGraphicsDevice);
+        }
+
+        static Project BuildAsymmetricValleyProject()
+        {
+            var song = new Song
+            {
+                TicksPerBeat = 480,
+                TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
+                Tracks = new List<Track>
+                {
+                    new Track { Length = 3360 },
+                    new Track
+                    {
+                        Length = 3360,
+                        Notes = new List<Note>
+                        {
+                            new Note { start = 0, stop = 479, channel = 0, pitch = 58, velocity = 50 },
+                            new Note { start = 960, stop = 1680, channel = 0, pitch = 53, velocity = 28 },
+                            new Note { start = 1200, stop = 3360, channel = 0, pitch = 58, velocity = 50 },
+                        },
+                    },
+                },
+                SongLengthT = 3360,
+            };
+            var project = new Project { Notes = song };
+            project.Props.MinPitch = 53;
+            project.Props.MaxPitch = 58;
+            return project;
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Hardware_line_join_is_centered_on_an_asymmetric_extremum()
+        {
+            // The valley note sits four times closer to the following note than to the
+            // preceding one, so the two arms leaving the turn have very different
+            // horizontal reach. Sizing the round join from that reach while leaving it
+            // centered on the turn itself hung a rectangular shelf off the short side.
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            try
+            {
+                var project = BuildAsymmetricValleyProject();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                var track = project.TrackViews[1];
+                track.TrackProps.StyleProps.Type = NoteStyleType.Line;
+                var lineStyle = track.TrackProps.StyleProps.GetLineStyle();
+                lineStyle.LineWidth = 50;
+                lineStyle.HlSize = 0;
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(cm);
+                NoteStyle.SetProject(project);
+                project.NormSongPos = 960.0 / 3360.0;
+
+                var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
+                Assert.Equal(1, bakedGeo.hardwareRoundJoinCount);
+
+                const int width = 1536;
+                const int height = 912;
+                Microsoft.Xna.Framework.Color[] Render(bool hardware)
+                {
+                    NoteStyle_Line.SetHardwareTessellation(hardware);
+                    using var target = new RenderTarget2D(gds.GraphicsDevice, width, height,
+                        false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                    using var depthStencil = new DepthStencilState
+                    {
+                        StencilEnable = true,
+                        StencilFunction = CompareFunction.Greater,
+                        StencilPass = StencilOperation.Replace,
+                        ReferenceStencil = 1,
+                    };
+                    var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
+                    gds.GraphicsDevice.SetRenderTarget(target);
+                    gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+                    var oldDepthStencil = gds.GraphicsDevice.DepthStencilState;
+                    gds.GraphicsDevice.DepthStencilState = depthStencil;
+                    gds.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer
+                        | ClearOptions.Stencil, clearColor, 1, 0);
+                    try
+                    {
+                        track.DrawTrack(project.GlobalTrackProps, defaultStyle: false);
+                    }
+                    finally
+                    {
+                        gds.GraphicsDevice.SetRenderTarget(null);
+                        gds.GraphicsDevice.DepthStencilState = oldDepthStencil;
+                    }
+
+                    var pixels = new Microsoft.Xna.Framework.Color[width * height];
+                    target.GetData(pixels);
+                    Assert.Contains(pixels, pixel => pixel != clearColor);
+                    return pixels;
+                }
+
+                // Largest single-row outward jump of either silhouette edge. The turn is
+                // the lowest point of the track, so the join and its approach live in the
+                // bottom rows; above them the arms converge and both edges move inward.
+                // A shelf is exactly an outward jump there, and the cap itself only ever
+                // curves inward, so a smooth join scores zero.
+                (int Step, int Row, char Side) WidestOutwardStep(
+                    Microsoft.Xna.Framework.Color[] pixels)
+                {
+                    var edges = new Dictionary<int, (int Left, int Right)>();
+                    for (int y = 0; y < height; y++)
+                    {
+                        int minX = width;
+                        int maxX = -1;
+                        for (int x = 0; x < width; x++)
+                        {
+                            if (pixels[y * width + x].R < 100)
+                                continue;
+                            minX = Math.Min(minX, x);
+                            maxX = Math.Max(maxX, x);
+                        }
+                        if (maxX >= 0)
+                            edges[y] = (minX, maxX);
+                    }
+
+                    Assert.NotEmpty(edges);
+                    int bottom = edges.Keys.Max();
+                    var widest = (Step: 0, Row: -1, Side: '-');
+                    for (int y = bottom - 250; y <= bottom; y++)
+                    {
+                        if (!edges.TryGetValue(y, out var row)
+                            || !edges.TryGetValue(y - 1, out var above))
+                            continue;
+                        if (row.Right - above.Right > widest.Step)
+                            widest = (row.Right - above.Right, y, 'R');
+                        if (above.Left - row.Left > widest.Step)
+                            widest = (above.Left - row.Left, y, 'L');
+                    }
+                    return widest;
+                }
+
+                // The shelf appears once the arms stack into a single stroke, which is a
+                // function of horizontal squeeze; 44.09 is the reported project's viewport.
+                foreach (float viewWidth in new[] { 30f, 44.090126f, 60f, 88f, 200f })
+                {
+                    track.TrackProps.SpatialProps.ViewWidthQn = viewWidth;
+                    var hardwareStep = WidestOutwardStep(Render(hardware: true));
+                    var legacyStep = WidestOutwardStep(Render(hardware: false));
+                    Assert.InRange(legacyStep.Step, 0, 1);
+                    Assert.True(hardwareStep.Step <= legacyStep.Step + 1,
+                        $"Shelf at viewport width {viewWidth}: silhouette jumps "
+                        + $"{hardwareStep.Step}px outward on the {hardwareStep.Side} side at "
+                        + $"row {hardwareStep.Row}; legacy jumps {legacyStep.Step}px.");
+                }
+            }
+            finally
+            {
+                NoteStyle_Line.SetHardwareTessellation(true);
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
         }
     }
 }
