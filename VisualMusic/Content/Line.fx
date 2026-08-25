@@ -548,6 +548,15 @@ float4 PS(in LineOutput IN) : COLOR0
 	}
 	if (IN.edgeBlurMask > 0.999f)
 		color = blurEdgeDistance(color, normDistFromCenter);
+	// Overlapping stroke parts are resolved by a first-fragment-wins stencil, so a
+	// fragment that blends nothing must not claim the pixel. The DiscardAtOnce pass
+	// already drops these; the second pass used to keep them, letting a modulated-out
+	// round join (its normPos.x is pinned to the note end, so a distance modulation
+	// blacks out its whole stem plug) win over the arm underneath it and cut that
+	// arm's soft edge back to the opaque pass — a hard shelf across the stroke where
+	// the plug ends.
+	if (!any(color))
+		discard;
     return color;
 }
 
