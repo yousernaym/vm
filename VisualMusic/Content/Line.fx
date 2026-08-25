@@ -443,6 +443,13 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 					{
 						signedOffset = sign(signedOffset) * maxInnerOffset;
 						edgeBlurMask = 0;
+						// The clamp moves this vertex off the cross-section position the
+						// domain asked for, so report where it actually landed. normPos.y
+						// is read as "distance from the centerline along the normal" (note
+						// style modulation, cap clipping, edge blur); leaving it at the
+						// unclamped domain value stretches that coordinate over a shorter
+						// cross-section and notches every modulation gradient at a bend.
+						sideT = signedOffset / Radius * 0.5f + 0.5f;
 					}
 				}
 			}
