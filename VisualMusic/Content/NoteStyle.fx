@@ -157,23 +157,39 @@ float3 calcLighting(float3 color, float3 normal, float3 worldPos)
 	return saturate(color) * SongFade;
 }
 
-float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out float3 destNormalDir, out bool discardFade)
+// normPosGradient is how much normPos covers in one pixel, measured by the caller.
+// Derivative instructions have to sit in flow every lane reaches, so they cannot be
+// taken in here past the per-pixel branches below - fxc quietly yields zero. Carry the
+// gradient through the same transforms as the distance instead, so the returned
+// distance's own per-pixel step comes out exact.
+float getInterpolant(ModEntry modEntry, float2 normPos, float2 normPosGradient, float2 noteSize,
+	out float3 destNormalDir, out bool discardFade, out float interpolantGradient)
 {
 	discardFade = false;
+	interpolantGradient = 0;
 	float2 transformedNormPos = normPos - modEntry.Origin;
 	float2 distToEdgeFromOrigin = modEntry.Origin;
+	float2 distGradient = normPosGradient;
 	if (transformedNormPos.x < 0)
+	{
 		transformedNormPos.x /= modEntry.Origin.x;
+		distGradient.x /= modEntry.Origin.x;
+	}
 	else
 	{
 		transformedNormPos.x /= 1 - modEntry.Origin.x;
+		distGradient.x /= 1 - modEntry.Origin.x;
 		distToEdgeFromOrigin = 1 - modEntry.Origin.x;
 	}
 	if (transformedNormPos.y < 0)
+	{
         transformedNormPos.y /= modEntry.Origin.y;
+		distGradient.y /= modEntry.Origin.y;
+	}
 	else
 	{
 		transformedNormPos.y /= 1 - modEntry.Origin.y;
+		distGradient.y /= 1 - modEntry.Origin.y;
 		distToEdgeFromOrigin = 1 - modEntry.Origin.y;
 	}
 	float2 normDistFromOrigin = abs(transformedNormPos);
@@ -189,6 +205,7 @@ float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out flo
             float ratio = distToEdgeFromOrigin.x / distToEdgeFromOrigin.y;
             float normDistFromEdgeX = min((1 - normDistFromOrigin.x) * ratio, 1); //1:1 aspect by increasing x dist from edge to match y dist from edge
             normDistFromOrigin.x = 1 - normDistFromEdgeX;
+            distGradient.x *= ratio;
 			//normDistFromOrigin.y = normDistFromOrigin.y / ratio; //1:1 aspect by reducing y dist from origin to match x dist from origin
         }
     }
@@ -205,25 +222,36 @@ float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out flo
 			else
 				destNormalDir.y = transformedNormPos.y;
 			interpolant = max(normDistFromOrigin.x, normDistFromOrigin.y);
+			interpolantGradient = normDistFromOrigin.x > normDistFromOrigin.y
+				? distGradient.x : distGradient.y;
 		}
 		else //Both x and y is used
 		{
 			destNormalDir = float3(transformedNormPos, 0);
 			if (modEntry.CombineXY == CombineXY_Add)
+			{
 				interpolant = normDistFromOrigin.x + normDistFromOrigin.y;
+				interpolantGradient = distGradient.x + distGradient.y;
+			}
 			else if (modEntry.CombineXY == CombineXY_Length)
+			{
 				interpolant = pow(normDistFromOrigin.x, 2) + pow(normDistFromOrigin.y, 2);
+				interpolantGradient = 2 * (normDistFromOrigin.x * distGradient.x
+					+ normDistFromOrigin.y * distGradient.y);
+			}
 		}
 	}
 	else if (modEntry.XOriginEnable)
 	{
 		destNormalDir.x = transformedNormPos.x;
 		interpolant = normDistFromOrigin.x;
+		interpolantGradient = distGradient.x;
 	}
 	else if (modEntry.YOriginEnable)
 	{
 		destNormalDir.y = transformedNormPos.y;
 		interpolant = normDistFromOrigin.y;
+		interpolantGradient = distGradient.y;
 	}
 	else
 		return 0;
@@ -231,7 +259,20 @@ float getInterpolant(ModEntry modEntry, float2 normPos, float2 noteSize, out flo
     if (!any(destNormalDir))
        destNormalDir.x = 1; //Pick a random direction with z = 0
 	destNormalDir = normalize(destNormalDir);
-		
+
+	// The fades double as the antialiasing of the Start/Stop edges, so neither may be
+	// narrower than a pixel. Neither should be wider: a fade band covers real screen
+	// distance, and where two notes overlap, a band wide enough to read as a shape of
+	// its own draws over the neighbour that still covers those pixels. Derive the floor
+	// from this entry's own per-pixel distance step, so it tracks the on-screen scale
+	// instead of claiming a fixed slice of the Start - Stop range.
+	float fadeRange = max(modEntry.Stop - modEntry.Start, 0.000001f);
+	float pixelFade = saturate(interpolantGradient * 1.5f / fadeRange);
+	modEntry.FadeOut = max(pixelFade, modEntry.FadeOut);
+	if (modEntry.Start > 0)
+		modEntry.FadeIn = max(pixelFade, modEntry.FadeIn);
+	modEntry.FadeIn = min(1 - modEntry.FadeOut, modEntry.FadeIn);
+
 	//Outside Start - Stop?
 	bool discardBeforeStart = modEntry.Invert && modEntry.DiscardAfterStop;
 	//bool discardBeforeStart = modEntry.DiscardAfterStop;
@@ -275,24 +316,21 @@ float4 modulate(float2 normPos, float2 noteSize, float4 sourceColor, float3 sour
 {
     float4 result = float4(1, 1, 1, 1);
 	float3 destNormal = float3(0,0,0);
-	
-	float gradLength = max(length(ddx(normPos)), length(ddy(normPos)));
+	// Measured here, where every lane of the quad runs the same instructions.
+	float2 normPosGradient = float2(fwidth(normPos.x), fwidth(normPos.y));
+
 	for (int i = 0; i < ActiveModEntries; i++)
 	{
 		if (ColorDestEnable[i] || AlphaDestEnable[i] || AngleDestEnable[i])
 		{
 			ModEntry modEntry;
 			fillModEntryStruct(modEntry, i);
-			modEntry.FadeOut = max(gradLength * 3, modEntry.FadeOut);
-            modEntry.FadeOut = max(0.05f, modEntry.FadeOut);
-
-			if (modEntry.Start > 0)
-				modEntry.FadeIn = max(gradLength * 3, modEntry.FadeIn);
-			modEntry.FadeIn = min(1 - modEntry.FadeOut, modEntry.FadeIn);
-					
+			// getInterpolant widens the fades to cover a pixel of its own distance value.
 			float3 destNormalDir;
 			bool discardFade;
-			float interpolant = getInterpolant(modEntry, normPos, noteSize, destNormalDir, discardFade);
+			float interpolantGradient;
+			float interpolant = getInterpolant(modEntry, normPos, normPosGradient, noteSize,
+				destNormalDir, discardFade, interpolantGradient);
 			
             if (DiscardAtOnce && (discardFade || interpolant < 0))
                 discard;
