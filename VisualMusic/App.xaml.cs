@@ -26,10 +26,15 @@ namespace VisualMusic
             }
             Program.InitTempDir();
 
-            // CefSharp.Wpf auto-initializes on first ChromiumWebBrowser creation
-            // and registers an Application.Exit handler for shutdown.
-            // Explicit Cef.Initialize() is skipped to avoid loading the C++/CLI
-            // CefSharp.Common.NETCore assembly in the WPF XAML design-time compiler.
+            // Initialize CEF here (not via ChromiumWebBrowser auto-init) so each
+            // process gets its own RootCachePath. Keep CefSharp types out of this
+            // file — the WPF XAML design-time compiler loads App.xaml.cs.
+            if (!CefInit.Initialize())
+            {
+                MessageBox.Show("Couldn't initialize embedded browser.", Program.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
+                return;
+            }
 
             var mainWindow = new MainWindow(e.Args);
             MainWindow = mainWindow;
@@ -44,8 +49,9 @@ namespace VisualMusic
         {
             MidMix.Close();
             Media.CloseMF();
-            Program.CloseTempDir();
+            CefInit.Shutdown();
             base.OnExit(e);
+            Program.CloseTempDir();
         }
     }
 }
