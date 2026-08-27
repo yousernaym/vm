@@ -1,4 +1,3 @@
-using ColorSpaces;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -65,17 +64,11 @@ namespace VisualMusic.Controls
 
             for (int x = 0; x < w; x++)
             {
-                double hue = (double)x / w;
+                float hue = (float)x / w;
                 for (int y = 0; y < h; y++)
                 {
-                    double sat = 1.0 - (double)y / h;
-                    // Blend between full-saturation hue color and white
-                    var hslFull = new HslColor(hue, 1.0, 0.5);
-                    System.Drawing.Color cFull = hslFull;
-                    // White = RGB(255,255,255), lerp by saturation
-                    byte r = (byte)(cFull.R + (255 - cFull.R) * (1 - sat));
-                    byte g = (byte)(cFull.G + (255 - cFull.G) * (1 - sat));
-                    byte b = (byte)(cFull.B + (255 - cFull.B) * (1 - sat));
+                    float sat = 1f - (float)y / h;
+                    HueSatConvert.ToRgb(hue, sat, out byte r, out byte g, out byte b);
                     int idx = y * stride + x * 4;
                     pixels[idx + 0] = b;
                     pixels[idx + 1] = g;
@@ -104,9 +97,8 @@ namespace VisualMusic.Controls
             crossV.Y1 = cy - half; crossV.Y2 = cy + half;
 
             // Use white crosshair on dark hues, black on light
-            var hsl = new HslColor(Hue, 1.0, 0.5);
-            System.Drawing.Color c = hsl;
-            double brightness = (c.R * 0.299 + c.G * 0.587 + c.B * 0.114) / 255.0;
+            HueSatConvert.ToRgb(Hue, 1f, out byte cr, out byte cg, out byte cb);
+            double brightness = (cr * 0.299 + cg * 0.587 + cb * 0.114) / 255.0;
             var pen = brightness > 0.5 ? Brushes.Black : Brushes.White;
             crossH.Stroke = crossV.Stroke = pen;
         }

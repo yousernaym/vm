@@ -1,4 +1,3 @@
-using ColorSpaces;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +8,11 @@ namespace VisualMusic.Controls
 {
     public partial class HueSatButtonWpf : UserControl
     {
+        /// <summary>
+        /// Raised once when the user confirms a new color in the picker (OK). Live preview while
+        /// dragging does not raise this — keyframing/undo treat it as the commit, like a slider's
+        /// <c>CommitChanges</c>.
+        /// </summary>
         public event EventHandler SelectionChanged;
 
         public HueSatButtonWpf()
@@ -46,41 +50,30 @@ namespace VisualMusic.Controls
 
         void Button_Click(object sender, RoutedEventArgs e)
         {
+            var original = SelectedXnaColor;
             var win = new HueSatWindow { Owner = Window.GetWindow(this) };
 
-            if (SelectedXnaColor != null)
+            if (original is XnaColor xna)
             {
-                var xna = SelectedXnaColor.Value;
-                var gdi = System.Drawing.Color.FromArgb(xna.R, xna.G, xna.B);
-                HslColor hsl = gdi;
-                win.Hue = (float)hsl.Hue;
-                win.Saturation = (float)hsl.Saturation;
+                HueSatConvert.FromRgb(xna.R, xna.G, xna.B, out float hue, out float sat);
+                win.Hue = hue;
+                win.Saturation = sat;
             }
 
-            float origHue = win.Hue, origSat = win.Saturation;
-
-            win.SelectionChanged += (_, _2) =>
+            // Live preview only — updates the bound color (and 3D view) without an undo snapshot.
+            bool pickerMoved = false;
+            win.SelectionChanged += (_, _) =>
             {
-                SelectedXnaColor = HslToXna(win.Hue, win.Saturation);
-                SelectionChanged?.Invoke(this, EventArgs.Empty);
+                pickerMoved = true;
+                SelectedXnaColor = HueSatConvert.ToXna(win.Hue, win.Saturation);
             };
 
-            if (win.ShowDialog() == true)
-            {
-                SelectedXnaColor = HslToXna(win.Hue, win.Saturation);
+            bool accepted = win.ShowDialog() == true;
+            bool raiseCommit = HueSatConvert.FinishDialog(original, accepted, pickerMoved,
+                win.Hue, win.Saturation, out var color);
+            SelectedXnaColor = color;
+            if (raiseCommit)
                 SelectionChanged?.Invoke(this, EventArgs.Empty);
-            }
-            else
-            {
-                SelectedXnaColor = HslToXna(origHue, origSat);
-                SelectionChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        static XnaColor HslToXna(float hue, float saturation)
-        {
-            var gdi = (System.Drawing.Color)new HslColor(hue, saturation, 0.5);
-            return new XnaColor((byte)gdi.R, (byte)gdi.G, (byte)gdi.B, (byte)255);
         }
     }
 }
