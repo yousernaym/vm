@@ -152,7 +152,13 @@ namespace VisualMusic
             if ((type & (int)TrackPropsType.TPT_Style) > 0)
                 StyleProps = source.StyleProps.Clone();
             if ((type & (int)TrackPropsType.TPT_Material) > 0)
+            {
+                // Clone() round-trips Path only (Texture2D is not serializable). Reload from disk,
+                // or keep the dest's already-loaded GPU texture when the path is unchanged.
+                var previous = MaterialProps;
                 MaterialProps = source.MaterialProps.Clone();
+                MaterialProps.AdoptGpuTexturesFrom(previous, host);
+            }
             if ((type & (int)TrackPropsType.TPT_Light) > 0)
                 LightProps = source.LightProps.Clone();
             if ((type & (int)TrackPropsType.TPT_Spatial) > 0)
@@ -408,14 +414,42 @@ namespace VisualMusic
             }
         }
 
-        internal void LoadContent()
+        static bool CanLoadGpu(ISongDrawHost host)
+            => host?.GraphicsDevice != null && host.SpriteBatch != null;
+
+        /// <summary>
+        /// After a clone/deserialize (Path only), keep <paramref name="previous"/>'s GPU texture
+        /// when the path is unchanged; otherwise dispose it and reload from <see cref="Path"/>.
+        /// </summary>
+        internal void AdoptGpuFromOrReload(TrackPropsTex previous, ISongDrawHost host)
         {
-            //Deserialization inits Path but not Texture because Texture2D is not serializable, and you can't load texture before the device is created.
+            host ??= Project.StaticDrawHost;
+            bool samePath = previous != null
+                && string.Equals(Path ?? "", previous.Path ?? "", StringComparison.OrdinalIgnoreCase);
+
+            if (samePath && previous.Texture != null)
+            {
+                Texture = previous.Texture;
+                previous.Texture = null;
+                previous.ClearTextureTransition();
+                return;
+            }
+
+            previous?.UnloadTexture();
+            LoadContent(host);
+        }
+
+        internal void LoadContent(ISongDrawHost host = null)
+        {
+            // Deserialization inits Path but not Texture because Texture2D is not serializable, and you can't load texture before the device is created.
+            host ??= Project.StaticDrawHost;
             try
             {
                 if (string.IsNullOrEmpty(Path) || !File.Exists(Path))
                     return;
-                LoadTexture(Path, Project.StaticDrawHost);
+                if (!CanLoadGpu(host))
+                    return;
+                LoadTexture(Path, host);
             }
             catch (Exception)
             {
@@ -681,10 +715,16 @@ namespace VisualMusic
             info.AddValue("hmapProps", HmapProps);
         }
 
-        internal void LoadContent()
+        internal void LoadContent(ISongDrawHost host = null)
         {
-            TexProps.LoadContent();
-            HmapProps.LoadContent();
+            TexProps.LoadContent(host);
+            HmapProps.LoadContent(host);
+        }
+
+        internal void AdoptGpuTexturesFrom(MaterialProps previous, ISongDrawHost host)
+        {
+            TexProps.AdoptGpuFromOrReload(previous?.TexProps, host);
+            HmapProps.AdoptGpuFromOrReload(previous?.HmapProps, host);
         }
 
         public Texture2D GetTexture(bool bhilited, MaterialProps globalMaterial)

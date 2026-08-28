@@ -434,5 +434,63 @@ namespace VisualMusic.Tests
                 TrackView.NumTracks = previousNumTracks;
             }
         }
+
+        [Fact]
+        public void CloneFrom_material_copies_texture_path()
+        {
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            using var bmp = TestFiles.TempPath.File("vm_tex_", ".bmp");
+            TestFiles.Write1x1Bmp(bmp.Path);
+            try
+            {
+                var live = ProjectWithNoteOnTrack1();
+                var dest = live.TrackViews[1].TrackProps;
+                var source = dest.Clone();
+                source.MaterialProps.TexProps.Path = bmp.Path;
+
+                dest.CloneFrom(source, (int)TrackPropsType.TPT_Material, host: null);
+
+                Assert.Equal(bmp.Path, dest.MaterialProps.TexProps.Path);
+                // Fake host has no GPU — Path is applied, Texture stays unloaded.
+                Assert.Null(dest.MaterialProps.TexProps.Texture);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void CopyPropsFrom_undo_redo_restores_texture_path()
+        {
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            using var bmp = TestFiles.TempPath.File("vm_tex_", ".bmp");
+            TestFiles.Write1x1Bmp(bmp.Path);
+            try
+            {
+                var live = ProjectWithNoteOnTrack1();
+                var undo = new UndoItems();
+                undo.Add("before texture", live);
+
+                live.TrackViews[1].TrackProps.MaterialProps.TexProps.Path = bmp.Path;
+                undo.Add("load texture", live);
+
+                undo--;
+                live.CopyPropsFrom(undo.Current.Project);
+                Assert.True(string.IsNullOrEmpty(live.TrackViews[1].TrackProps.MaterialProps.TexProps.Path));
+
+                undo++;
+                live.CopyPropsFrom(undo.Current.Project);
+                Assert.Equal(bmp.Path, live.TrackViews[1].TrackProps.MaterialProps.TexProps.Path);
+            }
+            finally
+            {
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
     }
 }

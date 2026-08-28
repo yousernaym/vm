@@ -1119,6 +1119,104 @@ namespace VisualMusic.Tests
 
         [Fact]
         [Trait("Category", "Integration")]
+        public void CloneFrom_material_loads_gpu_texture()
+        {
+            // Loading a .tp file clones MaterialProps (Path only). Notes sample TexProps.Texture
+            // at draw time; the material-tab preview reads Path via WPF — so Path-only left notes
+            // untextured. CloneFrom must reload the GPU texture.
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            SpriteBatch sb = null;
+            using var bmp = TestFiles.TempPath.File("vm_tex_", ".bmp");
+            TestFiles.Write1x1Bmp(bmp.Path);
+            try
+            {
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                sb = new SpriteBatch(gds.GraphicsDevice);
+                var host = new GpuSongDrawHost(gds.GraphicsDevice, sb);
+                Project.SetDrawHost(host);
+
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+
+                var dest = project.TrackViews[1].TrackProps;
+                var source = dest.Clone(host);
+                source.MaterialProps.TexProps.Path = bmp.Path;
+                dest.CloneFrom(source, (int)TrackPropsType.TPT_Material, host);
+
+                Assert.Equal(bmp.Path, dest.MaterialProps.TexProps.Path);
+                Assert.NotNull(dest.MaterialProps.TexProps.Texture);
+                Assert.True(dest.MaterialProps.HasLocalTextureForRender(false));
+            }
+            finally
+            {
+                sb?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void CopyPropsFrom_redo_reloads_gpu_texture()
+        {
+            // Undo snapshots serialize Path only. Redo of "Load texture" restored Path (preview)
+            // but not Texture (notes). CopyPropsFrom must reload from Path.
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            SpriteBatch sb = null;
+            using var bmp = TestFiles.TempPath.File("vm_tex_", ".bmp");
+            TestFiles.Write1x1Bmp(bmp.Path);
+            try
+            {
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                sb = new SpriteBatch(gds.GraphicsDevice);
+                var host = new GpuSongDrawHost(gds.GraphicsDevice, sb);
+                Project.SetDrawHost(host);
+
+                var project = BuildProjectWithNoteOnTrack1();
+                project.CreateTrackViews(2, eraseCurrent: true);
+
+                var texProps = project.TrackViews[1].TrackProps.MaterialProps.TexProps;
+                var undo = new UndoItems();
+                undo.Add("before texture", project);
+
+                Assert.True(texProps.LoadTexture(bmp.Path, host));
+                Assert.NotNull(texProps.Texture);
+                undo.Add("load texture", project);
+
+                undo--;
+                project.CopyPropsFrom(undo.Current.Project);
+                texProps = project.TrackViews[1].TrackProps.MaterialProps.TexProps;
+                Assert.True(string.IsNullOrEmpty(texProps.Path));
+                Assert.Null(texProps.Texture);
+
+                undo++;
+                project.CopyPropsFrom(undo.Current.Project);
+                texProps = project.TrackViews[1].TrackProps.MaterialProps.TexProps;
+                Assert.Equal(bmp.Path, texProps.Path);
+                Assert.NotNull(texProps.Texture);
+            }
+            finally
+            {
+                sb?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
         public void SetContent_failure_rebakes_fx_and_geo_with_previous_content()
         {
             // After a successful bake, a failed SetContent must restore the previous Content and

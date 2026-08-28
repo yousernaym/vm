@@ -2298,14 +2298,20 @@ namespace VisualMusic
             if (tv == null) return false;
             var texProps = tv.TrackProps.MaterialProps.TexProps;
             path ??= "";
-            if (string.Equals(texProps.Path ?? "", path, StringComparison.OrdinalIgnoreCase))
+            bool pathSame = string.Equals(texProps.Path ?? "", path, StringComparison.OrdinalIgnoreCase);
+            // Undo snapshots round-trip Path only, so redo can restore Path while Texture is still
+            // null. Treat that as a change so the GPU texture is reloaded.
+            bool gpuMatches = string.IsNullOrEmpty(path)
+                ? texProps.Texture == null
+                : texProps.Texture != null;
+            if (pathSame && gpuMatches)
                 return false;
 
             try
             {
                 if (string.IsNullOrEmpty(path))
                     texProps.UnloadTexture();
-                else if (DrawHost != null)
+                else if (DrawHost?.GraphicsDevice != null && DrawHost.SpriteBatch != null)
                     texProps.LoadTexture(path, DrawHost);
                 else
                     texProps.Path = path;
@@ -2681,7 +2687,11 @@ namespace VisualMusic
                 // InvalidCastException in DrawGeoChunk. Snapshot Geo matches the restored Type.
                 if (!NoteStyle.GeoMatchesStyle(tv.Geo, destProps.ActiveNoteStyle))
                     tv.Geo = srcByTn[tv.TrackNumber].Geo;
+                // Snapshots round-trip texture Path only. Keep the live GPU texture when the path
+                // is unchanged; otherwise dispose it and reload from the restored Path.
+                var previousMaterial = destProps.MaterialProps;
                 destProps.MaterialProps = sourceProps.MaterialProps;
+                destProps.MaterialProps.AdoptGpuTexturesFrom(previousMaterial, DrawHost);
                 destProps.LightProps = sourceProps.LightProps;
                 destProps.SpatialProps = sourceProps.SpatialProps;
                 // The live AudioProps object is kept (WaveformPanel holds its SidWizChannel), but
