@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Media;
 using Midi;
 using VisualMusic.ViewModels;
 using Xunit;
@@ -230,6 +231,37 @@ namespace VisualMusic.Tests
             finally
             {
                 Project.SetDrawHost(null);
+                TrackView.NumTracks = previousNumTracks;
+            }
+        }
+
+        [Fact]
+        public void TextureThumbnailScaling_follows_point_sampling()
+        {
+            var previousNumTracks = TrackView.NumTracks;
+            try
+            {
+                var song = EmptySong(2);
+                var tv = new TrackView(1, 2, song);
+                var vm = new TrackPropsViewModel
+                {
+                    SelectedTrackCount = 1,
+                    ApplyToSelected = fn => fn(tv.TrackProps),
+                    MergedProps = tv.TrackProps,
+                };
+
+                Assert.False(vm.PointSmp);
+                Assert.Equal(BitmapScalingMode.Linear, vm.TextureThumbnailScaling);
+
+                vm.PointSmp = true;
+                Assert.True(tv.TrackProps.MaterialProps.TexProps.PointSmp);
+                Assert.Equal(BitmapScalingMode.NearestNeighbor, vm.TextureThumbnailScaling);
+
+                vm.PointSmp = false;
+                Assert.Equal(BitmapScalingMode.Linear, vm.TextureThumbnailScaling);
+            }
+            finally
+            {
                 TrackView.NumTracks = previousNumTracks;
             }
         }

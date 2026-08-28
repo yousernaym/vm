@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using XnaColor = Microsoft.Xna.Framework.Color;
 
@@ -105,6 +106,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(HiliteLum));
             OnPropertyChanged(nameof(DisableTexture));
             OnPropertyChanged(nameof(PointSmp));
+            OnPropertyChanged(nameof(TextureThumbnailScaling));
             OnPropertyChanged(nameof(TexColBlend));
             OnPropertyChanged(nameof(UTile));
             OnPropertyChanged(nameof(VTile));
@@ -208,6 +210,7 @@ namespace VisualMusic.ViewModels
             OnPropertyChanged(nameof(HiliteLum));
             OnPropertyChanged(nameof(DisableTexture));
             OnPropertyChanged(nameof(PointSmp));
+            OnPropertyChanged(nameof(TextureThumbnailScaling));
             OnPropertyChanged(nameof(TexColBlend));
             OnPropertyChanged(nameof(UTile));
             OnPropertyChanged(nameof(VTile));
@@ -608,8 +611,17 @@ namespace VisualMusic.ViewModels
         public bool? PointSmp
         {
             get => TexProps?.PointSmp;
-            set { Apply(tp => tp.MaterialProps.TexProps.PointSmp = value ?? false); OnPropertyChanged(); }
+            set
+            {
+                Apply(tp => tp.MaterialProps.TexProps.PointSmp = value ?? false);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(TextureThumbnailScaling));
+            }
         }
+
+        /// <summary>Nearest-neighbor when Point smp is on, matching the song-area sampler.</summary>
+        public BitmapScalingMode TextureThumbnailScaling
+            => PointSmp == true ? BitmapScalingMode.NearestNeighbor : BitmapScalingMode.Linear;
 
         public bool? TexColBlend
         {

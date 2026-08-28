@@ -68,7 +68,9 @@
             <TextBlock Text="Texture" FontWeight="SemiBold" Margin="0,0,0,4"/>
             <Image x:Name="texThumb" Source="{Binding TextureThumbnail}"
                    Height="64" Stretch="Uniform"
-                   HorizontalAlignment="Left" Margin="0,0,0,4"/>
+                   HorizontalAlignment="Left" Margin="0,0,0,4"
+                   SnapsToDevicePixels="True"
+                   RenderOptions.BitmapScalingMode="{Binding TextureThumbnailScaling}"/>
             <TextBlock Text="{Binding TexturePath}" TextTrimming="CharacterEllipsis"
                        Margin="0,0,0,4" FontSize="10"/>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
