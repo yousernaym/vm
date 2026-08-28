@@ -22,6 +22,9 @@ namespace VisualMusic
     public struct LinePatchVertex
     {
         public Vector3 center;
+        // x/y are the texture coordinate on the centerline, z/w its offset to the v==1
+        // edge. Keeping the cross-section term separate from the swept-strip parameter is
+        // what lets the shader extend the mapping into the analytic caps and round joins.
         public Vector4 texCoords;
         public Vector4 texCoords2;
         // x/y are normalized note position and note length; z/w mark a real
@@ -204,6 +207,10 @@ namespace VisualMusic
             }
 
             public Vector2 OffsetAtVerticalDistance(bool fromEnd, float verticalDistance)
+                => OffsetAtVerticalDistance(fromEnd, verticalDistance, out _);
+
+            public Vector2 OffsetAtVerticalDistance(bool fromEnd, float verticalDistance,
+                out float parameter)
             {
                 CubicBezier curve = this;
                 Vector3 endpoint = fromEnd ? curve.P3 : curve.P0;
@@ -233,7 +240,8 @@ namespace VisualMusic
                     progressAtDistance = high;
                 }
 
-                Vector3 sample = curve.Evaluate(ParameterAtProgress(progressAtDistance));
+                parameter = ParameterAtProgress(progressAtDistance);
+                Vector3 sample = curve.Evaluate(parameter);
                 var offset = new Vector2(sample.X - endpoint.X, sample.Y - endpoint.Y);
                 if (offset.LengthSquared() < 0.0000000001f)
                 {
@@ -572,13 +580,31 @@ namespace VisualMusic
                     // stacked vertical stroke (expand the outer cap) from an open bend.
                     float joinRadius = vpLineWidth * 0.5f;
                     Vector2 incomingArm = noteCurve.OffsetAtVerticalDistance(
-                        fromEnd: true, joinRadius);
+                        fromEnd: true, joinRadius, out float incomingArmT);
                     Vector2 outgoingArm = outgoingCurve.OffsetAtVerticalDistance(
                         fromEnd: false, joinRadius);
                     joinVertex.endpointTangents = new Vector4(
                         incomingArm.X, incomingArm.Y, outgoingArm.X, outgoingArm.Y);
+                    // The join disk is not a swept cross-section, so control point 0's packed
+                    // pair alone cannot place a texel on it. Control point 1 - unused by an
+                    // analytic join otherwise - carries the texture change over the incoming
+                    // arm, the same one-radius secant endpointTangents already describes. The
+                    // shader reads the disk in that secant's frame, so the texture keeps the
+                    // arm's rendered direction and its density instead of the curve's tangent,
+                    // which GetHardwareCurveTangent has flattened to horizontal at this bend.
+                    CalcTexCoordsAt(noteCurve.Evaluate(incomingArmT),
+                        noteCurve.Derivative(incomingArmT), incomingArmT, noteLength,
+                        vpLineWidth, texMaterial, out Vector4 armTex, out Vector4 armTex2);
+                    Vector2 joinTexDelta = TexCoordsCenter(joinVertex.texCoords)
+                        - TexCoordsCenter(armTex);
+                    Vector2 joinTexDelta2 = TexCoordsCenter(joinVertex.texCoords2)
+                        - TexCoordsCenter(armTex2);
+                    LinePatchVertex joinRateVertex = joinVertex;
+                    joinRateVertex.texCoords = new Vector4(joinTexDelta.X, joinTexDelta.Y, 0, 0);
+                    joinRateVertex.texCoords2 = new Vector4(joinTexDelta2.X, joinTexDelta2.Y, 0, 0);
                     for (int controlPoint = 0; controlPoint < ControlPointsPerPatch; controlPoint++)
-                        s_linePatchVerts[vertIndex++] = joinVertex;
+                        s_linePatchVerts[vertIndex++] =
+                            controlPoint == 1 ? joinRateVertex : joinVertex;
                     lineGeo.hardwareRoundJoinCount++;
                 }
 
@@ -923,47 +949,85 @@ namespace VisualMusic
                 || (incomingDelta < 0 && outgoingDelta > 0);
         }
 
-        LinePatchVertex CreatePatchVertex(CubicBezier patch, int controlPoint, float sampleT,
-            float noteT, float noteLength, float lineWidth, Vector3 startTangent,
-            Vector3 endTangent, bool startsSegment, bool endsSegment,
-            MaterialProps texMaterial)
+        /// <summary>
+        /// Packs one cross-section's texture coordinates as (coordinate on the centerline,
+        /// offset to the v==1 edge) rather than as the pair of edge coordinates. Keeping the
+        /// cross-section term separate is what lets the domain shader carry the mapping into
+        /// geometry that is not part of the swept strip - the analytic end caps and the round
+        /// join at a sharp bend - instead of freezing it at the last cross-section.
+        /// </summary>
+        static Vector4 PackTexCoords(Vector2 side0Tex, Vector2 side1Tex)
         {
-            Vector3 sampleCenter = patch.Evaluate(sampleT);
-            Vector3 tangent = patch.Derivative(sampleT);
+            Vector2 center = (side0Tex + side1Tex) * 0.5f;
+            Vector2 halfDelta = (side1Tex - side0Tex) * 0.5f;
+            return new Vector4(center.X, center.Y, halfDelta.X, halfDelta.Y);
+        }
+
+        static Vector2 TexCoordsCenter(Vector4 packed) => new Vector2(packed.X, packed.Y);
+
+        /// <summary>
+        /// Texture coordinates for one Bezier control point of <paramref name="patch"/>.
+        /// The centerline is sampled at the control point itself, not at the curve position
+        /// for <paramref name="sampleT"/>: the mapping is affine in the centerline, so control
+        /// point samples are the exact Bezier coefficients of it, while curve samples are only
+        /// interpolated values that the shader's Bezier does not pass through. Screen-anchored
+        /// v drifted off the geometry between control points because of that, worst where the
+        /// pitch curve bends hardest.
+        /// </summary>
+        void CalcPatchTexCoords(CubicBezier patch, int controlPoint, float sampleT, float noteT,
+            float noteLength, float lineWidth, MaterialProps texMaterial,
+            out Vector4 texCoords, out Vector4 texCoords2)
+            => CalcTexCoordsAt(patch.GetControlPoint(controlPoint), patch.Derivative(sampleT),
+                noteT, noteLength, lineWidth, texMaterial, out texCoords, out texCoords2);
+
+        /// <summary>Packed texture coordinates for one cross-section of the stroke.</summary>
+        void CalcTexCoordsAt(Vector3 center, Vector3 tangent, float noteT, float noteLength,
+            float lineWidth, MaterialProps texMaterial,
+            out Vector4 texCoords, out Vector4 texCoords2)
+        {
+            texCoords = Vector4.Zero;
+            texCoords2 = Vector4.Zero;
+            Texture2D texture = texMaterial.TexProps.Texture ?? texMaterial.TexProps.TransitionTexture;
+            if (texture == null)
+                return;
+
             if (tangent.LengthSquared() < 0.0000001f)
                 tangent = Vector3.UnitX;
             Vector3 normal = new Vector3(-tangent.Y, tangent.X, 0);
             normal.Normalize();
             Vector3 offset = LineType == VisualMusic.LineType.Ribbon ? Vector3.UnitX : normal;
             offset *= lineWidth / 2;
-            Vector3 side0 = sampleCenter - offset;
-            Vector3 side1 = sampleCenter + offset;
+            Vector3 side0 = center - offset;
+            Vector3 side1 = center + offset;
 
-            Vector2 tex0 = Vector2.Zero;
-            Vector2 tex1 = Vector2.Zero;
-            Vector2 tex20 = Vector2.Zero;
-            Vector2 tex21 = Vector2.Zero;
-            Texture2D texture = texMaterial.TexProps.Texture ?? texMaterial.TexProps.TransitionTexture;
+            CalcTexCoords(out Vector2 tex0, out Vector2 tex1, texMaterial.TexProps, texture,
+                noteT * noteLength, noteT, lineWidth, side0, side1);
+            texCoords = PackTexCoords(tex0, tex1);
+
             Texture2D texture2 = texMaterial.TexProps.TransitionTexture;
-            if (texture != null)
+            if (texture2 == null)
             {
-                CalcTexCoords(out tex0, out tex1, texMaterial.TexProps, texture,
-                    noteT * noteLength, noteT, lineWidth, side0, side1);
-                if (texture2 != null)
-                    CalcTexCoords(out tex20, out tex21, texMaterial.TexProps, texture2,
-                        noteT * noteLength, noteT, lineWidth, side0, side1);
-                else
-                {
-                    tex20 = tex0;
-                    tex21 = tex1;
-                }
+                texCoords2 = texCoords;
+                return;
             }
+            CalcTexCoords(out Vector2 tex20, out Vector2 tex21, texMaterial.TexProps, texture2,
+                noteT * noteLength, noteT, lineWidth, side0, side1);
+            texCoords2 = PackTexCoords(tex20, tex21);
+        }
+
+        LinePatchVertex CreatePatchVertex(CubicBezier patch, int controlPoint, float sampleT,
+            float noteT, float noteLength, float lineWidth, Vector3 startTangent,
+            Vector3 endTangent, bool startsSegment, bool endsSegment,
+            MaterialProps texMaterial)
+        {
+            CalcPatchTexCoords(patch, controlPoint, sampleT, noteT, noteLength, lineWidth,
+                texMaterial, out Vector4 texCoords, out Vector4 texCoords2);
 
             return new LinePatchVertex
             {
                 center = patch.GetControlPoint(controlPoint),
-                texCoords = new Vector4(tex0.X, tex0.Y, tex1.X, tex1.Y),
-                texCoords2 = new Vector4(tex20.X, tex20.Y, tex21.X, tex21.Y),
+                texCoords = texCoords,
+                texCoords2 = texCoords2,
                 patchData = new Vector4(noteT, noteLength,
                     startsSegment ? 1 : 0, endsSegment ? 1 : 0),
                 endpointTangents = new Vector4(

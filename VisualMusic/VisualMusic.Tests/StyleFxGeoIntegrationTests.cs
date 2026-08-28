@@ -1547,5 +1547,507 @@ namespace VisualMusic.Tests
                 Project.SetDrawHost(null);
             }
         }
+
+        static Project BuildFlatNoteProject()
+        {
+            // One sustained note: a horizontal capsule with a round cap at each end and no
+            // joins, so the caps are exactly the first and last radius worth of columns.
+            var song = new Song
+            {
+                TicksPerBeat = 480,
+                TempoEvents = new List<TempoEvent> { new TempoEvent(0, 120.0) },
+                Tracks = new List<Track>
+                {
+                    new Track { Length = 7680 },
+                    new Track
+                    {
+                        Length = 7680,
+                        Notes = new List<Note>
+                        {
+                            new Note { start = 1920, stop = 5760, channel = 0, pitch = 70, velocity = 100 },
+                        },
+                    },
+                },
+                SongLengthT = 7680,
+            };
+            var project = new Project { Notes = song };
+            project.Props.MinPitch = 65;
+            project.Props.MaxPitch = 75;
+            return project;
+        }
+
+        // Half a period is ~5px on a 768px capture while the line radius is ~19px, so a cap or a
+        // join disk spans several stripes - a frozen coordinate shows up as one flat colour.
+        const int StripeTextureWidth = 24;
+
+        static Texture2D CreateStripeTexture(GraphicsDevice device)
+        {
+            var texture = new Texture2D(device, StripeTextureWidth, 1);
+            var texels = new Microsoft.Xna.Framework.Color[StripeTextureWidth];
+            for (int i = 0; i < StripeTextureWidth; i++)
+            {
+                texels[i] = i < StripeTextureWidth / 2
+                    ? new Microsoft.Xna.Framework.Color(255, 0, 0)
+                    : new Microsoft.Xna.Framework.Color(0, 255, 0);
+            }
+            texture.SetData(texels);
+            return texture;
+        }
+
+        /// <summary>
+        /// A white stroke multiplied by a red/green stripe texture tiled along the note. The edge
+        /// blur and the lighting are both uniform scales, so which of R and G wins survives them
+        /// and reads back the u coordinate a pixel was actually drawn with.
+        /// </summary>
+        static void ApplyStripeMaterial(Project project, TrackView track, Texture2D stripes)
+        {
+            var material = track.TrackProps.MaterialProps;
+            material.TexProps.Texture = stripes;
+            material.TexProps.TexColBlend = true;   // colour * texel instead of an HSL shift
+            material.TexProps.PointSmp = true;
+            material.TexProps.UAnchor = TexAnchorEnum.Note;
+            material.TexProps.VAnchor = TexAnchorEnum.Note;
+            material.TexProps.UTile = true;
+            material.TexProps.VTile = false;
+            material.TexProps.KeepAspect = false;
+            material.Normal.Sat = 0;                // white: the texel colour survives unchanged
+            material.Normal.Lum = 2;
+            var global = project.GlobalTrackProps.MaterialProps;
+            global.Hue = 0;
+            global.Transp = 1;
+            global.Normal.Sat = 1;
+            global.Normal.Lum = 1;
+        }
+
+        static int StripeSign(Microsoft.Xna.Framework.Color pixel)
+        {
+            if (pixel.R > pixel.G + 40 && pixel.R > 60)
+                return 1;
+            if (pixel.G > pixel.R + 40 && pixel.G > 60)
+                return -1;
+            return 0;
+        }
+
+        static (int Red, int Green) CountStripes(Microsoft.Xna.Framework.Color[] pixels, int width,
+            int firstRow, int lastRow, int firstColumn, int lastColumn)
+        {
+            int red = 0;
+            int green = 0;
+            for (int y = firstRow; y <= lastRow; y++)
+            {
+                for (int x = firstColumn; x <= lastColumn; x++)
+                {
+                    int sign = StripeSign(pixels[y * width + x]);
+                    if (sign > 0)
+                        red++;
+                    else if (sign < 0)
+                        green++;
+                }
+            }
+            return (red, green);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Hardware_line_caps_carry_the_texture_past_the_note()
+        {
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            Texture2D stripes = null;
+            try
+            {
+                var project = BuildFlatNoteProject();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                var track = project.TrackViews[1];
+                track.TrackProps.StyleProps.Type = NoteStyleType.Line;
+                var lineStyle = track.TrackProps.StyleProps.GetLineStyle();
+                lineStyle.LineWidth = 50;
+                lineStyle.HlSize = 0;
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(cm);
+                stripes = CreateStripeTexture(gds.GraphicsDevice);
+                ApplyStripeMaterial(project, track, stripes);   // before the bake: geo carries texcoords
+                NoteStyle.SetProject(project);
+                project.NormSongPos = 0.5;                      // note centred on screen
+
+                var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
+                Assert.Equal(1, bakedGeo.hardwareStartCapCount);
+                Assert.Equal(1, bakedGeo.hardwareEndCapCount);
+
+                const int width = 768;
+                const int height = 456;
+                var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
+                NoteStyle_Line.SetHardwareTessellation(true);
+                using var target = new RenderTarget2D(gds.GraphicsDevice, width, height, false,
+                    SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                gds.GraphicsDevice.SetRenderTarget(target);
+                gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+                gds.GraphicsDevice.Clear(clearColor);
+                try
+                {
+                    track.DrawTrack(project.GlobalTrackProps, defaultStyle: false);
+                }
+                finally
+                {
+                    gds.GraphicsDevice.SetRenderTarget(null);
+                }
+                var pixels = new Microsoft.Xna.Framework.Color[width * height];
+                target.GetData(pixels);
+
+                int minX = width, maxX = -1, minY = height, maxY = -1;
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (StripeSign(pixels[y * width + x]) == 0)
+                            continue;
+                        minX = Math.Min(minX, x);
+                        maxX = Math.Max(maxX, x);
+                        minY = Math.Min(minY, y);
+                        maxY = Math.Max(maxY, y);
+                    }
+                }
+                Assert.True(maxX > minX, "no textured stroke was rendered");
+                // A horizontal capsule is exactly one diameter tall, so its caps are the first
+                // and the last radius worth of columns.
+                int radius = (maxY - minY + 1) / 2;
+                Assert.InRange(radius, 12, 30);
+
+                var startCap = CountStripes(pixels, width, minY, maxY, minX + 1, minX + radius);
+                var endCap = CountStripes(pixels, width, minY, maxY, maxX - radius, maxX - 1);
+
+                // A cap is a rectangle pushed one radius past the end of the curve, where the
+                // domain's curve parameter is pinned. Pinning the texture coordinate with it
+                // smeared the endpoint's single texel column over the whole semicircle, so each
+                // cap came out one flat colour instead of continuing the stripes.
+                Assert.True(startCap.Red > 20 && startCap.Green > 20,
+                    $"start cap is not striped: {startCap.Red} red / {startCap.Green} green px.");
+                Assert.True(endCap.Red > 20 && endCap.Green > 20,
+                    $"end cap is not striped: {endCap.Red} red / {endCap.Green} green px.");
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                stripes?.Dispose();
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        static Microsoft.Xna.Framework.Color[] RenderTrack(GraphicsDeviceService gds,
+            Project project, TrackView track, out int width, out int height)
+        {
+            width = 768;
+            height = 456;
+            var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
+            NoteStyle_Line.SetHardwareTessellation(true);
+            using var target = new RenderTarget2D(gds.GraphicsDevice, width, height, false,
+                SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+            using var depthStencil = new DepthStencilState
+            {
+                StencilEnable = true,
+                StencilFunction = CompareFunction.Greater,
+                StencilPass = StencilOperation.Replace,
+                ReferenceStencil = 1,
+            };
+            gds.GraphicsDevice.SetRenderTarget(target);
+            gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            var oldDepthStencil = gds.GraphicsDevice.DepthStencilState;
+            gds.GraphicsDevice.DepthStencilState = depthStencil;
+            gds.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer
+                | ClearOptions.Stencil, clearColor, 1, 0);
+            try
+            {
+                track.DrawTrack(project.GlobalTrackProps, defaultStyle: false);
+            }
+            finally
+            {
+                gds.GraphicsDevice.SetRenderTarget(null);
+                gds.GraphicsDevice.DepthStencilState = oldDepthStencil;
+            }
+            var pixels = new Microsoft.Xna.Framework.Color[width * height];
+            target.GetData(pixels);
+            Assert.Contains(pixels, pixel => pixel != clearColor);
+            return pixels;
+        }
+
+        /// <summary>
+        /// Largest number of red/green stripe alternations along any single row of a box, and
+        /// the widest run of textured pixels a row of that box has. Their ratio is how densely
+        /// the texture repeats across the stroke there.
+        /// </summary>
+        static (int Transitions, int Width) StripeDensity(Microsoft.Xna.Framework.Color[] pixels,
+            int width, int firstRow, int lastRow, int firstColumn, int lastColumn)
+        {
+            int worstTransitions = 0;
+            int widestRun = 0;
+            for (int y = firstRow; y <= lastRow; y++)
+            {
+                int transitions = 0;
+                int run = 0;
+                int previous = 0;
+                for (int x = firstColumn; x <= lastColumn; x++)
+                {
+                    int sign = StripeSign(pixels[y * width + x]);
+                    if (sign == 0)
+                        continue;
+                    run++;
+                    if (previous != 0 && sign != previous)
+                        transitions++;
+                    previous = sign;
+                }
+                worstTransitions = Math.Max(worstTransitions, transitions);
+                widestRun = Math.Max(widestRun, run);
+            }
+            return (worstTransitions, widestRun);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Squeezed_track_view_keeps_the_cap_texture_off_the_note_scale()
+        {
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            Texture2D stripes = null;
+            try
+            {
+                var project = BuildFlatNoteProject();
+                project.CreateTrackViews(2, eraseCurrent: true);
+                var track = project.TrackViews[1];
+                track.TrackProps.StyleProps.Type = NoteStyleType.Line;
+                var lineStyle = track.TrackProps.StyleProps.GetLineStyle();
+                lineStyle.LineWidth = 50;
+                lineStyle.HlSize = 0;
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(cm);
+                stripes = CreateStripeTexture(gds.GraphicsDevice);
+                ApplyStripeMaterial(project, track, stripes);
+                // One texture across the whole note, so a repeat count reads directly off the
+                // number of red/green alternations.
+                track.TrackProps.MaterialProps.TexProps.UTile = false;
+                NoteStyle.SetProject(project);
+                // Baked at the global 16 QN, drawn through a far wider track view. The
+                // note collapses to well under one line diameter while the cap keeps its full
+                // radius, which is what made the cap out-repeat the note it caps.
+                track.TrackProps.SpatialProps.ViewWidthQn = 1024;
+                project.NormSongPos = 0.5;
+
+                var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
+                Assert.Equal(1, bakedGeo.hardwareStartCapCount);
+                Assert.Equal(1, bakedGeo.hardwareEndCapCount);
+                Assert.Equal(0.015625f, project.TrackViewWidthQnScale(track.TrackProps), 6);
+
+                var pixels = RenderTrack(gds, project, track, out int width, out int height);
+
+                int minX = width, maxX = -1, minY = height, maxY = -1;
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (StripeSign(pixels[y * width + x]) == 0)
+                            continue;
+                        minX = Math.Min(minX, x);
+                        maxX = Math.Max(maxX, x);
+                        minY = Math.Min(minY, y);
+                        maxY = Math.Max(maxY, y);
+                    }
+                }
+                Assert.True(maxX > minX, "no textured stroke was rendered");
+                int radius = (maxY - minY + 1) / 2;
+                Assert.InRange(radius, 12, 30);
+                // The squeeze is real: the note is now narrower than a single cap.
+                int noteWidth = maxX - minX + 1 - 2 * radius;
+                Assert.InRange(noteWidth, 1, radius);
+
+                var startCap = StripeDensity(pixels, width, minY, maxY, minX + 1, minX + radius);
+                var endCap = StripeDensity(pixels, width, minY, maxY, maxX - radius, maxX - 1);
+
+                // Each cap may show at most about one pass over the texture. Advancing at the
+                // curve parameter one radius of screen space is worth ran through the note's
+                // whole coordinate range several times over, tiling the texture across a cap
+                // far more finely than anywhere on the stroke it belongs to.
+                // Each cap may show at most about one pass over the texture. Advancing at the
+                // curve parameter one radius of screen space is worth ran through the note's
+                // whole coordinate range three times over here, tiling the texture across a cap
+                // far more finely than anywhere on the stroke the cap belongs to. A cap with no
+                // alternation at all would mean the coordinate is pinned again.
+                Assert.InRange(startCap.Transitions, 1, 3);
+                Assert.InRange(endCap.Transitions, 1, 3);
+            }
+            finally
+            {
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                stripes?.Dispose();
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void Hardware_round_join_carries_the_texture_through_the_bend()
+        {
+            string contentRoot = EnsureContentRoot();
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            IntPtr hwnd = IntPtr.Zero;
+            GraphicsDeviceService gds = null;
+            ContentManager cm = null;
+            Texture2D stripes = null;
+            try
+            {
+                var project = BuildSharpPeakProject();
+                project.Props.MaxPitch = 85;
+                project.CreateTrackViews(2, eraseCurrent: true);
+                var track = project.TrackViews[1];
+                track.TrackProps.StyleProps.Type = NoteStyleType.Line;
+                var lineStyle = track.TrackProps.StyleProps.GetLineStyle();
+                lineStyle.LineWidth = 50;
+                lineStyle.HlSize = 0;
+                track.TrackProps.SpatialProps.ViewWidthQn = 12.771335f;
+
+                hwnd = CreateHostWindow();
+                gds = GraphicsDeviceService.AddRef(hwnd, 64, 64);
+                var svc = new ServiceContainer();
+                svc.AddService<IGraphicsDeviceService>(gds);
+                cm = new ContentManager(svc, contentRoot);
+
+                NoteStyle.SetGraphicsDevice(gds.GraphicsDevice);
+                NoteStyle.SInitAllStyles();
+                NoteStyle.SetContent(cm);
+                stripes = CreateStripeTexture(gds.GraphicsDevice);
+                ApplyStripeMaterial(project, track, stripes);
+                NoteStyle.SetProject(project);
+                project.NormSongPos = 0.72;
+
+                var bakedGeo = Assert.IsType<LineGeo>(track.Geo);
+                Assert.Equal(1, bakedGeo.hardwareRoundJoinCount);
+
+                const int width = 768;
+                const int height = 456;
+                var clearColor = new Microsoft.Xna.Framework.Color(1, 2, 3, 4);
+                NoteStyle_Line.SetHardwareTessellation(true);
+                using var target = new RenderTarget2D(gds.GraphicsDevice, width, height, false,
+                    SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+                using var depthStencil = new DepthStencilState
+                {
+                    StencilEnable = true,
+                    StencilFunction = CompareFunction.Greater,
+                    StencilPass = StencilOperation.Replace,
+                    ReferenceStencil = 1,
+                };
+                gds.GraphicsDevice.SetRenderTarget(target);
+                gds.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+                var oldDepthStencil = gds.GraphicsDevice.DepthStencilState;
+                gds.GraphicsDevice.DepthStencilState = depthStencil;
+                gds.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer
+                    | ClearOptions.Stencil, clearColor, 1, 0);
+                try
+                {
+                    track.DrawTrack(project.GlobalTrackProps, defaultStyle: false);
+                }
+                finally
+                {
+                    gds.GraphicsDevice.SetRenderTarget(null);
+                    gds.GraphicsDevice.DepthStencilState = oldDepthStencil;
+                }
+                var pixels = new Microsoft.Xna.Framework.Color[width * height];
+                target.GetData(pixels);
+
+                int topRow = -1;
+                for (int y = 0; y < height && topRow < 0; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (StripeSign(pixels[y * width + x]) != 0)
+                        {
+                            topRow = y;
+                            break;
+                        }
+                    }
+                }
+                Assert.True(topRow >= 0, "no textured stroke was rendered");
+
+                // The peak's round join is the topmost geometry and is drawn before the arms, so
+                // the rows just under the top of the stroke are the join disk. Its texture used
+                // to be a lerp of the packed pair over the domain quad, which pinned u to the
+                // note end - the whole disk came out one flat colour and laid v across the
+                // disk's vertical axis instead of along the arm's normal.
+                // The disk's apex is the only thing in the stroke's topmost row, so its run
+                // centres on the join. Probe well inside the disk (a ~19px radius here) to stay
+                // clear of the two arms, which pass around it and are striped either way.
+                int apexLeft = width, apexRight = -1;
+                for (int x = 0; x < width; x++)
+                {
+                    if (StripeSign(pixels[topRow * width + x]) == 0)
+                        continue;
+                    apexLeft = Math.Min(apexLeft, x);
+                    apexRight = Math.Max(apexRight, x);
+                }
+                int joinX = (apexLeft + apexRight) / 2;
+                var joinDisk = CountStripes(pixels, width, topRow + 4, topRow + 12,
+                    joinX - 9, joinX + 9);
+                Assert.True(joinDisk.Red > 20 && joinDisk.Green > 20,
+                    $"round join is not textured: {joinDisk.Red} red / {joinDisk.Green} green px.");
+
+                // The arms leave this peak steeply, so the texture has to run along them: a row
+                // across the disk stays nearly one colour. Reading the disk in the curve's own
+                // frame instead laid the texture out as though the line were horizontal - the
+                // tangent at an extremum is flattened - and tiled it finely across these rows.
+                var acrossStroke = StripeDensity(pixels, width, topRow + 4, topRow + 12,
+                    joinX - 9, joinX + 9);
+                Assert.InRange(acrossStroke.Transitions, 0, 4);
+            }
+            finally
+            {
+                NoteStyle_Line.SetHardwareTessellation(true);
+                NoteStyle.SetContent(null);
+                NoteStyle.SetProject(null);
+                NoteStyle.SetGraphicsDevice(null);
+                stripes?.Dispose();
+                cm?.Dispose();
+                gds?.Release(disposing: true);
+                if (hwnd != IntPtr.Zero)
+                    DestroyWindow(hwnd);
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
     }
 }

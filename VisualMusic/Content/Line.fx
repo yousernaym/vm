@@ -286,6 +286,14 @@ float4 evaluateTexCoords(const OutputPatch<PatchControlPoint, 4> patch, float t,
 		+ p3 * (t * t * t);
 }
 
+// texCoords pack the mapping as (coordinate on the centerline, offset to the v==1 edge).
+// crossSection is the signed cross-section position in radii - the same value the
+// silhouette uses, so a curvature-clamped inner edge stays on its texel.
+float2 unpackTexCoords(float4 packed, float crossSection)
+{
+	return packed.xy + packed.zw * crossSection;
+}
+
 float4 evaluatePatchData(const OutputPatch<PatchControlPoint, 4> patch, float t)
 {
 	float s = 1 - t;
@@ -346,10 +354,27 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		}
 		float2 joinOffset = float2(outerCenter, 0) + joinCoords * outerRadius;
 		float3 rawPos = center + float3(joinOffset, 0);
-		float2 texCoords = lerp(patch[0].texCoords.xy, patch[0].texCoords.zw,
-			domainLocation.y);
-		float2 texCoords2 = lerp(patch[0].texCoords2.xy, patch[0].texCoords2.zw,
-			domainLocation.y);
+		// The join is a disk, not a swept cross-section, so map each of its points back onto
+		// the incoming arm's frame and continue that arm's own texture rate. armIn already
+		// reaches one line-radius back along the arm, which makes it the right secant twice
+		// over: its direction is the stroke as rendered - the curve's tangent at an extremum
+		// is flattened to horizontal by GetHardwareCurveTangent, which is why the disk's
+		// texture used to read as a horizontal line - and its projected length is at least a
+		// radius, so the disk cannot outrun the density the arm beside it shows. Control
+		// point 1 carries the texture change over exactly that secant; an analytic join has
+		// no other use for those slots.
+		float armLengthSquared = dot(armIn, armIn);
+		bool armIsMeasurable = armLengthSquared > 0.000000000001f;
+		float2 strokeDir = armIsMeasurable ? -armIn * rsqrt(armLengthSquared) : float2(1, 0);
+		float2 strokeNormal = float2(-strokeDir.y, strokeDir.x);
+		float joinCrossSection = dot(joinOffset, strokeNormal) / max(Radius, 0.000001f);
+		float joinAdvance = armIsMeasurable
+			? dot(joinOffset, strokeDir) / max(sqrt(armLengthSquared), Radius)
+			: 0;
+		float2 texCoords = unpackTexCoords(patch[0].texCoords, joinCrossSection)
+			+ patch[1].texCoords.xy * joinAdvance;
+		float2 texCoords2 = unpackTexCoords(patch[0].texCoords2, joinCrossSection)
+			+ patch[1].texCoords2.xy * joinAdvance;
 
 		LineOutput output;
 		output.normal = float3(0, 1, 0);
@@ -396,6 +421,10 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 	float side = sideT * 2 - 1;
 	float3 center = evaluatePosition(patch, curveT);
 	float3 tangent = evaluateTangent(patch, curveT);
+	// The texture coordinates are a Bezier over this patch's own parameter, so the cap
+	// extrapolation below has to measure distance with the patch derivative, not with
+	// the seam-carrying endpoint tangent substituted a few lines down.
+	float2 patchTangent = tangent.xy;
 	float3 secondDerivative = evaluateSecondDerivative(patch, curveT);
 	// Each connected patch uses the preceding patch's final cross-section at the
 	// shared endpoint. This also spans duplicate MIDI notes, whose zero-duration
@@ -406,6 +435,7 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 		tangent.xy = patch[0].endpointTangents.zw;
 	center.x *= VertWidthScale;
 	tangent.x *= VertWidthScale;
+	patchTangent.x *= VertWidthScale;
 	secondDerivative.x *= VertWidthScale;
 	float3 tangentDirection = normalize(tangent);
 	float3 normal = normalize(float3(-tangent.y, tangent.x, 0));
@@ -463,6 +493,23 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 	float3 rawPos = center + offset;
 	float4 packedTexCoords = evaluateTexCoords(patch, curveT, false);
 	float4 packedTexCoords2 = evaluateTexCoords(patch, curveT, true);
+	// A cap is a rectangle pushed one radius past the end of the curve's parameter range,
+	// where curveT is pinned to 0 or 1. Continue the texture across it at the rate the
+	// stroke beside it actually shows on screen: a secant of about one radius (clamped to
+	// this patch), measured in the same scaled space the cap is drawn in. The instantaneous
+	// derivative cannot stand in for that - GetHardwareCurveTangent flattens the tangent at
+	// an extremum and at a note's stop, exactly the ends that carry a cap, so dividing by it
+	// repeated the whole texture many times across the semicircle. Never advance by more
+	// than the secant itself covers either: under a squeezed track view one radius of screen
+	// space is worth many note lengths of curve parameter, and the cap would out-repeat the
+	// stroke it belongs to.
+	float capSecantT = clamp(Radius / max(length(patchTangent), 0.000001f), 0.02f, 1);
+	float capSampleT = saturate(curveT - capDirection * capSecantT);
+	float3 capSecantCenter = evaluatePosition(patch, capSampleT);
+	capSecantCenter.x *= VertWidthScale;
+	float capSecantLength = max(length(center.xy - capSecantCenter.xy), 0.000001f);
+	float capAdvance = capAmount * min(Radius / capSecantLength, 1);
+	float crossSection = sideT * 2 - 1;
 	float4 patchData = evaluatePatchData(patch, curveT);
 
 	LineOutput output;
@@ -473,8 +520,12 @@ LineOutput DS(PatchConstants constants, float2 domainLocation : SV_DomainLocatio
 	output.worldSize = float2(patchData.y * VertWidthScale, Radius * 2);
 	output.pos = float4(rawPos.xy, 0, 1);
 	output.pos = wvpTransform(output.pos, 1);
-	output.texCoords = lerp(packedTexCoords.xy, packedTexCoords.zw, sideT) - TexScrollOffset;
-	output.texCoords2 = lerp(packedTexCoords2.xy, packedTexCoords2.zw, sideT) - TexScrollOffset2;
+	output.texCoords = unpackTexCoords(packedTexCoords, crossSection)
+		+ (packedTexCoords.xy - evaluateTexCoords(patch, capSampleT, false).xy) * capAdvance
+		- TexScrollOffset;
+	output.texCoords2 = unpackTexCoords(packedTexCoords2, crossSection)
+		+ (packedTexCoords2.xy - evaluateTexCoords(patch, capSampleT, true).xy) * capAdvance
+		- TexScrollOffset2;
 	output.capAmount = capAmount;
 	output.edgeBlurMask = LineType == 0 ? edgeBlurMask : 1;
 	output.roundJoinCoords = float3(0, 0, 0);
