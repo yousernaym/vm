@@ -623,7 +623,7 @@ namespace VisualMusic
 
         }
 
-        protected void CalcRectTexCoords(out Vector2 topLeft_tex, out Vector2 size_tex, Vector2 texSize, Vector2 topLeft_world, Vector2 size_world, MaterialProps texMaterial)
+        protected internal void CalcRectTexCoords(out Vector2 topLeft_tex, out Vector2 size_tex, Vector2 texSize, Vector2 topLeft_world, Vector2 size_world, MaterialProps texMaterial)
         {
             topLeft_tex = CalcTexCoords(texSize, topLeft_world, size_world, new Vector2(0, 0), texMaterial);
             size_tex = CalcTexCoords(texSize, topLeft_world, size_world, size_world, texMaterial) - topLeft_tex;
@@ -652,7 +652,11 @@ namespace VisualMusic
             Vector2 coords = new Vector2();
             coords.X = CalcTexCoordComponent(texSize.X, Project.Props.Camera.ViewportSize.X, notePos.X, noteSize.X, posOffset.X, (bool)texMaterial.TexProps.UTile, (TexAnchorEnum)texMaterial.TexProps.UAnchor, true);
             coords.Y = CalcTexCoordComponent(texSize.Y, Project.Props.Camera.ViewportSize.Y, notePos.Y, noteSize.Y, posOffset.Y, (bool)texMaterial.TexProps.VTile, (TexAnchorEnum)texMaterial.TexProps.VAnchor, false);
-            coords.Y *= -1;
+            // destRect origin is min-Y (visual bottom). For default Note + untiled V, put 0 at the
+            // visual top of the note and 1 at the bottom so each bar maps (0,0) upper-left → (1,1) lower-right.
+            bool noteUntiledV = (TexAnchorEnum)texMaterial.TexProps.VAnchor == TexAnchorEnum.Note
+                && !(bool)texMaterial.TexProps.VTile;
+            coords.Y = noteUntiledV ? 1 - coords.Y : -coords.Y;
             return coords;
         }
 
