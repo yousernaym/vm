@@ -53,9 +53,11 @@ Source: "{#BinFolder}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; MonoGame content
 Source: "{#BinFolder}\Content\*"; DestDir: "{app}\Content"; Flags: ignoreversion createallsubdirs recursesubdirs
 
-;Remuxer
+;Remuxer (framework-dependent — runtimeconfig.json is required; without it the host treats the exe as self-contained)
 Source: "{#BinFolder}\Remuxer\*.dll"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "{#BinFolder}\Remuxer\Remuxer.exe"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
+Source: "{#BinFolder}\Remuxer\Remuxer.runtimeconfig.json"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
+Source: "{#BinFolder}\Remuxer\Remuxer.deps.json"; DestDir: "{app}\Remuxer"; Flags: ignoreversion
 Source: "..\Dependencies\Remuxer\libRemuxer\roms\*"; DestDir: "{app}\Remuxer\Roms"; Flags: ignoreversion
 
 ;Cefsharp
