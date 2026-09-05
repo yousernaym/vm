@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shell;
+using System.Windows.Threading;
 
 namespace VisualMusic.Controls
 {
@@ -48,6 +49,9 @@ namespace VisualMusic.Controls
 
         void IRenderProgressCallback.UpdateProgress(float normProgress)
             => Dispatcher.InvokeAsync(() => UpdateProgressOnUi(normProgress));
+
+        void IRenderProgressCallback.SetBusy()
+            => Dispatcher.InvokeAsync(SetBusyOnUi);
 
         // ---- Bound properties ----
 
@@ -133,6 +137,7 @@ namespace VisualMusic.Controls
         readonly string _doneMessage;
 
         bool _finished;
+        bool _jobStarted;
         bool _cancelRequested;   // guard against re-entrancy in RequestCancel()
 
         // Pause the live 120fps render loop while this modal dialog is up. The nested message loop
@@ -160,7 +165,12 @@ namespace VisualMusic.Controls
             InitializeComponent();
             _liveLoopSuspension = MonoGameHost.SuspendLiveLoop();
             Loaded += OnLoaded;
-            Activated += (_, _) => ApplyDeferredChrome(_progress / 100.0);
+            ContentRendered += OnContentRendered;
+            Activated += (_, _) =>
+            {
+                if (!IsIndeterminate)
+                    ApplyDeferredChrome(_progress / 100.0);
+            };
             Closed += (_, _) =>
             {
                 ClearOwnerTaskbar();
@@ -178,11 +188,51 @@ namespace VisualMusic.Controls
                 return;
             }
 
+            // Paint the busy bar first. Starting the job on Loaded lets a fully synchronous open
+            // (saved MIDI, texture loads) run at Normal priority and finish before Render, so the
+            // window never appears — MIDI mixdown looked fine only because Task.Run yielded.
+            SetBusyOnUi();
+            _stopwatch.Start();
+            Dispatcher.BeginInvoke(StartJob, DispatcherPriority.ApplicationIdle);
+        }
+
+        void OnContentRendered(object sender, EventArgs e)
+        {
+            Dispatcher.BeginInvoke(StartJob, DispatcherPriority.ApplicationIdle);
+        }
+
+        void StartJob()
+        {
+            if (_jobStarted || _finished || _job == null) return;
+            _jobStarted = true;
+            ContentRendered -= OnContentRendered;
+            _job(this).ContinueWith(OnJobFinished);
+        }
+
+        /// <summary>
+        /// Lets the progress window paint and process Cancel while the UI thread is doing a
+        /// stretch of synchronous work (GPU texture loads). No-op off the WPF dispatcher.
+        /// </summary>
+        internal static void PumpIdle()
+        {
+            var d = Application.Current?.Dispatcher;
+            if (d == null || !d.CheckAccess()) return;
+            var frame = new DispatcherFrame();
+            d.BeginInvoke(DispatcherPriority.Background, (Action)(() => frame.Continue = false));
+            Dispatcher.PushFrame(frame);
+        }
+
+        void SetBusyOnUi()
+        {
+            IsIndeterminate = true;
+            ElapsedText = "";
+            RemainingText = "";
+            TitleText = _titlePrefix;
+            _lastTitlePercent = -1;
+            _lastTaskbarProgress = float.NaN;
             var taskbar = EnsureOwnerTaskbar();
             if (taskbar != null)
-                taskbar.ProgressState = TaskbarItemProgressState.Normal;
-            _stopwatch.Start();
-            _job(this).ContinueWith(OnJobFinished);
+                taskbar.ProgressState = TaskbarItemProgressState.Indeterminate;
         }
 
         // ---- Progress update (called on UI thread via IRenderProgressCallback.UpdateProgress) ----
@@ -193,6 +243,9 @@ namespace VisualMusic.Controls
 
             Progress = normProgress * 100.0;
             IsIndeterminate = false;
+            var taskbar = EnsureOwnerTaskbar();
+            if (taskbar != null)
+                taskbar.ProgressState = TaskbarItemProgressState.Normal;
 
             // Title / taskbar chrome can yank Alt+Tab back to this app while the switcher is
             // open (foreground is Explorer/DWM, not us). Keep in-window progress updating;
@@ -230,7 +283,7 @@ namespace VisualMusic.Controls
 
         void ApplyDeferredChrome(double normProgress)
         {
-            if (double.IsNaN(normProgress) || normProgress < 0)
+            if (IsIndeterminate || double.IsNaN(normProgress) || normProgress < 0)
                 return;
 
             int percent = (int)(normProgress * 100.0 + 0.5);
@@ -376,20 +429,9 @@ namespace VisualMusic.Controls
                     {
                         if (totalBytes == null || totalBytes <= 0)
                         {
-                            // Signal the window to show indeterminate mode (no time estimates).
-                            cb.UpdateProgress(0f);
-                            if (cb is ProgressWindow pw)
-                                pw.Dispatcher.InvokeAsync(() =>
-                                {
-                                    pw.IsIndeterminate = true;
-                                    pw.ElapsedText = "";
-                                    pw.RemainingText = "";
-                                });
+                            cb.SetBusy();
                             return;
                         }
-
-                        if (cb is ProgressWindow progressWindow)
-                            progressWindow.Dispatcher.InvokeAsync(() => progressWindow.IsIndeterminate = false);
 
                         cb.UpdateProgress((float)downloadedBytes / totalBytes.Value);
                     },

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading;
 using LibSidWiz;
 using Microsoft.Xna.Framework.Content;
 using Midi;
@@ -241,6 +242,31 @@ namespace VisualMusic.Tests
                 var expected = loaded.TrackViews[1].TrackProps.AudioProps.SidWizChannel;
                 wp.RemoveChannel(expected);
                 Assert.Equal(0, wp.ChannelCount);
+            }
+            finally
+            {
+                wp.Dispose();
+                TrackView.NumTracks = previousNumTracks;
+                Project.SetDrawHost(null);
+            }
+        }
+
+        [Fact]
+        public void InitAfterDeserialization_throws_when_cancel_requested()
+        {
+            Project.SetDrawHost(new FakeSongDrawHost());
+            var previousNumTracks = TrackView.NumTracks;
+            var wp = new WaveformPanel();
+            try
+            {
+                var loaded = RoundTrip(BuildSampleProject());
+                loaded.Notes = EmptySong(2);
+                loaded.CreateTrackViews(2, eraseCurrent: false, preserveTrackSet: true);
+
+                using var cts = new CancellationTokenSource();
+                cts.Cancel();
+                Assert.Throws<OperationCanceledException>(() =>
+                    loaded.InitAfterDeserialization(waveformPanel: wp, loadAudio: false, ct: cts.Token));
             }
             finally
             {

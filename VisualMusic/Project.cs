@@ -649,7 +649,10 @@ namespace VisualMusic
                 if (MidMix.SfLoaded())
                 {
                     string audioPath = Path.Combine(Program.TempDir, Path.GetFileName(options.NotePath)) + ".wav";
-                    MidMix.Mixdown(options.NotePath, audioPath);
+                    // Fluidsynth mixdown is a blocking native call with no cancel; run it off the
+                    // UI thread so the progress window's busy bar can keep animating.
+                    await Task.Run(() => MidMix.Mixdown(options.NotePath, audioPath), ct);
+                    ct.ThrowIfCancellationRequested();
                     options.GeneratedAudioPath = audioPath;
                 }
             }
@@ -2749,10 +2752,15 @@ namespace VisualMusic
         /// live WaveformPanel or stale channels from a previous project remain. Headless unit tests
         /// that do not exercise waveforms pass true.
         /// </param>
+        /// <param name="ct">
+        /// Checked between tracks so a long multi-texture open can abort remaining GPU loads.
+        /// LoadTexture itself is not interruptible.
+        /// </param>
         internal void InitAfterDeserialization(
             WaveformPanel waveformPanel = null,
             bool loadAudio = true,
-            bool allowMissingWaveformPanel = false)
+            bool allowMissingWaveformPanel = false,
+            CancellationToken ct = default)
         {
             if (PropertyKeyframes == null)
                 PropertyKeyframes = new Keyframes.KeyframeSet();
@@ -2773,6 +2781,7 @@ namespace VisualMusic
             PrepareVoiceOwnership();
             for (int i = 0; i < TrackViews.Count; i++)
             {
+                ct.ThrowIfCancellationRequested();
                 var tv = TrackViews[i];
                 tv.TrackProps.LoadContent();
                 if (i > 0)
@@ -2781,6 +2790,7 @@ namespace VisualMusic
                         _ = tv.TrackProps.AudioProps.LoadAudioAsync();
                     wp?.AddChannel(tv.TrackProps.AudioProps.SidWizChannel);
                 }
+                Controls.ProgressWindow.PumpIdle();
             }
 
             // Force recalculation of derived state (SongLengthS, playbackOffsetT, etc).

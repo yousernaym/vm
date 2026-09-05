@@ -12,5 +12,10 @@ namespace VisualMusic
         CancellationToken CancelToken { get; }
         void ShowMessage(string message);
         void UpdateProgress(float normProgress);
+        /// <summary>
+        /// Show an indeterminate busy bar (no percentage or ETA). Use while work cannot report
+        /// progress, or after a determinate phase so a 100% bar does not look stuck.
+        /// </summary>
+        void SetBusy();
     }
 }

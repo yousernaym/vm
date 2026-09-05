@@ -712,7 +712,7 @@ namespace VisualMusic.ViewModels
         // ---- File commands ----
 
         [RelayCommand]
-        async Task OpenProject()
+        void OpenProject()
         {
             var dlg = new OpenFileDialog
             {
@@ -745,17 +745,13 @@ namespace VisualMusic.ViewModels
 
             // BindDrawProject + post-load Init share one try so any failure restores the live
             // NoteStyle / SongRenderer.Project / waveform channels (not a half-open temp project).
-            ImportOptions io;
+            ImportOptions io = null;
             // Non-null once RequireRendererWaveformPanel succeeds — Init (or a later step) may have
             // cleared/replaced the live panel's channels for tempProject; failure must re-wire Project.
             WaveformPanel panelTouched = null;
             var missingFiles = MissingFileResolveResult.Continue(false);
             try
             {
-                // Align NoteStyle + SongRenderer.Project before LoadContent/Init so the draw loop
-                // does not keep drawing the previous Project while NoteStyle reads the temp one.
-                BindDrawProject(tempProject);
-
                 missingFiles = ProjectMissingFiles.Resolve(tempProject,
                     new WpfMissingFilePrompt(Application.Current.MainWindow));
                 if (missingFiles.Aborted)
@@ -764,32 +760,31 @@ namespace VisualMusic.ViewModels
                     return;
                 }
 
-                // A MOD/SID/HVL project re-runs the external remuxer on load (unless its converted
-                // outputs are already cached), so show the same progress window a fresh import does.
-                // MIDI and audio-only projects rebuild in-process, so no progress window is needed.
-                if (tempProject.ImportOptions != null &&
-                    !tempProject.ImportOptions.SkipNoteLoad &&
-                    tempProject.ImportOptions.NoteFileType is not (FileType.Midi or FileType.Audio))
+                // Mixdown, remuxer, MIDI parse, and GPU texture/keyframe loads all run behind the
+                // shared progress window (determinate % only while remuxer reports it).
+                if (!RunBehindProgress("Opening project", async cb =>
                 {
-                    if (!RunConversionBehindProgress((p, ct) => tempProject.LoadContent(p, ct)))
-                    {
-                        // Conversion was cancelled or produced nothing — keep the current project.
-                        RestoreAfterFailedOpen(panelTouched);
-                        return;
-                    }
+                    // Bind inside the job so style bake is covered and the live loop (suspended
+                    // while the dialog is up) does not draw the previous project with temp NoteStyle.
+                    BindDrawProject(tempProject);
+                    if (!await tempProject.LoadContent(new Progress<float>(cb.UpdateProgress), cb.CancelToken))
+                        return false;
+                    cb.SetBusy();
+                    io = tempProject.ImportOptions;
+                    var trackAudioTargets = ApplyGeneratedTrackAudio(tempProject, io);
+                    bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
+                    panelTouched = RequireRendererWaveformPanel();
+                    tempProject.InitAfterDeserialization(panelTouched, loadAudio: !deferTrackAudioLoad,
+                        ct: CancelTokenForTextureLoad(cb.CancelToken));
+                    if (deferTrackAudioLoad)
+                        await LoadTrackAudioAsync(trackAudioTargets);
+                    LoadStaticBackgroundIfUnkeyframed(tempProject);
+                    return true;
+                }))
+                {
+                    RestoreAfterFailedOpen(panelTouched);
+                    return;
                 }
-                else
-                    await tempProject.LoadContent();
-
-                // Re-point tracks at freshly generated per-track WAVs before Init loads audio.
-                io = tempProject.ImportOptions;
-                var trackAudioTargets = ApplyGeneratedTrackAudio(tempProject, io);
-                bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
-                // RequireRendererWaveformPanel switches to Song so a Collapsed HwndHost can BuildWindowCore.
-                panelTouched = RequireRendererWaveformPanel();
-                tempProject.InitAfterDeserialization(panelTouched, loadAudio: !deferTrackAudioLoad);
-                if (deferTrackAudioLoad)
-                    await LoadTrackAudioAsync(trackAudioTargets);
             }
             catch (FileImportException ex)
             {
@@ -827,7 +822,6 @@ namespace VisualMusic.ViewModels
             Project = tempProject;
             tempProject.DefaultFileName = Path.GetFileName(path);
             OnProjectLoaded?.Invoke(tempProject);
-            LoadStaticBackgroundIfUnkeyframed(tempProject);
 
             _undoItems.Clear();
             _undoItems.Add("", tempProject);
@@ -1145,31 +1139,31 @@ namespace VisualMusic.ViewModels
         }
 
         [RelayCommand]
-        async Task ImportMidi()
+        void ImportMidi()
         {
             var dlg = new ImportSongWindow(FileType.Midi) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
-            await DoImport(BuildOptions(FileType.Midi, dlg));
+            DoImport(BuildOptions(FileType.Midi, dlg));
         }
 
         [RelayCommand]
-        async Task ImportMod()
+        void ImportMod()
         {
             var dlg = new ImportSongWindow(FileType.Mod) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
-            await DoImport(BuildOptions(FileType.Mod, dlg));
+            DoImport(BuildOptions(FileType.Mod, dlg));
         }
 
         [RelayCommand]
-        async Task ImportHvl()
+        void ImportHvl()
         {
             var dlg = new ImportSongWindow(FileType.Hvl) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
-            await DoImport(BuildOptions(FileType.Hvl, dlg));
+            DoImport(BuildOptions(FileType.Hvl, dlg));
         }
 
         [RelayCommand]
-        async Task ImportSid()
+        void ImportSid()
         {
             var dlg = new ImportSongWindow(FileType.Sid) { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
@@ -1179,11 +1173,11 @@ namespace VisualMusic.ViewModels
             // SID files may contain multiple sub-songs — let the user pick.
             if (!SelectSidSubSong(options)) return;
 
-            await DoImport(options);
+            DoImport(options);
         }
 
         [RelayCommand]
-        async Task ImportAudio()
+        void ImportAudio()
         {
             var dlg = new ImportAudioWindow { Owner = Application.Current.MainWindow };
             if (dlg.ShowDialog() != true) return;
@@ -1193,7 +1187,7 @@ namespace VisualMusic.ViewModels
                 AudioPath = dlg.AudioFilePath,
                 EraseCurrent = dlg.EraseCurrent,
             };
-            await DoImport(options);
+            DoImport(options);
         }
 
         /// <summary>
@@ -1240,23 +1234,21 @@ namespace VisualMusic.ViewModels
         }
 
         /// <summary>
-        /// Runs a MOD/SID remuxer conversion <paramref name="convert"/> behind the shared progress
-        /// window so the user sees the conversion advance and can cancel it. Rethrows any job failure
-        /// (so callers can surface it). Returns true only when the conversion completed and produced a
-        /// song; false if it was cancelled or nothing was imported.
+        /// Runs <paramref name="job"/> behind the shared progress window. Rethrows any job failure
+        /// (so callers can surface it). Returns true only when the job completed and returned true;
+        /// false if it was cancelled or reported that nothing was loaded.
         /// </summary>
-        static bool RunConversionBehindProgress(
-            Func<IProgress<float>, CancellationToken, Task<bool>> convert)
+        static bool RunBehindProgress(string title, Func<IRenderProgressCallback, Task<bool>> job)
         {
-            bool imported = false;
+            bool ok = false;
             bool cancelled = false;
             Exception failure = null;
 
             var w = new Controls.ProgressWindow(
-                "Importing song",
+                title,
                 async cb =>
                 {
-                    try { imported = await convert(new Progress<float>(cb.UpdateProgress), cb.CancelToken); }
+                    try { ok = await job(cb); }
                     catch (OperationCanceledException) { cancelled = true; }
                     catch (Exception ex) { failure = ex; }
                     return null;
@@ -1265,11 +1257,18 @@ namespace VisualMusic.ViewModels
             w.ShowDialog();
 
             if (failure != null) throw failure;
-            return imported && !cancelled;
+            return ok && !cancelled;
         }
 
+        /// <summary>
+        /// Remuxer may return success after Cancel (MIDI already written). A pre-cancelled token
+        /// would abort Init immediately; only honor cancel that happens during texture loads.
+        /// </summary>
+        static CancellationToken CancelTokenForTextureLoad(CancellationToken ct)
+            => ct.IsCancellationRequested ? CancellationToken.None : ct;
+
         /// <summary>Shared post-dialog import logic.</summary>
-        async Task DoImport(ImportOptions options)
+        void DoImport(ImportOptions options)
         {
             if (options.EraseCurrent && !ConfirmSaveChangesBefore("importing a new song"))
                 return;
@@ -1321,26 +1320,31 @@ namespace VisualMusic.ViewModels
             }
             WarnIfMidiAudioWillBeDisabled(options);
 
+            WaveformPanel panelTouched = null;
             try
             {
-                if (options.NoteFileType is not (FileType.Midi or FileType.Audio))
+                if (!RunBehindProgress("Importing song", async cb =>
                 {
-                    // MOD/SID are converted by the external remuxer.exe, which reports percentage
-                    // progress on stdout. Run it behind the shared progress window so the user sees
-                    // the conversion advance and can cancel it. MIDI and audio-only imports take the
-                    // direct in-process path (no remuxer, no progress window).
-                    if (!RunConversionBehindProgress((p, ct) => Project.ImportSong(options, p, ct)))
-                    {
-                        // Cancelled / nothing imported — drop an unused shell created for this attempt.
-                        if (createdProjectForImport)
-                            AbandonCreatedImportProject();
-                        return;
-                    }
-                }
-                else if (!await Project.ImportSong(options))
+                    if (!await Project.ImportSong(options, new Progress<float>(cb.UpdateProgress), cb.CancelToken))
+                        return false;
+                    cb.SetBusy();
+                    var trackAudioTargets = ApplyGeneratedTrackAudio(Project, options);
+                    bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
+                    panelTouched = RequireRendererWaveformPanel();
+                    Project.InitAfterDeserialization(panelTouched, loadAudio: !deferTrackAudioLoad,
+                        ct: CancelTokenForTextureLoad(cb.CancelToken));
+                    if (deferTrackAudioLoad)
+                        await LoadTrackAudioAsync(trackAudioTargets);
+                    LoadStaticBackgroundIfUnkeyframed(Project);
+                    return true;
+                }))
                 {
-                    if (createdProjectForImport)
+                    // Cancelled / nothing imported. Drop an unused first-import shell; if notes
+                    // already landed (cancel during textures), keep them and re-sync UI.
+                    if (createdProjectForImport && ShouldAbandonCreatedImportProject(Project))
                         AbandonCreatedImportProject();
+                    else if (!ShouldAbandonCreatedImportProject(Project))
+                        RecoverAfterImportInitFailure(panelTouched);
                     return;
                 }
             }
@@ -1353,7 +1357,7 @@ namespace VisualMusic.ViewModels
                 if (createdProjectForImport && ShouldAbandonCreatedImportProject(Project))
                     AbandonCreatedImportProject();
                 else
-                    RecoverAfterImportInitFailure(panelTouched: null);
+                    RecoverAfterImportInitFailure(panelTouched);
                 MetroMessageBox.Show($"{ex.Message}\n{ex.FileName}", Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -1363,7 +1367,7 @@ namespace VisualMusic.ViewModels
                 if (createdProjectForImport && ShouldAbandonCreatedImportProject(Project))
                     AbandonCreatedImportProject();
                 else
-                    RecoverAfterImportInitFailure(panelTouched: null);
+                    RecoverAfterImportInitFailure(panelTouched);
                 MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -1372,38 +1376,9 @@ namespace VisualMusic.ViewModels
             if (options.EraseCurrent)
                 _currentProjectPath = "";
 
-            WaveformPanel panelTouched = null;
-            try
-            {
-                // Assign freshly generated per-track WAVs before InitAfterDeserialization so ownership
-                // prep and the single audio load see the correct paths (avoids a second load racing the
-                // first and disposing NAudio readers mid-Read).
-                var trackAudioTargets = ApplyGeneratedTrackAudio(Project, options);
-
-                // Skip Init's fire-and-forget loads when we have fresh track WAVs — we await one load below.
-                bool deferTrackAudioLoad = trackAudioTargets.Count > 0;
-                // RequireRendererWaveformPanel switches to Song so a Collapsed HwndHost can BuildWindowCore.
-                panelTouched = RequireRendererWaveformPanel();
-                Project.InitAfterDeserialization(panelTouched, loadAudio: !deferTrackAudioLoad);
-
-                TrackList.Rebuild(Project);
-
-                if (deferTrackAudioLoad)
-                    await LoadTrackAudioAsync(trackAudioTargets);
-            }
-            catch (Exception ex)
-            {
-                // ImportSong already mutated Project; keep waveforms + track list in sync with the
-                // new tracks, then surface the failure instead of crashing or leaving stale UI.
-                // (Do not abandon: notes/audio from ImportSong are already on Project.)
-                RecoverAfterImportInitFailure(panelTouched);
-                MetroMessageBox.Show("Import failed: " + ex.Message, Program.AppName,
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+            TrackList.Rebuild(Project);
 
             OnProjectLoaded?.Invoke(Project);
-            LoadStaticBackgroundIfUnkeyframed(Project);
             // The project object is reused across an erase-import, so the Song-props panel bindings
             // are stale (OnProjectChanged didn't fire). Push the reset values to the panel.
             SongProps.RefreshAll();
@@ -2161,7 +2136,7 @@ namespace VisualMusic.ViewModels
             // SID downloads may contain multiple sub-songs — let the user pick.
             if (!SelectSidSubSong(options)) return;
 
-            _ = DoImport(options);   // fire-and-forget on the UI thread (async void pattern)
+            DoImport(options);
         }
     }
 }
