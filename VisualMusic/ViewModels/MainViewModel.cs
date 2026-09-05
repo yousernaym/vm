@@ -96,6 +96,18 @@ namespace VisualMusic.ViewModels
         UndoItems _undoItems = new UndoItems();
         List<int> _lastSelectedIndices = new List<int>();
 
+        // ProgressWindow.ShowDialog runs a nested pump, so a second CefSharp download-complete
+        // callback can start another import (and a second Fluidsynth mixdown) while the first is
+        // still running. One in-flight open/import at a time.
+        bool _projectLoadBusy;
+
+        /// <summary>Test seam: true while Open/Import holds the reentrancy gate.</summary>
+        internal bool ProjectLoadBusy
+        {
+            get => _projectLoadBusy;
+            set => _projectLoadBusy = value;
+        }
+
         // Ctrl+wheel viewport-width edit: multiply width by this factor per notch, clamp to the
         // slider's range (ExpBase 2, log 0..10 → 1..1024 QN), and coalesce undo via a debounce timer.
         const double ViewWidthWheelFactor = 1.1;
@@ -714,6 +726,20 @@ namespace VisualMusic.ViewModels
         [RelayCommand]
         void OpenProject()
         {
+            if (_projectLoadBusy) return;
+            _projectLoadBusy = true;
+            try
+            {
+                OpenProjectCore();
+            }
+            finally
+            {
+                _projectLoadBusy = false;
+            }
+        }
+
+        void OpenProjectCore()
+        {
             var dlg = new OpenFileDialog
             {
                 Filter = $"Visual Music projects|*.{Project.DefaultFileExt}|All files|*.*",
@@ -1269,6 +1295,20 @@ namespace VisualMusic.ViewModels
 
         /// <summary>Shared post-dialog import logic.</summary>
         void DoImport(ImportOptions options)
+        {
+            if (_projectLoadBusy) return;
+            _projectLoadBusy = true;
+            try
+            {
+                DoImportCore(options);
+            }
+            finally
+            {
+                _projectLoadBusy = false;
+            }
+        }
+
+        void DoImportCore(ImportOptions options)
         {
             if (options.EraseCurrent && !ConfirmSaveChangesBefore("importing a new song"))
                 return;
@@ -2095,6 +2135,8 @@ namespace VisualMusic.ViewModels
         public void ImportBrowserDownload(string url, string downloadedFilePath,
             string suggestedFileName, FileType preferredFileType)
         {
+            if (_projectLoadBusy) return;
+
             string ext = suggestedFileName.Split('.').Last().ToLower();
 
             FileType? fileType = ImportFileFormats.FromExtension(ext, preferredFileType);

@@ -668,6 +668,25 @@ namespace VisualMusic.Tests
             }
         }
 
+        [Fact]
+        public void ImportBrowserDownload_ignored_while_project_load_busy()
+        {
+            // Nested ShowDialog from a first import pumps CefSharp download-complete callbacks.
+            // A second ImportBrowserDownload must not start another mixdown on the same Fluidsynth.
+            var vm = new MainViewModel();
+            vm.ProjectLoadBusy = true;
+            try
+            {
+                vm.ImportBrowserDownload("http://example.com/a.mid", @"C:\missing.mid", "a.mid", FileType.Midi);
+                Assert.Null(vm.Project);
+                Assert.True(vm.ProjectLoadBusy);
+            }
+            finally
+            {
+                vm.ProjectLoadBusy = false;
+            }
+        }
+
         static Project BuildProjectWithNoteOnTrack1()
         {
             var song = new Song
