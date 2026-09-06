@@ -693,7 +693,13 @@ namespace VisualMusic.ViewModels
 
         // ---- Screen commands ----
 
-        [RelayCommand] void ShowSong() => CurrentScreen = AppScreen.Song;
+        [RelayCommand]
+        void ShowSong()
+        {
+            CurrentScreen = AppScreen.Song;
+            RequestSongHostFocusIfOnSong();
+        }
+
         [RelayCommand] void ShowModBrowser() => CurrentScreen = AppScreen.ModBrowser;
         [RelayCommand] void ShowSidBrowser() => CurrentScreen = AppScreen.SidBrowser;
         [RelayCommand] void ShowMidiBrowser() => CurrentScreen = AppScreen.MidiBrowser;
@@ -735,6 +741,7 @@ namespace VisualMusic.ViewModels
             finally
             {
                 _projectLoadBusy = false;
+                RequestSongHostFocusIfOnSong();
             }
         }
 
@@ -1305,6 +1312,8 @@ namespace VisualMusic.ViewModels
             finally
             {
                 _projectLoadBusy = false;
+                // Progress/sub-song dialogs restore focus to the (now hidden) Chromium control.
+                RequestSongHostFocusIfOnSong();
             }
         }
 
@@ -1894,6 +1903,24 @@ namespace VisualMusic.ViewModels
         /// before Open/Import call <see cref="Project.InitAfterDeserialization"/>.
         /// </summary>
         public Action EnsureSongHostReady { get; set; }
+
+        /// <summary>
+        /// After the Song screen is shown (view switch, open, import), claim keyboard focus on the
+        /// MonoGame host. A Chromium browser otherwise keeps WPF/Win32 focus after being collapsed,
+        /// which swallows KeyBindings (menu mnemonics still work).
+        /// </summary>
+        public Action FocusSongHost { get; set; }
+
+        /// <summary>
+        /// Invokes <see cref="FocusSongHost"/> when the Song screen is showing. Open/Import switch
+        /// to Song while a modal progress dialog is up; call this after that dialog closes so WPF
+        /// does not restore keyboard focus to a hidden Chromium control.
+        /// </summary>
+        internal void RequestSongHostFocusIfOnSong()
+        {
+            if (CurrentScreen == AppScreen.Song)
+                FocusSongHost?.Invoke();
+        }
 
         /// <summary>
         /// Keeps <see cref="SongRenderer.Project"/> / <see cref="NoteStyle"/> / DrawHost aligned.

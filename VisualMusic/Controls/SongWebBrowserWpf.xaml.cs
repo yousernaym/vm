@@ -14,6 +14,8 @@ namespace VisualMusic.Controls
     {
         ChromiumWebBrowser _browser;
         string _initialUrl;
+        // Read from CEF's UI thread in OnSetFocus; written on the WPF dispatcher.
+        volatile bool _acceptBrowserFocus;
         readonly HashSet<string> _completedDownloadIds = new HashSet<string>();
         readonly string _downloadFolder = Path.Combine(
             Program.TempDir, "browser-downloads", Path.GetRandomFileName());
@@ -44,6 +46,7 @@ namespace VisualMusic.Controls
         {
             InitializeComponent();
             Loaded += OnLoaded;
+            IsVisibleChanged += OnIsVisibleChanged;
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
@@ -53,7 +56,8 @@ namespace VisualMusic.Controls
             _browser = new ChromiumWebBrowser(_initialUrl ?? "")
             {
                 KeyboardHandler = new WpfBrowserKeyboardHandler(() => GetProject?.Invoke()),
-                RequestHandler = new DownloadNavigationHandler()
+                RequestHandler = new DownloadNavigationHandler(),
+                FocusHandler = new VisibleOnlyFocusHandler(() => _acceptBrowserFocus)
             };
 
             var downloadHandler = new DownloadHandler
@@ -157,6 +161,53 @@ namespace VisualMusic.Controls
         {
             if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute))
                 _browser?.Load(url);
+        }
+
+        void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            _acceptBrowserFocus = IsVisible;
+            if (!IsVisible)
+                ReleaseKeyboardFocus();
+        }
+
+        /// <summary>
+        /// Drop Chromium's WPF/CEF keyboard focus. A collapsed browser otherwise keeps
+        /// Keyboard.FocusedElement and swallows window KeyBindings (mnemonics still work).
+        /// </summary>
+        public void ReleaseKeyboardFocus()
+        {
+            if (_browser != null)
+            {
+                try
+                {
+                    if (_browser.IsBrowserInitialized)
+                        _browser.GetBrowser()?.GetHost()?.SetFocus(false);
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Browser already tearing down.
+                }
+
+                if (_browser.IsKeyboardFocusWithin)
+                    Keyboard.ClearFocus();
+            }
+            else if (IsKeyboardFocusWithin)
+            {
+                Keyboard.ClearFocus();
+            }
+        }
+
+        sealed class VisibleOnlyFocusHandler : IFocusHandler
+        {
+            readonly Func<bool> _acceptFocus;
+            public VisibleOnlyFocusHandler(Func<bool> acceptFocus) => _acceptFocus = acceptFocus;
+
+            public void OnGotFocus(IWebBrowser chromiumWebBrowser, IBrowser browser) { }
+
+            public bool OnSetFocus(IWebBrowser chromiumWebBrowser, IBrowser browser, CefFocusSource source)
+                => !_acceptFocus();
+
+            public void OnTakeFocus(IWebBrowser chromiumWebBrowser, IBrowser browser, bool next) { }
         }
 
         sealed class DownloadNavigationHandler : CefSharp.Handler.RequestHandler

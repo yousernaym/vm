@@ -289,6 +289,17 @@ namespace VisualMusic
             }, DispatcherPriority.Input);
         }
 
+        /// <summary>
+        /// Take Win32 + WPF keyboard focus so window KeyBindings and camera keys reach this host.
+        /// Used after leaving a Chromium browser (collapsed HwndHost/OSR still keeps focus otherwise).
+        /// </summary>
+        public void ClaimFocus()
+        {
+            if (!IsVisible || _hwnd == IntPtr.Zero)
+                return;
+            ClaimKeyboardFocus();
+        }
+
         // Default TabIntoCore returns false, so Keyboard.Focus(this) would fail and WPF would
         // keep the previous control (e.g. line-width textbox).
         protected override bool TabIntoCore(TraversalRequest request)

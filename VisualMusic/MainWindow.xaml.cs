@@ -185,8 +185,23 @@ namespace VisualMusic
                 monoGameHost.UpdateLayout();
             };
 
+            // After import/open/F1, take focus from Chromium. Same Input priority as WPF dialog
+            // focus-restore, queued after ShowDialog returns so we run after that restore.
+            _vm.FocusSongHost = () =>
+                Dispatcher.BeginInvoke(TakeSongHostFocus, DispatcherPriority.Input);
+
             _vm.RenderVideo = (file, cb, opts) =>
                 monoGameHost.Renderer?.RenderVideo(file, cb, opts);
+        }
+
+        void TakeSongHostFocus()
+        {
+            if (_vm.CurrentScreen != AppScreen.Song)
+                return;
+            modBrowser.ReleaseKeyboardFocus();
+            sidBrowser.ReleaseKeyboardFocus();
+            midiBrowser.ReleaseKeyboardFocus();
+            monoGameHost.ClaimFocus();
         }
     }
 }
