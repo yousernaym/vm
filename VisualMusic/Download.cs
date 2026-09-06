@@ -60,6 +60,9 @@ namespace VisualMusic
                     HttpCompletionOption.ResponseHeadersRead,
                     cancelToken);
 
+                // Some hosts (FreeMIDI getter URLs) return 302 with the file in the body and
+                // Content-Disposition: attachment, while Location points at an HTML page that
+                // 500s outside a browser session. Save that body instead of following Location.
                 if (response.IsSuccessStatusCode || HasAttachmentDisposition(response))
                 {
                     // A cookie-gate interstitial (see MaxVerifyRetries) returns an HTML body instead of
@@ -97,23 +100,9 @@ namespace VisualMusic
 
         internal static string GetDownloadFileName(string contentDisposition, string url)
         {
-            if (!string.IsNullOrEmpty(contentDisposition))
-            {
-                try
-                {
-                    string name = null;
-                    if (ContentDispositionHeaderValue.TryParse(contentDisposition, out var parsed))
-                        name = parsed.FileNameStar ?? parsed.FileName;
-
-                    name ??= new System.Net.Mime.ContentDisposition(contentDisposition).FileName;
-                    if (!string.IsNullOrWhiteSpace(name))
-                        return Path.GetFileName(name.Trim('"'));
-                }
-                catch
-                {
-                    // Malformed header - fall back to the URL.
-                }
-            }
+            string name = TryDispositionFileName(contentDisposition);
+            if (!string.IsNullOrWhiteSpace(name))
+                return Path.GetFileName(name);
 
             string urlName = Path.GetFileName(new Uri(url).LocalPath);
             return string.IsNullOrWhiteSpace(urlName) ? Path.GetRandomFileName() : urlName;
@@ -134,28 +123,105 @@ namespace VisualMusic
             return client;
         }
 
-        static string GetDownloadFileName(HttpResponseMessage response, string url)
-        {
-            string contentDisposition = response.Content.Headers.ContentDisposition?.ToString();
-            if (string.IsNullOrEmpty(contentDisposition) &&
-                response.Headers.TryGetValues("Content-Disposition", out var values))
-            {
-                contentDisposition = values.FirstOrDefault();
-            }
-
-            return GetDownloadFileName(contentDisposition, url);
-        }
+        // HttpClient's typed ContentDisposition parser rejects unquoted filenames with
+        // parentheses (FreeMIDI: attachment; filename=ThePenis(Eek!).mid), leaving the
+        // typed property null. The raw header is still on Content.Headers.
+        internal static string GetDownloadFileName(HttpResponseMessage response, string url)
+            => GetDownloadFileName(GetRawContentDisposition(response), url);
 
         static bool HasAttachmentDisposition(HttpResponseMessage response)
         {
-            string contentDisposition = response.Content.Headers.ContentDisposition?.ToString();
-            if (string.IsNullOrEmpty(contentDisposition) &&
-                response.Headers.TryGetValues("Content-Disposition", out var values))
+            string contentDisposition = GetRawContentDisposition(response);
+            return contentDisposition?.IndexOf("attachment", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        static string GetRawContentDisposition(HttpResponseMessage response)
+        {
+            if (response.Content.Headers.TryGetValues("Content-Disposition", out var contentValues))
             {
-                contentDisposition = values.FirstOrDefault();
+                string raw = contentValues.FirstOrDefault();
+                if (!string.IsNullOrEmpty(raw))
+                    return raw;
             }
 
-            return contentDisposition?.IndexOf("attachment", StringComparison.OrdinalIgnoreCase) >= 0;
+            if (response.Headers.TryGetValues("Content-Disposition", out var values))
+            {
+                string raw = values.FirstOrDefault();
+                if (!string.IsNullOrEmpty(raw))
+                    return raw;
+            }
+
+            return response.Content.Headers.ContentDisposition?.ToString();
+        }
+
+        static string TryDispositionFileName(string contentDisposition)
+        {
+            if (string.IsNullOrEmpty(contentDisposition))
+                return null;
+
+            try
+            {
+                if (ContentDispositionHeaderValue.TryParse(contentDisposition, out var parsed))
+                {
+                    string name = parsed.FileNameStar ?? parsed.FileName;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        return name.Trim('"');
+                }
+            }
+            catch { /* use lenient parse */ }
+
+            try
+            {
+                string name = new System.Net.Mime.ContentDisposition(contentDisposition).FileName;
+                if (!string.IsNullOrWhiteSpace(name))
+                    return name;
+            }
+            catch { /* use lenient parse */ }
+
+            return TryLenientDispositionFileName(contentDisposition);
+        }
+
+        /// <summary>
+        /// RFC parsers reject unquoted filename tokens with parentheses/! (legal on disk,
+        /// common on FreeMIDI). Split parameters and take filename* then filename.
+        /// </summary>
+        static string TryLenientDispositionFileName(string header)
+        {
+            string star = FindDispositionParam(header, "filename*");
+            if (!string.IsNullOrWhiteSpace(star))
+            {
+                int sep = star.IndexOf("''", StringComparison.Ordinal);
+                string value = sep >= 0 ? star.Substring(sep + 2) : star;
+                try { value = Uri.UnescapeDataString(value); }
+                catch { /* keep the raw value */ }
+                if (!string.IsNullOrWhiteSpace(value))
+                    return value.Trim().Trim('"');
+            }
+
+            string name = FindDispositionParam(header, "filename");
+            return string.IsNullOrWhiteSpace(name) ? null : name.Trim().Trim('"');
+        }
+
+        static string FindDispositionParam(string header, string name)
+        {
+            foreach (string rawPart in header.Split(';'))
+            {
+                string part = rawPart.Trim();
+                int eq = part.IndexOf('=');
+                if (eq <= 0)
+                    continue;
+                string key = part.Substring(0, eq).Trim();
+                if (!key.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    continue;
+                string value = part.Substring(eq + 1).Trim();
+                if (value.Length >= 2 && value[0] == '"')
+                {
+                    int end = value.IndexOf('"', 1);
+                    return end > 0 ? value.Substring(1, end - 1) : value.Trim('"');
+                }
+                return value;
+            }
+            return null;
         }
 
         static bool IsHtmlResponse(HttpResponseMessage response)
